@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Genode\Fx\Fade.cpp" />
+    <ClCompile Include="src\Genode\Fx\Move.cpp" />
+    <ClCompile Include="src\Genode\Fx\Rotate.cpp" />
+    <ClCompile Include="src\Genode\Fx\Scale.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Cursor.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Circle.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Polygon.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Rectangle.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shape.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Sprite.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Text.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
+    <ClCompile Include="src\Genode\IO\Archive.cpp" />
+    <ClCompile Include="src\Genode\IO\FileSystem.cpp" />
+    <ClCompile Include="src\Genode\IO\ResourceContainer.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\Node.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\Scene.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\SceneDirector.cpp" />
+    <ClCompile Include="src\Genode\System\Application.cpp" />
+    <ClCompile Include="src\Genode\System\Module.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Action.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Delay.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Sequence.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Task.cpp" />
+    <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\O2Jam\Scenes\SplashScene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Genode.hpp" />
+    <ClInclude Include="include\Genode\Entities.hpp" />
+    <ClInclude Include="include\Genode\Entities\Colorable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Inputable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Renderable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Updatable.hpp" />
+    <ClInclude Include="include\Genode\Fx.hpp" />
+    <ClInclude Include="include\Genode\Fx\Fade.hpp" />
+    <ClInclude Include="include\Genode\Fx\Move.hpp" />
+    <ClInclude Include="include\Genode\Fx\Rotate.hpp" />
+    <ClInclude Include="include\Genode\Fx\Scale.hpp" />
+    <ClInclude Include="include\Genode\Graphics.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Cursor.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Circle.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Polygon.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Rectangle.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shape.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Sprite.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Text.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Transformable.hpp" />
+    <ClInclude Include="include\Genode\IO.hpp" />
+    <ClInclude Include="include\Genode\IO\Archive.hpp" />
+    <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceContainer.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\Node.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\Scene.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\SceneDirector.hpp" />
+    <ClInclude Include="include\Genode\System.hpp" />
+    <ClInclude Include="include\Genode\System\Application.hpp" />
+    <ClInclude Include="include\Genode\System\Module.hpp" />
+    <ClInclude Include="include\Genode\Tasks.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Action.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Delay.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Sequence.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Task.hpp" />
+    <ClInclude Include="include\Genode\System\Primitives.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\Genode\IO\ResourceContainer.inl" />
+    <None Include="include\Genode\SceneGraph\Node.inl" />
+    <None Include="include\Genode\System\Application.inl" />
+    <None Include="include\Genode\Tasks\Sequence.inl" />
+    <None Include="include\Genode\Tasks\TaskContainer.hpp" />
+    <None Include="include\Genode\Tasks\TaskContainer.inl" />
+    <None Include="include\Genode\Tasks\Timeline.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{6F1EAC1B-A51C-42E8-BBDB-BB81207F0214}</ProjectGuid>
+    <RootNamespace>OTwo</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\windows\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\build\windows\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\windows\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\build\windows\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>sfml-main-d.lib;sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;ogg.lib;vorbis.lib;vorbisenc.lib;gdi32.lib;opengl32.lib;vorbisfile.lib;flac.lib;winmm.lib;freetyped.lib;libpng16d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>SFML_STATIC;WIN32;_RELEASE;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>.\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>sfml-main.lib;sfml-audio-s.lib;sfml-graphics-s.lib;sfml-system-s.lib;sfml-window-s.lib;openal32.lib;ogg.lib;vorbis.lib;vorbisenc.lib;gdi32.lib;opengl32.lib;vorbisfile.lib;flac.lib;winmm.lib;freetype.lib;libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

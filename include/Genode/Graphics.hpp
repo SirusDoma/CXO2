@@ -1,0 +1,13 @@
+#ifndef GENODE_GRAPHICS_HPP
+#define GENODE_GRAPHICS_HPP
+
+#include <Genode/Graphics/Transformable.hpp>
+#include <Genode/Graphics/Sprite.hpp>
+#include <Genode/Graphics/Text.hpp>
+#include <Genode/Graphics/Shape.hpp>
+#include <Genode/Graphics/Shapes/Circle.hpp>
+#include <Genode/Graphics/Shapes/Polygon.hpp>
+#include <Genode/Graphics/Shapes/Rectangle.hpp>
+#include <Genode/Graphics/Cursor.hpp>
+
+#endif

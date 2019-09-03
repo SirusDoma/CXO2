@@ -1,0 +1,33 @@
+#include <Genode/IO/Archive.hpp>
+#include <Genode/IO/FileSystem.hpp>
+
+namespace Gx
+{
+    Archive::Archive() :
+        m_filename()
+    {
+    }
+
+    Archive::~Archive()
+    {
+    }
+
+    bool Archive::Open(const std::string& fileName)
+    {
+        if (!FileSystem::Instance()->Exists(fileName))
+            return false;
+
+        m_filename = fileName;
+        return true;
+    }
+
+    const std::string& Archive::GetFileName() const
+    {
+        return m_filename;
+    }
+
+    const std::string& Archive::GetName() const
+    {
+        return FileSystem::Instance()->GetFileName(m_filename);
+    }
+}
