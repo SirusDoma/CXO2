@@ -15,7 +15,7 @@ bool OpiArchive::Open(const std::string& fileName)
     if (!Archive::Open(fileName))
         return false;
 
-    m_fileStream.open(fileName);
+    return m_fileStream.open(fileName);
 }
 
 bool OpiArchive::Contains(const std::string& name)
