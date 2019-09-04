@@ -13,10 +13,6 @@ file(GLOB_RECURSE HEADERS include/*.hpp)
 include_directories(include)
 include_directories(src)
 
-# Executable
-set(EXECUTABLE_NAME "OTwo")
-add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
-
 # Specific OS Directories and Flags
 if(WIN32)
     # Windows Compiler Flags
@@ -25,17 +21,14 @@ if(WIN32)
     set(SFML_STATIC_LIBRARIES TRUE)
 
     # Output Directory
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows")
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-    # Set output and module directory for windows
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc")
-
     # Set dependencies libs path
+    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc")
     set(FreeType_LIB ${MODULES_DIR}/freetype.lib)
     set(OpenAL_LIB ${MODULES_DIR}/openal32.lib)
     set(Ogg_LIB ${MODULES_DIR}/ogg.lib)
@@ -44,18 +37,15 @@ if(WIN32)
     set(VorbisEnc_LIB ${MODULES_DIR}/vorbisenc.lib)
     set(VorbisFile_LIB ${MODULES_DIR}/vorbisfile.lib)
 elseif(APPLE)
-    # Set output and module directory for osx
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_BUILD_TYPE}")
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
-
     # Output Directory
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx")
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Set dependencies libs path
+    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
     set(FreeType_LIB ${MODULES_DIR}/Framework/freetype.framework)
     set(OpenAL_LIB ${MODULES_DIR}/Framework/openal32.framework)
     set(Ogg_LIB ${MODULES_DIR}/Framework/ogg.framework)
@@ -71,17 +61,14 @@ else()
     set(CMAKE_CXX_FLAGS "-lstdc++fs -std=c++17")
 
     # Output Directory
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux")
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-    # Set output and module directory for unix
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-mingw")
-
     # Set dependencies libs path
+    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-mingw")
     set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
     set(OpenAL_LIB ${MODULES_DIR}/libopenal32.a)
     set(Ogg_LIB ${MODULES_DIR}/libogg.a)
@@ -89,8 +76,14 @@ else()
     set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
     set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
     set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
+endif()
 
-    # FileSystem library
+# Executable
+set(EXECUTABLE_NAME "OTwo")
+add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
+
+# FileSystem library
+if(UNIX)
     target_link_libraries(${EXECUTABLE_NAME} stdc++fs) 
 endif()
 
