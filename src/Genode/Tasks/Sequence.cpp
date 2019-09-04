@@ -3,8 +3,9 @@
 
 namespace Gx
 {
-    Sequence::Sequence() 
-        : Sequence::Sequence({})
+    Sequence::Sequence() :
+        m_iterator(),
+        m_tasks()
     {
     }
 

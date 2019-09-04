@@ -12,6 +12,7 @@ if(WIN32)
     # Windows Compiler Flags
     set(CMAKE_CXX_FLAGS_RELEASE "/MT")
     set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    set(SFML_STATIC_LIBRARIES TRUE)
 
     # Set output and module directory for windows
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
@@ -41,9 +42,9 @@ elseif(APPLE)
 else()
     # Compiler Flags
     set(CMAKE_C_COMPILER gcc)
-    set(CMAKE_C_FLAGS -m32)
+    set(CMAKE_C_FLAGS "-m32 -lstdc++fs")
     set(CMAKE_CXX_COMPILER g++)
-    set(CMAKE_CXX_FLAGS -m32)
+    set(CMAKE_CXX_FLAGS "-m32 -lstdc++fs")
 
     # Set output and module directory for unix
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
@@ -76,13 +77,12 @@ include_directories(src)
 set(EXECUTABLE_NAME "OTwo")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
-# SFML Flags (TODO: Should have no dependencies with ENV)
-set(SFML_STATIC_LIBRARIES TRUE)
+# SFML Flags
 set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
 set(SFML_INCLUDE_DIR "${SFML_ROOT}/include ")
 
 # Link SFML
-find_package(SFML 2.5 COMPONENTS main audio graphics system window REQUIRED)
+find_package(SFML 2.5 COMPONENTS audio graphics system window REQUIRED)
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
     target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)

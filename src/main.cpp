@@ -1,17 +1,9 @@
-/*
-
-    TODO:
-    1. Write cursor class
-    2. Write module class
-    3. Write IO casses
-
- */
 #include <stdio.h>
 #include <iostream>
 
-#include <SFML\Graphics.hpp>
-#include <SFML\Window.hpp>
-#include <SFML\OpenGL.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/OpenGL.hpp>
 
 #include <Genode.hpp>
 

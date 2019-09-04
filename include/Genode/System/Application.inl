@@ -42,7 +42,7 @@ namespace Gx
             T* target = dynamic_cast<T*>(m_modules.at(i));
             if (target)
             {
-                m_modules.erase(this->components.begin() + i);
+                m_modules.erase(m_modules.begin() + i);
 
                 delete target;
                 return true;

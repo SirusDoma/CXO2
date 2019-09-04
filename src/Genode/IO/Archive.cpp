@@ -21,12 +21,12 @@ namespace Gx
         return true;
     }
 
-    const std::string& Archive::GetFileName() const
+    std::string Archive::GetFileName() const
     {
         return m_filename;
     }
 
-    const std::string& Archive::GetName() const
+    std::string Archive::GetName() const
     {
         return FileSystem::Instance()->GetFileName(m_filename);
     }
