@@ -11,10 +11,10 @@ namespace Gx
     public:
         friend class ResourceContainer;
 
+        virtual bool Open(const std::string& fileName);
         virtual bool Contains(const std::string& name) = 0;
         virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
-
-        bool Open(const std::string& fileName);
+        
         const std::string& GetFileName() const;
         const std::string& GetName() const;
 
