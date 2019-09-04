@@ -6,13 +6,30 @@ project(O2Jam)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Sources
+file(GLOB_RECURSE SRCS src/*.cpp)
+file(GLOB_RECURSE HEADERS src/*.hpp)
+file(GLOB_RECURSE HEADERS include/*.hpp)
+include_directories(include)
+include_directories(src)
+
+# Executable
+set(EXECUTABLE_NAME "OTwo")
+add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
+
 # Specific OS Directories and Flags
-set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin")
 if(WIN32)
     # Windows Compiler Flags
     set(CMAKE_CXX_FLAGS_RELEASE "/MT")
     set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
     set(SFML_STATIC_LIBRARIES TRUE)
+
+    # Output Directory
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows")
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Set output and module directory for windows
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
@@ -31,6 +48,13 @@ elseif(APPLE)
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_BUILD_TYPE}")
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
 
+    # Output Directory
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx")
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
     # Set dependencies libs path
     set(FreeType_LIB ${MODULES_DIR}/Framework/freetype.framework)
     set(OpenAL_LIB ${MODULES_DIR}/Framework/openal32.framework)
@@ -41,10 +65,17 @@ elseif(APPLE)
     set(VorbisFile_LIB ${MODULES_DIR}/Framework/vorbisfile.framework)
 else()
     # Compiler Flags
-    set(CMAKE_C_COMPILER gcc)
-    set(CMAKE_C_FLAGS "-m32 -lstdc++fs")
-    set(CMAKE_CXX_COMPILER g++)
-    set(CMAKE_CXX_FLAGS "-m32 -lstdc++fs")
+    set(CMAKE_C_COMPILER gcc-8)
+    set(CMAKE_C_FLAGS "-lstdc++fs -std=c++17")
+    set(CMAKE_CXX_COMPILER g++-8)
+    set(CMAKE_CXX_FLAGS "-lstdc++fs -std=c++17")
+
+    # Output Directory
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux")
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Set output and module directory for unix
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
@@ -58,28 +89,14 @@ else()
     set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
     set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
     set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
+
+    # FileSystem library
+    target_link_libraries(${EXECUTABLE_NAME} stdc++fs) 
 endif()
-
-# Output Directory
-file(MAKE_DIRECTORY ${OUTPUT_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-
-# Sources
-file(GLOB_RECURSE SRCS src/*.cpp)
-file(GLOB_RECURSE HEADERS src/*.hpp)
-file(GLOB_RECURSE HEADERS include/*.hpp)
-include_directories(include)
-include_directories(src)
-
-# Executable
-set(EXECUTABLE_NAME "OTwo")
-add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
 # SFML Flags
 set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
-set(SFML_INCLUDE_DIR "${SFML_ROOT}/include ")
+set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
 
 # Link SFML
 find_package(SFML 2.5 COMPONENTS audio graphics system window REQUIRED)

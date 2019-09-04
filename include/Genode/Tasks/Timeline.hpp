@@ -11,7 +11,7 @@ namespace Gx
     public:
         struct KeyFrame
         {
-            Task* Task;
+            Task*  KeyTask;
             double Offset;
 
             KeyFrame(double offset, Gx::Task* task);

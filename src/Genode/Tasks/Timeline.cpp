@@ -21,14 +21,14 @@ namespace Gx
 
     Timeline::KeyFrame::KeyFrame(double offset, Gx::Task* task) :
         Offset(offset),
-        Task(task)
+        KeyTask(task)
     {
     }
 
     Timeline::KeyFrame::~KeyFrame()
     {
-        if (Task)
-            delete Task;
+        if (KeyTask)
+            delete KeyTask;
     }
     
     Timeline* Timeline::Add(KeyFrame* frame)
@@ -69,11 +69,11 @@ namespace Gx
         double elapsed = GetElapsed();
         for (auto frame : m_frames)
         {
-            if (frame->Task && frame->Offset <= elapsed)
+            if (frame->KeyTask && frame->Offset <= elapsed)
             {
-                state = frame->Task->GetState();
+                state = frame->KeyTask->GetState();
                 if (state == TaskState::Initial || state == TaskState::Running)
-                    frame->Task->Update(delta);
+                    frame->KeyTask->Update(delta);
                 else
                     completed++;
             }
@@ -88,8 +88,8 @@ namespace Gx
         Task::Reset();
         for (auto frame : m_frames)
         {
-            if (frame->Task)
-                frame->Task->Reset();
+            if (frame->KeyTask)
+                frame->KeyTask->Reset();
         }
     }
 }
