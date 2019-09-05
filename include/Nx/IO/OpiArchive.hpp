@@ -6,6 +6,13 @@
 
 #include <unordered_map>
 
+struct OpiFileEntry : Gx::Archive::FileEntry
+{
+	Gx::Uint32  Offset = 0;
+
+
+};
+
 class OpiArchive : public Gx::Archive
 {
 public:
@@ -23,20 +30,20 @@ public:
 
     virtual bool Open(const std::string& fileName);
     virtual bool Contains(const std::string& name) const;
+
     virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
+	virtual std::vector<FileEntry> GetFileEntries();
 
 private:
     const unsigned int ITEM_HEADER_SIZE = 152;
-    struct OpiItemHeader : Gx::Archive::ItemHeader
-    {
-        Gx::Uint32  Offset = 0;
-    };
 
     Gx::Uint64 Read(void* data, Gx::Uint64 size) const;
+	virtual Gx::Int64 GetFile(const Archive::FileEntry* entry, Gx::Uint8** data) const;
  
     Signature m_signature;
-    std::unordered_map<std::string, OpiItemHeader> m_headers;
+	Gx::Uint32 m_count;
 
+	mutable std::unordered_map<std::string, OpiFileEntry> m_headers;
     mutable sf::FileInputStream m_fileStream;
 };
 

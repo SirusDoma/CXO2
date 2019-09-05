@@ -12,6 +12,11 @@ namespace Gx
     {
     }
 
+	Int64 Archive::FileEntry::GetFile(Uint8** data) const
+	{
+		return Parent->GetFile(this, data);
+	}
+
     bool Archive::Open(const std::string& fileName)
     {
         if (!FileSystem::Instance()->Exists(fileName))
@@ -24,10 +29,5 @@ namespace Gx
     std::string Archive::GetFileName() const
     {
         return m_filename;
-    }
-
-    std::string Archive::GetName() const
-    {
-        return FileSystem::Instance()->GetFileName(m_filename);
     }
 }
