@@ -10,9 +10,14 @@ namespace Gx
     {
     public:
         friend class ResourceContainer;
+        struct ItemHeader
+        {
+            std::string Name;
+            Gx::Uint32  Size;
+        };
 
         virtual bool Open(const std::string& fileName);
-        virtual bool Contains(const std::string& name) = 0;
+        virtual bool Contains(const std::string& name) const = 0;
         virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
         
         std::string GetFileName() const;

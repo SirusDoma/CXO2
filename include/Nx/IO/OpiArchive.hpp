@@ -1,7 +1,7 @@
 #ifndef OPI_ARCHIVE_HPP
 #define OPI_ARCHIVE_HPP
 
-#include <Genode/IO/Archive.hpp>
+#include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
 #include <unordered_map>
@@ -22,24 +22,22 @@ public:
     Signature GetSignature() const;
 
     virtual bool Open(const std::string& fileName);
-    virtual bool Contains(const std::string& name);
+    virtual bool Contains(const std::string& name) const;
     virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
 
 private:
     const unsigned int ITEM_HEADER_SIZE = 152;
-    struct ItemHeader
+    struct OpiItemHeader : Gx::Archive::ItemHeader
     {
-        std::string Identifier;
         Gx::Uint32  Offset = 0;
-        Gx::Uint32  Size   = 0;
     };
 
-    bool Read(void* data, Gx::Uint64 size);
-
-    sf::FileInputStream m_fileStream;
-    std::unordered_map<std::string, ItemHeader> m_headers;
-
+    Gx::Uint64 Read(void* data, Gx::Uint64 size) const;
+ 
     Signature m_signature;
+    std::unordered_map<std::string, OpiItemHeader> m_headers;
+
+    mutable sf::FileInputStream m_fileStream;
 };
 
 #endif

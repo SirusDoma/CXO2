@@ -20,10 +20,11 @@ OpiArchive::Signature OpiArchive::GetSignature() const
 
 bool OpiArchive::Open(const std::string& fileName)
 {
-    if (!Archive::Open(fileName))
+    std::string fullName = Gx::FileSystem::Instance()->GetFullName(fileName);
+    if (!Archive::Open(fullName))
         return false;
 
-    m_fileStream.open(fileName);
+    m_fileStream.open(fullName);
 
     // Fetch meta data
     m_fileStream.seek(0);
@@ -44,7 +45,7 @@ bool OpiArchive::Open(const std::string& fileName)
     // Traverse the header
     for (unsigned int i = 0; i < count; i++)
     {
-        ItemHeader header;
+        OpiItemHeader header;
         Gx::Uint32 sign;
         if (!Read(&sign, sizeof(sign)) && sign != 01)
             continue;
@@ -65,17 +66,17 @@ bool OpiArchive::Open(const std::string& fileName)
         if (!Read(&size2, sizeof(size2)))
             continue;
 
-        header.Identifier = std::string(bytes);
-        header.Offset     = ref;
-        header.Size       = size1 > size2 ? size1 : size2;
+        header.Name   = std::string(bytes);
+        header.Offset = ref;
+        header.Size   = size1 > size2 ? size1 : size2;
 
-        m_headers[header.Identifier] = header;
+        m_headers[header.Name] = header;
     }
 
     return true;
 }
 
-bool OpiArchive::Contains(const std::string& name)
+bool OpiArchive::Contains(const std::string& name) const
 {
     auto iterator = m_headers.find(name);
     return iterator != m_headers.end();
@@ -83,10 +84,19 @@ bool OpiArchive::Contains(const std::string& name)
 
 Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
 {
-    return Gx::Int64();
+    auto iterator = m_headers.find(name);
+    if (iterator == m_headers.end())
+        return -1;
+
+    const OpiItemHeader* header = &iterator->second;
+    if (m_fileStream.seek(header->Offset) < 0)
+        return -1;
+
+    *data = new Gx::Uint8[header->Size];
+    return m_fileStream.read((char*) & (*data)[0], header->Size);
 }
 
-bool OpiArchive::Read(void* data, Gx::Uint64 size)
+Gx::Uint64 OpiArchive::Read(void* data, Gx::Uint64 size) const
 {
     auto read = m_fileStream.read(data, size);
     return read == size;
