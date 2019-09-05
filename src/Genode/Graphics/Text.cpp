@@ -88,7 +88,7 @@ namespace Gx
     {
     }
 
-    Text::Text(const std::string& string, FontPtr font, unsigned int characterSize) :
+    Text::Text(const std::string& string, FontHandle font, unsigned int characterSize) :
         m_string(string),
         m_font(font),
         m_characterSize(characterSize),
@@ -133,7 +133,7 @@ namespace Gx
         }
     }
 
-    void Text::SetFont(FontPtr font)
+    void Text::SetFont(FontHandle font)
     {
         if (m_font != font)
         {

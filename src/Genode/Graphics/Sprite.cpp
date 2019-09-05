@@ -52,14 +52,14 @@ namespace Gx
         SetTexCoords(rectangle);
     }
 
-    Sprite::Sprite(TexturePtr texture) :
+    Sprite::Sprite(TextureHandle texture) :
         m_texture(NULL),
         m_texcoords()
     {
         SetTexture(texture);
     }
 
-    Sprite::Sprite(TexturePtr texture, const sf::IntRect& rectangle) :
+    Sprite::Sprite(TextureHandle texture, const sf::IntRect& rectangle) :
         m_texture(NULL),
         m_texcoords()
     {
@@ -77,7 +77,7 @@ namespace Gx
         m_texture = std::make_shared<sf::Texture>(texture);
     }
 
-    void Sprite::SetTexture(TexturePtr texture, bool resetRect)
+    void Sprite::SetTexture(TextureHandle texture, bool resetRect)
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
         if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))

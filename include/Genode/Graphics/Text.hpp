@@ -59,7 +59,7 @@ namespace
 
 namespace Gx
 {
-    typedef std::shared_ptr<const sf::Font> FontPtr;
+    typedef std::shared_ptr<const sf::Font> FontHandle;
 
     class Text : public Node, public Renderable, public Updatable, public Inputable, public Colorable
     {
@@ -74,11 +74,11 @@ namespace Gx
         };
 
         Text();
-        Text(const std::string& string, FontPtr font, unsigned int characterSize = 30);
+        Text(const std::string& string, FontHandle font, unsigned int characterSize = 30);
         Text(const std::string& string, const sf::Font& font, unsigned int characterSize = 30);
 
         void SetString(const std::string& string);
-        void SetFont(FontPtr font);
+        void SetFont(FontHandle font);
         void SetFont(const sf::Font& font);
 
         void SetCharacterSize(unsigned int size);
@@ -116,7 +116,7 @@ namespace Gx
         void EnsureGeometryUpdate() const;
 
         std::string             m_string;
-        FontPtr                 m_font;
+        FontHandle                 m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;
