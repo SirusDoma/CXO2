@@ -44,6 +44,7 @@ namespace Gx
         template<class T>
         T* GetArchive(const std::string& filename);
 
+		// TODO: change all of these func parameters to match with CacheTexture / CacheFont function
         template<class T>
         std::shared_ptr<T> Load(const std::string& path);
 

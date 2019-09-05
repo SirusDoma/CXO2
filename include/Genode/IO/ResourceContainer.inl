@@ -1,4 +1,3 @@
-#include "ResourceContainer.hpp"
 namespace Gx
 {
     template<class T>
