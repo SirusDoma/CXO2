@@ -12,20 +12,16 @@ namespace Gx
 
     ResourceContainer::~ResourceContainer()
     {
-        for (auto item : m_resources)
+        for (auto archive : m_archives)
         {
-            auto deleter = [](auto resource) {
-                // Do not delete font, it's managed by internal font ref counters
-                if (typeid(resource) != typeid(sf::Font*))
-                    delete resource;
-            };
-
-            std::visit(deleter, item.second);
+            if (archive.second)
+                delete archive.second;
         }
 
-        // Clearing cache will let weakptr died
+        // Clearing cache will kill weakptr and sharedptr will be killed on the last instance
         m_caches.clear();
         m_resources.clear();
+        m_archives.clear();
     }
 
     ResourceContainer* ResourceContainer::Instance()
@@ -58,10 +54,10 @@ namespace Gx
         return false;
     }
 
-    sf::Texture* ResourceContainer::LoadTexture(const std::string& identifier, Uint8* data, Int64 size)
+    TexturePtr ResourceContainer::LoadTexture(const std::string& identifier, Uint8* data, Int64 size)
     {
-        m_resources[identifier] = new sf::Texture();
-        auto texture = std::get<sf::Texture*>(m_resources[identifier]);
+        m_resources[identifier] = std::make_shared<sf::Texture>();
+        auto texture = std::get<std::shared_ptr<sf::Texture>>(m_resources[identifier]);
 
         if (!texture->loadFromMemory(data, static_cast<size_t>(size)))
         {
@@ -73,10 +69,10 @@ namespace Gx
         return texture;
     }
 
-    sf::Font* ResourceContainer::LoadFont(const std::string& identifier, Uint8* data, Int64 size)
+    std::shared_ptr<sf::Font> ResourceContainer::LoadFont(const std::string& identifier, Uint8* data, Int64 size)
     {
-        m_resources[identifier] = new sf::Font();
-        auto font = std::get<sf::Font*>(m_resources[identifier]);
+        m_resources[identifier] = std::make_shared<sf::Font>();
+        auto font = std::get<std::shared_ptr<sf::Font>>(m_resources[identifier]);
 
         if (!font->loadFromMemory(data, static_cast<size_t>(size)))
         {
@@ -87,36 +83,28 @@ namespace Gx
         return font;
     }
 
-    TextureCache ResourceContainer::CacheTexture(const std::string& identifier, Uint8* data, Int64 size)
+    std::shared_ptr<sf::Texture> ResourceContainer::CacheTexture(const std::string& identifier, Uint8* data, Int64 size)
     {
-        auto deleter = [=](sf::Texture* cache) {
-            Uncache(identifier);
-            delete cache;
-        };
-
+        auto deleter = [=](sf::Texture* cache) { Uncache(identifier); delete cache; };
         auto texture = std::shared_ptr<sf::Texture>(new sf::Texture(), deleter);
-        m_caches[identifier] = texture;
 
+        m_caches[identifier] = texture;
         if (!texture->loadFromMemory(data, static_cast<size_t>(size)))
         {
             m_caches.erase(m_caches.find(identifier));
             return nullptr;
         }
 
-        texture.get()->setSmooth(true);
+        texture->setSmooth(true);
         return texture;
     }
 
-    FontCache ResourceContainer::CacheFont(const std::string& identifier, Uint8* data, Int64 size)
+    std::shared_ptr<sf::Font> ResourceContainer::CacheFont(const std::string& identifier, Uint8* data, Int64 size)
     {
-        auto deleter = [=](sf::Font* cache) {
-            Uncache(identifier);
-            delete cache;
-        };
-
+        auto deleter = [=](sf::Font* cache) { Uncache(identifier); delete cache; };
         auto font = std::shared_ptr<sf::Font>(new sf::Font(), deleter);
+        
         m_caches[identifier] = font;
-
         if (!font->loadFromMemory(data, static_cast<size_t>(size)))
         {
             m_caches.erase(m_caches.find(identifier));

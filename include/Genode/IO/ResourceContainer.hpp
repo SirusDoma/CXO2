@@ -24,11 +24,11 @@ namespace Gx
         std::weak_ptr<sf::Font>> ResourceCache;
 
     typedef std::variant<
-        sf::Texture*,
-        sf::Font*> Resource;
+        std::shared_ptr<sf::Texture>,
+        std::shared_ptr<sf::Font>> Resource;
 
-    typedef std::shared_ptr<sf::Texture> TextureCache;
-    typedef std::shared_ptr<sf::Font> FontCache;
+    typedef std::shared_ptr<sf::Texture> TexturePtr;
+    typedef std::shared_ptr<sf::Font> FontPtr;
 
     class ResourceContainer : public Module
     {
@@ -42,19 +42,22 @@ namespace Gx
         T* AddArchive(T* archive);
 
         template<class T>
-        T* Load(const std::string& path);
+        T* GetArchive(const std::string& filename);
+
+        template<class T>
+        std::shared_ptr<T> Load(const std::string& path);
 
         template<class T>
         std::shared_ptr<T> Cache(const std::string& path);
 
         template<class T>
-        T* Load(const std::string& filename, const std::string& identifier);
+        std::shared_ptr<T> Load(const std::string& filename, const std::string& identifier);
 
         template<class T>
         std::shared_ptr<T> Cache(const std::string& filename, const std::string& identifier);
 
         template<class T>
-        T* Get(const std::string& identifier) const;  
+        std::shared_ptr<T> Get(const std::string& identifier) const;
 
         template<class T>
         std::shared_ptr<T> GetCache(const std::string& identifier) const;
@@ -71,11 +74,11 @@ namespace Gx
         ResourceContainer();
         ~ResourceContainer();
 
-        sf::Texture* LoadTexture(const std::string& identifier, Uint8* data, Int64 size);
-        sf::Font* LoadFont(const std::string& identifier, Uint8* data, Int64 size);
+        TexturePtr LoadTexture(const std::string& identifier, Uint8* data, Int64 size);
+        FontPtr LoadFont(const std::string& identifier, Uint8* data, Int64 size);
 
-        TextureCache CacheTexture(const std::string& identifier, Uint8* data, Int64 size);
-        FontCache CacheFont(const std::string& identifier, Uint8* data, Int64 size);
+        TexturePtr CacheTexture(const std::string& identifier, Uint8* data, Int64 size);
+        FontPtr CacheFont(const std::string& identifier, Uint8* data, Int64 size);
 
         virtual void Update(double delta);
 

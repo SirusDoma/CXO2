@@ -1,3 +1,4 @@
+#include "ResourceContainer.hpp"
 namespace Gx
 {
     template<class T>
@@ -6,15 +7,14 @@ namespace Gx
         static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
         auto name = m_fileSystem->GetFileName(filename);
-        auto iterator = m_archives.find(name);
-        if (iterator == m_archives.end())
+        if (auto archive = GetArchive<T>(name); archive != nullptr)
+            return archive;
+
+        m_archives[name] = new T();
+        if (!m_archives[name]->Open(filename))
         {
-            m_archives[name] = new T();
-            if (!m_archives[name]->Open(filename))
-            {
-                m_archives.erase(m_archives.find(name));
-                return nullptr;
-            }
+            m_archives.erase(m_archives.find(name));
+            return nullptr;
         }
 
         return reinterpret_cast<T*>(m_archives[name]);
@@ -26,15 +26,24 @@ namespace Gx
         static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
         auto name = archive->GetName();
-        auto iterator = m_archives.find(name);
-        if (iterator == m_archives.end())
-            m_archives[name] = archive;
+        if (auto resource = GetArchive<T>(name); resource != nullptr)
+            return resource;
 
         return reinterpret_cast<T*>(m_archives[name]);
     }
 
     template<class T>
-    inline T* ResourceContainer::Load(const std::string& path)
+    inline T* ResourceContainer::GetArchive(const std::string& filename)
+    {
+        auto identifier = m_fileSystem->GetFileName(filename);
+        if (auto iterator = m_archives.find(identifier); iterator != m_archives.end())
+            return reinterpret_cast<T*>(m_archives[identifier]);
+
+        return nullptr;
+    }
+
+    template<class T>
+    inline std::shared_ptr<T> ResourceContainer::Load(const std::string& path)
     {
         auto name = m_fileSystem->GetIdentifier(path);
         auto resource = Get<T>(name);
@@ -46,15 +55,15 @@ namespace Gx
             return nullptr;
 
         if (typeid(T) == typeid(sf::Texture))
-            return reinterpret_cast<T*>(LoadTexture(name, data, size));
+            return std::reinterpret_pointer_cast<T>(LoadTexture(name, data, size));
         else if (typeid(T) == typeid(sf::Font))
-            return reinterpret_cast<T*>(LoadFont(name, data, size));
+            return std::reinterpret_pointer_cast<T>(LoadFont(name, data, size));
 
         return nullptr;
     }
 
     template<class T>
-    inline T* ResourceContainer::Load(const std::string& filename, const std::string& identifier)
+    inline std::shared_ptr<T> ResourceContainer::Load(const std::string& filename, const std::string& identifier)
     {
         auto resource = Get<T>(identifier);
         if (resource)
@@ -65,15 +74,15 @@ namespace Gx
             return nullptr;
 
         if (typeid(T) == typeid(sf::Texture))
-            return reinterpret_cast<T*>(LoadTexture(identifier, data, size));
+            return std::reinterpret_pointer_cast<T>(LoadTexture(identifier, data, size));
         else if (typeid(T) == typeid(sf::Font))
-            return reinterpret_cast<T*>(LoadFont(identifier, data, size));
+            return std::reinterpret_pointer_cast<T>(LoadFont(identifier, data, size));
 
         return nullptr;
     }
 
     template<class T>
-    std::shared_ptr<T> ResourceContainer::Cache(const std::string& path)
+    inline std::shared_ptr<T> ResourceContainer::Cache(const std::string& path)
     {
         auto name = m_fileSystem->GetIdentifier(path);
         auto cache = GetCache<T>(name);
@@ -93,7 +102,7 @@ namespace Gx
     }
 
     template<class T>
-    std::shared_ptr<T> ResourceContainer::Cache(const std::string& filename, const std::string& identifier)
+    inline std::shared_ptr<T> ResourceContainer::Cache(const std::string& filename, const std::string& identifier)
     {
         auto cache = GetCache<T>(identifier);
         if (cache)
@@ -112,18 +121,20 @@ namespace Gx
     }
 
     template<class T>
-    inline T* ResourceContainer::Get(const std::string& identifier) const
+    inline std::shared_ptr<T> ResourceContainer::Get(const std::string& name) const
     {
+        auto identifier = m_fileSystem->GetIdentifier(name);
         auto iterator = m_resources.find(identifier);
         if (iterator != m_resources.end())
-            return std::get<T*>(iterator->second);
+            return std::get<std::shared_ptr<T>>(iterator->second);
 
         return nullptr;
     }
 
     template<class T>
-    std::shared_ptr<T> ResourceContainer::GetCache(const std::string& identifier) const
+    inline std::shared_ptr<T> ResourceContainer::GetCache(const std::string& name) const
     {
+        auto identifier = m_fileSystem->GetIdentifier(name);
         auto iterator = m_caches.find(identifier);
         if (iterator != m_caches.end())
         {
