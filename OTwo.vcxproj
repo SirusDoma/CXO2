@@ -46,7 +46,8 @@
     <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
     <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\O2Jam\Scenes\SplashScene.cpp" />
+    <ClCompile Include="src\Nx\IO\OpiArchive.cpp" />
+    <ClCompile Include="src\Nx\Scenes\SplashScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Genode.hpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="include\Genode\Tasks\Task.hpp" />
     <ClInclude Include="include\Genode\System\Primitives.hpp" />
     <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
+    <ClInclude Include="include\Nx\IO\OpiArchive.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Genode\IO\ResourceContainer.inl" />

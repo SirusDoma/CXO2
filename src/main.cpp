@@ -6,6 +6,7 @@
 #include <SFML/OpenGL.hpp>
 
 #include <Genode.hpp>
+#include <Nx/IO/OpiArchive.hpp>
 
 namespace Nx
 {
@@ -22,8 +23,8 @@ namespace Nx
         {
             auto resource = Gx::ResourceContainer::Instance();
  
-            texture = resource->Load<sf::Texture>("D:\\final-fantasy-xv.jpg");
-            sprite = new Gx::Sprite(*texture); //resource->Cache<sf::Texture>("D:\\final-fantasy-xv.jpg")
+            texture = resource->Load<sf::Texture>("D:/O2Jam/Assets/StateWaiting/Background.png");
+            sprite = new Gx::Sprite(*texture); //resource->Cache<sf::Texture>("D:/O2Jam/Assets/StateWaiting/Background.png")
             AddChild(sprite);
 
             font = resource->Load<sf::Font>("D:/O2Jam/Assets/Global/Font.ttf");
@@ -44,6 +45,10 @@ namespace Nx
                 new Gx::Timeline::KeyFrame(1500, new Gx::Fade(sprite, 0, 1000)), 
                 new Gx::Timeline::KeyFrame(2000, new Gx::Fade(sprite, 255, 1000))
             );
+
+            auto archive = resource->AddArchive<OpiArchive>("D:/O2Jam/Client/O2Jam Live/Image/Interface.opi");
+            if (archive && archive->Contains("abusedata.ojs"))
+                std::printf("exists");
 
             //Run(timeline);
         }
