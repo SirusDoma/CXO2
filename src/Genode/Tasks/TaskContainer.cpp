@@ -52,7 +52,7 @@ namespace Gx
 
     void TaskContainer::Update(double delta)
     {
-        for (auto i = 0; i < m_tasks.size(); i++)
+        for (unsigned int i = 0; i < m_tasks.size(); i++)
         {
             auto task = m_tasks[i];
             if (task)
