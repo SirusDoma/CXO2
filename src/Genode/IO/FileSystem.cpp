@@ -1,20 +1,8 @@
 #include <Genode/IO/FileSystem.hpp>
-#include <SFML/System/FileInputStream.hpp>
 
 #include <memory>
 #include <algorithm>
 #include <filesystem>
-
-namespace
-{
-    struct MatchPathSeparator
-    {
-        bool operator()( char ch ) const
-        {
-            return ch == '\\' || ch == '/';
-        }
-    };
-}
 
 namespace Gx
 {
@@ -56,25 +44,25 @@ namespace Gx
         return path.filename().string();
     }
 
-    std::string FileSystem::GetIdentifier(const std::string& filename) const
+    std::string FileSystem::GetFullName(const std::string& fileName) const
     {
-        auto path = std::filesystem::path(filename.c_str());
-        return path.replace_extension().string();
+        if (Exists(fileName))
+            return fileName;
+
+        for (auto path : m_directories)
+        {
+            std::string fullPath = path + "/" + fileName;
+            if (Exists(fullPath))
+                return fullPath;
+        }
+
+        return "";
     }
-    
+
     Int64 FileSystem::ReadFile(const std::string& filename, Uint8** data) const
     {
         sf::FileInputStream fs;
-        if (m_directories.size() != 0)
-        {
-            for (auto path : m_directories)
-            {
-                if (fs.open(path + "/" + filename))
-                    break;
-            }
-        }
-        else
-            fs.open(filename);
+        fs.open(GetFullName(filename));
 
         auto size = fs.getSize();
         if (size <= 0)

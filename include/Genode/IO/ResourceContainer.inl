@@ -45,7 +45,7 @@ namespace Gx
     template<class T>
     inline std::shared_ptr<T> ResourceContainer::Load(const std::string& path)
     {
-        auto name = m_fileSystem->GetIdentifier(path);
+        auto name = m_fileSystem->GetFileName(path);
         auto resource = Get<T>(name);
         if (resource)
             return resource;
@@ -84,7 +84,7 @@ namespace Gx
     template<class T>
     inline std::shared_ptr<T> ResourceContainer::Cache(const std::string& path)
     {
-        auto name = m_fileSystem->GetIdentifier(path);
+        auto name = m_fileSystem->GetFileName(path);
         auto cache = GetCache<T>(name);
         if (cache)
             return cache;
@@ -121,9 +121,8 @@ namespace Gx
     }
 
     template<class T>
-    inline std::shared_ptr<T> ResourceContainer::Get(const std::string& name) const
+    inline std::shared_ptr<T> ResourceContainer::Get(const std::string& identifier) const
     {
-        auto identifier = m_fileSystem->GetIdentifier(name);
         auto iterator = m_resources.find(identifier);
         if (iterator != m_resources.end())
             return std::get<std::shared_ptr<T>>(iterator->second);
@@ -132,9 +131,8 @@ namespace Gx
     }
 
     template<class T>
-    inline std::shared_ptr<T> ResourceContainer::GetCache(const std::string& name) const
+    inline std::shared_ptr<T> ResourceContainer::GetCache(const std::string& identifier) const
     {
-        auto identifier = m_fileSystem->GetIdentifier(name);
         auto iterator = m_caches.find(identifier);
         if (iterator != m_caches.end())
         {
