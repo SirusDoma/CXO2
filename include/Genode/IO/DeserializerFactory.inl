@@ -1,4 +1,5 @@
 #include <Genode/IO/Deserializers/TextureDeserializer.hpp>
+#include <Genode/IO/Deserializers/FontDeserializer.hpp>
 
 namespace
 {
@@ -8,6 +9,8 @@ namespace
 		if (!registered)
 		{
 			Gx::DeserializerFactory::Register<sf::Texture>(new Gx::priv::TextureDeserializer());
+			Gx::DeserializerFactory::Register<sf::Font>(new Gx::priv::FontDeserializer());
+
 			registered = true;
 		}
 	}
