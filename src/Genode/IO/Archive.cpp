@@ -12,7 +12,7 @@ namespace Gx
     {
     }
 
-	Int64 Archive::FileEntry::GetFile(Uint8** data) const
+	Int64 Archive::FileEntry::GetContent(Uint8** data) const
 	{
 		return Parent->GetFile(this, data);
 	}

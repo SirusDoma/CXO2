@@ -2,6 +2,8 @@
 #define GENODE_ARCHIVE_HPP
 
 #include <Genode/System/Primitives.hpp>
+#include <Genode/IO/ResourceMetadata.hpp>
+
 #include <string>
 #include <vector>
 
@@ -11,19 +13,22 @@ namespace Gx
     {
     public:
         friend class ResourceContainer;
+		friend class ResourceManager;
+
         struct FileEntry
         {
 			Archive*    Parent;
             std::string Name;
             Gx::Uint32  Size = 0;
 
-			virtual Int64 GetFile(Uint8** data) const;
+			virtual Int64 GetContent(Uint8** data) const;
         };
 
+		std::string GetFileName() const;
         virtual bool Open(const std::string& fileName);
         virtual bool Contains(const std::string& name) const = 0;
-        
-		std::string GetFileName() const;
+
+		virtual ResourceMetadata GetMetadata(const std::string& name) const = 0;
 		virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
 
 		virtual std::vector<FileEntry> GetFileEntries() = 0;

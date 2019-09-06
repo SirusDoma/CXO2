@@ -126,30 +126,6 @@ namespace Gx
         return false;
     }
 
-    Int64 ResourceContainer::ReadResource(const std::string& path, Uint8** data)
-    {
-        if (m_fileSystem->Exists(path))
-            return m_fileSystem->ReadFile(path, data);
-
-        for (auto iterator : m_archives)
-        {
-            auto archive = iterator.second;
-            if (archive && archive->Contains(path))
-                return archive->GetFile(path, data);
-        }
-        
-        return -1;
-    }
-
-    Int64 ResourceContainer::ReadResource(const std::string& filename, const std::string& identifier, Uint8** data)
-    {
-        auto name = m_fileSystem->GetFileName(filename);
-        if (auto iterator = m_archives.find(name); iterator == m_archives.end())
-            return -1;
-
-        return m_archives[name]->GetFile(identifier, data);
-    }
-
     void ResourceContainer::Update(double delta)
     {
     }

@@ -33,44 +33,27 @@ namespace Gx
     class ResourceContainer : public Module
     {
     public:
+		friend class ResourceManager;
         static ResourceContainer* Instance();
 
         template<class T>
-        T* AddArchive(const std::string& path);
+        std::shared_ptr<T> Load(const std::string& name, Uint8* data, Int64 size);
 
         template<class T>
-        T* AddArchive(T* archive);
+        std::shared_ptr<T> Cache(const std::string& name, Uint8* data, Int64 size);
 
         template<class T>
-        T* GetArchive(const std::string& filename);
-
-		// TODO: change all of these func parameters to match with CacheTexture / CacheFont function
-        template<class T>
-        std::shared_ptr<T> Load(const std::string& path);
+        std::shared_ptr<T> Get(const std::string& name) const;
 
         template<class T>
-        std::shared_ptr<T> Cache(const std::string& path);
+        std::shared_ptr<T> GetCache(const std::string& name) const;
 
-        template<class T>
-        std::shared_ptr<T> Load(const std::string& filename, const std::string& identifier);
-
-        template<class T>
-        std::shared_ptr<T> Cache(const std::string& filename, const std::string& identifier);
-
-        template<class T>
-        std::shared_ptr<T> Get(const std::string& identifier) const;
-
-        template<class T>
-        std::shared_ptr<T> GetCache(const std::string& identifier) const;
-
-        bool Remove(const std::string& identifier);
-        bool Uncache(const std::string& identifier);
+        bool Remove(const std::string& name);
+        bool Uncache(const std::string& name);
 
         const FileSystem* GetFileSystem() const;
         void SetFileSystem(const FileSystem* system);
 
-        Int64 ReadResource(const std::string& path, Uint8** data);
-        Int64 ReadResource(const std::string& filename, const std::string& identifier, Uint8** data);
     private:
         ResourceContainer();
         ~ResourceContainer();

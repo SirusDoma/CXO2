@@ -20,14 +20,13 @@ OpiArchive::Signature OpiArchive::GetSignature() const
 
 bool OpiArchive::Open(const std::string& fileName)
 {
-    std::string fullName = Gx::FileSystem::Instance()->GetFullName(fileName);
-    if (!Archive::Open(fullName))
+    if (!Archive::Open(fileName))
         return false;
 
-    m_fileStream.open(fullName);
-
     // Fetch meta data
+	m_fileStream.open(fileName);
     m_fileStream.seek(0);
+
     if (!Read(&m_signature, sizeof(m_signature)))
         return false;
 
@@ -44,6 +43,12 @@ bool OpiArchive::Contains(const std::string& name) const
 {
     auto iterator = m_headers.find(name);
     return iterator != m_headers.end();
+}
+
+ResourceMetadata OpiArchive::GetMetadata(const std::string& name) const
+{
+
+	return ResourceMetadata();
 }
 
 Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
