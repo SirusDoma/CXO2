@@ -32,7 +32,7 @@ namespace Gx
         {
             m_scene = scene;
             m_scene->SetDirector(this);
-            m_scene->Stage();
+            m_scene->Initialize();
         }
     }
 

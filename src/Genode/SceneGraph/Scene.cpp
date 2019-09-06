@@ -24,7 +24,7 @@ namespace Gx
         StopAll();
     }
 
-    void Scene::Stage()
+    void Scene::Initialize()
     {
     }
 

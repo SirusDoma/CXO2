@@ -11,7 +11,7 @@ private:
 	sf::Texture texture;
 	Gx::Sprite* sprite;
 public:
-	virtual void Stage()
+	virtual void Initialize()
 	{
 		auto cache = Gx::Cache::Instance();
 		Gx::Uint8* bytes;

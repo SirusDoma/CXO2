@@ -22,7 +22,7 @@ namespace Gx
         virtual ~Scene();
 
     protected:
-        virtual void Stage();
+        virtual void Initialize();
         virtual bool Close(bool quit = false);
 
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
