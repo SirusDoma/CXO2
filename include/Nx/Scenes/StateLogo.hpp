@@ -15,7 +15,7 @@ public:
 	{
 		auto cache = Gx::Cache::Instance();
 		Gx::Uint8* bytes;
-		Gx::Uint64 size = Gx::FileSystem::Instance()->ReadFile("D:\\O2Jam\\Assets\\NX\\State_Planet\\State_Planet.png", &bytes);
+		Gx::Uint64 size = Gx::AssetManager::Instance()->GetFile("D:\\O2Jam\\Assets\\NX\\State_Planet\\State_Planet.png", &bytes);
 
 		sprite = new Gx::Sprite(cache->Add<sf::Texture>("State_Planet", bytes, size));
 

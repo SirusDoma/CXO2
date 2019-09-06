@@ -2,7 +2,7 @@
 #define GENODE_RESOURCE_MANAGER_HPP
 
 #include <Genode/IO/Archive.hpp>
-#include <Genode/IO/FileSystem.hpp>
+#include <Genode/IO/AssetManager.hpp>
 
 #include <unordered_map>
 #include <string>
@@ -28,8 +28,6 @@ namespace Gx
 		T* Instantiate(const std::string& name, bool cache = true);
 
     private:
-		Int64 ReadResource(const std::string& path, Uint8** data);
-
         Cache* m_cache;
 		std::unordered_map<std::string, Archive*> m_archives;
         std::unordered_map<std::string, const Archive::FileEntry*> m_entries;

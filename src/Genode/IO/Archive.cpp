@@ -12,16 +12,8 @@ namespace Gx
     {
     }
 
-	Int64 Archive::FileEntry::GetContent(Uint8** data) const
-	{
-		return Parent->GetFile(this, data);
-	}
-
     bool Archive::Open(const std::string& fileName)
     {
-        if (!FileSystem::Instance()->Exists(fileName))
-            return false;
-
         m_filename = fileName;
         return true;
     }

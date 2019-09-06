@@ -9,25 +9,25 @@
 
 namespace Gx
 {
+	template<class T>
     class FileSystem
     {
     public:
-        static FileSystem* Instance();
+		struct FileEntry
+		{
+			T* Parent = nullptr;
+			std::string Name;
+			Gx::Uint32  Size = 0;
 
-        FileSystem();
-        virtual ~FileSystem();
+			virtual ~FileEntry() {};
+		};
 
-        std::vector<std::string> GetPaths();
-        void AddPath(const std::string& path);
+		FileSystem() {}
+		virtual ~FileSystem() {}
 
-        bool Exists(const std::string& fileName) const;
-        std::string GetFileName(const std::string& fullPath) const;
-        std::string GetFullName(const std::string& fileName) const;
-
-        Int64 ReadFile(const std::string& filename, Uint8** data) const;
-
-    private:
-        std::vector<std::string> m_directories;
+		virtual bool Contains(const std::string& fileName) const = 0;
+		virtual Int64 GetFile(const std::string& filename, Uint8** data) const = 0;
+		virtual std::vector<FileEntry> GetFileEntries() const = 0;
     };
 }
 

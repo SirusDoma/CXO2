@@ -5,7 +5,7 @@ namespace Gx
 	{
 		static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
-		auto name = FileSystem::Instance()->GetFileName(fileName);
+		auto name = AssetManager::Instance()->GetFileName(fileName);
 		if (auto archive = GetArchive<T>(name); archive != nullptr)
 			return archive;
 
@@ -27,7 +27,7 @@ namespace Gx
 	{
 		static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
-		auto name     = FileSystem::Instance()->GetFileName(filename);
+		auto name     = AssetManager::Instance()->GetFileName(filename);
 		auto iterator = m_archives.find(name);
 		if (iterator != m_archives.end())
 			return iterator->second;

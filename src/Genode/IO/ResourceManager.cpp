@@ -33,17 +33,4 @@ namespace Gx
 		static ResourceManager instance;
 		return &instance;
 	}
-
-	Int64 ResourceManager::ReadResource(const std::string& path, Uint8** data)
-	{
-		std::string fullName = FileSystem::Instance()->GetFullName(path);
-		if (FileSystem::Instance()->Exists(fullName))
-			return FileSystem::Instance()->ReadFile(fullName, data);
-
-		auto iterator = m_entries.find(path);
-		if (iterator == m_entries.end())
-			return -1;
-
-		return m_entries[path]->GetContent(data);
-	}
 }
