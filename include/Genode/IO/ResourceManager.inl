@@ -5,12 +5,12 @@ namespace Gx
 	{
 		static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
-		auto name = AssetManager::Instance()->GetFileName(fileName);
+		auto name = FileHelper::GetFileName(fileName);
 		if (auto archive = GetArchive<T>(name); archive != nullptr)
 			return archive;
 
 		m_archives[name] = new T();
-		if (!m_archives[name]->Open(FileSystem::Instance()->GetFullName(fileName)))
+		if (!m_archives[name]->Open(FileHelper::GetFullName(fileName)))
 		{
 			m_archives.erase(m_archives.find(name));
 			return nullptr;
@@ -27,7 +27,7 @@ namespace Gx
 	{
 		static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
 
-		auto name     = AssetManager::Instance()->GetFileName(filename);
+		auto name     = FileHelper::GetFileName(filename);
 		auto iterator = m_archives.find(name);
 		if (iterator != m_archives.end())
 			return iterator->second;
@@ -38,7 +38,6 @@ namespace Gx
 	template<class T>
 	inline T* ResourceManager::Instantiate(const std::string& name, bool cache)
 	{
-
 		return nullptr;
 	}
 }

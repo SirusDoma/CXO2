@@ -2,7 +2,7 @@
 #define GENODE_RESOURCE_MANAGER_HPP
 
 #include <Genode/IO/Archive.hpp>
-#include <Genode/IO/AssetManager.hpp>
+#include <Genode/IO/FileHelper.hpp>
 
 #include <unordered_map>
 #include <string>

@@ -32,7 +32,7 @@
     <ClCompile Include="src\Genode\Graphics\Text.cpp" />
     <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
     <ClCompile Include="src\Genode\IO\Archive.cpp" />
-    <ClCompile Include="src\Genode\IO\AssetManager.cpp" />
+    <ClCompile Include="src\Genode\IO\FileHelper.cpp" />
     <ClCompile Include="src\Genode\IO\DeserializerFactory.cpp" />
     <ClCompile Include="src\Genode\IO\Cache.cpp" />
     <ClCompile Include="src\Genode\IO\ResourceManager.cpp" />
@@ -74,7 +74,7 @@
     <ClInclude Include="include\Genode\Graphics\Transformable.hpp" />
     <ClInclude Include="include\Genode\IO.hpp" />
     <ClInclude Include="include\Genode\IO\Archive.hpp" />
-    <ClInclude Include="include\Genode\IO\AssetManager.hpp" />
+    <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
     <ClInclude Include="include\Genode\IO\DeserializerFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Deserializers\FontDeserializer.hpp" />
     <ClInclude Include="include\Genode\IO\Deserializers\TextureDeserializer.hpp" />
