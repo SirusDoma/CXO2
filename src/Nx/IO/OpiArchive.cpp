@@ -5,7 +5,8 @@
 OpiArchive::OpiArchive() :
     m_fileStream(),
     m_headers(),
-    m_signature()
+    m_signature(),
+	m_count()
 {
 }
 
@@ -45,10 +46,10 @@ bool OpiArchive::Contains(const std::string& name) const
     return iterator != m_headers.end();
 }
 
-ResourceMetadata OpiArchive::GetMetadata(const std::string& name) const
+Gx::ResourceMetadata OpiArchive::GetMetadata(const std::string& name) const
 {
 
-	return ResourceMetadata();
+	return Gx::ResourceMetadata();
 }
 
 Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
