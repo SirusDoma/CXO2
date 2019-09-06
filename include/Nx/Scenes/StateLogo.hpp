@@ -3,6 +3,7 @@
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics.hpp>
+#include <Genode/IO.hpp>
 
 class StateLogo : public Gx::Scene
 {
@@ -12,10 +13,11 @@ private:
 public:
 	virtual void Stage()
 	{
-		texture.loadFromFile("D:\\O2Jam\\Assets\\NX\\State_Planet\\State_Planet.png");
-		texture.setSmooth(true);
+		auto cache = Gx::Cache::Instance();
+		Gx::Uint8* bytes;
+		Gx::Uint64 size = Gx::FileSystem::Instance()->ReadFile("D:\\O2Jam\\Assets\\NX\\State_Planet\\State_Planet.png", &bytes);
 
-		sprite = new Gx::Sprite(texture);
+		sprite = new Gx::Sprite(cache->Add<sf::Texture>("State_Planet", bytes, size));
 
 		AddChild(sprite);
 	}

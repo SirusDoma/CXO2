@@ -1,10 +1,10 @@
 #include <Genode/IO/ResourceManager.hpp>
-#include <Genode/IO/ResourceContainer.hpp>
+#include <Genode/IO/Cache.hpp>
 
 namespace Gx
 {
 	ResourceManager::ResourceManager() :
-		m_resources(ResourceContainer::Instance()),
+		m_cache(Cache::Instance()),
 		m_archives(),
 		m_entries()
 	{
@@ -24,8 +24,8 @@ namespace Gx
 				delete archive.second;
 		}
 
-		if (m_resources)
-			delete m_resources;
+		if (m_cache)
+			delete m_cache;
 	}
 
 	ResourceManager* ResourceManager::Instance()

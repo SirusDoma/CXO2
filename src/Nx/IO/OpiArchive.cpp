@@ -46,12 +46,6 @@ bool OpiArchive::Contains(const std::string& name) const
     return iterator != m_headers.end();
 }
 
-Gx::ResourceMetadata OpiArchive::GetMetadata(const std::string& name) const
-{
-
-	return Gx::ResourceMetadata();
-}
-
 Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
 {
     auto iterator = m_headers.find(name);

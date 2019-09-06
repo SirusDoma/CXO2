@@ -29,7 +29,6 @@ public:
     virtual bool Open(const std::string& fileName);
     virtual bool Contains(const std::string& name) const;
 
-	virtual Gx::ResourceMetadata GetMetadata(const std::string& name) const;
     virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
 	virtual std::vector<FileEntry> GetFileEntries();
 
