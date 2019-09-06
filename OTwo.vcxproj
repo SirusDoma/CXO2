@@ -75,6 +75,7 @@
     <ClInclude Include="include\Genode\IO.hpp" />
     <ClInclude Include="include\Genode\IO\Archive.hpp" />
     <ClInclude Include="include\Genode\IO\DeserializerFactory.hpp" />
+    <ClInclude Include="include\Genode\IO\Deserializers\FontDeserializer.hpp" />
     <ClInclude Include="include\Genode\IO\Deserializers\TextureDeserializer.hpp" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
     <ClInclude Include="include\Genode\IO\Cache.hpp" />

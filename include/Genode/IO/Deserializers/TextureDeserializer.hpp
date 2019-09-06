@@ -14,10 +14,9 @@ namespace Gx
 			virtual sf::Texture Deserialize(Uint8* data, Uint64 size) const
 			{
 				sf::Texture texture = sf::Texture();
-				if (!texture.loadFromMemory(data, static_cast<size_t>(size)))
-					return texture;
-
+				texture.loadFromMemory(data, static_cast<size_t>(size));
 				texture.setSmooth(true);
+
 				return texture;
 			}
 		};
