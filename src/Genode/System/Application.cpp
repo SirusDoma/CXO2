@@ -1,7 +1,7 @@
 #include <Genode/System/Application.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/IO/ResourceContainer.hpp>
+#include <Genode/IO/Cache.hpp>
 
 namespace Gx
 {
@@ -51,9 +51,6 @@ namespace Gx
 
         // Singleton instancing
         Application::instance = this;
-
-        // Install built-in modules
-        Install(ResourceContainer::Instance());
 
         // Trigger callback
         OnStart();
