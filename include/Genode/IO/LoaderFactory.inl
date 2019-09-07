@@ -1,5 +1,5 @@
-#include <Genode/IO/Deserializers/TextureDeserializer.hpp>
-#include <Genode/IO/Deserializers/FontDeserializer.hpp>
+#include <Genode/IO/Loaders/TextureLoader.hpp>
+#include <Genode/IO/Loaders/FontLoader.hpp>
 
 namespace
 {
@@ -8,8 +8,8 @@ namespace
 		static bool registered = false;
 		if (!registered)
 		{
-			Gx::DeserializerFactory::Register<sf::Texture>(new Gx::priv::TextureDeserializer());
-			Gx::DeserializerFactory::Register<sf::Font>(new Gx::priv::FontDeserializer());
+			Gx::LoaderFactory::Register<sf::Texture>(new Gx::priv::TextureLoader());
+			Gx::LoaderFactory::Register<sf::Font>(new Gx::priv::FontLoader());
 
 			registered = true;
 		}
@@ -19,7 +19,7 @@ namespace
 namespace Gx
 {
 	template<class T>
-	inline static void DeserializerFactory::Register(ResourceDeserializer<T>* deserializer)
+	inline static void LoaderFactory::Register(ResourceLoader<T>* deserializer)
 	{
 		Remove<T>();
 
@@ -28,7 +28,7 @@ namespace Gx
 	}
 	
 	template<class T>
-	inline bool DeserializerFactory::Remove()
+	inline bool LoaderFactory::Remove()
 	{
 		std::type_index type = typeid(T);
 		auto iterator = m_deserializers.find(type);
@@ -44,14 +44,14 @@ namespace Gx
 	}
 	
 	template<class T>
-	inline ResourceDeserializer<T>* DeserializerFactory::GetDeserializer()
+	inline ResourceLoader<T>* LoaderFactory::GetLoader()
 	{
 		EnsureDefaultDeserializersRegistered();
 
 		std::type_index type = typeid(T);
 		auto iterator = m_deserializers.find(type);
 		if (iterator != m_deserializers.end())
-			return dynamic_cast<ResourceDeserializer<T>*>(iterator->second);
+			return dynamic_cast<ResourceLoader<T>*>(iterator->second);
 
 		return nullptr;
 	}

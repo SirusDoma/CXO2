@@ -13,7 +13,7 @@ private:
 public:
 	virtual void Initialize()
 	{
-		auto cache = Gx::Cache::Instance();
+		auto cache = Gx::CacheManager::Instance();
 		Gx::Uint8* bytes;
 		Gx::Uint64 size = Gx::FileHelper::GetFile("D:\\O2Jam\\Assets\\NX\\State_Planet\\State_Planet.png", &bytes);
 

@@ -1,10 +1,10 @@
 #include <Genode/IO/ResourceManager.hpp>
-#include <Genode/IO/Cache.hpp>
+#include <Genode/IO/CacheManager.hpp>
 
 namespace Gx
 {
 	ResourceManager::ResourceManager() :
-		m_cache(Cache::Instance()),
+		m_cache(CacheManager::Instance()),
 		m_archives(),
 		m_entries()
 	{

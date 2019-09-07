@@ -19,11 +19,86 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\\**\*.cpp" />
+    <ClCompile Include="src\Genode\Fx\Fade.cpp" />
+    <ClCompile Include="src\Genode\Fx\Move.cpp" />
+    <ClCompile Include="src\Genode\Fx\Rotate.cpp" />
+    <ClCompile Include="src\Genode\Fx\Scale.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Cursor.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shape.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Circle.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Polygon.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Shapes\Rectangle.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Sprite.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Text.cpp" />
+    <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
+    <ClCompile Include="src\Genode\IO\Archive.cpp" />
+    <ClCompile Include="src\Genode\IO\CacheManager.cpp" />
+    <ClCompile Include="src\Genode\IO\FileHelper.cpp" />
+    <ClCompile Include="src\Genode\IO\LoaderFactory.cpp" />
+    <ClCompile Include="src\Genode\IO\ResourceManager.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\Node.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\Scene.cpp" />
+    <ClCompile Include="src\Genode\SceneGraph\SceneDirector.cpp" />
+    <ClCompile Include="src\Genode\System\Application.cpp" />
+    <ClCompile Include="src\Genode\System\Module.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Action.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Delay.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Sequence.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Task.cpp" />
+    <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
+    <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Nx\IO\OpiArchive.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="extlibs\headers\json.hpp" />
-    <ClInclude Include="include\\**\*.hpp" />
+    <ClInclude Include="extlibs\headers\\**\*.hpp" />
+    <ClInclude Include="include\Genode.hpp" />
+    <ClInclude Include="include\Genode\Entities.hpp" />
+    <ClInclude Include="include\Genode\Entities\Colorable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Inputable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Renderable.hpp" />
+    <ClInclude Include="include\Genode\Entities\Updatable.hpp" />
+    <ClInclude Include="include\Genode\Fx.hpp" />
+    <ClInclude Include="include\Genode\Fx\Fade.hpp" />
+    <ClInclude Include="include\Genode\Fx\Move.hpp" />
+    <ClInclude Include="include\Genode\Fx\Rotate.hpp" />
+    <ClInclude Include="include\Genode\Fx\Scale.hpp" />
+    <ClInclude Include="include\Genode\Graphics.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Cursor.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shape.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Circle.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Polygon.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Shapes\Rectangle.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Sprite.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Text.hpp" />
+    <ClInclude Include="include\Genode\Graphics\Transformable.hpp" />
+    <ClInclude Include="include\Genode\IO.hpp" />
+    <ClInclude Include="include\Genode\IO\Archive.hpp" />
+    <ClInclude Include="include\Genode\IO\CacheManager.hpp" />
+    <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
+    <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
+    <ClInclude Include="include\Genode\IO\LoaderFactory.hpp" />
+    <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
+    <ClInclude Include="include\Genode\IO\Loaders\TextureLoader.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceLoader.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceManager.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\Node.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\Scene.hpp" />
+    <ClInclude Include="include\Genode\SceneGraph\SceneDirector.hpp" />
+    <ClInclude Include="include\Genode\System.hpp" />
+    <ClInclude Include="include\Genode\System\Application.hpp" />
+    <ClInclude Include="include\Genode\System\Module.hpp" />
+    <ClInclude Include="include\Genode\System\Primitives.hpp" />
+    <ClInclude Include="include\Genode\Tasks.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Action.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Delay.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Sequence.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Task.hpp" />
+    <ClInclude Include="include\Genode\Tasks\TaskContainer.hpp" />
+    <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
+    <ClInclude Include="include\Nx\IO\OpiArchive.hpp" />
+    <ClInclude Include="include\Nx\Scenes\StateLogo.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\\**\*.inl" />
@@ -97,7 +172,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;.\extlibs\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -111,6 +186,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\include;.\extlibs\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +202,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_RELEASE;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>.\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;.\extlibs\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +219,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\include;.\extlibs\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

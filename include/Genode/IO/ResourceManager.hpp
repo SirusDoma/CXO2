@@ -9,7 +9,7 @@
 
 namespace Gx
 {
-    class Cache;
+    class CacheManager;
     class ResourceManager
     {
     public:

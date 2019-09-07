@@ -1,14 +1,14 @@
-#ifndef GENODE_TEXTURE_DESERIALIZER_HPP
-#define GENODE_TEXTURE_DESERIALIZER_HPP
+#ifndef GENODE_TEXTURE_LOADER_HPP
+#define GENODE_TEXTURE_LOADER_HPP
 
-#include <Genode/IO/ResourceDeserializer.hpp>
+#include <Genode/IO/ResourceLoader.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
 namespace Gx
 {
 	namespace priv
 	{
-		class TextureDeserializer : public Gx::ResourceDeserializer<sf::Texture>
+		class TextureLoader : public Gx::ResourceLoader<sf::Texture>
 		{
 		public:
 			virtual sf::Texture Deserialize(Uint8* data, Uint64 size) const

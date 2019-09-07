@@ -1,7 +1,7 @@
 #ifndef GENODE_DESERIALIZER_FACTORY_HPP
 #define GENODE_DESERIALIZER_FACTORY_HPP
 
-#include <Genode/IO/ResourceDeserializer.hpp>
+#include <Genode/IO/ResourceLoader.hpp>
 
 #include <unordered_map>
 #include <typeindex>
@@ -10,23 +10,23 @@
 
 namespace Gx
 {
-	class DeserializerFactory
+	class LoaderFactory
 	{
 	public:
 		template<class T>
-		static void Register(ResourceDeserializer<T>* deserializer);
+		static void Register(ResourceLoader<T>* deserializer);
 
 		template<class T>
 		static bool Remove();
 
 		template<class T>
-		static ResourceDeserializer<T>* GetDeserializer();
+		static ResourceLoader<T>* GetLoader();
 
 	private:
-		typedef std::unordered_map<std::type_index, priv::BaseDeserializer*> DeserializerMap;
+		typedef std::unordered_map<std::type_index, priv::BaseLoader*> DeserializerMap;
 		static DeserializerMap m_deserializers;
 	};
 }
 
-#include <Genode/IO/DeserializerFactory.inl>
+#include <Genode/IO/LoaderFactory.inl>
 #endif
