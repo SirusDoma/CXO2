@@ -22,6 +22,7 @@
     <ClCompile Include="src\\**\*.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="extlibs\headers\json.hpp" />
     <ClInclude Include="include\\**\*.hpp" />
   </ItemGroup>
   <ItemGroup>

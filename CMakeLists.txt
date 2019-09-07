@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE SRCS src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
+file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
 include_directories(include)
 include_directories(src)
 
