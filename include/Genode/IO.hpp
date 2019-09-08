@@ -2,7 +2,7 @@
 #define GENODE_IO_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
-#include <Genode/IO/LoaderFactory.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/CacheManager.hpp>

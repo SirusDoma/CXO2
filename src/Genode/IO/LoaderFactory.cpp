@@ -1,6 +1,6 @@
-#include <Genode/IO/LoaderFactory.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 
 namespace Gx
 {
-	LoaderFactory::DeserializerMap LoaderFactory::m_deserializers;
+	ResourceLoaderFactory::DeserializerMap ResourceLoaderFactory::m_deserializers;
 }

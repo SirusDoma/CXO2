@@ -10,7 +10,7 @@
 
 namespace Gx
 {
-	class LoaderFactory
+	class ResourceLoaderFactory
 	{
 	public:
 		template<class T>
@@ -23,10 +23,10 @@ namespace Gx
 		static ResourceLoader<T>* GetLoader();
 
 	private:
-		typedef std::unordered_map<std::type_index, priv::BaseLoader*> DeserializerMap;
-		static DeserializerMap m_deserializers;
+		typedef std::unordered_map<std::type_index, priv::BaseLoader*> LoaderMap;
+		static LoaderMap m_loaders;
 	};
 }
 
-#include <Genode/IO/LoaderFactory.inl>
+#include <Genode/IO/ResourceLoaderFactory.inl>
 #endif

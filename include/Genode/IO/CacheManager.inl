@@ -10,7 +10,7 @@ namespace Gx
 		if (size <= 0)
 			return nullptr;
 
-		auto deserializer = Gx::LoaderFactory::GetLoader<T>();
+		auto deserializer = Gx::ResourceLoaderFactory::GetLoader<T>();
 		if (deserializer)
 		{
 			auto deleter = [=](T* cache) { 

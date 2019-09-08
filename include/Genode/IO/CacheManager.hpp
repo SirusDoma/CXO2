@@ -11,7 +11,7 @@
 
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileSystem.hpp>
-#include <Genode/IO/LoaderFactory.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 
 #include <SFML/Audio/AlResource.hpp>
 #include <SFML/Graphics/Texture.hpp>
