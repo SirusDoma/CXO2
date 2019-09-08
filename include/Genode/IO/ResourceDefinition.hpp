@@ -6,15 +6,15 @@
 
 namespace Gx
 {
-	class ResourceDefinition
-	{
-	public:
-		ResourceDefinition();
-		virtual ~ResourceDefinition();
-		
-		std::string Texture;
-		std::string Font;
-	};
+    class ResourceDefinition
+    {
+    public:
+        ResourceDefinition();
+        virtual ~ResourceDefinition();
+        
+        std::string Texture;
+        std::string Font;
+    };
 }
 
 #endif

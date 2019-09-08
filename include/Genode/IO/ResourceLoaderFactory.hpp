@@ -11,25 +11,25 @@
 
 namespace Gx
 {
-	class ResourceLoaderFactory
-	{
-	public:
-		template<typename T>
-		static void Register(ResourceLoader<T>* deserializer);
+    class ResourceLoaderFactory
+    {
+    public:
+        template<typename T>
+        static void Register(ResourceLoader<T>* deserializer);
 
-		template<typename T>
-		static bool Remove();
+        template<typename T>
+        static bool Remove();
 
-		template<typename T>
-		static ResourceLoader<T>* GetLoader();
+        template<typename T>
+        static ResourceLoader<T>* GetLoader();
 
-		template<typename T>
-		static DefinitionLoader<T>* GetDefinitionLoader();
+        template<typename T>
+        static DefinitionLoader<T>* GetDefinitionLoader();
 
-	private:
-		typedef std::unordered_map<std::type_index, priv::BaseLoader*> LoaderMap;
-		static LoaderMap m_loaders;
-	};
+    private:
+        typedef std::unordered_map<std::type_index, priv::BaseLoader*> LoaderMap;
+        static LoaderMap m_loaders;
+    };
 }
 
 #include <Genode/IO/ResourceLoaderFactory.inl>

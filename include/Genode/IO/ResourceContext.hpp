@@ -8,11 +8,11 @@
 
 namespace Gx
 {
-	struct ResourceContext
-	{
-		std::shared_ptr<sf::Texture> Texture;
-		std::shared_ptr<sf::Font>    Font;
-	};
+    struct ResourceContext
+    {
+        std::shared_ptr<sf::Texture> Texture;
+        std::shared_ptr<sf::Font>    Font;
+    };
 }
 
 #endif

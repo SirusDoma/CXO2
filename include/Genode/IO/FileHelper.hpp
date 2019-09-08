@@ -8,21 +8,21 @@
 
 namespace Gx
 {
-	class FileHelper
-	{
-	public:
-		static std::vector<std::string> GetAssetPaths();
-		static void AddAssetPath(const std::string& path);
+    class FileHelper
+    {
+    public:
+        static std::vector<std::string> GetAssetPaths();
+        static void AddAssetPath(const std::string& path);
 
-		static std::string GetFileName(const std::string& fullPath);
-		static std::string GetFullName(const std::string& fileName);
+        static std::string GetFileName(const std::string& fullPath);
+        static std::string GetFullName(const std::string& fileName);
 
-		static bool Exists(const std::string& fileName);
-		static Int64 GetFile(const std::string& filename, Uint8** data);
+        static bool Exists(const std::string& fileName);
+        static Int64 GetFile(const std::string& filename, Uint8** data);
 
-	private:
-		static std::vector<std::string> m_directories;
-	};
+    private:
+        static std::vector<std::string> m_directories;
+    };
 }
 
 #endif

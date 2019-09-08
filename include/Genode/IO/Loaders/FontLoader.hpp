@@ -6,14 +6,14 @@
 
 namespace Gx
 {
-	namespace priv
-	{
-		class FontLoader : public Gx::ResourceLoader<sf::Font>
-		{
-		public:
-			virtual sf::Font Load(Uint8* data, Uint64 size) const;
-		};
-	}
+    namespace priv
+    {
+        class FontLoader : public Gx::ResourceLoader<sf::Font>
+        {
+        public:
+            virtual sf::Font Load(Uint8* data, Uint64 size) const;
+        };
+    }
 }
 
 #endif

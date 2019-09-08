@@ -13,13 +13,13 @@ namespace Gx
     {
     public:
         friend class Cache;
-		friend class ResourceManager;
+        friend class ResourceManager;
 
-		std::string GetFileName() const;
+        std::string GetFileName() const;
         virtual bool Open(const std::string& fileName);
 
-		virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
-		virtual std::vector<FileEntry> GetFileEntries() const = 0;
+        virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
+        virtual std::vector<FileEntry> GetFileEntries() const = 0;
 
     protected:
         Archive();

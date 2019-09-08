@@ -2,5 +2,5 @@
 
 namespace Gx
 {
-	ResourceLoaderFactory::LoaderMap ResourceLoaderFactory::m_loaders;
+    ResourceLoaderFactory::LoaderMap ResourceLoaderFactory::m_loaders;
 }

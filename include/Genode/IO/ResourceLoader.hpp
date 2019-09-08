@@ -5,22 +5,22 @@
 
 namespace Gx
 {
-	namespace priv
-	{
-		class BaseLoader
-		{
-		public:
-			virtual ~BaseLoader() {}
-		};
-	}
+    namespace priv
+    {
+        class BaseLoader
+        {
+        public:
+            virtual ~BaseLoader() {}
+        };
+    }
 
-	template<typename T>
-	class ResourceLoader : public priv::BaseLoader
-	{
-	public:
-		virtual ~ResourceLoader() {}
-		virtual T Load(Uint8* data, Uint64 size) const = 0;
-	};
+    template<typename T>
+    class ResourceLoader : public priv::BaseLoader
+    {
+    public:
+        virtual ~ResourceLoader() {}
+        virtual T Load(Uint8* data, Uint64 size) const = 0;
+    };
 }
 
 #endif

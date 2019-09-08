@@ -6,7 +6,7 @@ OpiArchive::OpiArchive() :
     m_fileStream(),
     m_headers(),
     m_signature(),
-	m_count()
+    m_count()
 {
 }
 
@@ -25,7 +25,7 @@ bool OpiArchive::Open(const std::string& fileName)
         return false;
 
     // Fetch meta data
-	m_fileStream.open(fileName);
+    m_fileStream.open(fileName);
     m_fileStream.seek(0);
 
     if (!Read(&m_signature, sizeof(m_signature)))
@@ -62,59 +62,59 @@ Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
 
 Gx::Int64 OpiArchive::GetFile(const Archive::FileEntry* entry, Gx::Uint8** data) const
 {
-	auto header = dynamic_cast<const OpiFileEntry*>(entry);
-	if (!header)
-		return -1;
+    auto header = dynamic_cast<const OpiFileEntry*>(entry);
+    if (!header)
+        return -1;
 
-	if (m_fileStream.seek(header->Offset) < 0)
-		return -1;
+    if (m_fileStream.seek(header->Offset) < 0)
+        return -1;
 
-	*data = new Gx::Uint8[header->Size];
-	return m_fileStream.read((char*) & (*data)[0], header->Size);
+    *data = new Gx::Uint8[header->Size];
+    return m_fileStream.read((char*) & (*data)[0], header->Size);
 }
 
 std::vector<Gx::Archive::FileEntry> OpiArchive::GetFileEntries()
 {
-	// Go to first item header offset
-	auto offset = m_count * ITEM_HEADER_SIZE;
-	m_fileStream.seek(m_fileStream.getSize() - offset);
+    // Go to first item header offset
+    auto offset = m_count * ITEM_HEADER_SIZE;
+    m_fileStream.seek(m_fileStream.getSize() - offset);
 
-	// Traverse the header
-	std::vector<FileEntry> result;
-	m_headers.clear();
-	for (unsigned int i = 0; i < m_count; i++)
-	{
-		OpiFileEntry header;
-		Gx::Uint32 sign;
-		if (!Read(&sign, sizeof(sign)) && sign != 01)
-			continue;
+    // Traverse the header
+    std::vector<FileEntry> result;
+    m_headers.clear();
+    for (unsigned int i = 0; i < m_count; i++)
+    {
+        OpiFileEntry header;
+        Gx::Uint32 sign;
+        if (!Read(&sign, sizeof(sign)) && sign != 01)
+            continue;
 
-		char bytes[128];
-		if (!Read(&bytes, sizeof(bytes)))
-			continue;
+        char bytes[128];
+        if (!Read(&bytes, sizeof(bytes)))
+            continue;
 
-		Gx::Uint32 ref;
-		if (!Read(&ref, sizeof(ref)))
-			continue;
+        Gx::Uint32 ref;
+        if (!Read(&ref, sizeof(ref)))
+            continue;
 
-		Gx::Uint32 size1;
-		if (!Read(&size1, sizeof(size1)))
-			continue;
+        Gx::Uint32 size1;
+        if (!Read(&size1, sizeof(size1)))
+            continue;
 
-		Gx::Uint32 size2;
-		if (!Read(&size2, sizeof(size2)))
-			continue;
+        Gx::Uint32 size2;
+        if (!Read(&size2, sizeof(size2)))
+            continue;
 
-		header.Parent = this;
-		header.Name   = std::string(bytes);
-		header.Offset = ref;
-		header.Size   = size1 > size2 ? size1 : size2;
+        header.Parent = this;
+        header.Name   = std::string(bytes);
+        header.Offset = ref;
+        header.Size   = size1 > size2 ? size1 : size2;
 
-		m_headers[header.Name] = header;
-		result.push_back(header);
-	}
+        m_headers[header.Name] = header;
+        result.push_back(header);
+    }
 
-	return result;
+    return result;
 }
 
 Gx::Uint64 OpiArchive::Read(void* data, Gx::Uint64 size) const

@@ -9,7 +9,7 @@ namespace Gx
 
     CacheManager::~CacheManager()
     {
-		// Shared ptr will be deleted upon handle released from this handle and goes out of scope
+        // Shared ptr will be deleted upon handle released from this handle and goes out of scope
         m_cacheMap.clear();
     }
 
@@ -19,11 +19,11 @@ namespace Gx
         return &instance;
     }
 
-	bool CacheManager::Contains(const std::string& identifier)
-	{
-		auto iterator = m_cacheMap.find(identifier);
-		return iterator != m_cacheMap.end();
-	}
+    bool CacheManager::Contains(const std::string& identifier)
+    {
+        auto iterator = m_cacheMap.find(identifier);
+        return iterator != m_cacheMap.end();
+    }
 
     bool CacheManager::Remove(const std::string& identifier)
     {

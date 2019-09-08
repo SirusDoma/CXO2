@@ -2,11 +2,11 @@
 
 namespace Gx
 {
-	ResourceDefinition::ResourceDefinition()
-	{
-	}
+    ResourceDefinition::ResourceDefinition()
+    {
+    }
 
-	ResourceDefinition::~ResourceDefinition()
-	{
-	}
+    ResourceDefinition::~ResourceDefinition()
+    {
+    }
 }

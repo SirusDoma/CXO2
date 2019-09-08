@@ -16,24 +16,24 @@ namespace Gx
     public:
         static ResourceManager* Instance();
 
-		ResourceManager();
-		virtual ~ResourceManager();
+        ResourceManager();
+        virtual ~ResourceManager();
 
         template<typename T>
         T* AddArchive(const std::string& filename);
 
-		template<typename T>
-		T* GetArchive(const std::string& filename) const;
+        template<typename T>
+        T* GetArchive(const std::string& filename) const;
 
-		template<typename T>
-		T* Create(const std::string& name, bool cache = true);
+        template<typename T>
+        T* Create(const std::string& name, bool cache = true);
 
     private:
-		template<typename T>
-		std::shared_ptr<T> Resolve(const std::string name);
+        template<typename T>
+        std::shared_ptr<T> Resolve(const std::string name);
 
         CacheManager* m_cache;
-		std::unordered_map<std::string, Archive*> m_archives;
+        std::unordered_map<std::string, Archive*> m_archives;
         std::unordered_map<std::string, const Archive::FileEntry*> m_entries;
     };
 }

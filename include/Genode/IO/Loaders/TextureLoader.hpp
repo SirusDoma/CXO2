@@ -6,14 +6,14 @@
 
 namespace Gx
 {
-	namespace priv
-	{
-		class TextureLoader : public Gx::ResourceLoader<sf::Texture>
-		{
-		public:
-			virtual sf::Texture Load(Uint8* data, Uint64 size) const;
-		};
-	}
+    namespace priv
+    {
+        class TextureLoader : public Gx::ResourceLoader<sf::Texture>
+        {
+        public:
+            virtual sf::Texture Load(Uint8* data, Uint64 size) const;
+        };
+    }
 }
 
 #endif

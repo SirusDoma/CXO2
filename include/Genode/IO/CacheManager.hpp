@@ -20,16 +20,16 @@
 
 namespace Gx
 {
-	typedef std::variant<
-		std::weak_ptr<sf::Texture>,
-		std::weak_ptr<sf::Font>,
-		std::weak_ptr<ResourceDefinition>>    CacheEntry;
-	typedef std::map<std::string, CacheEntry> CacheMap;
+    typedef std::variant<
+        std::weak_ptr<sf::Texture>,
+        std::weak_ptr<sf::Font>,
+        std::weak_ptr<ResourceDefinition>>    CacheEntry;
+    typedef std::map<std::string, CacheEntry> CacheMap;
 
     class CacheManager
     {
     public:
-		friend class ResourceManager;
+        friend class ResourceManager;
         static CacheManager* Instance();
 
         template<typename T>
@@ -38,7 +38,7 @@ namespace Gx
         template<typename T>
         std::shared_ptr<T> Get(const std::string& name) const;
 
-		bool Contains(const std::string& name);
+        bool Contains(const std::string& name);
 
         bool Remove(const std::string& name);
 
