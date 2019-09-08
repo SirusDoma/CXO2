@@ -77,6 +77,7 @@
     <ClInclude Include="include\Genode\IO\CacheManager.hpp" />
     <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceDefinition.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceLoaderFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\TextureLoader.hpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="include\Genode\SceneGraph\SceneDirector.hpp" />
     <ClInclude Include="include\Genode\System.hpp" />
     <ClInclude Include="include\Genode\System\Application.hpp" />
+    <ClInclude Include="include\Genode\System\Json.hpp" />
     <ClInclude Include="include\Genode\System\Module.hpp" />
     <ClInclude Include="include\Genode\System\Primitives.hpp" />
     <ClInclude Include="include\Genode\Tasks.hpp" />
