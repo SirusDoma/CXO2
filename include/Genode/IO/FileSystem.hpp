@@ -9,7 +9,7 @@
 
 namespace Gx
 {
-	template<class T>
+	template<typename T>
     class FileSystem
     {
     public:
@@ -20,6 +20,7 @@ namespace Gx
 			Gx::Uint32  Size = 0;
 
 			virtual ~FileEntry() {};
+			virtual Int64 GetContent(Uint8** data) { return Parent->GetFile(Name, data); }
 		};
 
 		FileSystem() {}

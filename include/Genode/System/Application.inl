@@ -1,6 +1,6 @@
 namespace Gx
 {
-    template<class T>
+    template<typename T>
     bool Application::Install()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
@@ -17,7 +17,7 @@ namespace Gx
         return false;
     }
 
-    template<class T>
+    template<typename T>
     bool Application::Install(T* instance)
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
@@ -32,7 +32,7 @@ namespace Gx
         return false;
     }
 
-    template<class T>
+    template<typename T>
     bool Application::Uninstall()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
@@ -52,7 +52,7 @@ namespace Gx
         return false;
     }
 
-    template<class T>
+    template<typename T>
     T* Application::GetModule() const
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");

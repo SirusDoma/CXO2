@@ -12,6 +12,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/IO/ResourceDefinition.hpp>
 
 #include <SFML/Audio/AlResource.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -19,11 +20,10 @@
 
 namespace Gx
 {
-	typedef std::shared_ptr<sf::Texture>      TexturePtr;
-	typedef std::shared_ptr<sf::Font>         FontPtr;
 	typedef std::variant<
 		std::weak_ptr<sf::Texture>,
-		std::weak_ptr<sf::Font>>              CacheEntry;
+		std::weak_ptr<sf::Font>,
+		std::weak_ptr<ResourceDefinition>>    CacheEntry;
 	typedef std::map<std::string, CacheEntry> CacheMap;
 
     class CacheManager
@@ -32,11 +32,13 @@ namespace Gx
 		friend class ResourceManager;
         static CacheManager* Instance();
 
-        template<class T>
+        template<typename T>
         std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size);
 
-        template<class T>
+        template<typename T>
         std::shared_ptr<T> Get(const std::string& name) const;
+
+		bool Contains(const std::string& name);
 
         bool Remove(const std::string& name);
 

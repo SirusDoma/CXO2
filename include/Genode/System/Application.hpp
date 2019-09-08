@@ -26,16 +26,16 @@ namespace Gx
         unsigned int GetRenderFrequency() const;
         void SetCursor(const Cursor& cursor);
 
-        template<class T>
+        template<typename T>
         bool Install();
 
-        template<class T>
+        template<typename T>
         bool Install(T* instance);
 
-        template<class T>
+        template<typename T>
         bool Uninstall();
 
-        template<class T>
+        template<typename T>
         T* GetModule() const;
 
     protected:

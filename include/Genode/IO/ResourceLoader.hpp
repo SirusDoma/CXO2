@@ -14,7 +14,7 @@ namespace Gx
 		};
 	}
 
-	template<class T>
+	template<typename T>
 	class ResourceLoader : public priv::BaseLoader
 	{
 	public:

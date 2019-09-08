@@ -1,6 +1,6 @@
 namespace Gx
 {
-    template<class T>
+    template<typename T>
     inline std::shared_ptr<T> CacheManager::Add(const std::string& name, Uint8* data, Int64 size)
     {
         auto cache = Get<T>(name);
@@ -27,7 +27,7 @@ namespace Gx
         return nullptr;
     }
 
-    template<class T>
+    template<typename T>
     inline std::shared_ptr<T> CacheManager::Get(const std::string& name) const
     {
         auto iterator = m_cacheMap.find(name);

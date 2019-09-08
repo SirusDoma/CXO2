@@ -19,6 +19,12 @@ namespace Gx
         return &instance;
     }
 
+	bool CacheManager::Contains(const std::string& identifier)
+	{
+		auto iterator = m_cacheMap.find(identifier);
+		return iterator != m_cacheMap.end();
+	}
+
     bool CacheManager::Remove(const std::string& identifier)
     {
         auto iterator = m_cacheMap.find(identifier);

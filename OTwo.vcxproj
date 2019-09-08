@@ -33,6 +33,7 @@
     <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
     <ClCompile Include="src\Genode\IO\Archive.cpp" />
     <ClCompile Include="src\Genode\IO\CacheManager.cpp" />
+    <ClCompile Include="src\Genode\IO\ResourceDefinition.cpp" />
     <ClCompile Include="src\Genode\IO\FileHelper.cpp" />
     <ClCompile Include="src\Genode\IO\Loaders\FontLoader.cpp" />
     <ClCompile Include="src\Genode\IO\Loaders\TextureLoader.cpp" />
@@ -77,10 +78,11 @@
     <ClInclude Include="include\Genode\IO.hpp" />
     <ClInclude Include="include\Genode\IO\Archive.hpp" />
     <ClInclude Include="include\Genode\IO\CacheManager.hpp" />
+    <ClInclude Include="include\Genode\IO\DefinitionLoader.hpp" />
     <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
-    <ClInclude Include="include\Genode\IO\Definition.hpp" />
-    <ClInclude Include="include\Genode\IO\Loaders\DefinitionLoader.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceDefinition.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceContext.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceLoaderFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\TextureLoader.hpp" />
@@ -174,7 +176,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\include;.\extlibs\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

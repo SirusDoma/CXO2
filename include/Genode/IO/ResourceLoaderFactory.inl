@@ -18,7 +18,7 @@ namespace
 
 namespace Gx
 {
-	template<class T>
+	template<typename T>
 	inline static void ResourceLoaderFactory::Register(ResourceLoader<T>* deserializer)
 	{
 		Remove<T>();
@@ -27,7 +27,7 @@ namespace Gx
 		m_loaders[type] = deserializer;
 	}
 	
-	template<class T>
+	template<typename T>
 	inline bool ResourceLoaderFactory::Remove()
 	{
 		std::type_index type = typeid(T);
@@ -43,7 +43,7 @@ namespace Gx
 		return false;
 	}
 	
-	template<class T>
+	template<typename T>
 	inline ResourceLoader<T>* ResourceLoaderFactory::GetLoader()
 	{
 		EnsureDefaultDeserializersRegistered();
@@ -52,6 +52,19 @@ namespace Gx
 		auto iterator = m_loaders.find(type);
 		if (iterator != m_loaders.end())
 			return dynamic_cast<ResourceLoader<T>*>(iterator->second);
+
+		return nullptr;
+	}
+
+	template<typename T>
+	inline DefinitionLoader<T>* ResourceLoaderFactory::GetDefinitionLoader()
+	{
+		EnsureDefaultDeserializersRegistered();
+
+		std::type_index type = typeid(T);
+		auto iterator = m_loaders.find(type);
+		if (iterator != m_loaders.end())
+			return dynamic_cast<DefinitionLoader<T>*>(iterator->second);
 
 		return nullptr;
 	}

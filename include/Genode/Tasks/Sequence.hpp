@@ -22,7 +22,7 @@ namespace Gx
         Sequence* Remove(Task* first, Args... args);
         Sequence* Remove(Task* task);
 
-        template<class T>
+        template<typename T>
         static Sequence* Routine(T* task, unsigned int count, double delay = 0);
 
     protected:

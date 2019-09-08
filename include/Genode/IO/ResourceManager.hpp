@@ -4,6 +4,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileHelper.hpp>
 
+#include <memory>
 #include <unordered_map>
 #include <string>
 
@@ -18,16 +19,19 @@ namespace Gx
 		ResourceManager();
 		virtual ~ResourceManager();
 
-        template<class T>
+        template<typename T>
         T* AddArchive(const std::string& filename);
 
-		template<class T>
+		template<typename T>
 		T* GetArchive(const std::string& filename) const;
 
-		template<class T>
-		T* Instantiate(const std::string& name, bool cache = true);
+		template<typename T>
+		T* Create(const std::string& name, bool cache = true);
 
     private:
+		template<typename T>
+		std::shared_ptr<T> Resolve(const std::string name);
+
         CacheManager* m_cache;
 		std::unordered_map<std::string, Archive*> m_archives;
         std::unordered_map<std::string, const Archive::FileEntry*> m_entries;
