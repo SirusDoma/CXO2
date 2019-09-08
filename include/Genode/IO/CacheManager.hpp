@@ -19,11 +19,11 @@
 
 namespace Gx
 {
-	typedef std::shared_ptr<sf::Texture>         TexturePtr;
-	typedef std::shared_ptr<sf::Font>            FontPtr;
+	typedef std::shared_ptr<sf::Texture>      TexturePtr;
+	typedef std::shared_ptr<sf::Font>         FontPtr;
 	typedef std::variant<
 		std::weak_ptr<sf::Texture>,
-		std::weak_ptr<sf::Font>>                 CacheEntry;
+		std::weak_ptr<sf::Font>>              CacheEntry;
 	typedef std::map<std::string, CacheEntry> CacheMap;
 
     class CacheManager
