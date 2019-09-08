@@ -19,7 +19,7 @@ namespace Gx
 	{
 	public:
 		virtual ~ResourceLoader() {}
-		virtual T Deserialize(Uint8* data, Uint64 size) const = 0;
+		virtual T Load(Uint8* data, Uint64 size) const = 0;
 	};
 }
 

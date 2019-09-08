@@ -10,15 +10,15 @@ namespace Gx
 		if (size <= 0)
 			return nullptr;
 
-		auto deserializer = Gx::ResourceLoaderFactory::GetLoader<T>();
-		if (deserializer)
+		auto loader = Gx::ResourceLoaderFactory::GetLoader<T>();
+		if (loader)
 		{
 			auto deleter = [=](T* cache) { 
 				Remove(name);
 				delete cache;
 			};
 
-			auto resource    = std::shared_ptr<T>(new T(deserializer->Deserialize(data, size)), deleter);
+			auto resource    = std::shared_ptr<T>(new T(loader->Load(data, size)), deleter);
 			m_cacheMap[name] = resource;
 
 			return resource;
