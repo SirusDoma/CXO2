@@ -33,6 +33,7 @@
     <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
     <ClCompile Include="src\Genode\IO\Archive.cpp" />
     <ClCompile Include="src\Genode\IO\CacheManager.cpp" />
+    <ClCompile Include="src\Genode\IO\LoaderFactory.cpp" />
     <ClCompile Include="src\Genode\IO\ResourceDefinition.cpp" />
     <ClCompile Include="src\Genode\IO\FileHelper.cpp" />
     <ClCompile Include="src\Genode\IO\Loaders\FontLoader.cpp" />
@@ -108,7 +109,14 @@
     <ClInclude Include="include\Nx\Scenes\StateLogo.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="include\Genode\IO\CacheManager.inl" />
     <None Include="include\Genode\IO\ResourceLoaderFactory.inl" />
+    <None Include="include\Genode\IO\ResourceManager.inl" />
+    <None Include="include\Genode\SceneGraph\Node.inl" />
+    <None Include="include\Genode\System\Application.inl" />
+    <None Include="include\Genode\Tasks\Sequence.inl" />
+    <None Include="include\Genode\Tasks\TaskContainer.inl" />
+    <None Include="include\Genode\Tasks\Timeline.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
