@@ -8,7 +8,6 @@
 #include <Genode.hpp>
 
 #include <Nx/Scenes/StateLogo.hpp>
-#include <Nx/IO/OpiArchive.hpp>
 
 int main() 
 {
