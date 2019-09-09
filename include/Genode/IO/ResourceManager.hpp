@@ -4,6 +4,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileHelper.hpp>
 #include <Genode/IO/DefinitionLoader.hpp>
+#include <Genode/IO/CacheManager.hpp>
 
 #include <memory>
 #include <unordered_map>
@@ -11,7 +12,6 @@
 
 namespace Gx
 {
-    class CacheManager;
     class ResourceManager
     {
     public:

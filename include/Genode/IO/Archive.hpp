@@ -12,7 +12,7 @@ namespace Gx
     class Archive : public FileSystem<Archive>
     {
     public:
-        friend class Cache;
+        friend class CacheManager;
         friend class ResourceManager;
 
         std::string GetFileName() const;
