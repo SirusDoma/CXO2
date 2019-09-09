@@ -12,6 +12,7 @@ namespace Gx
     
     ResourceManager::~ResourceManager()
     {
+        m_cache->Clear();
         for (auto entry : m_entries)
         {
             if (entry.second)
@@ -23,8 +24,6 @@ namespace Gx
             if (archive.second)
                 delete archive.second;
         }
-
-        // Do not delete m_cache, singleton instance automatically disposed, otherwise, delete will be triggered twice
     }
 
     ResourceManager* ResourceManager::Instance()

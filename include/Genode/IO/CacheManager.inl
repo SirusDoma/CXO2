@@ -13,12 +13,7 @@ namespace Gx
         auto loader = Gx::ResourceLoaderFactory::GetLoader<T>();
         if (loader)
         {
-            auto deleter = [=](T* cache) { 
-                Remove(name);
-                delete cache;
-            };
-
-            auto resource    = std::shared_ptr<T>(new T(loader->Load(data, size)), deleter);
+            auto resource    = std::shared_ptr<T>(new T(loader->Load(data, size)));
             m_cacheMap[name] = resource;
 
             return resource;
@@ -34,12 +29,7 @@ namespace Gx
         if (cache)
             return cache;
 
-        auto deleter = [=](T* cache) {
-            Remove(name);
-            delete cache;
-        };
-
-        auto resource    = std::shared_ptr<T>(value, deleter);
+        auto resource    = std::shared_ptr<T>(value);
         m_cacheMap[name] = resource;
 
         return resource;
@@ -50,15 +40,7 @@ namespace Gx
     {
         auto iterator = m_cacheMap.find(name);
         if (iterator != m_cacheMap.end())
-        {
-            std::weak_ptr<T> cache = std::get<std::weak_ptr<T>>(iterator->second);
-
-            // Thread-safe comparison
-            if (cache.expired())
-                return nullptr;
-
-            return cache.lock();
-        }
+            return std::get<std::shared_ptr<T>>(iterator->second);
 
         return nullptr;
     }
