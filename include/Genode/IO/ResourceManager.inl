@@ -42,10 +42,21 @@ namespace Gx
         std::shared_ptr<T> texture;
         if (!m_cache->Contains(name))
         {
-            auto fileEntry = m_entries[name];
-            auto loader = ResourceLoaderFactory::GetLoader<T>();
+            Uint8* data;
+            Uint64 size;
 
-            return m_cache->Add(loader->Load(fileEntry.GetContent(), fileEntry.Size));
+            auto iterator = m_entries.find(name);
+            if (iterator != m_entries.end())
+            {
+                auto entry = iterator->second;
+                size = entry->GetContent(&data);
+            }
+            else if (FileHelper::Exists(name))
+                size = FileHelper::GetFile(name, &data);
+            else
+                return nullptr;
+
+            return m_cache->Add<T>(name, data, size);
         }
 
         return m_cache->Get<T>(name);
@@ -55,10 +66,10 @@ namespace Gx
     inline T* ResourceManager::Create(const std::string& name, bool cache)
     {
         // Definition of target resource
-        auto definition = Gx::ResourceDefinition();
+        std::shared_ptr<ResourceDefinition> definition;
 
         // Find capable loader
-        auto loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
+        DefinitionLoader<T>* loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
         if (!loader)
             return nullptr;
 
@@ -68,40 +79,46 @@ namespace Gx
         // Load definition from entries
         if (!m_cache->Contains(name))
         {
-            auto iterator = m_entries.find(name);
-            if (iterator == m_entries.end())
-                return nullptr; // No definition found with specified name
-
             Uint8* data;
-            auto entry = iterator->second;
-            auto size  = entry->GetContent(&data);
-            if (size <= 0)
-                return nullptr; // Failed to read definition
+            Uint64 size;
 
-            definition = loader->Load(data, size);
+            auto iterator = m_entries.find(name);
+            if (iterator != m_entries.end())
+            {
+                auto entry = iterator->second;
+                size = entry->GetContent(&data);
+                if (size <= 0)
+                    return nullptr; // Failed to read definition
+            }
+            else if (FileHelper::Exists(name))
+                size = FileHelper::GetFile(name, &data);
+            else
+                return nullptr;
+
+            definition = m_cache->Add(name, loader->Load(data, size));
         }
         else
-            definition = *m_cache->Get<ResourceDefinition>(name);
+            definition = m_cache->Get<ResourceDefinition>(name);
 
         // Load texture from definition
-        if (definition.Texture)
+        if (!definition->Texture.empty())
         {
             // Load texture from cache / entries
-            context.Texture = Resolve<sf::Texture>(definition.Texture);
+            context.Texture = Resolve<sf::Texture>(definition->Texture);
             if (!context.Texture)
                 return nullptr; // Failed to load required texture
         }
 
         // Load font from definition
-        if (definition.Font)
+        if (!definition->Font.empty())
         {
             // Load font from cache / entries
-            context.Font = Resolve<sf::Font>(definition.Font);
+            context.Font = Resolve<sf::Font>(definition->Font);
             if (!context.Font)
                 return nullptr;  // Failed to load required font
         }
 
-        return loader->Create(definition, context);
+        return loader->Create(definition.get(), context);
     }
     
     

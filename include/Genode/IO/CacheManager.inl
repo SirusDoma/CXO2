@@ -28,16 +28,34 @@ namespace Gx
     }
 
     template<typename T>
+    inline std::shared_ptr<T> CacheManager::Add(const std::string& name, T* value)
+    {
+        auto cache = Get<T>(name);
+        if (cache)
+            return cache;
+
+        auto deleter = [=](T* cache) {
+            Remove(name);
+            delete cache;
+        };
+
+        auto resource    = std::shared_ptr<T>(value, deleter);
+        m_cacheMap[name] = resource;
+
+        return resource;
+    }
+
+    template<typename T>
     inline std::shared_ptr<T> CacheManager::Get(const std::string& name) const
     {
         auto iterator = m_cacheMap.find(name);
         if (iterator != m_cacheMap.end())
         {
             std::weak_ptr<T> cache = std::get<std::weak_ptr<T>>(iterator->second);
-            
+
             // Thread-safe comparison
             if (cache.expired())
-                return nullptr; 
+                return nullptr;
 
             return cache.lock();
         }

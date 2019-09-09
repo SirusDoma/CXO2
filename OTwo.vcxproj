@@ -33,8 +33,6 @@
     <ClCompile Include="src\Genode\Graphics\Transformable.cpp" />
     <ClCompile Include="src\Genode\IO\Archive.cpp" />
     <ClCompile Include="src\Genode\IO\CacheManager.cpp" />
-    <ClCompile Include="src\Genode\IO\LoaderFactory.cpp" />
-    <ClCompile Include="src\Genode\IO\ResourceDefinition.cpp" />
     <ClCompile Include="src\Genode\IO\FileHelper.cpp" />
     <ClCompile Include="src\Genode\IO\Loaders\FontLoader.cpp" />
     <ClCompile Include="src\Genode\IO\Loaders\TextureLoader.cpp" />
@@ -52,7 +50,8 @@
     <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
     <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Nx\IO\OpiArchive.cpp" />
+    <ClCompile Include="src\Nx\IO\Archives\OpiArchive.cpp" />
+    <ClCompile Include="src\Nx\IO\Definitions\SpriteDefinitionLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="extlibs\headers\\**\*.hpp" />
@@ -82,8 +81,8 @@
     <ClInclude Include="include\Genode\IO\DefinitionLoader.hpp" />
     <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
-    <ClInclude Include="include\Genode\IO\ResourceDefinition.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceContext.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceDefinition.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceLoaderFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\TextureLoader.hpp" />
@@ -95,7 +94,7 @@
     <ClInclude Include="include\Genode\SceneGraph\SceneDirector.hpp" />
     <ClInclude Include="include\Genode\System.hpp" />
     <ClInclude Include="include\Genode\System\Application.hpp" />
-    <ClInclude Include="include\Genode\System\Json.hpp" />
+    <ClInclude Include="include\Genode\IO\Json.hpp" />
     <ClInclude Include="include\Genode\System\Module.hpp" />
     <ClInclude Include="include\Genode\System\Primitives.hpp" />
     <ClInclude Include="include\Genode\Tasks.hpp" />
@@ -105,7 +104,9 @@
     <ClInclude Include="include\Genode\Tasks\Task.hpp" />
     <ClInclude Include="include\Genode\Tasks\TaskContainer.hpp" />
     <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
-    <ClInclude Include="include\Nx\IO\OpiArchive.hpp" />
+    <ClInclude Include="include\Nx\IO\Archives\OpiArchive.hpp" />
+    <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinition.hpp" />
+    <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinitionLoader.hpp" />
     <ClInclude Include="include\Nx\Scenes\StateLogo.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -24,8 +24,7 @@ namespace Gx
                 delete archive.second;
         }
 
-        if (m_cache)
-            delete m_cache;
+        // Do not delete m_cache, singleton instance automatically disposed, otherwise, delete will be triggered twice
     }
 
     ResourceManager* ResourceManager::Instance()

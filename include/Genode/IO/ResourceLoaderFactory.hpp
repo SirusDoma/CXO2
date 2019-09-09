@@ -18,6 +18,9 @@ namespace Gx
         static void Register(ResourceLoader<T>* deserializer);
 
         template<typename T>
+        static void Register(DefinitionLoader<T>* deserializer);
+
+        template<typename T>
         static bool Remove();
 
         template<typename T>

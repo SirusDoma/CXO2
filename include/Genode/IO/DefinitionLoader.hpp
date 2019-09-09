@@ -7,6 +7,8 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/System/Primitives.hpp>
 
+#include <memory>
+
 namespace Gx
 {
     template<typename T>
@@ -15,8 +17,8 @@ namespace Gx
     public:
         virtual ~DefinitionLoader() {}
 
-        virtual ResourceDefinition Load(Uint8* data, Uint64 size) const = 0;
-        virtual T Create(ResourceDefinition definition, const ResourceContext& context) const = 0;
+        virtual ResourceDefinition* Load(Uint8* data, Uint64 size) const = 0;
+        virtual T* Create(ResourceDefinition* definition, ResourceContext context) const = 0;
     };
 }
 

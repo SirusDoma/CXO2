@@ -23,7 +23,7 @@ namespace Gx
     typedef std::variant<
         std::weak_ptr<sf::Texture>,
         std::weak_ptr<sf::Font>,
-        std::weak_ptr<ResourceDefinition>>    CacheEntry;
+        std::weak_ptr<ResourceDefinition>>  CacheEntry;
     typedef std::map<std::string, CacheEntry> CacheMap;
 
     class CacheManager
@@ -34,6 +34,9 @@ namespace Gx
 
         template<typename T>
         std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size);
+
+        template<typename T>
+        std::shared_ptr<T> Add(const std::string& name, T* value);
 
         template<typename T>
         std::shared_ptr<T> Get(const std::string& name) const;

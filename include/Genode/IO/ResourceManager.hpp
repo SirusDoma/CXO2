@@ -3,6 +3,7 @@
 
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileHelper.hpp>
+#include <Genode/IO/DefinitionLoader.hpp>
 
 #include <memory>
 #include <unordered_map>
@@ -34,7 +35,7 @@ namespace Gx
 
         CacheManager* m_cache;
         std::unordered_map<std::string, Archive*> m_archives;
-        std::unordered_map<std::string, const Archive::FileEntry*> m_entries;
+        std::unordered_map<std::string, Archive::FileEntry*> m_entries;
     };
 }
 

@@ -26,6 +26,15 @@ namespace Gx
         std::type_index type = typeid(T);
         m_loaders[type] = deserializer;
     }
+
+    template<typename T>
+    inline static void ResourceLoaderFactory::Register(DefinitionLoader<T>* deserializer)
+    {
+        Remove<T>();
+
+        std::type_index type = typeid(T);
+        m_loaders[type] = deserializer;
+    }
     
     template<typename T>
     inline bool ResourceLoaderFactory::Remove()
