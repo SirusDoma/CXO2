@@ -9,9 +9,11 @@ namespace Gx
     class ResourceDefinition
     {
     public:
-        ResourceDefinition();
-        virtual ~ResourceDefinition();
+        virtual ~ResourceDefinition() {}
         
+        std::string Type;
+
+        // TODO: Make it into ResourceDependencies
         std::string Texture;
         std::string Font;
     };
