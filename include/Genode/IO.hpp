@@ -1,6 +1,7 @@
 #ifndef GENODE_IO_HPP
 #define GENODE_IO_HPP
 
+#include <Genode/IO/Json.hpp>
 #include <Genode/IO/ResourceLoader.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/IO/FileSystem.hpp>
