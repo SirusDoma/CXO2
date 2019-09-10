@@ -10,11 +10,12 @@ Gx::ResourceDefinition* SpriteDefinitionLoader::Load(Gx::Uint8* data, Gx::Uint64
     SpriteDefinition definition;
 
     json.at("type").get_to(definition.Type);
-    json.at("texture").get_to(definition.Texture);
 
-    auto properties = json.at("data");
-    auto color      = properties.at("color");
-    auto texCoords  = properties.at("texCoords");
+    auto attributes = json.at("attributes");
+    attributes.at("texture").get_to(definition.Texture);
+
+    auto color     = attributes.at("color");
+    auto texCoords = attributes.at("texCoords");
 
     unsigned int a, r, g, b;
     color.at("a").get_to(a);

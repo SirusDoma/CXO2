@@ -17,6 +17,4 @@ public:
     sf::IntRect TexCoords;
 };
 
-
-
 #endif
