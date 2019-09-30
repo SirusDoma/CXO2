@@ -4,12 +4,9 @@
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
-#include <unordered_map>
+#include <Nx/IO/Archives/O2FileEntry.hpp>
 
-struct OpiFileEntry : Gx::Archive::FileEntry
-{
-    Gx::Uint32  Offset = 0;
-};
+#include <unordered_map>
 
 class OpiArchive : public Gx::Archive
 {
@@ -41,7 +38,7 @@ private:
     Signature m_signature;
     Gx::Uint32 m_count;
 
-    mutable std::unordered_map<std::string, OpiFileEntry> m_headers;
+    mutable std::unordered_map<std::string, O2FileEntry> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
 

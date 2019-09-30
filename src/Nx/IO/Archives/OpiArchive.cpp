@@ -3,10 +3,10 @@
 #pragma warning(disable: 6054)
 
 OpiArchive::OpiArchive() :
-    m_fileStream(),
-    m_headers(),
-    m_signature(),
-    m_count()
+        m_fileStream(),
+        m_entries(),
+        m_signature(),
+        m_count()
 {
 }
 
@@ -34,25 +34,22 @@ bool OpiArchive::Open(const std::string& fileName)
     if (m_signature != Signature::OPI && m_signature != Signature::OPA)
         return false;
 
-    if (!Read(&m_count, sizeof(m_count)))
-        return false;
-
-    return true;
+    return Read(&m_count, sizeof(m_count)) != 0;
 }
 
 bool OpiArchive::Contains(const std::string& name) const
 {
-    auto iterator = m_headers.find(name);
-    return iterator != m_headers.end();
+    auto iterator = m_entries.find(name);
+    return iterator != m_entries.end();
 }
 
 Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
 {
-    auto iterator = m_headers.find(name);
-    if (iterator == m_headers.end())
+    auto iterator = m_entries.find(name);
+    if (iterator == m_entries.end())
         return -1;
 
-    const OpiFileEntry* header = &iterator->second;
+    const O2FileEntry* header = &iterator->second;
     if (m_fileStream.seek(header->Offset) < 0)
         return -1;
 
@@ -62,7 +59,7 @@ Gx::Int64 OpiArchive::GetFile(const std::string& name, Gx::Uint8** data) const
 
 Gx::Int64 OpiArchive::GetFile(const Archive::FileEntry* entry, Gx::Uint8** data) const
 {
-    auto header = dynamic_cast<const OpiFileEntry*>(entry);
+    auto header = dynamic_cast<const O2FileEntry*>(entry);
     if (!header)
         return -1;
 
@@ -81,10 +78,10 @@ std::vector<Gx::Archive::FileEntry> OpiArchive::GetFileEntries()
 
     // Traverse the header
     std::vector<FileEntry> result;
-    m_headers.clear();
+    m_entries.clear();
     for (unsigned int i = 0; i < m_count; i++)
     {
-        OpiFileEntry header;
+        O2FileEntry header;
         Gx::Uint32 sign;
         if (!Read(&sign, sizeof(sign)) && sign != 01)
             continue;
@@ -110,7 +107,7 @@ std::vector<Gx::Archive::FileEntry> OpiArchive::GetFileEntries()
         header.Offset = ref;
         header.Size   = size1 > size2 ? size1 : size2;
 
-        m_headers[header.Name] = header;
+        m_entries[header.Name] = header;
         result.push_back(header);
     }
 
