@@ -2,12 +2,9 @@
 #include <sstream>
 
 OmcArchive::OmcArchive() :
+    m_header(),
     m_fileStream(),
-    m_entries(),
-    m_wavCount(),
-    m_wavOffset(),
-    m_oggCount(),
-    m_oggOffset()
+    m_entries()
 {
 }
 
@@ -20,32 +17,18 @@ bool OmcArchive::Open(const std::string &fileName)
     if (!Archive::Open(fileName))
         return false;
 
-    // Fetch meta data
     m_fileStream.open(fileName);
     m_fileStream.seek(0);
 
-    char signbytes[4];
-    if (!Read(&signbytes, sizeof(signbytes)))
+    if (!Read(&m_header, sizeof(m_header)))
         return false;
 
-    auto signature = std::string(signbytes, 3);
+    auto signature = std::string(m_header.Signature, 3);
     if (signature != "OMC" && signature != "OJM")
         return false;
 
-    if (!Read(&m_wavCount, sizeof(m_wavCount)))
-        return false;
-
-    if (!Read(&m_oggCount, sizeof(m_oggCount)))
-        return false;
-
-    if (!Read(&m_wavOffset, sizeof(m_wavOffset)))
-        return false;
-
-    if (!Read(&m_oggOffset, sizeof(m_oggOffset)))
-        return false;
-
     auto entries = GetFileEntries();
-    return entries.size() > 0; // == m_wavCount + m_oggCount;
+    return entries.size() > 0; // == m_header.FxCount + m_header.BgCount;
 }
 
 bool OmcArchive::Contains(const std::string &name) const
@@ -72,9 +55,12 @@ Gx::Int64 OmcArchive::GetFile(unsigned int index, Gx::Uint8 **data) const
         if (!Read(&waveHeader, sizeof(waveHeader)))
             return -1;
 
-        auto encodedData = new unsigned char[waveHeader.ChunkSize];
+        auto encodedData = new Gx::Uint8[waveHeader.ChunkSize];
         if (!Read(encodedData, waveHeader.ChunkSize))
+        {
+            delete[] encodedData;
             return -1;
+        }
 
         auto sampleData = DecodeWave(encodedData, waveHeader.ChunkSize);
         int pcm = 16, fileSize = waveHeader.ChunkSize + 36;
@@ -99,7 +85,7 @@ Gx::Int64 OmcArchive::GetFile(unsigned int index, Gx::Uint8 **data) const
         auto buffer = waveStream.str();
         unsigned int read = buffer.length();
 
-        *data = new unsigned char[read];
+        *data = new Gx::Uint8[read];
         memcpy((char*)&(*data)[0], buffer.data(), read);
 
         delete[] encodedData;
@@ -113,8 +99,8 @@ Gx::Int64 OmcArchive::GetFile(unsigned int index, Gx::Uint8 **data) const
         if (!Read(&oggHeader, sizeof(oggHeader)))
             return -1;
 
-        *data = new unsigned char[oggHeader.SampleSize];
-        return Read((char*)&(*data)[0], oggHeader.SampleSize);
+        *data = new Gx::Uint8[oggHeader.Size];
+        return m_fileStream.read(*data, oggHeader.Size);
     }
 }
 
@@ -145,8 +131,8 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
     std::vector<FileEntry> result;
     m_entries.clear();
 
-    m_fileStream.seek(m_wavOffset);
-    for (unsigned int i = 0; i < m_wavCount; i++)
+    m_fileStream.seek(m_header.FxStartOffset);
+    for (unsigned int i = 0; i < m_header.FxCount; i++)
     {
         auto entry   = O2FileEntry();
         auto offset  = m_fileStream.tell();
@@ -160,7 +146,7 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
         if (m_fileStream.seek(m_fileStream.tell() + waveHeader.ChunkSize) == -1)
             continue;
 
-        entry.Name   = std::string(waveHeader.SampleName, sizeof(waveHeader.SampleName)).c_str();
+        entry.Name   = std::string(waveHeader.Name, sizeof(waveHeader.Name)).c_str();
         entry.Size   = waveHeader.ChunkSize;
         entry.Offset = offset;
 
@@ -168,8 +154,8 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
         result.push_back(entry);
     }
 
-    m_fileStream.seek(m_oggOffset);
-    for (unsigned int i = 0; i < m_oggCount; i++)
+    m_fileStream.seek(m_header.BgStartOffset);
+    for (unsigned int i = 0; i < m_header.BgCount; i++)
     {
         auto entry   = O2FileEntry();
         auto offset  = m_fileStream.tell();
@@ -180,11 +166,11 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
         if (!Read(&oggHeader, sizeof(oggHeader)))
             continue;
 
-        if (m_fileStream.seek(m_fileStream.tell() + oggHeader.SampleSize) == -1)
+        if (m_fileStream.seek(m_fileStream.tell() + oggHeader.Size) == -1)
             continue;
 
-        entry.Name   = std::string(oggHeader.SampleName, sizeof(oggHeader.SampleName)).c_str();
-        entry.Size   = oggHeader.SampleSize;
+        entry.Name   = std::string(oggHeader.Name, sizeof(oggHeader.Name)).c_str();
+        entry.Size   = oggHeader.Size;
         entry.Offset = offset;
 
         m_entries[i + 1000] = entry;
@@ -205,13 +191,13 @@ std::string OmcArchive::GetExtension(const std::string& name) const
     return "";
 }
 
-Gx::Uint64 OmcArchive::Read(void *data, Gx::Uint64 size) const
+bool OmcArchive::Read(void *data, Gx::Uint64 size) const
 {
     auto read = m_fileStream.read(data, size);
     return read == size;
 }
 
-static const unsigned char WAVE_REARRANGE_TABLE[] = {
+static const Gx::Uint8 WAVE_REARRANGE_TABLE[] = {
         0x10, 0x0E, 0x02, 0x09, 0x04, 0x00, 0x07, 0x01,
         0x06, 0x08, 0x0F, 0x0A, 0x05, 0x0C, 0x03, 0x0D,
         0x0B, 0x07, 0x02, 0x0A, 0x0B, 0x03, 0x05, 0x0D,
@@ -251,9 +237,9 @@ static const unsigned char WAVE_REARRANGE_TABLE[] = {
         0x04, 0x00
 };
 
-unsigned char* OmcArchive::DecodeWave(unsigned char* in, int length)
+Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length)
 {
-    auto *out = new unsigned char[length];
+    auto *out = new Gx::Uint8[length];
     int key = ((length % 17) << 4) + (length % 17);
     int blockSize = length / 17;
 
@@ -269,7 +255,7 @@ unsigned char* OmcArchive::DecodeWave(unsigned char* in, int length)
     }
 
     int tmp = 0;
-    unsigned char currentByte = 0;
+    Gx::Uint8 currentByte = 0;
 
     static int accKeyByte = 0xFF;
     static int accCounter = 0;
@@ -280,7 +266,7 @@ unsigned char* OmcArchive::DecodeWave(unsigned char* in, int length)
         currentByte = out[i];
 
         if(((accKeyByte << accCounter) & 0x80) != 0)
-            currentByte = (unsigned char) ~currentByte;
+            currentByte = (Gx::Uint8) ~currentByte;
 
         out[i] = currentByte;
         accCounter++;

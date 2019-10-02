@@ -32,7 +32,7 @@ public:
 private:
     const unsigned int ITEM_HEADER_SIZE = 152;
 
-    Gx::Uint64 Read(void* data, Gx::Uint64 size) const;
+    bool Read(void* data, Gx::Uint64 size) const;
     virtual Gx::Int64 GetFile(const Archive::FileEntry* entry, Gx::Uint8** data) const;
  
     Signature m_signature;

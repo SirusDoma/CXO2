@@ -34,7 +34,7 @@ bool OpiArchive::Open(const std::string& fileName)
     if (m_signature != Signature::OPI && m_signature != Signature::OPA)
         return false;
 
-    return Read(&m_count, sizeof(m_count)) != 0;
+    return Read(&m_count, sizeof(m_count));
 }
 
 bool OpiArchive::Contains(const std::string& name) const
@@ -114,7 +114,7 @@ std::vector<Gx::Archive::FileEntry> OpiArchive::GetFileEntries()
     return result;
 }
 
-Gx::Uint64 OpiArchive::Read(void* data, Gx::Uint64 size) const
+bool OpiArchive::Read(void* data, Gx::Uint64 size) const
 {
     auto read = m_fileStream.read(data, size);
     return read == size;
