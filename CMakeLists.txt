@@ -20,8 +20,8 @@ set(EXECUTABLE_NAME "OTwo")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
 # Specific OS Directories and Flags
-if(_WIN32)
-    # Windows Compiler Flags
+if(WIN32)
+    # Windows (Visual Studio) Compiler Flags
     set(CMAKE_CXX_FLAGS_RELEASE "/MT")
     set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
     set(SFML_STATIC_LIBRARIES TRUE)
