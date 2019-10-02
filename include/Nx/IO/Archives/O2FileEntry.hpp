@@ -5,7 +5,7 @@
 
 struct O2FileEntry : Gx::Archive::FileEntry
 {
-    Gx::Uint32 Offset = 0;
+    Gx::Uint64 Offset = 0;
 };
 
 #endif

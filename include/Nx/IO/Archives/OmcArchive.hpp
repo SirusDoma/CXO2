@@ -40,6 +40,7 @@ public:
     virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
 
     virtual std::vector<FileEntry> GetFileEntries() const;
+    std::string GetExtension(const std::string& name) const;
 
 private:
     static unsigned char* DecodeWave(unsigned char* in, int length);

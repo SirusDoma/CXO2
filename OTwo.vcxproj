@@ -50,6 +50,7 @@
     <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
     <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Nx\IO\Archives\OmcArchive.cpp" />
     <ClCompile Include="src\Nx\IO\Archives\OpiArchive.cpp" />
     <ClCompile Include="src\Nx\IO\Definitions\SpriteDefinitionLoader.cpp" />
   </ItemGroup>
@@ -104,6 +105,8 @@
     <ClInclude Include="include\Genode\Tasks\Task.hpp" />
     <ClInclude Include="include\Genode\Tasks\TaskContainer.hpp" />
     <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
+    <ClInclude Include="include\Nx\IO\Archives\O2FileEntry.hpp" />
+    <ClInclude Include="include\Nx\IO\Archives\OmcArchive.hpp" />
     <ClInclude Include="include\Nx\IO\Archives\OpiArchive.hpp" />
     <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinition.hpp" />
     <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinitionLoader.hpp" />
