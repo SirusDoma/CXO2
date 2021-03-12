@@ -1,6 +1,4 @@
 #include <Genode/Fx/Fade.hpp>
-#pragma warning(push)
-#pragma warning(disable : 4244)
 
 namespace Gx
 {
@@ -63,5 +61,3 @@ namespace Gx
         m_target->SetColor(color);
     }
 }
-
-#pragma warning(pop)
