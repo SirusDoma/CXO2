@@ -6,6 +6,7 @@
 #include <Genode/IO/DefinitionLoader.hpp>
 #include <Genode/IO/CacheManager.hpp>
 
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <string>
@@ -27,7 +28,12 @@ namespace Gx
         T* GetArchive(const std::string& filename) const;
 
         template<typename T>
+        ResourceDefinition* GetDefinition(const std::string& name, bool cache = true);
+
+        template<typename T>
         T* Create(const std::string& name, bool cache = true);
+
+        Uint64 GetResourceData(const std::string& name, Gx::Uint8** data);
 
     private:
         template<typename T>
@@ -35,7 +41,7 @@ namespace Gx
 
         CacheManager* m_cache;
         std::unordered_map<std::string, Archive*> m_archives;
-        std::unordered_map<std::string, Archive::FileEntry*> m_entries;
+        std::unordered_map<std::string, Archive::FileEntry> m_entries;
     };
 }
 

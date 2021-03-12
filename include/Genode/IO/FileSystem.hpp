@@ -15,7 +15,7 @@ namespace Gx
     public:
         struct FileEntry
         {
-            T* Parent = nullptr;
+            const T* Parent = nullptr;
             std::string Name;
             Gx::Uint32  Size = 0;
 

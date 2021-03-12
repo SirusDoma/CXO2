@@ -23,6 +23,11 @@ namespace Gx
         return iterator != m_cacheMap.end();
     }
 
+    Uint64 CacheManager::Count() const
+    {
+        return m_cacheMap.size();
+    }
+
     bool CacheManager::Remove(const std::string& identifier)
     {
         return m_cacheMap.erase(identifier) != 0;

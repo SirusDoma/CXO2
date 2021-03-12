@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    double Module::GetFrequency()
+    double Module::GetFrequency() const
     {
         return m_frequency;
     }

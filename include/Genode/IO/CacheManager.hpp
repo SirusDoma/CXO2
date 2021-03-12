@@ -33,17 +33,18 @@ namespace Gx
         static CacheManager* Instance();
 
         template<typename T>
-        std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size);
+        std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size, bool useCache = true);
 
         template<typename T>
-        std::shared_ptr<T> Add(const std::string& name, T* value);
+        std::shared_ptr<T> Add(const std::string& name, T* value, bool useCache = true);
 
         template<typename T>
         std::shared_ptr<T> Get(const std::string& name) const;
 
-        bool Contains(const std::string& name) const;
-        bool Remove(const std::string& name);
-        void Clear();
+        bool   Contains(const std::string& name) const;
+        Uint64 Count() const;
+        bool   Remove(const std::string& name);
+        void   Clear();
 
     private:
         CacheManager();

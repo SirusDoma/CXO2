@@ -1,3 +1,6 @@
+
+#include "ResourceManager.hpp"
+
 namespace Gx
 {
     template<typename T>
@@ -17,9 +20,12 @@ namespace Gx
         }
 
         for (auto entry : m_archives[name]->GetFileEntries())
+        {
             m_entries[entry.Name] = entry;
+            m_entries[entry.Name].Parent = m_archives[name];
+        }
 
-        return m_archives[name];
+        return static_cast<T*>(m_archives[name]);
     }
 
     template<typename T>
@@ -30,7 +36,7 @@ namespace Gx
         auto name     = FileHelper::GetFileName(filename);
         auto iterator = m_archives.find(name);
         if (iterator != m_archives.end())
-            return iterator->second;
+            return static_cast<T*>(iterator->second);
 
         return nullptr;
     }
@@ -38,88 +44,72 @@ namespace Gx
     template<typename T>
     inline std::shared_ptr<T> ResourceManager::Resolve(const std::string name)
     {
-        // Load texture from cache / entries
-        std::shared_ptr<T> texture;
+        // Load resources either from cache or file system (archive / physical file)
         if (!m_cache->Contains(name))
         {
             Uint8* data;
-            Uint64 size;
+            Uint64 size = GetResourceData(name, &data);
 
-            auto iterator = m_entries.find(name);
-            if (iterator != m_entries.end())
-            {
-                auto entry = iterator->second;
-                size = entry->GetContent(&data);
-            }
-            else if (FileHelper::Exists(name))
-                size = FileHelper::GetFile(name, &data);
-            else
-                return nullptr;
-
-            return m_cache->Add<T>(name, data, size);
+            return m_cache->Add<T>(name, data, size, false);
         }
 
         return m_cache->Get<T>(name);
+    }
+
+    template<typename T>
+    inline ResourceDefinition* ResourceManager::GetDefinition(const std::string& name, bool cache)
+    {
+        // Definition of target resource
+        std::shared_ptr<ResourceDefinition> definition;
+
+        // Load definition and create context for resource dependencies
+        auto context = ResourceContext();
+        if (!m_cache->Contains(name))
+        {
+            Uint8* data;
+            Uint64 size = GetResourceData(name, &data);
+
+            // Find capable loader
+            auto loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
+            if (!loader)
+                return nullptr;
+
+            // Load it with loader
+            definition = m_cache->Add(name, loader->Load(data, size), cache);
+        }
+        else
+            definition = m_cache->Get<ResourceDefinition>(name);
+
+        // No definition found, cannot proceed
+        if (!definition)
+            return nullptr;
+
+        return definition.get();
     }
     
     template<typename T>
     inline T* ResourceManager::Create(const std::string& name, bool cache)
     {
         // Definition of target resource
-        std::shared_ptr<ResourceDefinition> definition;
+        auto definition = GetDefinition<T>(name, cache);
+        if (!definition)
+            return nullptr;
 
         // Find capable loader
-        DefinitionLoader<T>* loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
+        auto loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
         if (!loader)
             return nullptr;
 
-        // Create context for resource dependencies
+        // Load required resources to build resource from definition
         auto context = ResourceContext();
-
-        // Load definition from entries
-        if (!m_cache->Contains(name))
+        for (auto resource : definition->ResourceReferences)
         {
-            Uint8* data;
-            Uint64 size;
-
-            auto iterator = m_entries.find(name);
-            if (iterator != m_entries.end())
-            {
-                auto entry = iterator->second;
-                size = entry->GetContent(&data);
-                if (size <= 0)
-                    return nullptr; // Failed to read definition
-            }
-            else if (FileHelper::Exists(name))
-                size = FileHelper::GetFile(name, &data);
-            else
-                return nullptr;
-
-            definition = m_cache->Add(name, loader->Load(data, size));
-        }
-        else
-            definition = m_cache->Get<ResourceDefinition>(name);
-
-        // Load texture from definition
-        if (!definition->Texture.empty())
-        {
-            // Load texture from cache / entries
-            context.Texture = Resolve<sf::Texture>(definition->Texture);
-            if (!context.Texture)
-                return nullptr; // Failed to load required texture
+            if (resource.first == "texture")
+                context.Texture = Resolve<sf::Texture>(resource.second);
+            else if (resource.first == "font")
+                context.Font    = Resolve<sf::Font>(resource.second);
         }
 
-        // Load font from definition
-        if (!definition->Font.empty())
-        {
-            // Load font from cache / entries
-            context.Font = Resolve<sf::Font>(definition->Font);
-            if (!context.Font)
-                return nullptr;  // Failed to load required font
-        }
-
-        return loader->Create(definition.get(), context);
+        return loader->Create(definition, context);
     }
-    
-    
 }

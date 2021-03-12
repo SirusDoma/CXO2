@@ -4,28 +4,18 @@ namespace Gx
     bool Application::Install()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
-
-        T* target = GetModule<T>();
-        if (!target)
-        {
-            target = new T();
-            m_modules.push_back(target);
-
-            return true;
-        }
-
-        return false;
+        return Install(new T());
     }
 
     template<typename T>
-    bool Application::Install(T* instance)
+    bool Application::Install(T* mod)
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
 
         auto target = GetModule<T>();
         if (!target)
         {
-            m_modules.push_back(static_cast<Module*>(instance));
+            m_modules.push_back(static_cast<Module*>(mod));
             return true;
         }
 

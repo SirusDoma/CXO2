@@ -1,9 +1,11 @@
 #ifndef SPRITE_DEFINITION_LOADER
 #define SPRITE_DEFINITION_LOADER
 
-#include <Genode/IO/DefinitionLoader.hpp>
-#include <Genode/IO/ResourceDefinition.hpp>
 #include <Genode/IO/Json.hpp>
+#include <Genode/IO/DefinitionLoader.hpp>
+
+#include <Genode/IO/ResourceDefinition.hpp>
+#include <Genode/IO/ResourceContext.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <Nx/IO/Definitions/SpriteDefinition.hpp>

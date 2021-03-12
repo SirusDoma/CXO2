@@ -109,8 +109,9 @@ std::vector<Gx::Archive::FileEntry> M30Archive::GetFileEntries() const
         if (m_fileStream.seek(m_fileStream.tell() + sampleHeader.Size) == -1)
             continue;
 
-        entry.Name = std::string(sampleHeader.Name, sizeof(sampleHeader.Name)).c_str();
-        entry.Size = sampleHeader.Size;
+        entry.Parent = this;
+        entry.Name   = std::string(sampleHeader.Name, sizeof(sampleHeader.Name)).c_str();
+        entry.Size   = sampleHeader.Size;
         entry.Offset = offset;
 
         m_entries[i] = entry;

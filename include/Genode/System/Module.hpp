@@ -11,7 +11,7 @@ namespace Gx
     public:
         friend class Application;
 
-        double GetFrequency();
+        double GetFrequency() const;
         void SetFrequency(double freq);
 
     protected:

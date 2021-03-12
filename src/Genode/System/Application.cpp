@@ -62,7 +62,7 @@ namespace Gx
         while (m_window.isOpen())
         {
             // Poll window event
-            sf::Event ev;
+            sf::Event ev = sf::Event();
             while (m_window.pollEvent(ev))
             {
                 // Call window event handlers based on received event
@@ -96,7 +96,7 @@ namespace Gx
             }
             m_window.display();
 
-            // Track the number frames rendered in a second
+            // Track the number of frames rendered in a second
             fpsDelta += delta;
             if (fpsDelta >= 1000)
             {

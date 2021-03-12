@@ -11,11 +11,13 @@ Gx::ResourceDefinition* SpriteDefinitionLoader::Load(Gx::Uint8* data, Gx::Uint64
 
     json.at("type").get_to(definition.Type);
 
-    auto attributes = json.at("attributes");
-    attributes.at("texture").get_to(definition.Texture);
+    auto resources = json.at("resources");
+    for (auto resource : resources.items())
+        definition.ResourceReferences[resource.key()] = resource.value();
 
-    auto color     = attributes.at("color");
-    auto texCoords = attributes.at("texCoords");
+    auto attributes = json.at("attributes");
+    auto color      = attributes.at("color");
+    auto texCoords  = attributes.at("texCoords");
 
     unsigned int a, r, g, b;
     color.at("a").get_to(a);
@@ -36,12 +38,11 @@ Gx::ResourceDefinition* SpriteDefinitionLoader::Load(Gx::Uint8* data, Gx::Uint64
 
 Gx::Sprite* SpriteDefinitionLoader::Create(Gx::ResourceDefinition* definition, Gx::ResourceContext context) const
 {
-    auto sprite = new Gx::Sprite();
-    auto spec   = dynamic_cast<SpriteDefinition*>(definition);
-    
-    if (!spec)
+    auto spec = dynamic_cast<SpriteDefinition*>(definition);
+    if (!spec || !context.Texture)
         return nullptr;
 
+    auto sprite = new Gx::Sprite();
     sprite->SetTexture(context.Texture);
     sprite->SetTexCoords(spec->TexCoords);
     sprite->SetColor(spec->Color);

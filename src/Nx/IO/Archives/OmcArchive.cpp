@@ -146,6 +146,7 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
         if (m_fileStream.seek(m_fileStream.tell() + waveHeader.ChunkSize) == -1)
             continue;
 
+        entry.Parent = this;
         entry.Name   = std::string(waveHeader.Name, sizeof(waveHeader.Name)).c_str();
         entry.Size   = waveHeader.ChunkSize;
         entry.Offset = offset;
@@ -169,6 +170,7 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
         if (m_fileStream.seek(m_fileStream.tell() + oggHeader.Size) == -1)
             continue;
 
+        entry.Parent = this;
         entry.Name   = std::string(oggHeader.Name, sizeof(oggHeader.Name)).c_str();
         entry.Size   = oggHeader.Size;
         entry.Offset = offset;

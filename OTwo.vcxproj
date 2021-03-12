@@ -53,6 +53,7 @@
     <ClCompile Include="src\Nx\IO\Archives\M30Archive.cpp" />
     <ClCompile Include="src\Nx\IO\Archives\OmcArchive.cpp" />
     <ClCompile Include="src\Nx\IO\Archives\OpiArchive.cpp" />
+    <ClCompile Include="src\Nx\IO\Definitions\MusicDefinitionLoader.cpp" />
     <ClCompile Include="src\Nx\IO\Definitions\SpriteDefinitionLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -110,8 +111,11 @@
     <ClInclude Include="include\Nx\IO\Archives\O2FileEntry.hpp" />
     <ClInclude Include="include\Nx\IO\Archives\OmcArchive.hpp" />
     <ClInclude Include="include\Nx\IO\Archives\OpiArchive.hpp" />
+    <ClInclude Include="include\Nx\IO\Definitions\MusicDefinition.hpp" />
+    <ClInclude Include="include\Nx\IO\Definitions\MusicDefinitionLoader.hpp" />
     <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinition.hpp" />
     <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinitionLoader.hpp" />
+    <ClInclude Include="include\Nx\Scenes\StateAvi.hpp" />
     <ClInclude Include="include\Nx\Scenes\StateLogo.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 # CMake Config
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(O2Jam)
 
 # Compiler
@@ -22,19 +22,18 @@ add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 # Specific OS Directories and Flags
 if(WIN32)
     # Windows (Visual Studio) Compiler Flags
-    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-    set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(SFML_STATIC_LIBRARIES TRUE)
 
     # Output Directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR}/archives)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR}/libs)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Set dependencies libs path
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc")
+    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
     set(FreeType_LIB ${MODULES_DIR}/freetype.lib)
     set(OpenAL_LIB ${MODULES_DIR}/openal32.lib)
     set(Ogg_LIB ${MODULES_DIR}/ogg.lib)

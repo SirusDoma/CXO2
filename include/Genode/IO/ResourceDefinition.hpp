@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace Gx
 {
@@ -13,9 +14,7 @@ namespace Gx
         
         std::string Type;
 
-        // TODO: Make it into ResourceDependencies
-        std::string Texture;
-        std::string Font;
+        std::unordered_map<std::string, std::string> ResourceReferences;
     };
 }
 
