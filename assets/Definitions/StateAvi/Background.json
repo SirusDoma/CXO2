@@ -4,7 +4,6 @@
         "texture": "StateAvi\\Background.png"
     },
     "attributes": {
-        "texture": "StateAvi\\Background.png",
         "color": {
             "a": 0,
             "r": 255,
