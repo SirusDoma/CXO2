@@ -50,11 +50,11 @@
     <ClCompile Include="src\Genode\Tasks\TaskContainer.cpp" />
     <ClCompile Include="src\Genode\Tasks\Timeline.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Nx\IO\Archives\M30Archive.cpp" />
-    <ClCompile Include="src\Nx\IO\Archives\OmcArchive.cpp" />
-    <ClCompile Include="src\Nx\IO\Archives\OpiArchive.cpp" />
-    <ClCompile Include="src\Nx\IO\Definitions\MusicDefinitionLoader.cpp" />
-    <ClCompile Include="src\Nx\IO\Definitions\SpriteDefinitionLoader.cpp" />
+    <ClCompile Include="src\O2\IO\Archives\M30Archive.cpp" />
+    <ClCompile Include="src\O2\IO\Archives\OmcArchive.cpp" />
+    <ClCompile Include="src\O2\IO\Archives\OpiArchive.cpp" />
+    <ClCompile Include="src\O2\IO\Definitions\MusicDefinitionLoader.cpp" />
+    <ClCompile Include="src\O2\IO\Definitions\SpriteDefinitionLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="extlibs\headers\\**\*.hpp" />
@@ -107,16 +107,16 @@
     <ClInclude Include="include\Genode\Tasks\Task.hpp" />
     <ClInclude Include="include\Genode\Tasks\TaskContainer.hpp" />
     <ClInclude Include="include\Genode\Tasks\Timeline.hpp" />
-    <ClInclude Include="include\Nx\IO\Archives\M30Archive.hpp" />
-    <ClInclude Include="include\Nx\IO\Archives\O2FileEntry.hpp" />
-    <ClInclude Include="include\Nx\IO\Archives\OmcArchive.hpp" />
-    <ClInclude Include="include\Nx\IO\Archives\OpiArchive.hpp" />
-    <ClInclude Include="include\Nx\IO\Definitions\MusicDefinition.hpp" />
-    <ClInclude Include="include\Nx\IO\Definitions\MusicDefinitionLoader.hpp" />
-    <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinition.hpp" />
-    <ClInclude Include="include\Nx\IO\Definitions\SpriteDefinitionLoader.hpp" />
-    <ClInclude Include="include\Nx\Scenes\StateAvi.hpp" />
-    <ClInclude Include="include\Nx\Scenes\StateLogo.hpp" />
+    <ClInclude Include="include\O2\IO\Archives\M30Archive.hpp" />
+    <ClInclude Include="include\O2\IO\Archives\O2FileEntry.hpp" />
+    <ClInclude Include="include\O2\IO\Archives\OmcArchive.hpp" />
+    <ClInclude Include="include\O2\IO\Archives\OpiArchive.hpp" />
+    <ClInclude Include="include\O2\IO\Definitions\MusicDefinition.hpp" />
+    <ClInclude Include="include\O2\IO\Definitions\MusicDefinitionLoader.hpp" />
+    <ClInclude Include="include\O2\IO\Definitions\SpriteDefinition.hpp" />
+    <ClInclude Include="include\O2\IO\Definitions\SpriteDefinitionLoader.hpp" />
+    <ClInclude Include="include\O2\Scenes\StateAvi.hpp" />
+    <ClInclude Include="include\O2\Scenes\StateLogo.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Genode\IO\CacheManager.inl" />

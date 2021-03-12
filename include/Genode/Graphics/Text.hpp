@@ -116,7 +116,7 @@ namespace Gx
         void EnsureGeometryUpdate() const;
 
         std::string             m_string;
-        FontHandle                 m_font;
+        FontHandle              m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;

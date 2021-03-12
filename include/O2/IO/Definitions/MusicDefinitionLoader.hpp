@@ -9,7 +9,7 @@
 #include <Genode/IO/ResourceDefinition.hpp>
 #include <Genode/IO/ResourceContext.hpp>
 
-#include <Nx/IO/Definitions/MusicDefinition.hpp>
+#include <O2/IO/Definitions/MusicDefinition.hpp>
 
 #include <memory>
 

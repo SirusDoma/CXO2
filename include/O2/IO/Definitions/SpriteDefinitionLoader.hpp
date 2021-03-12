@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
-#include <Nx/IO/Definitions/SpriteDefinition.hpp>
+#include <O2/IO/Definitions/SpriteDefinition.hpp>
 
 #include <memory>
 

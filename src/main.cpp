@@ -6,13 +6,13 @@
 
 #include <Genode.hpp>
 
-#include <Nx/IO/Archives/M30Archive.hpp>
-#include <Nx/IO/Archives/OmcArchive.hpp>
+#include <O2/IO/Archives/M30Archive.hpp>
+#include <O2/IO/Archives/OmcArchive.hpp>
 
-#include <Nx/IO/Definitions/SpriteDefinitionLoader.hpp>
-#include <Nx/IO/Definitions/MusicDefinitionLoader.hpp>
+#include <O2/IO/Definitions/SpriteDefinitionLoader.hpp>
+#include <O2/IO/Definitions/MusicDefinitionLoader.hpp>
 
-#include <Nx/Scenes/StateAvi.hpp>
+#include <O2/Scenes/StateAvi.hpp>
 
 int main() 
 {

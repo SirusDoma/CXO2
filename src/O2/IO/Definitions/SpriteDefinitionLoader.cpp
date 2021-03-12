@@ -1,4 +1,4 @@
-#include <Nx/IO/Definitions/SpriteDefinitionLoader.hpp>
+#include <O2/IO/Definitions/SpriteDefinitionLoader.hpp>
 
 SpriteDefinitionLoader::SpriteDefinitionLoader()
 {

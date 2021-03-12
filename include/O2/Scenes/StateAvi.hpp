@@ -8,7 +8,7 @@
 #include <Genode/IO.hpp>
 
 #include <iostream>
-#include <Nx/IO/Archives/OmcArchive.hpp>
+#include <O2/IO/Archives/OmcArchive.hpp>
 
 class StateAvi : public Gx::Scene
 {

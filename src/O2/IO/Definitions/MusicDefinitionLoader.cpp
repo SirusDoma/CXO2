@@ -1,4 +1,4 @@
-#include <Nx/IO/Definitions/MusicDefinitionLoader.hpp>
+#include <O2/IO/Definitions/MusicDefinitionLoader.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 MusicDefinitionLoader::MusicDefinitionLoader()

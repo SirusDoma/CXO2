@@ -4,7 +4,7 @@
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
-#include <Nx/IO/Archives/O2FileEntry.hpp>
+#include <O2/IO/Archives/O2FileEntry.hpp>
 
 #include <unordered_map>
 
