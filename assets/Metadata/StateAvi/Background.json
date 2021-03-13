@@ -1,0 +1,20 @@
+{
+  "type": "SPRITE",
+  "resources": {
+    "texture": "StateAvi\\Background.png"
+  },
+  "attributes": {
+    "color": {
+      "a": 0,
+      "r": 255,
+      "g": 255,
+      "b": 255
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 600
+    }
+  }
+}

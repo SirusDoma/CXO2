@@ -57,10 +57,10 @@ namespace Gx
     }
 
     template<typename T>
-    inline ResourceDefinition* ResourceManager::GetDefinition(const std::string& name, bool cache)
+    inline ResourceMetadata* ResourceManager::GetMetadata(const std::string& name, bool cache)
     {
         // Definition of target resource
-        std::shared_ptr<ResourceDefinition> definition;
+        std::shared_ptr<ResourceMetadata> definition;
 
         // Load definition and create context for resource dependencies
         auto context = ResourceContext();
@@ -70,7 +70,7 @@ namespace Gx
             Uint64 size = GetResourceData(name, &data);
 
             // Find capable loader
-            auto loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
+            auto loader = ResourceLoaderFactory::GetMetadataLoader<T>();
             if (!loader)
                 return nullptr;
 
@@ -78,7 +78,7 @@ namespace Gx
             definition = m_cache->Add(name, loader->Load(data, size), cache);
         }
         else
-            definition = m_cache->Get<ResourceDefinition>(name);
+            definition = m_cache->Get<ResourceMetadata>(name);
 
         // No definition found, cannot proceed
         if (!definition)
@@ -91,12 +91,12 @@ namespace Gx
     inline T* ResourceManager::Create(const std::string& name, bool cache)
     {
         // Definition of target resource
-        auto definition = GetDefinition<T>(name, cache);
+        auto definition = GetMetadata<T>(name, cache);
         if (!definition)
             return nullptr;
 
         // Find capable loader
-        auto loader = ResourceLoaderFactory::GetDefinitionLoader<T>();
+        auto loader = ResourceLoaderFactory::GetMetadataLoader<T>();
         if (!loader)
             return nullptr;
 

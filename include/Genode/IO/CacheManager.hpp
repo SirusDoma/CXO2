@@ -12,7 +12,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/IO/ResourceDefinition.hpp>
+#include <Genode/IO/ResourceMetadata.hpp>
 
 #include <SFML/Audio/AlResource.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -23,7 +23,7 @@ namespace Gx
     typedef std::variant<
         std::shared_ptr<sf::Texture>,
         std::shared_ptr<sf::Font>,
-        std::shared_ptr<ResourceDefinition>>  CacheEntry;
+        std::shared_ptr<ResourceMetadata>>  CacheEntry;
     typedef std::map<std::string, CacheEntry> CacheMap;
 
     class CacheManager

@@ -9,8 +9,9 @@
 #include <O2/IO/Archives/M30Archive.hpp>
 #include <O2/IO/Archives/OmcArchive.hpp>
 
-#include <O2/IO/Definitions/SpriteDefinitionLoader.hpp>
-#include <O2/IO/Definitions/MusicDefinitionLoader.hpp>
+#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 
 #include <O2/Scenes/StateAvi.hpp>
 
@@ -22,8 +23,9 @@ int main()
     Gx::FileHelper::AddAssetPath("./Music");
 
     // Register resource definition loaders
-    Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteDefinitionLoader());
-    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicDefinitionLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
 
     // Load globally used assets
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/BGM.ojm");

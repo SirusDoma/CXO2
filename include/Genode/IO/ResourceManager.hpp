@@ -3,7 +3,7 @@
 
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileHelper.hpp>
-#include <Genode/IO/DefinitionLoader.hpp>
+#include <Genode/IO/MetadataLoader.hpp>
 #include <Genode/IO/CacheManager.hpp>
 
 #include <iostream>
@@ -28,7 +28,7 @@ namespace Gx
         T* GetArchive(const std::string& filename) const;
 
         template<typename T>
-        ResourceDefinition* GetDefinition(const std::string& name, bool cache = true);
+        ResourceMetadata* GetMetadata(const std::string& name, bool cache = true);
 
         template<typename T>
         T* Create(const std::string& name, bool cache = true);

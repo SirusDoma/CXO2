@@ -6,14 +6,14 @@
 
 void StatePlanet::Initialize()
 {
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Definitions\\StatePlanet\\Music.json");
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\StatePlanet\\Music.json");
     if (bgm)
         bgm->play();
 
-    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Definitions\\StatePlanet\\Background.json");
+    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\StatePlanet\\Background.json");
     AddChild(background);
 
-    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Definitions\\StatePlanet\\Tower.json");
+    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\StatePlanet\\Tower.json");
     tower->SetPosition(211, 165);
     AddChild(tower);
 

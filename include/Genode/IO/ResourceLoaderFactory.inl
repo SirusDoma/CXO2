@@ -28,7 +28,7 @@ namespace Gx
     }
 
     template<typename T>
-    inline void ResourceLoaderFactory::Register(DefinitionLoader<T>* deserializer)
+    inline void ResourceLoaderFactory::Register(MetadataLoader<T>* deserializer)
     {
         Remove<T>();
 
@@ -66,14 +66,14 @@ namespace Gx
     }
 
     template<typename T>
-    inline DefinitionLoader<T>* ResourceLoaderFactory::GetDefinitionLoader()
+    inline MetadataLoader<T>* ResourceLoaderFactory::GetMetadataLoader()
     {
         EnsureDefaultDeserializersRegistered();
 
         std::type_index type = typeid(T);
         auto iterator = m_loaders.find(type);
         if (iterator != m_loaders.end())
-            return dynamic_cast<DefinitionLoader<T>*>(iterator->second);
+            return dynamic_cast<MetadataLoader<T>*>(iterator->second);
 
         return nullptr;
     }

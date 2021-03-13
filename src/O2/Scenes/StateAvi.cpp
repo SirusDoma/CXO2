@@ -9,10 +9,10 @@
 
 void StateAvi::Initialize()
 {
-    auto sprite = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Definitions\\StateAvi\\Background.json");
+    auto sprite = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\StateAvi\\Background.json");
     AddChild(sprite);
 
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Definitions\\StateAvi\\Music.json");
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\StateAvi\\Music.json");
     if (bgm)
         bgm->play();
 

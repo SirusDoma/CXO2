@@ -1,5 +1,5 @@
-#ifndef GENODE_RESOURCE_DEFINITION_HPP
-#define GENODE_RESOURCE_DEFINITION_HPP
+#ifndef GENODE_RESOURCE_METADATA_HPP
+#define GENODE_RESOURCE_METADATA_HPP
 
 #include <string>
 #include <vector>
@@ -7,10 +7,10 @@
 
 namespace Gx
 {
-    class ResourceDefinition
+    class ResourceMetadata
     {
     public:
-        virtual ~ResourceDefinition() {}
+        virtual ~ResourceMetadata() {}
         
         std::string Type;
 

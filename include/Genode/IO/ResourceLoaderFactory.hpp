@@ -2,7 +2,7 @@
 #define GENODE_DESERIALIZER_FACTORY_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
-#include <Genode/IO/DefinitionLoader.hpp>
+#include <Genode/IO/MetadataLoader.hpp>
 
 #include <unordered_map>
 #include <typeindex>
@@ -18,7 +18,7 @@ namespace Gx
         static void Register(ResourceLoader<T>* deserializer);
 
         template<typename T>
-        static void Register(DefinitionLoader<T>* deserializer);
+        static void Register(MetadataLoader<T>* deserializer);
 
         template<typename T>
         static bool Remove();
@@ -27,7 +27,7 @@ namespace Gx
         static ResourceLoader<T>* GetLoader();
 
         template<typename T>
-        static DefinitionLoader<T>* GetDefinitionLoader();
+        static MetadataLoader<T>* GetMetadataLoader();
 
     private:
         typedef std::unordered_map<std::type_index, priv::BaseLoader*> LoaderMap;

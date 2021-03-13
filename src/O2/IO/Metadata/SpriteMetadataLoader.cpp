@@ -1,13 +1,13 @@
-#include <O2/IO/Definitions/SpriteDefinitionLoader.hpp>
+#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 
-SpriteDefinitionLoader::SpriteDefinitionLoader()
+SpriteMetadataLoader::SpriteMetadataLoader()
 {
 }
 
-Gx::ResourceDefinition* SpriteDefinitionLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* SpriteMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
-    SpriteDefinition definition;
+    SpriteMetadata definition;
 
     json.at("type").get_to(definition.Type);
 
@@ -33,12 +33,12 @@ Gx::ResourceDefinition* SpriteDefinitionLoader::Load(Gx::Uint8* data, Gx::Uint64
     texCoords.at("height").get_to(h);
     definition.TexCoords = sf::IntRect(x, y, w, h);
 
-    return new SpriteDefinition(definition);
+    return new SpriteMetadata(definition);
 }
 
-Gx::Sprite* SpriteDefinitionLoader::Create(Gx::ResourceDefinition* definition, Gx::ResourceContext context) const
+Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
 {
-    auto spec = dynamic_cast<SpriteDefinition*>(definition);
+    auto spec = dynamic_cast<SpriteMetadata*>(definition);
     if (!spec || !context.Texture)
         return nullptr;
 
