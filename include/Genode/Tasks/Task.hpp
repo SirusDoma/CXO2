@@ -24,9 +24,9 @@ namespace Gx
         TaskState GetState() const;
         double GetElapsed() const;
 
-        void OnStart(void(*callback)());
-        void OnStopped(void(*callback)());
-        void OnCompleted(void(*callback)());
+        void OnStart(std::function<void()> callback);
+        void OnStopped(std::function<void()> callback);
+        void OnCompleted(std::function<void()> callback);
 
         virtual void Update(double delta);
         virtual void Reset();
