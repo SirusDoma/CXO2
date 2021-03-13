@@ -53,8 +53,8 @@
     <ClCompile Include="src\O2\IO\Archives\M30Archive.cpp" />
     <ClCompile Include="src\O2\IO\Archives\OmcArchive.cpp" />
     <ClCompile Include="src\O2\IO\Archives\OpiArchive.cpp" />
-    <ClCompile Include="src\O2\IO\Definitions\MusicDefinitionLoader.cpp" />
-    <ClCompile Include="src\O2\IO\Definitions\SpriteDefinitionLoader.cpp" />
+    <ClCompile Include="src\O2\IO\Metadata\MusicMetadataLoader.cpp" />
+    <ClCompile Include="src\O2\IO\Metadata\SpriteMetadataLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="extlibs\headers\\**\*.hpp" />
@@ -81,11 +81,11 @@
     <ClInclude Include="include\Genode\IO.hpp" />
     <ClInclude Include="include\Genode\IO\Archive.hpp" />
     <ClInclude Include="include\Genode\IO\CacheManager.hpp" />
-    <ClInclude Include="include\Genode\IO\DefinitionLoader.hpp" />
+    <ClInclude Include="include\Genode\IO\MetadataLoader.hpp" />
     <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceContext.hpp" />
-    <ClInclude Include="include\Genode\IO\ResourceDefinition.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceMetadata.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceLoaderFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\TextureLoader.hpp" />
@@ -111,10 +111,10 @@
     <ClInclude Include="include\O2\IO\Archives\O2FileEntry.hpp" />
     <ClInclude Include="include\O2\IO\Archives\OmcArchive.hpp" />
     <ClInclude Include="include\O2\IO\Archives\OpiArchive.hpp" />
-    <ClInclude Include="include\O2\IO\Definitions\MusicDefinition.hpp" />
-    <ClInclude Include="include\O2\IO\Definitions\MusicDefinitionLoader.hpp" />
-    <ClInclude Include="include\O2\IO\Definitions\SpriteDefinition.hpp" />
-    <ClInclude Include="include\O2\IO\Definitions\SpriteDefinitionLoader.hpp" />
+    <ClInclude Include="include\O2\IO\Metadata\MusicMetadata.hpp" />
+    <ClInclude Include="include\O2\IO\Metadata\MusicMetadataLoader.hpp" />
+    <ClInclude Include="include\O2\IO\Metadata\SpriteMetadata.hpp" />
+    <ClInclude Include="include\O2\IO\Metadata\SpriteMetadataLoader.hpp" />
     <ClInclude Include="include\O2\Scenes\StateAvi.hpp" />
     <ClInclude Include="include\O2\Scenes\StateLogo.hpp" />
   </ItemGroup>
