@@ -28,9 +28,9 @@ namespace Gx
             delete m_scene;
         }
 
+        m_scene = scene;
         if (scene)
         {
-            m_scene = scene;
             m_scene->SetDirector(this);
             m_scene->Initialize();
         }

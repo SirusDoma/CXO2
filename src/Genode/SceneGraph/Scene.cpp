@@ -21,7 +21,6 @@ namespace Gx
 
     Scene::~Scene()
     {
-        StopAll();
     }
 
     void Scene::Initialize()
@@ -30,6 +29,9 @@ namespace Gx
 
     bool Scene::Close(bool quit)
     {
+        StopAll();
+        for (auto child : GetChildren())
+            RemoveChild(child);
 
         return true;
     }
@@ -59,8 +61,6 @@ namespace Gx
 
     void Scene::Update(Node* node, double delta)
     {
-        TaskContainer::Update(delta);
-
         auto updatable = dynamic_cast<Updatable*>(node);
         if (updatable)
         {
@@ -97,6 +97,7 @@ namespace Gx
 
     void Scene::Update(double delta)
     {
+        TaskContainer::Update(delta);
         for (auto node : GetChildren())
         {
             Update(node, delta);

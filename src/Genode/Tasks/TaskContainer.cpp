@@ -9,10 +9,7 @@ namespace Gx
 
     TaskContainer::~TaskContainer()
     {
-        for (auto task : m_tasks)
-            delete task;
-
-        m_tasks.clear();
+        StopAll();
     }
 
     void TaskContainer::Run(Task* task)
@@ -43,9 +40,8 @@ namespace Gx
             // Run update before deleting
             auto item = m_tasks[i];
             item->Stop();
-            item->Update(0);
-
             delete item;
+
             m_tasks.erase(m_tasks.begin() + i);
         }
     }

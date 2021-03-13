@@ -2,9 +2,9 @@
 
 namespace Gx
 {
-    Action::Action(std::function<void()> callback) :
-        m_callback(callback)
+    Action::Action(std::function<void()> callback)
     {
+        OnCompleted(callback);
     }
 
     Action::~Action()
@@ -15,10 +15,7 @@ namespace Gx
     {
         Task::Update(delta);
 
-        if (GetState() == Task::Running && m_callback)
-        {
-            m_callback();
+        if (GetState() == Task::Running)
             Complete();
-        }
     }
 }

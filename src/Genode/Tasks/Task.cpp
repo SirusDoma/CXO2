@@ -23,17 +23,17 @@ namespace Gx
         return m_elapsed;
     }
 
-    void Task::OnStart(void(*callback)())
+    void Task::OnStart(std::function<void()> callback)
     {
         m_start = callback;
     }
 
-    void Task::OnStopped(void(*callback)())
+    void Task::OnStopped(std::function<void()> callback)
     {
         m_stop = callback;
     }
 
-    void Task::OnCompleted(void(*callback)())
+    void Task::OnCompleted(std::function<void()> callback)
     {
         m_complete = callback;
     }
@@ -65,8 +65,8 @@ namespace Gx
         m_state   = TaskState::Completed;
         m_elapsed = 0;
 
-        if (m_stop)
-            m_stop();
+        if (m_complete)
+            m_complete();
     }
 
     void Task::Reset()
