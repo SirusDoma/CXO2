@@ -19,6 +19,8 @@ public :
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Sprite* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+
+    static void Parse(Json json, SpriteMetadata* metadata);
 };
 
 #endif

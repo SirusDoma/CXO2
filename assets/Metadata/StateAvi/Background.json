@@ -4,6 +4,12 @@
     "texture": "StateAvi\\Background.png"
   },
   "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
     "color": {
       "a": 0,
       "r": 255,

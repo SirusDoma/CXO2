@@ -14,7 +14,6 @@ void StatePlanet::Initialize()
     AddChild(background);
 
     auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\StatePlanet\\Tower.json");
-    tower->SetPosition(211, 165);
     AddChild(tower);
 
     // Overlay fade in animation

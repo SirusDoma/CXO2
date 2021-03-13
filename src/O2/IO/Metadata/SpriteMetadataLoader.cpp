@@ -1,4 +1,5 @@
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Metadata/TransformMetadataLoader.hpp>
 
 SpriteMetadataLoader::SpriteMetadataLoader()
 {
@@ -7,38 +8,53 @@ SpriteMetadataLoader::SpriteMetadataLoader()
 Gx::ResourceMetadata* SpriteMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
-    SpriteMetadata definition;
+    SpriteMetadata metadata;
 
-    json.at("type").get_to(definition.Type);
+    json.at("type").get_to(metadata.Type);
 
     auto resources = json.at("resources");
     for (auto resource : resources.items())
-        definition.ResourceReferences[resource.key()] = resource.value();
+        metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    auto color      = attributes.at("color");
-    auto texCoords  = attributes.at("texCoords");
+    SpriteMetadataLoader::Parse(attributes, &metadata);
 
-    unsigned int a, r, g, b;
-    color.at("a").get_to(a);
-    color.at("r").get_to(r);
-    color.at("g").get_to(g);
-    color.at("b").get_to(b);
-    definition.Color = sf::Color(r, g, b, a);
-
-    unsigned int x, y, w, h;
-    texCoords.at("x").get_to(x);
-    texCoords.at("y").get_to(y);
-    texCoords.at("width").get_to(w);
-    texCoords.at("height").get_to(h);
-    definition.TexCoords = sf::IntRect(x, y, w, h);
-
-    return new SpriteMetadata(definition);
+    return new SpriteMetadata(metadata);
 }
 
-Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
+void SpriteMetadataLoader::Parse(Json attributes, SpriteMetadata *metadata)
 {
-    auto spec = dynamic_cast<SpriteMetadata*>(definition);
+    if (attributes.empty())
+        return;
+
+    TransformMetadataLoader::Parse(attributes["transform"], metadata);
+
+    auto color = attributes.find("color");
+    if (color != attributes.end())
+    {
+        unsigned int a, r, g, b;
+        color->at("a").get_to(a);
+        color->at("r").get_to(r);
+        color->at("g").get_to(g);
+        color->at("b").get_to(b);
+        metadata->Color = sf::Color(r, g, b, a);
+    }
+
+    auto texCoords  = attributes.find("texCoords");
+    if (texCoords != attributes.end())
+    {
+        unsigned int x, y, w, h;
+        texCoords->at("x").get_to(x);
+        texCoords->at("y").get_to(y);
+        texCoords->at("width").get_to(w);
+        texCoords->at("height").get_to(h);
+        metadata->TexCoords = sf::IntRect(x, y, w, h);
+    }
+}
+
+Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+{
+    auto spec = dynamic_cast<SpriteMetadata*>(metadata);
     if (!spec || !context.Texture)
         return nullptr;
 
@@ -46,6 +62,10 @@ Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::R
     sprite->SetTexture(context.Texture);
     sprite->SetTexCoords(spec->TexCoords);
     sprite->SetColor(spec->Color);
+
+    sprite->SetPosition(spec->Position);
+    sprite->SetScale(spec->Scale);
+    sprite->SetRotation(spec->Rotation);
 
     return sprite;
 }
