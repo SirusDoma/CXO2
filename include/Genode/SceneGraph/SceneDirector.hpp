@@ -18,7 +18,7 @@ namespace Gx
         ~SceneDirector();
 
         Scene* GetScene() const;
-        void SetScene(Scene *scene);
+        void SetScene(Scene* scene);
 
     private:
         Scene* m_scene;

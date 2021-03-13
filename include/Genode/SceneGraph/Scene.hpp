@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
 #include <Genode/SceneGraph/Node.hpp>
