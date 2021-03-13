@@ -1,7 +1,11 @@
 #include <O2/Scenes/StateAvi.hpp>
 
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/Tasks/Action.hpp>
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/Tasks/Sequence.hpp>
+
+#include <O2/Scenes/StatePlanet.hpp>
 
 void StateAvi::Initialize()
 {
@@ -12,8 +16,11 @@ void StateAvi::Initialize()
     if (bgm)
         bgm->play();
 
-    Run(new Gx::Sequence({
+    auto sequence = new Gx::Sequence({
         new Gx::Fade(sprite, 255, 2250),
-        new Gx::Fade(sprite, 0, 2250)
-    }));
+        new Gx::Fade(sprite, 0, 2250),
+        new Gx::Action([=] { GetDirector()->SetScene(new StatePlanet()); })
+    });
+
+    Run(sequence);
 }
