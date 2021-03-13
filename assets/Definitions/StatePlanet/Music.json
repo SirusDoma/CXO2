@@ -1,0 +1,9 @@
+{
+  "type": "Music",
+  "resources": {
+    "music": "bgMainRoom.ogg"
+  },
+  "attributes": {
+    "loop": true
+  }
+}
