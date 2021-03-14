@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "resources": {
+    "texture": "State_Planet/Btn_Exit.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 556
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 97,
+          "height": 44
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 97,
+          "y": 0,
+          "width": 97,
+          "height": 44
+        }
+      }
+    }
+  }
+}

@@ -8,5 +8,6 @@
 #include <Genode/Fx.hpp>
 #include <Genode/System.hpp>
 #include <Genode/IO.hpp>
+#include <Genode/UI.hpp>
 
 #endif

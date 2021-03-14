@@ -17,6 +17,9 @@ void StatePlanet::Initialize()
     auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State_Planet\\Tower.json");
     AddChild(tower);
 
+    auto button = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State_Planet\\Btn_Exit.json");
+    AddChild(button);
+
     // Overlay fade in animation
     auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
     overlay->SetFillColor(sf::Color::Black);

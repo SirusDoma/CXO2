@@ -11,6 +11,7 @@
 
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 
 #include <O2/Scenes/StateAvi.hpp>
@@ -25,6 +26,7 @@ int main()
     // Register resource definition loaders
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
 
     // Load globally used assets
