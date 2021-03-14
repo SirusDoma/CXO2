@@ -1,7 +1,7 @@
 {
   "type": "ANIMATION",
   "resources": {
-    "texture": "StatePlanet\\Tower.png"
+    "texture": "State_Planet\\Tower.png"
   },
   "attributes": {
     "transform": {

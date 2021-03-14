@@ -3,17 +3,18 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx/Fade.hpp>
+#include <Genode/UI.hpp>
 
 void StatePlanet::Initialize()
 {
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\StatePlanet\\Music.json");
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State_Planet\\Music.json");
     if (bgm)
         bgm->play();
 
-    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\StatePlanet\\Background.json");
+    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State_Planet\\Background.json");
     AddChild(background);
 
-    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\StatePlanet\\Tower.json");
+    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State_Planet\\Tower.json");
     AddChild(tower);
 
     // Overlay fade in animation
