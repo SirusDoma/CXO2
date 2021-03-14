@@ -10,8 +10,6 @@
 
 #include <O2/IO/Metadata/AnimationMetadata.hpp>
 
-#include <memory>
-
 class AnimationMetadataLoader : public Gx::MetadataLoader<Gx::Animation>
 {
 public :

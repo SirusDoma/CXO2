@@ -10,8 +10,6 @@
 
 #include <O2/IO/Metadata/SpriteMetadata.hpp>
 
-#include <memory>
-
 class SpriteMetadataLoader : public Gx::MetadataLoader<Gx::Sprite>
 {
 public :

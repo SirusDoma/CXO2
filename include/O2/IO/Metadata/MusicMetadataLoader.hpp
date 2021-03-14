@@ -11,8 +11,6 @@
 
 #include <O2/IO/Metadata/MusicMetadata.hpp>
 
-#include <memory>
-
 class MusicMetadataLoader : public Gx::MetadataLoader<sf::Music>
 {
 public :
