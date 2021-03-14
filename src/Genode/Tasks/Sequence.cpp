@@ -15,6 +15,13 @@ namespace Gx
     {
     }
 
+    Sequence::Sequence(std::function<void()> callback, std::initializer_list<Task *> tasks) :
+        m_iterator(),
+        m_tasks(tasks)
+    {
+        OnCompleted(callback);
+    }
+
     Sequence::~Sequence()
     {
         for (auto task : m_tasks)

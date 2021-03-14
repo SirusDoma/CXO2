@@ -13,6 +13,9 @@ namespace Gx
 
     protected:
         virtual void Update(double delta);
+
+    private:
+        std::function<void()> m_callback;
     };
 }
 

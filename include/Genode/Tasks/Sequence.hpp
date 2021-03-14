@@ -11,6 +11,7 @@ namespace Gx
     {
     public:
         Sequence();
+        Sequence(std::function<void()> callback, std::initializer_list<Task*> tasks);
         Sequence(std::initializer_list<Task*> tasks);
         virtual ~Sequence();
 
