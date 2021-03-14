@@ -4,31 +4,31 @@ namespace Gx
 {
     Button::Button() :
         m_sprite(),
-        m_state(Button::State::NORMAL)
+        m_state(Button::State::Normal)
     {
     }
 
     Button::Button(const sf::Texture &texture) :
         m_sprite(texture),
-        m_state(Button::State::NORMAL)
+        m_state(Button::State::Normal)
     {
     }
 
     Button::Button(const sf::Texture &texture, const sf::IntRect &rectangle) :
         m_sprite(texture, rectangle),
-        m_state(Button::State::NORMAL)
+        m_state(Button::State::Normal)
     {
     }
 
     Button::Button(TextureHandle texture) :
         m_sprite(texture),
-        m_state(Button::State::NORMAL)
+        m_state(Button::State::Normal)
     {
     }
 
     Button::Button(TextureHandle texture, const sf::IntRect &rectangle) :
         m_sprite(texture, rectangle),
-        m_state(Button::State::NORMAL)
+        m_state(Button::State::Normal)
     {
     }
 
@@ -92,31 +92,31 @@ namespace Gx
 
     void Button::OnMouseMove(sf::Event::MouseMoveEvent ev)
     {
-        if (!IsEnabled() || m_state == Button::State::PRESSED)
+        if (!IsEnabled() || m_state == Button::State::Pressed)
             return;
 
         bool intersect = IsIntersect(sf::Vector2f(ev.x, ev.y));
-        if (intersect && m_state == Button::State::NORMAL)
-            m_state = Button::State::HOVER;
-        else if (!intersect && m_state == Button::State::HOVER)
-            m_state = Button::State::NORMAL;
+        if (intersect && m_state == Button::State::Normal)
+            m_state = Button::State::Hover;
+        else if (!intersect && m_state == Button::State::Hover)
+            m_state = Button::State::Normal;
     }
 
     void Button::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
     {
-        if (IsEnabled() && m_state == Button::State::HOVER && IsIntersect(sf::Vector2f(ev.x, ev.y)))
-            m_state = Button::State::PRESSED;
+        if (IsEnabled() && m_state == Button::State::Hover && IsIntersect(sf::Vector2f(ev.x, ev.y)))
+            m_state = Button::State::Pressed;
     }
 
     void Button::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        if (!IsEnabled() || m_state != Button::State::PRESSED)
+        if (!IsEnabled() || m_state != Button::State::Pressed)
             return;
 
-        m_state = Button::State::NORMAL;
+        m_state = Button::State::Normal;
         if (IsIntersect(sf::Vector2f(ev.x, ev.y)))
         {
-            m_state = Button::State::HOVER;
+            m_state = Button::State::Hover;
             if (m_click)
                 m_click();
         }
@@ -126,7 +126,7 @@ namespace Gx
     {
         auto position = GetPosition();
         sf::FloatRect bounds = sf::FloatRect();
-        for (auto state : { Button::State::NORMAL, Button::State::HOVER, Button::State::PRESSED })
+        for (auto state : {Button::State::Normal, Button::State::Hover, Button::State::Pressed })
         {
             bounds = m_stateData[state].GetLocalBounds();
             if (bounds.width != 0 && bounds.height != 0)

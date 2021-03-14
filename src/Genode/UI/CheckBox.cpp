@@ -19,9 +19,9 @@ namespace Gx
 
         auto frame = GetStateFrame(GetState());
         if (IsChecked())
-            frame = GetStateFrame(CheckBox::State::PRESSED);
-        else if (GetState() == CheckBox::State::PRESSED)
-            frame = GetStateFrame(CheckBox::State::HOVER);
+            frame = GetStateFrame(CheckBox::State::Pressed);
+        else if (GetState() == CheckBox::State::Pressed)
+            frame = GetStateFrame(CheckBox::State::Hover);
 
         auto sprite = GetSprite();
         sprite->SetColor(frame.GetColor());
@@ -35,7 +35,7 @@ namespace Gx
 
     void CheckBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        if (!IsEnabled() || GetState() != CheckBox::State::PRESSED)
+        if (!IsEnabled() || GetState() != CheckBox::State::Pressed)
             return;
 
         Button::OnMouseButtonUp(ev);

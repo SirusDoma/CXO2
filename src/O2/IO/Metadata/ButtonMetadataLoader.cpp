@@ -24,9 +24,9 @@ Gx::ResourceMetadata* ButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
 
     auto states = attributes.at("states");
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
-        { "normal", Gx::Button::State::NORMAL },
-        { "hover", Gx::Button::State::HOVER },
-        { "click", Gx::Button::State::PRESSED },
+        { "normal", Gx::Button::State::Normal },
+        { "hover", Gx::Button::State::Hover },
+        { "click", Gx::Button::State::Pressed },
     };
 
     metadata.States = std::unordered_map<Gx::Button::State, SpriteMetadata>();
