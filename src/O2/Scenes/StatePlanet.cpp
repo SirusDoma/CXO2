@@ -19,7 +19,6 @@ void StatePlanet::Initialize()
     button->SetClickCallback([](Gx::Button *btn) {
         std::cout << "Hello World" << std::endl;
     });
-
     AddChild(button);
 
     // Overlay fade in animation
@@ -31,8 +30,7 @@ void StatePlanet::Initialize()
     if (bgm)
         bgm->play();
 
-    Run(new Gx::Sequence({
-        new Gx::Fade(overlay, 0, 4500),
-        new Gx::Action([=] { RemoveChild(overlay); })
+    Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
+        new Gx::Fade(overlay, 0, sf::seconds(4.5f))
     }));
 }

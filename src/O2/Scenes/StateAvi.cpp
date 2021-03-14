@@ -17,8 +17,8 @@ void StateAvi::Initialize()
 
     auto sequence = new Gx::Sequence([=] { GetDirector()->SetScene(new StatePlanet()); },
         {
-            new Gx::Fade(sprite, 255, 2250),
-            new Gx::Fade(sprite, 0, 2250)
+            new Gx::Fade(sprite, 255, sf::seconds(2.25f)),
+            new Gx::Fade(sprite, 000, sf::seconds(2.25f))
         }
     );
 
