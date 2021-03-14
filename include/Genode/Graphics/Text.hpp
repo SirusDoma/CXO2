@@ -61,7 +61,7 @@ namespace Gx
 {
     typedef std::shared_ptr<const sf::Font> FontHandle;
 
-    class Text : public Node, public Renderable, public Updatable, public Inputable, public Colorable
+    class Text : public Node, public Renderable, public Updatable, public Colorable
     {
     public:
         enum Style
@@ -111,7 +111,6 @@ namespace Gx
     private:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void Update(double delta);
-        virtual bool Input(sf::Event ev);
 
         void EnsureGeometryUpdate() const;
 

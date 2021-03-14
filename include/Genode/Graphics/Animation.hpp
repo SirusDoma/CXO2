@@ -11,7 +11,7 @@
 
 namespace Gx
 {
-    class Animation : public Node, public Renderable, public Updatable, public Inputable, public Colorable
+    class Animation : public Node, public Renderable, public Updatable, public Colorable
     {
     public:
         Animation();

@@ -33,7 +33,7 @@
 
 namespace Gx
 {
-    class Shape : public Node, public Renderable, public Updatable, public Inputable, public Colorable
+    class Shape : public Node, public Renderable, public Updatable, public Colorable
     {
     public:
         virtual ~Shape();
@@ -66,7 +66,6 @@ namespace Gx
         void Update();
 
         virtual void Update(double delta);
-        virtual bool Input(sf::Event ev);
 
     private:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;

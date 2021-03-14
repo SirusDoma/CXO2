@@ -138,11 +138,6 @@ namespace Gx
     {
     }
 
-    bool Sprite::Input(sf::Event ev)
-    {
-        return Inputable::Input(ev);
-    }
-
     sf::RenderStates Sprite::Render(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if (m_texture)
@@ -177,5 +172,4 @@ namespace Gx
         m_vertices[2].texCoords = sf::Vector2f(right, top);
         m_vertices[3].texCoords = sf::Vector2f(right, bottom);
     }
-
 }

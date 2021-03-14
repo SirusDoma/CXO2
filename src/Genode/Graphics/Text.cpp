@@ -361,11 +361,6 @@ namespace Gx
     {
     }
 
-    bool Text::Input(sf::Event ev)
-    {
-        return Inputable::Input(ev);
-    }
-
     void Text::EnsureGeometryUpdate() const
     {
         if (!m_font)

@@ -207,11 +207,6 @@ namespace Gx
     {
     }
 
-    bool Shape::Input(sf::Event ev)
-    {
-        return Inputable::Input(ev);
-    }
-
     void Shape::UpdateFillColors()
     {
         for (std::size_t i = 0; i < m_vertices.getVertexCount(); ++i)
