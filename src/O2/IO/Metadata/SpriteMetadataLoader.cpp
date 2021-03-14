@@ -39,6 +39,8 @@ void SpriteMetadataLoader::Parse(Json attributes, SpriteMetadata *metadata)
         color->at("b").get_to(b);
         metadata->Color = sf::Color(r, g, b, a);
     }
+    else
+        metadata->Color = sf::Color::White;
 
     auto texCoords  = attributes.find("texCoords");
     if (texCoords != attributes.end())
@@ -55,17 +57,20 @@ void SpriteMetadataLoader::Parse(Json attributes, SpriteMetadata *metadata)
 Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<SpriteMetadata*>(metadata);
-    if (!spec || !context.Texture)
+    if (!spec)
         return nullptr;
 
     auto sprite = new Gx::Sprite();
-    sprite->SetTexture(context.Texture);
+    if (context.Texture)
+        sprite->SetTexture(context.Texture);
+
     sprite->SetTexCoords(spec->TexCoords);
     sprite->SetColor(spec->Color);
 
     sprite->SetPosition(spec->Position);
     sprite->SetScale(spec->Scale);
     sprite->SetRotation(spec->Rotation);
+    sprite->SetOrigin(spec->Origin);
 
     return sprite;
 }

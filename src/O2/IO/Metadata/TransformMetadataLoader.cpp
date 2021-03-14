@@ -18,9 +18,6 @@ Gx::ResourceMetadata* TransformMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 
 
 void TransformMetadataLoader::Parse(Json attributes, TransformMetadata *metadata)
 {
-    if (attributes.empty())
-        return;
-
     auto position = attributes.find("position");
     if (position != attributes.end())
     {
@@ -44,6 +41,17 @@ void TransformMetadataLoader::Parse(Json attributes, TransformMetadata *metadata
         rotation->get_to(metadata->Rotation);
     else
         metadata->Rotation = 0;
+
+    auto origin  = attributes.find("origin");
+    if (origin != attributes.end())
+    {
+        float x, y;
+        origin->at("x").get_to(x);
+        origin->at("y").get_to(y);
+        metadata->Origin = sf::Vector2f (x, y);
+    }
+    else
+        metadata->Origin = sf::Vector2f();
 }
 
 sf::Transform* TransformMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const

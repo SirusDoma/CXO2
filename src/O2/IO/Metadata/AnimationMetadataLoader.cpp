@@ -47,7 +47,7 @@ Gx::ResourceMetadata* AnimationMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 
 Gx::Animation* AnimationMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<AnimationMetadata*>(metadata);
-    if (!spec || !context.Texture)
+    if (!spec)
         return nullptr;
 
     auto animation = new Gx::Animation();
