@@ -16,7 +16,7 @@ void StatePlanet::Initialize()
     AddChild(tower);
 
     auto button = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State_Planet\\Btn_Exit.json");
-    button->SetClickCallback([](Gx::Button *btn) {
+    button->SetClickCallback([] {
         std::cout << "Hello World" << std::endl;
     });
     AddChild(button);

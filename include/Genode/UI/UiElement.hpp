@@ -13,10 +13,10 @@ namespace Gx
 
         virtual void AddChild(Node *child);
 
-        void SetEnabled(const bool& enabled);
+        void SetEnabled(bool enabled);
         const bool& IsEnabled() const;
 
-        void SetVisible(const bool& visible);
+        void SetVisible(bool visible);
         const bool& IsVislble() const;
 
     protected:

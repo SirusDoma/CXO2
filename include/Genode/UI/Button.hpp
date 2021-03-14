@@ -21,29 +21,32 @@ namespace Gx
         explicit Button(TextureHandle texture);
         Button(TextureHandle texture, const sf::IntRect& rectangle);
 
-        void SetFocusCallback(std::function<void(Button*)> callback);
-        void SetLostFocusCallback(std::function<void(Button*)> callback);
-        void SetClickCallback(std::function<void(Button*)> callback);
-
-        void AddButtonState(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
-        void AddButtonState(Button::State state, const Gx::Sprite& sprite);
+        void SetClickCallback(std::function<void()> callback);
+        void SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
+        void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
 
     protected:
+        const Sprite GetStateFrame(Button::State state) const;
+        Sprite *GetSprite() const;
+
+        const Button::State GetState() const;
+        void SetState(const Button::State &state);
+
+        bool IsIntersect(sf::Vector2f ev);
+
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void Update(double delta);
-
-    private:
-        mutable Gx::Sprite m_sprite;
-        mutable std::unordered_map<Button::State, Gx::Sprite> m_stateData;
-
-        Button::State m_state;
-        std::function<void(Button*)> m_focus, m_lostFocus, m_click;
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonClick(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
 
-        bool IsIntersect(sf::Vector2f ev);
+    private:
+        mutable Gx::Sprite m_sprite;
+        mutable std::unordered_map<Button::State, Sprite> m_stateData;
+
+        Button::State m_state;
+        std::function<void()> m_click;
     };
 }
 

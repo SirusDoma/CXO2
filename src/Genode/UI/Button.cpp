@@ -32,33 +32,43 @@ namespace Gx
     {
     }
 
-    void Button::SetFocusCallback(std::function<void(Button*)> callback)
-    {
-        m_focus = callback;
-    }
-
-    void Button::SetLostFocusCallback(std::function<void(Button*)> callback)
-    {
-        m_lostFocus = callback;
-    }
-
-    void Button::SetClickCallback(std::function<void(Button*)> callback)
+    void Button::SetClickCallback(std::function<void()> callback)
     {
         m_click = callback;
     }
 
-    void Button::AddButtonState(Button::State state, sf::IntRect texCoords, sf::Color color)
+    Sprite *Button::GetSprite() const
+    {
+        return &m_sprite;
+    }
+
+    const Sprite Button::GetStateFrame(Button::State state) const
+    {
+        return m_stateData[state];
+    }
+
+    void Button::SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color)
     {
         auto sprite = Gx::Sprite();
         sprite.SetTexCoords(texCoords);
         sprite.SetColor(color);
 
-        AddButtonState(state, sprite);
+        SetStateFrame(state, sprite);
     }
 
-    void Button::AddButtonState(Button::State state, const Sprite &sprite)
+    void Button::SetStateFrame(Button::State state, const Sprite &sprite)
     {
         m_stateData[state] = sprite;
+    }
+
+    const Button::State Button::GetState() const
+    {
+        return m_state;
+    }
+
+    void Button::SetState(const Button::State &state)
+    {
+        m_state = state;
     }
 
     void Button::Update(double delta)
@@ -87,17 +97,9 @@ namespace Gx
 
         bool intersect = IsIntersect(sf::Vector2f(ev.x, ev.y));
         if (intersect && m_state == Button::State::NORMAL)
-        {
             m_state = Button::State::HOVER;
-            if (m_focus)
-                m_focus(this);
-        }
         else if (!intersect && m_state == Button::State::HOVER)
-        {
             m_state = Button::State::NORMAL;
-            if (m_lostFocus)
-                m_lostFocus(this);
-        }
     }
 
     void Button::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
@@ -116,7 +118,7 @@ namespace Gx
         {
             m_state = Button::State::HOVER;
             if (m_click)
-                m_click(this);
+                m_click();
         }
     }
 

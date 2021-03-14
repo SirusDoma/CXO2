@@ -60,7 +60,7 @@ Gx::Button* ButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
     if (loader)
     {
         for (auto[state, meta] : spec->States)
-            button->AddButtonState(state, *loader->Create(&meta, Gx::ResourceContext()));
+            button->SetStateFrame(state, *loader->Create(&meta, Gx::ResourceContext()));
     }
 
     return button;

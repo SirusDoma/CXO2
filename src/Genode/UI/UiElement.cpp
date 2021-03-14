@@ -24,7 +24,7 @@ namespace Gx
         }
     }
 
-    void UiElement::SetEnabled(const bool &enabled)
+    void UiElement::SetEnabled(bool enabled)
     {
         m_enabled = enabled;
     }
@@ -34,7 +34,7 @@ namespace Gx
         return m_enabled;
     }
 
-    void UiElement::SetVisible(const bool &visible)
+    void UiElement::SetVisible(bool visible)
     {
         m_visible = visible;
     }
