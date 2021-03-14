@@ -7,13 +7,12 @@
 
 namespace Gx
 {
-    class ResourceMetadata
+    struct ResourceMetadata
     {
     public:
         virtual ~ResourceMetadata() {}
         
         std::string Type;
-
         std::unordered_map<std::string, std::string> ResourceReferences;
     };
 }

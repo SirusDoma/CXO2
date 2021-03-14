@@ -10,7 +10,7 @@
 
 #include <vector>
 
-class AnimationMetadata : public SpriteMetadata
+struct AnimationMetadata : public SpriteMetadata
 {
 public:
     AnimationMetadata() {}

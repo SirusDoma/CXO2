@@ -7,7 +7,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-class MusicMetadata : public Gx::ResourceMetadata
+struct MusicMetadata : public Gx::ResourceMetadata
 {
 public:
     MusicMetadata() {}

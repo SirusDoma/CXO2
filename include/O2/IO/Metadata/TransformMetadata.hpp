@@ -7,7 +7,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-class TransformMetadata : public Gx::ResourceMetadata
+struct TransformMetadata : public Gx::ResourceMetadata
 {
 public:
     TransformMetadata() {}
@@ -16,6 +16,7 @@ public:
     sf::Vector2f Position;
     sf::Vector2f Scale;
     float        Rotation;
+    sf::Vector2f Origin;
 };
 
 #endif

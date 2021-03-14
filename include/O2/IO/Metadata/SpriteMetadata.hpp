@@ -9,7 +9,7 @@
 
 #include <O2/IO/Metadata/TransformMetadata.hpp>
 
-class SpriteMetadata : public TransformMetadata
+struct SpriteMetadata : public TransformMetadata
 {
 public:
     SpriteMetadata() {}
