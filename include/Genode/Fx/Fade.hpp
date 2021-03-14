@@ -1,6 +1,8 @@
 #ifndef GENODE_FADE_HPP
 #define GENODE_FADE_HPP
 
+#include <SFML/System/Time.hpp>
+
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Entities/Colorable.hpp>
 #include <Genode/System/Primitives.hpp>
@@ -10,7 +12,7 @@ namespace Gx
     class Fade : public Task
     {
     public:
-        Fade(Colorable* target, Uint8 opacity, double duration);
+        Fade(Colorable* target, Uint8 opacity, const sf::Time& duration);
 
     protected:
         virtual void Update(double delta);
@@ -19,7 +21,7 @@ namespace Gx
     private:
         Colorable* m_target;
         Int16 m_start, m_end, m_diff;
-        double m_duration;
+        sf::Time m_duration;
     };
 }
 

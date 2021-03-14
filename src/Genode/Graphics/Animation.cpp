@@ -54,7 +54,7 @@ namespace Gx
         return m_duration;
     }
 
-    void Animation::SetLoop(const bool &loop)
+    void Animation::SetLoop(bool loop)
     {
         m_loop = loop;
     }
@@ -64,15 +64,38 @@ namespace Gx
         return m_loop;
     }
 
+    void Animation::SetColor(const sf::Color &color)
+    {
+        if (m_sprite)
+            m_sprite->SetColor(color);
+    }
+
+    const sf::Color &Animation::GetColor() const
+    {
+        if (m_sprite)
+            return m_sprite->GetColor();
+
+        return sf::Color::White;
+    }
+
+    const sf::Time Animation::GetElapsed() const
+    {
+        return m_elapsed;
+    }
+
     void Animation::Update(double delta)
     {
+        Task::Update(delta);
+        if (GetState() == TaskState::Completed || GetState() == TaskState::Stopped)
+            return;
+
         m_elapsed += sf::milliseconds(delta);
         if (m_elapsed >= m_duration)
         {
-            if (IsLoop())
-                m_elapsed = sf::milliseconds(m_elapsed.asMilliseconds() % m_duration.asMilliseconds());
-            else
-                return;
+            if (!IsLoop())
+                return Complete();
+
+            m_elapsed = sf::milliseconds(m_elapsed.asMilliseconds() % m_duration.asMilliseconds());
         }
 
         auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / m_frames.size());
@@ -99,17 +122,13 @@ namespace Gx
         return states;
     }
 
-    void Animation::SetColor(const sf::Color &color)
+    void Animation::Reset()
     {
-        if (m_sprite)
-            m_sprite->SetColor(color);
-    }
+        Task::Reset();
 
-    const sf::Color &Animation::GetColor() const
-    {
-        if (m_sprite)
-            return m_sprite->GetColor();
-
-        return sf::Color::White;
+        m_elapsed      = sf::Time::Zero;
+        m_currentFrame = 0;
+        if (m_frames.size() > 0)
+            m_sprite->SetTexCoords(m_frames[m_currentFrame]);
     }
 }

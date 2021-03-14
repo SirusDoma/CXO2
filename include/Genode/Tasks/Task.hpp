@@ -1,7 +1,10 @@
 #ifndef GENODE_TASK_HPP
 #define GENODE_TASK_HPP
 
+#include <SFML/System/Time.hpp>
+
 #include <Genode/Entities/Updatable.hpp>
+
 #include <functional>
 
 namespace Gx
@@ -21,8 +24,8 @@ namespace Gx
 
         virtual ~Task();
 
-        TaskState GetState() const;
-        double GetElapsed() const;
+        const TaskState GetState() const;
+        virtual const sf::Time GetElapsed() const;
 
         void OnStart(std::function<void()> callback);
         void OnStopped(std::function<void()> callback);
@@ -34,12 +37,14 @@ namespace Gx
     protected:
         Task();
 
+        void SetState(const TaskState &state);
+
         virtual void Stop();
         virtual void Complete();
 
     private:
         TaskState m_state;
-        double m_elapsed;
+        sf::Time m_elapsed;
 
         std::function<void()> m_start, m_stop, m_complete;
     };

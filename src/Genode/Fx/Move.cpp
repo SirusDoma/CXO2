@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    Move::Move(Transformable* target, sf::Vector2f position, double duration) :
+    Move::Move(Transformable* target, sf::Vector2f position, const sf::Time& duration) :
         m_target(target),
         m_start(),
         m_diff(),
@@ -29,7 +29,7 @@ namespace Gx
 
         float offset = 0.0f;
         auto current = m_target->GetPosition();
-        double elapsed = GetElapsed();
+        auto elapsed = GetElapsed();
 
         if (m_end.x < current.x)
         {

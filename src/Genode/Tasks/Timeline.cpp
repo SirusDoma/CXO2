@@ -19,7 +19,7 @@ namespace Gx
         m_frames.clear();
     }
 
-    Timeline::KeyFrame::KeyFrame(double offset, Gx::Task* task) :
+    Timeline::KeyFrame::KeyFrame(const sf::Time& offset, Gx::Task* task) :
         Offset(offset),
         KeyTask(task)
     {
@@ -66,7 +66,7 @@ namespace Gx
             return;
 
         int completed = 0;
-        double elapsed = GetElapsed();
+        sf::Time elapsed = GetElapsed();
         for (auto frame : m_frames)
         {
             if (frame->KeyTask && frame->Offset <= elapsed)

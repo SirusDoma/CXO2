@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    Fade::Fade(Colorable* target, Uint8 opacity, double duration) :
+    Fade::Fade(Colorable* target, Uint8 opacity, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetColor().a),
         m_diff(0),
@@ -25,9 +25,9 @@ namespace Gx
             m_diff  = abs(m_start - m_end);
         }
 
-        short alpha    = 0;
-        auto current   = m_target->GetColor();
-        double elapsed = GetElapsed();
+        short alpha  = 0;
+        auto current = m_target->GetColor();
+        auto elapsed = GetElapsed();
 
         if (m_end < current.a)
         {

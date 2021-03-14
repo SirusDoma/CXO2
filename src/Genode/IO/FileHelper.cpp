@@ -25,7 +25,7 @@ namespace Gx
         m_directories.push_back(path);
     }
 
-    bool FileHelper::Exists(const std::string& fileName, const bool& asAsset)
+    bool FileHelper::Exists(const std::string& fileName, bool asAsset)
     {
         auto filePath = path(fileName.c_str());
         bool result = exists(filePath);

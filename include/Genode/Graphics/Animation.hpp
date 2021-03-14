@@ -11,7 +11,7 @@
 
 namespace Gx
 {
-    class Animation : public Node, public Renderable, public Updatable, public Colorable
+    class Animation : public Node, public Task, public Renderable, public Colorable
     {
     public:
         Animation();
@@ -27,10 +27,13 @@ namespace Gx
         void SetDuration(const sf::Time& duration);
 
         const bool& IsLoop() const;
-        void SetLoop(const bool& loop);
+        void SetLoop(bool loop);
 
         virtual const sf::Color& GetColor() const;
         virtual void SetColor(const sf::Color &color);
+
+        virtual const sf::Time GetElapsed() const;
+        virtual void Reset();
 
     protected:
         virtual void Update(double delta);

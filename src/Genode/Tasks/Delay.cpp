@@ -3,11 +3,11 @@
 namespace Gx
 {
     Delay::Delay() :
-        m_duration(0)
+        m_duration(sf::Time::Zero)
     {
     }
 
-    Delay::Delay(double duration) :
+    Delay::Delay(sf::Time duration) :
         m_duration(duration)
     {
     }
@@ -16,12 +16,12 @@ namespace Gx
     {
     }
 
-    double Delay::GetDuration() const
+    sf::Time Delay::GetDuration() const
     {
         return m_duration;
     }
 
-    void Delay::SetDuration(double duration)
+    void Delay::SetDuration(const sf::Time& duration)
     {
         m_duration = duration;
     }

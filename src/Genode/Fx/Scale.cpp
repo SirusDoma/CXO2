@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    Scale::Scale(Transformable* target, sf::Vector2f scale, double duration) :
+    Scale::Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetScale()),
         m_diff(),
@@ -27,9 +27,9 @@ namespace Gx
             m_diff.y = abs(m_diff.y);
         }
 
-        float scale = 0.0f;
+        float scale  = 0.0f;
         auto current = m_target->GetScale();
-        double elapsed = GetElapsed();
+        auto elapsed = GetElapsed();
 
         if (m_end.x < current.x)
         {

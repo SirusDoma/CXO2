@@ -11,7 +11,7 @@ namespace Gx
     class Scale : public Task
     {
     public:
-        Scale(Transformable* target, sf::Vector2f scale, double duration);
+        Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration);
 
     protected:
         virtual void Update(double delta);
@@ -20,7 +20,7 @@ namespace Gx
     private:
         Transformable* m_target;
         sf::Vector2f m_start, m_end, m_diff;
-        double m_duration;
+        sf::Time m_duration;
     };
 }
 

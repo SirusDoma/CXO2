@@ -4,7 +4,7 @@ namespace Gx
 {
     Task::Task() :
         m_state(TaskState::Initial),
-        m_elapsed(0)
+        m_elapsed(sf::Time::Zero)
     {
         Reset();
     }
@@ -13,12 +13,17 @@ namespace Gx
     {
     }
 
-    Task::TaskState Task::GetState() const
+    const Task::TaskState Task::GetState() const
     {
         return m_state;
     }
 
-    double Task::GetElapsed() const
+    void Task::SetState(const TaskState &state)
+    {
+        m_state = state;
+    }
+
+    const sf::Time Task::GetElapsed() const
     {
         return m_elapsed;
     }
@@ -43,18 +48,18 @@ namespace Gx
         if (m_state == TaskState::Completed || m_state == TaskState::Stopped)
             return;
 
-        if (m_elapsed == 0 && m_start)
+        if (m_elapsed == sf::Time::Zero && m_start)
             m_start();
-        else if (m_elapsed > 0 && m_state == TaskState::Initial)
+        else if (m_elapsed > sf::Time::Zero && m_state == TaskState::Initial)
             m_state = TaskState::Running;
 
-        m_elapsed += delta;
+        m_elapsed += sf::milliseconds(delta);
     }
 
     void Task::Stop()
     {
         m_state   = TaskState::Stopped;
-        m_elapsed = 0;
+        m_elapsed = sf::Time::Zero;
 
         if (m_stop)
             m_stop();
@@ -63,7 +68,7 @@ namespace Gx
     void Task::Complete()
     {
         m_state   = TaskState::Completed;
-        m_elapsed = 0;
+        m_elapsed = sf::Time::Zero;
 
         if (m_complete)
             m_complete();
@@ -72,6 +77,6 @@ namespace Gx
     void Task::Reset()
     {
         m_state   = TaskState::Initial;
-        m_elapsed = 0;
+        m_elapsed = sf::Time::Zero;
     }
 }

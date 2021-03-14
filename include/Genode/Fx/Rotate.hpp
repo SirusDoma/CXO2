@@ -9,7 +9,7 @@ namespace Gx
     class Rotate : public Task
     {
     public:
-        Rotate(Transformable* target, float rotation, double duration);
+        Rotate(Transformable* target, float rotation, const sf::Time& duration);
 
     protected:
         virtual void Update(double delta);
@@ -18,7 +18,7 @@ namespace Gx
     private:
         Transformable* m_target;
         float m_start, m_end, m_diff;
-        double m_duration;
+        sf::Time m_duration;
     };
 }
 

@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    Rotate::Rotate(Transformable* target, float angle, double duration) :
+    Rotate::Rotate(Transformable* target, float angle, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetRotation()),
         m_diff(0),
@@ -27,7 +27,7 @@ namespace Gx
 
         short rotation = 0;
         auto current   = m_target->GetRotation();
-        double elapsed = GetElapsed();
+        auto elapsed   = GetElapsed();
 
         if (m_end < current)
         {

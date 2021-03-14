@@ -9,17 +9,17 @@ namespace Gx
     {
     public:
         Delay();
-        Delay(double duration);
+        Delay(sf::Time duration);
         virtual ~Delay();
 
-        double GetDuration() const;
-        void SetDuration(double duration);
+        sf::Time GetDuration() const;
+        void SetDuration(const sf::Time& duration);
 
     protected:
         virtual void Update(double delta);
 
     private:
-        double m_duration;
+        sf::Time m_duration;
     };
 }
 

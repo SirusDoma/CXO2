@@ -11,10 +11,10 @@ namespace Gx
     public:
         struct KeyFrame
         {
-            Task*  KeyTask;
-            double Offset;
+            Task*    KeyTask;
+            sf::Time Offset;
 
-            KeyFrame(double offset, Gx::Task* task);
+            KeyFrame(const sf::Time& offset, Gx::Task* task);
             ~KeyFrame();
         };
 
