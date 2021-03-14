@@ -1,7 +1,7 @@
 #ifndef GENODE_BUTTON_HPP
 #define GENODE_BUTTON_HPP
 
-#include <Genode/UI/UiElement.hpp>
+#include <Genode/UI/Control.hpp>
 #include <Genode/Graphics.hpp>
 
 #include <functional>
@@ -9,7 +9,7 @@
 
 namespace Gx
 {
-    class Button : public UiElement
+    class Button : public Control
     {
     public:
         enum State { Normal, Hover, Pressed };

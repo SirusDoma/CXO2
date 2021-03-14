@@ -1,20 +1,20 @@
-#include <Genode/UI/UiElement.hpp>
+#include <Genode/UI/Control.hpp>
 
 namespace Gx
 {
-    UiElement::UiElement() :
+    Control::Control() :
         m_enabled(true),
         m_visible(true)
     {
     }
 
-    UiElement::~UiElement()
+    Control::~Control()
     {
     }
 
-    void UiElement::AddChild(Node *child)
+    void Control::AddChild(Node *child)
     {
-        auto ui = dynamic_cast<UiElement*>(child);
+        auto ui = dynamic_cast<Control*>(child);
         if (ui)
         {
             ui->SetEnabled(IsEnabled());
@@ -24,22 +24,22 @@ namespace Gx
         }
     }
 
-    void UiElement::SetEnabled(bool enabled)
+    void Control::SetEnabled(bool enabled)
     {
         m_enabled = enabled;
     }
 
-    const bool &UiElement::IsEnabled() const
+    const bool &Control::IsEnabled() const
     {
         return m_enabled;
     }
 
-    void UiElement::SetVisible(bool visible)
+    void Control::SetVisible(bool visible)
     {
         m_visible = visible;
     }
 
-    const bool &UiElement::IsVislble() const
+    const bool &Control::IsVislble() const
     {
         return m_visible;
     }

@@ -6,10 +6,10 @@
 
 namespace Gx
 {
-    class UiElement : public Node, public Renderable, public Updatable, public Inputable
+    class Control : public Node, public Renderable, public Updatable, public Inputable
     {
     public:
-        virtual ~UiElement();
+        virtual ~Control();
 
         virtual void AddChild(Node *child);
 
@@ -20,7 +20,7 @@ namespace Gx
         const bool& IsVislble() const;
 
     protected:
-        UiElement();
+        Control();
 
     private:
         bool m_enabled, m_visible;
