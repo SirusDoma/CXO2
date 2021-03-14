@@ -11,14 +11,24 @@
 
 namespace Gx
 {
-    class Animation : public Node, public Task, public Renderable, public Colorable
+    class Animation : public Node, public Renderable, public Updatable, public Colorable
     {
     public:
         Animation();
         Animation(Sprite *sprite, const sf::Time& duration, std::initializer_list<sf::IntRect> frames);
         virtual ~Animation();
 
-        void AddFrames(std::initializer_list<sf::IntRect> frames);
+        enum AnimationState
+        {
+            Initial,
+            Playing,
+            Stopped,
+            Completed
+        };
+
+        template<typename... Args>
+        void AddFrame(sf::IntRect first, Args... args);
+        void AddFrame(const sf::IntRect &frame);
 
         Gx::Sprite *GetSprite() const;
         void SetSprite(Gx::Sprite *sprite);
@@ -32,7 +42,9 @@ namespace Gx
         virtual const sf::Color& GetColor() const;
         virtual void SetColor(const sf::Color &color);
 
-        virtual const sf::Time GetElapsed() const;
+        const AnimationState GetState() const;
+
+        virtual void Stop();
         virtual void Reset();
 
     protected:
@@ -41,6 +53,8 @@ namespace Gx
 
     private:
         Sprite *m_sprite;
+        AnimationState m_state;
+
         sf::Time m_duration;
         sf::Time m_elapsed;
         double m_currentFrame;
@@ -49,4 +63,5 @@ namespace Gx
     };
 }
 
+#include <Genode/Graphics/Animation.inl>
 #endif

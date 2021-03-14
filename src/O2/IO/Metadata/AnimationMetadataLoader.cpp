@@ -59,7 +59,7 @@ Gx::Animation* AnimationMetadataLoader::Create(Gx::ResourceMetadata* metadata, G
         animation->SetSprite(loader->Create(metadata, context));
 
     for (auto frame : spec->Frames)
-        animation->AddFrames({ frame });
+        animation->AddFrame(frame);
 
     return animation;
 }

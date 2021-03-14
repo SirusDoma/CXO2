@@ -8,7 +8,8 @@ namespace Gx
         m_duration(sf::Time::Zero),
         m_frames(),
         m_elapsed(sf::Time::Zero),
-        m_currentFrame(0)
+        m_currentFrame(0),
+        m_state(AnimationState::Initial)
     {
     }
 
@@ -25,10 +26,9 @@ namespace Gx
     {
     }
 
-    void Animation::AddFrames(std::initializer_list<sf::IntRect> frames)
+    void Animation::AddFrame(const sf::IntRect &frame)
     {
-        for (auto frame : frames)
-            m_frames.push_back(frame);
+        m_frames.push_back(frame);
     }
 
     Gx::Sprite *Animation::GetSprite() const
@@ -78,22 +78,27 @@ namespace Gx
         return sf::Color::White;
     }
 
-    const sf::Time Animation::GetElapsed() const
+    const Animation::AnimationState Animation::GetState() const
     {
-        return m_elapsed;
+        return m_state;
     }
 
     void Animation::Update(double delta)
     {
-        Task::Update(delta);
-        if (GetState() == TaskState::Completed || GetState() == TaskState::Stopped)
+        if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
             return;
 
+        m_state    = AnimationState::Playing;
         m_elapsed += sf::milliseconds(delta);
         if (m_elapsed >= m_duration)
         {
             if (!IsLoop())
-                return Complete();
+            {
+                m_state   = AnimationState::Completed;
+                m_elapsed = sf::Time::Zero;
+
+                return;
+            }
 
             m_elapsed = sf::milliseconds(m_elapsed.asMilliseconds() % m_duration.asMilliseconds());
         }
@@ -122,11 +127,17 @@ namespace Gx
         return states;
     }
 
+    void Animation::Stop()
+    {
+        m_state   = AnimationState::Stopped;
+        m_elapsed = sf::Time::Zero;
+    }
+
     void Animation::Reset()
     {
-        Task::Reset();
+        m_state   = AnimationState::Initial;
+        m_elapsed = sf::Time::Zero;
 
-        m_elapsed      = sf::Time::Zero;
         m_currentFrame = 0;
         if (m_frames.size() > 0)
             m_sprite->SetTexCoords(m_frames[m_currentFrame]);
