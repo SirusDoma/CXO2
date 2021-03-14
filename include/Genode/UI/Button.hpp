@@ -12,7 +12,7 @@ namespace Gx
     class Button : public UiElement
     {
     public:
-        enum State { NORMAL, HOVER, PRESSED };
+        enum State { Normal, Hover, Pressed };
 
         Button();
         explicit Button(const sf::Texture& texture);
