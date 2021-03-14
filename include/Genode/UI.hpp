@@ -3,5 +3,6 @@
 
 #include <Genode/UI/UiElement.hpp>
 #include <Genode/UI/Button.hpp>
+#include <Genode/UI/CheckBox.hpp>
 
 #endif
