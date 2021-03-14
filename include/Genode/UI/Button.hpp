@@ -9,11 +9,11 @@
 
 namespace Gx
 {
-    enum ButtonState { NORMAL, HOVER, PRESSED };
-
     class Button : public UiElement
     {
     public:
+        enum State { NORMAL, HOVER, PRESSED };
+
         Button();
         explicit Button(const sf::Texture& texture);
         Button(const sf::Texture& texture, const sf::IntRect& rectangle);
@@ -25,8 +25,8 @@ namespace Gx
         void SetLostFocusCallback(std::function<void(Button*)> callback);
         void SetClickCallback(std::function<void(Button*)> callback);
 
-        void AddButtonState(ButtonState state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
-        void AddButtonState(ButtonState state, const Gx::Sprite& sprite);
+        void AddButtonState(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
+        void AddButtonState(Button::State state, const Gx::Sprite& sprite);
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -34,9 +34,9 @@ namespace Gx
 
     private:
         mutable Gx::Sprite m_sprite;
-        mutable std::unordered_map<ButtonState, Gx::Sprite> m_stateData;
+        mutable std::unordered_map<Button::State, Gx::Sprite> m_stateData;
 
-        ButtonState m_state;
+        Button::State m_state;
         std::function<void(Button*)> m_focus, m_lostFocus, m_click;
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);

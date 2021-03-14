@@ -17,7 +17,7 @@ public:
     ButtonMetadata() {}
     virtual ~ButtonMetadata() {}
 
-    std::unordered_map<Gx::ButtonState, SpriteMetadata> States;
+    std::unordered_map<Gx::Button::State, SpriteMetadata> States;
 };
 
 #endif

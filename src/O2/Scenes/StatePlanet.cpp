@@ -5,12 +5,10 @@
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/UI.hpp>
 
+#include <iostream>
+
 void StatePlanet::Initialize()
 {
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State_Planet\\Music.json");
-    if (bgm)
-        bgm->play();
-
     auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State_Planet\\Background.json");
     AddChild(background);
 
@@ -18,12 +16,20 @@ void StatePlanet::Initialize()
     AddChild(tower);
 
     auto button = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State_Planet\\Btn_Exit.json");
+    button->SetClickCallback([](Gx::Button *btn) {
+        std::cout << "Hello World" << std::endl;
+    });
+
     AddChild(button);
 
     // Overlay fade in animation
     auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
     overlay->SetFillColor(sf::Color::Black);
     AddChild(overlay);
+
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State_Planet\\Music.json");
+    if (bgm)
+        bgm->play();
 
     Run(new Gx::Sequence({
         new Gx::Fade(overlay, 0, 4500),
