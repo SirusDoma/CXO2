@@ -17,6 +17,8 @@ public :
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Button* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+
+    static void Parse(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata* metadata);
 };
 
 #endif
