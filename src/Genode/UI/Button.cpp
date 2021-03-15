@@ -3,43 +3,51 @@
 namespace Gx
 {
     Button::Button() :
-        m_sprite(),
-        m_state(Button::State::Normal)
+        m_sprite()
     {
     }
 
     Button::Button(const sf::Texture &texture) :
-        m_sprite(texture),
-        m_state(Button::State::Normal)
+        m_sprite(texture)
     {
     }
 
     Button::Button(const sf::Texture &texture, const sf::IntRect &rectangle) :
-        m_sprite(texture, rectangle),
-        m_state(Button::State::Normal)
+        m_sprite(texture, rectangle)
     {
     }
 
     Button::Button(TextureHandle texture) :
-        m_sprite(texture),
-        m_state(Button::State::Normal)
+        m_sprite(texture)
     {
     }
 
     Button::Button(TextureHandle texture, const sf::IntRect &rectangle) :
-        m_sprite(texture, rectangle),
-        m_state(Button::State::Normal)
+        m_sprite(texture, rectangle)
     {
-    }
-
-    void Button::SetClickCallback(std::function<void()> callback)
-    {
-        m_click = callback;
     }
 
     Sprite *Button::GetSprite() const
     {
         return &m_sprite;
+    }
+
+    const sf::FloatRect Button::GetLocalBounds() const
+    {
+        // Use frame for active state first before looking for other frames
+        auto bounds = m_stateData[GetControlState()].GetLocalBounds();
+        if (bounds.width > 0 && bounds.height > 0)
+            return bounds;
+
+        // There's no frame for active state, look for valid frame
+        for (auto [_, frame] : m_stateData)
+        {
+            bounds = frame.GetLocalBounds();
+            if (bounds.width > 0 && bounds.height > 0)
+                return bounds;
+        }
+
+        return sf::FloatRect();
     }
 
     const Sprite Button::GetStateFrame(Button::State state) const
@@ -59,20 +67,7 @@ namespace Gx
     void Button::SetStateFrame(Button::State state, const Sprite &sprite)
     {
         m_stateData[state] = sprite;
-    }
-
-    const Button::State Button::GetState() const
-    {
-        return m_state;
-    }
-
-    void Button::SetState(const Button::State &state)
-    {
-        m_state = state;
-    }
-
-    void Button::Update(double delta)
-    {
+        Invalidate();
     }
 
     sf::RenderStates Button::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -80,61 +75,20 @@ namespace Gx
         if (!IsVislble())
             return states;
 
-        auto frame = m_stateData[m_state];
-        m_sprite.SetColor(frame.GetColor());
-        m_sprite.SetTexCoords(frame.GetTexCoords());
+        auto frame = m_stateData[GetControlState()];
+        states.transform *= GetTransform();
+        states.transform *= frame.GetTransform();
 
-        states.transform *= GetTransform() * frame.GetTransform();
         target.draw(m_sprite, states);
 
         return states;
     }
 
-    void Button::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void Button::Invalidate()
     {
-        if (!IsEnabled() || m_state == Button::State::Pressed)
-            return;
+        auto frame = m_stateData[GetControlState()];
 
-        bool intersect = IsIntersect(sf::Vector2f(ev.x, ev.y));
-        if (intersect && m_state == Button::State::Normal)
-            m_state = Button::State::Hover;
-        else if (!intersect && m_state == Button::State::Hover)
-            m_state = Button::State::Normal;
-    }
-
-    void Button::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
-    {
-        if (IsEnabled() && m_state == Button::State::Hover && IsIntersect(sf::Vector2f(ev.x, ev.y)))
-            m_state = Button::State::Pressed;
-    }
-
-    void Button::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
-    {
-        if (!IsEnabled() || m_state != Button::State::Pressed)
-            return;
-
-        m_state = Button::State::Normal;
-        if (IsIntersect(sf::Vector2f(ev.x, ev.y)))
-        {
-            m_state = Button::State::Hover;
-            if (m_click)
-                m_click();
-        }
-    }
-
-    bool Button::IsIntersect(sf::Vector2f ev)
-    {
-        auto position = GetPosition();
-        sf::FloatRect bounds = sf::FloatRect();
-        for (auto state : {Button::State::Normal, Button::State::Hover, Button::State::Pressed })
-        {
-            bounds = m_stateData[state].GetLocalBounds();
-            if (bounds.width != 0 && bounds.height != 0)
-                break;
-        }
-
-        bounds.top  = position.y;
-        bounds.left = position.x;
-        return bounds.contains(ev.x, ev.y);
+        m_sprite.SetColor(frame.GetColor());
+        m_sprite.SetTexCoords(frame.GetTexCoords());
     }
 }

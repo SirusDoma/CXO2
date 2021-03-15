@@ -19,17 +19,22 @@ Gx::ResourceMetadata* ButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
     for (auto resource : resources.items())
         metadata.ResourceReferences[resource.key()] = resource.value();
 
-    auto attributes = json.at("attributes");
-    SpriteMetadataLoader::Parse(attributes, &metadata);
-
-    auto states = attributes.at("states");
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
         { "normal", Gx::Button::State::Normal },
         { "hover", Gx::Button::State::Hover },
-        { "click", Gx::Button::State::Pressed },
+        { "click", Gx::Button::State::Active },
     };
 
-    metadata.States = std::unordered_map<Gx::Button::State, SpriteMetadata>();
+    Parse(json.at("attributes"), stateMap, &metadata);
+    return new ButtonMetadata(metadata);
+}
+
+void ButtonMetadataLoader::Parse(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata *metadata)
+{
+    SpriteMetadataLoader::Parse(attributes, metadata);
+
+    auto states = attributes.at("states");
+    metadata->States = std::unordered_map<Gx::Button::State, SpriteMetadata>();
     for (auto [name, state] : stateMap)
     {
         if (!states.contains(name))
@@ -38,10 +43,8 @@ Gx::ResourceMetadata* ButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
         SpriteMetadata stateMeta;
         SpriteMetadataLoader::Parse(states.at(name), &stateMeta);
 
-        metadata.States[state] = stateMeta;
+        metadata->States[state] = stateMeta;
     }
-
-    return new ButtonMetadata(metadata);
 }
 
 Gx::Button* ButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
@@ -51,10 +54,10 @@ Gx::Button* ButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
         return nullptr;
 
     auto button = new Gx::Button(context.Texture);
+    button->SetOrigin(spec->Origin);
     button->SetPosition(spec->Position);
     button->SetScale(spec->Scale);
     button->SetRotation(spec->Rotation);
-    button->SetOrigin(spec->Origin);
 
     auto loader = Gx::ResourceLoaderFactory::GetMetadataLoader<Gx::Sprite>();
     if (loader)

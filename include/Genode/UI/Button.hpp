@@ -12,8 +12,6 @@ namespace Gx
     class Button : public Control
     {
     public:
-        enum State { Normal, Hover, Pressed };
-
         Button();
         explicit Button(const sf::Texture& texture);
         Button(const sf::Texture& texture, const sf::IntRect& rectangle);
@@ -21,7 +19,8 @@ namespace Gx
         explicit Button(TextureHandle texture);
         Button(TextureHandle texture, const sf::IntRect& rectangle);
 
-        void SetClickCallback(std::function<void()> callback);
+        const sf::FloatRect GetLocalBounds() const;
+
         void SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
         void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
 
@@ -29,24 +28,12 @@ namespace Gx
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;
 
-        const Button::State GetState() const;
-        void SetState(const Button::State &state);
-
-        bool IsIntersect(sf::Vector2f ev);
-
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void Update(double delta);
-
-        virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-        virtual void OnMouseButtonClick(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
+        virtual void Invalidate();
 
     private:
         mutable Gx::Sprite m_sprite;
         mutable std::unordered_map<Button::State, Sprite> m_stateData;
-
-        Button::State m_state;
-        std::function<void()> m_click;
     };
 }
 

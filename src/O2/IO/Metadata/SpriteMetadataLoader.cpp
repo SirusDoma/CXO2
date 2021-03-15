@@ -67,10 +67,10 @@ Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
     sprite->SetTexCoords(spec->TexCoords);
     sprite->SetColor(spec->Color);
 
+    sprite->SetOrigin(spec->Origin);
     sprite->SetPosition(spec->Position);
     sprite->SetScale(spec->Scale);
     sprite->SetRotation(spec->Rotation);
-    sprite->SetOrigin(spec->Origin);
 
     return sprite;
 }

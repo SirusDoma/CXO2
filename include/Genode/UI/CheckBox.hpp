@@ -14,17 +14,20 @@ namespace Gx
     public:
         using Button::Button;
 
-        const bool IsChecked() const;
-        void SetCheckedState(bool checked);
+        virtual const bool IsChecked() const;
+        virtual void SetCheckedState(bool checked);
+
+        void SetCheckStateChangeCallback(std::function<void()> callback);
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
 
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
+        virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
+        virtual void Invalidate();
 
     private:
-        bool m_isChecked;
-        std::function<void()> m_stateChanged;
+        bool m_isChecked = false;
+        std::function<void()> m_onCheckStateChanged = nullptr;
     };
 }
 

@@ -9,7 +9,19 @@ namespace Gx
 
     void CheckBox::SetCheckedState(bool checked)
     {
-        m_isChecked = checked;
+        if (IsChecked() != checked)
+        {
+            m_isChecked = checked;
+            Invalidate();
+
+            if (m_onCheckStateChanged)
+                m_onCheckStateChanged();
+        }
+    }
+
+    void CheckBox::SetCheckStateChangeCallback(std::function<void()> callback)
+    {
+        m_onCheckStateChanged = callback;
     }
 
     sf::RenderStates CheckBox::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -17,29 +29,35 @@ namespace Gx
         if (!IsVislble())
             return states;
 
-        auto frame = GetStateFrame(GetState());
-        if (IsChecked())
-            frame = GetStateFrame(CheckBox::State::Pressed);
-        else if (GetState() == CheckBox::State::Pressed)
-            frame = GetStateFrame(CheckBox::State::Hover);
-
-        auto sprite = GetSprite();
-        sprite->SetColor(frame.GetColor());
-        sprite->SetTexCoords(frame.GetTexCoords());
-
-        states.transform *= GetTransform() * frame.GetTransform();
-        target.draw(*sprite, states);
+        auto frame = GetStateFrame(GetControlState());
+        states.transform *= GetTransform();
+        states.transform *= frame.GetTransform();
+        target.draw(*GetSprite(), states);
 
         return states;
     }
 
-    void CheckBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    void CheckBox::OnControlClick(sf::Event::MouseButtonEvent ev)
     {
-        if (!IsEnabled() || GetState() != CheckBox::State::Pressed)
+        Control::OnControlClick(ev);
+        if (!IsEnabled())
             return;
 
-        Button::OnMouseButtonUp(ev);
-        if (IsIntersect(sf::Vector2f(ev.x, ev.y)))
-            m_isChecked = !m_isChecked;
+        SetCheckedState(!IsChecked());
+    }
+
+    void CheckBox::Invalidate()
+    {
+        Sprite frame;
+        if (IsChecked())
+            frame = GetStateFrame(CheckBox::State::Active);
+        else if (GetControlState() == CheckBox::State::Active)
+            frame = GetStateFrame(CheckBox::State::Hover);
+        else
+            frame = GetStateFrame(GetControlState());
+
+        auto sprite = GetSprite();
+        sprite->SetColor(frame.GetColor());
+        sprite->SetTexCoords(frame.GetTexCoords());
     }
 }
