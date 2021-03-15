@@ -30,17 +30,17 @@ namespace Gx
 
     void Task::OnStart(std::function<void()> callback)
     {
-        m_start = callback;
+        m_onStart = callback;
     }
 
     void Task::OnStopped(std::function<void()> callback)
     {
-        m_stop = callback;
+        m_onStop = callback;
     }
 
     void Task::OnCompleted(std::function<void()> callback)
     {
-        m_complete = callback;
+        m_onComplete = callback;
     }
 
     void Task::Update(double delta)
@@ -48,8 +48,8 @@ namespace Gx
         if (m_state == TaskState::Completed || m_state == TaskState::Stopped)
             return;
 
-        if (m_elapsed == sf::Time::Zero && m_start)
-            m_start();
+        if (m_elapsed == sf::Time::Zero && m_onStart)
+            m_onStart();
         else if (m_elapsed > sf::Time::Zero && m_state == TaskState::Initial)
             m_state = TaskState::Running;
 
@@ -61,8 +61,8 @@ namespace Gx
         m_state   = TaskState::Stopped;
         m_elapsed = sf::Time::Zero;
 
-        if (m_stop)
-            m_stop();
+        if (m_onStop)
+            m_onStop();
     }
 
     void Task::Complete()
@@ -70,8 +70,8 @@ namespace Gx
         m_state   = TaskState::Completed;
         m_elapsed = sf::Time::Zero;
 
-        if (m_complete)
-            m_complete();
+        if (m_onComplete)
+            m_onComplete();
     }
 
     void Task::Reset()

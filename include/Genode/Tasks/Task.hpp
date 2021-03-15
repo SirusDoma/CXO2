@@ -46,7 +46,7 @@ namespace Gx
         TaskState m_state;
         sf::Time m_elapsed;
 
-        std::function<void()> m_start, m_stop, m_complete;
+        std::function<void()> m_onStart, m_onStop, m_onComplete;
     };
 }
 

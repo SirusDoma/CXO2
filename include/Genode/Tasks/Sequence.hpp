@@ -26,6 +26,8 @@ namespace Gx
         template<typename T>
         static Sequence* Routine(T* task, unsigned int count, double delay = 0);
 
+        virtual void Reset();
+
     protected:
         virtual void Update(double delta);
 

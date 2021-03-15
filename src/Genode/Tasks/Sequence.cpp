@@ -76,4 +76,13 @@ namespace Gx
         else
             ++m_iterator;
     }
+
+    void Sequence::Reset()
+    {
+        Task::Reset();
+
+        m_iterator = m_tasks.begin();
+        for (auto task : m_tasks)
+            task->Reset();
+    }
 }
