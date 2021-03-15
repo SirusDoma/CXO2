@@ -20,12 +20,11 @@ namespace Gx
         void SetTag(const std::string& tag);
 
         Node* GetParent() const;
-        std::vector<Node*> GetChildren() const;
         std::vector<Node*> GetChildrenByTag(const std::string& tag) const;
-
         Node* GetChildByName(const std::string& name) const;
         Node* GetChildByTag(const std::string& tag) const;
 
+        virtual std::vector<Node*> GetChildren() const;
         virtual void AddChild(Node* child);
         virtual void RemoveChild(Node* child);
 
