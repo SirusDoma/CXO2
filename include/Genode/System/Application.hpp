@@ -22,6 +22,7 @@ namespace Gx
         ~Application();
 
         int Start();
+        void Close();
 
         unsigned int GetRenderFrequency() const;
         void SetCursor(const Cursor& cursor);

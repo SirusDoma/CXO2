@@ -88,7 +88,7 @@ namespace Gx
             }
 
             // Render the window
-            m_window.clear();
+            m_window.clear(sf::Color::White);
             {
                 // Game routine (update + render)
                 m_director->Update(delta);
@@ -115,6 +115,12 @@ namespace Gx
 
         // Application exit code
         return 0;
+    }
+
+
+    void Application::Close()
+    {
+        OnClose();
     }
 
     unsigned int Application::GetRenderFrequency() const
