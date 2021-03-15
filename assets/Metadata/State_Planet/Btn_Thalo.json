@@ -1,0 +1,32 @@
+{
+  "type": "RADIO_BUTTON",
+  "resources": {
+    "texture": "State_Planet/Btn_Thalo.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 56,
+        "y": 70
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 166,
+          "height": 190
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 166,
+          "y": 0,
+          "width": 166,
+          "height": 190
+        }
+      }
+    }
+  }
+}

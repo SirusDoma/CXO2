@@ -12,9 +12,11 @@
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
 #include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
+#include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 
 #include <O2/Scenes/StateAvi.hpp>
+#include <O2/Scenes/StatePlanet.hpp>
 
 int main() 
 {
@@ -27,10 +29,13 @@ int main()
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
 
     // Load globally used assets
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/BGM.ojm");
+    Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/bgEffect.ojm");
+    Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/Planet.ojm");
 
     sf::Texture hcursor;
     hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));

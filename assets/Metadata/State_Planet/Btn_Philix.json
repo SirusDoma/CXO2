@@ -1,0 +1,32 @@
+{
+  "type": "RADIO_BUTTON",
+  "resources": {
+    "texture": "State_Planet/Btn_Philix.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 378,
+        "y": 394
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 156,
+          "height": 129
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 156,
+          "y": 0,
+          "width": 156,
+          "height": 129
+        }
+      }
+    }
+  }
+}

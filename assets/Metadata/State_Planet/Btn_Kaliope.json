@@ -1,0 +1,32 @@
+{
+  "type": "RADIO_BUTTON",
+  "resources": {
+    "texture": "State_Planet/Btn_Kaliope.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 291,
+        "y": 22
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 245,
+          "height": 220
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 245,
+          "y": 0,
+          "width": 245,
+          "height": 220
+        }
+      }
+    }
+  }
+}
