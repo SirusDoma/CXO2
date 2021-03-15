@@ -11,6 +11,9 @@ using namespace std::filesystem;
 using namespace std::experimental::filesystem;
 #endif
 
+#include <fstream>
+#include <iostream>
+
 namespace Gx
 {
     std::vector<std::string> FileHelper::m_directories;
@@ -63,10 +66,10 @@ namespace Gx
         return "";
     }
 
-    Int64 FileHelper::GetFile(const std::string& filename, Uint8** data)
+    Int64 FileHelper::GetFile(const std::string& fileName, Uint8** data)
     {
         sf::FileInputStream fs;
-        fs.open(GetFullName(filename));
+        fs.open(GetFullName(fileName));
 
         auto size = fs.getSize();
         if (size <= 0)
@@ -74,5 +77,12 @@ namespace Gx
 
         *data = new Uint8[static_cast<unsigned int>(size)];
         return fs.read((char*) & (*data)[0], fs.getSize());
+    }
+
+    void FileHelper::WriteFile(const std::string &fileName, Uint8 *data, Int64 size)
+    {
+        std::ofstream fs(fileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
+        fs.write(reinterpret_cast<const char*>(data), size);
+        fs.close();
     }
 }
