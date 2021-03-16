@@ -19,9 +19,9 @@ namespace Gx
         sf::Cursor* GetHandle();
 
     private:
-        sf::Cursor*        m_cursor;
-        std::vector<Uint8> m_pixels;
-        sf::Vector2u       m_size;
+        sf::Cursor*  m_cursor;
+        Gx::Uint8*   m_source;
+        sf::Vector2u m_size;
     };
 }
 

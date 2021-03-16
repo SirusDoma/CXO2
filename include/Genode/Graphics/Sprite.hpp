@@ -29,7 +29,7 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph.hpp>
 #include <Genode/Entities.hpp>
 
 #include <memory>
@@ -38,7 +38,7 @@ namespace Gx
 {
     typedef std::shared_ptr<const sf::Texture> TextureHandle;
 
-    class Sprite : public Node, public Renderable, public Updatable, public Colorable
+    class Sprite : virtual public Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
     {
     public:
         Sprite();
@@ -62,7 +62,6 @@ namespace Gx
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void Update(double delta);
 
     private:
         void UpdatePositions();

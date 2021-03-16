@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Genode/Graphics/Text.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
+
 #include <cmath>
 #include <memory>
 
@@ -354,11 +354,7 @@ namespace Gx
             target.draw(m_vertices, states);
         }
 
-        return states;
-    }
-
-    void Text::Update(double delta)
-    {
+        return RenderableContainer::Render(target, states);
     }
 
     void Text::EnsureGeometryUpdate() const

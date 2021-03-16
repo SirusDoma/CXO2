@@ -25,8 +25,11 @@ namespace Gx
         {
             // Run update before deleting
             auto item = *iterator;
-            item->Stop();
-            item->Update(0);
+            if (item->GetState() != Task::Completed)
+            {
+                item->Stop();
+                item->Update(0);
+            }
 
             delete *iterator;
             m_tasks.erase(iterator);
@@ -39,30 +42,19 @@ namespace Gx
         {
             // Run update before deleting
             auto item = m_tasks[i];
-            item->Stop();
-            delete item;
+            if (item->GetState() != Task::Completed)
+                item->Stop();
 
             m_tasks.erase(m_tasks.begin() + i);
+            delete item;
         }
+
+        m_tasks.clear();
     }
 
     void TaskContainer::Update(double delta)
     {
-        for (unsigned int i = 0; i < m_tasks.size(); i++)
-        {
-            auto task = m_tasks[i];
-            if (task)
-            {
-                if (task->GetState() == Task::Completed)
-                {
-                    delete task;
-                    m_tasks.erase(m_tasks.begin() + i);
-                }
-                else
-                    task->Update(delta);
-            }
-            else
-                m_tasks.erase(m_tasks.begin() + i);
-        }
+        for (auto task : m_tasks)
+            task->Update(delta);
     }
 }

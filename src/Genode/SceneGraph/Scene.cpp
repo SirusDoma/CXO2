@@ -12,7 +12,10 @@ namespace Gx
     }
 
     Scene::Scene(const std::string &name) :
-        Node::Node(),
+        Node(),
+        RenderableContainer(),
+        UpdatableContainer(),
+        InputableContainer(),
         m_director(nullptr)
     {
         SetName(name);
@@ -29,7 +32,6 @@ namespace Gx
 
     bool Scene::Close(bool quit)
     {
-        StopAll();
         return true;
     }
 
@@ -43,77 +45,9 @@ namespace Gx
         m_director = director;
     }
 
-    void Scene::Render(Node* node, sf::RenderTarget& target, sf::RenderStates states) const
-    {
-        auto renderable = dynamic_cast<Renderable*>(node);
-        if (renderable)
-        {
-            states = renderable->Render(target, states);
-            for (auto child : node->GetChildren())
-            {
-                Render(child, target, states);
-            }
-        }
-    }
-
-    void Scene::Update(Node* node, double delta)
-    {
-        auto updatable = dynamic_cast<Updatable*>(node);
-        if (updatable)
-        {
-            updatable->Update(delta);
-            for (auto child : node->GetChildren())
-            {
-                Update(child, delta);
-            }
-        }
-    }
-
-    void Scene::Input(Node* node, sf::Event ev)
-    {
-        auto inputable = dynamic_cast<Inputable*>(node);
-        if (inputable)
-        {
-            inputable->Input(ev);
-            for (auto child : node->GetChildren())
-            {
-                Input(child, ev);
-            }
-        }
-    }
-
-    sf::RenderStates Scene::Render(sf::RenderTarget& target, sf::RenderStates states) const
-    {
-        for (auto node : GetChildren())
-        {
-            Render(node, target, states);
-        }
-
-        return states;
-    }
-
     void Scene::Update(double delta)
     {
-        for (auto node : GetChildren())
-        {
-            Update(node, delta);
-        }
-
+        UpdatableContainer::Update(delta);
         TaskContainer::Update(delta);
-    }
-
-    bool Scene::Input(sf::Event ev)
-    {
-        if (Inputable::Input(ev))
-        {
-            for (auto node : GetChildren())
-            {
-                Input(node, ev);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

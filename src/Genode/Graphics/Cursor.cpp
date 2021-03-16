@@ -10,19 +10,12 @@ namespace Gx
     Cursor::Cursor(const sf::Texture& texture) :
         Cursor::Cursor()
     {
-        auto image  = texture.copyToImage();
-        auto size   = image.getSize();
-        auto source = image.getPixelsPtr();
-        int count   = size.x * size.y * 4;
-
-        for (int i = 0; i < count; i++)
-        {
-            m_pixels.push_back(*source);
-            source++;
-        }
+        auto image = texture.copyToImage();
+        m_size     = image.getSize();
+        m_source   = const_cast<unsigned char*>(image.getPixelsPtr());
 
         m_cursor = new sf::Cursor();
-        m_cursor->loadFromPixels(&m_pixels[0], size, sf::Vector2u(0, 0));
+        m_cursor->loadFromPixels(&m_source[0], m_size, sf::Vector2u(0, 0));
     }
 
     sf::Cursor* Cursor::GetHandle()

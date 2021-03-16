@@ -1,13 +1,13 @@
 {
   "type": "RADIO_BUTTON",
   "resources": {
-    "texture": "State_Planet/Btn_Kleo.png"
+    "texture": "State/Planet/Btn_Thalo.png"
   },
   "attributes": {
     "transform": {
       "position": {
-        "x": 349,
-        "y": 221
+        "x": 56,
+        "y": 70
       }
     },
     "states": {
@@ -15,16 +15,16 @@
         "texCoords": {
           "x": 0,
           "y": 0,
-          "width": 215,
-          "height": 169
+          "width": 166,
+          "height": 190
         }
       },
       "check": {
         "texCoords": {
-          "x": 215,
+          "x": 166,
           "y": 0,
-          "width": 215,
-          "height": 169
+          "width": 166,
+          "height": 190
         }
       }
     }

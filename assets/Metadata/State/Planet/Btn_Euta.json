@@ -1,13 +1,13 @@
 {
-  "type": "BUTTON",
+  "type": "RADIO_BUTTON",
   "resources": {
-    "texture": "State_Planet/Btn_Exit.png"
+    "texture": "State/Planet/Btn_Euta.png"
   },
   "attributes": {
     "transform": {
       "position": {
-        "x": 0,
-        "y": 556
+        "x": 171,
+        "y": 23
       }
     },
     "states": {
@@ -15,16 +15,16 @@
         "texCoords": {
           "x": 0,
           "y": 0,
-          "width": 97,
-          "height": 44
+          "width": 175,
+          "height": 134
         }
       },
-      "click": {
+      "check": {
         "texCoords": {
-          "x": 97,
+          "x": 175,
           "y": 0,
-          "width": 97,
-          "height": 44
+          "width": 175,
+          "height": 134
         }
       }
     }

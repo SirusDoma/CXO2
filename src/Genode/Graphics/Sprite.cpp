@@ -134,10 +134,6 @@ namespace Gx
         return GetTransform().transformRect(GetLocalBounds());
     }
 
-    void Sprite::Update(double delta)
-    {
-    }
-
     sf::RenderStates Sprite::Render(sf::RenderTarget& target, sf::RenderStates states) const
     {
         if (m_texture)
@@ -147,7 +143,7 @@ namespace Gx
             target.draw(m_vertices, 4, sf::TriangleStrip, states);
         }
 
-        return states;
+        return RenderableContainer::Render(target, states);
     }
 
     void Sprite::UpdatePositions()

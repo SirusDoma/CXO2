@@ -25,10 +25,12 @@
 #ifndef GENODE_TEXT_HPP
 #define GENODE_TEXT_HPP
 
-#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph.hpp>
 #include <Genode/Entities.hpp>
 #include <Genode/System/Primitives.hpp>
 
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -61,7 +63,7 @@ namespace Gx
 {
     typedef std::shared_ptr<const sf::Font> FontHandle;
 
-    class Text : public Node, public Renderable, public Updatable, public Colorable
+    class Text : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
     {
     public:
         enum Style
@@ -110,7 +112,6 @@ namespace Gx
 
     private:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void Update(double delta);
 
         void EnsureGeometryUpdate() const;
 

@@ -1,13 +1,13 @@
 {
   "type": "RADIO_BUTTON",
   "resources": {
-    "texture": "State_Planet/Btn_Melpomin.png"
+    "texture": "State/Planet/Btn_Philix.png"
   },
   "attributes": {
     "transform": {
       "position": {
-        "x": 0,
-        "y": 218
+        "x": 378,
+        "y": 394
       }
     },
     "states": {
@@ -15,16 +15,16 @@
         "texCoords": {
           "x": 0,
           "y": 0,
-          "width": 166,
-          "height": 164
+          "width": 156,
+          "height": 129
         }
       },
       "check": {
         "texCoords": {
-          "x": 166,
+          "x": 156,
           "y": 0,
-          "width": 166,
-          "height": 164
+          "width": 156,
+          "height": 129
         }
       }
     }

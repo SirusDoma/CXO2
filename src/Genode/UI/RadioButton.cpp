@@ -1,10 +1,13 @@
 #include <Genode/UI/RadioButton.hpp>
 
+#include <Genode/UI/Container.hpp>
+
 namespace Gx
 {
     void RadioButton::SetCheckedState(bool checked)
     {
-        if (IsChecked() != checked)
+        bool alreadyChecked = IsChecked();
+        if (alreadyChecked != checked)
         {
             CheckBox::SetCheckedState(checked);
             if (checked)
@@ -35,13 +38,22 @@ namespace Gx
         }
     }
 
+    void RadioButton::UnpairAll()
+    {
+        for (auto pair : m_pairs)
+            pair->m_pairs.clear();
+
+        m_pairs.clear();
+    }
+
     void RadioButton::OnControlClick(sf::Event::MouseButtonEvent ev)
     {
-        Control::OnControlClick(ev);
         if (!IsEnabled())
             return;
 
         if (!IsChecked())
             SetCheckedState(true);
+
+        Control::OnControlClick(ev);
     }
 }

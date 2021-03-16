@@ -1,7 +1,7 @@
 {
   "type": "SPRITE",
   "resources": {
-    "texture": "State_Planet\\Background.png"
+    "texture": "State/Planet/Background.png"
   },
   "attributes": {
     "transform": {

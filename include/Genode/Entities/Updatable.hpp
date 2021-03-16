@@ -6,7 +6,7 @@ namespace Gx
     class Updatable
     {
     protected:
-        friend class Scene;
+        friend class UpdatableContainer;
 
         virtual void Update(double delta) = 0;
         virtual ~Updatable() {};

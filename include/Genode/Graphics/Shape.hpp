@@ -29,11 +29,11 @@
 #include <SFML/System/Vector2.hpp>
 
 #include <Genode/Entities.hpp>
-#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph.hpp>
 
 namespace Gx
 {
-    class Shape : public Node, public Renderable, public Updatable, public Colorable
+    class Shape : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
     {
     public:
         virtual ~Shape();
@@ -64,8 +64,6 @@ namespace Gx
     protected:
         Shape();
         void Update();
-
-        virtual void Update(double delta);
 
     private:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;

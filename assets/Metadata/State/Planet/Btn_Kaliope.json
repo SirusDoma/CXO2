@@ -1,13 +1,13 @@
 {
   "type": "RADIO_BUTTON",
   "resources": {
-    "texture": "State_Planet/Btn_Philix.png"
+    "texture": "State/Planet/Btn_Kaliope.png"
   },
   "attributes": {
     "transform": {
       "position": {
-        "x": 378,
-        "y": 394
+        "x": 291,
+        "y": 22
       }
     },
     "states": {
@@ -15,16 +15,16 @@
         "texCoords": {
           "x": 0,
           "y": 0,
-          "width": 156,
-          "height": 129
+          "width": 245,
+          "height": 220
         }
       },
       "check": {
         "texCoords": {
-          "x": 156,
+          "x": 245,
           "y": 0,
-          "width": 156,
-          "height": 129
+          "width": 245,
+          "height": 220
         }
       }
     }

@@ -200,11 +200,7 @@ namespace Gx
             target.draw(m_outlineVertices, states);
         }
 
-        return states;
-    }
-
-    void Shape::Update(double delta)
-    {
+        return RenderableContainer::Render(target, states);
     }
 
     void Shape::UpdateFillColors()

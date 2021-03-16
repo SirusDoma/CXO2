@@ -46,6 +46,11 @@ namespace Gx
         return m_parent;
     }
 
+    void Node::SetParent(Node* node)
+    {
+        m_parent = node;
+    }
+
     std::vector<Node*> Node::GetChildren() const
     {
         return m_children;

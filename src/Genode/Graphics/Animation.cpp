@@ -86,7 +86,7 @@ namespace Gx
     void Animation::Update(double delta)
     {
         if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
-            return;
+            return UpdatableContainer::Update(delta);
 
         m_state    = AnimationState::Playing;
         m_elapsed += sf::milliseconds(delta);
@@ -113,6 +113,8 @@ namespace Gx
 
             m_sprite->SetTexCoords(m_frames[m_currentFrame]);
         }
+
+        UpdatableContainer::Update(delta);
     }
 
     sf::RenderStates Animation::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -124,7 +126,7 @@ namespace Gx
         auto drawable = static_cast<sf::Drawable*>(m_sprite);
         target.draw(*drawable, states);
 
-        return states;
+        return RenderableContainer::Render(target, states);
     }
 
     void Animation::Stop()

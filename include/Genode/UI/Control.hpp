@@ -2,24 +2,21 @@
 #define GENODE_UIELEMENT_HPP
 
 #include <Genode/Entities.hpp>
-#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph.hpp>
 
 #include <functional>
 
 namespace Gx
 {
-    class Control : public Node, public Renderable, public Updatable, public Inputable
+    class Control : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer
     {
     public:
         enum State { Normal, Hover, Active };
 
-        Control();
         virtual ~Control();
 
         virtual const sf::FloatRect GetLocalBounds() const = 0;
         const sf::FloatRect GetGlobalBounds() const;
-
-        virtual void AddChild(Node *child);
 
         void SetEnabled(bool enabled);
         const bool& IsEnabled() const;
@@ -27,13 +24,28 @@ namespace Gx
         void SetVisible(bool visible);
         const bool& IsVislble() const;
 
+        virtual void AddChild(Control *node);
+        virtual void RemoveChild(Control *node);
+
+        template<typename... Args>
+        void AddChild(Control* first, Args... args);
+
+        template<typename... Args>
+        void RemoveChild(Control* first, Args... args);
+
         void SetClickCallback(std::function<void()> callback);
+        virtual void Invalidate() = 0;
 
     protected:
-        virtual void Update(double delta);
+        friend class Container;
+
+        Control();
 
         const State GetControlState() const;
         void SetControlState(const State &state);
+
+        void Update(double delta);
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonClick(sf::Event::MouseButtonEvent ev);
@@ -43,8 +55,6 @@ namespace Gx
         virtual void OnControlPress(sf::Event::MouseButtonEvent ev);
         virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
 
-        virtual void Invalidate() = 0;
-
     private:
         State m_state;
         bool  m_enabled, m_visible;
@@ -53,4 +63,5 @@ namespace Gx
     };
 }
 
+#include <Genode/UI/Control.inl>
 #endif

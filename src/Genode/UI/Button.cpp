@@ -78,10 +78,9 @@ namespace Gx
         auto frame = m_stateData[GetControlState()];
         states.transform *= GetTransform();
         states.transform *= frame.GetTransform();
-
         target.draw(m_sprite, states);
 
-        return states;
+        return RenderableContainer::Render(target, states);
     }
 
     void Button::Invalidate()

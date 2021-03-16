@@ -1,4 +1,5 @@
 #include <Genode/UI/Control.hpp>
+#include <type_traits>
 
 namespace Gx
 {
@@ -13,21 +14,10 @@ namespace Gx
     {
     }
 
-    void Control::AddChild(Node *child)
-    {
-        auto ui = dynamic_cast<Control*>(child);
-        if (!ui)
-            return;
-
-        ui->SetEnabled(IsEnabled());
-        ui->SetVisible(IsVislble());
-
-        Node::AddChild(child);
-    }
-
     void Control::SetEnabled(bool enabled)
     {
         m_enabled = enabled;
+        Invalidate();
     }
 
     const bool &Control::IsEnabled() const
@@ -38,6 +28,7 @@ namespace Gx
     void Control::SetVisible(bool visible)
     {
         m_visible = visible;
+        Invalidate();
     }
 
     const bool &Control::IsVislble() const
@@ -66,32 +57,74 @@ namespace Gx
         m_onClick = callback;
     }
 
-    void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void Control::AddChild(Control *node)
     {
-        Inputable::OnMouseMove(ev);
-        if (!IsEnabled() || GetControlState() == Control::State::Active)
+        if (!node)
             return;
 
-        bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
-        if (intersect && GetControlState() == Control::State::Normal)
-            SetControlState(Control::State::Hover);
-        else if (!intersect && GetControlState() == Control::State::Hover)
-            SetControlState(Control::State::Normal);
+        Node::AddChild(node);
+        Invalidate();
+    }
+
+    void Control::RemoveChild(Control *node)
+    {
+        if (!node)
+            return;
+
+        Node::RemoveChild(node);
+        Invalidate();
+    }
+
+    void Control::Update(double delta)
+    {
+        if (!IsEnabled())
+            return;
+
+        UpdatableContainer::Update(delta);
+    }
+
+    sf::RenderStates Control::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    {
+        if (!IsVislble())
+            return states;
+
+        states.transform *= GetTransform();
+        return RenderableContainer::Render(target, states);
+    }
+
+    void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    {
+        if (!IsEnabled())
+            return;
+
+        if (GetControlState() != Control::State::Active)
+        {
+            bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
+            if (intersect && GetControlState() == Control::State::Normal)
+                SetControlState(Control::State::Hover);
+            else if (!intersect && GetControlState() == Control::State::Hover)
+                SetControlState(Control::State::Normal);
+        }
+
+        InputableContainer::OnMouseMove(ev);
     }
 
     void Control::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
     {
-        Inputable::OnMouseButtonClick(ev);
-        if (IsEnabled() && m_state == Control::State::Hover && GetGlobalBounds().contains(ev.x, ev.y))
+        if (!IsEnabled())
+            return;
+
+        if (m_state == Control::State::Hover && GetGlobalBounds().contains(ev.x, ev.y))
         {
             SetControlState(Control::State::Active);
             OnControlPress(ev);
         }
+
+        InputableContainer::OnMouseButtonClick(ev);
     }
 
     void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        Inputable::OnMouseButtonUp(ev);
         if (!IsEnabled() || m_state != Control::State::Active)
             return;
 
@@ -104,10 +137,8 @@ namespace Gx
             if (m_onClick)
                 m_onClick();
         }
-    }
 
-    void Control::Update(double delta)
-    {
+        InputableContainer::OnMouseButtonUp(ev);
     }
 
     void Control::OnControlStateChanged(Control::State state)

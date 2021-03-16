@@ -39,8 +39,8 @@ int main()
 
     sf::Texture hcursor;
     hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
-
     Gx::Cursor cursor = Gx::Cursor(hcursor);
+
     Gx::Application application(new StateAvi(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
 
     application.SetCursor(cursor);

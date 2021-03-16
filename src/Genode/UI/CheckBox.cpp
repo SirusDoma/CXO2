@@ -34,16 +34,16 @@ namespace Gx
         states.transform *= frame.GetTransform();
         target.draw(*GetSprite(), states);
 
-        return states;
+        return RenderableContainer::Render(target, states);
     }
 
     void CheckBox::OnControlClick(sf::Event::MouseButtonEvent ev)
     {
-        Control::OnControlClick(ev);
         if (!IsEnabled())
             return;
 
         SetCheckedState(!IsChecked());
+        Control::OnControlClick(ev);
     }
 
     void CheckBox::Invalidate()

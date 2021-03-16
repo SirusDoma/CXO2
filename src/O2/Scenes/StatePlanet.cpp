@@ -8,24 +8,26 @@
 
 void StatePlanet::Initialize()
 {
-    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State_Planet\\Background.json");
+    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\Background.json");
     AddChild(background);
 
-    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State_Planet\\Tower.json");
+    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State\\Planet\\Tower.json");
     AddChild(tower);
 
-    auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State_Planet\\Btn_Exit.json");
+    auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State\\Planet\\Btn_Exit.json");
     exitButton->SetClickCallback([=] { Gx::Application::Instance()->Close(); });
     AddChild(exitButton);
 
-    auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Philix.json");
-    auto kleo     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Kleo.json");
-    auto kaliope  = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Kaliope.json");
-    auto euta     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Euta.json");
-    auto thalo    = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Thalo.json");
-    auto melpomin = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State_Planet\\Btn_Melpomin.json");
+    auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Philix.json");
+    auto kleo     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Kleo.json");
+    auto kaliope  = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Kaliope.json");
+    auto euta     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Euta.json");
+    auto thalo    = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Thalo.json");
+    auto melpomin = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Melpomin.json");
 
     // TODO: UI Container
+//    auto container = new Gx::Container();
+//    container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
     philix->Pair(kleo, kaliope, euta, thalo, melpomin);
     std::unordered_map<Planet, Gx::RadioButton*> planets = {
         {Planet::Melpomin, melpomin},
@@ -52,6 +54,7 @@ void StatePlanet::Initialize()
         });
     }
 
+    //AddChild(container);
     AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
 
     // Overlay fade in animation
@@ -59,7 +62,7 @@ void StatePlanet::Initialize()
     overlay->SetFillColor(sf::Color::White);
     AddChild(overlay);
 
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State_Planet\\Music.json");
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
     if (bgm)
         bgm->play();
 
@@ -76,7 +79,7 @@ void StatePlanet::ShowChannelBoard(Planet planet)
 
     if (!m_channelBoard)
     {
-        m_channelBoard = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State_Planet\\ChannelBoard.json");
+        m_channelBoard = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\ChannelBoard.json");
         channelBoardPosition = m_channelBoard->GetPosition();
 
         Gx::Uint8 *data;
@@ -91,7 +94,7 @@ void StatePlanet::ShowChannelBoard(Planet planet)
     m_channelBoard->SetPosition(800 + m_channelBoard->GetLocalBounds().width, m_channelBoard->GetPosition().y);
     Run(new Gx::Sequence({
         new Gx::Action([=] { sfx.play(); }),
-        new Gx::Move(m_channelBoard, channelBoardPosition - sf::Vector2f(30, 0), sf::milliseconds(250)),
-        new Gx::Move(m_channelBoard, channelBoardPosition, sf::milliseconds(50))
+        new Gx::Move(m_channelBoard, channelBoardPosition - sf::Vector2f(30, 0), sf::milliseconds(150)),
+        new Gx::Move(m_channelBoard, channelBoardPosition, sf::milliseconds(100))
     }));
 }

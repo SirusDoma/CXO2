@@ -20,6 +20,8 @@ namespace Gx
         template<typename... Args>
         void Pair(RadioButton *first, Args... args);
 
+        void UnpairAll();
+
     protected:
         virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
 

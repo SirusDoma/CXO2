@@ -1,13 +1,13 @@
 {
   "type": "RADIO_BUTTON",
   "resources": {
-    "texture": "State_Planet/Btn_Euta.png"
+    "texture": "State/Planet/Btn_Kleo.png"
   },
   "attributes": {
     "transform": {
       "position": {
-        "x": 171,
-        "y": 23
+        "x": 349,
+        "y": 221
       }
     },
     "states": {
@@ -15,16 +15,16 @@
         "texCoords": {
           "x": 0,
           "y": 0,
-          "width": 175,
-          "height": 134
+          "width": 215,
+          "height": 169
         }
       },
       "check": {
         "texCoords": {
-          "x": 175,
+          "x": 215,
           "y": 0,
-          "width": 175,
-          "height": 134
+          "width": 215,
+          "height": 169
         }
       }
     }
