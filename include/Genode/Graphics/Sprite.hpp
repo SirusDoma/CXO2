@@ -29,8 +29,10 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include <Genode/SceneGraph.hpp>
-#include <Genode/Entities.hpp>
+#include <Genode/Entities/Colorable.hpp>
+#include <Genode/SceneGraph/RenderableContainer.hpp>
+#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/SceneGraph/InputableContainer.hpp>
 
 #include <memory>
 

@@ -6,7 +6,6 @@
 #include <Genode/IO/MetadataLoader.hpp>
 #include <Genode/IO/CacheManager.hpp>
 
-#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <string>

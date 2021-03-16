@@ -12,7 +12,6 @@ using namespace std::experimental::filesystem;
 #endif
 
 #include <fstream>
-#include <iostream>
 
 namespace Gx
 {

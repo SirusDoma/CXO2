@@ -28,8 +28,10 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
 
-#include <Genode/Entities.hpp>
-#include <Genode/SceneGraph.hpp>
+#include <Genode/Entities/Colorable.hpp>
+#include <Genode/SceneGraph/RenderableContainer.hpp>
+#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/SceneGraph/InputableContainer.hpp>
 
 namespace Gx
 {

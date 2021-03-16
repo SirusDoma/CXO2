@@ -16,7 +16,7 @@
 namespace Gx
 {
     class SceneDirector;
-    class Scene : public virtual Node, public TaskContainer, public RenderableContainer, public virtual UpdatableContainer, public InputableContainer
+    class Scene : public virtual Node, public RenderableContainer, public virtual UpdatableContainer, public InputableContainer, public TaskContainer
     {
     public:
         friend SceneDirector;
