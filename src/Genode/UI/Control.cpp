@@ -44,7 +44,7 @@ namespace Gx
     void Control::SetControlState(const Control::State &state)
     {
         m_state = state;
-        OnControlStateChanged(m_state);
+        OnControlStateChanged(this, m_state);
     }
 
     const sf::FloatRect Control::GetGlobalBounds() const
@@ -75,7 +75,6 @@ namespace Gx
 
         OnControlChildRemove(node);
         Node::RemoveChild(node);
-
         Invalidate();
     }
 
@@ -123,7 +122,7 @@ namespace Gx
         if (m_state == Control::State::Hover && GetGlobalBounds().contains(ev.x, ev.y))
         {
             SetControlState(Control::State::Active);
-            OnControlPress(ev);
+            OnControlPress(this, ev);
         }
 
         InputableContainer::OnMouseButtonClick(ev);
@@ -137,7 +136,7 @@ namespace Gx
             if (GetGlobalBounds().contains(ev.x, ev.y))
             {
                 SetControlState(Control::State::Hover);
-                OnControlClick(ev);
+                OnControlClick(this, ev);
 
                 if (m_onClick)
                     m_onClick();
@@ -145,11 +144,6 @@ namespace Gx
         }
 
         InputableContainer::OnMouseButtonUp(ev);
-    }
-
-    void Control::OnControlStateChanged(Control::State state)
-    {
-        Invalidate();
     }
 
     void Control::OnControlChildAdded(Control *control)
@@ -160,11 +154,26 @@ namespace Gx
     {
     }
 
-    void Control::OnControlPress(sf::Event::MouseButtonEvent ev)
+    void Control::OnControlStateChanged(Control *sender, Control::State state)
     {
+        Invalidate();
+
+        auto parent = dynamic_cast<Control*>(GetParent());
+        if (parent)
+            parent->OnControlStateChanged(sender, state);
     }
 
-    void Control::OnControlClick(sf::Event::MouseButtonEvent ev)
+    void Control::OnControlPress(Control *sender, sf::Event::MouseButtonEvent ev)
     {
+        auto parent = dynamic_cast<Control*>(GetParent());
+        if (parent)
+            parent->OnControlPress(sender, ev);
+    }
+
+    void Control::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    {
+        auto parent = dynamic_cast<Control*>(GetParent());
+        if (parent)
+            parent->OnControlClick(sender, ev);
     }
 }

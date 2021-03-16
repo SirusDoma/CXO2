@@ -2,7 +2,6 @@
 #define GENODE_CHECKBOX_HPP
 
 #include <Genode/UI/Button.hpp>
-#include <Genode/Graphics.hpp>
 
 #include <functional>
 #include <unordered_map>
@@ -22,7 +21,7 @@ namespace Gx
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
+        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
 
         virtual void Invalidate();
 

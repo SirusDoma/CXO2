@@ -1,5 +1,3 @@
-#include <iostream>
-
 namespace Gx
 {
     template<typename... Args>

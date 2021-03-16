@@ -1,8 +1,11 @@
 #ifndef GENODE_BUTTON_HPP
 #define GENODE_BUTTON_HPP
 
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Rect.hpp>
+
+#include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Control.hpp>
-#include <Genode/Graphics.hpp>
 
 #include <functional>
 #include <unordered_map>

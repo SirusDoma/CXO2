@@ -4,7 +4,9 @@
 #include <SFML/Window/Event.hpp>
 
 #include <Genode/Entities.hpp>
-#include <Genode/SceneGraph.hpp>
+#include <Genode/SceneGraph/RenderableContainer.hpp>
+#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/SceneGraph/InputableContainer.hpp>
 
 #include <functional>
 
@@ -37,7 +39,7 @@ namespace Gx
         void RemoveChild(Control* first, Args... args);
 
     protected:
-        friend class Container;
+        friend class UiContainer;
 
         Control();
 
@@ -55,9 +57,9 @@ namespace Gx
         virtual void OnControlChildAdded(Control *control);
         virtual void OnControlChildRemove(Control *control);
 
-        virtual void OnControlStateChanged(State state);
-        virtual void OnControlPress(sf::Event::MouseButtonEvent ev);
-        virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
+        virtual void OnControlStateChanged(Control * sender, State state);
+        virtual void OnControlPress(Control * sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnControlClick(Control * sender, sf::Event::MouseButtonEvent ev);
 
         virtual void Invalidate() = 0;
 

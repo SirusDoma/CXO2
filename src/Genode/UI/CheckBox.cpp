@@ -37,13 +37,15 @@ namespace Gx
         return RenderableContainer::Render(target, states);
     }
 
-    void CheckBox::OnControlClick(sf::Event::MouseButtonEvent ev)
+    void CheckBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
         if (!IsEnabled())
             return;
 
-        SetCheckedState(!IsChecked());
-        Control::OnControlClick(ev);
+        if (sender == this)
+            SetCheckedState(!IsChecked());
+
+        Control::OnControlClick(sender, ev);
     }
 
     void CheckBox::Invalidate()

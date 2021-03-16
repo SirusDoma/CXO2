@@ -1,6 +1,6 @@
 #include <Genode/UI/RadioButton.hpp>
 
-#include <Genode/UI/Container.hpp>
+#include <Genode/UI/UiContainer.hpp>
 
 namespace Gx
 {
@@ -61,14 +61,14 @@ namespace Gx
         m_pairs.clear();
     }
 
-    void RadioButton::OnControlClick(sf::Event::MouseButtonEvent ev)
+    void RadioButton::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
         if (!IsEnabled())
             return;
 
-        if (!IsChecked())
+        if (!IsChecked() && sender == this)
             SetCheckedState(true);
 
-        Control::OnControlClick(ev);
+        Control::OnControlClick(sender, ev);
     }
 }

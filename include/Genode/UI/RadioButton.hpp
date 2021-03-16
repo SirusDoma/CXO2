@@ -2,7 +2,6 @@
 #define GENODE_RADIO_BUTTON_HPP
 
 #include <Genode/UI/CheckBox.hpp>
-#include <Genode/Graphics.hpp>
 
 #include <functional>
 #include <unordered_map>
@@ -24,7 +23,7 @@ namespace Gx
         void UnpairAll();
 
     protected:
-        virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
+        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
 
     private:
         std::vector<RadioButton*> m_pairs;
