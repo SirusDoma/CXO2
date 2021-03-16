@@ -61,6 +61,7 @@ Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
         return nullptr;
 
     auto sprite = new Gx::Sprite();
+    sprite->SetName(spec->Name);
     if (context.Texture)
         sprite->SetTexture(context.Texture);
 

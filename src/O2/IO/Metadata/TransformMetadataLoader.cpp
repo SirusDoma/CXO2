@@ -18,6 +18,10 @@ Gx::ResourceMetadata* TransformMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 
 
 void TransformMetadataLoader::Parse(Json attributes, TransformMetadata *metadata)
 {
+    auto name = attributes.find("name");
+    if (name != attributes.end())
+        name->get_to(metadata->Name);
+
     auto position = attributes.find("position");
     if (position != attributes.end())
     {

@@ -28,11 +28,10 @@ sf::Music* MusicMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::Res
     if (!spec)
         return nullptr;
 
-    auto music = new sf::Music();
-
     Gx::Uint8 *data;
     auto size = Gx::ResourceManager::Instance()->GetResourceData(definition->ResourceReferences["music"], &data);
 
+    auto music = new sf::Music();
     if (!music->openFromMemory(data, size))
         return nullptr;
 

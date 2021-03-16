@@ -5,5 +5,8 @@ namespace Gx
     {
         Pair(first);
         Pair(args...);
+
+        if constexpr (sizeof ...(args) == 0)
+            Invalidate();
     }
 }

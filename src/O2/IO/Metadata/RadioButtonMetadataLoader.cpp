@@ -36,6 +36,7 @@ Gx::RadioButton* RadioButtonMetadataLoader::Create(Gx::ResourceMetadata* metadat
         return nullptr;
 
     auto radio = new Gx::RadioButton(context.Texture);
+    radio->SetName(spec->Name);
     radio->SetOrigin(spec->Origin);
     radio->SetPosition(spec->Position);
     radio->SetScale(spec->Scale);

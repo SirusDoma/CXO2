@@ -54,6 +54,7 @@ Gx::Button* ButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
         return nullptr;
 
     auto button = new Gx::Button(context.Texture);
+    button->SetName(spec->Name);
     button->SetOrigin(spec->Origin);
     button->SetPosition(spec->Position);
     button->SetScale(spec->Scale);

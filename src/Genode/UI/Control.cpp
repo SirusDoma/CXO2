@@ -63,6 +63,8 @@ namespace Gx
             return;
 
         Node::AddChild(node);
+        OnControlChildAdded(node);
+
         Invalidate();
     }
 
@@ -71,16 +73,10 @@ namespace Gx
         if (!node)
             return;
 
+        OnControlChildRemove(node);
         Node::RemoveChild(node);
+
         Invalidate();
-    }
-
-    void Control::Update(double delta)
-    {
-        if (!IsEnabled())
-            return;
-
-        UpdatableContainer::Update(delta);
     }
 
     sf::RenderStates Control::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -92,11 +88,24 @@ namespace Gx
         return RenderableContainer::Render(target, states);
     }
 
-    void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void Control::Update(double delta)
     {
         if (!IsEnabled())
             return;
 
+        UpdatableContainer::Update(delta);
+    }
+
+    bool Control::Input(sf::Event ev)
+    {
+        if (!IsEnabled())
+            return false;
+
+        return InputableContainer::Input(ev);
+    }
+
+    void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    {
         if (GetControlState() != Control::State::Active)
         {
             bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
@@ -111,9 +120,6 @@ namespace Gx
 
     void Control::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
     {
-        if (!IsEnabled())
-            return;
-
         if (m_state == Control::State::Hover && GetGlobalBounds().contains(ev.x, ev.y))
         {
             SetControlState(Control::State::Active);
@@ -125,17 +131,17 @@ namespace Gx
 
     void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        if (!IsEnabled() || m_state != Control::State::Active)
-            return;
-
-        SetControlState(Control::State::Normal);
-        if (GetGlobalBounds().contains(ev.x, ev.y))
+        if (m_state == Control::State::Active)
         {
-            SetControlState(Control::State::Hover);
-            OnControlClick(ev);
+            SetControlState(Control::State::Normal);
+            if (GetGlobalBounds().contains(ev.x, ev.y))
+            {
+                SetControlState(Control::State::Hover);
+                OnControlClick(ev);
 
-            if (m_onClick)
-                m_onClick();
+                if (m_onClick)
+                    m_onClick();
+            }
         }
 
         InputableContainer::OnMouseButtonUp(ev);
@@ -144,6 +150,14 @@ namespace Gx
     void Control::OnControlStateChanged(Control::State state)
     {
         Invalidate();
+    }
+
+    void Control::OnControlChildAdded(Control *control)
+    {
+    }
+
+    void Control::OnControlChildRemove(Control *control)
+    {
     }
 
     void Control::OnControlPress(sf::Event::MouseButtonEvent ev)

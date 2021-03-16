@@ -13,6 +13,7 @@ namespace Gx
         virtual ~ResourceMetadata() {}
         
         std::string Type;
+        std::string Name;
         std::unordered_map<std::string, std::string> ResourceReferences;
     };
 }

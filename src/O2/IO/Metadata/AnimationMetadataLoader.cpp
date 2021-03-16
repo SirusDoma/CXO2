@@ -51,6 +51,7 @@ Gx::Animation* AnimationMetadataLoader::Create(Gx::ResourceMetadata* metadata, G
         return nullptr;
 
     auto animation = new Gx::Animation();
+    animation->SetName(spec->Name);
     animation->SetLoop(spec->IsLoop);
     animation->SetDuration(spec->Duration);
 

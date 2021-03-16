@@ -1,6 +1,8 @@
 #ifndef GENODE_UIELEMENT_HPP
 #define GENODE_UIELEMENT_HPP
 
+#include <SFML/Window/Event.hpp>
+
 #include <Genode/Entities.hpp>
 #include <Genode/SceneGraph.hpp>
 
@@ -17,6 +19,7 @@ namespace Gx
 
         virtual const sf::FloatRect GetLocalBounds() const = 0;
         const sf::FloatRect GetGlobalBounds() const;
+        void SetClickCallback(std::function<void()> callback);
 
         void SetEnabled(bool enabled);
         const bool& IsEnabled() const;
@@ -33,9 +36,6 @@ namespace Gx
         template<typename... Args>
         void RemoveChild(Control* first, Args... args);
 
-        void SetClickCallback(std::function<void()> callback);
-        virtual void Invalidate() = 0;
-
     protected:
         friend class Container;
 
@@ -44,16 +44,22 @@ namespace Gx
         const State GetControlState() const;
         void SetControlState(const State &state);
 
-        void Update(double delta);
-        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        virtual void Update(double delta);
+        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        virtual bool Input(sf::Event ev);
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonClick(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
 
+        virtual void OnControlChildAdded(Control *control);
+        virtual void OnControlChildRemove(Control *control);
+
         virtual void OnControlStateChanged(State state);
         virtual void OnControlPress(sf::Event::MouseButtonEvent ev);
         virtual void OnControlClick(sf::Event::MouseButtonEvent ev);
+
+        virtual void Invalidate() = 0;
 
     private:
         State m_state;

@@ -16,6 +16,7 @@ namespace Gx
 
         virtual void SetCheckedState(bool checked);
         virtual void Pair(RadioButton *radio);
+        virtual void Unpair(RadioButton *radio);
 
         template<typename... Args>
         void Pair(RadioButton *first, Args... args);
