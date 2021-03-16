@@ -25,10 +25,8 @@ void StatePlanet::Initialize()
     auto thalo    = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Thalo.json");
     auto melpomin = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Melpomin.json");
 
-    // TODO: UI Container
-//    auto container = new Gx::Container();
-//    container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
-    philix->Pair(kleo, kaliope, euta, thalo, melpomin);
+    auto container = new Gx::UiContainer();
+    container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
     std::unordered_map<Planet, Gx::RadioButton*> planets = {
         {Planet::Melpomin, melpomin},
         {Planet::Thalo,    thalo},
@@ -54,8 +52,7 @@ void StatePlanet::Initialize()
         });
     }
 
-    //AddChild(container);
-    AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
+    AddChild(container);
 
     // Overlay fade in animation
     auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
@@ -94,7 +91,7 @@ void StatePlanet::ShowChannelBoard(Planet planet)
     m_channelBoard->SetPosition(800 + m_channelBoard->GetLocalBounds().width, m_channelBoard->GetPosition().y);
     Run(new Gx::Sequence({
         new Gx::Action([=] { sfx.play(); }),
-        new Gx::Move(m_channelBoard, channelBoardPosition - sf::Vector2f(30, 0), sf::milliseconds(150)),
+        new Gx::Move(m_channelBoard, channelBoardPosition - sf::Vector2f(30, 0), sf::milliseconds(200)),
         new Gx::Move(m_channelBoard, channelBoardPosition, sf::milliseconds(100))
     }));
 }
