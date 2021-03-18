@@ -89,18 +89,23 @@ namespace Gx
 
     void UiContainer::Update(double delta)
     {
-        if (!IsEnabled() || m_overlay)
-            return;
+        if (IsEnabled())
+          Control::Update(delta);
 
-        Control::Update(delta);
+        if (m_overlay)
+            m_overlay->Update(delta);
     }
 
     bool UiContainer::Input(sf::Event ev)
     {
-        if (!IsEnabled() || m_overlay)
-            return false;
+        bool input = false;
+        if (IsEnabled() && !m_overlay)
+            input = Control::Input(ev);
 
-        return Control::Input(ev);
+        if (m_overlay)
+            m_overlay->Input(ev);
+
+        return input;
     }
 
     void UiContainer::Invalidate()
@@ -111,6 +116,9 @@ namespace Gx
         for (auto node : GetChildren())
         {
             auto control = dynamic_cast<Control*>(node);
+            if (!control)
+                continue;
+
             auto bounds = control->GetGlobalBounds();
             if (first)
             {

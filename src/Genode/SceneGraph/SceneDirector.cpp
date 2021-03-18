@@ -3,35 +3,34 @@
 
 namespace Gx
 {
-    SceneDirector::SceneDirector(Scene* scene) :
-        m_scene(0)
+    SceneDirector::SceneDirector(Scene* scene, sf::RenderTarget *target) :
+        m_scene(),
+        m_target(target)
     {
         SetScene(scene);
     }
 
     SceneDirector::~SceneDirector()
     {
-        if (m_scene)
-            delete m_scene;
     }
 
     Scene* SceneDirector::GetScene() const
     {
-        return m_scene;
+        return m_scene.get();
     }
 
     void SceneDirector::SetScene(Scene* scene)
     {
         if (m_scene)
-        {
             m_scene->Close();
-            delete m_scene;
-        }
 
-        m_scene = scene;
+        m_scene = std::unique_ptr<Scene>(scene);
         if (scene)
         {
             m_scene->SetDirector(this);
+            if (m_target)
+                m_scene->SetView(m_target->getView());
+
             m_scene->Initialize();
         }
     }

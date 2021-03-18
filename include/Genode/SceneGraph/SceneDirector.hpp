@@ -14,14 +14,15 @@ namespace Gx
     public:
         friend class Application;
 
-        explicit SceneDirector(Scene* scene);
+        explicit SceneDirector(Scene* scene, sf::RenderTarget *target);
         ~SceneDirector();
 
         Scene* GetScene() const;
         void SetScene(Scene* scene);
 
     private:
-        Scene* m_scene;
+        std::unique_ptr<Scene> m_scene;
+        sf::RenderTarget *m_target;
 
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void Update(double delta);

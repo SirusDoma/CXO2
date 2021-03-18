@@ -16,7 +16,10 @@ namespace Gx
         for (auto archive : m_archives)
         {
             if (archive.second)
+            {
                 delete archive.second;
+                archive.second = nullptr;
+            }
         }
     }
 

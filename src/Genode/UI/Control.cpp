@@ -49,7 +49,16 @@ namespace Gx
 
     const sf::FloatRect Control::GetGlobalBounds() const
     {
-        return GetTransform().transformRect(GetLocalBounds());
+        auto parent    = GetParent();
+        auto transform = sf::Transform::Identity;
+        while (parent)
+        {
+            transform *= parent->GetTransform();
+            parent = parent->GetParent();
+        }
+
+        transform *= GetTransform();
+        return transform.transformRect(GetLocalBounds());
     }
 
     void Control::SetClickCallback(std::function<void()> callback)

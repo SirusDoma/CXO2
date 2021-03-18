@@ -1,5 +1,7 @@
 #include <O2/Scenes/StateAvi.hpp>
 
+#include <SFML/Audio/Music.hpp>
+
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/Tasks/Sequence.hpp>

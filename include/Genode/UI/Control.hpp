@@ -57,9 +57,9 @@ namespace Gx
         virtual void OnControlChildAdded(Control *control);
         virtual void OnControlChildRemove(Control *control);
 
-        virtual void OnControlStateChanged(Control * sender, State state);
-        virtual void OnControlPress(Control * sender, sf::Event::MouseButtonEvent ev);
-        virtual void OnControlClick(Control * sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnControlStateChanged(Control *sender, State state);
+        virtual void OnControlPress(Control *sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
 
         virtual void Invalidate() = 0;
 

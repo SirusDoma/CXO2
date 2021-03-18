@@ -12,12 +12,6 @@ namespace Gx
 
     Node::~Node()
     {
-        for (auto child : m_children)
-        {
-            if (child)
-                delete child;
-        }
-
         m_children.clear();
     }
 
@@ -53,16 +47,20 @@ namespace Gx
 
     std::vector<Node*> Node::GetChildren() const
     {
-        return m_children;
+        std::vector<Node*> children = std::vector<Node*>(m_children.size());
+        for (auto& child : m_children)
+            children.push_back(child.get());
+
+        return children;
     }
 
     std::vector<Node*> Node::GetChildrenByTag(const std::string &tag) const
     {
         auto nodes = std::vector<Node*>();
-        for (auto node : m_children)
+        for (auto& node : m_children)
         {
             if (node->m_tag == tag)
-                nodes.push_back(node);
+                nodes.push_back(node.get());
         }
 
         return nodes;
@@ -70,10 +68,10 @@ namespace Gx
 
     Node *Node::GetChildByName(const std::string &name) const
     {
-        for (auto node : m_children)
+        for (auto& node : m_children)
         {
             if (node->m_name == name)
-                return node;
+                return node.get();
         }
 
         return nullptr;
@@ -81,10 +79,10 @@ namespace Gx
 
     Node *Node::GetChildByTag(const std::string &tag) const
     {
-        for (auto node : m_children)
+        for (auto& node : m_children)
         {
             if (node->m_tag == tag)
-                return node;
+                return node.get();
         }
 
         return nullptr;
@@ -95,7 +93,7 @@ namespace Gx
         if (child)
         {
             child->m_parent = this;
-            m_children.push_back(child);
+            m_children.push_back(std::shared_ptr<Node>(child));
         }
     }
 
@@ -103,13 +101,11 @@ namespace Gx
     {
         if (child)
         {
-            auto iterator = std::find(m_children.begin(), m_children.end(), child);
+            auto iterator = std::find_if(m_children.begin(), m_children.end(), [child](auto node) { return child == node.get(); });
             if (iterator != m_children.end())
             {
                 child->m_parent = nullptr;
                 m_children.erase(iterator);
-
-                delete child;
             }
         }
     }

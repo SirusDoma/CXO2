@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <Genode/Graphics/Transformable.hpp>
 
@@ -39,10 +40,10 @@ namespace Gx
             virtual void SetParent(Node* node);
 
         private:
-            Node*              m_parent;
-            std::string        m_name;
-            std::string        m_tag;
-            std::vector<Node*> m_children;
+            Node* m_parent;
+            std::string m_name;
+            std::string m_tag;
+            std::vector<std::shared_ptr<Node>> m_children;
     };
 }
 

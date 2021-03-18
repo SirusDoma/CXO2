@@ -60,9 +60,9 @@ namespace Gx
     inline ResourceMetadata* ResourceManager::GetMetadata(const std::string& name, bool cache)
     {
         // Definition of target resource
-        std::shared_ptr<ResourceMetadata> definition;
+        std::shared_ptr<ResourceMetadata> metadata;
 
-        // Load definition and create context for resource dependencies
+        // Load metadata and create context for resource dependencies
         auto context = ResourceContext();
         if (!m_cache->Contains(name))
         {
@@ -75,34 +75,40 @@ namespace Gx
                 return nullptr;
 
             // Load it with loader
-            definition = m_cache->Add(name, loader->Load(data, size), cache);
+            metadata = m_cache->Add(name, loader->Load(data, size), cache);
         }
         else
-            definition = m_cache->Get<ResourceMetadata>(name);
+            metadata = m_cache->Get<ResourceMetadata>(name);
 
-        // No definition found, cannot proceed
-        if (!definition)
+        // No metadata found, cannot proceed
+        if (!metadata)
             return nullptr;
 
-        return definition.get();
+        return metadata.get();
     }
     
     template<typename T>
     inline T* ResourceManager::Create(const std::string& name, bool cache)
     {
         // Definition of target resource
-        auto definition = GetMetadata<T>(name, cache);
-        if (!definition)
+        ResourceMetadata* metadata = GetMetadata<T>(name, cache);
+        if (!metadata)
             return nullptr;
 
+        return Create<T>(metadata);
+    }
+
+    template<typename T>
+    T *ResourceManager::Create(ResourceMetadata *metadata)
+    {
         // Find capable loader
         auto loader = ResourceLoaderFactory::GetMetadataLoader<T>();
         if (!loader)
             return nullptr;
 
-        // Load required resources to build resource from definition
+        // Load required resources to build resource from metadata
         auto context = ResourceContext();
-        for (auto resource : definition->ResourceReferences)
+        for (auto resource : metadata->ResourceReferences)
         {
             if (resource.first == "texture")
                 context.Texture = Resolve<sf::Texture>(resource.second);
@@ -110,6 +116,6 @@ namespace Gx
                 context.Font    = Resolve<sf::Font>(resource.second);
         }
 
-        return loader->Create(definition, context);
+        return loader->Create(metadata, context);
     }
 }

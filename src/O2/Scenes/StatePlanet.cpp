@@ -1,10 +1,14 @@
 #include <O2/Scenes/StatePlanet.hpp>
 
+#include <SFML/Audio.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
+
+Gx::Dialog *dialog;
 
 void StatePlanet::Initialize()
 {
@@ -14,8 +18,10 @@ void StatePlanet::Initialize()
     auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State\\Planet\\Tower.json");
     AddChild(tower);
 
+    dialog = Gx::ResourceManager::Instance()->Create<Gx::Dialog>("Metadata\\Dialog\\Question2.json");
+
     auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State\\Planet\\Btn_Exit.json");
-    exitButton->SetClickCallback([=] { Gx::Application::Instance()->Close(); });
+    exitButton->SetClickCallback([=] { dialog->Show(this); });
     AddChild(exitButton);
 
     auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Philix.json");

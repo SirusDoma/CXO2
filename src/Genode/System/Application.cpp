@@ -23,7 +23,7 @@ namespace Gx
         m_virtualMode = virtualMode;
         m_fullScreen  = fullScreen;
 
-        m_director    = new SceneDirector(scene);
+        m_director    = new SceneDirector(scene, &m_window);
     }
 
     Application::~Application()

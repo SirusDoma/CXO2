@@ -8,6 +8,7 @@ namespace Gx
     class Inputable
     {
     protected:
+        friend class Scene;
         friend class InputableContainer;
 
         virtual ~Inputable() {}

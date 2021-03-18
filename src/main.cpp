@@ -11,6 +11,7 @@
 
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Metadata/DialogMetadataLoader.hpp>
 #include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadataLoader.hpp>
@@ -25,9 +26,10 @@ int main()
     Gx::FileHelper::AddAssetPath("./Image");
     Gx::FileHelper::AddAssetPath("./Music");
 
-    // Register resource definition loaders
+    // Register resource metadata loaders
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());

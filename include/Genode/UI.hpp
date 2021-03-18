@@ -6,5 +6,6 @@
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/UiContainer.hpp>
+#include <Genode/UI/Dialog.hpp>
 
 #endif

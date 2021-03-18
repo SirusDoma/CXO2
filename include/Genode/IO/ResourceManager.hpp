@@ -32,6 +32,9 @@ namespace Gx
         template<typename T>
         T* Create(const std::string& name, bool cache = true);
 
+        template<typename T>
+        T* Create(ResourceMetadata* metadata);
+
         Uint64 GetResourceData(const std::string& name, Gx::Uint8** data);
 
     private:
