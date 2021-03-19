@@ -8,8 +8,6 @@ Gx::ResourceMetadata* LabelMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     LabelMetadata metadata;
-
-
     Parse(json, &metadata);
 
     return new LabelMetadata(metadata);
