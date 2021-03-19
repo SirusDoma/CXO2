@@ -12,7 +12,6 @@
 
 namespace Gx
 {
-    class RadioButton;
     class UiContainer : public Control
     {
     public:
@@ -20,13 +19,6 @@ namespace Gx
         virtual ~UiContainer();
 
         const sf::FloatRect GetLocalBounds() const;
-
-        Control *GetOverlay() const;
-        void SetOverlay(Control *control);
-        void CloseOverlay(bool cleanup = true);
-
-        const sf::Color GetBackdropColor() const;
-        void SetBackdropColor(const sf::Color &color);
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -38,10 +30,6 @@ namespace Gx
 
     private:
         sf::FloatRect m_localBounds;
-
-        Control *m_overlay;
-        RadioButton *m_radio;
-        Rectangle m_backDrop;
     };
 }
 

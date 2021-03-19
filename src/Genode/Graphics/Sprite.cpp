@@ -26,6 +26,7 @@
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 #include <cstdlib>
 
@@ -131,7 +132,16 @@ namespace Gx
 
     sf::FloatRect Sprite::GetGlobalBounds() const
     {
-        return GetTransform().transformRect(GetLocalBounds());
+        auto parent    = GetParent();
+        auto transform = sf::Transform::Identity;
+        while (parent)
+        {
+            transform *= parent->GetTransform();
+            parent = parent->GetParent();
+        }
+
+        transform *= GetTransform();
+        return transform.transformRect(GetLocalBounds());
     }
 
     sf::RenderStates Sprite::Render(sf::RenderTarget& target, sf::RenderStates states) const

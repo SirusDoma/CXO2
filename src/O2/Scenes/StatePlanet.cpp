@@ -8,8 +8,6 @@
 #include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
 
-Gx::Dialog *dialog;
-
 void StatePlanet::Initialize()
 {
     auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\Background.json");
@@ -18,10 +16,8 @@ void StatePlanet::Initialize()
     auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata\\State\\Planet\\Tower.json");
     AddChild(tower);
 
-    dialog = Gx::ResourceManager::Instance()->Create<Gx::Dialog>("Metadata\\Dialog\\Question2.json");
-
     auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State\\Planet\\Btn_Exit.json");
-    exitButton->SetClickCallback([=] { dialog->Show(this); });
+    exitButton->SetClickCallback([=] { Gx::Application::Instance()->Close(); });
     AddChild(exitButton);
 
     auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Philix.json");
@@ -82,7 +78,7 @@ void StatePlanet::ShowChannelBoard(Planet planet)
 
     if (!m_channelBoard)
     {
-        m_channelBoard = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\ChannelBoard.json");
+        m_channelBoard = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\Channel_Board.json");
         channelBoardPosition = m_channelBoard->GetPosition();
 
         Gx::Uint8 *data;

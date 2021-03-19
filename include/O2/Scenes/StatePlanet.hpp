@@ -5,6 +5,8 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
+#include <O2/Scenes/State.hpp>
+
 enum Planet
 {
     Melpomin,
@@ -15,7 +17,7 @@ enum Planet
     Philix
 };
 
-class StatePlanet : public Gx::Scene
+class StatePlanet : public State
 {
 public:
     virtual void Initialize();

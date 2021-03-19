@@ -9,7 +9,7 @@
 
 namespace Gx
 {
-    class RenderableContainer : public virtual Node, public Renderable
+    class RenderableContainer : public virtual Node, public virtual Renderable
     {
     public:
         virtual ~RenderableContainer();

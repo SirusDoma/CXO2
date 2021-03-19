@@ -26,3 +26,8 @@ void StateAvi::Initialize()
 
     Run(sequence);
 }
+
+bool StateAvi::Close(bool quit)
+{
+    return false;
+}

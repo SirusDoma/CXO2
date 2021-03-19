@@ -36,7 +36,7 @@ namespace Gx
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);
 
-        const bool& IsLoop() const;
+        bool IsLoop() const;
         void SetLoop(bool loop);
 
         virtual const sf::Color& GetColor() const;

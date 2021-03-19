@@ -146,7 +146,16 @@ namespace Gx
 
     sf::FloatRect Shape::GetGlobalBounds() const
     {
-        return GetTransform().transformRect(GetLocalBounds());
+        auto parent    = GetParent();
+        auto transform = sf::Transform::Identity;
+        while (parent)
+        {
+            transform *= parent->GetTransform();
+            parent = parent->GetParent();
+        }
+
+        transform *= GetTransform();
+        return transform.transformRect(GetLocalBounds());
     }
 
     void Shape::Update()

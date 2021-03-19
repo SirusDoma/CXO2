@@ -110,11 +110,11 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const;
         sf::FloatRect GetGlobalBounds() const;
 
-    private:
+    protected:
+        void EnsureGeometryUpdate() const;
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
 
-        void EnsureGeometryUpdate() const;
-
+    private:
         std::string             m_string;
         FontHandle              m_font;
         unsigned int            m_characterSize;

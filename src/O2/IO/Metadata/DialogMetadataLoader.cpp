@@ -1,10 +1,13 @@
 #include <O2/IO/Metadata/DialogMetadataLoader.hpp>
 
+#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/UI/Label.hpp>
 
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+#include <O2/IO/Metadata/LabelMetadata.hpp>
+#include <O2/IO/Metadata/LabelMetadataLoader.hpp>
 
 DialogMetadataLoader::DialogMetadataLoader()
 {
@@ -17,12 +20,13 @@ Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
 
     json.at("type").get_to(metadata.Type);
 
+    auto attributes = json.at("attributes");
     auto resources = json.at("resources");
     for (auto resource : resources.items())
         metadata.ResourceReferences[resource.key()] = resource.value();
 
-    auto attributes = json.at("attributes");
     SpriteMetadataLoader::Parse(attributes, &metadata);
+    LabelMetadataLoader::Parse(attributes.at("prompt"), &metadata.PromptLabel);
     if (attributes.contains("buttons"))
     {
         auto buttons = attributes.at("buttons");
@@ -69,6 +73,7 @@ Gx::Dialog* DialogMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
     dialog->SetScale(spec->Scale);
     dialog->SetRotation(spec->Rotation);
 
+    dialog->SetLabel(Gx::ResourceManager::Instance()->Create<Gx::Label>(&spec->PromptLabel));
     dialog->SetAcceptButton(Gx::ResourceManager::Instance()->Create<Gx::Button>(&spec->AcceptButton));
     dialog->SetCancelButton(Gx::ResourceManager::Instance()->Create<Gx::Button>(&spec->CancelButton));
 

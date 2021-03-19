@@ -29,8 +29,7 @@ namespace Gx
         SceneDirector* GetDirector() const;
         sf::View GetView() const;
 
-        void SetOverlay(Node *overlay);
-        Node *GetOverlay() const;
+        void PushOverlay(Node *overlay);
         void CloseOverlay();
 
     protected:
@@ -42,16 +41,12 @@ namespace Gx
         virtual bool Input(sf::Event ev);
 
     private:
-        SceneDirector *m_director;
-        Node *m_overlay;
-
         mutable sf::View m_view;
-        mutable std::queue<std::function<void()>> m_deferrables;
+        SceneDirector *m_director;
+        std::vector<Node*> m_overlays;
 
         void SetDirector(SceneDirector* director);
         void SetView(const sf::View &view);
-
-        void ProcessDeferrables() const;
     };
 }
 

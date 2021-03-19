@@ -2,7 +2,10 @@
 #define GENODE_UI_DIALOG_HPP
 
 #include <Genode/UI/UiContainer.hpp>
+#include <Genode/UI/Label.hpp>
 #include <Genode/Graphics/Sprite.hpp>
+
+#include <functional>
 
 namespace Gx
 {
@@ -23,13 +26,17 @@ namespace Gx
         bool IsAccepted() const;
         virtual const sf::FloatRect GetLocalBounds() const;
 
+        void SetLabel(Label *label);
+        void SetPromptString(const std::string& prompt);
         void SetAcceptButton(Button *acceptButton);
         void SetCancelButton(Button *cancelButton);
 
-        void SetOverlayMode(bool enabled);
-        bool IsOverlayMode() const;
+        void SetAcceptCallback(std::function<void()> callback);
+        void SetCancelCallback(std::function<void()> callback);
 
         void Show(Scene *scene, bool enableBackdrop = true);
+        bool IsShown() const;
+
         void Close();
 
     protected:
@@ -45,9 +52,11 @@ namespace Gx
 
         Scene *m_scene;
         Button *m_acceptButton, *m_cancelButton;
+        Label *m_promptText;
         Rectangle m_backdrop;
 
-        bool m_accepted, m_overlayMode;
+        bool m_accepted, m_shown;
+        std::function<void()> m_onAccepted, m_onCancelled;
     };
 }
 

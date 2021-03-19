@@ -10,11 +10,12 @@
 #include <O2/IO/Archives/OmcArchive.hpp>
 
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
-#include <O2/IO/Metadata/DialogMetadataLoader.hpp>
+#include <O2/IO/Metadata/LabelMetadataLoader.hpp>
 #include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
-#include <O2/IO/Metadata/MusicMetadataLoader.hpp>
+#include <O2/IO/Metadata/DialogMetadataLoader.hpp>
 
 #include <O2/Scenes/StateAvi.hpp>
 #include <O2/Scenes/StatePlanet.hpp>
@@ -28,11 +29,12 @@ int main()
 
     // Register resource metadata loaders
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogMetadataLoader());
 
     // Load globally used assets
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/BGM.ojm");

@@ -13,7 +13,7 @@ namespace Gx
     public:
         using Button::Button;
 
-        virtual const bool IsChecked() const;
+        virtual bool IsChecked() const;
         virtual void SetCheckedState(bool checked);
 
         void SetCheckStateChangeCallback(std::function<void()> callback);

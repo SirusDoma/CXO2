@@ -20,7 +20,7 @@ namespace Gx
         Invalidate();
     }
 
-    const bool &Control::IsEnabled() const
+    bool Control::IsEnabled() const
     {
         return m_enabled;
     }
@@ -31,7 +31,7 @@ namespace Gx
         Invalidate();
     }
 
-    const bool &Control::IsVislble() const
+    bool Control::IsVislble() const
     {
         return m_visible;
     }

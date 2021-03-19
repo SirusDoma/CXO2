@@ -58,7 +58,7 @@ namespace Gx
         m_loop = loop;
     }
 
-    const bool &Animation::IsLoop() const
+    bool Animation::IsLoop() const
     {
         return m_loop;
     }

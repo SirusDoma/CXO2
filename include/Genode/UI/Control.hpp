@@ -24,10 +24,10 @@ namespace Gx
         void SetClickCallback(std::function<void()> callback);
 
         void SetEnabled(bool enabled);
-        const bool& IsEnabled() const;
+        bool IsEnabled() const;
 
         void SetVisible(bool visible);
-        const bool& IsVislble() const;
+        bool IsVislble() const;
 
         virtual void AddChild(Control *node);
         virtual void RemoveChild(Control *node);

@@ -17,8 +17,7 @@ namespace Gx
         UpdatableContainer(),
         InputableContainer(),
         m_director(nullptr),
-        m_overlay(nullptr),
-        m_deferrables()
+        m_overlays()
     {
         SetName(name);
         SetTag("Scene");
@@ -26,7 +25,7 @@ namespace Gx
 
     Scene::~Scene()
     {
-        m_overlay = nullptr;
+        m_overlays.clear();
     }
 
     void Scene::Initialize()
@@ -58,43 +57,45 @@ namespace Gx
         m_view = view;
     }
 
-    void Scene::SetOverlay(Node *overlay)
+    void Scene::PushOverlay(Node *overlay)
     {
-        m_overlay = overlay;
-    }
-
-    Node *Scene::GetOverlay() const
-    {
-        return m_overlay;
+        m_overlays.push_back(overlay);
     }
 
     void Scene::CloseOverlay()
     {
-        SetOverlay(nullptr);
+        if (!m_overlays.empty())
+            m_overlays.pop_back();
     }
 
     sf::RenderStates Scene::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
         m_view = target.getView();
         states = RenderableContainer::Render(target, states);
-        if (m_overlay)
+
+        if (!m_overlays.empty())
         {
-            auto renderable = dynamic_cast<Renderable*>(m_overlay);
-            if (renderable)
-                states = renderable->Render(target, states);
+            for (auto overlay : m_overlays)
+            {
+                auto renderable = dynamic_cast<Renderable *>(overlay);
+                if (renderable)
+                    renderable->Render(target, states);
+            }
         }
 
-        //ProcessDeferrables();
         return states;
     }
 
     void Scene::Update(double delta)
     {
-        if (m_overlay)
+        if (!m_overlays.empty())
         {
-            auto updatable = dynamic_cast<Updatable*>(m_overlay);
-            if (updatable)
-                updatable->Update(delta);
+            for (auto overlay : m_overlays)
+            {
+                auto updatable = dynamic_cast<Updatable*>(overlay);
+                if (updatable)
+                    updatable->Update(delta);
+            }
         }
 
         UpdatableContainer::Update(delta);
@@ -103,9 +104,9 @@ namespace Gx
 
     bool Scene::Input(sf::Event ev)
     {
-        if (m_overlay)
+        if (!m_overlays.empty())
         {
-            auto inputable = dynamic_cast<Inputable*>(m_overlay);
+            auto inputable = dynamic_cast<Inputable*>(m_overlays.back());
             if (inputable)
                 return inputable->Input(ev);
 
@@ -113,16 +114,5 @@ namespace Gx
         }
 
         return InputableContainer::Input(ev);
-    }
-
-    void Scene::ProcessDeferrables() const
-    {
-        while (!m_deferrables.empty())
-        {
-            auto callback = m_deferrables.front();
-            callback();
-
-            m_deferrables.pop();
-        }
     }
 }

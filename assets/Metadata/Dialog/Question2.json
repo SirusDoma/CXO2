@@ -4,6 +4,16 @@
     "texture": "Dialog/Question2/Background.png"
   },
   "attributes": {
+    "prompt": {
+      "type": "LABEL",
+      "resources": {
+        "font": "Common/Font.ttf"
+      },
+      "attributes": {
+        "string": "Are you sure want to exit?",
+        "fontSize": 14
+      }
+    },
     "color": {
       "a": 255,
       "r": 255,

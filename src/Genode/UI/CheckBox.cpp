@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    const bool CheckBox::IsChecked() const
+    bool CheckBox::IsChecked() const
     {
         return m_isChecked;
     }
