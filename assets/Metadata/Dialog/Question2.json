@@ -4,7 +4,7 @@
     "texture": "Dialog/Question2/Background.png"
   },
   "attributes": {
-    "prompt": {
+    "label": {
       "type": "LABEL",
       "resources": {
         "font": "Common/Font.ttf"

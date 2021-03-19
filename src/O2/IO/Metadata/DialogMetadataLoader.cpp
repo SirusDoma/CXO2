@@ -26,7 +26,7 @@ Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     SpriteMetadataLoader::Parse(attributes, &metadata);
-    LabelMetadataLoader::Parse(attributes.at("prompt"), &metadata.PromptLabel);
+    LabelMetadataLoader::Parse(attributes.at("label"), &metadata.PromptLabel);
     if (attributes.contains("buttons"))
     {
         auto buttons = attributes.at("buttons");
