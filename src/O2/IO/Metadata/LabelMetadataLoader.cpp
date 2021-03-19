@@ -26,10 +26,12 @@ void LabelMetadataLoader::Parse(Json json, LabelMetadata *metadata)
         metadata->ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
+    attributes.at("fontSize").get_to(metadata->FontSize);
     TransformMetadataLoader::Parse(attributes["transform"], metadata);
 
-    attributes.at("fontSize").get_to(metadata->FontSize);
-    attributes.at("string").get_to(metadata->String);
+    auto string = attributes.find("string");
+    if (string != attributes.end())
+        string->get_to(metadata->String);
 }
 
 Gx::Label* LabelMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
@@ -38,5 +40,11 @@ Gx::Label* LabelMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Resou
     if (!spec)
         return nullptr;
 
-    return new Gx::Label(spec->String, context.Font, spec->FontSize);
+    auto label = new Gx::Label(spec->String, context.Font, spec->FontSize);
+    label->SetOrigin(spec->Origin);
+    label->SetPosition(spec->Position);
+    label->SetScale(spec->Scale);
+    label->SetRotation(spec->Rotation);
+
+    return label;
 }

@@ -28,7 +28,7 @@ bool State::Close(bool quit)
 {
     if (quit && !m_prompted && m_dialog)
     {
-        m_dialog->Show(this, true);
+        m_dialog->Show(this, "Do you really want to exit?", true);
         return false;
     }
 

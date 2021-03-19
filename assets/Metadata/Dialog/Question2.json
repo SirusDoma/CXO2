@@ -10,8 +10,17 @@
         "font": "Common/Font.ttf"
       },
       "attributes": {
-        "string": "Are you sure want to exit?",
-        "fontSize": 14
+        "fontSize": 12,
+        "transform": {
+          "position": {
+            "x": 175,
+            "y": 108.5
+          },
+          "origin": {
+            "x": 69,
+            "y": 8.5
+          }
+        }
       }
     },
     "color": {

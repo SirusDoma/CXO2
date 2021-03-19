@@ -113,7 +113,7 @@ namespace Gx
         m_onCancelled = callback;
     }
 
-    void Dialog::Show(Scene *scene, bool enableBackDrop)
+    void Dialog::Show(Scene *scene, const std::string& prompt, bool enableBackDrop)
     {
         if (m_shown)
             return;
@@ -133,6 +133,9 @@ namespace Gx
             }
             else
                 m_backdrop = Rectangle(sf::Vector2f(0, 0));
+
+            if (m_promptText)
+                m_promptText->SetString(prompt);
 
             m_scene->PushOverlay(this);
             m_shown = true;
