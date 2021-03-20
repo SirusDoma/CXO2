@@ -46,15 +46,11 @@ int main()
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/bgEffect.ojm");
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/Planet.ojm");
 
-    Gx::Uint8 *data;
-    auto size = Gx::ResourceManager::Instance()->GetResourceData("bgEffect/07", &data);
-
-
     sf::Texture hcursor;
     hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
     Gx::Cursor cursor = Gx::Cursor(hcursor);
 
-    Gx::Application application(new StatePlanet(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
+    Gx::Application application(new StateAvi(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
 
     application.SetCursor(cursor);
     int exitCode = application.Start();
