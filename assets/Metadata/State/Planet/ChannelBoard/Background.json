@@ -1,7 +1,7 @@
 {
   "type": "SPRITE",
   "resources": {
-    "texture": "State/Planet/Channel_Board.png"
+    "texture": "State/Planet/ChannelBoard.png"
   },
   "attributes": {
     "transform": {
@@ -9,12 +9,6 @@
         "x": 574,
         "y": 4
       }
-    },
-    "color": {
-      "a": 255,
-      "r": 255,
-      "g": 255,
-      "b": 255
     },
     "texCoords": {
       "x": 0,

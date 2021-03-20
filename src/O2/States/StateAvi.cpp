@@ -1,4 +1,4 @@
-#include <O2/Scenes/StateAvi.hpp>
+#include <O2/States/StateAvi.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -6,7 +6,7 @@
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
-#include <O2/Scenes/StatePlanet.hpp>
+#include <O2/States/StatePlanet.hpp>
 
 void StateAvi::Initialize()
 {

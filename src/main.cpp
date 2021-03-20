@@ -17,8 +17,8 @@
 #include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/DialogMetadataLoader.hpp>
 
-#include <O2/Scenes/StateAvi.hpp>
-#include <O2/Scenes/StatePlanet.hpp>
+#include <O2/States/StateAvi.hpp>
+#include <O2/States/StatePlanet.hpp>
 
 int main() 
 {

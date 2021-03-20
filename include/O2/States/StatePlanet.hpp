@@ -5,17 +5,10 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
-#include <O2/Scenes/State.hpp>
+#include <O2/States/State.hpp>
+#include <O2/Data/Planet.hpp>
 
-enum Planet
-{
-    Melpomin,
-    Thalo,
-    Euta,
-    Kaliope,
-    Kleo,
-    Philix
-};
+#include <O2/Components/Planet/ChannelBoard.hpp>
 
 class StatePlanet : public State
 {
@@ -23,8 +16,8 @@ public:
     virtual void Initialize();
 
 private:
-    Gx::Sprite *m_channelBoard;
-    Gx::Sequence *m_channelBoardSequence;
+    ChannelBoard    *m_channelBoard;
+    Gx::UiContainer *m_container;
 
     void ShowChannelBoard(Planet planet);
 

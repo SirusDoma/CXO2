@@ -1,4 +1,4 @@
-#include <O2/Scenes/StatePlanet.hpp>
+#include <O2/States/StatePlanet.hpp>
 
 #include <SFML/Audio.hpp>
 
@@ -7,6 +7,8 @@
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
+
+#include <O2/Components/Planet/ChannelBoard.hpp>
 
 void StatePlanet::Initialize()
 {
@@ -27,8 +29,8 @@ void StatePlanet::Initialize()
     auto thalo    = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Thalo.json");
     auto melpomin = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata\\State\\Planet\\Btn_Melpomin.json");
 
-    auto container = new Gx::UiContainer();
-    container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
+    m_container = new Gx::UiContainer();
+    m_container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
     std::unordered_map<Planet, Gx::RadioButton*> planets = {
         {Planet::Melpomin, melpomin},
         {Planet::Thalo,    thalo},
@@ -49,12 +51,18 @@ void StatePlanet::Initialize()
     for (auto [planet, radio] : planets)
     {
         radio->SetCheckStateChangeCallback([this, p = planet] {
+            if (m_channelBoard->InTransition())
+                return;
+
             sfx.play();
             ShowChannelBoard(p);
         });
     }
 
-    AddChild(container);
+    AddChild(m_container);
+
+    m_channelBoard = new ChannelBoard();
+    AddChild(m_channelBoard);
 
     // Overlay fade in animation
     auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
@@ -72,28 +80,7 @@ void StatePlanet::Initialize()
 
 void StatePlanet::ShowChannelBoard(Planet planet)
 {
-    static auto channelBoardPosition = sf::Vector2f();
-    static auto sfx = sf::Sound();
-    static auto sbf = sf::SoundBuffer();
-
-    if (!m_channelBoard)
-    {
-        m_channelBoard = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\Channel_Board.json");
-        channelBoardPosition = m_channelBoard->GetPosition();
-
-        Gx::Uint8 *data;
-        auto size = Gx::ResourceManager::Instance()->GetResourceData("openChannel", &data);
-
-        if (sbf.loadFromMemory(data, size))
-            sfx.setBuffer(sbf);
-
-        AddChild(m_channelBoard);
-    }
-
-    m_channelBoard->SetPosition(800 + m_channelBoard->GetLocalBounds().width, m_channelBoard->GetPosition().y);
-    Run(new Gx::Sequence({
-        new Gx::Action([=] { sfx.play(); }),
-        new Gx::Move(m_channelBoard, channelBoardPosition - sf::Vector2f(30, 0), sf::milliseconds(200)),
-        new Gx::Move(m_channelBoard, channelBoardPosition, sf::milliseconds(100))
-    }));
+    m_channelBoard->Show(planet, [=] {
+        m_container->SetEnabled(true);
+    });
 }

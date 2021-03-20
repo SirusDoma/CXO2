@@ -62,11 +62,11 @@ Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::Res
 
     auto sprite = new Gx::Sprite();
     sprite->SetName(spec->Name);
-    if (context.Texture)
-        sprite->SetTexture(context.Texture);
-
     sprite->SetTexCoords(spec->TexCoords);
     sprite->SetColor(spec->Color);
+
+    if (context.Texture)
+        sprite->SetTexture(context.Texture);
 
     sprite->SetOrigin(spec->Origin);
     sprite->SetPosition(spec->Position);

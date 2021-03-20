@@ -2,7 +2,7 @@
 #define STATE_LOGO_HPP
 
 #include <Genode/SceneGraph.hpp>
-#include <O2/Scenes/State.hpp>
+#include <O2/States/State.hpp>
 
 class StateAvi : public Gx::Scene
 {
