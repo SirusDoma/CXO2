@@ -5,8 +5,8 @@
 #include <Genode/IO/Json.hpp>
 
 #include <O2/IO/Metadata/SpriteMetadata.hpp>
-#include <O2/IO/Metadata/ButtonMetadata.hpp>
-#include <O2/IO/Metadata/LabelMetadata.hpp>
+#include <O2/IO/Metadata/UI/ButtonMetadata.hpp>
+#include <O2/IO/Metadata/UI/LabelMetadata.hpp>
 
 struct DialogMetadata : public SpriteMetadata
 {

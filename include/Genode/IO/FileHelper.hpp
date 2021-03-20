@@ -14,7 +14,7 @@ namespace Gx
         static std::vector<std::string> GetAssetPaths();
         static void AddAssetPath(const std::string& path);
 
-        static std::string GetFileName(const std::string& fullPath);
+        static std::string GetFileName(const std::string& fullPath, bool extension = true);
         static std::string GetFullName(const std::string& fileName);
 
         static bool Exists(const std::string& fileName, bool asAsset = false);

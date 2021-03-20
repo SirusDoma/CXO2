@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/Dialog.hpp>
 
-#include <O2/IO/Metadata/DialogMetadata.hpp>
+#include <O2/IO/Metadata/UI/DialogMetadata.hpp>
 
 class DialogMetadataLoader : public Gx::MetadataLoader<Gx::Dialog>
 {

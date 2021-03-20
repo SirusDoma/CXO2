@@ -34,9 +34,9 @@ namespace Gx
         if (!asAsset || result)
             return result;
 
-        for (std::string& filePath : m_directories)
+        for (std::string& path : m_directories)
         {
-            std::string fullPath = std::string(filePath).append("/").append(fileName);
+            std::string fullPath = std::string(path).append("/").append(fileName);
             if (exists(fullPath.c_str()))
                 return true;
         }
@@ -44,10 +44,14 @@ namespace Gx
         return false;
     }
 
-    std::string FileHelper::GetFileName(const std::string& filename)
+    std::string FileHelper::GetFileName(const std::string& filename, bool extension)
     {
         auto filePath = path(filename.c_str());
-        return filePath.filename().string();
+
+        if (extension)
+            return filePath.filename().string();
+        else
+            return filePath.filename().replace_extension().string();
     }
 
     std::string FileHelper::GetFullName(const std::string& fileName)

@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/Label.hpp>
 
-#include <O2/IO/Metadata/LabelMetadata.hpp>
+#include <O2/IO/Metadata/UI/LabelMetadata.hpp>
 #include <O2/IO/Metadata/TransformMetadataLoader.hpp>
 
 class LabelMetadataLoader : public Gx::MetadataLoader<Gx::Label>

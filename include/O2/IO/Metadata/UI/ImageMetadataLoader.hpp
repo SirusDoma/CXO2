@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/Image.hpp>
 
-#include <O2/IO/Metadata/ImageMetadata.hpp>
+#include <O2/IO/Metadata/UI/ImageMetadata.hpp>
 
 class ImageMetadataLoader : public Gx::MetadataLoader<Gx::Image>
 {

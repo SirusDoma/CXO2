@@ -38,7 +38,6 @@ private:
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
     sf::Vector2f m_position;
-    sf::IntRect  m_texCoords;
 
     Gx::Image *m_background;
     Gx::Image *m_notice;

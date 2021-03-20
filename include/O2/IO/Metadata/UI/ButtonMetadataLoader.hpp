@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/Button.hpp>
 
-#include <O2/IO/Metadata/ButtonMetadata.hpp>
+#include <O2/IO/Metadata/UI/ButtonMetadata.hpp>
 
 class ButtonMetadataLoader : public Gx::MetadataLoader<Gx::Button>
 {

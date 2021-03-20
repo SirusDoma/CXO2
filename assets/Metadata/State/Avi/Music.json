@@ -1,7 +1,7 @@
 {
   "type": "Music",
   "resources": {
-    "music": "bgLogo.ogg"
+    "music": "BGM/bgLogo.ogg"
   },
   "attributes": {
     "loop": false

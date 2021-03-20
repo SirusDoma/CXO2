@@ -1,4 +1,4 @@
-#include <O2/IO/Metadata/ImageMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/ImageMetadataLoader.hpp>
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 
 ImageMetadataLoader::ImageMetadataLoader()

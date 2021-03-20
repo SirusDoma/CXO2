@@ -1,4 +1,3 @@
-
 #include "ResourceManager.hpp"
 
 namespace Gx
@@ -19,10 +18,12 @@ namespace Gx
             return nullptr;
         }
 
+        auto prefix = FileHelper::GetFileName(fileName, false) + "/";
         for (auto entry : m_archives[name]->GetFileEntries())
         {
-            m_entries[entry.Name] = entry;
-            m_entries[entry.Name].Parent = m_archives[name];
+            auto entryName = prefix + entry.Name;
+            m_entries[entryName] = entry;
+            m_entries[entryName].Parent = m_archives[name];
         }
 
         return static_cast<T*>(m_archives[name]);

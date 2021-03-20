@@ -1,7 +1,7 @@
 {
   "type": "Music",
   "resources": {
-    "music": "bgMainRoom.ogg"
+    "music": "BGM/bgMainRoom.ogg"
   },
   "attributes": {
     "loop": true

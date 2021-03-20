@@ -4,7 +4,7 @@
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>
 
-#include <O2/IO/Metadata/ButtonMetadata.hpp>
+#include <O2/IO/Metadata/UI/ButtonMetadata.hpp>
 
 struct RadioButtonMetadata : public ButtonMetadata
 {

@@ -1,4 +1,4 @@
-#include <O2/IO/Metadata/LabelMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/LabelMetadataLoader.hpp>
 
 LabelMetadataLoader::LabelMetadataLoader()
 {

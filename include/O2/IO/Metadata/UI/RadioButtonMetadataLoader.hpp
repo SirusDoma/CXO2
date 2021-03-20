@@ -8,7 +8,7 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/RadioButton.hpp>
 
-#include <O2/IO/Metadata/RadioButtonMetadata.hpp>
+#include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
 
 class RadioButtonMetadataLoader : public Gx::MetadataLoader<Gx::RadioButton>
 {

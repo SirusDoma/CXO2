@@ -1,4 +1,4 @@
-#include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 

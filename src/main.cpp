@@ -12,11 +12,12 @@
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
-#include <O2/IO/Metadata/ImageMetadataLoader.hpp>
-#include <O2/IO/Metadata/LabelMetadataLoader.hpp>
-#include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
-#include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
-#include <O2/IO/Metadata/DialogMetadataLoader.hpp>
+
+#include <O2/IO/Metadata/UI/ImageMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/LabelMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/RadioButtonMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/DialogMetadataLoader.hpp>
 
 #include <O2/States/StateAvi.hpp>
 #include <O2/States/StatePlanet.hpp>
@@ -28,10 +29,12 @@ int main()
     Gx::FileHelper::AddAssetPath("./Image");
     Gx::FileHelper::AddAssetPath("./Music");
 
-    // Register resource metadata loaders
+    // -- Register resource metadata loaders
+    // Basic Resource
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    // UI
     Gx::ResourceLoaderFactory::Register<Gx::Image>(new ImageMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());

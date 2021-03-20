@@ -44,7 +44,7 @@ void StatePlanet::Initialize()
     static auto sbf = sf::SoundBuffer();
 
     Gx::Uint8 *data;
-    auto size = Gx::ResourceManager::Instance()->GetResourceData("click1", &data);
+    auto size = Gx::ResourceManager::Instance()->GetResourceData("Planet/click1", &data);
     if (sbf.loadFromMemory(data, size))
         sfx.setBuffer(sbf);
 

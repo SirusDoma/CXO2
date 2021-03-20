@@ -7,7 +7,6 @@
 
 ChannelBoard::ChannelBoard() :
     m_position(),
-    m_texCoords(),
     m_background(),
     m_notice(),
     m_sfx(),
@@ -22,8 +21,7 @@ ChannelBoard::ChannelBoard() :
 void ChannelBoard::Initialize()
 {
     m_background = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Background.json");
-    m_texCoords = m_background->GetTexCoords();
-    m_position  = m_background->GetPosition();
+    m_position   = m_background->GetPosition();
 
     SetOrigin(m_background->GetOrigin());
     SetPosition(m_position);
@@ -34,7 +32,7 @@ void ChannelBoard::Initialize()
     m_notice = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Notice.json");
 
     Gx::Uint8 *data;
-    auto size = Gx::ResourceManager::Instance()->GetResourceData("openChannel", &data);
+    auto size = Gx::ResourceManager::Instance()->GetResourceData("Planet/openChannel", &data);
 
     m_sfx = sf::Sound();
     m_sfxBuffer = sf::SoundBuffer();
