@@ -55,7 +55,7 @@ public:
     std::string GetExtension(const std::string& name) const;
 
 private:
-    static Gx::Uint8* DecodeWave(Gx::Uint8* in, int length);
+    static Gx::Uint8* DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, int *accCounter);
 
     bool Read(void* data, Gx::Uint64 size) const;
     virtual Gx::Int64 GetFile(const FileEntry* entry, Gx::Uint8** data) const;

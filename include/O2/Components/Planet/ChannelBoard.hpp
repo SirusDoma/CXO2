@@ -35,6 +35,7 @@ public:
 
 private:
     void Initialize();
+    void LoadSfx();
     virtual void Invalidate();
 
     virtual void Update(double delta);
@@ -47,8 +48,8 @@ private:
     Gx::UiContainer *m_channelListContainer;
     ChannelButton   *m_channelButton;
 
-    sf::Sound          m_sfx;
-    sf::SoundBuffer   m_sfxBuffer;
+    sf::Sound         m_showSfx, m_channelNavigateSfx, m_channelEnterSfx;
+    sf::SoundBuffer   m_showSfxBuffer, m_channelNavigateSfxBuffer, m_channelEnterSfxBuffer;
     sf::RenderTexture m_duplicateTexture;
 
     Planet m_planet;
