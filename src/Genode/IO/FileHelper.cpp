@@ -84,7 +84,7 @@ namespace Gx
 
     void FileHelper::WriteFile(const std::string &fileName, Uint8 *data, Int64 size)
     {
-        std::ofstream fs(fileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
+        std::ofstream fs(fileName.c_str(), std::ios::out | std::ios::binary);
         fs.write(reinterpret_cast<const char*>(data), size);
         fs.close();
     }
