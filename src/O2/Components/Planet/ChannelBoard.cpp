@@ -44,6 +44,9 @@ void ChannelBoard::Initialize()
             SwitchTab(Tab::ChannelList);
     });
 
+    m_channelCategory = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
+    m_channelListContainer->AddChild(m_channelCategory);
+
     m_channelButton = new ChannelButton();
     m_channelListContainer->AddChild(m_channelButton);
 
@@ -148,6 +151,17 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     m_channelButton->SetPlanet(planet);
     SwitchTab(Tab::ChannelList);
     SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
+
+    switch (planet)
+    {
+        case Planet::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
+        case Planet::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
+        case Planet::Philix:   m_channelCategory->SetFrame("Philix");   break;
+        case Planet::Melpomin: m_channelCategory->SetFrame("Melpomin"); break;
+        case Planet::Thalo:    m_channelCategory->SetFrame("Thalo");    break;
+        case Planet::Euta:     m_channelCategory->SetFrame("Euta");     break;
+        default: break;
+    }
 
     Run(new Gx::Sequence([=] {
         m_animating = false;

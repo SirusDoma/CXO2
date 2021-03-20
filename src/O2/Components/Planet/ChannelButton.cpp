@@ -5,6 +5,7 @@
 
 ChannelButton::ChannelButton() :
     m_button(),
+    m_channelName(),
     m_selector()
 {
     Initialize();
@@ -12,15 +13,18 @@ ChannelButton::ChannelButton() :
 
 void ChannelButton::Initialize()
 {
-    m_button = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel.json");
+    m_button = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
     SetOrigin(m_button->GetOrigin());
     SetPosition(m_button->GetPosition());
 
     m_button->SetOrigin(0.f, 0.f);
     m_button->SetPosition(0.f, 0.f);
 
-    m_selector = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/ChannelSelector.json");
-    AddChild(m_button, m_selector);
+    m_channelName = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
+    m_selector    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
+    m_selector->SetVisible(false);
+
+    AddChild(m_button, m_channelName, m_selector);
 }
 
 const sf::FloatRect ChannelButton::GetLocalBounds() const
@@ -37,19 +41,31 @@ void ChannelButton::SetPlanet(Planet planet)
     switch (planet)
     {
         case Planet::Kaliope:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelHigh.json");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
+            m_channelName->SetFrame("Kaliope");
             break;
         case Planet::Kleo:
+            m_channelName->SetFrame("Kleo");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
+            break;
         case Planet::Philix:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelIntermediate.json");
+            m_channelName->SetFrame("Philix");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
             break;
         case Planet::Melpomin:
+            m_channelName->SetFrame("Melpomin");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            break;
         case Planet::Thalo:
+            m_channelName->SetFrame("Thalo");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            break;
         case Planet::Euta:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelBeginner.json");
+            m_channelName->SetFrame("Euta");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
         default:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel.json");
+            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
             break;
     }
 

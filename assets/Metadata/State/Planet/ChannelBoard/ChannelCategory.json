@@ -1,0 +1,58 @@
+{
+  "type": "IMAGE",
+  "resources": {
+    "texture": "State/Planet/ChannelCategory.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 72,
+        "y": 18
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 99,
+      "height": 31
+    },
+    "frames": {
+      "Euta": {
+        "x": 0,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      },
+      "Thalo": {
+        "x": 99,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      },
+      "Melpomin": {
+        "x": 198,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      },
+      "Kleo": {
+        "x": 297,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      },
+      "Kaliope": {
+        "x": 396,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      },
+      "Philix": {
+        "x": 495,
+        "y": 0,
+        "width": 99,
+        "height": 31
+      }
+    }
+  }
+}

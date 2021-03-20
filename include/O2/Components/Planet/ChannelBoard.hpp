@@ -42,7 +42,7 @@ private:
 
     sf::Vector2f m_position;
 
-    Gx::Image       *m_background, *m_notice, m_duplicateImage;
+    Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
     Gx::Button      *m_channelTabButton, *m_noticeTabButton;
     Gx::UiContainer *m_channelListContainer;
     ChannelButton   *m_channelButton;

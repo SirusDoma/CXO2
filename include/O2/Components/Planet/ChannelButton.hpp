@@ -23,7 +23,7 @@ private:
     void Initialize();
 
     Gx::Button *m_button;
-    Gx::Image  *m_selector;
+    Gx::Image  *m_selector, *m_channelName;
 };
 
 #endif
