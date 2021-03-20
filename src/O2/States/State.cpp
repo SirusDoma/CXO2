@@ -17,6 +17,10 @@ State::State(const std::string &name) :
     m_dialog(),
     m_prompted(false)
 {
+}
+
+void State::Initialize()
+{
     m_dialog = std::unique_ptr<Gx::Dialog>(Gx::ResourceManager::Instance()->Create<Gx::Dialog>("Metadata\\Dialog\\Question2.json"));
     m_dialog->SetAcceptCallback([=] {
         m_prompted = true;

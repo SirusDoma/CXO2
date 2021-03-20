@@ -12,6 +12,8 @@
 
 void StatePlanet::Initialize()
 {
+    State::Initialize();
+
     auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Planet\\Background.json");
     AddChild(background);
 
@@ -69,9 +71,9 @@ void StatePlanet::Initialize()
     overlay->SetFillColor(sf::Color::White);
     AddChild(overlay);
 
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
-    if (bgm)
-        bgm->play();
+//    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
+//    if (bgm)
+//        bgm->play();
 
     Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
         new Gx::Fade(overlay, 0, sf::seconds(2.5f))

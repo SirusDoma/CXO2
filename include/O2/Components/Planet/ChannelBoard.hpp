@@ -6,6 +6,8 @@
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/UI/Image.hpp>
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/UiContainer.hpp>
 
 #include <O2/Data/Planet.hpp>
 
@@ -41,6 +43,8 @@ private:
 
     Gx::Image *m_background;
     Gx::Image *m_notice;
+    Gx::Button *m_channelTabButton, *m_noticeTabButton;
+    Gx::UiContainer *m_channelListContainer;
 
     sf::Sound       m_sfx;
     sf::SoundBuffer m_sfxBuffer;

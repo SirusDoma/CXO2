@@ -1,0 +1,40 @@
+{
+  "type": "BUTTON",
+  "resources": {
+    "texture": "State/Planet/Btn_NoticeTab.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 120
+      }
+    },
+    "states": {
+      "normal": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 26,
+          "height": 121
+        }
+      },
+      "hover": {
+        "texCoords": {
+          "x": 26,
+          "y": 0,
+          "width": 26,
+          "height": 121
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 52,
+          "y": 0,
+          "width": 26,
+          "height": 121
+        }
+      }
+    }
+  }
+}

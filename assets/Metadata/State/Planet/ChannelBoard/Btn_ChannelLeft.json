@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "resources": {
+    "texture": "State/Planet/Btn_ChannelLeft.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 39,
+        "y": 463
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 47,
+          "height": 22
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 47,
+          "y": 0,
+          "width": 47,
+          "height": 22
+        }
+      }
+    }
+  }
+}

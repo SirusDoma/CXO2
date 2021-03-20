@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "resources": {
+    "texture": "State/Planet/Btn_ChannelEnter.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 119,
+        "y": 490
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 86,
+          "height": 25
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 86,
+          "y": 0,
+          "width": 86,
+          "height": 25
+        }
+      }
+    }
+  }
+}

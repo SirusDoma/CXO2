@@ -5,14 +5,19 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx.hpp>
 
+#include <O2/Components/Planet/ChannelButton.hpp>
+
 ChannelBoard::ChannelBoard() :
     m_position(),
     m_background(),
+    m_channelTabButton(),
+    m_noticeTabButton(),
     m_notice(),
+    m_channelListContainer(),
     m_sfx(),
     m_sfxBuffer(),
     m_planet(),
-    m_tab(Tab::Notice),
+    m_tab(),
     m_animating(false)
 {
     Initialize();
@@ -31,6 +36,24 @@ void ChannelBoard::Initialize()
 
     m_notice = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Notice.json");
 
+    m_channelListContainer = new Gx::UiContainer();
+    auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
+    auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
+    auto btnChannelRight = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
+    m_channelListContainer->AddChild(btnChannelEnter, btnChannelLeft, btnChannelRight);
+
+    m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
+    m_channelTabButton->SetClickCallback([this] {
+        if (m_tab != Tab::ChannelList && !m_animating && m_planet)
+            SwitchTab(Tab::ChannelList);
+    });
+
+    m_noticeTabButton  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_NoticeTab.json");
+    m_noticeTabButton->SetClickCallback([this] {
+        if (m_tab != Tab::Notice && !m_animating)
+            SwitchTab(Tab::Notice);
+    });
+
     Gx::Uint8 *data;
     auto size = Gx::ResourceManager::Instance()->GetResourceData("Planet/openChannel", &data);
 
@@ -39,8 +62,8 @@ void ChannelBoard::Initialize()
     if (m_sfxBuffer.loadFromMemory(data, size))
         m_sfx.setBuffer(m_sfxBuffer);
 
-    AddChild(m_background, m_notice);
-    SwitchTab(m_tab);
+    AddChild(m_background,  m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice);
+    SwitchTab(Tab::Notice);
 }
 
 ChannelBoard::~ChannelBoard()
@@ -71,11 +94,27 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
     {
         m_background->SetFrame("ChannelList");
         m_notice->SetVisible(false);
+
+        m_channelTabButton->SetVisible(false);
+        m_channelTabButton->SetEnabled(false);
+
+        m_noticeTabButton->SetVisible(true);
+        m_noticeTabButton->SetEnabled(true);
+
+        m_channelListContainer->SetVisible(true);
     }
     else
     {
         m_background->SetFrame("Notice");
         m_notice->SetVisible(true);
+
+        m_channelTabButton->SetVisible(true);
+        m_channelTabButton->SetEnabled(true);
+
+        m_noticeTabButton->SetVisible(false);
+        m_noticeTabButton->SetEnabled(false);
+
+        m_channelListContainer->SetVisible(false);
     }
 }
 

@@ -16,7 +16,7 @@ public:
     virtual bool Close(bool quit = false);
 
 protected:
-
+    virtual void Initialize();
 
 private:
     std::unique_ptr<Gx::Dialog> m_dialog;
