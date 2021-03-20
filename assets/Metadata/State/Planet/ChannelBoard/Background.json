@@ -1,5 +1,5 @@
 {
-  "type": "SPRITE",
+  "type": "IMAGE",
   "resources": {
     "texture": "State/Planet/ChannelBoard.png"
   },
@@ -10,11 +10,19 @@
         "y": 4
       }
     },
-    "texCoords": {
-      "x": 0,
-      "y": 0,
-      "width": 226,
-      "height": 524
+    "frames": {
+      "ChannelList": {
+        "x": 0,
+        "y": 0,
+        "width": 226,
+        "height": 524
+      },
+      "Notice": {
+        "x": 226,
+        "y": 0,
+        "width": 226,
+        "height": 524
+      }
     }
   }
 }

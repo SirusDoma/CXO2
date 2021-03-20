@@ -2,6 +2,7 @@
 #define GENODE_UI_HPP
 
 #include <Genode/UI/Control.hpp>
+#include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>

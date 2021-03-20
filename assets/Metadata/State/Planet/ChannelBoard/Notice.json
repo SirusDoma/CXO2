@@ -1,5 +1,5 @@
 {
-  "type": "SPRITE",
+  "type": "IMAGE",
   "resources": {
     "texture": "State/Planet/NoticePlaceholder.png"
   },

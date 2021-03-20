@@ -12,6 +12,7 @@
 #include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadataLoader.hpp>
 #include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Metadata/ImageMetadataLoader.hpp>
 #include <O2/IO/Metadata/LabelMetadataLoader.hpp>
 #include <O2/IO/Metadata/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/RadioButtonMetadataLoader.hpp>
@@ -31,6 +32,7 @@ int main()
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Image>(new ImageMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
