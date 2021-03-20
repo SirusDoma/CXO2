@@ -104,21 +104,11 @@ void ChannelBoard::LoadSfx()
 
     data = nullptr;
     size = Gx::ResourceManager::Instance()->GetResourceData("bgEffect/07", &data);
-    Gx::FileHelper::WriteFile("D:\\test.wav", data, size);
-
-    m_channelNavigateSfx = sf::Sound();
-    m_channelNavigateSfxBuffer = sf::SoundBuffer();
-    if (m_channelNavigateSfxBuffer.loadFromFile("D:\\test.wav"))
-        m_channelNavigateSfx.setBuffer(m_channelNavigateSfxBuffer);
 
     m_channelNavigateSfx = sf::Sound();
     m_channelNavigateSfxBuffer = sf::SoundBuffer();
     if (m_channelNavigateSfxBuffer.loadFromMemory(data, size))
         m_channelNavigateSfx.setBuffer(m_channelNavigateSfxBuffer);
-
-    int ch = m_channelNavigateSfx.getBuffer()->getChannelCount();
-    int sp = m_channelNavigateSfx.getBuffer()->getSampleCount();
-    int sr = m_channelNavigateSfx.getBuffer()->getSampleRate();
 
     data = nullptr;
     size = Gx::ResourceManager::Instance()->GetResourceData("bgEffect/10", &data);
