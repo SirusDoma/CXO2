@@ -39,8 +39,8 @@ namespace Gx
     int Application::Start()
     {
         // Set render frequency
-        m_window.setVerticalSyncEnabled(true);
-        m_window.setFramerateLimit(60);
+        //m_window.setVerticalSyncEnabled(true);
+        //m_window.setFramerateLimit(60);
 
         // Setup view
         auto view = m_window.getDefaultView();
@@ -102,6 +102,7 @@ namespace Gx
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
+                m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta = 0.0f;
             }

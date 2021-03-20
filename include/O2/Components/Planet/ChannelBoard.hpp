@@ -13,6 +13,7 @@
 
 #include <functional>
 
+class ChannelButton;
 class ChannelBoard : public virtual Gx::Control, public virtual Gx::TaskContainer
 {
 public:
@@ -41,13 +42,14 @@ private:
 
     sf::Vector2f m_position;
 
-    Gx::Image *m_background;
-    Gx::Image *m_notice;
-    Gx::Button *m_channelTabButton, *m_noticeTabButton;
+    Gx::Image       *m_background, *m_notice, m_duplicateImage;
+    Gx::Button      *m_channelTabButton, *m_noticeTabButton;
     Gx::UiContainer *m_channelListContainer;
+    ChannelButton   *m_channelButton;
 
-    sf::Sound       m_sfx;
-    sf::SoundBuffer m_sfxBuffer;
+    sf::Sound          m_sfx;
+    sf::SoundBuffer   m_sfxBuffer;
+    sf::RenderTexture m_duplicateTexture;
 
     Planet m_planet;
     Tab m_tab;

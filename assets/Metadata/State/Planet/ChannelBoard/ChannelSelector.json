@@ -1,0 +1,20 @@
+{
+  "type": "IMAGE",
+  "resources": {
+    "texture": "State/Planet/Btn_Channel.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "texCoords": {
+      "x": 159,
+      "y": 0,
+      "width": 159,
+      "height": 18
+    }
+  }
+}

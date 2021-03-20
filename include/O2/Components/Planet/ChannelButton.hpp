@@ -5,18 +5,25 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/Image.hpp>
 
-class ChannelButton : Gx::Button
+#include <O2/Data/Planet.hpp>
+
+class ChannelButton : public Gx::Control
 {
 public:
     ChannelButton();
+    virtual const sf::FloatRect GetLocalBounds() const;
+
+    virtual void SetPlanet(Planet planet);
 
 protected:
+    virtual void OnControlStateChanged(Control *sender, State state);
     virtual void Invalidate();
 
 private:
     void Initialize();
 
-    Gx::Image *m_selection;
+    Gx::Button *m_button;
+    Gx::Image  *m_selector;
 };
 
 #endif
