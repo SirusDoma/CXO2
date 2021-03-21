@@ -3,9 +3,10 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Sequence.hpp>
-#include <Genode/Fx.hpp>
+#include <Genode/Fx/Move.hpp>
 
 #include <O2/Components/Planet/ChannelButton.hpp>
+#include <iostream>
 
 ChannelBoard::ChannelBoard() :
     m_position(),
@@ -13,7 +14,7 @@ ChannelBoard::ChannelBoard() :
     m_channelTabButton(),
     m_noticeTabButton(),
     m_notice(),
-    m_channelButton(),
+    m_repeater(),
     m_channelListContainer(),
     m_duplicateImage(),
     m_duplicateTexture(),
@@ -45,7 +46,7 @@ void ChannelBoard::Initialize()
 
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
-    m_channelTabButton->SetClickCallback([this] {
+    m_channelTabButton->SetClickCallback([=] {
         if (m_tab != Tab::ChannelList && !m_animating && m_planet)
             SwitchTab(Tab::ChannelList);
     });
@@ -53,8 +54,8 @@ void ChannelBoard::Initialize()
     m_channelCategory = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
     m_channelListContainer->AddChild(m_channelCategory);
 
-    m_channelButton = new ChannelButton();
-    m_channelListContainer->AddChild(m_channelButton);
+    m_repeater = Gx::ResourceManager::Instance()->Create<Gx::Repeater>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
+    m_channelListContainer->AddChild(m_repeater);
 
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] {
@@ -181,12 +182,12 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     m_duplicateTexture.display();
     m_duplicateImage.SetTexture(m_duplicateTexture.getTexture());
     m_duplicateImage.SetVisible(true);
+    m_repeater->ClearChildren();
 
-    m_channelButton->SetPlanet(planet);
     SwitchTab(Tab::ChannelList);
     SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
 
-    switch (planet)
+    switch (m_planet)
     {
         case Planet::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
         case Planet::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
@@ -207,6 +208,26 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
         new Gx::Move(this, m_position - sf::Vector2f(30, 0), sf::milliseconds(200)),
         new Gx::Move(this, m_position, sf::milliseconds(100))
     }));
+}
+
+void ChannelBoard::UpdateChannelList(int count, int pageIndex)
+{
+    // TODO: Pagination
+    int loopCount = count;
+    if (loopCount > m_repeater->GetRepeatCount())
+        loopCount = m_repeater->GetRepeatCount();
+
+    m_repeater->ClearChildren();
+    for (int i = 0; i < loopCount; i++)
+    {
+        auto channelButton = new ChannelButton(*Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json"));
+        channelButton->SetPlanet(m_planet);
+        channelButton->SetClickCallback([=] {
+
+        });
+
+        m_repeater->AddChild(channelButton);
+    }
 }
 
 void ChannelBoard::Update(double delta)

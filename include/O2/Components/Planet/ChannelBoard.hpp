@@ -8,6 +8,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/UiContainer.hpp>
+#include <Genode/UI/Repeater.hpp>
 
 #include <O2/Data/Planet.hpp>
 
@@ -29,6 +30,7 @@ public:
     virtual const sf::FloatRect GetLocalBounds() const;
 
     void Show(Planet planet, std::function<void()> callback);
+    void UpdateChannelList(int count, int pageIndex);
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
@@ -46,7 +48,7 @@ private:
     Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
     Gx::Button      *m_channelTabButton, *m_noticeTabButton;
     Gx::UiContainer *m_channelListContainer;
-    ChannelButton   *m_channelButton;
+    Gx::Repeater    *m_repeater;
 
     sf::Sound         m_showSfx, m_channelNavigateSfx, m_channelEnterSfx;
     sf::SoundBuffer   m_showSfxBuffer, m_channelNavigateSfxBuffer, m_channelEnterSfxBuffer;

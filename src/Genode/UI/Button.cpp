@@ -32,6 +32,17 @@ namespace Gx
         return &m_sprite;
     }
 
+
+    void Button::SetTexture(const sf::Texture &texture)
+    {
+        m_sprite.SetTexture(texture);
+    }
+
+    void Button::SetTexture(TextureHandle texture)
+    {
+        m_sprite.SetTexture(texture);
+    }
+
     const sf::FloatRect Button::GetLocalBounds() const
     {
         // Use frame for active state first before looking for other frames

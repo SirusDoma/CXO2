@@ -84,5 +84,11 @@ void StatePlanet::ShowChannelBoard(Planet planet)
 {
     m_channelBoard->Show(planet, [=] {
         m_container->SetEnabled(true);
+        GetChannelCount(planet);
     });
+}
+
+void StatePlanet::GetChannelCount(Planet planet)
+{
+    m_channelBoard->UpdateChannelList(20, 0);
 }

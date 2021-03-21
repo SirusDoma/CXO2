@@ -17,8 +17,7 @@ namespace Gx
         virtual void SetCheckedState(bool checked);
 
         void SetCheckStateChangeCallback(std::function<void()> callback);
-
-
+        
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);

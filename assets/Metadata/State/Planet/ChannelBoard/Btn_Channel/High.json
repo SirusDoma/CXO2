@@ -1,19 +1,13 @@
 {
-  "type": "BUTTON",
+  "type": "RADIO_BUTTON",
   "resources": {
     "texture": "State/Planet/Btn_Channel.png"
   },
   "attributes": {
-    "transform": {
-      "position": {
-        "x": 43,
-        "y": 55
-      }
-    },
     "states": {
       "normal": {
         "texCoords": {
-          "x": 636,
+          "x": 0,
           "y": 0,
           "width": 159,
           "height": 18
@@ -21,13 +15,13 @@
       },
       "hover": {
         "texCoords": {
-          "x": 636,
+          "x": 0,
           "y": 0,
           "width": 159,
           "height": 18
         }
       },
-      "click": {
+      "check": {
         "texCoords": {
           "x": 636,
           "y": 0,

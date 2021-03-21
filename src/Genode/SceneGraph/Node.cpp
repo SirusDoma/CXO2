@@ -109,4 +109,9 @@ namespace Gx
             }
         }
     }
+
+    void Node::ClearChildren()
+    {
+        m_children.clear();
+    }
 }

@@ -1,15 +1,9 @@
 {
-  "type": "BUTTON",
+  "type": "RADIO_BUTTON",
   "resources": {
     "texture": "State/Planet/Btn_Channel.png"
   },
   "attributes": {
-    "transform": {
-      "position": {
-        "x": 43,
-        "y": 55
-      }
-    },
     "states": {
       "normal": {
         "texCoords": {

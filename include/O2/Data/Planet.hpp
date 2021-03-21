@@ -3,6 +3,7 @@
 
 enum Planet
 {
+    None,
     Melpomin,
     Thalo,
     Euta,

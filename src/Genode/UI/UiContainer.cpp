@@ -36,6 +36,8 @@ namespace Gx
 
             other->SetCheckedState(false);
         }
+
+        radio->SetCheckedState(true);
     }
 
     sf::RenderStates UiContainer::Render(sf::RenderTarget &target, sf::RenderStates states) const

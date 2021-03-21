@@ -16,11 +16,11 @@ public:
     virtual void Initialize();
 
 private:
+    void ShowChannelBoard(Planet planet);
+    void GetChannelCount(Planet planet);
+
     ChannelBoard    *m_channelBoard;
     Gx::UiContainer *m_container;
-
-    void ShowChannelBoard(Planet planet);
-
 };
 
 #endif

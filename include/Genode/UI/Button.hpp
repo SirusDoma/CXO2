@@ -28,6 +28,9 @@ namespace Gx
         void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
 
     protected:
+        void SetTexture(const sf::Texture& texture);
+        void SetTexture(TextureHandle texture);
+
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;
 

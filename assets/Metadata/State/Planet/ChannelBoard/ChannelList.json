@@ -1,0 +1,15 @@
+{
+  "type": "REPEATER",
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 43,
+        "y": 55
+      }
+    },
+    "vertical": {
+      "count": 20,
+      "spacing": 20
+    }
+  }
+}

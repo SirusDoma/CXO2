@@ -28,6 +28,7 @@ namespace Gx
 
         virtual void AddChild(Node* child);
         virtual void RemoveChild(Node* child);
+        virtual void ClearChildren();
 
         template<typename... Args>
         void AddChild(Node* first, Args... args);
