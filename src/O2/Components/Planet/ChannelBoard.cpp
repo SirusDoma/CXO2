@@ -56,6 +56,8 @@ void ChannelBoard::Initialize()
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] {
         m_channelEnterSfx.play();
+        if (m_callback && m_selectedChannel < m_planetInfo.Channels.size())
+            m_callback(m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
@@ -89,7 +91,7 @@ void ChannelBoard::Initialize()
     m_duplicateImage.SetPosition(m_position);
     m_duplicateImage.SetVisible(false);
 
-    AddChild(m_background,  m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice);
+    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice);
 }
 
 
@@ -131,6 +133,11 @@ const sf::FloatRect ChannelBoard::GetLocalBounds() const
 bool ChannelBoard::InTransition() const
 {
     return m_animating;
+}
+
+void ChannelBoard::SetEnterChannelCallback(std::function<void(ChannelInfo)> callback)
+{
+    m_callback = callback;
 }
 
 void ChannelBoard::CaptureCurrentState()

@@ -1,14 +1,13 @@
 #include <O2/States/StatePlanet.hpp>
 
-#include <SFML/Audio.hpp>
-
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
+
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
 
-#include <O2/Components/Planet/ChannelBoard.hpp>
+#include <O2/States/StateRoom.hpp>
 
 void StatePlanet::Initialize()
 {
@@ -64,6 +63,7 @@ void StatePlanet::Initialize()
     AddChild(m_container);
 
     m_channelBoard = new ChannelBoard();
+    m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
     AddChild(m_channelBoard);
 
     // Overlay fade in animation
@@ -71,9 +71,8 @@ void StatePlanet::Initialize()
     overlay->SetFillColor(sf::Color::White);
     AddChild(overlay);
 
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
-    if (bgm)
-        bgm->play();
+    m_bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
+    m_bgm->play();
 
     Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
         new Gx::Fade(overlay, 0, sf::seconds(2.5f))
@@ -105,4 +104,10 @@ void StatePlanet::GetChannelCount(Planet planet)
     }
 
     m_channelBoard->UpdateChannelList(planetInfo);
+}
+
+void StatePlanet::OnEnterChannel(ChannelInfo channel)
+{
+    m_bgm->stop();
+    QueueEvent([=] { GetDirector()->SetScene(new StateRoom()); } );
 }

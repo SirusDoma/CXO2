@@ -1,6 +1,8 @@
 #ifndef STATE_PLANET_HPP
 #define STATE_PLANET_HPP
 
+#include <SFML/Audio.hpp>
+
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Sequence.hpp>
@@ -19,8 +21,11 @@ private:
     void ShowChannelBoard(Planet planet);
     void GetChannelCount(Planet planet);
 
+    void OnEnterChannel(ChannelInfo channel);
+
     ChannelBoard    *m_channelBoard;
     Gx::UiContainer *m_container;
+    sf::Music       *m_bgm;
 };
 
 #endif

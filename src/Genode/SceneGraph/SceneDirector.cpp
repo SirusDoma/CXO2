@@ -57,6 +57,12 @@ namespace Gx
         return false;
     }
 
+    void SceneDirector::ProcessEvents()
+    {
+        if (m_scene)
+            m_scene->ProcessEvents();
+    }
+
     bool SceneDirector::Close()
     {
         if (m_scene)

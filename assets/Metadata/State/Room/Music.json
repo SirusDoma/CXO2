@@ -1,0 +1,9 @@
+{
+  "type": "Music",
+  "resources": {
+    "music": "BGM/bgRoom.ogg"
+  },
+  "attributes": {
+    "loop": true
+  }
+}

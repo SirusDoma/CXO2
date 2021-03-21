@@ -17,6 +17,7 @@ namespace Gx
         UpdatableContainer(),
         InputableContainer(),
         m_director(nullptr),
+        m_events(),
         m_overlays()
     {
         SetName(name);
@@ -68,6 +69,12 @@ namespace Gx
             m_overlays.pop_back();
     }
 
+    void Scene::QueueEvent(std::function<void()> evt)
+    {
+        if (evt)
+            m_events.push(evt);
+    }
+
     sf::RenderStates Scene::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
         m_view = target.getView();
@@ -114,5 +121,21 @@ namespace Gx
         }
 
         return InputableContainer::Input(ev);
+    }
+
+    void Scene::ProcessEvents()
+    {
+        auto director = GetDirector();
+        while (!m_events.empty())
+        {
+            auto event = m_events.front();
+            m_events.pop();
+
+            if (event)
+                event();
+
+            if (director->GetScene() != this)
+                return;
+        }
     }
 }

@@ -6,6 +6,8 @@
 
 #include <Genode/System/Module.hpp>
 #include <Genode/Graphics/Cursor.hpp>
+#include <Genode/SceneGraph/SceneDirector.hpp>
+
 
 namespace Gx
 {

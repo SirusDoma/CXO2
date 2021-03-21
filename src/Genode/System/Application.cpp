@@ -96,6 +96,8 @@ namespace Gx
             }
             m_window.display();
 
+            m_director->ProcessEvents();
+
             // Track the number of frames rendered in a second
             fpsDelta += delta;
             if (fpsDelta >= 1000)

@@ -1,0 +1,26 @@
+{
+  "type": "SPRITE",
+  "resources": {
+    "texture": "State/Room/Background.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "color": {
+      "a": 255,
+      "r": 255,
+      "g": 255,
+      "b": 255
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 600
+    }
+  }
+}
