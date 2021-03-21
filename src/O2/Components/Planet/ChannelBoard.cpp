@@ -6,7 +6,6 @@
 #include <Genode/Fx/Move.hpp>
 
 #include <O2/Components/Planet/ChannelButton.hpp>
-#include <iostream>
 
 ChannelBoard::ChannelBoard() :
     m_planetInfo(),
@@ -56,7 +55,7 @@ void ChannelBoard::Initialize()
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] {
         m_channelEnterSfx.play();
-        if (m_callback && m_selectedChannel < m_planetInfo.Channels.size())
+        if (m_callback && m_selectedChannel > 0 && m_selectedChannel < m_planetInfo.Channels.size())
             m_callback(m_planetInfo.Channels[m_selectedChannel]);
     });
 
