@@ -93,12 +93,15 @@ void StatePlanet::GetChannelCount(Planet planet)
     auto planetInfo = PlanetInfo();
     planetInfo.Planet = planet;
 
-    for (int i = 0; i < 35; i++)
+    for (int x = 0; x < 2; x++)
     {
-        auto channel = ChannelInfo();
-        channel.Population = static_cast<int>((i / 20.f) * 100.f);
+        for (int i = 5; i < 25; i++)
+        {
+            auto channel = ChannelInfo();
+            channel.Population = static_cast<int>((i / 20.f) * 100.f);
 
-        planetInfo.Channels.push_back(channel);
+            planetInfo.Channels.push_back(channel);
+        }
     }
 
     m_channelBoard->UpdateChannelList(planetInfo);

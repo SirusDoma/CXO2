@@ -1,0 +1,21 @@
+{
+  "type": "PROGRESS_BAR",
+  "resources": {
+    "texture": "State/Planet/ChannelCount.png"
+  },
+  "attributes": {
+    "orientation": "horizontal",
+    "transform": {
+      "position": {
+        "x": 110,
+        "y": 5
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 41,
+      "height": 9
+    }
+  }
+}

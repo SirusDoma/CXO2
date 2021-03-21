@@ -6,13 +6,16 @@
 ChannelButton::ChannelButton(const Gx::RadioButton &copy) :
     Gx::RadioButton(copy)
 {
-    m_channelName   = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
-    m_channelNumber = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
+    m_channelName    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
+    m_channelNumber  = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
     m_channelNumber->SetDigitCount(2);
-    m_selector      = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
+    m_channelCounter = Gx::ResourceManager::Instance()->Create<Gx::ProgressBar>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
+    m_channelFull    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
+    m_channelFull->SetVisible(false);
+    m_selector       = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
     m_selector->SetVisible(false);
 
-    AddChild(m_channelNumber, m_channelName, m_selector);
+    AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_selector);
 }
 
 ChannelButton::~ChannelButton()
@@ -32,6 +35,19 @@ int ChannelButton::GetChannelNumber() const
 void ChannelButton::SetChannelNumber(int channelNumber)
 {
     m_channelNumber->SetValue(channelNumber);
+}
+
+int ChannelButton::GetChannelPopulation() const
+{
+    return static_cast<int>(m_channelCounter->GetValue());
+}
+
+void ChannelButton::SetChannelPopulation(int population)
+{
+    m_channelCounter->SetValue(population);
+
+    m_channelFull->SetVisible(m_channelCounter->GetValue() == m_channelCounter->GetMaximumValue());
+    m_channelCounter->SetVisible(!m_channelFull->IsVislble());
 }
 
 Planet ChannelButton::GetPlanet() const
@@ -106,5 +122,3 @@ void ChannelButton::Invalidate()
 {
     Gx::RadioButton::Invalidate();
 }
-
-

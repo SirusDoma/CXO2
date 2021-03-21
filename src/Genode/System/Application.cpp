@@ -102,7 +102,7 @@ namespace Gx
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
-                m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
+                //m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta = 0.0f;
             }

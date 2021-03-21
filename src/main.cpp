@@ -18,6 +18,7 @@
 #include <O2/IO/Metadata/UI/NumberMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/RadioButtonMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/ProgressBarMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/RepeaterMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/DialogMetadataLoader.hpp>
 
@@ -42,6 +43,7 @@ int main()
     Gx::ResourceLoaderFactory::Register<Gx::Number>(new NumberMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::ProgressBar>(new ProgressBarMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Repeater>(new RepeaterMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogMetadataLoader());
 

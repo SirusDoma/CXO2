@@ -246,7 +246,7 @@ void ChannelBoard::ShowPage(int page)
         channelButton->SetPlanet(m_planetInfo.Planet);
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetCheckedState(i == m_selectedChannel);
-        //channelButton->SetPopulation(m_planetInfo.Channels[i].Population);
+        channelButton->SetChannelPopulation(m_planetInfo.Channels[i].Population);
         channelButton->SetClickCallback([=] {
             m_selectedChannel = i;
         });

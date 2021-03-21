@@ -1,0 +1,20 @@
+{
+  "type": "IMAGE",
+  "resources": {
+    "texture": "State/Planet/ChannelFull.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 109,
+        "y": 3
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 42,
+      "height": 12
+    }
+  }
+}

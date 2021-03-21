@@ -6,6 +6,7 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
+#include <Genode/UI/ProgressBar.hpp>
 
 #include <O2/Data/Planet.hpp>
 
@@ -20,6 +21,9 @@ public:
     int GetChannelNumber() const;
     void SetChannelNumber(int channelNumber);
 
+    int GetChannelPopulation() const;
+    void SetChannelPopulation(int population);
+
     Planet GetPlanet() const;
     void SetPlanet(Planet planet);
 
@@ -30,8 +34,9 @@ protected:
     virtual void Invalidate();
 
 private:
-    Gx::Image *m_selector, *m_channelName;
-    Gx::Number *m_channelNumber;
+    Gx::Image       *m_selector, *m_channelName, *m_channelFull;
+    Gx::Number      *m_channelNumber;
+    Gx::ProgressBar *m_channelCounter;
 
     Planet m_planet;
 };
