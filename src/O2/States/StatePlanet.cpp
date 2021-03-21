@@ -71,9 +71,9 @@ void StatePlanet::Initialize()
     overlay->SetFillColor(sf::Color::White);
     AddChild(overlay);
 
-//    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
-//    if (bgm)
-//        bgm->play();
+    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Planet\\Music.json");
+    if (bgm)
+        bgm->play();
 
     Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
         new Gx::Fade(overlay, 0, sf::seconds(2.5f))
@@ -90,5 +90,16 @@ void StatePlanet::ShowChannelBoard(Planet planet)
 
 void StatePlanet::GetChannelCount(Planet planet)
 {
-    m_channelBoard->UpdateChannelList(20, 0);
+    auto planetInfo = PlanetInfo();
+    planetInfo.Planet = planet;
+
+    for (int i = 0; i < 35; i++)
+    {
+        auto channel = ChannelInfo();
+        channel.Population = static_cast<int>((i / 20.f) * 100.f);
+
+        planetInfo.Channels.push_back(channel);
+    }
+
+    m_channelBoard->UpdateChannelList(planetInfo);
 }

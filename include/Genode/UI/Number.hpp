@@ -7,14 +7,13 @@
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Control.hpp>
 
+#include <unordered_map>
 
 namespace Gx
 {
     class Number : public virtual Control, public Colorable
     {
     public:
-        enum Alignment { Left, Center, Right };
-
         Number();
         explicit Number(const sf::Texture& texture);
         explicit Number(TextureHandle texture);
@@ -27,9 +26,6 @@ namespace Gx
 
         virtual const sf::Color & GetColor() const;
         virtual void SetColor(const sf::Color &color);
-
-        Alignment GetAlignment() const;
-        void SetAlignment(Alignment alignment);
 
         float GetLetterSpacing() const;
         void SetLetterSpacing(float spacing);
@@ -49,7 +45,6 @@ namespace Gx
         virtual void Invalidate();
 
     private:
-        Alignment       m_alignment;
         sf::VertexArray m_vertices;
         TextureHandle   m_texture;
 
@@ -57,7 +52,7 @@ namespace Gx
         float m_width, m_height, m_spacing;
         bool m_needUpdate;
 
-        std::unordered_map<int, sf::IntRect> m_texCoords;
+        std::unordered_map<unsigned int, sf::IntRect> m_texCoords;
     };
 }
 

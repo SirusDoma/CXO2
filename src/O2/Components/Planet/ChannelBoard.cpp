@@ -9,19 +9,9 @@
 #include <iostream>
 
 ChannelBoard::ChannelBoard() :
-    m_position(),
-    m_background(),
-    m_channelTabButton(),
-    m_noticeTabButton(),
-    m_notice(),
-    m_repeater(),
-    m_channelListContainer(),
-    m_duplicateImage(),
-    m_duplicateTexture(),
-    m_showSfx(),
-    m_showSfxBuffer(),
-    m_planet(),
+    m_planetInfo(),
     m_tab(),
+    m_selectedChannel(),
     m_animating(false)
 {
     Initialize();
@@ -47,7 +37,7 @@ void ChannelBoard::Initialize()
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
     m_channelTabButton->SetClickCallback([=] {
-        if (m_tab != Tab::ChannelList && !m_animating && m_planet)
+        if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Planet)
             SwitchTab(Tab::ChannelList);
     });
 
@@ -57,6 +47,12 @@ void ChannelBoard::Initialize()
     m_repeater = Gx::ResourceManager::Instance()->Create<Gx::Repeater>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
     m_channelListContainer->AddChild(m_repeater);
 
+    m_currentPageNumber = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelCurrentPageNumber.json");
+    m_maxPageNumber     = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
+    m_currentPageNumber->SetDigitCount(2);
+    m_maxPageNumber->SetDigitCount(2);
+    m_channelListContainer->AddChild(m_currentPageNumber, m_maxPageNumber);
+
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] {
         m_channelEnterSfx.play();
@@ -65,11 +61,15 @@ void ChannelBoard::Initialize()
     auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
     btnChannelLeft->SetClickCallback([=] {
         m_channelNavigateSfx.play();
+        if (m_currentPageNumber->GetValue() > 1)
+            ShowPage(m_currentPageNumber->GetValue() - 1);
     });
 
     auto btnChannelRight = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
     btnChannelRight->SetClickCallback([=] {
         m_channelNavigateSfx.play();
+        if (m_currentPageNumber->GetValue() < m_maxPageNumber->GetValue())
+            ShowPage(m_currentPageNumber->GetValue() + 1);
     });
 
     m_channelListContainer->AddChild(btnChannelEnter, btnChannelLeft, btnChannelRight);
@@ -133,6 +133,17 @@ bool ChannelBoard::InTransition() const
     return m_animating;
 }
 
+void ChannelBoard::CaptureCurrentState()
+{
+    m_duplicateTexture.clear(sf::Color::Transparent);
+    {
+        Render(m_duplicateTexture, sf::Transform().translate(-GetPosition()));
+    }
+    m_duplicateTexture.display();
+    m_duplicateImage.SetTexture(m_duplicateTexture.getTexture());
+    m_duplicateImage.SetVisible(true);
+}
+
 void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
 {
     if (!m_background)
@@ -150,6 +161,7 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
         m_noticeTabButton->SetVisible(true);
         m_noticeTabButton->SetEnabled(true);
 
+        m_channelListContainer->SetEnabled(true);
         m_channelListContainer->SetVisible(true);
     }
     else
@@ -163,6 +175,7 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
         m_noticeTabButton->SetVisible(false);
         m_noticeTabButton->SetEnabled(false);
 
+        m_channelListContainer->SetEnabled(false);
         m_channelListContainer->SetVisible(false);
     }
 }
@@ -172,22 +185,15 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     if (m_animating)
         return;
 
-    m_planet    = planet;
+    m_planetInfo.Planet = planet;
     m_animating = true;
 
-    m_duplicateTexture.clear(sf::Color::Transparent);
-    {
-        Render(m_duplicateTexture, sf::Transform().translate(-GetPosition()));
-    }
-    m_duplicateTexture.display();
-    m_duplicateImage.SetTexture(m_duplicateTexture.getTexture());
-    m_duplicateImage.SetVisible(true);
-    m_repeater->ClearChildren();
-
+    CaptureCurrentState();
     SwitchTab(Tab::ChannelList);
     SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
 
-    switch (m_planet)
+    m_repeater->ClearChildren();
+    switch (planet)
     {
         case Planet::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
         case Planet::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
@@ -210,20 +216,39 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     }));
 }
 
-void ChannelBoard::UpdateChannelList(int count, int pageIndex)
+void ChannelBoard::UpdateChannelList(PlanetInfo info)
 {
-    // TODO: Pagination
-    int loopCount = count;
-    if (loopCount > m_repeater->GetRepeatCount())
-        loopCount = m_repeater->GetRepeatCount();
+    m_planetInfo = info;
+    m_maxPageNumber->SetValue(static_cast<int>(std::ceil(static_cast<float>(info.Channels.size()) / CHANNEL_LIST_PER_PAGE)));
+    m_selectedChannel = 0;
 
+    ShowPage(1);
+}
+
+void ChannelBoard::ShowPage(int page)
+{
+    if (page <= 0)
+        page = 1;
+
+    if (page > m_maxPageNumber->GetValue())
+        page = m_maxPageNumber->GetValue();
+
+    int start = (page - 1) * CHANNEL_LIST_PER_PAGE;
+    int end   = start + CHANNEL_LIST_PER_PAGE;
+    if (end > m_planetInfo.Channels.size())
+        end   = m_planetInfo.Channels.size();
+
+    m_currentPageNumber->SetValue(page);
     m_repeater->ClearChildren();
-    for (int i = 0; i < loopCount; i++)
+    for (int i = start; i < end; i++)
     {
         auto channelButton = new ChannelButton(*Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json"));
-        channelButton->SetPlanet(m_planet);
+        channelButton->SetPlanet(m_planetInfo.Planet);
+        channelButton->SetChannelNumber(i + 1);
+        channelButton->SetCheckedState(i == m_selectedChannel);
+        //channelButton->SetPopulation(m_planetInfo.Channels[i].Population);
         channelButton->SetClickCallback([=] {
-
+            m_selectedChannel = i;
         });
 
         m_repeater->AddChild(channelButton);

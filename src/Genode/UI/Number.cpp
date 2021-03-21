@@ -1,4 +1,5 @@
 #include <Genode/UI/Number.hpp>
+#include <stack>
 
 namespace Gx
 {
@@ -12,8 +13,7 @@ namespace Gx
     }
 
     Number::Number(TextureHandle texture) :
-        m_alignment(Alignment::Center),
-        m_vertices(sf::Triangles, 6 * 10),
+        m_vertices(sf::TriangleStrip, 6 * 10),
         m_texCoords(),
         m_digitCount(),
         m_width(),
@@ -56,17 +56,6 @@ namespace Gx
             m_vertices[i].color = color;
     }
 
-    Number::Alignment Number::GetAlignment() const
-    {
-        return m_alignment;
-    }
-
-    void Number::SetAlignment(Alignment alignment)
-    {
-        m_alignment = alignment;
-        m_needUpdate = true;
-    }
-
     float Number::GetLetterSpacing() const
     {
         return m_spacing;
@@ -97,9 +86,12 @@ namespace Gx
 
     void Number::SetDigitsSize(sf::Vector2u size)
     {
+        if (size == sf::Vector2u())
+            return;
+
         m_texCoords.clear();
         unsigned int current = 0;
-        for (int i = 1; i <= 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             SetDigitFrame(i, sf::IntRect(current, 0, size.x, size.y));
             current += size.x;
@@ -138,13 +130,14 @@ namespace Gx
 
     void Number::Invalidate()
     {
-        m_width = 0;
         auto color = GetColor();
-        m_vertices.clear();
+        m_vertices = sf::VertexArray(sf::Triangles, 6 * 10);
+        m_width = 0;
 
-        unsigned digit = 0, digitCount = 0, leadingCount = 0, value = m_value, width = m_texture->getSize().x;
+        unsigned digit = 0, digitCount = 0, leadingCount = 0, value = m_value;
         if (value > 0)
         {
+            // TODO: Merge this loop
             while (value > 0)
             {
                 value /= 10;
@@ -158,26 +151,39 @@ namespace Gx
             leadingCount = m_digitCount - digitCount;
 
         digitCount += leadingCount;
-        auto position = sf::Vector2f();
+        value = m_value;
 
-        for (int i = 0, j = digitCount - 1; i < digitCount; i++, j--)
+        std::stack<unsigned int> digits = std::stack<unsigned int>();
+        for (int d = 0; d < digitCount; d++)
         {
-            bool isLeading = false;
-            if (leadingCount > 0)
-                isLeading = i >= leadingCount;
+            if (d > 0)
+                m_width += m_spacing;
 
+            bool isLeading = leadingCount > 0 && d > leadingCount;
             if (isLeading)
                 digit = 0;
             else
                 digit = value % 10;
 
+            if (!isLeading)
+                value /= 10;
+
             auto texCoords = m_texCoords[digit];
-            switch (m_alignment)
-            {
-                case Alignment::Left:   position = sf::Vector2f((width * m_spacing) * j, 0); break;
-                case Alignment::Center: position = sf::Vector2f((width * m_spacing) * j - digitCount * (m_width * m_spacing) / 2, 0); break;
-                case Alignment::Right:  position = sf::Vector2f((width * m_spacing) * j - digitCount * (m_width * m_spacing), 0); break;
-            }
+            m_width += texCoords.width;
+
+            digits.push(digit);
+        }
+
+        auto position = sf::Vector2f();
+        auto size = digits.size();
+        for (unsigned int i = 0; i < size; i++)
+        {
+            digit = digits.top();
+            digits.pop();
+
+            auto texCoords = m_texCoords[digit];
+            if (i > 0)
+                position += sf::Vector2f(texCoords.width + m_spacing, 0);
 
             float x = position.x;
             float y = position.y;
@@ -197,8 +203,7 @@ namespace Gx
             m_vertices[index + 4] = sf::Vertex(sf::Vector2f(w, y), color, sf::Vector2f(right , top));
             m_vertices[index + 5] = sf::Vertex(sf::Vector2f(w, h), color, sf::Vector2f(right , bottom));
 
-            if (!isLeading)
-                value /= 10;
+            m_height  = m_height < texCoords.height ? texCoords.height : m_height;
         }
 
         m_needUpdate = false;

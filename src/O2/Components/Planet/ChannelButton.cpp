@@ -6,11 +6,13 @@
 ChannelButton::ChannelButton(const Gx::RadioButton &copy) :
     Gx::RadioButton(copy)
 {
-    m_channelName = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
-    m_selector    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
+    m_channelName   = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
+    m_channelNumber = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
+    m_channelNumber->SetDigitCount(2);
+    m_selector      = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
     m_selector->SetVisible(false);
 
-    AddChild(m_channelName, m_selector);
+    AddChild(m_channelNumber, m_channelName, m_selector);
 }
 
 ChannelButton::~ChannelButton()
@@ -22,10 +24,29 @@ const sf::FloatRect ChannelButton::GetLocalBounds() const
     return RadioButton::GetLocalBounds();
 }
 
+int ChannelButton::GetChannelNumber() const
+{
+    return m_channelNumber->GetValue();
+}
+
+void ChannelButton::SetChannelNumber(int channelNumber)
+{
+    m_channelNumber->SetValue(channelNumber);
+}
+
+Planet ChannelButton::GetPlanet() const
+{
+    return m_planet;
+}
+
 void ChannelButton::SetPlanet(Planet planet)
 {
+    if (m_planet == planet)
+        return;
+
     Gx::ResourceMetadata *metadata = nullptr;
-    switch (planet)
+    m_planet = planet;
+    switch (m_planet)
     {
         case Planet::Kaliope:
             metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
@@ -67,6 +88,12 @@ void ChannelButton::SetPlanet(Planet planet)
     }
 }
 
+sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const
+{
+    states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha);
+    return CheckBox::Render(target, states);
+}
+
 void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)
 {
     if (m_selector)
@@ -79,6 +106,5 @@ void ChannelButton::Invalidate()
 {
     Gx::RadioButton::Invalidate();
 }
-
 
 

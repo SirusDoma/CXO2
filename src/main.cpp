@@ -15,6 +15,7 @@
 
 #include <O2/IO/Metadata/UI/ImageMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/LabelMetadataLoader.hpp>
+#include <O2/IO/Metadata/UI/NumberMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/RadioButtonMetadataLoader.hpp>
 #include <O2/IO/Metadata/UI/RepeaterMetadataLoader.hpp>
@@ -38,6 +39,7 @@ int main()
     // UI
     Gx::ResourceLoaderFactory::Register<Gx::Image>(new ImageMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Number>(new NumberMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Repeater>(new RepeaterMetadataLoader());
@@ -52,7 +54,7 @@ int main()
     hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
     Gx::Cursor cursor = Gx::Cursor(hcursor);
 
-    Gx::Application application(new StatePlanet(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
+    Gx::Application application(new StateAvi(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
 
     application.SetCursor(cursor);
     int exitCode = application.Start();
