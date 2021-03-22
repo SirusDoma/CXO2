@@ -1,8 +1,8 @@
-#include <O2/IO/Metadata/UI/RadioButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/RadioButtonMetadataLoader.hpp>
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 
-#include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ButtonMetadataLoader.hpp>
 
 RadioButtonMetadataLoader::RadioButtonMetadataLoader()
 {

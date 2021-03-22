@@ -1,4 +1,4 @@
-#include <O2/IO/Metadata/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
 
 TransformMetadataLoader::TransformMetadataLoader()
 {

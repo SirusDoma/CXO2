@@ -1,5 +1,5 @@
-#include <O2/IO/Metadata/UI/ImageMetadataLoader.hpp>
-#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ImageMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
 
 ImageMetadataLoader::ImageMetadataLoader()
 {

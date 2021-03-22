@@ -9,21 +9,20 @@
 #include <O2/IO/Archives/M30Archive.hpp>
 #include <O2/IO/Archives/OmcArchive.hpp>
 
-#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
-#include <O2/IO/Metadata/MusicMetadataLoader.hpp>
-#include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/MusicMetadataLoader.hpp>
+#include <O2/IO/Loaders/AnimationMetadataLoader.hpp>
 
-#include <O2/IO/Metadata/UI/ImageMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/LabelMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/NumberMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/RadioButtonMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/ProgressBarMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/RepeaterMetadataLoader.hpp>
-#include <O2/IO/Metadata/UI/DialogMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ImageMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/LabelMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/NumberMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/RadioButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ProgressBarMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/RepeaterMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/DialogMetadataLoader.hpp>
 
 #include <O2/States/StateAvi.hpp>
-#include <O2/States/StatePlanet.hpp>
 
 int main() 
 {
@@ -56,7 +55,7 @@ int main()
     hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
     Gx::Cursor cursor = Gx::Cursor(hcursor);
 
-    Gx::Application application(new StateAvi(), sf::VideoMode(1024, 768), sf::VideoMode(800, 600));
+    Gx::Application application(new StateAvi(), sf::VideoMode(800, 600), sf::VideoMode(800, 600));
 
     application.SetCursor(cursor);
     int exitCode = application.Start();

@@ -9,7 +9,7 @@
 #include <Genode/UI/Repeater.hpp>
 
 #include <O2/IO/Metadata/UI/RepeaterMetadata.hpp>
-#include <O2/IO/Metadata/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
 
 class RepeaterMetadataLoader : public Gx::MetadataLoader<Gx::Repeater>
 {

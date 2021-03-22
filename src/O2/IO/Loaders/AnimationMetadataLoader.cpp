@@ -1,9 +1,9 @@
-#include <O2/IO/Metadata/AnimationMetadataLoader.hpp>
+#include <O2/IO/Loaders/AnimationMetadataLoader.hpp>
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 
-#include <O2/IO/Metadata/TransformMetadataLoader.hpp>
-#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
 
 AnimationMetadataLoader::AnimationMetadataLoader()
 {

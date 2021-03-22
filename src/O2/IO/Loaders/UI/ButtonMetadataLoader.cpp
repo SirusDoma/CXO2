@@ -1,8 +1,8 @@
-#include <O2/IO/Metadata/UI/ButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ButtonMetadataLoader.hpp>
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 
-#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
 
 ButtonMetadataLoader::ButtonMetadataLoader()
 {

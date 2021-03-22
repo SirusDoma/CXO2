@@ -1,4 +1,4 @@
-#include <O2/IO/Metadata/MusicMetadataLoader.hpp>
+#include <O2/IO/Loaders/MusicMetadataLoader.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 MusicMetadataLoader::MusicMetadataLoader()

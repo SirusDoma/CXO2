@@ -1,5 +1,5 @@
-#include <O2/IO/Metadata/SpriteMetadataLoader.hpp>
-#include <O2/IO/Metadata/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
 
 SpriteMetadataLoader::SpriteMetadataLoader()
 {
