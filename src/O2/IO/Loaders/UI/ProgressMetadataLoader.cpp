@@ -1,6 +1,6 @@
-#include <O2/IO/Loaders/UI/ProgressBarMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
 
-#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteLoader.hpp>
 
 ProgressBarMetadataLoader::ProgressBarMetadataLoader()
 {

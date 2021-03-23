@@ -11,10 +11,10 @@
 
 #include <O2/IO/Metadata/MusicMetadata.hpp>
 
-class MusicMetadataLoader : public Gx::MetadataLoader<sf::Music>
+class MusicLoader : public Gx::MetadataLoader<sf::Music>
 {
 public :
-    MusicMetadataLoader();
+    MusicLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual sf::Music* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

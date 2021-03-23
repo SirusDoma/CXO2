@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/RepeaterMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/RepeaterLoader.hpp>
 
 RepeaterMetadataLoader::RepeaterMetadataLoader()
 {

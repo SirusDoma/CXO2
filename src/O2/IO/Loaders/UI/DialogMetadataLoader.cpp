@@ -1,13 +1,13 @@
-#include <O2/IO/Loaders/UI/DialogMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/DialogLoader.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/UI/Label.hpp>
 
-#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/ButtonMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteLoader.hpp>
+#include <O2/IO/Loaders/UI/ButtonLoader.hpp>
 #include <O2/IO/Metadata/UI/LabelMetadata.hpp>
-#include <O2/IO/Loaders/UI/LabelMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/LabelLoader.hpp>
 
 DialogMetadataLoader::DialogMetadataLoader()
 {

@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/SpriteMetadata.hpp>
 
-class SpriteMetadataLoader : public Gx::MetadataLoader<Gx::Sprite>
+class SpriteLoader : public Gx::MetadataLoader<Gx::Sprite>
 {
 public :
-    SpriteMetadataLoader();
+    SpriteLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Sprite* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

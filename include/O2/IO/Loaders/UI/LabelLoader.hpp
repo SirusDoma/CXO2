@@ -9,12 +9,12 @@
 #include <Genode/UI/Label.hpp>
 
 #include <O2/IO/Metadata/UI/LabelMetadata.hpp>
-#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformLoader.hpp>
 
-class LabelMetadataLoader : public Gx::MetadataLoader<Gx::Label>
+class LabelLoader : public Gx::MetadataLoader<Gx::Label>
 {
 public :
-    LabelMetadataLoader();
+    LabelLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Label* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

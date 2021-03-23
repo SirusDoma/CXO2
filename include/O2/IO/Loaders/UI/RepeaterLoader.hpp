@@ -9,12 +9,12 @@
 #include <Genode/UI/Repeater.hpp>
 
 #include <O2/IO/Metadata/UI/RepeaterMetadata.hpp>
-#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformLoader.hpp>
 
-class RepeaterMetadataLoader : public Gx::MetadataLoader<Gx::Repeater>
+class RepeaterLoader : public Gx::MetadataLoader<Gx::Repeater>
 {
 public :
-    RepeaterMetadataLoader();
+    RepeaterLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Repeater* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

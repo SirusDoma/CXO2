@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/AnimationMetadata.hpp>
 
-class AnimationMetadataLoader : public Gx::MetadataLoader<Gx::Animation>
+class AnimationLoader : public Gx::MetadataLoader<Gx::Animation>
 {
 public :
-    AnimationMetadataLoader();
+    AnimationLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Animation* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

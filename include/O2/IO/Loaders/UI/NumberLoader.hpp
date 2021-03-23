@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/UI/NumberMetadata.hpp>
 
-class NumberMetadataLoader : public Gx::MetadataLoader<Gx::Number>
+class NumberLoader : public Gx::MetadataLoader<Gx::Number>
 {
 public :
-    NumberMetadataLoader();
+    NumberLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Number* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/UI/ButtonMetadata.hpp>
 
-class ButtonMetadataLoader : public Gx::MetadataLoader<Gx::Button>
+class ButtonLoader : public Gx::MetadataLoader<Gx::Button>
 {
 public :
-    ButtonMetadataLoader();
+    ButtonLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Button* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

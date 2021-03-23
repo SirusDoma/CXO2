@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/UI/DialogMetadata.hpp>
 
-class DialogMetadataLoader : public Gx::MetadataLoader<Gx::Dialog>
+class DialogLoader : public Gx::MetadataLoader<Gx::Dialog>
 {
 public :
-    DialogMetadataLoader();
+    DialogLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::Dialog* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

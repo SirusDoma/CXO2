@@ -9,18 +9,18 @@
 #include <O2/IO/Archives/M30Archive.hpp>
 #include <O2/IO/Archives/OmcArchive.hpp>
 
-#include <O2/IO/Loaders/SpriteMetadataLoader.hpp>
-#include <O2/IO/Loaders/MusicMetadataLoader.hpp>
-#include <O2/IO/Loaders/AnimationMetadataLoader.hpp>
+#include <O2/IO/Loaders/SpriteLoader.hpp>
+#include <O2/IO/Loaders/MusicLoader.hpp>
+#include <O2/IO/Loaders/AnimationLoader.hpp>
 
-#include <O2/IO/Loaders/UI/ImageMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/LabelMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/NumberMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/ButtonMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/RadioButtonMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/ProgressBarMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/RepeaterMetadataLoader.hpp>
-#include <O2/IO/Loaders/UI/DialogMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/ImageLoader.hpp>
+#include <O2/IO/Loaders/UI/LabelLoader.hpp>
+#include <O2/IO/Loaders/UI/NumberLoader.hpp>
+#include <O2/IO/Loaders/UI/ButtonLoader.hpp>
+#include <O2/IO/Loaders/UI/RadioButtonLoader.hpp>
+#include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
+#include <O2/IO/Loaders/UI/RepeaterLoader.hpp>
+#include <O2/IO/Loaders/UI/DialogLoader.hpp>
 
 #include <O2/States/StateAvi.hpp>
 
@@ -33,18 +33,18 @@ int main()
 
     // -- Register resource metadata loaders
     // Basic Resource
-    Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteLoader());
+    Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationLoader());
     // UI
-    Gx::ResourceLoaderFactory::Register<Gx::Image>(new ImageMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Number>(new NumberMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::ProgressBar>(new ProgressBarMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Repeater>(new RepeaterMetadataLoader());
-    Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogMetadataLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Image>(new ImageLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Label>(new LabelLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Number>(new NumberLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Button>(new ButtonLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::RadioButton>(new RadioButtonLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::ProgressBar>(new ProgressBarLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Repeater>(new RepeaterLoader());
+    Gx::ResourceLoaderFactory::Register<Gx::Dialog>(new DialogLoader());
 
     // Load globally used assets
     Gx::ResourceManager::Instance()->AddArchive<OmcArchive>("Music/BGM.ojm");

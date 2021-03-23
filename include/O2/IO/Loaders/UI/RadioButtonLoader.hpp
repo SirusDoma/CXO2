@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
 
-class RadioButtonMetadataLoader : public Gx::MetadataLoader<Gx::RadioButton>
+class RadioButtonLoader : public Gx::MetadataLoader<Gx::RadioButton>
 {
 public :
-    RadioButtonMetadataLoader();
+    RadioButtonLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::RadioButton* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

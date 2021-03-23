@@ -11,10 +11,10 @@
 
 #include <O2/IO/Metadata/TransformMetadata.hpp>
 
-class TransformMetadataLoader : public Gx::MetadataLoader<sf::Transform>
+class TransformLoader : public Gx::MetadataLoader<sf::Transform>
 {
 public :
-    TransformMetadataLoader();
+    TransformLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual sf::Transform* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

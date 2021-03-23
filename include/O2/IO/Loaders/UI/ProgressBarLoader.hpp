@@ -10,10 +10,10 @@
 
 #include <O2/IO/Metadata/UI/ProgressBarMetadata.hpp>
 
-class ProgressBarMetadataLoader : public Gx::MetadataLoader<Gx::ProgressBar>
+class ProgressBarLoader : public Gx::MetadataLoader<Gx::ProgressBar>
 {
 public :
-    ProgressBarMetadataLoader();
+    ProgressBarLoader();
 
     virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
     virtual Gx::ProgressBar* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;

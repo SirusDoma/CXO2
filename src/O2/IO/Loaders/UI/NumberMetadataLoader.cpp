@@ -1,6 +1,6 @@
-#include <O2/IO/Loaders/UI/NumberMetadataLoader.hpp>
+#include <O2/IO/Loaders/UI/NumberLoader.hpp>
 
-#include <O2/IO/Loaders/TransformMetadataLoader.hpp>
+#include <O2/IO/Loaders/TransformLoader.hpp>
 
 NumberMetadataLoader::NumberMetadataLoader()
 {
