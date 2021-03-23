@@ -15,12 +15,12 @@ namespace Gx
     void TaskContainer::Run(Task* task)
     {
         if (task)
-            m_tasks.push_back(task);
+            m_tasks.push_back(std::shared_ptr<Task>(task));
     }
 
     void TaskContainer::Stop(Task* task)
     {
-        auto iterator = std::find(m_tasks.begin(), m_tasks.end(), task);
+        auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto node) { return task == node.get(); });
         if (iterator != m_tasks.end())
         {
             // Run update before deleting
@@ -31,7 +31,6 @@ namespace Gx
                 item->Update(0);
             }
 
-            delete *iterator;
             m_tasks.erase(iterator);
         }
     }
@@ -43,10 +42,12 @@ namespace Gx
             // Run update before deleting
             auto item = m_tasks[i];
             if (item->GetState() != Task::Completed)
+            {
                 item->Stop();
+                item->Update(0);
+            }
 
             m_tasks.erase(m_tasks.begin() + i);
-            delete item;
         }
 
         m_tasks.clear();

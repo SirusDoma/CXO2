@@ -27,7 +27,7 @@ namespace Gx
         virtual void Update(double delta);
 
     private:
-        std::vector<Task*> m_tasks;
+        std::vector<std::shared_ptr<Task>> m_tasks;
     };
 }
 
