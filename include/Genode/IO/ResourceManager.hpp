@@ -17,7 +17,7 @@ namespace Gx
     public:
         static ResourceManager* Instance();
 
-        ResourceManager();
+        ResourceManager(CacheManager *cacheManager);
         virtual ~ResourceManager();
 
         template<typename T>

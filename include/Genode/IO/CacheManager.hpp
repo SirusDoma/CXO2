@@ -1,14 +1,6 @@
 #ifndef GENODE_CACHE_HPP
 #define GENODE_CACHE_HPP
 
-#include <memory>
-#include <map>
-#include <unordered_map>
-#include <string>
-#include <variant>
-#include <functional>
-#include <vector>
-
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
@@ -18,19 +10,24 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Font.hpp>
 
+#include <memory>
+#include <map>
+#include <unordered_map>
+#include <string>
+#include <variant>
+#include <functional>
+#include <vector>
+#include <any>
+
 namespace Gx
 {
-    typedef std::variant<
-        std::shared_ptr<sf::Texture>,
-        std::shared_ptr<sf::Font>,
-        std::shared_ptr<ResourceMetadata>>  CacheEntry;
-    typedef std::map<std::string, CacheEntry> CacheMap;
+    typedef std::map<std::string, std::shared_ptr<void>> CacheMap;
 
     class CacheManager
     {
     public:
-        friend class ResourceManager;
-        static CacheManager* Instance();
+        CacheManager();
+        ~CacheManager();
 
         template<typename T>
         std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size, bool useCache = true);
@@ -47,9 +44,6 @@ namespace Gx
         void   Clear();
 
     private:
-        CacheManager();
-        ~CacheManager();
-
         CacheMap m_cacheMap;
     };
 }

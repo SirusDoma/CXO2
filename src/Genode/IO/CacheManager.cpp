@@ -11,12 +11,6 @@ namespace Gx
     {
     }
 
-    CacheManager* CacheManager::Instance()
-    {
-        static CacheManager instance = CacheManager();
-        return &instance;
-    }
-
     bool CacheManager::Contains(const std::string& identifier) const
     {
         auto iterator = m_cacheMap.find(identifier);

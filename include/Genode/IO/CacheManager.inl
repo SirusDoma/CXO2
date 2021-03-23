@@ -46,7 +46,7 @@ namespace Gx
     {
         auto iterator = m_cacheMap.find(name);
         if (iterator != m_cacheMap.end())
-            return std::get<std::shared_ptr<T>>(iterator->second);
+            return std::static_pointer_cast<T>(iterator->second);
 
         return nullptr;
     }

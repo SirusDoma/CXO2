@@ -3,11 +3,12 @@
 
 namespace Gx
 {
-    ResourceManager::ResourceManager() :
-        m_cache(CacheManager::Instance()),
+    ResourceManager::ResourceManager(CacheManager *cacheManager) :
+        m_cache(cacheManager),
         m_archives(),
         m_entries()
     {
+
     }
     
     ResourceManager::~ResourceManager()
@@ -25,7 +26,7 @@ namespace Gx
 
     ResourceManager* ResourceManager::Instance()
     {
-        static ResourceManager instance;
+        static ResourceManager instance(new CacheManager());
         return &instance;
     }
 
