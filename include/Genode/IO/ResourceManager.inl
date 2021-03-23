@@ -92,7 +92,7 @@ namespace Gx
     inline T* ResourceManager::Create(const std::string& name, bool cache)
     {
         // Definition of target resource
-        ResourceMetadata* metadata = GetMetadata<T>(name, cache);
+        auto metadata = GetMetadata<T>(name, cache);
         if (!metadata)
             return nullptr;
 

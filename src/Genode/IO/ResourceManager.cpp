@@ -18,7 +18,9 @@ namespace Gx
         {
             if (archive.second)
             {
-                delete archive.second;
+                if (archive.second)
+                    delete archive.second;
+
                 archive.second = nullptr;
             }
         }
