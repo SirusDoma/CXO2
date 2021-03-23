@@ -14,6 +14,8 @@ namespace Gx
     class Number : public virtual Control, public Colorable
     {
     public:
+        enum Alignment { None, Left, Center, Right };
+
         Number();
         explicit Number(const sf::Texture& texture);
         explicit Number(TextureHandle texture);
@@ -39,6 +41,8 @@ namespace Gx
         unsigned int GetValue() const;
         void SetValue(unsigned int value);
 
+        void Align(Alignment alignment);
+
     protected:
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -47,6 +51,7 @@ namespace Gx
     private:
         sf::VertexArray m_vertices;
         TextureHandle   m_texture;
+        Alignment       m_alignment;
 
         unsigned int m_value, m_digitCount;
         float m_width, m_height, m_spacing;

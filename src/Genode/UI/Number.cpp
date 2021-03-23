@@ -111,6 +111,12 @@ namespace Gx
         m_needUpdate = true;
     }
 
+    void Number::Align(Number::Alignment alignment)
+    {
+        m_alignment = alignment;
+        Invalidate();
+    }
+
     void Number::Update(double delta)
     {
         if (m_needUpdate)
@@ -132,7 +138,7 @@ namespace Gx
     {
         auto color = GetColor();
         m_vertices = sf::VertexArray(sf::Triangles, 6 * 10);
-        m_width = 0;
+        m_width    = 0;
 
         unsigned digit = 0, digitCount = 0, leadingCount = 0, value = m_value;
         if (value > 0)
@@ -203,7 +209,17 @@ namespace Gx
             m_vertices[index + 4] = sf::Vertex(sf::Vector2f(w, y), color, sf::Vector2f(right , top));
             m_vertices[index + 5] = sf::Vertex(sf::Vector2f(w, h), color, sf::Vector2f(right , bottom));
 
-            m_height  = m_height < texCoords.height ? texCoords.height : m_height;
+            m_height = m_height < texCoords.height ? texCoords.height : m_height;
+        }
+
+        if (m_alignment != None)
+        {
+            if (m_alignment == Left)
+                SetOrigin(m_width / 2.f, 0);
+            else if (m_alignment == Center)
+                SetOrigin(m_width / 2.f, m_height / 2.f);
+            else if (m_alignment == Right)
+                SetOrigin(m_width, 0);
         }
 
         m_needUpdate = false;
