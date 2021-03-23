@@ -43,15 +43,12 @@ private:
     const unsigned int CHANNEL_LIST_PER_PAGE = 20;
 
     void Initialize();
-    void LoadSfx();
     void CaptureCurrentState();
-
-    virtual void Invalidate();
 
     virtual void Update(double delta);
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
-    sf::Vector2f m_position;
+    virtual void Invalidate();
 
     Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
     Gx::Button      *m_channelTabButton, *m_noticeTabButton;
@@ -59,10 +56,10 @@ private:
     Gx::Repeater    *m_repeater;
     Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
 
-    sf::Sound         m_showSfx, m_channelNavigateSfx, m_channelEnterSfx;
-    sf::SoundBuffer   m_showSfxBuffer, m_channelNavigateSfxBuffer, m_channelEnterSfxBuffer;
+    sf::Sound         *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
     sf::RenderTexture m_duplicateTexture;
 
+    sf::Vector2f m_position;
     PlanetInfo m_planetInfo;
     Tab m_tab;
 

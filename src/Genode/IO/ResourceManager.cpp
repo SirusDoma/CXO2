@@ -39,7 +39,9 @@ namespace Gx
             if (resource.first == "texture")
                 context.Texture = GetResource<sf::Texture>(resource.second);
             else if (resource.first == "font")
-                context.Font    = GetResource<sf::Font>(resource.second);
+                context.Font = GetResource<sf::Font>(resource.second);
+            else if (resource.first == "sound")
+                context.SoundBuffer = GetResource<sf::SoundBuffer>(resource.second);
         }
 
         return context;

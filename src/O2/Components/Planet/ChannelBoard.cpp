@@ -22,8 +22,6 @@ ChannelBoard::~ChannelBoard()
 
 void ChannelBoard::Initialize()
 {
-    LoadSfx();
-
     m_background = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Background.json");
     m_position   = m_background->GetPosition();
 
@@ -32,6 +30,10 @@ void ChannelBoard::Initialize()
 
     m_background->SetOrigin(0.f, 0.f);
     m_background->SetPosition(0.f, 0.f);
+
+    m_sfxPopup    = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/OpenChannel.json");
+    m_sfxNavigate = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelNavigation.json");
+    m_sfxEnter    = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelEnter.json");
 
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
@@ -54,21 +56,21 @@ void ChannelBoard::Initialize()
 
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] {
-        m_channelEnterSfx.play();
+        m_sfxEnter->play();
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
             m_callback(m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
     btnChannelLeft->SetClickCallback([=] {
-        m_channelNavigateSfx.play();
+        m_sfxNavigate->play();
         if (m_currentPageNumber->GetValue() > 1)
             ShowPage(m_currentPageNumber->GetValue() - 1);
     });
 
     auto btnChannelRight = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
     btnChannelRight->SetClickCallback([=] {
-        m_channelNavigateSfx.play();
+        m_sfxNavigate->play();
         if (m_currentPageNumber->GetValue() < m_maxPageNumber->GetValue())
             ShowPage(m_currentPageNumber->GetValue() + 1);
     });
@@ -91,34 +93,6 @@ void ChannelBoard::Initialize()
     m_duplicateImage.SetVisible(false);
 
     AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice);
-}
-
-
-void ChannelBoard::LoadSfx()
-{
-    Gx::Uint8 *data;
-    auto size = Gx::ResourceManager::Instance()->GetResourceData("Planet/openChannel", &data);
-
-    m_showSfx = sf::Sound();
-    m_showSfxBuffer = sf::SoundBuffer();
-    if (m_showSfxBuffer.loadFromMemory(data, size))
-        m_showSfx.setBuffer(m_showSfxBuffer);
-
-    data = nullptr;
-    size = Gx::ResourceManager::Instance()->GetResourceData("bgEffect/07", &data);
-
-    m_channelNavigateSfx = sf::Sound();
-    m_channelNavigateSfxBuffer = sf::SoundBuffer();
-    if (m_channelNavigateSfxBuffer.loadFromMemory(data, size))
-        m_channelNavigateSfx.setBuffer(m_channelNavigateSfxBuffer);
-
-    data = nullptr;
-    size = Gx::ResourceManager::Instance()->GetResourceData("bgEffect/10", &data);
-
-    m_channelEnterSfx = sf::Sound();
-    m_channelEnterSfxBuffer = sf::SoundBuffer();
-    if (m_channelEnterSfxBuffer.loadFromMemory(data, size))
-        m_channelEnterSfx.setBuffer(m_channelEnterSfxBuffer);
 }
 
 const sf::FloatRect ChannelBoard::GetLocalBounds() const
@@ -216,7 +190,7 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
         if (callback)
             callback();
     }, {
-        new Gx::Action([=] { m_showSfx.play(); }),
+        new Gx::Action([=] { m_sfxPopup->play(); }),
         new Gx::Move(this, m_position - sf::Vector2f(30, 0), sf::milliseconds(200)),
         new Gx::Move(this, m_position, sf::milliseconds(100))
     }));

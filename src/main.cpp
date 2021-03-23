@@ -10,6 +10,7 @@
 #include <O2/IO/Archives/OmcArchive.hpp>
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
+#include <O2/IO/Loaders/SoundLoader.hpp>
 #include <O2/IO/Loaders/MusicLoader.hpp>
 #include <O2/IO/Loaders/AnimationLoader.hpp>
 
@@ -34,6 +35,7 @@ int main()
     // -- Register resource metadata loaders
     // Basic Resource
     Gx::ResourceLoaderFactory::Register<Gx::Sprite>(new SpriteLoader());
+    Gx::ResourceLoaderFactory::Register<sf::Sound>(new SoundLoader());
     Gx::ResourceLoaderFactory::Register<sf::Music>(new MusicLoader());
     Gx::ResourceLoaderFactory::Register<Gx::Animation>(new AnimationLoader());
     // UI

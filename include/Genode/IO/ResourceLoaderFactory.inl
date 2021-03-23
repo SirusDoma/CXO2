@@ -1,5 +1,6 @@
 #include <Genode/IO/Loaders/TextureLoader.hpp>
 #include <Genode/IO/Loaders/FontLoader.hpp>
+#include <Genode/IO/Loaders/SoundBufferLoader.hpp>
 
 namespace
 {
@@ -10,6 +11,7 @@ namespace
         {
             Gx::ResourceLoaderFactory::Register<sf::Texture>(new Gx::priv::TextureLoader());
             Gx::ResourceLoaderFactory::Register<sf::Font>(new Gx::priv::FontLoader());
+            Gx::ResourceLoaderFactory::Register<sf::SoundBuffer>(new Gx::priv::SoundBufferLoader());
 
             registered = true;
         }
