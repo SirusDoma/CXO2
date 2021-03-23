@@ -29,6 +29,21 @@ namespace Gx
         return &instance;
     }
 
+    ResourceContext ResourceManager::GetResourceContext(ResourceMetadata *metadata)
+    {
+        // Load required resources to build resource from metadata
+        auto context = ResourceContext();
+        for (auto resource : metadata->ResourceReferences)
+        {
+            if (resource.first == "texture")
+                context.Texture = GetResource<sf::Texture>(resource.second);
+            else if (resource.first == "font")
+                context.Font    = GetResource<sf::Font>(resource.second);
+        }
+
+        return context;
+    }
+
     Uint64 ResourceManager::GetResourceData(const std::string &name, Gx::Uint8 **data)
     {
         auto iterator = m_entries.find(name);

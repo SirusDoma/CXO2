@@ -43,7 +43,7 @@ namespace Gx
     }
 
     template<typename T>
-    inline std::shared_ptr<T> ResourceManager::Resolve(const std::string name)
+    inline std::shared_ptr<T> ResourceManager::GetResource(const std::string name)
     {
         // Load resources either from cache or file system (archive / physical file)
         if (!m_cache->Contains(name))
@@ -107,16 +107,7 @@ namespace Gx
         if (!loader)
             return nullptr;
 
-        // Load required resources to build resource from metadata
-        auto context = ResourceContext();
-        for (auto resource : metadata->ResourceReferences)
-        {
-            if (resource.first == "texture")
-                context.Texture = Resolve<sf::Texture>(resource.second);
-            else if (resource.first == "font")
-                context.Font    = Resolve<sf::Font>(resource.second);
-        }
-
-        return loader->Create(metadata, context);
+        // Create object from loader
+        return loader->Create(metadata, GetResourceContext(metadata));
     }
 }

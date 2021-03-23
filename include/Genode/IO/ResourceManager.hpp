@@ -35,11 +35,13 @@ namespace Gx
         template<typename T>
         T* Create(ResourceMetadata* metadata);
 
+        ResourceContext GetResourceContext(ResourceMetadata *metadata);
+
         Uint64 GetResourceData(const std::string& name, Gx::Uint8** data);
 
     private:
         template<typename T>
-        std::shared_ptr<T> Resolve(const std::string name);
+        std::shared_ptr<T> GetResource(const std::string name);
 
         CacheManager* m_cache;
         std::unordered_map<std::string, Archive*> m_archives;
