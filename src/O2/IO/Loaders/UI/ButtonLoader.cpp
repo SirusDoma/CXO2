@@ -4,11 +4,11 @@
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
-ButtonMetadataLoader::ButtonMetadataLoader()
+ButtonLoader::ButtonLoader()
 {
 }
 
-Gx::ResourceMetadata* ButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* ButtonLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     ButtonMetadata metadata;
@@ -29,9 +29,9 @@ Gx::ResourceMetadata* ButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
     return new ButtonMetadata(metadata);
 }
 
-void ButtonMetadataLoader::Parse(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata *metadata)
+void ButtonLoader::Parse(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata *metadata)
 {
-    SpriteMetadataLoader::Parse(attributes, metadata);
+    SpriteLoader::Parse(attributes, metadata);
 
     auto states = attributes.at("states");
     metadata->States = std::unordered_map<Gx::Button::State, SpriteMetadata>();
@@ -41,13 +41,13 @@ void ButtonMetadataLoader::Parse(Json attributes, std::unordered_map<std::string
             continue;
 
         SpriteMetadata stateMeta;
-        SpriteMetadataLoader::Parse(states.at(name), &stateMeta);
+        SpriteLoader::Parse(states.at(name), &stateMeta);
 
         metadata->States[state] = stateMeta;
     }
 }
 
-Gx::Button* ButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Button* ButtonLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<ButtonMetadata*>(metadata);
     if (!spec)

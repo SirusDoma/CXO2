@@ -1,22 +1,22 @@
 #include <O2/IO/Loaders/TransformLoader.hpp>
 
-TransformMetadataLoader::TransformMetadataLoader()
+TransformLoader::TransformLoader()
 {
 }
 
-Gx::ResourceMetadata* TransformMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* TransformLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
 
     auto attributes = json.at("attributes");
     TransformMetadata metadata = TransformMetadata();
-    TransformMetadataLoader::Parse(attributes["transform"], &metadata);
+    TransformLoader::Parse(attributes["transform"], &metadata);
 
     return new TransformMetadata(metadata);
 }
 
 
-void TransformMetadataLoader::Parse(Json attributes, TransformMetadata *metadata)
+void TransformLoader::Parse(Json attributes, TransformMetadata *metadata)
 {
     auto name = attributes.find("name");
     if (name != attributes.end())
@@ -58,7 +58,7 @@ void TransformMetadataLoader::Parse(Json attributes, TransformMetadata *metadata
         metadata->Origin = sf::Vector2f();
 }
 
-sf::Transform* TransformMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
+sf::Transform* TransformLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<TransformMetadata*>(definition);
     if (!spec)

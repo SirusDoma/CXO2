@@ -1,11 +1,11 @@
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 #include <O2/IO/Loaders/TransformLoader.hpp>
 
-SpriteMetadataLoader::SpriteMetadataLoader()
+SpriteLoader::SpriteLoader()
 {
 }
 
-Gx::ResourceMetadata* SpriteMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* SpriteLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     SpriteMetadata metadata;
@@ -17,17 +17,17 @@ Gx::ResourceMetadata* SpriteMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    SpriteMetadataLoader::Parse(attributes, &metadata);
+    SpriteLoader::Parse(attributes, &metadata);
 
     return new SpriteMetadata(metadata);
 }
 
-void SpriteMetadataLoader::Parse(Json attributes, SpriteMetadata *metadata)
+void SpriteLoader::Parse(Json attributes, SpriteMetadata *metadata)
 {
     if (attributes.empty())
         return;
 
-    TransformMetadataLoader::Parse(attributes["transform"], metadata);
+    TransformLoader::Parse(attributes["transform"], metadata);
 
     auto color = attributes.find("color");
     if (color != attributes.end())
@@ -54,7 +54,7 @@ void SpriteMetadataLoader::Parse(Json attributes, SpriteMetadata *metadata)
     }
 }
 
-Gx::Sprite* SpriteMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Sprite* SpriteLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<SpriteMetadata*>(metadata);
     if (!spec)

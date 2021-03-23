@@ -4,11 +4,11 @@
 
 #include <O2/IO/Loaders/UI/ButtonLoader.hpp>
 
-RadioButtonMetadataLoader::RadioButtonMetadataLoader()
+RadioButtonLoader::RadioButtonLoader()
 {
 }
 
-Gx::ResourceMetadata* RadioButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* RadioButtonLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     RadioButtonMetadata metadata;
@@ -25,11 +25,11 @@ Gx::ResourceMetadata* RadioButtonMetadataLoader::Load(Gx::Uint8* data, Gx::Uint6
         { "check", Gx::Button::State::Active },
     };
 
-    ButtonMetadataLoader::Parse(json.at("attributes"), stateMap, &metadata);
+    ButtonLoader::Parse(json.at("attributes"), stateMap, &metadata);
     return new RadioButtonMetadata(metadata);
 }
 
-Gx::RadioButton* RadioButtonMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::RadioButton* RadioButtonLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<RadioButtonMetadata*>(metadata);
     if (!spec)

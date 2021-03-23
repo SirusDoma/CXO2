@@ -9,11 +9,11 @@
 #include <O2/IO/Metadata/UI/LabelMetadata.hpp>
 #include <O2/IO/Loaders/UI/LabelLoader.hpp>
 
-DialogMetadataLoader::DialogMetadataLoader()
+DialogLoader::DialogLoader()
 {
 }
 
-Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* DialogLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     DialogMetadata metadata;
@@ -25,9 +25,9 @@ Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
     for (auto resource : resources.items())
         metadata.ResourceReferences[resource.key()] = resource.value();
 
-    SpriteMetadataLoader::Parse(attributes, &metadata);
+    SpriteLoader::Parse(attributes, &metadata);
     if (attributes.contains("label"))
-        LabelMetadataLoader::Parse(attributes.at("label"), &metadata.PromptLabel);
+        LabelLoader::Parse(attributes.at("label"), &metadata.PromptLabel);
 
     if (attributes.contains("buttons"))
     {
@@ -45,7 +45,7 @@ Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
             for (auto resource : resources.items())
                 metadata.AcceptButton.ResourceReferences[resource.key()] = resource.value();
 
-            ButtonMetadataLoader::Parse(accept->at("attributes"), stateMap, &metadata.AcceptButton);
+            ButtonLoader::Parse(accept->at("attributes"), stateMap, &metadata.AcceptButton);
         }
 
         auto cancel = buttons.find("cancel");
@@ -55,14 +55,14 @@ Gx::ResourceMetadata* DialogMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
             for (auto resource : resources.items())
                 metadata.CancelButton.ResourceReferences[resource.key()] = resource.value();
 
-            ButtonMetadataLoader::Parse(cancel->at("attributes"), stateMap, &metadata.CancelButton);
+            ButtonLoader::Parse(cancel->at("attributes"), stateMap, &metadata.CancelButton);
         }
     }
 
     return new DialogMetadata(metadata);
 }
 
-Gx::Dialog* DialogMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Dialog* DialogLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<DialogMetadata*>(metadata);
     if (!spec)

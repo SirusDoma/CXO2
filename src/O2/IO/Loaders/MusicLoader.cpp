@@ -1,11 +1,11 @@
 #include <O2/IO/Loaders/MusicLoader.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
-MusicMetadataLoader::MusicMetadataLoader()
+MusicLoader::MusicLoader()
 {
 }
 
-Gx::ResourceMetadata* MusicMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* MusicLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     MusicMetadata definition;
@@ -22,7 +22,7 @@ Gx::ResourceMetadata* MusicMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size
     return new MusicMetadata(definition);
 }
 
-sf::Music* MusicMetadataLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
+sf::Music* MusicLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<MusicMetadata*>(definition);
     if (!spec)

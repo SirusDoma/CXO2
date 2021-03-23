@@ -2,11 +2,11 @@
 
 #include <O2/IO/Loaders/TransformLoader.hpp>
 
-NumberMetadataLoader::NumberMetadataLoader()
+NumberLoader::NumberLoader()
 {
 }
 
-Gx::ResourceMetadata* NumberMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* NumberLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     NumberMetadata metadata;
@@ -18,7 +18,7 @@ Gx::ResourceMetadata* NumberMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    TransformMetadataLoader::Parse(attributes["transform"], &metadata);
+    TransformLoader::Parse(attributes["transform"], &metadata);
 
     auto digitSize = attributes.find("digitSize");
     if (digitSize != attributes.end())
@@ -66,7 +66,7 @@ Gx::ResourceMetadata* NumberMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 siz
     return new NumberMetadata(metadata);
 }
 
-Gx::Number* NumberMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Number* NumberLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<NumberMetadata*>(metadata);
     if (!spec)

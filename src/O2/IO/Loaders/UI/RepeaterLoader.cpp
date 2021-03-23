@@ -1,17 +1,17 @@
 #include <O2/IO/Loaders/UI/RepeaterLoader.hpp>
 
-RepeaterMetadataLoader::RepeaterMetadataLoader()
+RepeaterLoader::RepeaterLoader()
 {
 }
 
-Gx::ResourceMetadata* RepeaterMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* RepeaterLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     RepeaterMetadata metadata;
 
     json.at("type").get_to(metadata.Type);
     auto attributes = json.at("attributes");
-    TransformMetadataLoader::Parse(attributes["transform"], &metadata);
+    TransformLoader::Parse(attributes["transform"], &metadata);
 
     auto vertical = attributes.find("vertical");
     if (vertical != attributes.end())
@@ -41,7 +41,7 @@ Gx::ResourceMetadata* RepeaterMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 s
 }
 
 
-Gx::Repeater* RepeaterMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Repeater* RepeaterLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<RepeaterMetadata*>(metadata);
     if (!spec)

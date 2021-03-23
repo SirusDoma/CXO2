@@ -5,11 +5,11 @@
 #include <O2/IO/Loaders/TransformLoader.hpp>
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
-AnimationMetadataLoader::AnimationMetadataLoader()
+AnimationLoader::AnimationLoader()
 {
 }
 
-Gx::ResourceMetadata* AnimationMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* AnimationLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     AnimationMetadata metadata;
@@ -21,7 +21,7 @@ Gx::ResourceMetadata* AnimationMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    SpriteMetadataLoader::Parse(attributes, &metadata);
+    SpriteLoader::Parse(attributes, &metadata);
 
     unsigned int duration;
     attributes.at("duration").get_to(duration);
@@ -44,7 +44,7 @@ Gx::ResourceMetadata* AnimationMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 
     return new AnimationMetadata(metadata);
 }
 
-Gx::Animation* AnimationMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Animation* AnimationLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<AnimationMetadata*>(metadata);
     if (!spec)

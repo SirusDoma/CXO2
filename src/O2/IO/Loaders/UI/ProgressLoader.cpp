@@ -2,11 +2,11 @@
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
-ProgressBarMetadataLoader::ProgressBarMetadataLoader()
+ProgressBarLoader::ProgressBarLoader()
 {
 }
 
-Gx::ResourceMetadata* ProgressBarMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* ProgressBarLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     ProgressBarMetadata metadata;
@@ -18,7 +18,7 @@ Gx::ResourceMetadata* ProgressBarMetadataLoader::Load(Gx::Uint8* data, Gx::Uint6
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    SpriteMetadataLoader::Parse(attributes, &metadata);
+    SpriteLoader::Parse(attributes, &metadata);
 
     auto orientation = attributes.find("orientation");
     if (orientation != attributes.end())
@@ -40,7 +40,7 @@ Gx::ResourceMetadata* ProgressBarMetadataLoader::Load(Gx::Uint8* data, Gx::Uint6
     return new ProgressBarMetadata(metadata);
 }
 
-Gx::ProgressBar* ProgressBarMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ProgressBar* ProgressBarLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<ProgressBarMetadata*>(metadata);
     if (!spec)

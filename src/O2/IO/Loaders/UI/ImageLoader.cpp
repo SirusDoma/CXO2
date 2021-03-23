@@ -1,11 +1,11 @@
 #include <O2/IO/Loaders/UI/ImageLoader.hpp>
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
-ImageMetadataLoader::ImageMetadataLoader()
+ImageLoader::ImageLoader()
 {
 }
 
-Gx::ResourceMetadata* ImageMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* ImageLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     ImageMetadata metadata;
@@ -17,7 +17,7 @@ Gx::ResourceMetadata* ImageMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size
         metadata.ResourceReferences[resource.key()] = resource.value();
 
     auto attributes = json.at("attributes");
-    SpriteMetadataLoader::Parse(attributes, &metadata);
+    SpriteLoader::Parse(attributes, &metadata);
 
     metadata.Frames = std::unordered_map<std::string, sf::IntRect>();
     if (attributes.contains("frames"))
@@ -39,7 +39,7 @@ Gx::ResourceMetadata* ImageMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size
     return new ImageMetadata(metadata);
 }
 
-Gx::Image* ImageMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Image* ImageLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<ImageMetadata*>(metadata);
     if (!spec)

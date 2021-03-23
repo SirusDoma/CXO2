@@ -1,10 +1,10 @@
 #include <O2/IO/Loaders/UI/LabelLoader.hpp>
 
-LabelMetadataLoader::LabelMetadataLoader()
+LabelLoader::LabelLoader()
 {
 }
 
-Gx::ResourceMetadata* LabelMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+Gx::ResourceMetadata* LabelLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
 {
     Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
     LabelMetadata metadata;
@@ -13,7 +13,7 @@ Gx::ResourceMetadata* LabelMetadataLoader::Load(Gx::Uint8* data, Gx::Uint64 size
     return new LabelMetadata(metadata);
 }
 
-void LabelMetadataLoader::Parse(Json json, LabelMetadata *metadata)
+void LabelLoader::Parse(Json json, LabelMetadata *metadata)
 {
     if (json.empty())
         return;
@@ -25,14 +25,14 @@ void LabelMetadataLoader::Parse(Json json, LabelMetadata *metadata)
 
     auto attributes = json.at("attributes");
     attributes.at("fontSize").get_to(metadata->FontSize);
-    TransformMetadataLoader::Parse(attributes["transform"], metadata);
+    TransformLoader::Parse(attributes["transform"], metadata);
 
     auto string = attributes.find("string");
     if (string != attributes.end())
         string->get_to(metadata->String);
 }
 
-Gx::Label* LabelMetadataLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::Label* LabelLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
 {
     auto spec = dynamic_cast<LabelMetadata*>(metadata);
     if (!spec)
