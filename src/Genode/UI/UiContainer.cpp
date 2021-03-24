@@ -4,7 +4,8 @@
 namespace Gx
 {
     UiContainer::UiContainer() :
-        m_localBounds()
+        m_localBounds(),
+        m_activeRadio()
     {
     }
 
@@ -17,27 +18,23 @@ namespace Gx
         return m_localBounds;
     }
 
+    void UiContainer::SetRadioActiveCallback(std::function<void(RadioButton *)> callback)
+    {
+        m_radioCallback = callback;
+    }
+
     void UiContainer::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
-        Control::OnControlClick(sender, ev);
-
-        auto radio = dynamic_cast<RadioButton*>(sender);
-        if (!radio || !radio->IsChecked())
+        if (!IsEnabled())
             return;
 
-        for (auto child : GetChildren())
-        {
-            if (child == radio)
-                continue;
+        Control::OnControlClick(sender, ev);
 
-            auto other = dynamic_cast<RadioButton*>(child);
-            if (!other || other == radio)
-                continue;
+        auto radio = dynamic_cast<RadioButton *>(sender);
+        if (!radio || radio->IsChecked())
+            return;
 
-            other->SetCheckedState(false);
-        }
-
-        radio->SetCheckedState(true);
+        m_activeRadio = radio;
     }
 
     sf::RenderStates UiContainer::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -52,7 +49,29 @@ namespace Gx
 
     bool UiContainer::Input(sf::Event ev)
     {
-        return Control::Input(ev);
+        bool input = Control::Input(ev);
+        if (m_activeRadio)
+        {
+            for (auto child : GetChildren())
+            {
+                if (child == m_activeRadio)
+                    continue;
+
+                auto other = dynamic_cast<RadioButton *>(child);
+                if (!other || other == m_activeRadio)
+                    continue;
+
+                other->SetCheckedState(false);
+            }
+
+            m_activeRadio->SetCheckedState(true);
+            if (m_radioCallback)
+                m_radioCallback(m_activeRadio);
+
+            m_activeRadio = nullptr;
+        }
+
+        return input;
     }
 
     void UiContainer::Invalidate()

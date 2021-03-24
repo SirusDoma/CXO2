@@ -86,7 +86,7 @@ namespace Gx
             RemoveChild(m_acceptButton);
 
         m_acceptButton = acceptButton;
-        m_acceptButton->SetClickCallback([this]() { OnAccepted(); });
+        m_acceptButton->SetClickCallback([this](auto _) { OnAccepted(); });
         AddChild(m_acceptButton);
     }
 
@@ -99,7 +99,7 @@ namespace Gx
             RemoveChild(m_cancelButton);
 
         m_cancelButton = cancelButton;
-        m_cancelButton->SetClickCallback([this]() { OnCancelled(); });
+        m_cancelButton->SetClickCallback([this](auto _) { OnCancelled(); });
         AddChild(m_cancelButton);
     }
 

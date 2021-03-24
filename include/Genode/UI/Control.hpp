@@ -21,7 +21,7 @@ namespace Gx
 
         virtual const sf::FloatRect GetLocalBounds() const = 0;
         const sf::FloatRect GetGlobalBounds() const;
-        void SetClickCallback(std::function<void()> callback);
+        void SetClickCallback(std::function<void(Control*)> callback);
 
         void SetEnabled(bool enabled);
         bool IsEnabled() const;
@@ -67,7 +67,7 @@ namespace Gx
         State m_state;
         bool  m_enabled, m_visible;
 
-        std::function<void()> m_onClick;
+        std::function<void(Control*)> m_onClick;
     };
 }
 

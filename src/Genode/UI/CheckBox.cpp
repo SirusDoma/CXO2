@@ -15,11 +15,11 @@ namespace Gx
             Invalidate();
 
             if (m_onCheckStateChanged)
-                m_onCheckStateChanged();
+                m_onCheckStateChanged(this);
         }
     }
 
-    void CheckBox::SetCheckStateChangeCallback(std::function<void()> callback)
+    void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback)
     {
         m_onCheckStateChanged = callback;
     }
@@ -42,10 +42,9 @@ namespace Gx
         if (!IsEnabled())
             return;
 
+        Control::OnControlClick(sender, ev);
         if (sender == this)
             SetCheckedState(!IsChecked());
-
-        Control::OnControlClick(sender, ev);
     }
 
     void CheckBox::Invalidate()

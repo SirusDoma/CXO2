@@ -9,7 +9,7 @@ namespace Gx
         if (IsChecked() != checked)
         {
             CheckBox::SetCheckedState(checked);
-            if (checked)
+            if (IsChecked())
             {
                 for (auto pair : m_pairs)
                 {
@@ -17,6 +17,9 @@ namespace Gx
                         pair->SetCheckedState(false);
                 }
             }
+
+            if (m_onCheckStateChanged)
+                m_onCheckStateChanged(this);
         }
     }
 
@@ -66,9 +69,13 @@ namespace Gx
         if (!IsEnabled())
             return;
 
+        Control::OnControlClick(sender, ev);
         if (!IsChecked() && sender == this)
             SetCheckedState(true);
+    }
 
-        Control::OnControlClick(sender, ev);
+    void RadioButton::SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback)
+    {
+        m_onCheckStateChanged = callback;
     }
 }

@@ -20,7 +20,7 @@ void StatePlanet::Initialize()
     AddChild(tower);
 
     auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
-    exitButton->SetClickCallback([=] { Gx::Application::Instance()->Close(); });
+    exitButton->SetClickCallback([=] (auto _) { Gx::Application::Instance()->Close(); });
     AddChild(exitButton);
 
     auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
@@ -44,12 +44,14 @@ void StatePlanet::Initialize()
     static auto clickSfx = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/Click.json");
     for (auto [planet, radio] : planets)
     {
-        radio->SetCheckStateChangeCallback([this, p = planet] {
-            if (m_channelBoard->InTransition())
+        radio->SetCheckStateChangeCallback([this, p = planet] (auto sender) {
+            if (!sender->IsChecked())
                 return;
 
             clickSfx->play();
-            ShowChannelBoard(p);
+            m_container->SetEnabled(false);
+
+            m_channelBoard->Show(p, [=] { OnEnterPlanet(p); });
         });
     }
 
@@ -72,15 +74,7 @@ void StatePlanet::Initialize()
     }));
 }
 
-void StatePlanet::ShowChannelBoard(Planet planet)
-{
-    m_channelBoard->Show(planet, [=] {
-        m_container->SetEnabled(true);
-        GetChannelCount(planet);
-    });
-}
-
-void StatePlanet::GetChannelCount(Planet planet)
+void StatePlanet::OnEnterPlanet(Planet planet)
 {
     auto planetInfo = PlanetInfo();
     planetInfo.Planet = planet;
@@ -97,6 +91,7 @@ void StatePlanet::GetChannelCount(Planet planet)
     }
 
     m_channelBoard->UpdateChannelList(planetInfo);
+    m_container->SetEnabled(true);
 }
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)

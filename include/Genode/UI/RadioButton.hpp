@@ -13,6 +13,8 @@ namespace Gx
     public:
         using CheckBox::CheckBox;
 
+        virtual void SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback);
+
         virtual void SetCheckedState(bool checked);
         virtual void Pair(RadioButton *radio);
         virtual void Unpair(RadioButton *radio);
@@ -27,6 +29,7 @@ namespace Gx
 
     private:
         std::vector<RadioButton*> m_pairs;
+        std::function<void(RadioButton*)> m_onCheckStateChanged;
     };
 }
 

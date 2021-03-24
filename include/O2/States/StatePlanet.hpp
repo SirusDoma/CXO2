@@ -18,9 +18,7 @@ public:
     virtual void Initialize();
 
 private:
-    void ShowChannelBoard(Planet planet);
-    void GetChannelCount(Planet planet);
-
+    void OnEnterPlanet(Planet planet);
     void OnEnterChannel(ChannelInfo channel);
 
     ChannelBoard    *m_channelBoard;

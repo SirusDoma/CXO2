@@ -9,9 +9,11 @@
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 
 #include <vector>
+#include <functional>
 
 namespace Gx
 {
+    class RadioButton;
     class UiContainer : public Control
     {
     public:
@@ -19,6 +21,7 @@ namespace Gx
         virtual ~UiContainer();
 
         const sf::FloatRect GetLocalBounds() const;
+        void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -30,6 +33,8 @@ namespace Gx
 
     private:
         sf::FloatRect m_localBounds;
+        RadioButton *m_activeRadio;
+        std::function<void(RadioButton*)> m_radioCallback;
     };
 }
 

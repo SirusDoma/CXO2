@@ -16,8 +16,8 @@ namespace Gx
         virtual bool IsChecked() const;
         virtual void SetCheckedState(bool checked);
 
-        void SetCheckStateChangeCallback(std::function<void()> callback);
-        
+        virtual void SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback);
+
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
@@ -26,7 +26,7 @@ namespace Gx
 
     private:
         bool m_isChecked = false;
-        std::function<void()> m_onCheckStateChanged = nullptr;
+        std::function<void(CheckBox*)> m_onCheckStateChanged = nullptr;
     };
 }
 

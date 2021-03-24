@@ -37,7 +37,7 @@ void ChannelBoard::Initialize()
 
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
-    m_channelTabButton->SetClickCallback([=] {
+    m_channelTabButton->SetClickCallback([=] (auto _) {
         if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Planet)
             SwitchTab(Tab::ChannelList);
     });
@@ -55,21 +55,21 @@ void ChannelBoard::Initialize()
     m_channelListContainer->AddChild(m_currentPageNumber, m_maxPageNumber);
 
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
-    btnChannelEnter->SetClickCallback([=] {
+    btnChannelEnter->SetClickCallback([=] (auto _) {
         m_sfxEnter->play();
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
             m_callback(m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
-    btnChannelLeft->SetClickCallback([=] {
+    btnChannelLeft->SetClickCallback([=] (auto _) {
         m_sfxNavigate->play();
         if (m_currentPageNumber->GetValue() > 1)
             ShowPage(m_currentPageNumber->GetValue() - 1);
     });
 
     auto btnChannelRight = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
-    btnChannelRight->SetClickCallback([=] {
+    btnChannelRight->SetClickCallback([=] (auto _) {
         m_sfxNavigate->play();
         if (m_currentPageNumber->GetValue() < m_maxPageNumber->GetValue())
             ShowPage(m_currentPageNumber->GetValue() + 1);
@@ -79,7 +79,7 @@ void ChannelBoard::Initialize()
 
     m_notice = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Notice.json");
     m_noticeTabButton  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_NoticeTab.json");
-    m_noticeTabButton->SetClickCallback([this] {
+    m_noticeTabButton->SetClickCallback([=] (auto _) {
         if (m_tab != Tab::Notice && !m_animating)
             SwitchTab(Tab::Notice);
     });
@@ -162,7 +162,7 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
 
 void ChannelBoard::Show(Planet planet, std::function<void()> callback)
 {
-    if (m_animating)
+    if (m_animating || m_planetInfo.Planet == planet)
         return;
 
     m_planetInfo.Planet = planet;
@@ -227,7 +227,7 @@ void ChannelBoard::ShowPage(int page)
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetCheckedState(i == m_selectedChannel);
         channelButton->SetChannelPopulation(m_planetInfo.Channels[i].Population);
-        channelButton->SetClickCallback([=] {
+        channelButton->SetClickCallback([=] (auto _) {
             m_selectedChannel = i;
         });
 

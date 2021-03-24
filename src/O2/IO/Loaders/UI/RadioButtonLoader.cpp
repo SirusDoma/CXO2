@@ -14,6 +14,8 @@ Gx::ResourceMetadata* RadioButtonLoader::Load(Gx::Uint8* data, Gx::Uint64 size) 
     RadioButtonMetadata metadata;
 
     json.at("type").get_to(metadata.Type);
+    if (json.contains("name"))
+        metadata.Name = json["name"].get<std::string>();
 
     auto resources = json.at("resources");
     for (auto resource : resources.items())

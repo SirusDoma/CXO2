@@ -61,7 +61,7 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    void Control::SetClickCallback(std::function<void()> callback)
+    void Control::SetClickCallback(std::function<void(Control*)> callback)
     {
         m_onClick = callback;
     }
@@ -128,10 +128,15 @@ namespace Gx
 
     void Control::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
     {
-        if (m_state == Control::State::Hover && GetGlobalBounds().contains(ev.x, ev.y))
+        if (GetGlobalBounds().contains(ev.x, ev.y))
         {
-            SetControlState(Control::State::Active);
-            OnControlPress(this, ev);
+            if (m_state == Control::State::Hover)
+            {
+                SetControlState(Control::State::Active);
+                OnControlPress(this, ev);
+            }
+            else
+                SetControlState(Control::State::Hover);
         }
 
         InputableContainer::OnMouseButtonClick(ev);
@@ -148,7 +153,7 @@ namespace Gx
                 OnControlClick(this, ev);
 
                 if (m_onClick)
-                    m_onClick();
+                    m_onClick(this);
             }
         }
 
