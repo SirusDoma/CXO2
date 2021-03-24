@@ -4,6 +4,7 @@
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
+#include <Genode/Audio/Mixer.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
@@ -26,7 +27,7 @@ public:
         ChannelList
     };
 
-    ChannelBoard();
+    ChannelBoard(Gx::Mixer *mixer);
     ~ChannelBoard();
 
     virtual const sf::FloatRect GetLocalBounds() const;
@@ -56,7 +57,8 @@ private:
     Gx::Repeater    *m_repeater;
     Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
 
-    sf::Sound         *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
+    Gx::Mixer         *m_mixer;
+    sf::SoundSource   *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
     sf::RenderTexture m_duplicateTexture;
 
     sf::Vector2f m_position;

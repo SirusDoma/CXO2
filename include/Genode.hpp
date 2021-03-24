@@ -2,6 +2,7 @@
 #define GENODE_MAIN_HPP
 
 #include <Genode/Entities.hpp>
+#include <Genode/Audio.hpp>
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks.hpp>

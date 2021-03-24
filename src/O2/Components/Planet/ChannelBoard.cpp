@@ -7,11 +7,12 @@
 
 #include <O2/Components/Planet/ChannelButton.hpp>
 
-ChannelBoard::ChannelBoard() :
+ChannelBoard::ChannelBoard(Gx::Mixer *mixer) :
     m_planetInfo(),
     m_tab(),
     m_selectedChannel(),
-    m_animating(false)
+    m_animating(false),
+    m_mixer(mixer)
 {
     Initialize();
 }
@@ -31,9 +32,9 @@ void ChannelBoard::Initialize()
     m_background->SetOrigin(0.f, 0.f);
     m_background->SetPosition(0.f, 0.f);
 
-    m_sfxPopup    = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/OpenChannel.json");
-    m_sfxNavigate = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelNavigation.json");
-    m_sfxEnter    = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelEnter.json");
+    m_sfxPopup    = m_mixer->Register(Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/OpenChannel.json"));
+    m_sfxNavigate = m_mixer->Register(Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelNavigation.json"));
+    m_sfxEnter    = m_mixer->Register(Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/ChannelEnter.json"));
 
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
@@ -56,21 +57,21 @@ void ChannelBoard::Initialize()
 
     auto btnChannelEnter = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] (auto _) {
-        m_sfxEnter->play();
+        m_mixer->Play(m_sfxEnter);
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
             m_callback(m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
     btnChannelLeft->SetClickCallback([=] (auto _) {
-        m_sfxNavigate->play();
+        m_mixer->Play(m_sfxNavigate);
         if (m_currentPageNumber->GetValue() > 1)
             ShowPage(m_currentPageNumber->GetValue() - 1);
     });
 
     auto btnChannelRight = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
     btnChannelRight->SetClickCallback([=] (auto _) {
-        m_sfxNavigate->play();
+        m_mixer->Play(m_sfxNavigate);
         if (m_currentPageNumber->GetValue() < m_maxPageNumber->GetValue())
             ShowPage(m_currentPageNumber->GetValue() + 1);
     });
@@ -190,7 +191,7 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
         if (callback)
             callback();
     }, {
-        new Gx::Action([=] { m_sfxPopup->play(); }),
+        new Gx::Action([=] { m_mixer->Play(m_sfxPopup); }),
         new Gx::Move(this, m_position - sf::Vector2f(30, 0), sf::milliseconds(200)),
         new Gx::Move(this, m_position, sf::milliseconds(100))
     }));
@@ -220,9 +221,11 @@ void ChannelBoard::ShowPage(int page)
 
     m_currentPageNumber->SetValue(page);
     m_repeater->ClearChildren();
+
+    auto base = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
     for (int i = start; i < end; i++)
     {
-        auto channelButton = new ChannelButton(*Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json"));
+        auto channelButton = new ChannelButton(*base);
         channelButton->SetPlanet(m_planetInfo.Planet);
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetCheckedState(i == m_selectedChannel);
@@ -233,6 +236,8 @@ void ChannelBoard::ShowPage(int page)
 
         m_repeater->AddChild(channelButton);
     }
+
+    delete base;
 }
 
 void ChannelBoard::Update(double delta)

@@ -48,16 +48,15 @@ void StatePlanet::Initialize()
             if (!sender->IsChecked())
                 return;
 
-            clickSfx->play();
+            Play(clickSfx, "sfx");
             m_container->SetEnabled(false);
-
             m_channelBoard->Show(p, [=] { OnEnterPlanet(p); });
         });
     }
 
     AddChild(m_container);
 
-    m_channelBoard = new ChannelBoard();
+    m_channelBoard = new ChannelBoard(this);
     m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
     AddChild(m_channelBoard);
 
@@ -67,7 +66,7 @@ void StatePlanet::Initialize()
     AddChild(overlay);
 
     m_bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata/State/Planet/Music.json");
-    m_bgm->play();
+    Play(m_bgm, "BGM");
 
     Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
         new Gx::Fade(overlay, 0, sf::seconds(2.5f))
@@ -96,6 +95,5 @@ void StatePlanet::OnEnterPlanet(Planet planet)
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)
 {
-    m_bgm->stop();
     QueueEvent([=] { GetDirector()->SetScene(new StateRoom()); } );
 }
