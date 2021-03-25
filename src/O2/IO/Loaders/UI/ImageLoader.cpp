@@ -46,12 +46,12 @@ Gx::Image* ImageLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceConte
         return nullptr;
 
     auto image = new Gx::Image();
-    image->SetName(spec->Name);
+    image->SetName(context.Name);
     image->SetTexCoords(spec->TexCoords);
     image->SetColor(spec->Color);
 
     if (context.Texture)
-        image->SetTexture(context.Texture);
+        image->SetTexture(*context.Texture);
 
     for (auto frame : spec->Frames)
         image->AddFrame(frame.first, frame.second);

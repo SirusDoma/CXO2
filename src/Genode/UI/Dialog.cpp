@@ -30,20 +30,23 @@ namespace Gx
         m_sprite = Sprite(texture, rectangle);
     }
 
-    Dialog::Dialog(TextureHandle texture) :
-        Dialog()
-    {
-        m_sprite = Sprite(texture);
-    }
-
-    Dialog::Dialog(TextureHandle texture, const sf::IntRect &rectangle) :
-        Dialog()
-    {
-        m_sprite = Sprite(texture, rectangle);
-    }
-
     Dialog::~Dialog()
     {
+    }
+
+    const sf::FloatRect Dialog::GetLocalBounds() const
+    {
+        return m_sprite.GetLocalBounds();
+    }
+
+    const sf::Texture *Dialog::GetTexture() const
+    {
+        return m_sprite.GetTexture();
+    }
+
+    void Dialog::SetTexture(const sf::Texture &texture)
+    {
+        m_sprite.SetTexture(texture);
     }
 
     bool Dialog::IsAccepted() const
@@ -54,11 +57,6 @@ namespace Gx
     bool Dialog::IsShown() const
     {
         return m_shown;
-    }
-
-    const sf::FloatRect Dialog::GetLocalBounds() const
-    {
-        return m_sprite.GetLocalBounds();
     }
 
     void Dialog::SetLabel(Label *label)

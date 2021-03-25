@@ -17,28 +17,17 @@ namespace Gx
     {
     }
 
-    Button::Button(TextureHandle texture) :
-        m_sprite(texture)
-    {
-    }
-
-    Button::Button(TextureHandle texture, const sf::IntRect &rectangle) :
-        m_sprite(texture, rectangle)
-    {
-    }
-
     Sprite *Button::GetSprite() const
     {
         return &m_sprite;
     }
 
-
-    void Button::SetTexture(const sf::Texture &texture)
+    const sf::Texture *Button::GetTexture() const
     {
-        m_sprite.SetTexture(texture);
+        return m_sprite.GetTexture();
     }
 
-    void Button::SetTexture(TextureHandle texture)
+    void Button::SetTexture(const sf::Texture &texture)
     {
         m_sprite.SetTexture(texture);
     }

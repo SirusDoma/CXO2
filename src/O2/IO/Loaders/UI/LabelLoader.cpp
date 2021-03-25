@@ -38,7 +38,13 @@ Gx::Label* LabelLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceConte
     if (!spec)
         return nullptr;
 
-    auto label = new Gx::Label(spec->String, context.Font, spec->FontSize);
+    auto label = new Gx::Label();
+    if (context.Font)
+        label->SetFont(*context.Font);
+
+    label->SetCharacterSize(spec->FontSize);
+    label->SetString(spec->String);
+
     label->SetOrigin(spec->Origin);
     label->SetPosition(spec->Position);
     label->SetScale(spec->Scale);

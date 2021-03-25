@@ -18,10 +18,10 @@ namespace Gx
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        explicit Dialog(TextureHandle texture);
-        Dialog(TextureHandle texture, const sf::IntRect& rectangle);
-
         virtual ~Dialog();
+
+        const sf::Texture* GetTexture() const;
+        void SetTexture(const sf::Texture& texture);
 
         bool IsAccepted() const;
         virtual const sf::FloatRect GetLocalBounds() const;

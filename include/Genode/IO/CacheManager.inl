@@ -1,7 +1,7 @@
 namespace Gx
 {
     template<typename T>
-    inline std::shared_ptr<T> CacheManager::Add(const std::string& name, Uint8* data, Int64 size, bool useCache)
+    inline T* CacheManager::Add(const std::string& name, Uint8* data, Int64 size, bool useCache)
     {
         if (useCache)
         {
@@ -19,14 +19,14 @@ namespace Gx
             auto resource    = std::shared_ptr<T>(new T(loader->Load(data, size)));
             m_cacheMap[name] = resource;
 
-            return resource;
+            return resource.get();
         }
 
         return nullptr;
     }
 
     template<typename T>
-    inline std::shared_ptr<T> CacheManager::Add(const std::string& name, T* value, bool useCache)
+    inline T* CacheManager::Add(const std::string& name, const T& value, bool useCache)
     {
         if (useCache)
         {
@@ -35,18 +35,18 @@ namespace Gx
                 return cache;
         }
 
-        auto resource    = std::shared_ptr<T>(value);
+        auto resource    = std::make_shared<T>(value);
         m_cacheMap[name] = resource;
 
-        return resource;
+        return resource.get();
     }
 
     template<typename T>
-    inline std::shared_ptr<T> CacheManager::Get(const std::string& name) const
+    inline T* CacheManager::Get(const std::string& name) const
     {
         auto iterator = m_cacheMap.find(name);
         if (iterator != m_cacheMap.end())
-            return std::static_pointer_cast<T>(iterator->second);
+            return std::static_pointer_cast<T>(iterator->second).get();
 
         return nullptr;
     }

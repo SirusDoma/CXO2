@@ -43,7 +43,7 @@ namespace Gx
     }
 
     template<typename T>
-    inline std::shared_ptr<T> ResourceManager::GetResource(const std::string name)
+    inline T* ResourceManager::GetResource(const std::string name)
     {
         // Load resources either from cache or file system (archive / physical file)
         if (!m_cache->Contains(name))
@@ -60,11 +60,7 @@ namespace Gx
     template<typename T>
     inline ResourceMetadata* ResourceManager::GetMetadata(const std::string& name, bool cache)
     {
-        // Definition of target resource
-        std::shared_ptr<ResourceMetadata> metadata;
-
         // Load metadata and create context for resource dependencies
-        auto context = ResourceContext();
         if (!m_cache->Contains(name))
         {
             Uint8* data;
@@ -76,16 +72,10 @@ namespace Gx
                 return nullptr;
 
             // Load it with loader
-            metadata = m_cache->Add(name, loader->Load(data, size), cache);
+            return m_cache->Add<ResourceMetadata>(name, *loader->Load(data, size), cache);
         }
         else
-            metadata = m_cache->Get<ResourceMetadata>(name);
-
-        // No metadata found, cannot proceed
-        if (!metadata)
-            return nullptr;
-
-        return metadata.get();
+            return m_cache->Get<ResourceMetadata>(name);
     }
     
     template<typename T>

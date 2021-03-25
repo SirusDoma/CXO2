@@ -53,21 +53,6 @@ namespace Gx
         SetTexCoords(rectangle);
     }
 
-    Sprite::Sprite(TextureHandle texture) :
-        m_texture(NULL),
-        m_texcoords()
-    {
-        SetTexture(texture);
-    }
-
-    Sprite::Sprite(TextureHandle texture, const sf::IntRect& rectangle) :
-        m_texture(NULL),
-        m_texcoords()
-    {
-        SetTexture(texture);
-        SetTexCoords(rectangle);
-    }
-
     void Sprite::SetTexture(const sf::Texture& texture, bool resetRect)
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
@@ -75,17 +60,7 @@ namespace Gx
             SetTexCoords(sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
 
         // Assign the new texture
-        m_texture = std::make_shared<sf::Texture>(texture);
-    }
-
-    void Sprite::SetTexture(TextureHandle texture, bool resetRect)
-    {
-        // Recompute the texture area if requested, or if there was no valid texture & rect before
-        if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))
-            SetTexCoords(sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y));
-
-        // Assign the new texture
-        m_texture = texture;
+        m_texture = &texture;
     }
 
     void Sprite::SetTexCoords(const sf::IntRect& rectangle)
@@ -109,7 +84,7 @@ namespace Gx
 
     const sf::Texture* Sprite::GetTexture() const
     {
-        return m_texture.get();
+        return m_texture;
     }
 
     const sf::IntRect& Sprite::GetTexCoords() const
@@ -149,7 +124,7 @@ namespace Gx
         if (m_texture)
         {
             states.transform *= GetTransform();
-            states.texture = m_texture.get();
+            states.texture = m_texture;
             target.draw(m_vertices, 4, sf::TriangleStrip, states);
         }
 

@@ -14,8 +14,7 @@ void StateAvi::Initialize()
     AddChild(sprite);
 
     auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Avi\\Music.json");
-    if (bgm)
-        bgm->play();
+    Play(bgm);
 
     auto sequence = new Gx::Sequence([=] { QueueEvent([=] { GetDirector()->SetScene(new StatePlanet()); }); },
         {

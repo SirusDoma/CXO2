@@ -36,8 +36,13 @@ namespace Gx
     {
         // Load required resources to build resource from metadata
         auto context = ResourceContext();
+        context.Name = metadata->Name;
+
         for (auto resource : metadata->ResourceReferences)
         {
+            if (context.Name.empty())
+                context.Name = FileHelper::GetFullName(resource.second);
+
             if (resource.first == "texture")
                 context.Texture = GetResource<sf::Texture>(resource.second);
             else if (resource.first == "font")
@@ -61,5 +66,10 @@ namespace Gx
             return FileHelper::GetFile(name, data);
         else
             return 0;
+    }
+
+    CacheManager *ResourceManager::GetCache() const
+    {
+        return m_cache;
     }
 }

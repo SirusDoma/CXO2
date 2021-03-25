@@ -36,12 +36,13 @@ namespace Gx
         T* Create(ResourceMetadata* metadata);
 
         ResourceContext GetResourceContext(ResourceMetadata *metadata);
-
         Uint64 GetResourceData(const std::string& name, Gx::Uint8** data);
+
+        CacheManager *GetCache() const;
 
     private:
         template<typename T>
-        std::shared_ptr<T> GetResource(const std::string name);
+        T* GetResource(const std::string name);
 
         CacheManager* m_cache;
         std::unordered_map<std::string, Archive*> m_archives;

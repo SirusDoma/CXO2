@@ -72,8 +72,11 @@ Gx::Number* NumberLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceCon
     if (!spec)
         return nullptr;
 
-    auto number = new Gx::Number(context.Texture);
-    number->SetName(spec->Name);
+    auto number = new Gx::Number();
+    if (context.Texture)
+        number->SetTexture(*context.Texture);
+
+    number->SetName(context.Name);
     number->SetColor(spec->Color);
 
     if (spec->DigitSize != sf::Vector2u() || spec->DigitFrames.size() > 0)

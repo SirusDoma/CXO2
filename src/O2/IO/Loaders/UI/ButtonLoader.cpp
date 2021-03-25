@@ -53,8 +53,11 @@ Gx::Button* ButtonLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceCon
     if (!spec)
         return nullptr;
 
-    auto button = new Gx::Button(context.Texture);
-    button->SetName(spec->Name);
+    auto button = new Gx::Button();
+    if (context.Texture)
+        button->SetTexture(*context.Texture);
+
+    button->SetName(context.Name);
     button->SetOrigin(spec->Origin);
     button->SetPosition(spec->Position);
     button->SetScale(spec->Scale);

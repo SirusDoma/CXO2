@@ -15,16 +15,12 @@ namespace Gx
 
         ProgressBar();
         explicit ProgressBar(const sf::Texture& texture);
-        explicit ProgressBar(TextureHandle texture);
-
         ProgressBar(const sf::Texture& texture, const sf::IntRect &texCoords);
-        ProgressBar(TextureHandle texture, const sf::IntRect &texCoords);
 
         virtual const sf::FloatRect GetLocalBounds() const;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
-        void SetTexture(TextureHandle texture);
 
         const sf::IntRect& GetTexCoords() const;
         void SetTexCoords(const sf::IntRect &texCoords);
@@ -47,10 +43,10 @@ namespace Gx
 
         virtual void Invalidate();
     private:
-        sf::VertexArray m_vertices;
-        TextureHandle   m_texture;
-        sf::IntRect     m_texCoords;
-        Orientation     m_orientation;
+        sf::VertexArray    m_vertices;
+        const sf::Texture* m_texture;
+        sf::IntRect        m_texCoords;
+        Orientation        m_orientation;
 
     private:
         float m_value, m_maximum;

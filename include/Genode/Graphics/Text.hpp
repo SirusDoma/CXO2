@@ -76,11 +76,9 @@ namespace Gx
         };
 
         Text();
-        Text(const std::string& string, FontHandle font, unsigned int characterSize = 30);
         Text(const std::string& string, const sf::Font& font, unsigned int characterSize = 30);
 
         void SetString(const std::string& string);
-        void SetFont(FontHandle font);
         void SetFont(const sf::Font& font);
 
         void SetCharacterSize(unsigned int size);
@@ -116,7 +114,7 @@ namespace Gx
 
     private:
         std::string             m_string;
-        FontHandle              m_font;
+        const sf::Font*         m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;

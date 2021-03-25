@@ -18,13 +18,11 @@ namespace Gx
 
         Number();
         explicit Number(const sf::Texture& texture);
-        explicit Number(TextureHandle texture);
 
         virtual const sf::FloatRect GetLocalBounds() const;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
-        void SetTexture(TextureHandle texture);
 
         virtual const sf::Color & GetColor() const;
         virtual void SetColor(const sf::Color &color);
@@ -49,9 +47,9 @@ namespace Gx
         virtual void Invalidate();
 
     private:
-        sf::VertexArray m_vertices;
-        TextureHandle   m_texture;
-        Alignment       m_alignment;
+        sf::VertexArray   m_vertices;
+        const sf::Texture *m_texture;
+        Alignment         m_alignment;
 
         unsigned int m_value, m_digitCount;
         float m_width, m_height, m_spacing;

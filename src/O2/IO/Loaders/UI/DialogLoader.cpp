@@ -68,12 +68,14 @@ Gx::Dialog* DialogLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceCon
     if (!spec)
         return nullptr;
 
-    auto dialog = new Gx::Dialog(context.Texture);
-    dialog->SetName(spec->Name);
+    auto dialog = new Gx::Dialog();
+    dialog->SetName(context.Name);
     dialog->SetOrigin(spec->Origin);
     dialog->SetPosition(spec->Position);
     dialog->SetScale(spec->Scale);
     dialog->SetRotation(spec->Rotation);
+    if (context.Texture)
+        dialog->SetTexture(*context.Texture);
 
     dialog->SetLabel(Gx::ResourceManager::Instance()->Create<Gx::Label>(&spec->PromptLabel));
     dialog->SetAcceptButton(Gx::ResourceManager::Instance()->Create<Gx::Button>(&spec->AcceptButton));

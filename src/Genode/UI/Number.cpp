@@ -3,23 +3,21 @@
 
 namespace Gx
 {
-    Number::Number()
-    {
-    }
-
-    Number::Number(const sf::Texture& texture) :
-        Number(std::make_shared<sf::Texture>(texture))
-    {
-    }
-
-    Number::Number(TextureHandle texture) :
+    Number::Number() :
         m_vertices(sf::TriangleStrip, 6 * 10),
+        m_texture(),
         m_texCoords(),
         m_digitCount(),
         m_width(),
         m_height(),
         m_spacing(),
+        m_value(),
         m_needUpdate(true)
+    {
+    }
+
+    Number::Number(const sf::Texture& texture) :
+        Number()
     {
         SetTexture(texture);
         SetValue(0);
@@ -32,17 +30,13 @@ namespace Gx
 
     const sf::Texture* Number::GetTexture() const
     {
-        return m_texture.get();
+        return m_texture;
     }
 
     void Number::SetTexture(const sf::Texture& texture)
     {
-        m_texture = std::make_shared<sf::Texture>(texture);
-    }
-
-    void Number::SetTexture(TextureHandle texture)
-    {
-        m_texture = texture;
+        m_texture = &texture;
+        m_needUpdate = true;
     }
 
     const sf::Color & Number::GetColor() const
@@ -128,7 +122,7 @@ namespace Gx
     sf::RenderStates Number::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
         states.transform *= GetTransform();
-        states.texture    = m_texture.get();
+        states.texture    = m_texture;
         target.draw(m_vertices, states);
 
         return Control::Render(target, states);

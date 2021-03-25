@@ -88,24 +88,6 @@ namespace Gx
     {
     }
 
-    Text::Text(const std::string& string, FontHandle font, unsigned int characterSize) :
-        m_string(string),
-        m_font(font),
-        m_characterSize(characterSize),
-        m_letterSpacingFactor(1.f),
-        m_lineSpacingFactor(1.f),
-        m_style(Regular),
-        m_fillColor(255, 255, 255),
-        m_outlineColor(0, 0, 0),
-        m_outlineThickness(0),
-        m_vertices(sf::Triangles),
-        m_outlineVertices(sf::Triangles),
-        m_bounds(),
-        m_geometryNeedUpdate(true),
-        m_fontTextureId(0)
-    {
-    }
-
     Text::Text(const std::string& string, const sf::Font& font, unsigned int characterSize) :
         m_string(string),
         m_font(&font),
@@ -133,18 +115,9 @@ namespace Gx
         }
     }
 
-    void Text::SetFont(FontHandle font)
-    {
-        if (m_font != font)
-        {
-            m_font = font;
-            m_geometryNeedUpdate = true;
-        }
-    }
-
     void Text::SetFont(const sf::Font& font)
     {
-        m_font = std::make_shared<sf::Font>(font);
+        m_font = &font;
         m_geometryNeedUpdate = true;
     }
 
@@ -237,7 +210,7 @@ namespace Gx
 
     const sf::Font* Text::GetFont() const
     {
-        return m_font.get();
+        return m_font;
     }
 
     unsigned int Text::GetCharacterSize() const

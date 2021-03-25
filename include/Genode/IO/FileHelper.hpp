@@ -15,7 +15,7 @@ namespace Gx
         static void AddAssetPath(const std::string& path);
 
         static std::string GetFileName(const std::string& fullPath, bool extension = true);
-        static std::string GetFullName(const std::string& fileName);
+        static std::string GetFullName(const std::string& fileName, bool extension = true);
 
         static bool Exists(const std::string& fileName, bool asAsset = false);
         static Int64 GetFile(const std::string& fileName, Uint8** data);

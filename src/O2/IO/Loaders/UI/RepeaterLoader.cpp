@@ -52,6 +52,7 @@ Gx::Repeater* RepeaterLoader::Create(Gx::ResourceMetadata* metadata, Gx::Resourc
         spec->HorizontalCount, spec->HorizontalSpacing
     );
 
+    repeater->SetName(context.Name);
     repeater->SetOrigin(spec->Origin);
     repeater->SetPosition(spec->Position);
     repeater->SetScale(spec->Scale);

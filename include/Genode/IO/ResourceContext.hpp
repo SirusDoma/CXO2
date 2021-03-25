@@ -11,9 +11,10 @@ namespace Gx
 {
     struct ResourceContext
     {
-        std::shared_ptr<sf::Texture>     Texture;
-        std::shared_ptr<sf::Font>        Font;
-        std::shared_ptr<sf::SoundBuffer> SoundBuffer;
+        std::string            Name;
+        const sf::Texture*     Texture;
+        const sf::Font*        Font;
+        const sf::SoundBuffer* SoundBuffer;
     };
 }
 

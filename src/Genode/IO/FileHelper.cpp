@@ -54,7 +54,7 @@ namespace Gx
             return filePath.filename().replace_extension().string();
     }
 
-    std::string FileHelper::GetFullName(const std::string& fileName)
+    std::string FileHelper::GetFullName(const std::string& fileName, bool extension)
     {
         if (Exists(fileName))
             return fileName;
@@ -63,7 +63,12 @@ namespace Gx
         {
             std::string fullPath = std::string(filePath).append("/").append(fileName);
             if (Exists(fullPath))
-                return fullPath;
+            {
+                if (extension)
+                    return fullPath;
+                else
+                    return path(fullPath).replace_extension().string();
+            }
         }
 
         return "";

@@ -2,37 +2,27 @@
 
 namespace Gx
 {
-    ProgressBar::ProgressBar()
+    ProgressBar::ProgressBar() :
+        m_vertices(sf::TriangleStrip, 4),
+        m_texture(),
+        m_texCoords(),
+        m_orientation(Orientation::Horizontal),
+        m_value(0),
+        m_maximum(100.0f)
     {
 
     }
 
     ProgressBar::ProgressBar(const sf::Texture &texture) :
-        ProgressBar(std::make_shared<sf::Texture>(texture))
+        ProgressBar(texture, sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y))
     {
 
     }
-
-    ProgressBar::ProgressBar(TextureHandle texture) :
-        ProgressBar(texture, sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y))
-    {
-
-    }
-
 
     ProgressBar::ProgressBar(const sf::Texture &texture, const sf::IntRect &texCoords) :
-        ProgressBar(std::make_shared<sf::Texture>(texture), texCoords)
+        ProgressBar()
     {
-
-    }
-
-    ProgressBar::ProgressBar(TextureHandle texture, const sf::IntRect &texCoords) :
-        m_vertices(sf::TriangleStrip, 4),
-        m_orientation(Orientation::Horizontal),
-        m_value(0),
-        m_maximum(100.0f)
-    {
-        m_texture = texture;
+        SetTexture(texture);
         SetTexCoords(texCoords);
     }
 
@@ -43,20 +33,12 @@ namespace Gx
 
     const sf::Texture *ProgressBar::GetTexture() const
     {
-        return m_texture.get();
+        return m_texture;
     }
 
     void ProgressBar::SetTexture(const sf::Texture &texture)
     {
-        SetTexture(std::make_shared<sf::Texture>(texture));
-    }
-
-    void ProgressBar::SetTexture(TextureHandle texture)
-    {
-        if (!m_texture && (m_texCoords == sf::IntRect()))
-            SetTexCoords(sf::IntRect (0, 0, texture->getSize().x, texture->getSize().y));
-
-        m_texture = texture;
+        m_texture = &texture;
     }
 
     const sf::IntRect& ProgressBar::GetTexCoords() const
@@ -142,7 +124,7 @@ namespace Gx
         if (m_texture)
         {
             states.transform *= GetTransform();
-            states.texture    = m_texture.get();
+            states.texture    = m_texture;
             target.draw(m_vertices, states);
         }
 
@@ -178,7 +160,6 @@ namespace Gx
                 top = progress;
             }
         }
-
 
         m_vertices[0] = sf::Vertex(sf::Vector2f(x, y), color, sf::Vector2f(left, top));
         m_vertices[1] = sf::Vertex(sf::Vector2f(x, h), color, sf::Vector2f(left, bottom));

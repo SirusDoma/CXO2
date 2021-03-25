@@ -19,18 +19,15 @@ namespace Gx
         explicit Button(const sf::Texture& texture);
         Button(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        explicit Button(TextureHandle texture);
-        Button(TextureHandle texture, const sf::IntRect& rectangle);
-
         const sf::FloatRect GetLocalBounds() const;
+
+        const sf::Texture* GetTexture() const;
+        void SetTexture(const sf::Texture& texture);
 
         void SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
         void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
 
     protected:
-        void SetTexture(const sf::Texture& texture);
-        void SetTexture(TextureHandle texture);
-
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;
 

@@ -47,11 +47,7 @@ namespace Gx
         explicit Sprite(const sf::Texture& texture);
         Sprite(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        explicit Sprite(TextureHandle texture);
-        Sprite(TextureHandle texture, const sf::IntRect& rectangle);
-
         void SetTexture(const sf::Texture& texture, bool resetRect = false);
-        void SetTexture(TextureHandle texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rectangle);
         virtual void SetColor(const sf::Color& color);
 
@@ -70,7 +66,7 @@ namespace Gx
         void UpdateTexCoords();
 
         sf::Vertex  m_vertices[4];
-        TextureHandle  m_texture;     
+        const sf::Texture* m_texture;
         sf::IntRect m_texcoords;
     };
 

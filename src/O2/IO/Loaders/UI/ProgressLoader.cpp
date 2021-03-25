@@ -46,7 +46,11 @@ Gx::ProgressBar* ProgressBarLoader::Create(Gx::ResourceMetadata* metadata, Gx::R
     if (!spec)
         return nullptr;
 
-    auto progressBar = new Gx::ProgressBar(context.Texture, spec->TexCoords);
+    auto progressBar = new Gx::ProgressBar();
+    if (context.Texture)
+        progressBar->SetTexture(*context.Texture);
+
+    progressBar->SetTexCoords(spec->TexCoords);
     progressBar->SetOrientation(spec->Orientation);
     progressBar->SetMaximumValue(spec->Maxiumum);
     progressBar->SetColor(spec->Color);
