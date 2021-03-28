@@ -1,52 +1,59 @@
-#ifndef GENODE_RESOURCE_MANAGER_HPP
-#define GENODE_RESOURCE_MANAGER_HPP
+#ifndef GENODE_IO_RESOURCEMANAGER_HPP
+#define GENODE_IO_RESOURCEMANAGER_HPP
 
-#include <Genode/IO/Archive.hpp>
-#include <Genode/IO/FileHelper.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-#include <Genode/IO/CacheManager.hpp>
+#include <Genode/IO/ResourceContainer.hpp>
+#include <Genode/IO/ResourceContext.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/IO/ResourceMetadata.hpp>
 
 #include <memory>
-#include <unordered_map>
-#include <string>
 
 namespace Gx
 {
+    enum ResourceScope { Local, Shared };
+
+    class Node;
     class ResourceManager
     {
     public:
-        static ResourceManager* Instance();
+        using ResourceContainerMap = std::unordered_map<std::type_index, std::unique_ptr<priv::BaseContainer>>;
+        using ArchiveMap           = std::unordered_map<std::string, std::unique_ptr<Archive>>;
+        using EntryMap             = std::unordered_map<std::string, Archive::FileEntry>;
 
-        ResourceManager(CacheManager *cacheManager);
-        virtual ~ResourceManager();
+        ResourceManager();
+        ~ResourceManager();
 
-        template<typename T>
-        T* AddArchive(const std::string& filename);
+        template<typename A>
+        A* LoadArchive(const std::string& fileName);
 
-        template<typename T>
-        T* GetArchive(const std::string& filename) const;
+        template<typename R>
+        ResourceContainer<R>* Register();
 
-        template<typename T>
-        ResourceMetadata* GetMetadata(const std::string& name, bool cache = true);
+        template<typename R>
+        bool Unregister();
 
-        template<typename T>
-        T* Create(const std::string& name, bool cache = true);
+        template<typename R>
+        ResourcePtr<R> Resolve(const std::string& source);
 
-        template<typename T>
-        T* Create(ResourceMetadata* metadata);
+        template<typename R>
+        bool Contains(const std::string& name);
 
-        ResourceContext GetResourceContext(ResourceMetadata *metadata);
-        Uint64 GetResourceData(const std::string& name, Gx::Uint8** data);
+        template<typename R>
+        R* Load(const std::string& source);
 
-        CacheManager *GetCache() const;
+        template<typename R>
+        ResourceMetadata* LoadMetadata(const std::string& source);
+
+        ResourceContext ResolveContext(const ResourceMetadata& metadata);
+        Uint64 GetResourceData(const std::string &name, Gx::Uint8 **data) const;
 
     private:
-        template<typename T>
-        T* GetResource(const std::string name);
+        template<typename R>
+        ResourceContainer<R>* GetContainer();
 
-        CacheManager* m_cache;
-        std::unordered_map<std::string, Archive*> m_archives;
-        std::unordered_map<std::string, Archive::FileEntry> m_entries;
+        ResourceContainerMap m_containers;
+        ArchiveMap           m_archives;
+        EntryMap             m_entries;
     };
 }
 

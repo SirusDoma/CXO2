@@ -1,24 +1,19 @@
-#ifndef SPRITE_METADATA_LOADER_HPP
-#define SPRITE_METADATA_LOADER_HPP
+#ifndef SPRITE_LOADER_HPP
+#define SPRITE_LOADER_HPP
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
 #include <Genode/Graphics/Sprite.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 
-#include <O2/IO/Metadata/SpriteMetadata.hpp>
-
-class SpriteLoader : public Gx::MetadataLoader<Gx::Sprite>
+class SpriteMetadata;
+class SpriteLoader : public O2JamResourceLoader<Gx::Sprite>
 {
 public :
     SpriteLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::Sprite* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::Sprite> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 
-    static void Parse(Json json, SpriteMetadata* metadata);
+    static void ParseSprite(Json attributes, SpriteMetadata &metadata);
 };
 
 #endif

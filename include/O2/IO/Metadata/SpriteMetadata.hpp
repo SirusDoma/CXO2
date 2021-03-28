@@ -4,19 +4,23 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/Json.hpp>
-
 #include <O2/IO/Metadata/TransformMetadata.hpp>
 
-struct SpriteMetadata : public TransformMetadata
+class SpriteMetadata : public TransformMetadata
 {
 public:
     SpriteMetadata() {}
     virtual ~SpriteMetadata() {}
 
-    sf::Color   Color;
-    sf::IntRect TexCoords;
+    const sf::Color& GetColor() const      { return m_color; }
+    void SetColor(const sf::Color& mColor) { m_color = mColor; }
+
+    const sf::IntRect& GetTexCoords() const          { return m_texCoords; }
+    void SetTexCoords(const sf::IntRect& mTexCoords) { m_texCoords = mTexCoords; }
+
+private:
+    sf::Color   m_color;
+    sf::IntRect m_texCoords;
 };
 
 #endif

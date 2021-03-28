@@ -1,25 +1,19 @@
-#ifndef LABEL_METADATA_LOADER_HPP
-#define LABEL_METADATA_LOADER_HPP
+#ifndef LABEL_LOADER_HPP
+#define LABEL_LOADER_HPP
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
+#include <O2/IO/Metadata/UI/LabelMetadata.hpp>
 #include <Genode/UI/Label.hpp>
 
-#include <O2/IO/Metadata/UI/LabelMetadata.hpp>
-#include <O2/IO/Loaders/TransformLoader.hpp>
-
-class LabelLoader : public Gx::MetadataLoader<Gx::Label>
+class LabelLoader : public O2JamResourceLoader<Gx::Label>
 {
 public :
     LabelLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::Label* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::Label> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 
-    static void Parse(Json json, LabelMetadata *metadata);
+    static void ParseLabel(Json attributes, LabelMetadata& metadata);
 };
 
 #endif

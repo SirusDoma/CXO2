@@ -1,22 +1,18 @@
-#ifndef NUMBER_METADATA_LOADER_HPP
-#define NUMBER_METADATA_LOADER_HPP
+#ifndef NUMBER_LOADER_HPP
+#define NUMBER_LOADER_HPP
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/Number.hpp>
 
-#include <O2/IO/Metadata/UI/NumberMetadata.hpp>
-
-class NumberLoader : public Gx::MetadataLoader<Gx::Number>
+class NumberLoader : public O2JamResourceLoader<Gx::Number>
 {
 public :
     NumberLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::Number* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::Number> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
+
 };
+
 
 #endif

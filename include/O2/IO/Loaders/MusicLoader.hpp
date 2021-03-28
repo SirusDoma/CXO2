@@ -1,23 +1,16 @@
-#ifndef MUSIC_METADATA_LOADER_HPP
-#define MUSIC_METADATA_LOADER_HPP
+#ifndef MUSIC_LOADER_HPP
+#define MUSIC_LOADER_HPP
 
 #include <SFML/Audio/Music.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
-
-#include <O2/IO/Metadata/MusicMetadata.hpp>
-
-class MusicLoader : public Gx::MetadataLoader<sf::Music>
+class MusicLoader : public O2JamResourceLoader<sf::Music>
 {
 public :
     MusicLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual sf::Music* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const;
+    virtual Gx::ResourcePtr<sf::Music> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 };
 
 #endif

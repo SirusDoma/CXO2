@@ -9,12 +9,14 @@
 
 namespace Gx
 {
+    class ResourceManager;
     struct ResourceContext
     {
         std::string            Name;
         const sf::Texture*     Texture;
         const sf::Font*        Font;
         const sf::SoundBuffer* SoundBuffer;
+        ResourceManager*       Resources;
     };
 }
 

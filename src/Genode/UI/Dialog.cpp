@@ -64,7 +64,11 @@ namespace Gx
         if (!label)
             return;
 
-        m_promptText = label;
+        if (m_promptText)
+            RemoveChild(m_promptText.get());
+
+        m_promptText = std::unique_ptr<Gx::Label>(label);
+        AddChild(m_promptText.get());
     }
 
     void Dialog::SetPromptString(const std::string &prompt)
@@ -81,11 +85,12 @@ namespace Gx
             return;
 
         if (m_acceptButton)
-            RemoveChild(m_acceptButton);
+            RemoveChild(m_acceptButton.get());
 
-        m_acceptButton = acceptButton;
+        m_acceptButton = std::unique_ptr<Gx::Button>(acceptButton);
         m_acceptButton->SetClickCallback([this](auto _) { OnAccepted(); });
-        AddChild(m_acceptButton);
+
+        AddChild(m_acceptButton.get());
     }
 
     void Dialog::SetCancelButton(Button *cancelButton)
@@ -94,11 +99,12 @@ namespace Gx
             return;
 
         if (m_cancelButton)
-            RemoveChild(m_cancelButton);
+            RemoveChild(m_cancelButton.get());
 
-        m_cancelButton = cancelButton;
+        m_cancelButton = std::unique_ptr<Gx::Button>(cancelButton);
         m_cancelButton->SetClickCallback([this](auto _) { OnCancelled(); });
-        AddChild(m_cancelButton);
+
+        AddChild(m_cancelButton.get());
     }
 
     void Dialog::SetAcceptCallback(std::function<void()> callback)
@@ -132,10 +138,9 @@ namespace Gx
             else
                 m_backdrop = Rectangle(sf::Vector2f(0, 0));
 
-            if (m_promptText)
-                m_promptText->SetString(prompt);
-
+            m_promptText->SetString(prompt);
             m_scene->PushOverlay(this);
+
             m_shown = true;
         }
     }
@@ -159,8 +164,6 @@ namespace Gx
 
         states.transform *= GetTransform();
         target.draw(m_sprite, states);
-        if (m_promptText)
-            target.draw(*m_promptText, states);
 
         return RenderableContainer::Render(target, states);
     }

@@ -1,62 +1,67 @@
 #include <O2/IO/Loaders/UI/RepeaterLoader.hpp>
 
+#include <O2/IO/Loaders/TransformLoader.hpp>
+#include <O2/IO/Metadata/UI/RepeaterMetadata.hpp>
+
 RepeaterLoader::RepeaterLoader()
 {
 }
 
-Gx::ResourceMetadata* RepeaterLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> RepeaterLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     RepeaterMetadata metadata;
 
-    json.at("type").get_to(metadata.Type);
+    metadata.SetType(json.at("type").get<std::string>());
     auto attributes = json.at("attributes");
-    TransformLoader::Parse(attributes["transform"], &metadata);
+
+    ParseReferences(json["require"], metadata);
+    TransformLoader::ParseTransform(attributes["transform"], metadata);
 
     auto vertical = attributes.find("vertical");
     if (vertical != attributes.end())
     {
-        vertical->at("count").get_to(metadata.VerticalCount);
-        vertical->at("spacing").get_to(metadata.VerticalSpacing);
+        metadata.SetVerticalCount(vertical->at("count").get<unsigned int>());
+        metadata.SetVerticalSpacing(vertical->at("spacing").get<float>());
     }
     else
     {
-        metadata.VerticalCount = 1;
-        metadata.VerticalSpacing = 0;
+        metadata.SetVerticalCount(1);
+        metadata.SetVerticalSpacing(0.f);
     }
 
     auto horizontal = attributes.find("horizontal");
     if (horizontal != attributes.end())
     {
-        horizontal->at("count").get_to(metadata.HorizontalCount);
-        horizontal->at("spacing").get_to(metadata.HorizontalSpacing);
+        metadata.SetHorizontalCount(horizontal->at("count").get<unsigned int>());
+        metadata.SetHorizontalSpacing(horizontal->at("spacing").get<float>());
     }
     else
     {
-        metadata.HorizontalCount = 1;
-        metadata.HorizontalSpacing = 0;
+        metadata.SetHorizontalCount(1);
+        metadata.SetHorizontalSpacing(0.f);
     }
 
-    return new RepeaterMetadata(metadata);
+    return std::make_unique<RepeaterMetadata>(metadata);
 }
 
-
-Gx::Repeater* RepeaterLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ResourcePtr<Gx::Repeater> RepeaterLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<RepeaterMetadata*>(metadata);
+    auto spec = dynamic_cast<const RepeaterMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto repeater = new Gx::Repeater(
-        spec->VerticalCount,   spec->VerticalSpacing,
-        spec->HorizontalCount, spec->HorizontalSpacing
+    auto repeater = std::make_unique<Gx::Repeater>(
+        spec->GetVerticalCount(),   spec->GetVerticalSpacing(),
+        spec->GetHorizontalCount(), spec->GetHorizontalSpacing()
     );
 
     repeater->SetName(context.Name);
-    repeater->SetOrigin(spec->Origin);
-    repeater->SetPosition(spec->Position);
-    repeater->SetScale(spec->Scale);
-    repeater->SetRotation(spec->Rotation);
+    repeater->SetOrigin(spec->GetOrigin());
+    repeater->SetPosition(spec->GetPosition());
+    repeater->SetScale(spec->GetScale());
+    repeater->SetRotation(spec->GetRotation());
 
     return repeater;
 }
+

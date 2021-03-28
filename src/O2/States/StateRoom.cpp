@@ -9,15 +9,15 @@ void StateRoom::Initialize()
 {
     State::Initialize();
 
-    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Room\\Background.json");
+    auto background = Create<Gx::Sprite>("Metadata/State/Room/Background.json");
     AddChild(background);
 
-    auto btnCreateRoom = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State\\Room\\Btn_CreateRoom.json");
+    auto btnCreateRoom = Create<Gx::Button>("Metadata/State/Room/Btn_CreateRoom.json");
     AddChild(btnCreateRoom);
 
-    auto btnBack = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata\\State\\Room\\Btn_Back.json");
+    auto btnBack = Create<Gx::Button>("Metadata/State/Room/Btn_Back.json");
     AddChild(btnBack);
 
-    m_bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Room\\Music.json");
-    m_bgm->play();
+    m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
+    Play(m_bgm);
 }

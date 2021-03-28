@@ -1,25 +1,19 @@
 #include <O2/IO/Loaders/UI/RadioButtonLoader.hpp>
 
-#include <Genode/IO/ResourceLoaderFactory.hpp>
-
 #include <O2/IO/Loaders/UI/ButtonLoader.hpp>
+#include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
 
 RadioButtonLoader::RadioButtonLoader()
 {
 }
 
-Gx::ResourceMetadata* RadioButtonLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> RadioButtonLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
-    RadioButtonMetadata metadata;
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
+    auto metadata = RadioButtonMetadata();
 
-    json.at("type").get_to(metadata.Type);
-    if (json.contains("name"))
-        metadata.Name = json["name"].get<std::string>();
-
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        metadata.ResourceReferences[resource.key()] = resource.value();
+    metadata.SetType(json.at("type").get<std::string>());
+    ParseReferences(json["require"], metadata);
 
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
         { "normal", Gx::Button::State::Normal },
@@ -27,33 +21,34 @@ Gx::ResourceMetadata* RadioButtonLoader::Load(Gx::Uint8* data, Gx::Uint64 size) 
         { "check", Gx::Button::State::Active },
     };
 
-    ButtonLoader::Parse(json.at("attributes"), stateMap, &metadata);
-    return new RadioButtonMetadata(metadata);
+    ButtonLoader::ParseButton(json["attributes"], stateMap, metadata);
+    return std::make_unique<RadioButtonMetadata>(metadata);
 }
 
-Gx::RadioButton* RadioButtonLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<RadioButtonMetadata*>(metadata);
+    auto spec = dynamic_cast<const RadioButtonMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto radio = new Gx::RadioButton();
+    auto radio = std::make_unique<Gx::RadioButton>();
     if (context.Texture)
         radio->SetTexture(*context.Texture);
 
     radio->SetName(context.Name);
-    radio->SetOrigin(spec->Origin);
-    radio->SetPosition(spec->Position);
-    radio->SetScale(spec->Scale);
-    radio->SetRotation(spec->Rotation);
+    radio->SetOrigin(spec->GetOrigin());
+    radio->SetPosition(spec->GetPosition());
+    radio->SetScale(spec->GetScale());
+    radio->SetRotation(spec->GetRotation());
 
-    auto loader = Gx::ResourceLoaderFactory::GetMetadataLoader<Gx::Sprite>();
+    auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
     {
-        for (auto[state, meta] : spec->States)
-            radio->SetStateFrame(state, *loader->Create(&meta, Gx::ResourceContext()));
+        for (auto[state, meta] : spec->GetStates())
+            radio->SetStateFrame(state, *loader->Load(meta, Gx::ResourceContext()));
     }
 
     return radio;
 }
+
 

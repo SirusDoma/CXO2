@@ -1,6 +1,6 @@
 {
   "type": "PROGRESS_BAR",
-  "resources": {
+  "require": {
     "texture": "State/Planet/ChannelCount.png"
   },
   "attributes": {

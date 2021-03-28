@@ -1,10 +1,12 @@
 #ifndef GENODE_SCENEGRAPH_DIRECTOR
 #define GENODE_SCENEGRAPH_DIRECTOR
 
-#include <Genode/Entities.hpp>
-
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
+
+#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Entities.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 
 namespace Gx
 {
@@ -14,15 +16,26 @@ namespace Gx
     public:
         friend class Application;
 
-        explicit SceneDirector(Scene* scene, sf::RenderTarget *target);
+        SceneDirector(Application &app, Scene *scene, const sf::RenderTarget &target);
         ~SceneDirector();
 
         Scene* GetScene() const;
         void SetScene(Scene* scene);
 
+        Application &GetApplication() const;
+        ResourceManager &GetSharedResources() const;
+        Mixer &GetMixer() const;
+
     private:
-        std::unique_ptr<Scene> m_scene;
-        sf::RenderTarget *m_target;
+        const sf::RenderTarget  *m_target;
+        Application             *m_application;
+        ResourceManager         *m_resources;
+        Mixer                   *m_mixer;
+        std::unique_ptr<Scene>   m_scene;
+
+        void Initialize();
+        void SetSharedResources(ResourceManager &resources);
+        void SetMixer(Mixer &mixer);
 
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void Update(double delta);

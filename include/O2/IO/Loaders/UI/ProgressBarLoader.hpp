@@ -1,22 +1,17 @@
-#ifndef PROGRESS_BAR_METADATA_LOADER_HPP
-#define PROGRESS_BAR_METADATA_LOADER_HPP
+#ifndef PROGRESS_BAR_LOADER_HPP
+#define PROGRESS_BAR_LOADER_HPP
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/ProgressBar.hpp>
 
-#include <O2/IO/Metadata/UI/ProgressBarMetadata.hpp>
-
-class ProgressBarLoader : public Gx::MetadataLoader<Gx::ProgressBar>
+class ProgressBarLoader : public O2JamResourceLoader<Gx::ProgressBar>
 {
 public :
     ProgressBarLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::ProgressBar* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::ProgressBar> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
+
 };
 
 #endif

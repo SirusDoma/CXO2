@@ -7,62 +7,68 @@
 #include <Genode/System/Module.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/Audio/Mixer.hpp>
 
 namespace Gx
 {
     class Scene;
+
     class SceneDirector;
+
     class Application
     {
     public:
-        const sf::String TITLE = "O2-JAM";
-        static Application* Instance();
+        const std::string TITLE = "O2-JAM";
 
-        Application(Scene* scene, sf::VideoMode mode, bool fullScreen = false);
-        Application(Scene* scene, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
+        Application(sf::VideoMode mode, bool fullScreen = false);
+        Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
         ~Application();
 
-        int Start();
+        int Start(Scene *scene);
         void Close();
 
         unsigned int GetRenderFrequency() const;
-        void SetCursor(const Cursor& cursor);
+        void SetCursor(const Cursor &cursor);
 
         template<typename T>
         bool Install();
 
         template<typename T>
-        bool Install(T* instance);
+        bool Install(T *instance);
 
         template<typename T>
         bool Uninstall();
 
         template<typename T>
-        T* GetModule() const;
+        T *GetModule() const;
 
     protected:
+        sf::RenderWindow &GetRenderWindow() const;
+
         virtual void OnStart();
         virtual void OnClose();
-
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
-
         virtual void OnInputReceived(sf::Event ev);
 
-    private:
-        static Application* instance;
-        SceneDirector* m_director;
+        void ShareResources(ResourceManager &resources);
+        void UseMixer(Mixer &mixer);
 
-        sf::RenderWindow m_window;
+    private:
+        mutable sf::RenderWindow m_window;
+
+        SceneDirector  *m_director;
+        ResourceManager m_resources;
+        Mixer           m_mixer;
+
         sf::VideoMode m_mode;
         sf::VideoMode m_virtualMode;
 
         sf::Clock m_timer;
         Cursor m_cursor;
-        const sf::IntRect* m_cursorFrame;
 
-        std::vector<Module*> m_modules;
+        std::vector<Module *> m_modules;
 
         unsigned int m_frames;
         unsigned int m_renderFreq;

@@ -3,8 +3,14 @@
 
 #include <Genode/System/Primitives.hpp>
 
+#include <Genode/IO/ResourceMetadata.hpp>
+#include <Genode/IO/ResourceContext.hpp>
+
+#include <memory>
+
 namespace Gx
 {
+    struct ResourceContext;
     namespace priv
     {
         class BaseLoader
@@ -19,7 +25,14 @@ namespace Gx
     {
     public:
         virtual ~ResourceLoader() {}
-        virtual T Load(Uint8* data, Uint64 size) const = 0;
+
+        virtual bool IsMetadataRequired() const = 0;
+        virtual bool IsResourceStream() const { return false; }
+
+        virtual std::unique_ptr<ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const = 0;
+
+        virtual ResourcePtr<T> Load(const ResourceMetadata& metadata, const ResourceContext& context = ResourceContext()) const = 0;
+        virtual ResourcePtr<T> Load(const void* data, std::size_t size) const = 0;
     };
 }
 

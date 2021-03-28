@@ -29,6 +29,9 @@ namespace Gx
 
     bool FileHelper::Exists(const std::string& fileName, bool asAsset)
     {
+        if (fileName.empty())
+            return false;
+
         auto filePath = path(fileName.c_str());
         bool result = exists(filePath);
         if (!asAsset || result)
@@ -74,7 +77,7 @@ namespace Gx
         return "";
     }
 
-    Int64 FileHelper::GetFile(const std::string& fileName, Uint8** data)
+    Int64 FileHelper::ReadFile(const std::string& fileName, Uint8** data)
     {
         sf::FileInputStream fs;
         fs.open(GetFullName(fileName));
@@ -83,7 +86,7 @@ namespace Gx
         if (size <= 0)
             return size;
 
-        *data = new Uint8[static_cast<unsigned int>(size)];
+        *data = new Uint8[size];
         return fs.read((char*) & (*data)[0], fs.getSize());
     }
 

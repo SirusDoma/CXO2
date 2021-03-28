@@ -1,6 +1,6 @@
 {
   "type": "BUTTON",
-  "resources": {
+  "require": {
     "texture": "Common/Btn_Back.png"
   },
   "attributes": {

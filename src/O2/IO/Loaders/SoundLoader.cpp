@@ -1,29 +1,25 @@
 #include <O2/IO/Loaders/SoundLoader.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+#include <O2/IO/Metadata/SoundMetadata.hpp>
 
 SoundLoader::SoundLoader()
 {
 }
 
-Gx::ResourceMetadata* SoundLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> SoundLoader::LoadMetadata(const void* data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
-    SoundMetadata definition;
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
+    SoundMetadata metadata;
 
-    json.at("type").get_to(definition.Type);
+    metadata.SetType(json.at("type").get<std::string>());
+    SoundLoader::ParseReferences(json["require"], metadata);
 
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        definition.ResourceReferences[resource.key()] = resource.value();
-
-    return new SoundMetadata(definition);
+    return std::make_unique<SoundMetadata>(metadata);
 }
 
-sf::Sound* SoundLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
+Gx::ResourcePtr<sf::Sound> SoundLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<SoundMetadata*>(definition);
-    if (!spec)
+    if (!context.SoundBuffer)
         return nullptr;
 
-    return new sf::Sound(*context.SoundBuffer);
+    return std::make_unique<sf::Sound>(*context.SoundBuffer);
 }

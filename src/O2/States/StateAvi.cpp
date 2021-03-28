@@ -2,7 +2,6 @@
 
 #include <SFML/Audio/Music.hpp>
 
-#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
@@ -10,13 +9,13 @@
 
 void StateAvi::Initialize()
 {
-    auto sprite = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata\\State\\Avi\\Background.json");
+    auto sprite = Create<Gx::Sprite>("Metadata/State/Avi/Background.json");
     AddChild(sprite);
 
-    auto bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata\\State\\Avi\\Music.json");
-    Play(bgm);
+    auto bgm = Create<sf::Music>("Metadata/State/Avi/Music.json", Gx::ResourceScope::Shared);
+    Mixer::Play(bgm);
 
-    auto sequence = new Gx::Sequence([=] { QueueEvent([=] { GetDirector()->SetScene(new StatePlanet()); }); },
+    auto sequence = new Gx::Sequence([=] { QueueEvent([=] { GetDirector().SetScene(new StatePlanet()); }); },
         {
             new Gx::Fade(sprite, 255, sf::seconds(2.25f)),
             new Gx::Fade(sprite, 000, sf::seconds(2.25f))
@@ -28,5 +27,5 @@ void StateAvi::Initialize()
 
 bool StateAvi::Close(bool quit)
 {
-    return false;
+    return true;
 }

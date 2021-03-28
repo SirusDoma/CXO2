@@ -1,22 +1,19 @@
-#ifndef ANIMATION_METADATA_LOADER_HPP
-#define ANIMATION_METADATA_LOADER_HPP
-
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
+#ifndef ANIMATION_LOADER_HPP
+#define ANIMATION_LOADER_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/Graphics/Animation.hpp>
 
-#include <O2/IO/Metadata/AnimationMetadata.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 
-class AnimationLoader : public Gx::MetadataLoader<Gx::Animation>
+class AnimationLoader : public O2JamResourceLoader<Gx::Animation>
 {
 public :
     AnimationLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::Animation* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::Animation> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 };
 
 #endif

@@ -3,11 +3,18 @@
 
 #include <O2/IO/Metadata/TransformMetadata.hpp>
 
-struct LabelMetadata : TransformMetadata
+class LabelMetadata : public TransformMetadata
 {
 public:
-    std::string String;
-    unsigned int FontSize;
+    const std::string &GetString() const { return m_string; }
+    void SetString(const std::string &string) { m_string = string; }
+
+    unsigned int GetFontSize() const { return m_fontSize; }
+    void SetFontSize(unsigned int fontSize) { m_fontSize = fontSize; }
+
+private:
+    std::string m_string;
+    unsigned int m_fontSize;
 };
 
 #endif

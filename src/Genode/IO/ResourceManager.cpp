@@ -1,60 +1,44 @@
 #include <Genode/IO/ResourceManager.hpp>
-#include <Genode/IO/CacheManager.hpp>
 
 namespace Gx
 {
-    ResourceManager::ResourceManager(CacheManager *cacheManager) :
-        m_cache(cacheManager),
+    ResourceManager::ResourceManager() :
         m_archives(),
-        m_entries()
+        m_entries(),
+        m_containers()
     {
-
+        Register<sf::Texture>();
+        Register<sf::Font>();
+        Register<sf::SoundBuffer>();
+        Register<ResourceMetadata>();
     }
-    
+
     ResourceManager::~ResourceManager()
     {
-        m_cache->Clear();
-        for (auto archive : m_archives)
-        {
-            if (archive.second)
-            {
-                if (archive.second)
-                    delete archive.second;
-
-                archive.second = nullptr;
-            }
-        }
     }
 
-    ResourceManager* ResourceManager::Instance()
+    ResourceContext ResourceManager::ResolveContext(const ResourceMetadata &metadata)
     {
-        static ResourceManager instance(new CacheManager());
-        return &instance;
-    }
-
-    ResourceContext ResourceManager::GetResourceContext(ResourceMetadata *metadata)
-    {
-        // Load required resources to build resource from metadata
         auto context = ResourceContext();
-        context.Name = metadata->Name;
-
-        for (auto resource : metadata->ResourceReferences)
+        context.Resources = this;
+        for (auto type : {ResourceReference::Texture, ResourceReference::Font, ResourceReference::SoundBuffer })
         {
-            if (context.Name.empty())
-                context.Name = FileHelper::GetFullName(resource.second);
+            auto ref = metadata.GetResourceReference(type);
+            if (!ref)
+                continue;
 
-            if (resource.first == "texture")
-                context.Texture = GetResource<sf::Texture>(resource.second);
-            else if (resource.first == "font")
-                context.Font = GetResource<sf::Font>(resource.second);
-            else if (resource.first == "sound")
-                context.SoundBuffer = GetResource<sf::SoundBuffer>(resource.second);
+            if (ref->Type == ResourceReference::Texture)
+                context.Texture = Load<sf::Texture>(ref->Value);
+            else if (ref->Type == ResourceReference::Font)
+                context.Font = Load<sf::Font>(ref->Value);
+            else if (ref->Type == ResourceReference::SoundBuffer)
+                context.SoundBuffer = Load<sf::SoundBuffer>(ref->Value);
         }
 
         return context;
     }
 
-    Uint64 ResourceManager::GetResourceData(const std::string &name, Gx::Uint8 **data)
+    Uint64 ResourceManager::GetResourceData(const std::string &name, Gx::Uint8 **data) const
     {
         auto iterator = m_entries.find(name);
         if (iterator != m_entries.end())
@@ -63,13 +47,8 @@ namespace Gx
             return entry.GetContent(data);
         }
         else if (FileHelper::Exists(name, true))
-            return FileHelper::GetFile(name, data);
+            return FileHelper::ReadFile(name, data);
         else
             return 0;
-    }
-
-    CacheManager *ResourceManager::GetCache() const
-    {
-        return m_cache;
     }
 }

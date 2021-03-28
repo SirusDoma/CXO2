@@ -19,7 +19,7 @@ protected:
     virtual void Initialize();
 
 private:
-    std::unique_ptr<Gx::Dialog> m_dialog;
+    Gx::Dialog* m_dialog;
     bool m_prompted;
 };
 

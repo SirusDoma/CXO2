@@ -1,6 +1,7 @@
 #ifndef O2JAM_PLANET_CHANNEL_BUTTON_HPP
 #define O2JAM_PLANET_CHANNEL_BUTTON_HPP
 
+#include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <Genode/UI/RadioButton.hpp>
@@ -13,7 +14,7 @@
 class ChannelButton : public Gx::RadioButton
 {
 public:
-    ChannelButton(const Gx::RadioButton &copy);
+    ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy);
     virtual ~ChannelButton();
 
     virtual const sf::FloatRect GetLocalBounds() const;
@@ -34,6 +35,7 @@ protected:
     virtual void Invalidate();
 
 private:
+    Gx::Scene       *m_scene;
     Gx::Image       *m_selector, *m_channelName, *m_channelFull;
     Gx::Number      *m_channelNumber;
     Gx::ProgressBar *m_channelCounter;

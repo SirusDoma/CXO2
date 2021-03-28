@@ -1,24 +1,20 @@
-#ifndef BUTTON_METADATA_LOADER_HPP
-#define BUTTON_METADATA_LOADER_HPP
+#ifndef BUTTON_LOADER_HPP
+#define BUTTON_LOADER_HPP
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/Button.hpp>
 
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 #include <O2/IO/Metadata/UI/ButtonMetadata.hpp>
 
-class ButtonLoader : public Gx::MetadataLoader<Gx::Button>
+class ButtonLoader : public O2JamResourceLoader<Gx::Button>
 {
 public :
     ButtonLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::Button* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::Button> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 
-    static void Parse(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata* metadata);
+    static void ParseButton(Json attributes, std::unordered_map<std::string, Gx::Button::State> stateMap, ButtonMetadata& metadata);
 };
 
 #endif

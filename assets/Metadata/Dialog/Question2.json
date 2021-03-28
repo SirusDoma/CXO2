@@ -1,12 +1,12 @@
 {
   "type": "DIALOG",
-  "resources": {
+  "require": {
     "texture": "Dialog/Question2/Background.png"
   },
   "attributes": {
     "label": {
       "type": "LABEL",
-      "resources": {
+      "require": {
         "font": "Common/Font.ttf"
       },
       "attributes": {
@@ -38,7 +38,7 @@
     "buttons": {
       "accept": {
         "type": "BUTTON",
-        "resources": {
+        "require": {
           "texture": "Dialog/Question2/Btn_Yes.png"
         },
         "attributes": {
@@ -70,7 +70,7 @@
       },
       "cancel": {
         "type": "BUTTON",
-        "resources": {
+        "require": {
           "texture": "Dialog/Question2/Btn_No.png"
         },
         "attributes": {

@@ -1,6 +1,6 @@
 {
   "type": "IMAGE",
-  "resources": {
+  "require": {
     "texture": "State/Planet/ChannelCategory.png"
   },
   "attributes": {

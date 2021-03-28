@@ -3,29 +3,35 @@
 
 #include <SFML/Audio.hpp>
 
-#include <Genode/Entities/Updatable.hpp>
+#include <Genode/IO/ResourceMetadata.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 
+#include <vector>
 #include <memory>
 #include <unordered_map>
-#include <vector>
 
 namespace Gx
 {
+    class SoundGroup;
+    using SoundGroupContainer  = std::unordered_map<std::string, ResourcePtr<SoundGroup>>;
+
     class Mixer
     {
     public:
+        friend class SceneDirector;
+
         Mixer();
         virtual ~Mixer();
 
-        sf::SoundSource *Register(sf::SoundSource *source, const std::string& group = "default");
-        void Play(sf::SoundSource *source, const std::string& group = "default");
-
+        sf::SoundSource* Play(sf::SoundSource *source, const std::string &group = "default");
+        void Pause(const std::string &group);
         void Stop(const std::string &group);
-
         void StopAll();
 
+        SoundGroup *GetGroup(const std::string &name);
+
     private:
-        std::unordered_map<std::string, std::vector<std::shared_ptr<sf::SoundSource>>> m_sources;
+        SoundGroupContainer  m_groups;
     };
 }
 

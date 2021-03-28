@@ -1,40 +1,54 @@
 #include <O2/IO/Loaders/MusicLoader.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+#include <O2/IO/Metadata/MusicMetadata.hpp>
 
 MusicLoader::MusicLoader()
 {
 }
 
-Gx::ResourceMetadata* MusicLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> MusicLoader::LoadMetadata(const void* data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
-    MusicMetadata definition;
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
+    MusicMetadata metadata;
 
-    json.at("type").get_to(definition.Type);
-
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        definition.ResourceReferences[resource.key()] = resource.value();
+    metadata.SetType(json.at("type").get<std::string>());
+    for (auto resource : json["require"].items())
+    {
+        if (resource.key() == "music")
+        {
+            metadata.SetSource(resource.value());
+            break;
+        }
+    }
 
     auto attributes = json.at("attributes");
-    attributes.at("loop").get_to(definition.Loop);
+    metadata.SetLoop(attributes.at("loop").get<bool>());
 
-    return new MusicMetadata(definition);
+    return std::make_unique<MusicMetadata>(metadata);
 }
 
-sf::Music* MusicLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
+Gx::ResourcePtr<sf::Music> MusicLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<MusicMetadata*>(definition);
+    auto spec = dynamic_cast<const MusicMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
     Gx::Uint8 *data;
-    auto size = Gx::ResourceManager::Instance()->GetResourceData(definition->ResourceReferences["music"], &data);
+    if (auto size = context.Resources->GetResourceData(spec->GetSource(), &data))
+    {
+        auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto music) {
+            delete music;
+            delete[] data;
+        });
 
-    auto music = new sf::Music();
-    if (!music->openFromMemory(data, size))
-        return nullptr;
+        if (!music->openFromMemory(data, size))
+        {
+            delete[] data;
+            return nullptr;
+        }
 
-    music->setLoop(spec->Loop);
-    return music;
+        music->setLoop(spec->IsLoop());
+        return music;
+    }
+
+    return nullptr;
 }

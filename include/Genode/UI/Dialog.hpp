@@ -50,9 +50,10 @@ namespace Gx
     private:
         mutable Gx::Sprite m_sprite;
 
+        std::unique_ptr<Button> m_acceptButton, m_cancelButton;
+        std::unique_ptr<Label>  m_promptText;
+
         Scene *m_scene;
-        Button *m_acceptButton, *m_cancelButton;
-        Label *m_promptText;
         Rectangle m_backdrop;
 
         bool m_accepted, m_shown;

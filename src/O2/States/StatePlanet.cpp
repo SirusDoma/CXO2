@@ -13,22 +13,22 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    auto background = Gx::ResourceManager::Instance()->Create<Gx::Sprite>("Metadata/State/Planet/Background.json");
+    auto background = Create<Gx::Sprite>("Metadata/State/Planet/Background.json");
     AddChild(background);
 
-    auto tower = Gx::ResourceManager::Instance()->Create<Gx::Animation>("Metadata/State/Planet/Tower.json");
+    auto tower = Create<Gx::Animation>("Metadata/State/Planet/Tower.json");
     AddChild(tower);
 
-    auto exitButton = Gx::ResourceManager::Instance()->Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
-    exitButton->SetClickCallback([=] (auto _) { Gx::Application::Instance()->Close(); });
+    auto exitButton = Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
+    exitButton->SetClickCallback([=] (auto _) { GetDirector().GetApplication().Close(); });
     AddChild(exitButton);
 
-    auto philix   = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
-    auto kleo     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kleo.json");
-    auto kaliope  = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kaliope.json");
-    auto euta     = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Euta.json");
-    auto thalo    = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Thalo.json");
-    auto melpomin = Gx::ResourceManager::Instance()->Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Melpomin.json");
+    auto philix   = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
+    auto kleo     = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kleo.json");
+    auto kaliope  = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kaliope.json");
+    auto euta     = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Euta.json");
+    auto thalo    = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Thalo.json");
+    auto melpomin = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Melpomin.json");
 
     m_container = new Gx::UiContainer();
     m_container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
@@ -41,14 +41,14 @@ void StatePlanet::Initialize()
         {Planet::Philix,   philix}
     };
 
-    static auto clickSfx = Gx::ResourceManager::Instance()->Create<sf::Sound>("Metadata/State/Planet/Sound/Click.json");
+    auto clickSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
     for (auto [planet, radio] : planets)
     {
-        radio->SetCheckStateChangeCallback([this, p = planet] (auto sender) {
+        radio->SetCheckStateChangeCallback([this, sfx = clickSfx, p = planet] (auto sender) {
             if (!sender->IsChecked())
                 return;
 
-            Play(clickSfx, "sfx");
+            Mixer::Play(sfx, "sfx");
             m_container->SetEnabled(false);
             m_channelBoard->Show(p, [=] { OnEnterPlanet(p); });
         });
@@ -56,7 +56,7 @@ void StatePlanet::Initialize()
 
     AddChild(m_container);
 
-    m_channelBoard = new ChannelBoard(this);
+    m_channelBoard = new ChannelBoard(*this);
     m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
     AddChild(m_channelBoard);
 
@@ -65,10 +65,9 @@ void StatePlanet::Initialize()
     overlay->SetFillColor(sf::Color::White);
     AddChild(overlay);
 
-    m_bgm = Gx::ResourceManager::Instance()->Create<sf::Music>("Metadata/State/Planet/Music.json");
-    Play(m_bgm, "BGM");
-
+    m_bgm = Create<sf::Music>("Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
     Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
+        new Gx::Action([this] {  Mixer::Play(m_bgm, "BGM"); }),
         new Gx::Fade(overlay, 0, sf::seconds(2.5f))
     }));
 }
@@ -95,5 +94,5 @@ void StatePlanet::OnEnterPlanet(Planet planet)
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)
 {
-    QueueEvent([=] { GetDirector()->SetScene(new StateRoom()); } );
+    QueueEvent([=] { GetDirector().SetScene(new StateRoom()); } );
 }

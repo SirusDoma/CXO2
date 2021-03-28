@@ -1,74 +1,74 @@
 #include <O2/IO/Loaders/TransformLoader.hpp>
+#include <O2/IO/Metadata/TransformMetadata.hpp>
 
 TransformLoader::TransformLoader()
 {
 }
 
-Gx::ResourceMetadata* TransformLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> TransformLoader::LoadMetadata(const void* data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
 
     auto attributes = json.at("attributes");
     TransformMetadata metadata = TransformMetadata();
-    TransformLoader::Parse(attributes["transform"], &metadata);
+    TransformLoader::ParseTransform(attributes["transform"], metadata);
 
-    return new TransformMetadata(metadata);
+    return std::make_unique<TransformMetadata>(metadata);
 }
 
 
-void TransformLoader::Parse(Json attributes, TransformMetadata *metadata)
+Gx::ResourcePtr<sf::Transform> TransformLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto name = attributes.find("name");
-    if (name != attributes.end())
-        name->get_to(metadata->Name);
-
-    auto position = attributes.find("position");
-    if (position != attributes.end())
-    {
-        position->at("x").get_to(metadata->Position.x);
-        position->at("y").get_to(metadata->Position.y);
-    }
-    else
-        metadata->Position = sf::Vector2f();
-
-    auto scale = attributes.find("scale");
-    if (scale != attributes.end())
-    {
-        scale->at("scale").at("x").get_to(metadata->Scale.x);
-        scale->at("scale").at("y").get_to(metadata->Scale.y);
-    }
-    else
-        metadata->Scale = sf::Vector2f(1.f, 1.f); // default scale
-
-    auto rotation = attributes.find("rotation");
-    if (rotation != attributes.end())
-        rotation->get_to(metadata->Rotation);
-    else
-        metadata->Rotation = 0;
-
-    auto origin  = attributes.find("origin");
-    if (origin != attributes.end())
-    {
-        float x, y;
-        origin->at("x").get_to(x);
-        origin->at("y").get_to(y);
-        metadata->Origin = sf::Vector2f (x, y);
-    }
-    else
-        metadata->Origin = sf::Vector2f();
-}
-
-sf::Transform* TransformLoader::Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const
-{
-    auto spec = dynamic_cast<TransformMetadata*>(definition);
+    auto spec = dynamic_cast<const TransformMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto transform = new sf::Transform();
-    transform->translate(spec->Position);
-    transform->scale(spec->Scale);
-    transform->rotate(spec->Rotation);
+    auto transform = sf::Transform();
+    transform.translate(spec->GetPosition());
+    transform.scale(spec->GetScale());
+    transform.rotate(spec->GetRotation());
 
-    return transform;
+    return std::make_unique<sf::Transform>(transform);
 }
+
+void TransformLoader::ParseTransform(Json attributes, TransformMetadata &metadata)
+{
+    auto name = attributes.find("name");
+    if (name != attributes.end())
+        metadata.SetName(name->get<std::string>());
+
+    auto p = attributes.find("position");
+    auto position = sf::Vector2f();
+    if (p != attributes.end())
+    {
+        p->at("x").get_to(position.x);
+        p->at("y").get_to(position.y);
+    }
+    metadata.SetPosition(position);
+
+    auto s = attributes.find("scale");
+    auto scale = sf::Vector2f(1.f, 1.f);
+    if (s != attributes.end())
+    {
+        s->at("scale").at("x").get_to(scale.x);
+        s->at("scale").at("y").get_to(scale.y);
+    }
+    metadata.SetScale(scale);
+
+    auto r = attributes.find("rotation");
+    float rotation = 0;
+    if (r != attributes.end())
+        r->get_to(rotation);
+    metadata.SetRotation(rotation);
+
+    auto o  = attributes.find("origin");
+    auto origin = sf::Vector2f();
+    if (o != attributes.end())
+    {
+        o->at("x").get_to(origin.x);
+        o->at("y").get_to(origin.y);
+    }
+    metadata.SetOrigin(origin);
+}
+
 

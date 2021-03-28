@@ -13,19 +13,35 @@ namespace Gx
 
     Scene::Scene(const std::string &name) :
         Node(),
+        Mixer(),
         RenderableContainer(),
         UpdatableContainer(),
         InputableContainer(),
         m_director(nullptr),
         m_events(),
-        m_overlays()
+        m_overlays(),
+        m_entities()
     {
         SetName(name);
         SetTag("Scene");
+        RegisterLocalResource<ResourceManager>();
+    }
+
+    Scene::Scene(ResourceManager& resources) :
+        Scene::Scene(typeid(this).name(), resources)
+    {
+    }
+
+    Scene::Scene(const std::string &name, ResourceManager& resources) :
+        Scene::Scene(name)
+    {
+       m_resources = std::unique_ptr<ResourceManager>(&resources);
     }
 
     Scene::~Scene()
     {
+        m_entities.clear();
+        m_sources.clear();
         m_overlays.clear();
     }
 
@@ -38,14 +54,14 @@ namespace Gx
         return true;
     }
 
-    SceneDirector* Scene::GetDirector() const
+    SceneDirector& Scene::GetDirector() const
     {
-        return m_director;
+        return *m_director;
     }
 
-    void Scene::SetDirector(SceneDirector* director)
+    void Scene::SetDirector(SceneDirector& director)
     {
-        m_director = director;
+        m_director = &director;
     }
 
     sf::View Scene::GetView() const
@@ -56,6 +72,16 @@ namespace Gx
     void Scene::SetView(const sf::View &view)
     {
         m_view = view;
+    }
+
+    ResourceManager &Scene::GetLocalResources() const
+    {
+        return *m_resources;
+    }
+
+    ResourceManager &Scene::GetSharedResources() const
+    {
+        return GetDirector().GetSharedResources();
     }
 
     void Scene::PushOverlay(Node *overlay)
@@ -125,7 +151,7 @@ namespace Gx
 
     void Scene::ProcessEvents()
     {
-        auto director = GetDirector();
+        auto& director = GetDirector();
         while (!m_events.empty())
         {
             auto event = m_events.front();
@@ -134,8 +160,35 @@ namespace Gx
             if (event)
                 event();
 
-            if (director->GetScene() != this)
+            if (director.GetScene() != this)
                 return;
         }
+    }
+
+    bool Scene::Destroy(sf::SoundSource *source)
+    {
+        if (!source)
+            return false;
+
+        auto iterator = std::find_if(m_sources.begin(), m_sources.end(), [source] (const auto& e) { return source == e.get(); });
+        if (iterator != m_sources.end())
+            return m_sources.erase(iterator) == m_sources.end();
+
+        return false;
+    }
+
+    bool Scene::Destroy(Node *resource)
+    {
+        if (!resource)
+            return false;
+
+        auto iterator = std::find_if(m_entities.begin(), m_entities.end(), [resource] (const auto& e) { return resource == e.get(); });
+        if (iterator != m_entities.end())
+        {
+            RemoveChild(resource);
+            return m_entities.erase(iterator) == m_entities.end();
+        }
+
+        return false;
     }
 }

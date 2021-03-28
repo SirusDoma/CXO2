@@ -1,7 +1,6 @@
 #include <O2/IO/Loaders/AnimationLoader.hpp>
 
-#include <Genode/IO/ResourceLoaderFactory.hpp>
-
+#include <O2/IO/Metadata/AnimationMetadata.hpp>
 #include <O2/IO/Loaders/TransformLoader.hpp>
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
@@ -9,27 +8,19 @@ AnimationLoader::AnimationLoader()
 {
 }
 
-Gx::ResourceMetadata* AnimationLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     AnimationMetadata metadata;
 
-    json.at("type").get_to(metadata.Type);
-
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        metadata.ResourceReferences[resource.key()] = resource.value();
+    ParseReferences(json["require"], metadata);
+    SpriteLoader::ParseSprite(json["attributes"], metadata);
 
     auto attributes = json.at("attributes");
-    SpriteLoader::Parse(attributes, &metadata);
-
-    unsigned int duration;
-    attributes.at("duration").get_to(duration);
-    attributes.at("isLoop").get_to(metadata.IsLoop);
-    metadata.Duration = sf::milliseconds(duration);
+    metadata.SetDuration(sf::milliseconds(attributes.at("duration").get<unsigned int>()));
+    metadata.SetLoop(attributes.at("isLoop").get<bool>());
 
     auto frames = attributes.at("frames");
-    metadata.Frames = std::vector<sf::IntRect>();
     for (auto frame : frames)
     {
         unsigned int x, y, width, height;
@@ -38,28 +29,28 @@ Gx::ResourceMetadata* AnimationLoader::Load(Gx::Uint8* data, Gx::Uint64 size) co
         frame.at("width").get_to(width);
         frame.at("height").get_to(height);
 
-        metadata.Frames.push_back(sf::IntRect(x, y, width, height));
+        metadata.AddFrame(sf::IntRect(x, y, width, height));
     }
 
-    return new AnimationMetadata(metadata);
+    return std::make_unique<AnimationMetadata>(metadata);
 }
 
-Gx::Animation* AnimationLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ResourcePtr<Gx::Animation> AnimationLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<AnimationMetadata*>(metadata);
+    auto spec = dynamic_cast<const AnimationMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto animation = new Gx::Animation();
+    auto animation = std::make_unique<Gx::Animation>();
     animation->SetName(context.Name);
-    animation->SetLoop(spec->IsLoop);
-    animation->SetDuration(spec->Duration);
+    animation->SetLoop(spec->isLoop());
+    animation->SetDuration(spec->GetDuration());
 
-    auto loader = Gx::ResourceLoaderFactory::GetMetadataLoader<Gx::Sprite>();
+    auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
-        animation->SetSprite(loader->Create(metadata, context));
+        animation->SetSprite(std::move(loader->Load(metadata, context)).release());
 
-    for (auto frame : spec->Frames)
+    for (auto frame : spec->GetFrames())
         animation->AddFrame(frame);
 
     return animation;

@@ -1,6 +1,6 @@
 {
   "type": "BUTTON",
-  "resources": {
+  "require": {
     "texture": "State/Planet/Btn_NoticeTab.png"
   },
   "attributes": {

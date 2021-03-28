@@ -9,9 +9,9 @@ namespace
         static bool registered = false;
         if (!registered)
         {
-            Gx::ResourceLoaderFactory::Register<sf::Texture>(new Gx::priv::TextureLoader());
-            Gx::ResourceLoaderFactory::Register<sf::Font>(new Gx::priv::FontLoader());
-            Gx::ResourceLoaderFactory::Register<sf::SoundBuffer>(new Gx::priv::SoundBufferLoader());
+            Gx::ResourceLoaderFactory::Register<sf::Texture,     Gx::priv::TextureLoader>();
+            Gx::ResourceLoaderFactory::Register<sf::Font,        Gx::priv::FontLoader>();
+            Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, Gx::priv::SoundBufferLoader>();
 
             registered = true;
         }
@@ -20,62 +20,28 @@ namespace
 
 namespace Gx
 {
-    template<typename T>
-    inline void ResourceLoaderFactory::Register(ResourceLoader<T>* deserializer)
+    template<typename R, typename D>
+    inline void ResourceLoaderFactory::Register()
     {
-        Remove<T>();
+        Remove<R>();
 
-        std::type_index type = typeid(T);
-        m_loaders[type] = deserializer;
+        m_loaders[typeid(R)] = [] { return new D(); };
     }
 
-    template<typename T>
-    inline void ResourceLoaderFactory::Register(MetadataLoader<T>* deserializer)
-    {
-        Remove<T>();
-
-        std::type_index type = typeid(T);
-        m_loaders[type] = deserializer;
-    }
-    
-    template<typename T>
+    template<typename R>
     inline bool ResourceLoaderFactory::Remove()
     {
-        std::type_index type = typeid(T);
-        auto iterator = m_loaders.find(type);
-        if (iterator != m_loaders.end())
-        {
-            delete iterator->second;
-            m_loaders.erase(iterator);
-
-            return true;
-        }
-
-        return false;
+        return m_loaders.erase(typeid(R)) != 0;
     }
     
-    template<typename T>
-    inline ResourceLoader<T>* ResourceLoaderFactory::GetLoader()
+    template<typename R>
+    inline ResourceLoader<R>* ResourceLoaderFactory::GetLoader()
     {
         EnsureDefaultDeserializersRegistered();
 
-        std::type_index type = typeid(T);
-        auto iterator = m_loaders.find(type);
+        auto iterator = m_loaders.find(typeid(R));
         if (iterator != m_loaders.end())
-            return dynamic_cast<ResourceLoader<T>*>(iterator->second);
-
-        return nullptr;
-    }
-
-    template<typename T>
-    inline MetadataLoader<T>* ResourceLoaderFactory::GetMetadataLoader()
-    {
-        EnsureDefaultDeserializersRegistered();
-
-        std::type_index type = typeid(T);
-        auto iterator = m_loaders.find(type);
-        if (iterator != m_loaders.end())
-            return dynamic_cast<MetadataLoader<T>*>(iterator->second);
+            return static_cast<ResourceLoader<R>*>(iterator->second());
 
         return nullptr;
     }

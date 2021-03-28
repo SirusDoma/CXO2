@@ -27,7 +27,7 @@ public:
         ChannelList
     };
 
-    ChannelBoard(Gx::Mixer *mixer);
+    ChannelBoard(Gx::Scene &scene);
     ~ChannelBoard();
 
     virtual const sf::FloatRect GetLocalBounds() const;
@@ -57,7 +57,7 @@ private:
     Gx::Repeater    *m_repeater;
     Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
 
-    Gx::Mixer         *m_mixer;
+    Gx::Scene         *m_scene;
     sf::SoundSource   *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
     sf::RenderTexture m_duplicateTexture;
 
@@ -68,6 +68,7 @@ private:
     bool m_animating;
     int m_selectedChannel;
     std::function<void(ChannelInfo)> m_callback;
+    std::vector<std::unique_ptr<ChannelButton>> m_channelButtons;
 };
 
 #endif

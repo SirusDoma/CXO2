@@ -1,22 +1,20 @@
-#ifndef RADIO_BUTTON_METADATA_LOADER_HPP
-#define RADIO_BUTTON_METADATA_LOADER_HPP
-
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
+#ifndef RADIO_BUTTON_LOADER_HPP
+#define RADIO_BUTTON_LOADER_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/UI/RadioButton.hpp>
 
-#include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 
-class RadioButtonLoader : public Gx::MetadataLoader<Gx::RadioButton>
+class RadioButtonLoader : public O2JamResourceLoader<Gx::RadioButton>
 {
 public :
     RadioButtonLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual Gx::RadioButton* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const;
+    virtual Gx::ResourcePtr<Gx::RadioButton> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 };
+
 
 #endif

@@ -1,6 +1,6 @@
 {
   "type": "Music",
-  "resources": {
+  "require": {
     "music": "BGM/bgRoom.ogg"
   },
   "attributes": {

@@ -1,17 +1,21 @@
+#include <Genode/IO/FileHelper.hpp>
+#include <Genode/SceneGraph/Node.hpp>
 #include "ResourceManager.hpp"
+
 
 namespace Gx
 {
-    template<typename T>
-    inline T* ResourceManager::AddArchive(const std::string& fileName)
+    template<typename A>
+    A* ResourceManager::LoadArchive(const std::string& fileName)
     {
-        static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
+        static_assert(std::is_base_of<Archive, A>::value, "Parameter must be a Gx::Archive");
 
         auto name = FileHelper::GetFileName(fileName);
-        if (auto archive = GetArchive<T>(name); archive != nullptr)
-            return archive;
+        auto it = m_archives.find(fileName);
+        if (it != m_archives.end())
+            return nullptr;
 
-        m_archives[name] = new T();
+        m_archives[name] = std::make_unique<A>();
         if (!m_archives[name]->Open(FileHelper::GetFullName(fileName)))
         {
             m_archives.erase(m_archives.find(name));
@@ -23,81 +27,149 @@ namespace Gx
         {
             auto entryName = prefix + entry.Name;
             m_entries[entryName] = entry;
-            m_entries[entryName].Parent = m_archives[name];
+            m_entries[entryName].Parent = m_archives[name].get();
         }
 
-        return static_cast<T*>(m_archives[name]);
+        return static_cast<A*>(m_archives[name].get());
     }
 
-    template<typename T>
-    inline T* ResourceManager::GetArchive(const std::string& filename) const
+    template<typename R>
+    ResourceContainer<R>* ResourceManager::Register()
     {
-        static_assert(std::is_base_of<Archive, T>::value, "Parameter must be a Gx::Archive");
+        auto container = GetContainer<R>();
+        if (container)
+            return container;
 
-        auto name     = FileHelper::GetFileName(filename);
-        auto iterator = m_archives.find(name);
-        if (iterator != m_archives.end())
-            return static_cast<T*>(iterator->second);
+        m_containers[typeid(R)] = std::make_unique<ResourceContainer<R>>();
+        return static_cast<ResourceContainer<R>*>(m_containers[typeid(R)].get());
+    }
+
+    template<typename R>
+    bool ResourceManager::Unregister()
+    {
+        return m_containers.erase(typeid(R)) != 0;
+    }
+
+    template<typename R>
+    ResourceContainer<R>* ResourceManager::GetContainer()
+    {
+        auto iterator = m_containers.find(typeid(R));
+        if (iterator != m_containers.end())
+            return static_cast<ResourceContainer<R>*>(iterator->second.get());
 
         return nullptr;
     }
 
-    template<typename T>
-    inline T* ResourceManager::GetResource(const std::string name)
+    template<typename R>
+    bool ResourceManager::Contains(const std::string &name)
     {
-        // Load resources either from cache or file system (archive / physical file)
-        if (!m_cache->Contains(name))
-        {
-            Uint8* data;
-            Uint64 size = GetResourceData(name, &data);
+        auto iterator = m_entries.find(name);
+        if (iterator != m_entries.end())
+            return true;
 
-            return m_cache->Add<T>(name, data, size, false);
-        }
+        auto container = GetContainer<R>();
+        if (!container)
+            return false;
 
-        return m_cache->Get<T>(name);
+        return container->Contains(name);
     }
 
-    template<typename T>
-    inline ResourceMetadata* ResourceManager::GetMetadata(const std::string& name, bool cache)
+    template<typename R>
+    ResourcePtr<R> ResourceManager::Resolve(const std::string &source)
     {
-        // Load metadata and create context for resource dependencies
-        if (!m_cache->Contains(name))
-        {
-            Uint8* data;
-            Uint64 size = GetResourceData(name, &data);
-
-            // Find capable loader
-            auto loader = ResourceLoaderFactory::GetMetadataLoader<T>();
-            if (!loader)
-                return nullptr;
-
-            // Load it with loader
-            return m_cache->Add<ResourceMetadata>(name, *loader->Load(data, size), cache);
-        }
-        else
-            return m_cache->Get<ResourceMetadata>(name);
-    }
-    
-    template<typename T>
-    inline T* ResourceManager::Create(const std::string& name, bool cache)
-    {
-        // Definition of target resource
-        auto metadata = GetMetadata<T>(name, cache);
-        if (!metadata)
-            return nullptr;
-
-        return Create<T>(metadata);
-    }
-
-    template<typename T>
-    T *ResourceManager::Create(ResourceMetadata *metadata)
-    {
-        // Find capable loader
-        auto loader = ResourceLoaderFactory::GetMetadataLoader<T>();
+        auto loader = ResourceLoaderFactory::GetLoader<R>();
         if (!loader)
             return nullptr;
 
-        // Create object from loader
-        return loader->Create(metadata, GetResourceContext(metadata));
+        auto metaContainer = GetContainer<ResourceMetadata>();
+        if (loader->IsMetadataRequired() && metaContainer)
+        {
+            if (auto metadata = metaContainer->Find(source))
+                return loader->Load(*metadata, ResolveContext(*metadata));
+        }
+
+        Uint8 *data;
+        if (auto size = GetResourceData(source, &data))
+        {
+            ResourcePtr<R> resource;
+            if (loader->IsMetadataRequired())
+            {
+                auto metadata = loader->LoadMetadata(data, size);
+                if (!metadata)
+                    return nullptr;
+
+                if (metaContainer)
+                {
+                    auto cachedMeta = metaContainer->Add(source, std::move(metadata));
+                    resource = loader->Load(*cachedMeta, ResolveContext(*cachedMeta));
+                }
+                else
+                    resource = loader->Load(*metadata, ResolveContext(*metadata));
+
+                // metadata can be deleted immediately
+                delete[] data;
+                data = nullptr;
+
+                return resource;
+            }
+            else
+            {
+                resource = loader->Load(data, size);
+                if (!loader->IsResourceStream())
+                {
+                    delete[] data;
+                    data = nullptr;
+                }
+
+                std::function<void(R *)> deleter = [data, loader](auto ptr) {
+                    delete ptr;
+                    if (loader->IsResourceStream())
+                        delete[] data;
+                };
+
+                return ResourcePtr<R>{resource.release(), deleter};
+            }
+        }
+
+        return nullptr;
+    }
+
+    template<typename R>
+    ResourceMetadata *ResourceManager::LoadMetadata(const std::string &source)
+    {
+        auto container = GetContainer<ResourceMetadata>();
+        if (!container)
+            return nullptr;
+
+        if (auto metadata = container->Find(source))
+            return dynamic_cast<ResourceMetadata*>(metadata);
+
+        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        if (!loader || !loader->IsMetadataRequired())
+            return nullptr;
+
+        Uint8 *data;
+        if (auto size = GetResourceData(source, &data))
+        {
+            auto metadata = loader->LoadMetadata(data, size);
+
+            delete[] data;
+            data = nullptr;
+
+            return dynamic_cast<ResourceMetadata*>(container->Add(source, std::move(metadata)));
+        }
+
+        return nullptr;
+    }
+
+    template<typename R>
+    R* ResourceManager::Load(const std::string &source)
+    {
+        auto container = GetContainer<R>();
+        if (!container)
+            return nullptr;
+
+        auto resolver = [this, source] { return Resolve<R>(source); };
+        return container->Add(source, resolver, true);
     }
 }

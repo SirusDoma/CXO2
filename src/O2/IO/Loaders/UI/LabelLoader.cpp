@@ -1,54 +1,58 @@
 #include <O2/IO/Loaders/UI/LabelLoader.hpp>
 
+#include <O2/IO/Metadata/UI/LabelMetadata.hpp>
+#include <O2/IO/Loaders/TransformLoader.hpp>
+
 LabelLoader::LabelLoader()
 {
 }
 
-Gx::ResourceMetadata* LabelLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> LabelLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     LabelMetadata metadata;
-    Parse(json, &metadata);
 
-    return new LabelMetadata(metadata);
-}
-
-void LabelLoader::Parse(Json json, LabelMetadata *metadata)
-{
-    if (json.empty())
-        return;
-
-    json.at("type").get_to(metadata->Type);
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        metadata->ResourceReferences[resource.key()] = resource.value();
+    metadata.SetType(json.at("type").get<std::string>());
 
     auto attributes = json.at("attributes");
-    attributes.at("fontSize").get_to(metadata->FontSize);
-    TransformLoader::Parse(attributes["transform"], metadata);
+    ParseReferences(json["require"], metadata);
+    ParseLabel(attributes, metadata);
 
-    auto string = attributes.find("string");
-    if (string != attributes.end())
-        string->get_to(metadata->String);
+    return std::make_unique<LabelMetadata>(metadata);
 }
 
-Gx::Label* LabelLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ResourcePtr<Gx::Label> LabelLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<LabelMetadata*>(metadata);
+    auto spec = dynamic_cast<const LabelMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto label = new Gx::Label();
+    auto label = std::make_unique<Gx::Label>();
     if (context.Font)
         label->SetFont(*context.Font);
 
-    label->SetCharacterSize(spec->FontSize);
-    label->SetString(spec->String);
+    label->SetCharacterSize(spec->GetFontSize());
+    label->SetString(spec->GetString());
 
-    label->SetOrigin(spec->Origin);
-    label->SetPosition(spec->Position);
-    label->SetScale(spec->Scale);
-    label->SetRotation(spec->Rotation);
+    label->SetOrigin(spec->GetOrigin());
+    label->SetPosition(spec->GetPosition());
+    label->SetScale(spec->GetScale());
+    label->SetRotation(spec->GetRotation());
 
     return label;
+}
+
+void LabelLoader::ParseLabel(Json attributes, LabelMetadata &metadata)
+{
+    TransformLoader::ParseTransform(attributes["transform"], metadata);
+
+    auto fontSize = attributes.find("fontSize");
+    if (fontSize != attributes.end())
+        metadata.SetFontSize(fontSize->get<unsigned int>());
+    else
+        metadata.SetFontSize(30);
+
+    auto string = attributes.find("string");
+    if (string != attributes.end())
+        metadata.SetString(string->get<std::string>());
 }

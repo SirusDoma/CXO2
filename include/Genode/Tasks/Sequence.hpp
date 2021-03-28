@@ -24,7 +24,7 @@ namespace Gx
         Sequence* Remove(Task* task);
 
         template<typename T>
-        static Sequence* Routine(T* task, unsigned int count, double delay = 0);
+        static Sequence* Routine(T* task, unsigned int count, sf::Time delay = sf::Time::Zero);
 
         virtual void Reset();
 

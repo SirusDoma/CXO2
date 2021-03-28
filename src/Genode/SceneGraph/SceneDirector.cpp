@@ -3,15 +3,29 @@
 
 namespace Gx
 {
-    SceneDirector::SceneDirector(Scene* scene, sf::RenderTarget *target) :
-        m_scene(),
-        m_target(target)
+    SceneDirector::SceneDirector(Application &app, Scene *scene, const sf::RenderTarget &target) :
+        m_application(&app),
+        m_scene(scene),
+        m_target(&target),
+        m_resources(),
+        m_mixer()
     {
-        SetScene(scene);
     }
 
     SceneDirector::~SceneDirector()
     {
+    }
+
+    void SceneDirector::Initialize()
+    {
+        if (m_scene)
+        {
+            m_scene->SetDirector(*this);
+            if (m_target)
+                m_scene->SetView(m_target->getView());
+
+            m_scene->Initialize();
+        }
     }
 
     Scene* SceneDirector::GetScene() const
@@ -25,14 +39,32 @@ namespace Gx
             m_scene->Close();
 
         m_scene = std::unique_ptr<Scene>(scene);
-        if (scene)
-        {
-            m_scene->SetDirector(this);
-            if (m_target)
-                m_scene->SetView(m_target->getView());
+        Initialize();
+    }
 
-            m_scene->Initialize();
-        }
+    Application &SceneDirector::GetApplication() const
+    {
+        return *m_application;
+    }
+
+    ResourceManager &SceneDirector::GetSharedResources() const
+    {
+        return *m_resources;
+    }
+
+    Mixer &SceneDirector::GetMixer() const
+    {
+        return *m_mixer;
+    }
+
+    void SceneDirector::SetMixer(Mixer &mixer)
+    {
+        m_mixer = &mixer;
+    }
+
+    void SceneDirector::SetSharedResources(ResourceManager &resources)
+    {
+        m_resources = &resources;
     }
 
     sf::RenderStates SceneDirector::Render(sf::RenderTarget& target, sf::RenderStates states) const
@@ -52,7 +84,7 @@ namespace Gx
     bool SceneDirector::Input(sf::Event ev)
     {
         if (m_scene)
-            m_scene->Input(ev);
+            return m_scene->Input(ev);
 
         return false;
     }

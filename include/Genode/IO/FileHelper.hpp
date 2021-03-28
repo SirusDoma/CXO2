@@ -18,7 +18,7 @@ namespace Gx
         static std::string GetFullName(const std::string& fileName, bool extension = true);
 
         static bool Exists(const std::string& fileName, bool asAsset = false);
-        static Int64 GetFile(const std::string& fileName, Uint8** data);
+        static Int64 ReadFile(const std::string& fileName, Uint8** data);
         static void WriteFile(const std::string& fileName, Uint8* data, Int64 size);
 
     private:

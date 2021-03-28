@@ -1,6 +1,6 @@
 {
   "type": "IMAGE",
-  "resources": {
+  "require": {
     "texture": "State/Planet/Btn_Channel.png"
   },
   "attributes": {

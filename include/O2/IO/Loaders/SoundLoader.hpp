@@ -1,23 +1,16 @@
-#ifndef SOUND_METADATA_LOADER_HPP
-#define SOUND_METADATA_LOADER_HPP
+#ifndef SOUND_LOADER_HPP
+#define SOUND_LOADER_HPP
 
 #include <SFML/Audio/Sound.hpp>
+#include <O2/IO/Loaders/O2JamResourceLoader.hpp>
 
-#include <Genode/IO/Json.hpp>
-#include <Genode/IO/MetadataLoader.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
-
-#include <O2/IO/Metadata/SoundMetadata.hpp>
-
-class SoundLoader : public Gx::MetadataLoader<sf::Sound>
+class SoundLoader : public O2JamResourceLoader<sf::Sound>
 {
 public :
     SoundLoader();
 
-    virtual Gx::ResourceMetadata* Load(Gx::Uint8* data, Gx::Uint64 size) const;
-    virtual sf::Sound* Create(Gx::ResourceMetadata* definition, Gx::ResourceContext context) const;
+    virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void* data, std::size_t size) const;
+    virtual Gx::ResourcePtr<sf::Sound> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 };
 
 #endif

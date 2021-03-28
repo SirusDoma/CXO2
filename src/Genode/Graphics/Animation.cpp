@@ -23,6 +23,10 @@ namespace Gx
 
     Animation::~Animation()
     {
+        if (m_sprite)
+            delete m_sprite;
+
+        m_sprite = nullptr;
     }
 
     void Animation::AddFrame(const sf::IntRect &frame)

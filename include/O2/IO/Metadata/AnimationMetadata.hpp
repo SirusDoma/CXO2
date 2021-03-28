@@ -1,25 +1,29 @@
 #ifndef ANIMATION_METADATA_HPP
 #define ANIMATION_METADATA_HPP
 
-#include <SFML/Graphics.hpp>
-
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/Json.hpp>
-
 #include <O2/IO/Metadata/SpriteMetadata.hpp>
-
 #include <vector>
 
-struct AnimationMetadata : public SpriteMetadata
+class AnimationMetadata : public SpriteMetadata
 {
 public:
-    AnimationMetadata() {}
+    AnimationMetadata() : m_frames() {}
     virtual ~AnimationMetadata() {}
 
-    bool     IsLoop;
-    sf::Time Duration;
+    bool isLoop() const { return m_isLoop; }
+    void SetLoop(bool isLoop) { m_isLoop = isLoop; }
 
-    std::vector<sf::IntRect> Frames;
+    const sf::Time &GetDuration() const { return m_duration; }
+    void SetDuration(const sf::Time &duration) { m_duration = duration; }
+
+    const std::vector<sf::IntRect> &GetFrames() const { return m_frames; }
+    void AddFrame(const sf::IntRect &frame) { m_frames.push_back(frame); }
+
+private:
+    bool     m_isLoop;
+    sf::Time m_duration;
+
+    std::vector<sf::IntRect> m_frames;
 };
 
 #endif

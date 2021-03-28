@@ -1,6 +1,6 @@
 {
   "type": "NUMBER",
-  "resources": {
+  "require": {
     "texture": "State/Planet/ChannelNumber.png"
   },
   "attributes": {

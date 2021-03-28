@@ -1,6 +1,6 @@
 {
   "type": "SPRITE",
-  "resources": {
+  "require": {
     "texture": "State/Avi/Background.png"
   },
   "attributes": {

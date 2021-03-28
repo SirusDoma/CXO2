@@ -44,7 +44,7 @@ namespace Gx
             Node* m_parent;
             std::string m_name;
             std::string m_tag;
-            std::vector<std::shared_ptr<Node>> m_children;
+            std::vector<Node*> m_children;
     };
 }
 

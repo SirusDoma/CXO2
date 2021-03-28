@@ -1,6 +1,6 @@
 {
   "type": "BUTTON",
-  "resources": {
+  "require": {
     "texture": "State/Room/Btn_CreateRoom.png"
   },
   "attributes": {

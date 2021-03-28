@@ -1,6 +1,6 @@
 {
   "type": "RADIO_BUTTON",
-  "resources": {
+  "require": {
     "texture": "State/Planet/Btn_Philix.png"
   },
   "attributes": {

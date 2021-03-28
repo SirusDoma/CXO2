@@ -3,16 +3,17 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
 
-ChannelButton::ChannelButton(const Gx::RadioButton &copy) :
-    Gx::RadioButton(copy)
+ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
+    Gx::RadioButton(copy),
+    m_scene(&scene)
 {
-    m_channelName    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
-    m_channelNumber  = Gx::ResourceManager::Instance()->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
+    m_channelName    = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
+    m_channelNumber  = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
     m_channelNumber->SetDigitCount(2);
-    m_channelCounter = Gx::ResourceManager::Instance()->Create<Gx::ProgressBar>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
-    m_channelFull    = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
+    m_channelCounter = m_scene->Create<Gx::ProgressBar>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
+    m_channelFull    = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
     m_channelFull->SetVisible(false);
-    m_selector       = Gx::ResourceManager::Instance()->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
+    m_selector       = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
     m_selector->SetVisible(false);
 
     AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_selector);
@@ -62,34 +63,36 @@ void ChannelButton::SetPlanet(Planet planet)
 
     Gx::ResourceMetadata *metadata = nullptr;
     m_planet = planet;
+
+    // TODO: Load all and put inside a map
     switch (m_planet)
     {
         case Planet::Kaliope:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
             m_channelName->SetFrame("Kaliope");
             break;
         case Planet::Kleo:
             m_channelName->SetFrame("Kleo");
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
             break;
         case Planet::Philix:
             m_channelName->SetFrame("Philix");
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
             break;
         case Planet::Melpomin:
             m_channelName->SetFrame("Melpomin");
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
         case Planet::Thalo:
             m_channelName->SetFrame("Thalo");
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
         case Planet::Euta:
             m_channelName->SetFrame("Euta");
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
         default:
-            metadata = Gx::ResourceManager::Instance()->GetMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
+            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
             break;
     }
 
@@ -99,8 +102,8 @@ void ChannelButton::SetPlanet(Planet planet)
     auto radioData = dynamic_cast<RadioButtonMetadata*>(metadata);
     if (radioData)
     {
-        for (auto[state, sprite] : radioData->States)
-            SetStateFrame(state, sprite.TexCoords);
+        for (auto[state, sprite] : radioData->GetStates())
+            SetStateFrame(state, sprite.GetTexCoords());
     }
 }
 

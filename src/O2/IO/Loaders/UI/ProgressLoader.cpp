@@ -1,64 +1,61 @@
 #include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
+#include <O2/IO/Metadata/UI/ProgressBarMetadata.hpp>
 
 ProgressBarLoader::ProgressBarLoader()
 {
 }
 
-Gx::ResourceMetadata* ProgressBarLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> ProgressBarLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     ProgressBarMetadata metadata;
 
-    json.at("type").get_to(metadata.Type);
-
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        metadata.ResourceReferences[resource.key()] = resource.value();
-
     auto attributes = json.at("attributes");
-    SpriteLoader::Parse(attributes, &metadata);
+    metadata.SetType(json.at("type").get<std::string>());
+
+    ProgressBarLoader::ParseReferences(json["require"], metadata);
+    SpriteLoader::ParseSprite(attributes, metadata);
 
     auto orientation = attributes.find("orientation");
     if (orientation != attributes.end())
     {
-        std::string result;
-        orientation->get_to(result);
-        if (result == "vertical")
-            metadata.Orientation = Gx::ProgressBar::Vertical;
+        if (orientation->get<std::string>() == "vertical")
+            metadata.SetOrientation(Gx::ProgressBar::Vertical);
         else
-            metadata.Orientation = Gx::ProgressBar::Horizontal;
+            metadata.SetOrientation(Gx::ProgressBar::Horizontal);
     }
 
     auto maximum = attributes.find("maximum");
     if (maximum != attributes.end())
-        maximum->get_to(metadata.Maxiumum);
+        metadata.SetMaximum(maximum->get<float>());
     else
-        metadata.Maxiumum = 100.0f;
+        metadata.SetMaximum(100.0f);
 
-    return new ProgressBarMetadata(metadata);
+    return std::make_unique<ProgressBarMetadata>(metadata);
 }
 
-Gx::ProgressBar* ProgressBarLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
+Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto spec = dynamic_cast<ProgressBarMetadata*>(metadata);
+    auto spec = dynamic_cast<const ProgressBarMetadata*>(&metadata);
     if (!spec)
         return nullptr;
 
-    auto progressBar = new Gx::ProgressBar();
+    auto progressBar = std::make_unique<Gx::ProgressBar>();
     if (context.Texture)
         progressBar->SetTexture(*context.Texture);
 
-    progressBar->SetTexCoords(spec->TexCoords);
-    progressBar->SetOrientation(spec->Orientation);
-    progressBar->SetMaximumValue(spec->Maxiumum);
-    progressBar->SetColor(spec->Color);
+    progressBar->SetTexCoords(spec->GetTexCoords());
+    progressBar->SetOrientation(spec->GetOrientation());
+    progressBar->SetMaximumValue(spec->GetMaximum());
+    progressBar->SetColor(spec->GetColor());
 
-    progressBar->SetOrigin(spec->Origin);
-    progressBar->SetPosition(spec->Position);
-    progressBar->SetScale(spec->Scale);
-    progressBar->SetRotation(spec->Rotation);
+    progressBar->SetOrigin(spec->GetOrigin());
+    progressBar->SetPosition(spec->GetPosition());
+    progressBar->SetScale(spec->GetScale());
+    progressBar->SetRotation(spec->GetRotation());
 
     return progressBar;
 }
+

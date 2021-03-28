@@ -1,34 +1,52 @@
 #include <O2/IO/Loaders/SpriteLoader.hpp>
+
 #include <O2/IO/Loaders/TransformLoader.hpp>
+#include <O2/IO/Metadata/SpriteMetadata.hpp>
 
 SpriteLoader::SpriteLoader()
 {
 }
 
-Gx::ResourceMetadata* SpriteLoader::Load(Gx::Uint8* data, Gx::Uint64 size) const
+std::unique_ptr<Gx::ResourceMetadata> SpriteLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<char*>(data), size));
+    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     SpriteMetadata metadata;
 
-    json.at("type").get_to(metadata.Type);
+    metadata.SetType(json.at("type").get<std::string>());
+    ParseReferences(json["require"], metadata);
+    ParseSprite(json["attributes"], metadata);
 
-    auto resources = json.at("resources");
-    for (auto resource : resources.items())
-        metadata.ResourceReferences[resource.key()] = resource.value();
-
-    auto attributes = json.at("attributes");
-    SpriteLoader::Parse(attributes, &metadata);
-
-    return new SpriteMetadata(metadata);
+    return std::make_unique<SpriteMetadata>(metadata);
 }
 
-void SpriteLoader::Parse(Json attributes, SpriteMetadata *metadata)
+Gx::ResourcePtr<Gx::Sprite> SpriteLoader::Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context) const
+{
+    auto spec = dynamic_cast<const SpriteMetadata*>(&metadata);
+    if (!spec)
+        return nullptr;
+
+    auto sprite = std::make_unique<Gx::Sprite>();
+    sprite->SetName(context.Name);
+    sprite->SetTexCoords(spec->GetTexCoords());
+    sprite->SetColor(spec->GetColor());
+
+    if (context.Texture)
+        sprite->SetTexture(*context.Texture);
+
+    sprite->SetOrigin(spec->GetOrigin());
+    sprite->SetPosition(spec->GetPosition());
+    sprite->SetScale(spec->GetScale());
+    sprite->SetRotation(spec->GetRotation());
+
+    return sprite;
+}
+
+void SpriteLoader::ParseSprite(Json attributes, SpriteMetadata &metadata)
 {
     if (attributes.empty())
         return;
 
-    TransformLoader::Parse(attributes["transform"], metadata);
-
+    TransformLoader::ParseTransform(attributes["transform"], metadata);
     auto color = attributes.find("color");
     if (color != attributes.end())
     {
@@ -37,10 +55,10 @@ void SpriteLoader::Parse(Json attributes, SpriteMetadata *metadata)
         color->at("r").get_to(r);
         color->at("g").get_to(g);
         color->at("b").get_to(b);
-        metadata->Color = sf::Color(r, g, b, a);
+        metadata.SetColor(sf::Color(r, g, b, a));
     }
     else
-        metadata->Color = sf::Color::White;
+        metadata.SetColor(sf::Color::White);
 
     auto texCoords  = attributes.find("texCoords");
     if (texCoords != attributes.end())
@@ -50,28 +68,6 @@ void SpriteLoader::Parse(Json attributes, SpriteMetadata *metadata)
         texCoords->at("y").get_to(y);
         texCoords->at("width").get_to(w);
         texCoords->at("height").get_to(h);
-        metadata->TexCoords = sf::IntRect(x, y, w, h);
+        metadata.SetTexCoords(sf::IntRect(x, y, w, h));
     }
-}
-
-Gx::Sprite* SpriteLoader::Create(Gx::ResourceMetadata* metadata, Gx::ResourceContext context) const
-{
-    auto spec = dynamic_cast<SpriteMetadata*>(metadata);
-    if (!spec)
-        return nullptr;
-
-    auto sprite = new Gx::Sprite();
-    sprite->SetName(context.Name);
-    sprite->SetTexCoords(spec->TexCoords);
-    sprite->SetColor(spec->Color);
-
-    if (context.Texture)
-        sprite->SetTexture(*context.Texture);
-
-    sprite->SetOrigin(spec->Origin);
-    sprite->SetPosition(spec->Position);
-    sprite->SetScale(spec->Scale);
-    sprite->SetRotation(spec->Rotation);
-
-    return sprite;
 }

@@ -9,6 +9,9 @@ class StateAvi : public Gx::Scene
 public:
     virtual void Initialize();
     virtual bool Close(bool quit = false);
+
+private:
+    Gx::ResourcePtr<sf::Music> m_bgm;
 };
 
 #endif

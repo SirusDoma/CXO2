@@ -4,26 +4,23 @@
 
 namespace Gx
 {
-    Application* Application::instance;
-
-    Application::Application(Scene* scene, sf::VideoMode mode, bool fullScreen)
-        : Application::Application(scene, mode, mode, fullScreen)
+    Application::Application(sf::VideoMode mode, bool fullScreen)
+        : Application::Application(mode, mode, fullScreen)
     {
     }
 
-    Application::Application(Scene* scene, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
+    Application::Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
         m_window(mode, Application::TITLE, fullScreen ? sf::Style::Fullscreen : sf::Style::Titlebar | sf::Style::Close),
         m_timer(),
         m_renderFreq(0),
         m_frames(0),
         m_cursor(),
-        m_cursorFrame(0)
+        m_resources(),
+        m_mixer()
     {
         m_mode        = mode;
         m_virtualMode = virtualMode;
         m_fullScreen  = fullScreen;
-
-        m_director    = new SceneDirector(scene, &m_window);
     }
 
     Application::~Application()
@@ -31,16 +28,14 @@ namespace Gx
         delete m_director;
     }
 
-    Application* Application::Instance()
+    int Application::Start(Scene *scene)
     {
-        return Application::instance;
-    }
+        // Construct resources
+        m_director = new SceneDirector(*this, scene, m_window);
 
-    int Application::Start()
-    {
         // Set render frequency
-        //m_window.setVerticalSyncEnabled(true);
-        //m_window.setFramerateLimit(60);
+        m_window.setVerticalSyncEnabled(true);
+        m_window.setFramerateLimit(60);
 
         // Setup view
         auto view = m_window.getDefaultView();
@@ -48,11 +43,18 @@ namespace Gx
         view.setCenter(m_virtualMode.width / 2.0f, m_virtualMode.height / 2.0f);
         m_window.setView(view);
 
-        // Singleton instancing
-        Application::instance = this;
-
         // Trigger callback
         OnStart();
+
+        // Fallback mixer and resources
+        if (!m_director->m_resources)
+            ShareResources(m_resources);
+
+        if (!m_director->m_mixer)
+            UseMixer(m_mixer);
+
+        // Initialize scene
+        m_director->Initialize();
 
         // Setup timer
         m_timer = sf::Clock();
@@ -104,7 +106,7 @@ namespace Gx
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
-                //m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
+                m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta = 0.0f;
             }
@@ -120,6 +122,28 @@ namespace Gx
         return 0;
     }
 
+    sf::RenderWindow &Application::GetRenderWindow() const
+    {
+        return m_window;
+    }
+
+    void Application::ShareResources(ResourceManager &resources)
+    {
+        if (m_director)
+            m_director->SetSharedResources(resources);
+    }
+
+
+    void Application::UseMixer(Mixer &mixer)
+    {
+        if (m_director)
+            m_director->SetMixer(mixer);
+    }
+
+    void Application::OnStart()
+    {
+        ShareResources(m_resources);
+    }
 
     void Application::Close()
     {
@@ -135,10 +159,6 @@ namespace Gx
     {
         m_cursor = cursor;
         m_window.setMouseCursor(*m_cursor.GetHandle());
-    }
-
-    void Application::OnStart()
-    {
     }
 
     void Application::OnClose()

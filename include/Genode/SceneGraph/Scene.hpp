@@ -6,11 +6,12 @@
 #include <SFML/Window/Event.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
+#include <Genode/Entities.hpp>
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
-#include <Genode/Entities.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks/TaskContainer.hpp>
 
 #include <queue>
@@ -25,10 +26,25 @@ namespace Gx
 
         Scene();
         Scene(const std::string& name);
+        Scene(ResourceManager& resources);
+        Scene(const std::string& name, ResourceManager& resources);
+
         virtual ~Scene();
 
-        SceneDirector* GetDirector() const;
+        SceneDirector &GetDirector() const;
         sf::View GetView() const;
+
+        template<typename R>
+        R* Create(const std::string &source, ResourceScope scope = ResourceScope::Local);
+
+        template<typename R>
+        R& RegisterLocalResource();
+
+        bool Destroy(Node* node);
+        bool Destroy(sf::SoundSource *source);
+
+        ResourceManager &GetLocalResources() const;
+        virtual ResourceManager &GetSharedResources() const;
 
         void PushOverlay(Node *overlay);
         void CloseOverlay();
@@ -36,6 +52,9 @@ namespace Gx
         void QueueEvent(std::function<void()> evt);
 
     protected:
+        using EntityContainer      = std::vector<ResourcePtr<Node>>;
+        using SoundSourceContainer = std::vector<ResourcePtr<sf::SoundSource>>;
+
         virtual void Initialize();
         virtual bool Close(bool quit = false);
 
@@ -46,14 +65,26 @@ namespace Gx
         virtual void ProcessEvents();
 
     private:
+        template<typename R>
+        R* CreateNode(const std::string &source, ResourceScope scope = ResourceScope::Local);
+
+        template<typename R>
+        R* CreateSoundSource(const std::string &source, ResourceScope scope = ResourceScope::Local);
+
         mutable sf::View m_view;
-        SceneDirector *m_director;
+        std::unique_ptr<ResourceManager> m_resources;
+
+        EntityContainer      m_entities;
+        SoundSourceContainer m_sources;
+
+        SceneDirector     *m_director;
         std::vector<Node*> m_overlays;
         std::queue<std::function<void()>> m_events;
 
-        void SetDirector(SceneDirector* director);
+        void SetDirector(SceneDirector& director);
         void SetView(const sf::View &view);
     };
 }
 
+#include <Genode/SceneGraph/Scene.inl>
 #endif

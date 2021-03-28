@@ -11,7 +11,12 @@ namespace Gx
         class FontLoader : public Gx::ResourceLoader<sf::Font>
         {
         public:
-            virtual sf::Font Load(Uint8* data, Uint64 size) const;
+            virtual bool IsMetadataRequired() const;
+            virtual bool IsResourceStream() const;
+
+            virtual std::unique_ptr<ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+            virtual ResourcePtr<sf::Font> Load(const ResourceMetadata &metadata, const ResourceContext& context = ResourceContext()) const;
+            virtual ResourcePtr<sf::Font> Load(const void* data, std::size_t size) const;
         };
     }
 }

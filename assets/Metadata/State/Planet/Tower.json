@@ -1,6 +1,6 @@
 {
   "type": "ANIMATION",
-  "resources": {
+  "require": {
     "texture": "State/Planet/Tower.png"
   },
   "attributes": {

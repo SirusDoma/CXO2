@@ -11,7 +11,11 @@ namespace Gx
         class SoundBufferLoader : public Gx::ResourceLoader<sf::SoundBuffer>
         {
         public:
-            virtual sf::SoundBuffer Load(Uint8* data, Uint64 size) const;
+            bool IsMetadataRequired() const;
+
+            virtual std::unique_ptr<ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
+            virtual ResourcePtr<sf::SoundBuffer> Load(const ResourceMetadata &metadata, const ResourceContext& context = ResourceContext()) const;
+            virtual ResourcePtr<sf::SoundBuffer> Load(const void *data, std::size_t size) const;
         };
     }
 }

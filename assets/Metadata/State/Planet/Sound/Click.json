@@ -1,6 +1,6 @@
 {
   "type": "SOUND",
-  "resources": {
+  "require": {
     "sound": "Planet/click1"
   }
 }

@@ -1,55 +1,65 @@
 #include <Genode/Audio/Mixer.hpp>
+#include <Genode/Audio/SoundGroup.hpp>
 
 namespace Gx
 {
     Mixer::Mixer() :
-        m_sources()
+        m_groups()
     {
     }
 
     Mixer::~Mixer()
     {
-        for (auto [_, sources] : m_sources)
-        {
-            for (auto source : sources)
-                source->stop();
-
-            sources.clear();
-        }
+        m_groups.clear();
     }
 
-    sf::SoundSource* Mixer::Register(sf::SoundSource *source, const std::string &group)
-    {
-        auto it = std::find_if(m_sources[group].begin(), m_sources[group].end(), [source] (auto sound) { return source == sound.get(); });
-        if (it != m_sources[group].end())
-            source = it->get();
-        else
-            m_sources[group].push_back(std::shared_ptr<sf::SoundSource>(source));
-
-        return source;
-    }
-
-    void Mixer::Play(sf::SoundSource *source, const std::string &group)
+    sf::SoundSource* Mixer::Play(sf::SoundSource *source, const std::string &groupName)
     {
         if (source)
         {
-            source = Register(source, group);
-            source->play();
+            auto iterator = m_groups.find(groupName);
+            if (iterator == m_groups.end())
+            {
+                m_groups[groupName] = std::make_unique<SoundGroup>(groupName);
+                return m_groups[groupName]->Play(source);
+            }
+            else
+                return iterator->second->Play(source);
         }
+
+        return nullptr;
+    }
+
+    void Mixer::Pause(const std::string &group)
+    {
+        if (m_groups.find(group) != m_groups.end())
+            m_groups[group]->Pause();
     }
 
     void Mixer::Stop(const std::string &group)
     {
-        for (auto source : m_sources[group])
-            source->stop();
+        auto iterator = m_groups.find(group);
+        if (iterator != m_groups.end())
+        {
+            m_groups[group]->Stop();
+            m_groups.erase(iterator);
+        }
     }
 
     void Mixer::StopAll()
     {
-        for (auto [_, sources] : m_sources)
-        {
-            for (auto source : sources)
-                source->stop();
-        }
+        for (auto& [_, group] : m_groups)
+            group->Stop();
+
+        m_groups.clear();
+    }
+
+    SoundGroup *Mixer::GetGroup(const std::string &group)
+    {
+        auto iterator = m_groups.find(group);
+        if (iterator != m_groups.end())
+            return iterator->second.get();
+
+        return nullptr;
     }
 }

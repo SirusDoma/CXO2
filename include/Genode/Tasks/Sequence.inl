@@ -1,7 +1,7 @@
 namespace Gx
 {
     template<typename T>
-    Sequence* Sequence::Routine(T* task, unsigned int count, double delay)
+    Sequence* Sequence::Routine(T* task, unsigned int count, sf::Time delay)
     {
         static_assert(std::is_base_of<Task, T>::value, "Parameter must be a Gx::Task");
 

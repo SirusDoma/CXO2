@@ -47,11 +47,7 @@ namespace Gx
 
     std::vector<Node*> Node::GetChildren() const
     {
-        std::vector<Node*> children = std::vector<Node*>(m_children.size());
-        for (auto& child : m_children)
-            children.push_back(child.get());
-
-        return children;
+        return m_children;
     }
 
     std::vector<Node*> Node::GetChildrenByTag(const std::string &tag) const
@@ -60,7 +56,7 @@ namespace Gx
         for (auto& node : m_children)
         {
             if (node->m_tag == tag)
-                nodes.push_back(node.get());
+                nodes.push_back(node);
         }
 
         return nodes;
@@ -71,7 +67,7 @@ namespace Gx
         for (auto& node : m_children)
         {
             if (node->m_name == name)
-                return node.get();
+                return node;
         }
 
         return nullptr;
@@ -82,7 +78,7 @@ namespace Gx
         for (auto& node : m_children)
         {
             if (node->m_tag == tag)
-                return node.get();
+                return node;
         }
 
         return nullptr;
@@ -90,10 +86,10 @@ namespace Gx
 
     void Node::AddChild(Node* child)
     {
-        if (child)
+        if (child && std::find(m_children.begin(), m_children.end(), child) == m_children.end())
         {
             child->m_parent = this;
-            m_children.push_back(std::shared_ptr<Node>(child));
+            m_children.push_back(child);
         }
     }
 
@@ -101,7 +97,7 @@ namespace Gx
     {
         if (child)
         {
-            auto iterator = std::find_if(m_children.begin(), m_children.end(), [child](auto node) { return child == node.get(); });
+            auto iterator = std::find(m_children.begin(), m_children.end(), child);
             if (iterator != m_children.end())
             {
                 child->m_parent = nullptr;

@@ -39,7 +39,7 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    const sf::Color & Number::GetColor() const
+    const sf::Color& Number::GetColor() const
     {
         return m_vertices[0].color;
     }
