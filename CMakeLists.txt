@@ -21,16 +21,16 @@ add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
 # Specific OS Directories and Flags
 if(WIN32)
-    # Windows (Visual Studio) Compiler Flags
-    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set(SFML_STATIC_LIBRARIES TRUE)
-
-    # Output Directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+    # Windows (Visual Studio) Compiler Flags
+    set(SFML_STATIC_LIBRARIES TRUE)
+    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG  ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
+    )
 
     # Set dependencies libs path
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
