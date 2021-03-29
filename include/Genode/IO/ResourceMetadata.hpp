@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <memory>
 
 namespace Gx
 {
