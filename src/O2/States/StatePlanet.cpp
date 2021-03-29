@@ -1,8 +1,6 @@
 #include <O2/States/StatePlanet.hpp>
 
 #include <Genode/System/Application.hpp>
-#include <Genode/IO/ResourceManager.hpp>
-
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
@@ -22,6 +20,8 @@ void StatePlanet::Initialize()
     auto exitButton = Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
     exitButton->SetClickCallback([=] (auto& sender, auto& ev) { GetDirector().GetApplication().Close(); });
     AddChild(exitButton);
+
+    m_dialogInfo = Create<Gx::Dialog>("Metadata/Dialog/Information.json");
 
     auto philix   = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
     auto kleo     = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kleo.json");
@@ -60,7 +60,7 @@ void StatePlanet::Initialize()
             if (!radio)
                 return;
 
-            if (radio->IsChecked() || m_channelBoard->InTransition())
+            if (radio->IsChecked() || IsConnecting())
             {
                 ev.Handled = true;
                 return;
@@ -91,6 +91,8 @@ void StatePlanet::Initialize()
 
 void StatePlanet::OnEnterPlanet(Planet planet)
 {
+    m_connecting = true;
+
     auto planetInfo = PlanetInfo();
     planetInfo.Planet = planet;
 
@@ -105,10 +107,25 @@ void StatePlanet::OnEnterPlanet(Planet planet)
         }
     }
 
+    m_connecting = false;
     m_channelBoard->UpdateChannelList(planetInfo);
 }
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)
 {
+    if (channel.Population >= 100)
+    {
+        if (m_dialogInfo)
+            m_dialogInfo->Show(this, "Channel is full");
+
+        return;
+    }
+
+    m_connecting = true;
     QueueEvent([=] { GetDirector().SetScene(new StateRoom()); } );
+}
+
+bool StatePlanet::IsConnecting()
+{
+    return m_channelBoard->InTransition() || m_connecting;
 }

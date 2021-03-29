@@ -18,12 +18,18 @@ public:
     virtual void Initialize();
 
 private:
+    bool IsConnecting();
+
     void OnEnterPlanet(Planet planet);
     void OnEnterChannel(ChannelInfo channel);
 
     std::unique_ptr<ChannelBoard>    m_channelBoard;
     std::unique_ptr<Gx::UiContainer> m_container;
-    sf::Music                        *m_bgm;
+
+    sf::Music  *m_bgm;
+    Gx::Dialog *m_dialogInfo;
+
+    bool m_connecting;
 };
 
 #endif
