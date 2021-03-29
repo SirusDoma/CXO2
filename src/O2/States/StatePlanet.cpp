@@ -20,7 +20,7 @@ void StatePlanet::Initialize()
     AddChild(tower);
 
     auto exitButton = Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
-    exitButton->SetClickCallback([=] (auto _) { GetDirector().GetApplication().Close(); });
+    exitButton->SetClickCallback([=] (auto& sender, auto& ev) { GetDirector().GetApplication().Close(); });
     AddChild(exitButton);
 
     auto philix   = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
@@ -30,7 +30,7 @@ void StatePlanet::Initialize()
     auto thalo    = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Thalo.json");
     auto melpomin = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Melpomin.json");
 
-    m_container = new Gx::UiContainer();
+    m_container = std::make_unique<Gx::UiContainer>();
     m_container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
     std::unordered_map<Planet, Gx::RadioButton*> planets = {
         {Planet::Melpomin, melpomin},
@@ -42,23 +42,40 @@ void StatePlanet::Initialize()
     };
 
     auto clickSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
+    auto hoverSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
     for (auto [planet, radio] : planets)
     {
-        radio->SetCheckStateChangeCallback([this, sfx = clickSfx, p = planet] (auto sender) {
-            if (!sender->IsChecked())
+        radio->SetGainFocusCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
+        {
+            auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
+            if (!radio || radio->IsChecked())
                 return;
 
+            Mixer::Play(sfx);
+        });
+
+        radio->SetClickCallback([this, sfx = clickSfx, planet = planet] (auto& sender, auto& ev)
+        {
+            auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
+            if (!radio)
+                return;
+
+            if (radio->IsChecked() || m_channelBoard->InTransition())
+            {
+                ev.Handled = true;
+                return;
+            }
+
             Mixer::Play(sfx, "sfx");
-            m_container->SetEnabled(false);
-            m_channelBoard->Show(p, [=] { OnEnterPlanet(p); });
+            m_channelBoard->Show(planet, [=] { OnEnterPlanet(planet); });
         });
     }
 
-    AddChild(m_container);
+    AddChild(m_container.get());
 
-    m_channelBoard = new ChannelBoard(*this);
+    m_channelBoard = std::make_unique<ChannelBoard>(*this);
     m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
-    AddChild(m_channelBoard);
+    AddChild(m_channelBoard.get());
 
     // Overlay fade in animation
     auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
@@ -89,7 +106,6 @@ void StatePlanet::OnEnterPlanet(Planet planet)
     }
 
     m_channelBoard->UpdateChannelList(planetInfo);
-    m_container->SetEnabled(true);
 }
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)

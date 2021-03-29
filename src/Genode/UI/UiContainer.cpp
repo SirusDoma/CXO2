@@ -50,27 +50,26 @@ namespace Gx
     bool UiContainer::Input(sf::Event ev)
     {
         bool input = Control::Input(ev);
-        if (m_activeRadio)
+        if (!m_activeRadio)
+            return input;
+
+        for (auto child : GetChildren())
         {
-            for (auto child : GetChildren())
-            {
-                if (child == m_activeRadio)
-                    continue;
+            if (child == m_activeRadio)
+                continue;
 
-                auto other = dynamic_cast<RadioButton *>(child);
-                if (!other || other == m_activeRadio)
-                    continue;
+            auto other = dynamic_cast<RadioButton *>(child);
+            if (!other || other == m_activeRadio)
+                continue;
 
-                other->SetCheckedState(false);
-            }
-
-            m_activeRadio->SetCheckedState(true);
-            if (m_radioCallback)
-                m_radioCallback(m_activeRadio);
-
-            m_activeRadio = nullptr;
+            other->SetCheckedState(false);
         }
 
+        m_activeRadio->SetCheckedState(true);
+        if (m_radioCallback)
+            m_radioCallback(m_activeRadio);
+
+        m_activeRadio = nullptr;
         return input;
     }
 

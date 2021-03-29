@@ -21,9 +21,9 @@ private:
     void OnEnterPlanet(Planet planet);
     void OnEnterChannel(ChannelInfo channel);
 
-    ChannelBoard    *m_channelBoard;
-    Gx::UiContainer *m_container;
-    sf::Music       *m_bgm;
+    std::unique_ptr<ChannelBoard>    m_channelBoard;
+    std::unique_ptr<Gx::UiContainer> m_container;
+    sf::Music                        *m_bgm;
 };
 
 #endif

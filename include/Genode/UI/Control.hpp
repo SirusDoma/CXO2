@@ -16,12 +16,22 @@ namespace Gx
     {
     public:
         enum State { Normal, Hover, Active };
+        struct Event
+        {
+            bool Handled;
+            const State State;
+        };
 
         virtual ~Control();
 
         virtual const sf::FloatRect GetLocalBounds() const = 0;
         const sf::FloatRect GetGlobalBounds() const;
-        void SetClickCallback(std::function<void(Control*)> callback);
+
+        bool IsFocused() const;
+
+        void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
+        void SetLostFocusCallback(std::function<void(Control&, Event&)> callback);
+        void SetClickCallback(std::function<void(Control&, Event&)> callback);
 
         void SetEnabled(bool enabled);
         bool IsEnabled() const;
@@ -65,9 +75,9 @@ namespace Gx
 
     private:
         State m_state;
-        bool  m_enabled, m_visible;
+        bool  m_enabled, m_visible, m_focused;
 
-        std::function<void(Control*)> m_onClick;
+        std::function<void(Control&, Event&)> m_onClick, m_onGainFocus, m_onLostFocus;
     };
 }
 

@@ -88,7 +88,7 @@ namespace Gx
             RemoveChild(m_acceptButton.get());
 
         m_acceptButton = std::unique_ptr<Gx::Button>(acceptButton);
-        m_acceptButton->SetClickCallback([this](auto _) { OnAccepted(); });
+        m_acceptButton->SetClickCallback([this] (auto& sender, auto& ev) { OnAccepted(); });
 
         AddChild(m_acceptButton.get());
     }
@@ -102,7 +102,7 @@ namespace Gx
             RemoveChild(m_cancelButton.get());
 
         m_cancelButton = std::unique_ptr<Gx::Button>(cancelButton);
-        m_cancelButton->SetClickCallback([this](auto _) { OnCancelled(); });
+        m_cancelButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCancelled(); });
 
         AddChild(m_cancelButton.get());
     }

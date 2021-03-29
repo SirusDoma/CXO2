@@ -6,12 +6,21 @@ namespace Gx
     Control::Control() :
         m_enabled(true),
         m_visible(true),
-        m_state(State::Normal)
+        m_focused(false),
+        m_state(State::Normal),
+        m_onClick(),
+        m_onGainFocus(),
+        m_onLostFocus()
     {
     }
 
     Control::~Control()
     {
+    }
+
+    bool Control::IsFocused() const
+    {
+        return m_focused;
     }
 
     void Control::SetEnabled(bool enabled)
@@ -43,8 +52,11 @@ namespace Gx
 
     void Control::SetControlState(const Control::State &state)
     {
-        m_state = state;
-        OnControlStateChanged(this, m_state);
+        if (m_state != state)
+        {
+            m_state = state;
+            OnControlStateChanged(this, m_state);
+        }
     }
 
     const sf::FloatRect Control::GetGlobalBounds() const
@@ -61,7 +73,17 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    void Control::SetClickCallback(std::function<void(Control*)> callback)
+    void Control::SetGainFocusCallback(std::function<void(Control &, Event &)> callback)
+    {
+        m_onGainFocus = callback;
+    }
+
+    void Control::SetLostFocusCallback(std::function<void(Control &, Event &)> callback)
+    {
+        m_onLostFocus = callback;
+    }
+
+    void Control::SetClickCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onClick = callback;
     }
@@ -114,13 +136,29 @@ namespace Gx
 
     void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
     {
+        bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
         if (GetControlState() != Control::State::Active)
         {
-            bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
             if (intersect && GetControlState() == Control::State::Normal)
                 SetControlState(Control::State::Hover);
             else if (!intersect && GetControlState() == Control::State::Hover)
                 SetControlState(Control::State::Normal);
+        }
+
+        bool focus = m_state == Control::State::Hover || m_state == Control::State::Active;
+        if (focus != m_focused)
+        {
+            m_focused = focus;
+            auto uiEvent = Event{false, GetControlState()};
+
+            if (m_focused && m_onGainFocus)
+                m_onGainFocus(*this, uiEvent);
+            else if (m_focused && m_onLostFocus)
+                m_onLostFocus(*this, uiEvent);
+
+            SetControlState(uiEvent.State);
+            if (uiEvent.Handled)
+                return;
         }
 
         InputableContainer::OnMouseMove(ev);
@@ -146,15 +184,24 @@ namespace Gx
     {
         if (m_state == Control::State::Active)
         {
-            SetControlState(Control::State::Normal);
             if (GetGlobalBounds().contains(ev.x, ev.y))
             {
-                SetControlState(Control::State::Hover);
-                OnControlClick(this, ev);
-
                 if (m_onClick)
-                    m_onClick(this);
+                {
+                    auto uiEvent = Event{false, Control::State::Hover};
+                    m_onClick(*this, uiEvent);
+
+                    SetControlState(uiEvent.State);
+                    if (uiEvent.Handled)
+                        return;
+                }
+                else
+                    SetControlState(Control::State::Hover);
+
+                OnControlClick(this, ev);
             }
+            else
+                SetControlState(Control::State::Normal);
         }
 
         InputableContainer::OnMouseButtonUp(ev);
