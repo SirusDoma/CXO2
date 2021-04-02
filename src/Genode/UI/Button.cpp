@@ -85,6 +85,9 @@ namespace Gx
 
     void Button::Invalidate()
     {
+        if (!IsEnabled())
+            return;
+
         auto frame = m_stateData[GetControlState()];
 
         m_sprite.SetColor(frame.GetColor());

@@ -29,6 +29,7 @@ namespace Gx
 
         bool IsFocused() const;
 
+        void SetFocusChangedCallback(std::function<void(Control&, Event&)> callback);
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetLostFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetClickCallback(std::function<void(Control&, Event&)> callback);
@@ -77,7 +78,7 @@ namespace Gx
         State m_state;
         bool  m_enabled, m_visible, m_focused;
 
-        std::function<void(Control&, Event&)> m_onClick, m_onGainFocus, m_onLostFocus;
+        std::function<void(Control&, Event&)> m_onClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }
 

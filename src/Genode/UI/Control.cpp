@@ -55,7 +55,8 @@ namespace Gx
         if (m_state != state)
         {
             m_state = state;
-            OnControlStateChanged(this, m_state);
+            if (IsEnabled())
+                OnControlStateChanged(this, m_state);
         }
     }
 
@@ -71,6 +72,11 @@ namespace Gx
 
         transform *= GetTransform();
         return transform.transformRect(GetLocalBounds());
+    }
+
+    void Control::SetFocusChangedCallback(std::function<void(Control &, Event &)> callback)
+    {
+        m_onFocusChanged = callback;
     }
 
     void Control::SetGainFocusCallback(std::function<void(Control &, Event &)> callback)
@@ -129,7 +135,15 @@ namespace Gx
     bool Control::Input(sf::Event ev)
     {
         if (!IsEnabled())
+        {
+            if (ev.type == sf::Event::MouseMoved)
+            {
+                OnMouseMove(ev.mouseMove);
+                return true;
+            }
+
             return false;
+        }
 
         return InputableContainer::Input(ev);
     }
@@ -145,15 +159,20 @@ namespace Gx
                 SetControlState(Control::State::Normal);
         }
 
+        if (!IsEnabled())
+            return;
+
         bool focus = m_state == Control::State::Hover || m_state == Control::State::Active;
         if (focus != m_focused)
         {
             m_focused = focus;
             auto uiEvent = Event{false, GetControlState()};
+            if (m_onFocusChanged)
+                m_onFocusChanged(*this, uiEvent);
 
             if (m_focused && m_onGainFocus)
                 m_onGainFocus(*this, uiEvent);
-            else if (m_focused && m_onLostFocus)
+            else if (!m_focused && m_onLostFocus)
                 m_onLostFocus(*this, uiEvent);
 
             SetControlState(uiEvent.State);
