@@ -7,6 +7,14 @@
 
 #include <O2/States/StateRoom.hpp>
 
+StatePlanet::StatePlanet(bool fadeIn) :
+    State(),
+    m_useFadeIn(fadeIn),
+    m_connecting(false)
+{
+
+}
+
 void StatePlanet::Initialize()
 {
     State::Initialize();
@@ -45,10 +53,10 @@ void StatePlanet::Initialize()
     auto hoverSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
     for (auto [planet, radio] : planets)
     {
-        radio->SetGainFocusCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
+        radio->SetFocusChangedCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
         {
             auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
-            if (!radio || radio->IsChecked())
+            if (!radio || !radio->IsFocused() || radio->IsChecked())
                 return;
 
             Mixer::Play(sfx);
@@ -77,16 +85,20 @@ void StatePlanet::Initialize()
     m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
     AddChild(m_channelBoard.get());
 
-    // Overlay fade in animation
-    auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
-    overlay->SetFillColor(sf::Color::White);
-    AddChild(overlay);
-
     m_bgm = Create<sf::Music>("Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
-    Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
-        new Gx::Action([this] {  Mixer::Play(m_bgm, "BGM"); }),
-        new Gx::Fade(overlay, 0, sf::seconds(2.5f))
-    }));
+    Mixer::Play(m_bgm, "BGM");
+
+    if (m_useFadeIn)
+    {
+        // Overlay fade in animation
+        auto overlay = new Gx::Rectangle(sf::Vector2f(800, 600));
+        overlay->SetFillColor(sf::Color::White);
+        AddChild(overlay);
+
+        Run(new Gx::Sequence([=] { RemoveChild(overlay); }, {
+            new Gx::Fade(overlay, 0, sf::seconds(2.5f))
+        }));
+    }
 }
 
 void StatePlanet::OnEnterPlanet(Planet planet)
@@ -98,7 +110,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
 
     for (int x = 0; x < 2; x++)
     {
-        for (int i = 5; i < 25; i++)
+        for (int i = 1; i <= 20; i++)
         {
             auto channel = ChannelInfo();
             channel.Population = static_cast<int>((i / 20.f) * 100.f);
@@ -113,7 +125,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
 
 void StatePlanet::OnEnterChannel(ChannelInfo channel)
 {
-    if (channel.Population >= 100)
+    if (channel.Population >= channel.MaxPopulation)
     {
         if (m_dialogInfo)
             m_dialogInfo->Show(this, "Channel is full");

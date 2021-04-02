@@ -247,7 +247,7 @@ void ChannelBoard::ShowPage(int page)
             continue;
 
         int channelIndex = start + i;
-        if (channelIndex > end)
+        if (channelIndex >= end)
         {
             channelButton->SetVisible(false);
             channelButton->SetEnabled(false);

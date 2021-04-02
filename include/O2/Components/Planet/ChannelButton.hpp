@@ -36,11 +36,12 @@ protected:
 
 private:
     Gx::Scene       *m_scene;
-    Gx::Image       *m_selector, *m_channelName, *m_channelFull;
+    Gx::Image       *m_hover, *m_channelName, *m_channelFull;
     Gx::Number      *m_channelNumber;
     Gx::ProgressBar *m_channelCounter;
 
     Planet m_planet;
+    int m_population;
 };
 
 #endif

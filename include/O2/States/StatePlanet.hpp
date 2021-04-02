@@ -15,6 +15,7 @@
 class StatePlanet : public State
 {
 public:
+    StatePlanet(bool fadeIn = true);
     virtual void Initialize();
 
 private:
@@ -29,6 +30,7 @@ private:
     sf::Music  *m_bgm;
     Gx::Dialog *m_dialogInfo;
 
+    bool m_useFadeIn;
     bool m_connecting;
 };
 

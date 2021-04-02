@@ -5,7 +5,8 @@
 
 ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
     Gx::RadioButton(copy),
-    m_scene(&scene)
+    m_scene(&scene),
+    m_population()
 {
     m_channelName    = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
     m_channelNumber  = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
@@ -13,10 +14,10 @@ ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
     m_channelCounter = m_scene->Create<Gx::ProgressBar>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
     m_channelFull    = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
     m_channelFull->SetVisible(false);
-    m_selector       = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Selector.json");
-    m_selector->SetVisible(false);
+    m_hover          = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Hover.json");
+    m_hover->SetVisible(false);
 
-    AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_selector);
+    AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_hover);
 }
 
 ChannelButton::~ChannelButton()
@@ -45,9 +46,12 @@ int ChannelButton::GetChannelPopulation() const
 
 void ChannelButton::SetChannelPopulation(int population)
 {
-    m_channelCounter->SetValue(population);
+    m_population = population;
 
-    m_channelFull->SetVisible(m_channelCounter->GetValue() == m_channelCounter->GetMaximumValue());
+    float percentage = static_cast<float>(population) / 20.0f;
+    m_channelCounter->SetValue(static_cast<int>(std::ceil(percentage) * 20.0f));
+
+    m_channelFull->SetVisible(m_population >= m_channelCounter->GetMaximumValue());
     m_channelCounter->SetVisible(!m_channelFull->IsVislble());
 }
 
@@ -115,8 +119,8 @@ sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderState
 
 void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)
 {
-    if (m_selector)
-        m_selector->SetVisible(state == Gx::Control::Hover || state == Gx::Control::Active);
+    if (m_hover)
+        m_hover->SetVisible(state == Gx::Control::Hover || state == Gx::Control::Active);
 
     Control::OnControlStateChanged(sender, state);
 }

@@ -16,7 +16,8 @@ enum Planet
 
 struct ChannelInfo
 {
-    int Population = 0;
+    int Population    = 0;
+    int MaxPopulation = 100;
 };
 
 struct PlanetInfo
