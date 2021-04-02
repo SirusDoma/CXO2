@@ -1,0 +1,20 @@
+{
+  "type": "IMAGE",
+  "require": {
+    "texture": "State/Room/Btn_RoomHover.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 292,
+      "height": 95
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_Room.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 389,
+        "y": 372
+      }
+    },
+    "states": {
+      "normal": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 91
+        }
+      },
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 91
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 288,
+          "height": 91
+        }
+      }
+    }
+  }
+}

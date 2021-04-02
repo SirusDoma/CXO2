@@ -1,0 +1,19 @@
+{
+  "type": "LIST",
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 26,
+        "y": 82
+      }
+    },
+    "horizontal": {
+      "count": 2,
+      "spacing": 291
+    },
+    "vertical": {
+      "count": 3,
+      "spacing": 95
+    }
+  }
+}
