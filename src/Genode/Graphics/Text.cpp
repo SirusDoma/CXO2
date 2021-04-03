@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
 // Copyright (C) 2007-2018 Laurent Gomila (laurent@sfml-dev.org)
@@ -88,7 +88,7 @@ namespace Gx
     {
     }
 
-    Text::Text(const std::string& string, const sf::Font& font, unsigned int characterSize) :
+    Text::Text(const sf::String& string, const sf::Font& font, unsigned int characterSize) :
         m_string(string),
         m_font(&font),
         m_characterSize(characterSize),
@@ -106,7 +106,7 @@ namespace Gx
     {
     }
 
-    void Text::SetString(const std::string& string)
+    void Text::SetString(const sf::String& string)
     {
         if (m_string != string)
         {
@@ -203,7 +203,7 @@ namespace Gx
         }
     }
 
-    const std::string& Text::GetString() const
+    const sf::String& Text::GetString() const
     {
         return m_string;
     }
@@ -260,8 +260,8 @@ namespace Gx
             return sf::Vector2f();
 
         // Adjust the index if it's out of range
-        if (index > m_string.size())
-            index = m_string.size();
+        if (index > m_string.getSize())
+            index = m_string.getSize();
 
         // Precompute the variables needed by the algorithm
         bool  isBold = m_style & Bold;
@@ -361,7 +361,7 @@ namespace Gx
         m_bounds = sf::FloatRect();
 
         // No text: nothing to draw
-        if (m_string.empty())
+        if (m_string.isEmpty())
             return;
 
         // Compute values related to the text style
@@ -392,7 +392,7 @@ namespace Gx
         float maxX = 0.f;
         float maxY = 0.f;
         Uint32 prevChar = 0;
-        for (std::size_t i = 0; i < m_string.size(); ++i)
+        for (std::size_t i = 0; i < m_string.getSize(); ++i)
         {
             Uint32 curChar = m_string[i];
 

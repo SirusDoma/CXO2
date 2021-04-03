@@ -76,9 +76,9 @@ namespace Gx
         };
 
         Text();
-        Text(const std::string& string, const sf::Font& font, unsigned int characterSize = 30);
+        Text(const sf::String& string, const sf::Font& font, unsigned int characterSize = 30);
 
-        void SetString(const std::string& string);
+        void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
 
         void SetCharacterSize(unsigned int size);
@@ -91,7 +91,7 @@ namespace Gx
         void SetOutlineColor(const sf::Color& color);
         void SetOutlineThickness(float thickness);
 
-        const std::string& GetString() const;
+        const sf::String& GetString() const;
         const sf::Font* GetFont() const;
 
         unsigned int GetCharacterSize() const;
@@ -113,7 +113,7 @@ namespace Gx
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
 
     private:
-        std::string             m_string;
+        sf::String             m_string;
         const sf::Font*         m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;
