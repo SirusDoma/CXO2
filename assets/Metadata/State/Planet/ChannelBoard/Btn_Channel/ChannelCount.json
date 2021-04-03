@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "PROGRESS_BAR",
   "require": {
     "texture": "State/Planet/ChannelCount.png"

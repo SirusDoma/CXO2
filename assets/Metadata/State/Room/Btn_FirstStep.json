@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "BUTTON",
   "require": {
     "texture": "State/Room/Btn_FirstStep.png"
@@ -7,7 +7,7 @@
     "transform": {
       "position": {
         "x": 660,
-        "y": 1
+        "y": 0
       }
     },
     "states": {

@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "BUTTON",
   "require": {
     "texture": "State/Room/Btn_RoomLeft.png"

@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "BUTTON",
   "require": {
     "texture": "State/Room/Btn_Option.png"
@@ -7,7 +7,7 @@
     "transform": {
       "position": {
         "x": 727,
-        "y": 1
+        "y": 0
       }
     },
     "states": {

@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "RADIO_BUTTON",
   "require": {
     "texture": "State/Planet/Btn_Euta.png"

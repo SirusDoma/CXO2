@@ -1,0 +1,32 @@
+﻿{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_MyRoom.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 484,
+        "y": 0
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 71,
+          "height": 32
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 71,
+          "y": 0,
+          "width": 71,
+          "height": 32
+        }
+      }
+    }
+  }
+}

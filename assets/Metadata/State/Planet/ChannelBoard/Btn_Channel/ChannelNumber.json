@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "NUMBER",
   "require": {
     "texture": "State/Planet/ChannelNumber.png"
@@ -16,9 +16,67 @@
       "width": 70,
       "height": 11
     },
-    "digitSize": {
-      "width": 7,
-      "height": 11
+    "characters": {
+      "0": {
+        "x": 0,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "1": {
+        "x": 7,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "2": {
+        "x": 14,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "3": {
+        "x": 21,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "4": {
+        "x": 28,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "5": {
+        "x": 35,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "6": {
+        "x": 42,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "7": {
+        "x": 49,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "8": {
+        "x": 56,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      },
+      "9": {
+        "x": 63,
+        "y": 0,
+        "width": 7,
+        "height": 11
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-{
+﻿{
   "type": "SOUND",
   "require": {
     "sound": "Planet/openChannel"
