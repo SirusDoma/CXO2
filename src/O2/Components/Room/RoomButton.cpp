@@ -12,6 +12,8 @@ RoomButton::RoomButton(Gx::Scene &scene) :
     m_button->SetFocusChangedCallback([hover] (auto& sender, auto& ev) { hover->SetVisible(sender.IsFocused()); });
     hover->SetVisible(false);
 
+    m_titleLabel  = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Title.json");
+    m_musicLabel  = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Music.json");
     m_numberLabel = scene.Create<Gx::Number>("Metadata/State/Room/Btn_Room/RoomNumber.json");
     m_speedLabel  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameSpeed.json");
     m_stateLabel  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/State.json");
@@ -19,7 +21,7 @@ RoomButton::RoomButton(Gx::Scene &scene) :
     m_ohmLevel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/OhmLevel.json");
     m_lock        = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Lock.json");
 
-    AddChild(m_button, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, hover);
+    AddChild(m_button, m_titleLabel, m_musicLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, hover);
 }
 
 const sf::FloatRect RoomButton::GetLocalBounds() const
@@ -40,6 +42,9 @@ void RoomButton::SetRoomData(const RoomData &data)
 
 void RoomButton::Invalidate()
 {
+    m_titleLabel->SetString(m_data.Title);
+    m_musicLabel->SetString("Lv.99 - Parousia");
+
     m_numberLabel->SetValue(m_data.Number);
     m_numberLabel->SetDigitCount(3);
     m_gameMode->SetFrame("VS");

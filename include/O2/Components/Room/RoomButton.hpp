@@ -3,6 +3,7 @@
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Button.hpp>
+#include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
 
@@ -23,6 +24,7 @@ private:
 
     Gx::Scene *m_scene;
     Gx::Button *m_button;
+    Gx::Label  *m_titleLabel, *m_musicLabel;
     Gx::Number *m_numberLabel;
     Gx::Image  *m_speedLabel, *m_gameMode, *m_stateLabel, *m_ohmLevel, *m_lock;
 

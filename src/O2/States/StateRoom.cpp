@@ -36,6 +36,11 @@ void StateRoom::Initialize()
     }
     AddChild(channelCategory);
 
+    auto channelNumber = Create<Gx::Number>("Metadata/State/Room/ChannelNumber.json");
+    channelNumber->SetValue(m_channel.Number);
+    channelNumber->SetDigitCount(2);
+    AddChild(channelNumber);
+
     auto btnFirstStep = Create<Gx::Button>("Metadata/State/Room/Btn_FirstStep.json");
     AddChild(btnFirstStep);
 
@@ -55,6 +60,7 @@ void StateRoom::Initialize()
         auto roomButton = std::make_unique<RoomButton>(*this);
         auto roomData = RoomData{
             i,
+            "CXO2's Room",
             i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
             i <= 2 ? Difficulty::Easy : i <= 4 ? Difficulty::Normal : i <= 6 ? Difficulty::Hard : Difficulty::Master,
             SpeedType::HiSpeed,
