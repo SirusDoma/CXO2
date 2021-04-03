@@ -65,7 +65,6 @@ void ChannelBoard::Initialize()
     m_maxPageNumber     = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
     m_currentPageNumber->SetDigitCount(2);
     m_maxPageNumber->SetDigitCount(2);
-    m_channelListContainer->AddChild(m_currentPageNumber, m_maxPageNumber);
 
     auto btnChannelEnter = m_scene->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
     btnChannelEnter->SetClickCallback([=] (auto& sender, auto& ev)
@@ -79,21 +78,40 @@ void ChannelBoard::Initialize()
     btnChannelLeft->SetClickCallback([=] (auto& sender, auto& ev)
     {
         m_sfxNavigate->play();
-        if (m_currentPageNumber->GetValue() > 1)
-            ShowPage(m_currentPageNumber->GetValue() - 1);
+        if (m_tab == Tab::ChannelList)
+        {
+            if (m_channelPageIndex > 1)
+                ShowChannelList(m_channelPageIndex - 1);
+        }
+        else
+        {
+            if (m_noticePageIndex > 1)
+                ShowNotice(m_noticePageIndex - 1);
+        }
     });
 
     auto btnChannelRight = m_scene->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
     btnChannelRight->SetClickCallback([=] (auto& sender, auto& ev)
     {
         m_sfxNavigate->play();
-        if (m_currentPageNumber->GetValue() < m_maxPageNumber->GetValue())
-            ShowPage(m_currentPageNumber->GetValue() + 1);
+        if (m_tab == Tab::ChannelList)
+        {
+            if (m_channelPageIndex < m_channelMaxPage)
+                ShowChannelList(m_channelPageIndex + 1);
+        }
+        else
+        {
+            if (m_noticePageIndex < m_noticeMaxPage)
+                ShowNotice(m_noticePageIndex + 1);
+        }
     });
 
-    m_channelListContainer->AddChild(btnChannelEnter, btnChannelLeft, btnChannelRight);
+    m_channelListContainer->AddChild(btnChannelEnter);
 
     m_notice = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Notice.json");
+    m_noticePageIndex = 1;
+    m_noticeMaxPage   = m_notice->GetFrameCount();
+
     m_noticeTabButton  = m_scene->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_NoticeTab.json");
     m_noticeTabButton->SetClickCallback([=] (auto& sender, auto& ev)
     {
@@ -109,7 +127,7 @@ void ChannelBoard::Initialize()
     m_duplicateImage.SetPosition(m_position);
     m_duplicateImage.SetVisible(false);
 
-    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice);
+    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice, m_currentPageNumber, m_maxPageNumber, btnChannelLeft, btnChannelRight);
 }
 
 const sf::FloatRect ChannelBoard::GetLocalBounds() const
@@ -160,6 +178,9 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
 
         m_channelListContainer->SetEnabled(true);
         m_channelListContainer->SetVisible(true);
+
+        m_currentPageNumber->SetValue(m_channelPageIndex);
+        m_maxPageNumber->SetValue(m_channelMaxPage);
     }
     else
     {
@@ -174,6 +195,12 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
 
         m_channelListContainer->SetEnabled(false);
         m_channelListContainer->SetVisible(false);
+
+        m_noticePageIndex = 1;
+        m_noticeMaxPage   = 1;
+
+        m_currentPageNumber->SetValue(m_noticePageIndex);
+        m_maxPageNumber->SetValue(m_noticeMaxPage);
     }
 }
 
@@ -218,21 +245,24 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
 void ChannelBoard::UpdateChannelList(PlanetInfo info)
 {
     m_planetInfo = info;
-    m_maxPageNumber->SetValue(static_cast<int>(std::ceil(static_cast<float>(info.Channels.size()) / CHANNEL_LIST_PER_PAGE)));
+    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(info.Channels.size()) / CHANNEL_LIST_PER_PAGE));
+    m_maxPageNumber->SetValue(m_channelMaxPage);
     m_selectedChannel = 0;
 
-    ShowPage(1);
+    ShowChannelList(1);
 }
 
-void ChannelBoard::ShowPage(int page)
+void ChannelBoard::ShowChannelList(int page)
 {
     if (page <= 0)
         page = 1;
 
-    if (page > m_maxPageNumber->GetValue())
-        page = m_maxPageNumber->GetValue();
+    if (page > m_channelMaxPage)
+        page = m_channelMaxPage;
 
-    m_currentPageNumber->SetValue(page);
+    m_channelPageIndex = page;
+    m_currentPageNumber->SetValue(m_channelPageIndex);
+
     int start = (page - 1) * CHANNEL_LIST_PER_PAGE;
     int end   = start + CHANNEL_LIST_PER_PAGE;
     if (end > m_planetInfo.Channels.size())
@@ -266,6 +296,19 @@ void ChannelBoard::ShowPage(int page)
             m_selectedChannel = channelIndex;
         });
     }
+}
+
+void ChannelBoard::ShowNotice(int page)
+{
+    if (page <= 0)
+        page = 1;
+
+    if (page > m_noticeMaxPage)
+        page = m_noticeMaxPage;
+
+    m_noticePageIndex = page;
+    m_currentPageNumber->SetValue(m_noticePageIndex);
+    m_notice->SetFrame(m_noticePageIndex - 1);
 }
 
 void ChannelBoard::Update(double delta)

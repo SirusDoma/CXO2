@@ -34,7 +34,8 @@ public:
 
     void Show(Planet planet, std::function<void()> callback);
     void UpdateChannelList(PlanetInfo info);
-    void ShowPage(int page);
+    void ShowChannelList(int page);
+    void ShowNotice(int page);
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
@@ -66,7 +67,7 @@ private:
     Tab m_tab;
 
     bool m_animating;
-    int m_selectedChannel;
+    int m_selectedChannel, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
     std::function<void(Planet, ChannelInfo)> m_callback;
     std::vector<std::unique_ptr<ChannelButton>> m_channelButtons;
 };
