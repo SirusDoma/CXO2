@@ -1,0 +1,46 @@
+{
+  "type": "IMAGE",
+  "require": {
+    "texture": "State/Room/OhmLevel.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 56,
+        "y": 63
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 40,
+      "height": 19
+    },
+    "frames": {
+      "Beginner": {
+        "x": 0,
+        "y": 0,
+        "width": 40,
+        "height": 19
+      },
+      "Intermediate": {
+        "x": 40,
+        "y": 0,
+        "width": 40,
+        "height": 19
+      },
+      "High": {
+        "x": 80,
+        "y": 0,
+        "width": 40,
+        "height": 19
+      },
+      "Master": {
+        "x": 120,
+        "y": 0,
+        "width": 40,
+        "height": 19
+      }
+    }
+  }
+}

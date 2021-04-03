@@ -1,0 +1,58 @@
+{
+  "type": "IMAGE",
+  "require": {
+    "texture": "State/Room/ChannelCategory.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 27,
+        "y": 26
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 56,
+      "height": 24
+    },
+    "frames": {
+      "Euta": {
+        "x": 0,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      },
+      "Thalo": {
+        "x": 56,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      },
+      "Melpomin": {
+        "x": 112,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      },
+      "Kleo": {
+        "x": 168,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      },
+      "Kaliope": {
+        "x": 224,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      },
+      "Philix": {
+        "x": 280,
+        "y": 0,
+        "width": 56,
+        "height": 24
+      }
+    }
+  }
+}

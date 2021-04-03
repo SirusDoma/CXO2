@@ -1,0 +1,20 @@
+{
+  "type": "IMAGE",
+  "require": {
+    "texture": "State/Room/Lock.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 188,
+        "y": 63
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 15,
+      "height": 16
+    }
+  }
+}

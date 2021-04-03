@@ -1,0 +1,46 @@
+{
+  "type": "IMAGE",
+  "require": {
+    "texture": "State/Room/GameMode.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 8,
+        "y": 63
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 46,
+      "height": 20
+    },
+    "frames": {
+      "Single": {
+        "x": 0,
+        "y": 0,
+        "width": 46,
+        "height": 20
+      },
+      "VS": {
+        "x": 46,
+        "y": 0,
+        "width": 46,
+        "height": 20
+      },
+      "Album": {
+        "x": 92,
+        "y": 0,
+        "width": 46,
+        "height": 19
+      },
+      "Couple": {
+        "x": 120,
+        "y": 0,
+        "width": 46,
+        "height": 19
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_Option.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 727,
+        "y": 1
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 60,
+          "height": 32
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 60,
+          "y": 0,
+          "width": 60,
+          "height": 32
+        }
+      }
+    }
+  }
+}
