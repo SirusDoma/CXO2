@@ -67,6 +67,9 @@
     <ClCompile Include="src\Genode\UI\Repeater.cpp" />
     <ClCompile Include="src\Genode\UI\UiContainer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\O2\Components\Planet\ChannelBoard.cpp" />
+    <ClCompile Include="src\O2\Components\Planet\ChannelButton.cpp" />
+    <ClCompile Include="src\O2\Components\Room\RoomButton.cpp" />
     <ClCompile Include="src\O2\IO\Archives\M30Archive.cpp" />
     <ClCompile Include="src\O2\IO\Archives\OmcArchive.cpp" />
     <ClCompile Include="src\O2\IO\Archives\OpiArchive.cpp" />
@@ -86,6 +89,7 @@
     <ClCompile Include="src\O2\O2Jam.cpp" />
     <ClCompile Include="src\O2\States\State.cpp" />
     <ClCompile Include="src\O2\States\StateAvi.cpp" />
+    <ClCompile Include="src\O2\States\StatePlanet.cpp" />
     <ClCompile Include="src\O2\States\StateRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,7 +162,12 @@
     <ClInclude Include="include\Genode\UI\RadioButton.hpp" />
     <ClInclude Include="include\Genode\UI\Repeater.hpp" />
     <ClInclude Include="include\Genode\UI\UiContainer.hpp" />
+    <ClInclude Include="include\O2\Components\Planet\ChannelBoard.hpp" />
+    <ClInclude Include="include\O2\Components\Planet\ChannelButton.hpp" />
+    <ClInclude Include="include\O2\Components\Room\RoomButton.hpp" />
+    <ClInclude Include="include\O2\Data\Game.hpp" />
     <ClInclude Include="include\O2\Data\Planet.hpp" />
+    <ClInclude Include="include\O2\Data\Room.hpp" />
     <ClInclude Include="include\O2\IO\Archives\M30Archive.hpp" />
     <ClInclude Include="include\O2\IO\Archives\O2FileEntry.hpp" />
     <ClInclude Include="include\O2\IO\Archives\OmcArchive.hpp" />
@@ -193,6 +202,7 @@
     <ClInclude Include="include\O2\O2Jam.hpp" />
     <ClInclude Include="include\O2\States\State.hpp" />
     <ClInclude Include="include\O2\States\StateAvi.hpp" />
+    <ClInclude Include="include\O2\States\StatePlanet.hpp" />
     <ClInclude Include="include\O2\States\StateRoom.hpp" />
   </ItemGroup>
   <ItemGroup>
