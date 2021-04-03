@@ -38,7 +38,7 @@ public:
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
-    void SetEnterChannelCallback(std::function<void(ChannelInfo)> callback);
+    void SetEnterChannelCallback(std::function<void(Planet, ChannelInfo)> callback);
 
 private:
     const unsigned int CHANNEL_LIST_PER_PAGE = 20;
@@ -67,7 +67,7 @@ private:
 
     bool m_animating;
     int m_selectedChannel;
-    std::function<void(ChannelInfo)> m_callback;
+    std::function<void(Planet, ChannelInfo)> m_callback;
     std::vector<std::unique_ptr<ChannelButton>> m_channelButtons;
 };
 

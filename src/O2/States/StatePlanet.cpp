@@ -82,7 +82,7 @@ void StatePlanet::Initialize()
     AddChild(m_container.get());
 
     m_channelBoard = std::make_unique<ChannelBoard>(*this);
-    m_channelBoard->SetEnterChannelCallback([=] (auto channel) { OnEnterChannel(channel); });
+    m_channelBoard->SetEnterChannelCallback([=] (auto planet, auto channel) { OnEnterChannel(planet, channel); });
     AddChild(m_channelBoard.get());
 
     m_bgm = Create<sf::Music>("Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
@@ -113,6 +113,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
         for (int i = 1; i <= 20; i++)
         {
             auto channel = ChannelInfo();
+            channel.Number     = i;
             channel.Population = static_cast<int>((i / 20.f) * 100.f);
 
             planetInfo.Channels.push_back(channel);
@@ -123,7 +124,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
     m_channelBoard->UpdateChannelList(planetInfo);
 }
 
-void StatePlanet::OnEnterChannel(ChannelInfo channel)
+void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
 {
     if (channel.Population >= channel.MaxPopulation)
     {
@@ -134,7 +135,7 @@ void StatePlanet::OnEnterChannel(ChannelInfo channel)
     }
 
     m_connecting = true;
-    QueueEvent([=] { GetDirector().SetScene(new StateRoom()); } );
+    QueueEvent([=] { GetDirector().SetScene(new StateRoom(planet, channel)); } );
 }
 
 bool StatePlanet::IsConnecting()

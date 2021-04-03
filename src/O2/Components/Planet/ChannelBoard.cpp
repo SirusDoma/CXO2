@@ -72,7 +72,7 @@ void ChannelBoard::Initialize()
     {
         m_sfxEnter->play();
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
-            m_callback(m_planetInfo.Channels[m_selectedChannel]);
+            m_callback(m_planetInfo.Planet, m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = m_scene->Create<Gx::Button>("Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
@@ -125,7 +125,7 @@ bool ChannelBoard::InTransition() const
     return m_animating;
 }
 
-void ChannelBoard::SetEnterChannelCallback(std::function<void(ChannelInfo)> callback)
+void ChannelBoard::SetEnterChannelCallback(std::function<void(Planet, ChannelInfo)> callback)
 {
     m_callback = callback;
 }
