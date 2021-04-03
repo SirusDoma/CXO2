@@ -159,7 +159,7 @@ namespace Gx
             if (d > 0)
                 m_width += m_spacing;
 
-            bool isLeading = leadingCount > 0 && d > leadingCount;
+            bool isLeading = leadingCount > 0 && d > digitCount - leadingCount;
             if (isLeading)
                 digit = 0;
             else
@@ -176,15 +176,16 @@ namespace Gx
 
         auto position = sf::Vector2f();
         auto size = digits.size();
+        auto texCoords = sf::IntRect();
         for (unsigned int i = 0; i < size; i++)
         {
             digit = digits.top();
             digits.pop();
 
-            auto texCoords = m_texCoords[digit];
             if (i > 0)
                 position += sf::Vector2f(texCoords.width + m_spacing, 0);
 
+            texCoords = m_texCoords[digit];
             float x = position.x;
             float y = position.y;
             float w = position.x + texCoords.width;

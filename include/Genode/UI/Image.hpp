@@ -18,8 +18,10 @@ namespace Gx
 
         virtual const sf::FloatRect GetLocalBounds() const;
 
+        unsigned int GetFrameCount() const;
         void AddFrame(const std::string &name, const sf::IntRect &texCoords);
         void SetFrame(const std::string &name);
+        void SetFrame(unsigned int index);
 
     protected:
         virtual void Update(double delta);

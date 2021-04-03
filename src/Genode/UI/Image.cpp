@@ -11,6 +11,11 @@ namespace Gx
         return Sprite::GetLocalBounds();
     }
 
+    unsigned int Image::GetFrameCount() const
+    {
+        return m_frames.size() > 0 ? m_frames.size() : 1;
+    }
+
     void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)
     {
         m_frames[name] = texCoords;
@@ -22,6 +27,24 @@ namespace Gx
     {
         SetTexCoords(m_frames[name]);
         Invalidate();
+    }
+
+    void Image::SetFrame(unsigned int index)
+    {
+        if (index < 0 || index >= m_frames.size())
+            return;
+
+        unsigned int it = 0;
+        for (auto [name, _] : m_frames)
+        {
+            if (it == index)
+            {
+                SetFrame(name);
+                break;
+            }
+
+            it++;
+        }
     }
 
     void Image::Update(double delta)
