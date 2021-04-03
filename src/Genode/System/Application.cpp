@@ -1,4 +1,4 @@
-#include <Genode/System/Application.hpp>
+﻿#include <Genode/System/Application.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 

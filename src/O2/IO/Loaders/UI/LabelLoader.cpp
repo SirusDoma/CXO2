@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/LabelLoader.hpp>
+﻿#include <O2/IO/Loaders/UI/LabelLoader.hpp>
 
 #include <O2/IO/Metadata/UI/LabelMetadata.hpp>
 #include <O2/IO/Loaders/TransformLoader.hpp>

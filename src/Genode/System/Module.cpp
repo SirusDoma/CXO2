@@ -1,4 +1,4 @@
-#include <Genode/System/Module.hpp>
+﻿#include <Genode/System/Module.hpp>
 
 namespace Gx
 {

@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/NumberLoader.hpp>
+﻿#include <O2/IO/Loaders/UI/NumberLoader.hpp>
 
 #include <O2/IO/Metadata/UI/NumberMetadata.hpp>
 #include <O2/IO/Loaders/TransformLoader.hpp>

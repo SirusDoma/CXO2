@@ -1,4 +1,4 @@
-#include <Genode/UI/Control.hpp>
+﻿#include <Genode/UI/Control.hpp>
 #include <type_traits>
 
 namespace Gx

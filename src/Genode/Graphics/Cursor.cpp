@@ -1,4 +1,4 @@
-#include <Genode/Graphics/Cursor.hpp>
+﻿#include <Genode/Graphics/Cursor.hpp>
 
 namespace Gx
 {

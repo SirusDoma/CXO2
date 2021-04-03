@@ -1,4 +1,4 @@
-#include <Genode/IO/Loaders/FontLoader.hpp>
+﻿#include <Genode/IO/Loaders/FontLoader.hpp>
 #include <Genode/IO/FileHelper.hpp>
 
 namespace Gx

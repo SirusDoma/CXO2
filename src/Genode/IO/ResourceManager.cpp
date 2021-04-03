@@ -1,4 +1,4 @@
-#include <Genode/IO/ResourceManager.hpp>
+﻿#include <Genode/IO/ResourceManager.hpp>
 
 namespace Gx
 {

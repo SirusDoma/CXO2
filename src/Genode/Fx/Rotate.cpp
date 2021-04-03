@@ -1,4 +1,4 @@
-#include <Genode/Fx/Rotate.hpp>
+﻿#include <Genode/Fx/Rotate.hpp>
 
 namespace Gx
 {

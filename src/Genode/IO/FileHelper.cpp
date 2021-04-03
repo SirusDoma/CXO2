@@ -1,4 +1,4 @@
-#include <Genode/IO/FileHelper.hpp>
+﻿#include <Genode/IO/FileHelper.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
 #include <algorithm>

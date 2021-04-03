@@ -1,4 +1,4 @@
-#include <Genode/IO/Loaders/TextureLoader.hpp>
+﻿#include <Genode/IO/Loaders/TextureLoader.hpp>
 #include <Genode/IO/FileHelper.hpp>
 
 namespace Gx

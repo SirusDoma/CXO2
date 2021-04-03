@@ -1,4 +1,4 @@
-#include <Genode/Graphics/Animation.hpp>
+﻿#include <Genode/Graphics/Animation.hpp>
 
 namespace Gx
 {

@@ -1,4 +1,4 @@
-#include <Genode/IO/Loaders/SoundBufferLoader.hpp>
+﻿#include <Genode/IO/Loaders/SoundBufferLoader.hpp>
 #include <Genode/IO/FileHelper.hpp>
 
 namespace Gx

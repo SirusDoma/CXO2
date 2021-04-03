@@ -1,4 +1,4 @@
-#include <O2/IO/Archives/OmcArchive.hpp>
+﻿#include <O2/IO/Archives/OmcArchive.hpp>
 #include <sstream>
 
 OmcArchive::OmcArchive() :

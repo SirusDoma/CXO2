@@ -1,4 +1,4 @@
-#include <Genode/UI/ProgressBar.hpp>
+﻿#include <Genode/UI/ProgressBar.hpp>
 
 namespace Gx
 {

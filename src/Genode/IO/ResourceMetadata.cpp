@@ -1,4 +1,4 @@
-#include <Genode/IO/ResourceMetadata.hpp>
+﻿#include <Genode/IO/ResourceMetadata.hpp>
 
 namespace Gx
 {

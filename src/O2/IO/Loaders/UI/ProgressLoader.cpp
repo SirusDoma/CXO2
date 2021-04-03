@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
+﻿#include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 #include <O2/IO/Metadata/UI/ProgressBarMetadata.hpp>

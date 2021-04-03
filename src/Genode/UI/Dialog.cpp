@@ -1,4 +1,4 @@
-#include <Genode/UI/Dialog.hpp>
+﻿#include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/System/Application.hpp>

@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/AnimationLoader.hpp>
+﻿#include <O2/IO/Loaders/AnimationLoader.hpp>
 
 #include <O2/IO/Metadata/AnimationMetadata.hpp>
 #include <O2/IO/Loaders/TransformLoader.hpp>

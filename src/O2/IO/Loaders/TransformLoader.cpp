@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/TransformLoader.hpp>
+﻿#include <O2/IO/Loaders/TransformLoader.hpp>
 #include <O2/IO/Metadata/TransformMetadata.hpp>
 
 TransformLoader::TransformLoader()

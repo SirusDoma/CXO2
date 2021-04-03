@@ -1,4 +1,4 @@
-#include <Genode/Fx/Scale.hpp>
+﻿#include <Genode/Fx/Scale.hpp>
 
 namespace Gx
 {

@@ -1,4 +1,4 @@
-#include <Genode/Audio/Mixer.hpp>
+﻿#include <Genode/Audio/Mixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
 
 namespace Gx

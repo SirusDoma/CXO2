@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/DialogLoader.hpp>
+﻿#include <O2/IO/Loaders/UI/DialogLoader.hpp>
 
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 #include <O2/IO/Loaders/UI/ButtonLoader.hpp>

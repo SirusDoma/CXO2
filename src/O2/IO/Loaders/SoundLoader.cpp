@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/SoundLoader.hpp>
+﻿#include <O2/IO/Loaders/SoundLoader.hpp>
 #include <O2/IO/Metadata/SoundMetadata.hpp>
 
 SoundLoader::SoundLoader()

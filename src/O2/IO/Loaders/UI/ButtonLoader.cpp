@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/UI/ButtonLoader.hpp>
+﻿#include <O2/IO/Loaders/UI/ButtonLoader.hpp>
 #include <O2/IO/Loaders/SpriteLoader.hpp>
 
 ButtonLoader::ButtonLoader()

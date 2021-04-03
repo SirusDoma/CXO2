@@ -1,4 +1,4 @@
-#include <Genode/SceneGraph/UpdatableContainer.hpp>
+﻿#include <Genode/SceneGraph/UpdatableContainer.hpp>
 
 namespace Gx
 {

@@ -1,4 +1,4 @@
-#include <O2/IO/Loaders/MusicLoader.hpp>
+﻿#include <O2/IO/Loaders/MusicLoader.hpp>
 #include <O2/IO/Metadata/MusicMetadata.hpp>
 
 MusicLoader::MusicLoader()

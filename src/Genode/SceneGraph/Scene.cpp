@@ -1,4 +1,4 @@
-#include <algorithm>
+﻿#include <algorithm>
 #include <cstdarg>
 
 #include <Genode/SceneGraph/Scene.hpp>

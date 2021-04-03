@@ -1,4 +1,4 @@
-#include <Genode/UI/Number.hpp>
+﻿#include <Genode/UI/Number.hpp>
 #include <stack>
 
 namespace Gx

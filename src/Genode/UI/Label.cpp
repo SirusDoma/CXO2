@@ -1,4 +1,4 @@
-#include <Genode/UI/Label.hpp>
+﻿#include <Genode/UI/Label.hpp>
 
 namespace Gx
 {

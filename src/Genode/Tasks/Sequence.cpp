@@ -1,4 +1,4 @@
-#include <Genode/Tasks/Sequence.hpp>
+﻿#include <Genode/Tasks/Sequence.hpp>
 #include <algorithm>
 
 namespace Gx
