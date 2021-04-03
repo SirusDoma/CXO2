@@ -1,4 +1,4 @@
-#include <O2/States/StateRoom.hpp>
+﻿#include <O2/States/StateRoom.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks.hpp>
@@ -41,11 +41,14 @@ void StateRoom::Initialize()
     channelNumber->SetDigitCount(2);
     AddChild(channelNumber);
 
+    auto btnMusicShop = Create<Gx::Button>("Metadata/State/Room/Btn_MusicShop.json");
+    auto btnItemShop  = Create<Gx::Button>("Metadata/State/Room/Btn_ItemShop.json");
+    auto btnMyRoom    = Create<Gx::Button>("Metadata/State/Room/Btn_MyRoom.json");
+    auto btnCoupon    = Create<Gx::Button>("Metadata/State/Room/Btn_Coupon.json");
     auto btnFirstStep = Create<Gx::Button>("Metadata/State/Room/Btn_FirstStep.json");
-    AddChild(btnFirstStep);
+    auto btnOption    = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
 
-    auto btnOption = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
-    AddChild(btnOption);
+    AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
     auto btnCreateRoom = Create<Gx::Button>("Metadata/State/Room/Btn_CreateRoom.json");
     btnCreateRoom->SetClickCallback([] (auto& sender, auto& event)
@@ -60,7 +63,7 @@ void StateRoom::Initialize()
         auto roomButton = std::make_unique<RoomButton>(*this);
         auto roomData = RoomData{
             i,
-            "CXO2's Room",
+            "Let's play together~",
             i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
             i <= 2 ? Difficulty::Easy : i <= 4 ? Difficulty::Normal : i <= 6 ? Difficulty::Hard : Difficulty::Master,
             SpeedType::HiSpeed,

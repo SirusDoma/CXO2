@@ -12,7 +12,7 @@ enum RoomState
 struct RoomData
 {
     unsigned int Number;
-    std::string  Title;
+    sf::String   Title;
     RoomState    State;
     Difficulty   Difficulty;
     SpeedType    SpeedType;
