@@ -12,6 +12,10 @@ ChannelBoard::ChannelBoard(Gx::Scene &scene) :
     m_selectedChannel(),
     m_channelButtons(),
     m_animating(false),
+    m_channelPageIndex(),
+    m_channelMaxPage(),
+    m_noticePageIndex(),
+    m_noticeMaxPage(),
     m_scene(&scene)
 {
     Initialize();
