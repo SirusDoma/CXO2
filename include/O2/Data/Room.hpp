@@ -2,7 +2,7 @@
 #define O2JAM_ROOM_HPP
 
 #include <O2/Data/Game.hpp>
-#include <O2/IO/Metadata/Chart/ChartMetadata.hpp>
+#include <O2/Metadata/Chart/ChartMetadata.hpp>
 
 enum RoomState
 {

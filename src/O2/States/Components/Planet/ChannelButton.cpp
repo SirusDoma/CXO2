@@ -1,7 +1,7 @@
 ﻿#include <O2/States/Components/Planet/ChannelButton.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
-#include <O2/IO/Metadata/UI/RadioButtonMetadata.hpp>
+#include <O2/Metadata/UI/RadioButtonMetadata.hpp>
 
 ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
     Gx::RadioButton(copy),

@@ -1,22 +1,22 @@
 ﻿#include <O2/O2Jam.hpp>
 #include <Genode.hpp>
 
-#include <O2/IO/Archives/M30Archive.hpp>
-#include <O2/IO/Archives/OmcArchive.hpp>
+#include <O2/Archives/M30Archive.hpp>
+#include <O2/Archives/OmcArchive.hpp>
 
-#include <O2/IO/Loaders/SpriteLoader.hpp>
-#include <O2/IO/Loaders/SoundLoader.hpp>
-#include <O2/IO/Loaders/MusicLoader.hpp>
-#include <O2/IO/Loaders/AnimationLoader.hpp>
+#include <O2/Loaders/SpriteLoader.hpp>
+#include <O2/Loaders/SoundLoader.hpp>
+#include <O2/Loaders/MusicLoader.hpp>
+#include <O2/Loaders/AnimationLoader.hpp>
 
-#include <O2/IO/Loaders/UI/ImageLoader.hpp>
-#include <O2/IO/Loaders/UI/LabelLoader.hpp>
-#include <O2/IO/Loaders/UI/NumberLoader.hpp>
-#include <O2/IO/Loaders/UI/ButtonLoader.hpp>
-#include <O2/IO/Loaders/UI/RadioButtonLoader.hpp>
-#include <O2/IO/Loaders/UI/ProgressBarLoader.hpp>
-#include <O2/IO/Loaders/UI/RepeaterLoader.hpp>
-#include <O2/IO/Loaders/UI/DialogLoader.hpp>
+#include <O2/Loaders/UI/ImageLoader.hpp>
+#include <O2/Loaders/UI/LabelLoader.hpp>
+#include <O2/Loaders/UI/NumberLoader.hpp>
+#include <O2/Loaders/UI/ButtonLoader.hpp>
+#include <O2/Loaders/UI/RadioButtonLoader.hpp>
+#include <O2/Loaders/UI/ProgressBarLoader.hpp>
+#include <O2/Loaders/UI/RepeaterLoader.hpp>
+#include <O2/Loaders/UI/DialogLoader.hpp>
 
 void O2Jam::OnStart()
 {
