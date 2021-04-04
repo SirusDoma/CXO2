@@ -1,5 +1,5 @@
-#ifndef GENODE_ACTION_HPP
-#define GENODE_ACTION_HPP
+#ifndef GENODE_TASKS_ACTION_HPP
+#define GENODE_TASKS_ACTION_HPP
 
 #include <Genode/Tasks/Task.hpp>
 

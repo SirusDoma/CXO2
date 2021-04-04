@@ -1,5 +1,5 @@
-#ifndef GENODE_SCALE_HPP
-#define GENODE_SCALE_HPP
+#ifndef GENODE_FX_SCALE_HPP
+#define GENODE_FX_SCALE_HPP
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>

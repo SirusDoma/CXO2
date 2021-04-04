@@ -1,5 +1,5 @@
-#ifndef GENODE_RESOURCE_CONTEXT_HPP
-#define GENODE_RESOURCE_CONTEXT_HPP
+#ifndef GENODE_IO_RESOURCE_CONTEXT_HPP
+#define GENODE_IO_RESOURCE_CONTEXT_HPP
 
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Texture.hpp>

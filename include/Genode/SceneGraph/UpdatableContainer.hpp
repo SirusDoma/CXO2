@@ -1,5 +1,5 @@
-#ifndef GENODE_UPDATABLE_CONTAINER_HPP
-#define GENODE_UPDATABLE_CONTAINER_HPP
+#ifndef GENODE_SCENEGRAPH_UPDATABLE_CONTAINER_HPP
+#define GENODE_SCENEGRAPH_UPDATABLE_CONTAINER_HPP
 
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/Entities/Updatable.hpp>

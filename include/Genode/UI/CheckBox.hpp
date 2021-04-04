@@ -1,5 +1,5 @@
-#ifndef GENODE_CHECKBOX_HPP
-#define GENODE_CHECKBOX_HPP
+#ifndef GENODE_UI_CHECKBOX_HPP
+#define GENODE_UI_CHECKBOX_HPP
 
 #include <Genode/UI/Button.hpp>
 

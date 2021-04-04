@@ -23,8 +23,8 @@
 ////////////////////////////////////////////////////////////
 
 
-#ifndef GENODE_RECTANGLE_HPP
-#define GENODE_RECTANGLE_HPP
+#ifndef GENODE_GRAPHICS_RECTANGLE_HPP
+#define GENODE_GRAPHICS_RECTANGLE_HPP
 
 #include <Genode/Graphics/Shape.hpp>
 

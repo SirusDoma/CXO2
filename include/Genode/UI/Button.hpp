@@ -1,5 +1,5 @@
-#ifndef GENODE_BUTTON_HPP
-#define GENODE_BUTTON_HPP
+#ifndef GENODE_UI_BUTTON_HPP
+#define GENODE_UI_BUTTON_HPP
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Rect.hpp>

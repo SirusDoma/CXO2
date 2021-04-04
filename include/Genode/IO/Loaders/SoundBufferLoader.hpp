@@ -1,5 +1,5 @@
-#ifndef GENODE_SOUND_BUFFER_LOADER_HPP
-#define GENODE_SOUND_BUFFER_LOADER_HPP
+#ifndef GENODE_IO_SOUND_BUFFER_LOADER_HPP
+#define GENODE_IO_SOUND_BUFFER_LOADER_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>

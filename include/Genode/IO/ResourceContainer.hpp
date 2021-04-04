@@ -1,5 +1,5 @@
-#ifndef GENODE_CACHE_HPP
-#define GENODE_CACHE_HPP
+#ifndef GENODE_IO_CACHE_HPP
+#define GENODE_IO_CACHE_HPP
 
 #include <SFML/Audio/AlResource.hpp>
 #include <SFML/Graphics/Texture.hpp>

@@ -1,5 +1,5 @@
-#ifndef GENODE_ROTATE_HPP
-#define GENODE_ROTATE_HPP
+#ifndef GENODE_FX_ROTATE_HPP
+#define GENODE_FX_ROTATE_HPP
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>

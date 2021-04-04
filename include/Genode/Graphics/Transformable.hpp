@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_TRANSFORMABLE_HPP
-#define GENODE_TRANSFORMABLE_HPP
+#ifndef GENODE_GRAPHICS_TRANSFORMABLE_HPP
+#define GENODE_GRAPHICS_TRANSFORMABLE_HPP
 
 #include <SFML/Graphics/Export.hpp>
 #include <SFML/Graphics/Transform.hpp>

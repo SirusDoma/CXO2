@@ -1,5 +1,5 @@
-#ifndef GENODE_CURSOR_HPP
-#define GENODE_CURSOR_HPP
+#ifndef GENODE_GRAPHICS_CURSOR_HPP
+#define GENODE_GRAPHICS_CURSOR_HPP
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics/Texture.hpp>

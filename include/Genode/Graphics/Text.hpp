@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_TEXT_HPP
-#define GENODE_TEXT_HPP
+#ifndef GENODE_GRAPHICS_TEXT_HPP
+#define GENODE_GRAPHICS_TEXT_HPP
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Entities.hpp>

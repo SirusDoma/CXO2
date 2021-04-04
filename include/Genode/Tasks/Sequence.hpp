@@ -1,5 +1,5 @@
-#ifndef GENODE_SEQUENCE_HPP
-#define GENODE_SEQUENCE_HPP
+#ifndef GENODE_TASKS_SEQUENCE_HPP
+#define GENODE_TASKS_SEQUENCE_HPP
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Tasks/Delay.hpp>

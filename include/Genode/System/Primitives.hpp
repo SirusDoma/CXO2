@@ -1,5 +1,5 @@
-#ifndef GENODE_TYPES_HPP
-#define GENODE_TYPES_HPP
+#ifndef GENODE_SYSTEM_TYPES_HPP
+#define GENODE_SYSTEM_TYPES_HPP
 
 namespace Gx
 {

@@ -1,5 +1,5 @@
-#ifndef GENODE_TASK_HPP
-#define GENODE_TASK_HPP
+#ifndef GENODE_TASKS_TASK_HPP
+#define GENODE_TASKS_TASK_HPP
 
 #include <SFML/System/Time.hpp>
 

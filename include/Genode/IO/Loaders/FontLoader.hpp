@@ -1,5 +1,5 @@
-#ifndef GENODE_FONT_LOADER_HPP
-#define GENODE_FONT_LOADER_HPP
+#ifndef GENODE_IO_FONT_LOADER_HPP
+#define GENODE_IO_FONT_LOADER_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
 #include <SFML/Graphics/Font.hpp>

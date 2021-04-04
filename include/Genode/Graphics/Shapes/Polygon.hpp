@@ -23,8 +23,8 @@
 ////////////////////////////////////////////////////////////
 
 
-#ifndef GENODE_POLYGON_HPP
-#define GENODE_POLYGON_HPP
+#ifndef GENODE_GRAPHICS_POLYGON_HPP
+#define GENODE_GRAPHICS_POLYGON_HPP
 
 #include <Genode/Graphics/Shape.hpp>
 #include <vector>

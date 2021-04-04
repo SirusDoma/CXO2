@@ -1,5 +1,5 @@
-#ifndef GENODE_FILE_HELPER_HPP
-#define GENODE_FILE_HELPER_HPP
+#ifndef GENODE_IO_FILE_HELPER_HPP
+#define GENODE_IO_FILE_HELPER_HPP
 
 #include <Genode/System/Primitives.hpp>
 

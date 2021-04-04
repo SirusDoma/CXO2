@@ -1,5 +1,5 @@
-#ifndef GENODE_APPLICATION_HPP
-#define GENODE_APPLICATION_HPP
+#ifndef GENODE_SYSTEM_APPLICATION_HPP
+#define GENODE_SYSTEM_APPLICATION_HPP
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>

@@ -1,5 +1,5 @@
-#ifndef GENODE_LABEL_HPP
-#define GENODE_LABEL_HPP
+#ifndef GENODE_UI_LABEL_HPP
+#define GENODE_UI_LABEL_HPP
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/Graphics/Text.hpp>

@@ -1,5 +1,5 @@
-#ifndef GENODE_IO_RESOURCEMANAGER_HPP
-#define GENODE_IO_RESOURCEMANAGER_HPP
+#ifndef GENODE_IO_IO_RESOURCEMANAGER_HPP
+#define GENODE_IO_IO_RESOURCEMANAGER_HPP
 
 #include <Genode/IO/ResourceContainer.hpp>
 #include <Genode/IO/ResourceContext.hpp>

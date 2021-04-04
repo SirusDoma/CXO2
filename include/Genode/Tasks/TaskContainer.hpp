@@ -1,5 +1,5 @@
-#ifndef GENODE_TASK_CONTAINER_HPP
-#define GENODE_TASK_CONTAINER_HPP
+#ifndef GENODE_TASKS_TASK_CONTAINER_HPP
+#define GENODE_TASKS_TASK_CONTAINER_HPP
 
 #include <Genode/Entities/Updatable.hpp>
 #include <Genode/Tasks/Task.hpp>

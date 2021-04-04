@@ -1,5 +1,5 @@
-#ifndef GENODE_NODE_HPP
-#define GENODE_NODE_HPP
+#ifndef GENODE_SCENEGRAPH_NODE_HPP
+#define GENODE_SCENEGRAPH_NODE_HPP
 
 #include <string>
 #include <vector>

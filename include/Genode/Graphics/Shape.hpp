@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_SHAPE_HPP
-#define GENODE_SHAPE_HPP
+#ifndef GENODE_GRAPHICS_SHAPE_HPP
+#define GENODE_GRAPHICS_SHAPE_HPP
 
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>

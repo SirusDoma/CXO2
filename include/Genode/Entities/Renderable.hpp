@@ -1,5 +1,5 @@
-#ifndef GENODE_RENDERABLE_HPP
-#define GENODE_RENDERABLE_HPP
+#ifndef GENODE_ENTITIES_RENDERABLE_HPP
+#define GENODE_ENTITIES_RENDERABLE_HPP
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>

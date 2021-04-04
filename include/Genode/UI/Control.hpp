@@ -1,5 +1,5 @@
-#ifndef GENODE_UIELEMENT_HPP
-#define GENODE_UIELEMENT_HPP
+#ifndef GENODE_UI_CONTROL_HPP
+#define GENODE_UI_CONTROL_HPP
 
 #include <SFML/Window/Event.hpp>
 

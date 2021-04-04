@@ -1,5 +1,5 @@
-#ifndef GENODE_FADE_HPP
-#define GENODE_FADE_HPP
+#ifndef GENODE_FX_FADE_HPP
+#define GENODE_FX_FADE_HPP
 
 #include <SFML/System/Time.hpp>
 

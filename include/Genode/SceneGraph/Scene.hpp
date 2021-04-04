@@ -1,5 +1,5 @@
-#ifndef GENODE_SCENE_HPP
-#define GENODE_SCENE_HPP
+#ifndef GENODE_SCENEGRAPH_SCENE_HPP
+#define GENODE_SCENEGRAPH_SCENE_HPP
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>

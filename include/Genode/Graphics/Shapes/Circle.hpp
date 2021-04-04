@@ -23,8 +23,8 @@
 ////////////////////////////////////////////////////////////
 
 
-#ifndef GENODE_CIRCLE_HPP
-#define GENODE_CIRCLE_HPP
+#ifndef GENODE_GRAPHICS_CIRCLE_HPP
+#define GENODE_GRAPHICS_CIRCLE_HPP
 
 #include <Genode/Graphics/Shape.hpp>
 

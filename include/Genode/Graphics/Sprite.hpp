@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_SPRITE_HPP
-#define GENODE_SPRITE_HPP
+#ifndef GENODE_GRAPHICS_SPRITE_HPP
+#define GENODE_GRAPHICS_SPRITE_HPP
 
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>

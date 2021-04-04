@@ -1,5 +1,5 @@
-#ifndef GENODE_TIMELINE_HPP
-#define GENODE_TIMELINE_HPP
+#ifndef GENODE_TASKS_TIMELINE_HPP
+#define GENODE_TASKS_TIMELINE_HPP
 
 #include <Genode/Tasks/Task.hpp>
 #include <vector>

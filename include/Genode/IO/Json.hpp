@@ -1,5 +1,5 @@
-#ifndef GENODE_JSON_HPP
-#define GENODE_JSON_HPP
+#ifndef GENODE_IO_JSON_HPP
+#define GENODE_IO_JSON_HPP
 
 #include <sstream>
 #include <iomanip>

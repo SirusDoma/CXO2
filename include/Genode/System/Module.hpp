@@ -1,5 +1,5 @@
-#ifndef GENODE_MODULE_HPP
-#define GENODE_MODULE_HPP
+#ifndef GENODE_SYSTEM_MODULE_HPP
+#define GENODE_SYSTEM_MODULE_HPP
 
 #include <Genode/Entities/Updatable.hpp>
 #include <SFML/Window/Event.hpp>

@@ -1,5 +1,5 @@
-#ifndef GENODE_ARCHIVE_HPP
-#define GENODE_ARCHIVE_HPP
+#ifndef GENODE_IO_ARCHIVE_HPP
+#define GENODE_IO_ARCHIVE_HPP
 
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/System/Primitives.hpp>

@@ -1,5 +1,5 @@
-#ifndef GENODE_RESOURCE_LOADER_HPP
-#define GENODE_RESOURCE_LOADER_HPP
+#ifndef GENODE_IO_RESOURCE_LOADER_HPP
+#define GENODE_IO_RESOURCE_LOADER_HPP
 
 #include <Genode/System/Primitives.hpp>
 

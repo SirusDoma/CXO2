@@ -1,5 +1,5 @@
-#ifndef GENODE_RADIO_BUTTON_HPP
-#define GENODE_RADIO_BUTTON_HPP
+#ifndef GENODE_UI_RADIO_BUTTON_HPP
+#define GENODE_UI_RADIO_BUTTON_HPP
 
 #include <Genode/UI/CheckBox.hpp>
 

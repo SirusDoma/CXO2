@@ -1,5 +1,5 @@
-#ifndef GENODE_FILESYSTEM_HPP
-#define GENODE_FILESYSTEM_HPP
+#ifndef GENODE_IO_FILESYSTEM_HPP
+#define GENODE_IO_FILESYSTEM_HPP
 
 #include <Genode/System/Primitives.hpp>
 #include <SFML/System/FileInputStream.hpp>
