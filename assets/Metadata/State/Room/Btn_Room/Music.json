@@ -1,7 +1,7 @@
 ﻿{
   "type": "LABEL",
   "require": {
-    "font": "Common/Font.ttf"
+    "font": "Common/Font.Unicode.ttf"
   },
   "attributes": {
     "transform": {
@@ -15,9 +15,9 @@
       "thickness": 1,
       "color": {
         "a": 255,
-        "r": 25,
-        "g": 25,
-        "b": 25
+        "r": 0,
+        "g": 0,
+        "b": 0
       }
     }
   }
