@@ -55,6 +55,9 @@ void StateRoom::Initialize()
     });
     AddChild(btnCreateRoom);
 
+    auto chatBox = Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
+    AddChild(chatBox);
+
     auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < 6; i++)
     {
