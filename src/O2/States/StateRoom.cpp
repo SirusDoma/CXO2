@@ -6,7 +6,7 @@
 #include <Genode/UI.hpp>
 
 #include <O2/States/StatePlanet.hpp>
-#include <O2/Components/Room/RoomButton.hpp>
+#include <O2/States/Components/Room/RoomButton.hpp>
 
 StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),

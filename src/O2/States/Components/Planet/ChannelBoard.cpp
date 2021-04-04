@@ -1,10 +1,10 @@
-﻿#include <O2/Components/Planet/ChannelBoard.hpp>
+﻿#include <O2/States/Components/Planet/ChannelBoard.hpp>
 
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Move.hpp>
 
-#include <O2/Components/Planet/ChannelButton.hpp>
+#include <O2/States/Components/Planet/ChannelButton.hpp>
 
 ChannelBoard::ChannelBoard(Gx::Scene &scene) :
     m_planetInfo(),

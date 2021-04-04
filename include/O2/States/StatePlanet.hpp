@@ -10,7 +10,7 @@
 #include <O2/States/State.hpp>
 #include <O2/Data/Planet.hpp>
 
-#include <O2/Components/Planet/ChannelBoard.hpp>
+#include <O2/States/Components/Planet/ChannelBoard.hpp>
 
 class StatePlanet : public State
 {
