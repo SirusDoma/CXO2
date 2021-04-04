@@ -29,7 +29,7 @@ namespace Gx
             return;
 
         m_focused = focus;
-        auto uiEvent = Event{false, m_focused ? Control::State::Hover : Control::State::Normal};
+        auto uiEvent = Event{false, GetControlState()};
         if (m_onFocusChanged)
             m_onFocusChanged(*this, uiEvent);
 
@@ -93,17 +93,17 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    void Control::SetFocusChangedCallback(std::function<void(Control &, Event &)> callback)
+    void Control::SetFocusChangedCallback(std::function<void(Control&, Control::Event&)> callback)
     {
         m_onFocusChanged = callback;
     }
 
-    void Control::SetGainFocusCallback(std::function<void(Control &, Event &)> callback)
+    void Control::SetGainFocusCallback(std::function<void(Control&, Control::Event&)> callback)
     {
         m_onGainFocus = callback;
     }
 
-    void Control::SetLostFocusCallback(std::function<void(Control &, Event &)> callback)
+    void Control::SetLostFocusCallback(std::function<void(Control&, Control::Event&)> callback)
     {
         m_onLostFocus = callback;
     }
@@ -111,6 +111,26 @@ namespace Gx
     void Control::SetClickCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onClick = callback;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetFocusChangedCallback()
+    {
+        return m_onFocusChanged;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetGainFocusCallback()
+    {
+        return m_onGainFocus;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetLostFocusCallback()
+    {
+        return m_onLostFocus;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetClickCallback()
+    {
+        return m_onClick;
     }
 
     void Control::AddChild(Control *node)

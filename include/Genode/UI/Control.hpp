@@ -58,6 +58,11 @@ namespace Gx
         const State GetControlState() const;
         void SetControlState(const State &state);
 
+        const std::function<void(Control&, Event&)>& GetFocusChangedCallback();
+        const std::function<void(Control&, Event&)>& GetGainFocusCallback();
+        const std::function<void(Control&, Event&)>& GetLostFocusCallback();
+        const std::function<void(Control&, Event&)>& GetClickCallback();
+
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
         virtual bool Input(sf::Event ev);

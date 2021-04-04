@@ -1,0 +1,21 @@
+﻿{
+  "type": "TEXTBOX",
+  "require": {
+    "font": "Common/Font.Unicode.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 170,
+        "y": 564
+      }
+    },
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "height": 12,
+      "width": 328
+    },
+    "fontSize": 12
+  }
+}

@@ -12,5 +12,6 @@
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Dialog.hpp>
+#include <Genode/UI/TextBox.hpp>
 
 #endif

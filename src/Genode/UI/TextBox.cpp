@@ -1,0 +1,318 @@
+#include <Genode/UI/TextBox.hpp>
+
+namespace Gx
+{
+    TextBox::TextBox() :
+        m_text(),
+        m_caret(*this),
+        m_bounds()
+    {
+    }
+
+    TextBox::TextBox(const sf::String &string, const sf::Font &font, unsigned int characterSize, sf::FloatRect bounds) :
+        m_text(string, font, characterSize),
+        m_caret(*this),
+        m_bounds(bounds),
+        m_maxLength(0)
+    {
+        if (m_bounds == sf::FloatRect())
+            m_bounds = m_text.GetLocalBounds();
+    }
+
+    const sf::FloatRect TextBox::GetLocalBounds() const
+    {
+        return m_bounds;
+    }
+
+    void TextBox::SetLocalBounds(sf::FloatRect bounds)
+    {
+        m_bounds = bounds;
+    }
+
+    sf::Vector2f TextBox::FindCharacterPosition(std::size_t index) const
+    {
+        return m_text.FindCharacterPosition(index);
+    }
+
+    void TextBox::SetString(const sf::String &string)
+    {
+        m_text.SetString(string);
+    }
+
+    void TextBox::SetFont(const sf::Font &font)
+    {
+        m_text.SetFont(font);
+    }
+
+    void TextBox::SetCharacterSize(unsigned int size)
+    {
+        m_text.SetCharacterSize(size);
+    }
+
+    void TextBox::SetLineSpacing(float spacingFactor)
+    {
+        m_text.SetLetterSpacing(spacingFactor);
+    }
+
+    void TextBox::SetLetterSpacing(float spacingFactor)
+    {
+        m_text.SetLetterSpacing(spacingFactor);
+    }
+
+    void TextBox::SetStyle(Uint32 style)
+    {
+        m_text.SetStyle(style);
+    }
+
+    void TextBox::SetColor(const sf::Color &color)
+    {
+        m_text.SetColor(color);
+    }
+
+    void TextBox::SetFillColor(const sf::Color &color)
+    {
+        m_text.SetFillColor(color);
+    }
+
+    void TextBox::SetOutlineColor(const sf::Color &color)
+    {
+        m_text.SetOutlineColor(color);
+    }
+
+    void TextBox::SetOutlineThickness(float thickness)
+    {
+        m_text.SetOutlineThickness(thickness);
+    }
+
+    const sf::String &TextBox::GetString() const
+    {
+        return m_text.GetString();
+    }
+
+    const sf::Font *TextBox::GetFont() const
+    {
+        return m_text.GetFont();
+    }
+
+    unsigned int TextBox::GetCharacterSize() const
+    {
+        return m_text.GetCharacterSize();
+    }
+
+    float TextBox::GetLetterSpacing() const
+    {
+        return m_text.GetLetterSpacing();
+    }
+
+    float TextBox::GetLineSpacing() const
+    {
+        return m_text.GetLineSpacing();
+    }
+
+    Uint32 TextBox::GetStyle() const
+    {
+        return m_text.GetStyle();
+    }
+
+    const sf::Color &TextBox::GetColor() const
+    {
+        return m_text.GetColor();
+    }
+
+    const sf::Color &TextBox::GetFillColor() const
+    {
+        return m_text.GetFillColor();
+    }
+
+    const sf::Color &TextBox::GetOutlineColor() const
+    {
+        return m_text.GetOutlineColor();
+    }
+
+    float TextBox::GetOutlineThickness() const
+    {
+        return m_text.GetOutlineThickness();
+    }
+
+    unsigned int TextBox::GetMaximumTextLength() const
+    {
+        return m_maxLength;
+    }
+
+    void TextBox::SetMaximumTextLength(unsigned int maxLength)
+    {
+        m_maxLength = maxLength;
+    }
+
+    void TextBox::SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback)
+    {
+        m_onTextEntered = callback;
+    }
+
+    void TextBox::Update(double delta)
+    {
+        m_caret.Update(delta);
+        Control::Update(delta);
+    }
+
+    sf::RenderStates TextBox::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    {
+        states.transform *= GetTransform();
+        target.draw(m_text, states);
+        if (IsFocused())
+            target.draw(m_caret, states);
+
+        return Control::Render(target, states);
+    }
+
+    void TextBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    {
+        SetFocus(true);
+        m_caret.Reset(true);
+    }
+
+    void TextBox::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    {
+        bool focused = IsFocused();
+        Control::OnMouseMove(ev);
+
+        SetFocus(focused);
+    }
+
+    void TextBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    {
+        Control::OnMouseButtonUp(ev);
+        SetFocus(GetControlState() != Control::State::Normal);
+    }
+
+    void TextBox::OnKeyDown(sf::Event::KeyEvent ev)
+    {
+        if (!IsEnabled() || !IsFocused())
+            return;
+
+        if (ev.code == sf::Keyboard::Backspace)
+        {
+            if (m_caret.Index == 0)
+                return;
+
+            auto str = m_text.GetString();
+            str.erase(m_caret.Index - 1);
+
+            m_text.SetString(str);
+            m_caret.Index--;
+
+            Invalidate();
+        }
+        else if (ev.code == sf::Keyboard::Enter)
+        {
+            if (m_onTextEntered)
+                m_onTextEntered(*this, m_text.GetString());
+
+            m_text.SetString("");
+            Invalidate();
+        }
+        else if (!ev.shift)
+        {
+            if (ev.code == sf::Keyboard::Left)
+                m_caret.Index--;
+            else if (ev.code == sf::Keyboard::Right)
+                m_caret.Index++;
+        }
+
+        Invalidate();
+    }
+
+    void TextBox::OnKeyType(sf::Event::TextEvent ev)
+    {
+        if (!IsEnabled() || !IsFocused())
+            return;
+
+        // backspace, tab, enter
+        if (ev.unicode == 8 || ev.unicode == 9 || ev.unicode == 13)
+            return;
+
+        auto str = m_text.GetString();
+        if (m_maxLength > 0 && str.getSize() >= m_maxLength)
+            return;
+
+        str.insert(m_caret.Index, " ");
+        m_text.SetString(str);
+        bool isFit = m_text.GetLocalBounds().width <= m_bounds.width;
+
+        str.erase(m_caret.Index);
+        m_text.SetString(str);
+        if (isFit)
+        {
+            str.insert(m_caret.Index, ev.unicode);
+            m_text.SetString(str);
+        }
+        else
+            return;
+
+        m_caret.Index++;
+        Invalidate();
+    }
+
+    void TextBox::Invalidate()
+    {
+        m_caret.Invalidate();
+        m_caret.Reset(true);
+    }
+}
+
+namespace Gx
+{
+    TextBox::Caret::Caret(TextBox &instance) :
+        Instance(instance),
+        Index(),
+        SelectionLength(),
+        m_cursor(),
+        m_elapsed(),
+        m_visible(true)
+    {
+        Invalidate();
+    }
+
+    void TextBox::Caret::Reset(bool visible)
+    {
+        m_elapsed = 0;
+        m_visible = visible;
+    }
+
+    sf::RenderStates TextBox::Caret::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    {
+        if (!m_visible)
+            return states;
+
+        target.draw(m_cursor, states);
+        return states;
+    }
+
+    void TextBox::Caret::Update(double delta)
+    {
+        m_elapsed += delta;
+        if (m_elapsed >= BLINK_THRESHOLD)
+        {
+            m_elapsed = 0;
+            m_visible = !m_visible;
+        }
+    }
+
+    void TextBox::Caret::Invalidate()
+    {
+        if (Index < 0)
+            Index = 0;
+
+        if (Index > Instance.GetString().getSize())
+            Index = Instance.GetString().getSize();
+
+        if (Instance.GetFont())
+        {
+            auto glyph = Instance.GetFont()->getGlyph('|', Instance.GetCharacterSize(), false);
+            m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, Instance.GetCharacterSize()));
+        }
+
+        m_cursor.SetPosition(Instance.FindCharacterPosition(Index));
+        m_cursor.SetFillColor(Instance.GetColor());
+    }
+}
