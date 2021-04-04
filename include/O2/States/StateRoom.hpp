@@ -8,11 +8,10 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <O2/States/State.hpp>
-#include <O2/States/Components/Room/RoomButton.hpp>
-
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Room.hpp>
 
+class RoomButton;
 class StateRoom : public State
 {
 public:

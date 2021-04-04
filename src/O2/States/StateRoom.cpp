@@ -1,8 +1,6 @@
 ﻿#include <O2/States/StateRoom.hpp>
 
-#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tasks.hpp>
-#include <Genode/Fx.hpp>
 #include <Genode/UI.hpp>
 
 #include <O2/States/StatePlanet.hpp>
