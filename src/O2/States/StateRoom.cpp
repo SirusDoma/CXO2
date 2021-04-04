@@ -64,9 +64,10 @@ void StateRoom::Initialize()
         auto roomData = RoomData{
             i + 1,
             "Let's play together~",
-            i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
+            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
             i <= 2 ? Difficulty::Easy : i <= 4 ? Difficulty::Normal : i <= 6 ? Difficulty::Hard : Difficulty::Master,
             SpeedType::HiSpeed,
+            i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
             (i + 1) * 0.5f,
             i % 2 == 0
         };

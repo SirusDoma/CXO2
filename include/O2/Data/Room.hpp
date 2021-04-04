@@ -2,6 +2,7 @@
 #define O2JAM_ROOM_HPP
 
 #include <O2/Data/Game.hpp>
+#include <O2/IO/Metadata/Chart/ChartMetadata.hpp>
 
 enum RoomState
 {
@@ -11,15 +12,16 @@ enum RoomState
 
 struct RoomData
 {
-    unsigned int Number;
-    sf::String   Title;
-    RoomState    State;
-    Difficulty   Difficulty;
-    SpeedType    SpeedType;
-    float        Speed;
-    bool         Locked;
-    unsigned int PlayerCount;
-    unsigned int Capacity;
+    unsigned int  Number;
+    sf::String    Title;
+    ChartMetadata Chart;
+    Difficulty    Difficulty;
+    SpeedType     SpeedType;
+    RoomState     State;
+    float         Speed;
+    bool          Locked;
+    unsigned int  PlayerCount;
+    unsigned int  Capacity;
 };
 
 #endif
