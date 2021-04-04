@@ -12,16 +12,17 @@ RoomButton::RoomButton(Gx::Scene &scene) :
     m_button->SetFocusChangedCallback([hover] (auto& sender, auto& ev) { hover->SetVisible(sender.IsFocused()); });
     hover->SetVisible(false);
 
-    m_titleLabel  = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Title.json");
-    m_musicLabel  = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Music.json");
-    m_numberLabel = scene.Create<Gx::Number>("Metadata/State/Room/Btn_Room/RoomNumber.json");
-    m_speedLabel  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameSpeed.json");
-    m_stateLabel  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/State.json");
-    m_gameMode    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameMode.json");
-    m_ohmLevel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/OhmLevel.json");
-    m_lock        = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Lock.json");
+    m_titleLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Title.json");
+    m_musicLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Music.json");
+    m_capacityLabel = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Capacity.json");
+    m_numberLabel   = scene.Create<Gx::Number>("Metadata/State/Room/Btn_Room/RoomNumber.json");
+    m_speedLabel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameSpeed.json");
+    m_stateLabel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/State.json");
+    m_gameMode      = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameMode.json");
+    m_ohmLevel      = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/OhmLevel.json");
+    m_lock          = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Lock.json");
 
-    AddChild(m_button, m_titleLabel, m_musicLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, hover);
+    AddChild(m_button, m_titleLabel, m_musicLabel, m_capacityLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, hover);
 }
 
 const sf::FloatRect RoomButton::GetLocalBounds() const
@@ -44,6 +45,11 @@ void RoomButton::Invalidate()
 {
     m_titleLabel->SetString(m_data.Title);
     m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
+
+    if (m_data.Number % 2 != 0)
+        m_capacityLabel->SetString("(" + std::to_string(m_data.PlayerCount) + "/" + std::to_string(m_data.Capacity) + ")");
+    else
+        m_capacityLabel->SetString("(1/8)");
 
     m_numberLabel->SetValue(m_data.Number);
     m_numberLabel->SetDigitCount(3);

@@ -20,8 +20,8 @@ struct RoomData
     RoomState     State;
     float         Speed;
     bool          Locked;
-    unsigned int  PlayerCount;
-    unsigned int  Capacity;
+    unsigned int  PlayerCount = 1;
+    unsigned int  Capacity    = 8;
 };
 
 #endif
