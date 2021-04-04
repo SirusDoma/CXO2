@@ -15,7 +15,7 @@
 #include <O2/Loaders/UI/ButtonLoader.hpp>
 #include <O2/Loaders/UI/RadioButtonLoader.hpp>
 #include <O2/Loaders/UI/ProgressBarLoader.hpp>
-#include <O2/Loaders/UI/RepeaterLoader.hpp>
+#include <O2/Loaders/UI/ListLoader.hpp>
 #include <O2/Loaders/UI/DialogLoader.hpp>
 
 void O2Jam::OnStart()
@@ -43,7 +43,7 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ProgressBar, ProgressBarLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Repeater, RepeaterLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
 
     // Load global assets

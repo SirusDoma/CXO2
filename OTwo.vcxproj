@@ -64,7 +64,7 @@
     <ClCompile Include="src\Genode\UI\Number.cpp" />
     <ClCompile Include="src\Genode\UI\ProgressBar.cpp" />
     <ClCompile Include="src\Genode\UI\RadioButton.cpp" />
-    <ClCompile Include="src\Genode\UI\Repeater.cpp" />
+    <ClCompile Include="src\Genode\UI\List.cpp" />
     <ClCompile Include="src\Genode\UI\UiContainer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\O2\Components\Planet\ChannelBoard.cpp" />
@@ -85,7 +85,7 @@
     <ClCompile Include="src\O2\IO\Loaders\UI\NumberLoader.cpp" />
     <ClCompile Include="src\O2\IO\Loaders\UI\ProgressLoader.cpp" />
     <ClCompile Include="src\O2\IO\Loaders\UI\RadioButtonLoader.cpp" />
-    <ClCompile Include="src\O2\IO\Loaders\UI\RepeaterLoader.cpp" />
+    <ClCompile Include="src\O2\IO\Loaders\UI\ListLoader.cpp" />
     <ClCompile Include="src\O2\O2Jam.cpp" />
     <ClCompile Include="src\O2\States\State.cpp" />
     <ClCompile Include="src\O2\States\StateAvi.cpp" />
@@ -160,7 +160,7 @@
     <ClInclude Include="include\Genode\UI\Number.hpp" />
     <ClInclude Include="include\Genode\UI\ProgressBar.hpp" />
     <ClInclude Include="include\Genode\UI\RadioButton.hpp" />
-    <ClInclude Include="include\Genode\UI\Repeater.hpp" />
+    <ClInclude Include="include\Genode\UI\List.hpp" />
     <ClInclude Include="include\Genode\UI\UiContainer.hpp" />
     <ClInclude Include="include\O2\Components\Planet\ChannelBoard.hpp" />
     <ClInclude Include="include\O2\Components\Planet\ChannelButton.hpp" />
@@ -185,7 +185,7 @@
     <ClInclude Include="include\O2\IO\Loaders\UI\NumberLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\UI\ProgressBarLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\UI\RadioButtonLoader.hpp" />
-    <ClInclude Include="include\O2\IO\Loaders\UI\RepeaterLoader.hpp" />
+    <ClInclude Include="include\O2\IO\Loaders\UI\ListLoader.hpp" />
     <ClInclude Include="include\O2\IO\Metadata\AnimationMetadata.hpp" />
     <ClInclude Include="include\O2\IO\Metadata\MusicMetadata.hpp" />
     <ClInclude Include="include\O2\IO\Metadata\SoundMetadata.hpp" />

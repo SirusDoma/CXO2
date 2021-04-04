@@ -1,18 +1,18 @@
-﻿#include <Genode/UI/Repeater.hpp>
+﻿#include <Genode/UI/List.hpp>
 
 namespace Gx
 {
-    Repeater::Repeater() :
-        Repeater(1, 0, 1, 0)
+    List::List() :
+        List(1, 0, 1, 0)
     {
     }
 
-    Repeater::Repeater(int verticalCount, float verticalSpacing) :
-        Repeater(verticalCount, verticalSpacing, 1, 0)
+    List::List(int verticalCount, float verticalSpacing) :
+        List(verticalCount, verticalSpacing, 1, 0)
     {
     }
 
-    Repeater::Repeater(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing) :
+    List::List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing) :
         m_verticalCount(verticalCount),
         m_verticalSpacing(verticalSpacing),
         m_horizontalCount(horizontalCount),
@@ -22,49 +22,49 @@ namespace Gx
     {
     }
 
-    Repeater::~Repeater()
+    List::~List()
     {
     }
 
 
-    void Repeater::SetVerticalRepeat(int count, float spacing)
+    void List::SetVerticalRepeat(int count, float spacing)
     {
         m_verticalCount   = count;
         m_verticalSpacing = spacing;
     }
 
-    void Repeater::SetHorizontalRepeat(int count, float spacing)
+    void List::SetHorizontalRepeat(int count, float spacing)
     {
         m_horizontalCount   = count;
         m_horizontalSpacing = spacing;
     }
 
-    int Repeater::GetRepeatCount() const
+    int List::GetRepeatCount() const
     {
         return m_verticalCount + m_horizontalCount;
     }
 
-    int Repeater::GetVerticalCount() const
+    int List::GetVerticalCount() const
     {
         return m_verticalCount;
     }
 
-    int Repeater::GetHorizontalCount() const
+    int List::GetHorizontalCount() const
     {
         return m_horizontalCount;
     }
 
-    float Repeater::GetVerticalSpacing() const
+    float List::GetVerticalSpacing() const
     {
         return m_verticalSpacing;
     }
 
-    float Repeater::GetHorizontalSpacing() const
+    float List::GetHorizontalSpacing() const
     {
         return m_horizontalSpacing;
     }
 
-    void Repeater::Apply(std::function<void(Control *)> fun)
+    void List::Apply(std::function<void(Control *)> fun)
     {
         if (!fun)
             return;
@@ -77,7 +77,7 @@ namespace Gx
         }
     }
 
-    void Repeater::AddChild(Control *control)
+    void List::AddChild(Control *control)
     {
         if (!control || m_horizontalCounter >= m_horizontalCount)
             return;
@@ -93,17 +93,17 @@ namespace Gx
         Control::AddChild(control);
     }
 
-    void Repeater::RemoveChild(Control *control)
+    void List::RemoveChild(Control *control)
     {
         Control::RemoveChild(control);
     }
 
-    void Repeater::Invalidate()
+    void List::Invalidate()
     {
         UiContainer::Invalidate();
     }
 
-    void Repeater::ClearChildren()
+    void List::ClearChildren()
     {
         Node::ClearChildren();
         m_verticalCounter   = 0;

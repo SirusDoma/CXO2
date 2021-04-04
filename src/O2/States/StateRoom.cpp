@@ -57,7 +57,7 @@ void StateRoom::Initialize()
     });
     AddChild(btnCreateRoom);
 
-    auto roomList = Create<Gx::Repeater>("Metadata/State/Room/RoomList.json");
+    auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < 6; i++)
     {
         auto roomButton = std::make_unique<RoomButton>(*this);

@@ -10,7 +10,7 @@
 #include <Genode/UI/Number.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/UiContainer.hpp>
-#include <Genode/UI/Repeater.hpp>
+#include <Genode/UI/List.hpp>
 
 #include <O2/Data/Planet.hpp>
 
@@ -55,7 +55,7 @@ private:
     Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
     Gx::Button      *m_channelTabButton, *m_noticeTabButton;
     Gx::UiContainer *m_channelListContainer;
-    Gx::Repeater    *m_repeater;
+    Gx::List        *m_list;
     Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
 
     Gx::Scene         *m_scene;

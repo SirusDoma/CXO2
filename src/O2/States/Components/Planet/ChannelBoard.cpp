@@ -46,7 +46,7 @@ void ChannelBoard::Initialize()
     m_channelCategory = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
     m_channelListContainer->AddChild(m_channelCategory);
 
-    m_repeater = m_scene->Create<Gx::Repeater>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
+    m_list = m_scene->Create<Gx::List>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
     auto base = m_scene->GetLocalResources().Resolve<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
     for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
     {
@@ -56,10 +56,10 @@ void ChannelBoard::Initialize()
             m_selectedChannel = i;
         });
 
-        m_repeater->AddChild(channelButton.get());
+        m_list->AddChild(channelButton.get());
         m_channelButtons.push_back(std::move(channelButton));
     }
-    m_channelListContainer->AddChild(m_repeater);
+    m_channelListContainer->AddChild(m_list);
 
     m_currentPageNumber = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelCurrentPageNumber.json");
     m_maxPageNumber     = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
@@ -216,7 +216,7 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     SwitchTab(Tab::ChannelList);
     SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
 
-    m_repeater->SetVisible(false);
+    m_list->SetVisible(false);
     switch (planet)
     {
         case Planet::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
@@ -268,8 +268,8 @@ void ChannelBoard::ShowChannelList(int page)
     if (end > m_planetInfo.Channels.size())
         end   = m_planetInfo.Channels.size();
 
-    auto children = m_repeater->GetChildren();
-    m_repeater->SetVisible(true);
+    auto children = m_list->GetChildren();
+    m_list->SetVisible(true);
     for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
     {
         auto channelButton = dynamic_cast<ChannelButton*>(children[i]);

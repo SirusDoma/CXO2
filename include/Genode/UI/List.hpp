@@ -6,14 +6,14 @@
 
 namespace Gx
 {
-    class Repeater : public virtual UiContainer
+    class List : public virtual UiContainer
     {
     public:
-        Repeater();
-        Repeater(int verticalCount, float verticalSpacing);
-        Repeater(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
+        List();
+        List(int verticalCount, float verticalSpacing);
+        List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
 
-        virtual ~Repeater();
+        virtual ~List();
 
         void SetVerticalRepeat(int count, float spacing);
         void SetHorizontalRepeat(int count, float spacing);
