@@ -12,12 +12,12 @@
     },
     "fontSize": 12,
     "outline": {
-      "thickness": 1.5,
+      "thickness": 1,
       "color": {
         "a": 255,
-        "r": 15,
-        "g": 15,
-        "b": 15
+        "r": 25,
+        "g": 25,
+        "b": 25
       }
     }
   }
