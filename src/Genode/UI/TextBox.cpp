@@ -17,6 +17,8 @@ namespace Gx
     {
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
+
+        SetFocus(true);
     }
 
     const sf::FloatRect TextBox::GetLocalBounds() const
