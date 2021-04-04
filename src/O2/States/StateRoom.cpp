@@ -62,7 +62,7 @@ void StateRoom::Initialize()
     {
         auto roomButton = std::make_unique<RoomButton>(*this);
         auto roomData = RoomData{
-            i,
+            i + 1,
             "Let's play together~",
             i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
             i <= 2 ? Difficulty::Easy : i <= 4 ? Difficulty::Normal : i <= 6 ? Difficulty::Hard : Difficulty::Master,
@@ -118,5 +118,5 @@ void StateRoom::Initialize()
 
 void StateRoom::OnExitPlanet()
 {
-    QueueEvent([this] { GetDirector().SetScene(new StatePlanet(false)); });
+    QueueSceneEvent([this] { GetDirector().SetScene(new StatePlanet(false)); });
 }

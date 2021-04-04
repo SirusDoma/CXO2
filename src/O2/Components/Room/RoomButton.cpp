@@ -43,7 +43,7 @@ void RoomButton::SetRoomData(const RoomData &data)
 void RoomButton::Invalidate()
 {
     m_titleLabel->SetString(m_data.Title);
-    m_musicLabel->SetString("Lv.99 - Parousia");
+    m_musicLabel->SetString("Lv.36 - Earth Quake");
 
     m_numberLabel->SetValue(m_data.Number);
     m_numberLabel->SetDigitCount(3);

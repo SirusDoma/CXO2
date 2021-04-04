@@ -135,7 +135,7 @@ void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
     }
 
     m_connecting = true;
-    QueueEvent([=] { GetDirector().SetScene(new StateRoom(planet, channel)); } );
+    QueueSceneEvent([=] { GetDirector().SetScene(new StateRoom(planet, channel)); });
 }
 
 bool StatePlanet::IsConnecting()
