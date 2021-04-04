@@ -1,5 +1,5 @@
-#ifndef NUMBER_METADATA_HPP
-#define NUMBER_METADATA_HPP
+#ifndef O2JAM_NUMBER_METADATA_HPP
+#define O2JAM_NUMBER_METADATA_HPP
 
 #include <SFML/Graphics/Rect.hpp>
 #include <O2/Metadata/TransformMetadata.hpp>

@@ -1,5 +1,5 @@
-#ifndef IMAGE_LOADER_HPP
-#define IMAGE_LOADER_HPP
+#ifndef O2JAM_IMAGE_LOADER_HPP
+#define O2JAM_IMAGE_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/Image.hpp>

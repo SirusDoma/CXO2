@@ -1,5 +1,5 @@
-#ifndef NUMBER_LOADER_HPP
-#define NUMBER_LOADER_HPP
+#ifndef O2JAM_NUMBER_LOADER_HPP
+#define O2JAM_NUMBER_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/Number.hpp>

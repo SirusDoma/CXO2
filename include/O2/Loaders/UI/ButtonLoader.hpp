@@ -1,5 +1,5 @@
-#ifndef BUTTON_LOADER_HPP
-#define BUTTON_LOADER_HPP
+#ifndef O2JAM_BUTTON_LOADER_HPP
+#define O2JAM_BUTTON_LOADER_HPP
 
 #include <Genode/UI/Button.hpp>
 

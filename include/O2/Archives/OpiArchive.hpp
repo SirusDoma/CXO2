@@ -1,5 +1,5 @@
-#ifndef OPI_ARCHIVE_HPP
-#define OPI_ARCHIVE_HPP
+#ifndef O2JAM_OPI_ARCHIVE_HPP
+#define O2JAM_OPI_ARCHIVE_HPP
 
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>

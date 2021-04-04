@@ -1,5 +1,5 @@
-#ifndef LABEL_LOADER_HPP
-#define LABEL_LOADER_HPP
+#ifndef O2JAM_LABEL_LOADER_HPP
+#define O2JAM_LABEL_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <O2/Metadata/UI/LabelMetadata.hpp>

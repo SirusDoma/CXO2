@@ -1,5 +1,5 @@
-#ifndef RADIO_BUTTON_METADATA_HPP
-#define RADIO_BUTTON_METADATA_HPP
+#ifndef O2JAM_RADIO_BUTTON_METADATA_HPP
+#define O2JAM_RADIO_BUTTON_METADATA_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>

@@ -1,5 +1,5 @@
-#ifndef O2_FILE_ENTRY_HPP
-#define O2_FILE_ENTRY_HPP
+#ifndef O2JAM_O2_FILE_ENTRY_HPP
+#define O2JAM_O2_FILE_ENTRY_HPP
 
 #include <Genode/IO/Archive.hpp>
 

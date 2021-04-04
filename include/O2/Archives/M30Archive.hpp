@@ -1,5 +1,5 @@
-#ifndef M30_ARCHIVE_HPP
-#define M30_ARCHIVE_HPP
+#ifndef O2JAM_M30_ARCHIVE_HPP
+#define O2JAM_M30_ARCHIVE_HPP
 
 #include <SFML/System/FileInputStream.hpp>
 

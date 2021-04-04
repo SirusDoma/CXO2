@@ -1,5 +1,5 @@
-#ifndef LABEL_METADATA_HPP
-#define LABEL_METADATA_HPP
+#ifndef O2JAM_LABEL_METADATA_HPP
+#define O2JAM_LABEL_METADATA_HPP
 
 #include <O2/Metadata/TransformMetadata.hpp>
 

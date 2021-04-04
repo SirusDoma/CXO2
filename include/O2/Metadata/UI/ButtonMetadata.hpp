@@ -1,5 +1,5 @@
-#ifndef BUTTON_METADATA_HPP
-#define BUTTON_METADATA_HPP
+#ifndef O2JAM_BUTTON_METADATA_HPP
+#define O2JAM_BUTTON_METADATA_HPP
 
 #include <O2/Metadata/SpriteMetadata.hpp>
 

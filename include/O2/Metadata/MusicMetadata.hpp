@@ -1,5 +1,5 @@
-#ifndef MUSIC_METADATA_HPP
-#define MUSIC_METADATA_HPP
+#ifndef O2JAM_MUSIC_METADATA_HPP
+#define O2JAM_MUSIC_METADATA_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 

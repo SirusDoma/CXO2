@@ -1,5 +1,5 @@
-#ifndef O2JAM_METADATA_OJN_HPP
-#define O2JAM_METADATA_OJN_HPP
+#ifndef O2JAM_O2CHART_METADATA_HPP
+#define O2JAM_O2CHART_METADATA_HPP
 
 #include <SFML/System/String.hpp>
 #include <O2/Metadata/Chart/ChartMetadata.hpp>

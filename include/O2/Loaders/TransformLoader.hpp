@@ -1,5 +1,5 @@
-#ifndef TRANSFORM_LOADER_HPP
-#define TRANSFORM_LOADER_HPP
+#ifndef O2JAM_TRANSFORM_LOADER_HPP
+#define O2JAM_TRANSFORM_LOADER_HPP
 
 #include <SFML/Graphics/Transform.hpp>
 #include <O2/Loaders/O2JamResourceLoader.hpp>

@@ -1,5 +1,5 @@
-#ifndef STATE_ROOM_HPP
-#define STATE_ROOM_HPP
+#ifndef O2JAM_STATE_ROOM_HPP
+#define O2JAM_STATE_ROOM_HPP
 
 #include <SFML/Audio.hpp>
 

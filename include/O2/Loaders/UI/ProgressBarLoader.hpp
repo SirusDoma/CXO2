@@ -1,5 +1,5 @@
-#ifndef PROGRESS_BAR_LOADER_HPP
-#define PROGRESS_BAR_LOADER_HPP
+#ifndef O2JAM_PROGRESS_BAR_LOADER_HPP
+#define O2JAM_PROGRESS_BAR_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/ProgressBar.hpp>

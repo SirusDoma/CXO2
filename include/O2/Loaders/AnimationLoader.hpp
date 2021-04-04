@@ -1,5 +1,5 @@
-#ifndef ANIMATION_LOADER_HPP
-#define ANIMATION_LOADER_HPP
+#ifndef O2JAM_ANIMATION_LOADER_HPP
+#define O2JAM_ANIMATION_LOADER_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceContext.hpp>

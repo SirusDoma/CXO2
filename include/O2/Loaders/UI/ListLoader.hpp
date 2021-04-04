@@ -1,5 +1,5 @@
-#ifndef REPEATER_LOADER_HPP
-#define REPEATER_LOADER_HPP
+#ifndef O2JAM_REPEATER_LOADER_HPP
+#define O2JAM_REPEATER_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/List.hpp>

@@ -1,5 +1,5 @@
-#ifndef STATE_PLANET_HPP
-#define STATE_PLANET_HPP
+#ifndef O2JAM_STATE_PLANET_HPP
+#define O2JAM_STATE_PLANET_HPP
 
 #include <SFML/Audio.hpp>
 

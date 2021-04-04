@@ -1,5 +1,5 @@
-#ifndef TRANSFORM_METADATA_HPP
-#define TRANSFORM_METADATA_HPP
+#ifndef O2JAM_TRANSFORM_METADATA_HPP
+#define O2JAM_TRANSFORM_METADATA_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 

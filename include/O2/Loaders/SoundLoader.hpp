@@ -1,5 +1,5 @@
-#ifndef SOUND_LOADER_HPP
-#define SOUND_LOADER_HPP
+#ifndef O2JAM_SOUND_LOADER_HPP
+#define O2JAM_SOUND_LOADER_HPP
 
 #include <SFML/Audio/Sound.hpp>
 #include <O2/Loaders/O2JamResourceLoader.hpp>

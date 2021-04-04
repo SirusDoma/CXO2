@@ -1,5 +1,5 @@
-#ifndef DIALOG_METADATA_HPP
-#define DIALOG_METADATA_HPP
+#ifndef O2JAM_DIALOG_METADATA_HPP
+#define O2JAM_DIALOG_METADATA_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>

@@ -1,6 +1,3 @@
-
-#include "O2JamResourceLoader.hpp"
-
 template<typename R>
 bool O2JamResourceLoader<R>::IsMetadataRequired() const
 {

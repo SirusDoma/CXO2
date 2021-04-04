@@ -1,5 +1,5 @@
-#ifndef ANIMATION_METADATA_HPP
-#define ANIMATION_METADATA_HPP
+#ifndef O2JAM_ANIMATION_METADATA_HPP
+#define O2JAM_ANIMATION_METADATA_HPP
 
 #include <O2/Metadata/SpriteMetadata.hpp>
 #include <vector>

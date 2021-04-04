@@ -1,5 +1,5 @@
-#ifndef DIALOG_LOADER_HPP
-#define DIALOG_LOADER_HPP
+#ifndef O2JAM_DIALOG_LOADER_HPP
+#define O2JAM_DIALOG_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 #include <Genode/UI/Dialog.hpp>

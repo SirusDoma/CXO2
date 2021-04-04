@@ -1,5 +1,5 @@
-#ifndef STATE_LOGO_HPP
-#define STATE_LOGO_HPP
+#ifndef O2JAM_STATE_LOGO_HPP
+#define O2JAM_STATE_LOGO_HPP
 
 #include <Genode/SceneGraph.hpp>
 #include <O2/States/State.hpp>

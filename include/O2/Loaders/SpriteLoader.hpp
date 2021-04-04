@@ -1,5 +1,5 @@
-#ifndef SPRITE_LOADER_HPP
-#define SPRITE_LOADER_HPP
+#ifndef O2JAM_SPRITE_LOADER_HPP
+#define O2JAM_SPRITE_LOADER_HPP
 
 #include <Genode/Graphics/Sprite.hpp>
 #include <O2/Loaders/O2JamResourceLoader.hpp>

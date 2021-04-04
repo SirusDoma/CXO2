@@ -1,5 +1,5 @@
-#ifndef PROGRESS_BAR_METADATA_HPP
-#define PROGRESS_BAR_METADATA_HPP
+#ifndef O2JAM_PROGRESS_BAR_METADATA_HPP
+#define O2JAM_PROGRESS_BAR_METADATA_HPP
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>

@@ -1,5 +1,5 @@
-#ifndef REPEATER_METADATA_HPP
-#define REPEATER_METADATA_HPP
+#ifndef O2JAM_REPEATER_METADATA_HPP
+#define O2JAM_REPEATER_METADATA_HPP
 
 #include <O2/Metadata/TransformMetadata.hpp>
 

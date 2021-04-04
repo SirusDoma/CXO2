@@ -1,5 +1,5 @@
-#ifndef SOUND_METADATA_HPP
-#define SOUND_METADATA_HPP
+#ifndef O2JAM_SOUND_METADATA_HPP
+#define O2JAM_SOUND_METADATA_HPP
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>

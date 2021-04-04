@@ -1,5 +1,5 @@
-#ifndef STATE_HPP
-#define STATE_HPP
+#ifndef O2JAM_STATE_HPP
+#define O2JAM_STATE_HPP
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Dialog.hpp>
