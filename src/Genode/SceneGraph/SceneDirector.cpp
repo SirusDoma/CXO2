@@ -92,7 +92,7 @@ namespace Gx
     void SceneDirector::ProcessEvents()
     {
         if (m_scene)
-            m_scene->ProcessEvents();
+            m_scene->ProcessSceneEvents();
     }
 
     bool SceneDirector::Close()

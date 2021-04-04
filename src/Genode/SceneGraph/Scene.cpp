@@ -54,6 +54,11 @@ namespace Gx
         return true;
     }
 
+    Application &Scene::GetApplication() const
+    {
+        return GetDirector().GetApplication();
+    }
+
     SceneDirector& Scene::GetDirector() const
     {
         return *m_director;
@@ -93,12 +98,57 @@ namespace Gx
     {
         if (!m_overlays.empty())
             m_overlays.pop_back();
+
+        Input(GetApplication().GetLastEvent());
     }
 
-    void Scene::QueueEvent(std::function<void()> evt)
+    void Scene::QueueSceneEvent(std::function<void()> evt)
     {
         if (evt)
             m_events.push(evt);
+    }
+
+    void Scene::ProcessSceneEvents()
+    {
+        auto& director = GetDirector();
+        while (!m_events.empty())
+        {
+            auto event = m_events.front();
+            m_events.pop();
+
+            if (event)
+                event();
+
+            if (director.GetScene() != this)
+                return;
+        }
+    }
+
+    bool Scene::Destroy(sf::SoundSource *source)
+    {
+        if (!source)
+            return false;
+
+        auto iterator = std::find_if(m_sources.begin(), m_sources.end(), [source] (const auto& e) { return source == e.get(); });
+        if (iterator != m_sources.end())
+            return m_sources.erase(iterator) == m_sources.end();
+
+        return false;
+    }
+
+    bool Scene::Destroy(Node *resource)
+    {
+        if (!resource)
+            return false;
+
+        auto iterator = std::find_if(m_entities.begin(), m_entities.end(), [resource] (const auto& e) { return resource == e.get(); });
+        if (iterator != m_entities.end())
+        {
+            RemoveChild(resource);
+            return m_entities.erase(iterator) == m_entities.end();
+        }
+
+        return false;
     }
 
     sf::RenderStates Scene::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -147,48 +197,5 @@ namespace Gx
         }
 
         return InputableContainer::Input(ev);
-    }
-
-    void Scene::ProcessEvents()
-    {
-        auto& director = GetDirector();
-        while (!m_events.empty())
-        {
-            auto event = m_events.front();
-            m_events.pop();
-
-            if (event)
-                event();
-
-            if (director.GetScene() != this)
-                return;
-        }
-    }
-
-    bool Scene::Destroy(sf::SoundSource *source)
-    {
-        if (!source)
-            return false;
-
-        auto iterator = std::find_if(m_sources.begin(), m_sources.end(), [source] (const auto& e) { return source == e.get(); });
-        if (iterator != m_sources.end())
-            return m_sources.erase(iterator) == m_sources.end();
-
-        return false;
-    }
-
-    bool Scene::Destroy(Node *resource)
-    {
-        if (!resource)
-            return false;
-
-        auto iterator = std::find_if(m_entities.begin(), m_entities.end(), [resource] (const auto& e) { return resource == e.get(); });
-        if (iterator != m_entities.end())
-        {
-            RemoveChild(resource);
-            return m_entities.erase(iterator) == m_entities.end();
-        }
-
-        return false;
     }
 }

@@ -28,6 +28,7 @@ namespace Gx
         const sf::FloatRect GetGlobalBounds() const;
 
         bool IsFocused() const;
+        void SetFocus(bool focus);
 
         void SetFocusChangedCallback(std::function<void(Control&, Event&)> callback);
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);

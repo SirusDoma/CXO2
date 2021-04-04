@@ -23,6 +23,24 @@ namespace Gx
         return m_focused;
     }
 
+    void Control::SetFocus(bool focus)
+    {
+        if (m_focused == focus || m_state == Control::State::Active)
+            return;
+
+        m_focused = focus;
+        auto uiEvent = Event{false, m_focused ? Control::State::Hover : Control::State::Normal};
+        if (m_onFocusChanged)
+            m_onFocusChanged(*this, uiEvent);
+
+        if (m_focused && m_onGainFocus)
+            m_onGainFocus(*this, uiEvent);
+        else if (!m_focused && m_onLostFocus)
+            m_onLostFocus(*this, uiEvent);
+
+        SetControlState(uiEvent.State);
+    }
+
     void Control::SetEnabled(bool enabled)
     {
         m_enabled = enabled;
@@ -55,6 +73,7 @@ namespace Gx
         if (m_state != state)
         {
             m_state = state;
+            SetFocus(m_state == Control::State::Hover || m_state == Control::State::Active);
             if (IsEnabled())
                 OnControlStateChanged(this, m_state);
         }
@@ -162,24 +181,6 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        bool focus = m_state == Control::State::Hover || m_state == Control::State::Active;
-        if (focus != m_focused)
-        {
-            m_focused = focus;
-            auto uiEvent = Event{false, GetControlState()};
-            if (m_onFocusChanged)
-                m_onFocusChanged(*this, uiEvent);
-
-            if (m_focused && m_onGainFocus)
-                m_onGainFocus(*this, uiEvent);
-            else if (!m_focused && m_onLostFocus)
-                m_onLostFocus(*this, uiEvent);
-
-            SetControlState(uiEvent.State);
-            if (uiEvent.Handled)
-                return;
-        }
-
         InputableContainer::OnMouseMove(ev);
     }
 
@@ -201,9 +202,9 @@ namespace Gx
 
     void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        if (m_state == Control::State::Active)
+        if (GetGlobalBounds().contains(ev.x, ev.y))
         {
-            if (GetGlobalBounds().contains(ev.x, ev.y))
+            if (m_state == Control::State::Active)
             {
                 if (m_onClick)
                 {
@@ -220,8 +221,10 @@ namespace Gx
                 OnControlClick(this, ev);
             }
             else
-                SetControlState(Control::State::Normal);
+                SetControlState(Control::State::Hover);
         }
+        else
+            SetControlState(Control::State::Normal);
 
         InputableContainer::OnMouseButtonUp(ev);
     }

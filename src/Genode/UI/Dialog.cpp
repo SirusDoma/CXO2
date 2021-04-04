@@ -142,6 +142,12 @@ namespace Gx
             m_scene->PushOverlay(this);
 
             m_shown = true;
+
+            sf::RenderTarget& target = m_scene->GetApplication();
+            auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(static_cast<sf::RenderWindow&>(target)));
+
+            m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+            m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
         }
     }
 

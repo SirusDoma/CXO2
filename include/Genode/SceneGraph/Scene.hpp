@@ -15,6 +15,7 @@
 #include <Genode/Tasks/TaskContainer.hpp>
 
 #include <queue>
+#include <Genode/System/Application.hpp>
 
 namespace Gx
 {
@@ -31,6 +32,7 @@ namespace Gx
 
         virtual ~Scene();
 
+        Application &GetApplication() const;
         SceneDirector &GetDirector() const;
         sf::View GetView() const;
 
@@ -49,7 +51,7 @@ namespace Gx
         void PushOverlay(Node *overlay);
         void CloseOverlay();
 
-        void QueueEvent(std::function<void()> evt);
+        void QueueSceneEvent(std::function<void()> evt);
 
     protected:
         using EntityContainer      = std::vector<ResourcePtr<Node>>;
@@ -62,7 +64,7 @@ namespace Gx
         virtual void Update(double delta);
         virtual bool Input(sf::Event ev);
 
-        virtual void ProcessEvents();
+        virtual void ProcessSceneEvents();
 
     private:
         template<typename R>

@@ -64,17 +64,17 @@ namespace Gx
         while (m_window.isOpen())
         {
             // Poll window event
-            sf::Event ev = sf::Event();
-            while (m_window.pollEvent(ev))
+            m_event = sf::Event();
+            while (m_window.pollEvent(m_event))
             {
                 // Call window event handlers based on received event
-                switch (ev.type)
+                switch (m_event.type)
                 {
                     case sf::Event::Closed:      OnClose();             break;
                     case sf::Event::GainedFocus: OnFocusChanged(true);  break;
                     case sf::Event::LostFocus:   OnFocusChanged(false); break;
-                    case sf::Event::Resized:     OnResized(ev.size);    break;
-                    default:                     OnInputReceived(ev);   break;
+                    case sf::Event::Resized:     OnResized(m_event.size);    break;
+                    default:                     OnInputReceived(m_event);   break;
                 }
             }
 
@@ -125,6 +125,11 @@ namespace Gx
     sf::RenderWindow &Application::GetRenderWindow() const
     {
         return m_window;
+    }
+
+    sf::Event Application::GetLastEvent() const
+    {
+        return m_event;
     }
 
     void Application::ShareResources(ResourceManager &resources)
@@ -196,6 +201,7 @@ namespace Gx
         }
 
         // Pass input into active scene via director
+        m_event = ev;
         m_director->Input(ev);
 
         // Move cursor
@@ -217,5 +223,10 @@ namespace Gx
 
     void Application::OnResized(sf::Event::SizeEvent ev)
     {
+    }
+
+    Application::operator sf::RenderTarget&() const
+    {
+        return m_window;
     }
 }

@@ -29,6 +29,7 @@ namespace Gx
         void Close();
 
         unsigned int GetRenderFrequency() const;
+        sf::Event GetLastEvent() const;
         void SetCursor(const Cursor &cursor);
 
         template<typename T>
@@ -42,6 +43,8 @@ namespace Gx
 
         template<typename T>
         T *GetModule() const;
+
+        operator sf::RenderTarget&() const;
 
     protected:
         sf::RenderWindow &GetRenderWindow() const;
@@ -57,6 +60,7 @@ namespace Gx
 
     private:
         mutable sf::RenderWindow m_window;
+        sf::Event m_event;
 
         SceneDirector  *m_director;
         ResourceManager m_resources;
