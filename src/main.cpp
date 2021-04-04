@@ -7,7 +7,7 @@
 
 int main()
 {
-//    sf::Texture hcursor;S
+//    sf::Texture hcursor;
 //    hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
 //    Gx::Cursor cursor = Gx::Cursor(hcursor);
 
