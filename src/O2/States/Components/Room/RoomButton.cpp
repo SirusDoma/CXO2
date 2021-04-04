@@ -12,8 +12,8 @@ RoomButton::RoomButton(Gx::Scene &scene) :
     m_button->SetFocusChangedCallback([hover] (auto& sender, auto& ev) { hover->SetVisible(sender.IsFocused()); });
     hover->SetVisible(false);
 
-    m_titleLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Title.json");
-    m_musicLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Music.json");
+    m_titleLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/TitleLabel.json");
+    m_musicLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/MusicLabel.json");
     m_capacityLabel = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Capacity.json");
     m_numberLabel   = scene.Create<Gx::Number>("Metadata/State/Room/Btn_Room/RoomNumber.json");
     m_speedLabel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameSpeed.json");
