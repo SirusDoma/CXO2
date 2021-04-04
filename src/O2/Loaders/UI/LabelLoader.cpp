@@ -90,4 +90,9 @@ void LabelLoader::ParseLabel(Json attributes, LabelMetadata &metadata)
             metadata.SetOutlineColor(sf::Color(r, g, b, a));
         }
     }
+    else
+    {
+        metadata.SetOutlineThickness(0.f);
+        metadata.SetOutlineColor(sf::Color::Transparent);
+    }
 }
