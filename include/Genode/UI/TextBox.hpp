@@ -28,6 +28,8 @@ namespace Gx
 
         virtual void SetColor(const sf::Color& color);
         void SetFillColor(const sf::Color& color);
+        virtual void SetHighlightBackColor(const sf::Color& color);
+        void SetHighlightTextColor(const sf::Color& color);
         void SetOutlineColor(const sf::Color& color);
         void SetOutlineThickness(float thickness);
 
@@ -41,6 +43,8 @@ namespace Gx
 
         virtual const sf::Color& GetColor() const;
         const sf::Color& GetFillColor() const;
+        virtual const sf::Color& GetHighlightBackColor() const;
+        const sf::Color& GetHighlightTextColor() const;
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;
 
@@ -72,6 +76,7 @@ namespace Gx
             Caret(TextBox &instance);
             void Reset(bool visible = false);
             const Rectangle &GetHighlight() const;
+            void SetHighlightColor(sf::Color color);
 
             virtual void Update(double delta);
             virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -88,6 +93,7 @@ namespace Gx
 
         Text  m_text;
         Caret m_caret;
+        sf::Color m_highlightColor;
         sf::FloatRect m_bounds;
         unsigned int m_maxLength;
 

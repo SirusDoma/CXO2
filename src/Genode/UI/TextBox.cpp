@@ -5,7 +5,8 @@ namespace Gx
     TextBox::TextBox() :
         m_text(),
         m_caret(*this),
-        m_bounds()
+        m_bounds(),
+        m_maxLength()
     {
     }
 
@@ -19,6 +20,8 @@ namespace Gx
             m_bounds = m_text.GetLocalBounds();
 
         SetFocus(true);
+        SetHighlightBackColor(sf::Color(150, 185, 215));
+        SetHighlightTextColor(sf::Color::Black);
     }
 
     const sf::FloatRect TextBox::GetLocalBounds() const
@@ -76,6 +79,16 @@ namespace Gx
         m_text.SetFillColor(color);
     }
 
+    void TextBox::SetHighlightBackColor(const sf::Color &color)
+    {
+        m_caret.SetHighlightColor(color);
+    }
+
+    void TextBox::SetHighlightTextColor(const sf::Color &color)
+    {
+        m_highlightColor = color;
+    }
+
     void TextBox::SetOutlineColor(const sf::Color &color)
     {
         m_text.SetOutlineColor(color);
@@ -124,6 +137,15 @@ namespace Gx
     const sf::Color &TextBox::GetFillColor() const
     {
         return m_text.GetFillColor();
+    }
+    const sf::Color &TextBox::GetHighlightBackColor() const
+    {
+        return m_caret.GetHighlight().GetColor();
+    }
+
+    const sf::Color &TextBox::GetHighlightTextColor() const
+    {
+        return m_highlightColor;
     }
 
     const sf::Color &TextBox::GetOutlineColor() const
@@ -341,7 +363,7 @@ namespace Gx
             for (size_t index = 0; index < m_text.GetString().getSize(); index++)
             {
                 if (index >= start && index < start + std::abs(m_caret.SelectionLength))
-                    m_text.SetFillColor(sf::Color::Black, index);
+                    m_text.SetFillColor(m_highlightColor, index);
             }
         }
     }
@@ -358,6 +380,7 @@ namespace Gx
         m_elapsed(),
         m_visible(true)
     {
+        SetHighlightColor(sf::Color::Transparent);
         Invalidate();
     }
 
@@ -370,6 +393,11 @@ namespace Gx
     const Rectangle &TextBox::Caret::GetHighlight() const
     {
         return m_highlight;
+    }
+
+    void TextBox::Caret::SetHighlightColor(sf::Color color)
+    {
+        m_highlight.SetColor(color);
     }
 
     sf::RenderStates TextBox::Caret::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -421,7 +449,6 @@ namespace Gx
             auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
             m_highlight.SetPosition(sf::Vector2f(charPos.x, charPos.y + 0.65f));
             m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), Instance.GetCharacterSize()));
-            m_highlight.SetColor(sf::Color(150, 185, 215));
         }
         else
             m_highlight.SetSize(sf::Vector2f());
