@@ -169,8 +169,24 @@ namespace Gx
 
     void TextBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
+        float minDistance  = -1;
+        size_t selectIndex = m_caret.Index;
+        for (size_t index = 0; index <= m_text.GetString().getSize(); index++)
+        {
+            float distance = std::abs((FindCharacterPosition(index).x + GetPosition().x) - ev.x);
+            if (minDistance == -1 || distance < minDistance)
+            {
+                selectIndex = index;
+                minDistance = distance;
+            }
+            else if (distance > minDistance)
+                break;
+        }
+
         SetFocus(true);
-        m_caret.Reset(true);
+        m_caret.Index = selectIndex;
+
+        Invalidate();
     }
 
     void TextBox::OnMouseMove(sf::Event::MouseMoveEvent ev)
