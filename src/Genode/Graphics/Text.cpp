@@ -192,6 +192,9 @@ namespace Gx
             // (if geometry is updated anyway, we can skip this step)
             if (!m_geometryNeedUpdate)
             {
+                if (m_string[index] == L' ' || m_string[index] == L'\n' && m_string[index] == L'\t')
+                    return;
+
                 size_t start = 0;
                 for (size_t i = 0; i < index; ++i)
                 {
