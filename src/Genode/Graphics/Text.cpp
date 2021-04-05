@@ -84,7 +84,8 @@ namespace Gx
         m_outlineVertices(sf::Triangles),
         m_bounds(),
         m_geometryNeedUpdate(false),
-        m_fontTextureId(0)
+        m_fontTextureId(0),
+        m_colorMap()
     {
     }
 
@@ -102,7 +103,8 @@ namespace Gx
         m_outlineVertices(sf::Triangles),
         m_bounds(),
         m_geometryNeedUpdate(true),
-        m_fontTextureId(0)
+        m_fontTextureId(0),
+        m_colorMap()
     {
     }
 
@@ -164,9 +166,10 @@ namespace Gx
 
     void Text::SetFillColor(const sf::Color& color)
     {
-        if (color != m_fillColor)
+        if (color != m_fillColor || !m_colorMap.empty())
         {
             m_fillColor = color;
+            m_colorMap.clear();
 
             // Change vertex colors directly, no need to update whole geometry
             // (if geometry is updated anyway, we can skip this step)
@@ -174,6 +177,35 @@ namespace Gx
             {
                 for (std::size_t i = 0; i < m_vertices.getVertexCount(); ++i)
                     m_vertices[i].color = m_fillColor;
+            }
+        }
+    }
+
+    void Text::SetFillColor(const sf::Color &color, size_t index)
+    {
+        auto iterator = m_colorMap.find(index);
+        if (iterator == m_colorMap.end() || (iterator != m_colorMap.end() && iterator->second != color))
+        {
+            m_colorMap[index] = color;
+
+            // Change vertex colors directly, no need to update whole geometry
+            // (if geometry is updated anyway, we can skip this step)
+            if (!m_geometryNeedUpdate)
+            {
+                size_t start = 0;
+                for (size_t i = 0; i < index; ++i)
+                {
+                    if (m_string[i] != L' ' && m_string[i] != L'\n' && m_string[i] != L'\t')
+                        start++;
+                }
+
+                for (std::size_t i = start * 6; i < (start * 6) + 6; ++i)
+                {
+                    if (i >= m_vertices.getVertexCount())
+                        break;
+
+                    m_vertices[i].color = color;
+                }
             }
         }
     }
@@ -396,6 +428,10 @@ namespace Gx
         {
             Uint32 curChar = m_string[i];
 
+            sf::Color fillColor = m_fillColor;
+            if (m_colorMap.find(i) != m_colorMap.end())
+                fillColor = m_colorMap[i];
+
             // Skip the \r char to avoid weird graphical issues
             if (curChar == '\r')
                 continue;
@@ -406,7 +442,7 @@ namespace Gx
             // If we're using the underlined style and there's a new line, draw a line
             if (isUnderlined && (curChar == L'\n' && prevChar != L'\n'))
             {
-                AddLine(m_vertices, x, y, m_fillColor, underlineOffset, underlineThickness);
+                AddLine(m_vertices, x, y, fillColor, underlineOffset, underlineThickness);
 
                 if (m_outlineThickness != 0)
                     AddLine(m_outlineVertices, x, y, m_outlineColor, underlineOffset, underlineThickness, m_outlineThickness);
@@ -415,7 +451,7 @@ namespace Gx
             // If we're using the strike through style and there's a new line, draw a line across all characters
             if (isStrikeThrough && (curChar == L'\n' && prevChar != L'\n'))
             {
-                AddLine(m_vertices, x, y, m_fillColor, strikeThroughOffset, underlineThickness);
+                AddLine(m_vertices, x, y, fillColor, strikeThroughOffset, underlineThickness);
 
                 if (m_outlineThickness != 0)
                     AddLine(m_outlineVertices, x, y, m_outlineColor, strikeThroughOffset, underlineThickness, m_outlineThickness);
@@ -469,7 +505,7 @@ namespace Gx
             const sf::Glyph& glyph = m_font->getGlyph(curChar, m_characterSize, isBold);
 
             // Add the glyph to the vertices
-            AddGlyphQuad(m_vertices, sf::Vector2f(x, y), m_fillColor, glyph, italicShear);
+            AddGlyphQuad(m_vertices, sf::Vector2f(x, y), fillColor, glyph, italicShear);
 
             // Update the current bounds with the non outlined glyph bounds
             if (m_outlineThickness == 0)
@@ -513,5 +549,4 @@ namespace Gx
         m_bounds.width  = maxX - minX;
         m_bounds.height = maxY - minY;
     }
-
 }

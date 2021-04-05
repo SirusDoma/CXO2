@@ -40,6 +40,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <memory>
 
 namespace
@@ -88,6 +89,7 @@ namespace Gx
 
         virtual void SetColor(const sf::Color& color);
         void SetFillColor(const sf::Color& color);
+        void SetFillColor(const sf::Color& color, size_t index);
         void SetOutlineColor(const sf::Color& color);
         void SetOutlineThickness(float thickness);
 
@@ -113,6 +115,8 @@ namespace Gx
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
 
     private:
+        using ColorMap = std::unordered_map<size_t, sf::Color>;
+
         sf::String             m_string;
         const sf::Font*         m_font;
         unsigned int            m_characterSize;
@@ -127,6 +131,7 @@ namespace Gx
         mutable sf::FloatRect   m_bounds;
         mutable bool            m_geometryNeedUpdate; 
         mutable Uint64          m_fontTextureId;
+        mutable ColorMap        m_colorMap;
     };
 
 }
