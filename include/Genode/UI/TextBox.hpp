@@ -67,10 +67,11 @@ namespace Gx
         public:
             TextBox& Instance;
             int Index;
-            unsigned int SelectionLength;
+            int SelectionLength;
 
             Caret(TextBox &instance);
             void Reset(bool visible = false);
+            const Rectangle &GetHighlight() const;
 
             virtual void Update(double delta);
             virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -80,7 +81,7 @@ namespace Gx
         private:
             const double BLINK_THRESHOLD = 500.f;
 
-            Rectangle m_cursor;
+            Rectangle m_cursor, m_highlight;
             bool      m_visible;
             double    m_elapsed;
         };

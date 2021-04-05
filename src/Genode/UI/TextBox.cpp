@@ -160,6 +160,9 @@ namespace Gx
     sf::RenderStates TextBox::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
         states.transform *= GetTransform();
+        if (m_caret.SelectionLength != 0)
+            target.draw(m_caret.GetHighlight(), states);
+
         target.draw(m_text, states);
         if (IsFocused())
             target.draw(m_caret, states);
@@ -208,18 +211,27 @@ namespace Gx
         if (!IsEnabled() || !IsFocused())
             return;
 
-        if (ev.code == sf::Keyboard::Backspace)
+        if (ev.code == sf::Keyboard::Backspace || (ev.code == sf::Keyboard::Delete && m_caret.SelectionLength != 0))
         {
             if (m_caret.Index == 0)
                 return;
 
+            size_t index = m_caret.Index - 1;
+            int length   = m_caret.SelectionLength;
+            if (length < 0)
+                index += length + 1;
+            else if (length > 0)
+                index++;
+
             auto str = m_text.GetString();
-            str.erase(m_caret.Index - 1);
-
+            str.erase(index, length == 0 ? 1 : std::abs(length));
             m_text.SetString(str);
-            m_caret.Index--;
 
-            Invalidate();
+            m_caret.SelectionLength = 0;
+            if (length == 0)
+                m_caret.Index--;
+            else
+                m_caret.Index = index;
         }
         else if (ev.code == sf::Keyboard::Delete)
         {
@@ -230,7 +242,7 @@ namespace Gx
             str.erase(m_caret.Index);
 
             m_text.SetString(str);
-            Invalidate();
+            m_caret.SelectionLength = 0;
         }
         else if (ev.code == sf::Keyboard::Enter)
         {
@@ -238,14 +250,45 @@ namespace Gx
                 m_onTextEntered(*this, m_text.GetString());
 
             m_text.SetString("");
-            Invalidate();
+            m_caret.SelectionLength = 0;
         }
         else if (!ev.shift)
         {
             if (ev.code == sf::Keyboard::Left)
+            {
                 m_caret.Index--;
+                m_caret.SelectionLength = 0;
+                m_text.SetFillColor(m_text.GetFillColor());
+            }
             else if (ev.code == sf::Keyboard::Right)
+            {
                 m_caret.Index++;
+                m_caret.SelectionLength = 0;
+                m_text.SetFillColor(m_text.GetFillColor());
+            }
+            else
+                return;
+        }
+        else if (ev.shift)
+        {
+            if (ev.code == sf::Keyboard::Left)
+            {
+                if (m_caret.Index <= 0)
+                    return;
+
+                m_caret.Index--;
+                m_caret.SelectionLength++;
+            }
+            else if (ev.code == sf::Keyboard::Right)
+            {
+                if (m_caret.Index >= m_text.GetString().getSize())
+                    return;
+
+                m_caret.Index++;
+                m_caret.SelectionLength--;
+            }
+            else
+                return;
         }
 
         Invalidate();
@@ -257,6 +300,7 @@ namespace Gx
             return;
 
         // backspace, tab, enter
+        m_caret.SelectionLength = 0;
         if (ev.unicode == 8 || ev.unicode == 9 || ev.unicode == 13)
             return;
 
@@ -286,6 +330,20 @@ namespace Gx
     {
         m_caret.Invalidate();
         m_caret.Reset(true);
+
+        size_t start = m_caret.Index;
+        if (m_caret.SelectionLength < 0)
+            start += m_caret.SelectionLength;
+
+        m_text.SetFillColor(m_text.GetFillColor());
+        if (m_caret.SelectionLength != 0)
+        {
+            for (size_t index = 0; index < m_text.GetString().getSize(); index++)
+            {
+                if (index >= start && index < start + std::abs(m_caret.SelectionLength))
+                    m_text.SetFillColor(sf::Color::Black, index);
+            }
+        }
     }
 }
 
@@ -296,6 +354,7 @@ namespace Gx
         Index(),
         SelectionLength(),
         m_cursor(),
+        m_highlight(),
         m_elapsed(),
         m_visible(true)
     {
@@ -306,6 +365,11 @@ namespace Gx
     {
         m_elapsed = 0;
         m_visible = visible;
+    }
+
+    const Rectangle &TextBox::Caret::GetHighlight() const
+    {
+        return m_highlight;
     }
 
     sf::RenderStates TextBox::Caret::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -343,5 +407,23 @@ namespace Gx
 
         m_cursor.SetPosition(Instance.FindCharacterPosition(Index));
         m_cursor.SetFillColor(Instance.GetColor());
+
+        if (SelectionLength != 0)
+        {
+            size_t index = Index - 1;
+            int length   = SelectionLength;
+            if (length < 0)
+                index += length + 1;
+            else if (length > 0)
+                index++;
+
+            auto charPos = Instance.FindCharacterPosition(index);
+            auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
+            m_highlight.SetPosition(sf::Vector2f(charPos.x, charPos.y + 0.65f));
+            m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), Instance.GetCharacterSize()));
+            m_highlight.SetColor(sf::Color(150, 185, 215));
+        }
+        else
+            m_highlight.SetSize(sf::Vector2f());
     }
 }
