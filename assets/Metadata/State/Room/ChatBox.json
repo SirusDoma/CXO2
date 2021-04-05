@@ -16,6 +16,7 @@
       "height": 12,
       "width": 328
     },
-    "fontSize": 12
+    "fontSize": 12,
+    "maximumLength": 50
   }
 }
