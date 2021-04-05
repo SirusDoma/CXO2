@@ -221,6 +221,17 @@ namespace Gx
 
             Invalidate();
         }
+        else if (ev.code == sf::Keyboard::Delete)
+        {
+            if (m_caret.Index >= m_text.GetString().getSize())
+                return;
+
+            auto str = m_text.GetString();
+            str.erase(m_caret.Index);
+
+            m_text.SetString(str);
+            Invalidate();
+        }
         else if (ev.code == sf::Keyboard::Enter)
         {
             if (m_onTextEntered)
