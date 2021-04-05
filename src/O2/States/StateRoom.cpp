@@ -5,6 +5,7 @@
 
 #include <O2/States/StatePlanet.hpp>
 #include <O2/States/Components/Room/RoomButton.hpp>
+#include <iostream>
 
 StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),
@@ -56,6 +57,10 @@ void StateRoom::Initialize()
     AddChild(btnCreateRoom);
 
     auto chatBox = Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
+    chatBox->SetTextEnteredCallback([] (auto& textBox, sf::String text)
+    {
+       std::cout << std::string(text) << std::endl;
+    });
     AddChild(chatBox);
 
     auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
