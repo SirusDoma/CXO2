@@ -52,6 +52,7 @@ namespace Gx
         void SetMaximumTextLength(unsigned int maxLength);
         void SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback);
 
+        sf::String GetSelectedText() const;
         size_t Insert(size_t index, Uint32 unicode, int selectionLength = 0);
         size_t Erase(size_t index, int length);
 

@@ -15,6 +15,15 @@ include_directories(src)
 include_directories(include)
 include_directories(extlibs/headers)
 
+# External Libs Sources and Flags
+# -- SFML
+set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
+set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
+# -- Clip Flags
+set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
+set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
+add_subdirectory(extlibs/headers/clip)
+
 # Executable
 set(EXECUTABLE_NAME "OTwo")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
@@ -31,6 +40,9 @@ if(WIN32)
         RUNTIME_OUTPUT_DIRECTORY_DEBUG  ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
     )
+
+    # External Libs Compiler Flags
+    set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     # Set dependencies libs path
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
@@ -95,9 +107,8 @@ else()
     target_link_libraries(${EXECUTABLE_NAME} stdc++fs)
 endif()
 
-# SFML Flags
-set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
-set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
+# Link Clip
+target_link_libraries(${EXECUTABLE_NAME} clip)
 
 # Link SFML
 find_package(SFML 2.5.1 COMPONENTS audio graphics system window REQUIRED)

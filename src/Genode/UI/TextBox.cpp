@@ -1,4 +1,5 @@
 #include <Genode/UI/TextBox.hpp>
+#include <clip/clip.h>
 
 namespace Gx
 {
@@ -190,6 +191,20 @@ namespace Gx
         return fit;
     }
 
+    sf::String TextBox::GetSelectedText() const
+    {
+        auto index  = m_caret.Index - 1;
+        auto length = m_caret.SelectionLength;
+        if (length < 0)
+            index += length + 1;
+        else if (length > 0)
+            index++;
+        else
+            return sf::String();
+
+        return m_text.GetString().substring(index, std::abs(length));
+    }
+
     size_t TextBox::Insert(size_t index, Uint32 unicode, int selectionLength)
     {
         // backspace, tab, enter, etc
@@ -319,6 +334,26 @@ namespace Gx
 
             m_text.SetString("");
             m_caret.SelectionLength = 0;
+        }
+        else if (ev.control)
+        {
+            if (ev.code == sf::Keyboard::C || ev.code == sf::Keyboard::X)
+            {
+                clip::set_text(GetSelectedText());
+                if (ev.code == sf::Keyboard::X)
+                {
+                    m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
+                    m_caret.SelectionLength = 0;
+                }
+            }
+            else if (ev.code == sf::Keyboard::V)
+            {
+                auto string = std::string();
+                clip::get_text(string);
+
+                for (size_t index = 0; index < string.size(); index++)
+                    m_caret.Index = Insert(m_caret.Index, string[index]);
+            }
         }
         else if (!ev.shift)
         {

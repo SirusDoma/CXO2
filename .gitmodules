@@ -1,0 +1,3 @@
+[submodule "extlibs/headers/clip"]
+	path = extlibs/headers/clip
+	url = https://github.com/dacap/clip.git
