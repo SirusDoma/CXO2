@@ -189,9 +189,9 @@ namespace Gx
 
     void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
     {
-        bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
         if (GetControlState() != Control::State::Active)
         {
+            bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
             if (intersect && GetControlState() == Control::State::Normal)
                 SetControlState(Control::State::Hover);
             else if (!intersect && GetControlState() == Control::State::Hover)
