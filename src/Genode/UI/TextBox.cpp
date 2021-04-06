@@ -235,7 +235,7 @@ namespace Gx
 
         if (ev.code == sf::Keyboard::Backspace || (ev.code == sf::Keyboard::Delete && m_caret.SelectionLength != 0))
         {
-            if (m_caret.Index == 0)
+            if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
 
             size_t index = m_caret.Index - 1;
