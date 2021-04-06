@@ -1,0 +1,290 @@
+#include <Genode/UI/ScrollBar.hpp>
+
+namespace Gx
+{
+    ScrollBar::ScrollBar() :
+        m_sprite(),
+        m_bounds(),
+        m_step(1.f),
+        m_value(),
+        m_maxValue(100.f),
+        m_dragging(false),
+        m_anchorPoint()
+    {
+    }
+
+    ScrollBar::ScrollBar(const sf::Texture &texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+        m_sprite(texture),
+        m_bounds(),
+        m_step(1.f),
+        m_value(),
+        m_maxValue(100.f),
+        m_orientation(orientation),
+        m_dragging(false),
+        m_anchorPoint()
+    {
+        SetLocalBounds(bounds);
+    }
+
+    ScrollBar::ScrollBar(const sf::Texture &texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+        m_sprite(texture, texCoords),
+        m_bounds(),
+        m_step(1.f),
+        m_value(),
+        m_maxValue(100.f),
+        m_orientation(orientation),
+        m_dragging(false),
+        m_anchorPoint()
+    {
+        SetLocalBounds(bounds);
+    }
+
+    const sf::FloatRect ScrollBar::GetLocalBounds() const
+    {
+        return m_bounds;
+    }
+
+    void ScrollBar::SetLocalBounds(const sf::FloatRect &bounds)
+    {
+        if (m_bounds != bounds)
+        {
+            m_bounds = bounds;
+            Invalidate();
+        }
+    }
+
+    const sf::Texture *ScrollBar::GetTexture() const
+    {
+        return m_sprite.GetTexture();
+    }
+
+    void ScrollBar::SetTexture(const sf::Texture &texture, bool resetRect)
+    {
+        m_sprite.SetTexture(texture, resetRect);
+        Invalidate();
+    }
+
+    const sf::IntRect &ScrollBar::GetTexCoords() const
+    {
+        return m_sprite.GetTexCoords();
+    }
+
+    void ScrollBar::SetTexCoords(const sf::IntRect &rectangle)
+    {
+        if (m_sprite.GetTexCoords() != rectangle)
+        {
+            m_sprite.SetTexCoords(rectangle);
+            Invalidate();
+        }
+    }
+
+    const sf::Color &ScrollBar::GetColor() const
+    {
+        return m_sprite.GetColor();
+    }
+
+    void ScrollBar::SetColor(const sf::Color &color)
+    {
+        m_sprite.SetColor(color);
+    }
+
+    ScrollBar::ScrollOrientation ScrollBar::GetScrollOrientation() const
+    {
+        return m_orientation;
+    }
+
+    void ScrollBar::SetScrollOrientation(ScrollBar::ScrollOrientation orientation)
+    {
+        m_orientation = orientation;
+    }
+
+    float ScrollBar::GetValue() const
+    {
+        return m_value;
+    }
+
+    void ScrollBar::SetValue(float value)
+    {
+        value = std::min(value, m_maxValue);
+        value = std::max(value, 0.f);
+
+        if (value != m_value)
+        {
+            m_value = value;
+            if (m_onValueChanged)
+                m_onValueChanged(*this, m_value);
+
+            Invalidate();
+        }
+    }
+
+    void ScrollBar::SetValueChangedCallback(std::function<void(ScrollBar &, float)> callback)
+    {
+        m_onValueChanged = callback;
+    }
+
+    float ScrollBar::GetStep() const
+    {
+        return m_step;
+    }
+
+    void ScrollBar::SetStep(float step)
+    {
+        m_step = step;
+    }
+
+    float ScrollBar::GetMaximumValue() const
+    {
+        return m_maxValue;
+    }
+
+    void ScrollBar::SetMaximumValue(float max)
+    {
+        if (max != m_maxValue)
+        {
+            m_maxValue = max;
+            Invalidate();
+        }
+    }
+
+    sf::FloatRect ScrollBar::GetScrollBarGlobalBounds() const
+    {
+        auto parent    = GetParent();
+        auto transform = sf::Transform::Identity;
+        while (parent)
+        {
+            transform *= parent->GetTransform();
+            parent = parent->GetParent();
+        }
+
+        transform *= GetTransform();
+        transform *= m_sprite.GetTransform();
+
+        return transform.transformRect(m_sprite.GetLocalBounds());
+    }
+
+    void ScrollBar::Increase()
+    {
+        SetValue(m_value + (m_step == 0 ? 1 : m_step));
+    }
+
+    void ScrollBar::Decrease()
+    {
+        SetValue(m_value - (m_step == 0 ? 1 : m_step));
+    }
+
+    sf::RenderStates ScrollBar::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    {
+        if (!IsVislble())
+            return states;
+
+        states = Control::Render(target, states);
+        target.draw(m_sprite, states);
+
+        return states;
+    }
+
+    void ScrollBar::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    {
+        Control::OnMouseMove(ev);
+
+        if (!IsEnabled())
+            return;
+
+        if (m_dragging)
+        {
+            auto bounds   = GetGlobalBounds();
+            auto mpos     = sf::Vector2f(ev.x, ev.y);
+            auto position = m_sprite.GetPosition();
+            float value   = 0.f;
+            if (m_orientation == ScrollOrientation::Horizontal)
+            {
+                position.x = mpos.x - bounds.left - m_anchorPoint.x;
+                position.x = std::min(position.x, m_maxBounds.x);
+                position.x = std::max(position.x, 0.f);
+
+                value = (position.x / m_maxBounds.x) * m_maxValue;
+            }
+            else
+            {
+                position.y = mpos.y - bounds.top - m_anchorPoint.y;
+                position.y = std::min(position.y, m_maxBounds.y);
+                position.y = std::max(position.y, 0.f);
+
+                value = (position.y / m_maxBounds.y) * m_maxValue;
+            }
+
+            value = std::min(value, m_maxValue);
+            value = std::max(value, 0.f);
+
+            if (m_step != 0)
+            {
+                if (std::abs(m_value - value) < m_step)
+                    return;
+
+                float step = value > m_value ? m_step : -m_step;
+                value = m_value + step;
+                value = std::min(value, m_maxValue);
+                value = std::max(value, 0.f);
+            }
+
+            if (m_value != value)
+            {
+                m_value = value;
+                if (m_onValueChanged)
+                    m_onValueChanged(*this, m_value);
+
+                m_sprite.SetPosition(position);
+            }
+        }
+    }
+
+    void ScrollBar::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
+    {
+        Control::OnMouseButtonDown(ev);
+
+        if (!IsEnabled())
+            return;
+
+        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(ev.x, ev.y))
+        {
+            auto bounds   = GetScrollBarGlobalBounds();
+            m_dragging    = true;
+            m_anchorPoint = sf::Vector2f(ev.x - bounds.left, ev.y - bounds.top);
+        }
+    }
+
+    void ScrollBar::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    {
+        Control::OnMouseButtonUp(ev);
+        m_dragging = false;
+    }
+
+    void ScrollBar::Invalidate()
+    {
+        auto position = m_sprite.GetPosition();
+        if (m_maxValue <= 0.f)
+            return;
+
+        auto barBounds = m_sprite.GetLocalBounds();
+        m_maxBounds    = sf::Vector2f(
+          std::abs(m_bounds.width  - barBounds.width),
+          std::abs(m_bounds.height - barBounds.height)
+        );
+
+        if (m_orientation == ScrollOrientation::Horizontal)
+        {
+            position.x = (m_value / m_maxValue) * m_maxBounds.x;
+            position.x = std::min(position.x, m_maxBounds.x);
+            position.x = std::max(position.x, 0.f);
+        }
+        else
+        {
+            position.y = (m_value / m_maxValue) * m_maxBounds.y;
+            position.y = std::min(position.y, m_maxBounds.y);
+            position.y = std::max(position.y, 0.f);
+        }
+
+        m_sprite.SetPosition(position);
+    }
+}

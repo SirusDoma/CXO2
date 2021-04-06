@@ -119,6 +119,13 @@ void StateRoom::Initialize()
     btnBack->SetClickCallback([this] (auto& sender, auto& ev) { OnExitPlanet(); });
     AddChild(btnBack);
 
+    auto scroll = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
+    scroll->SetValueChangedCallback([] (auto& sender, float value)
+    {
+       //std::cout << value << std::endl;
+    });
+    AddChild(scroll);
+
     m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
     Play(m_bgm);
 }

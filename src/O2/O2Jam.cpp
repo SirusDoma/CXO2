@@ -18,6 +18,7 @@
 #include <O2/Loaders/UI/ListLoader.hpp>
 #include <O2/Loaders/UI/DialogLoader.hpp>
 #include <O2/Loaders/UI/TextBoxLoader.hpp>
+#include <O2/Loaders/UI/ScrollBarLoader.hpp>
 
 void O2Jam::OnStart()
 {
@@ -47,6 +48,7 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
 
     // Load global assets
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
