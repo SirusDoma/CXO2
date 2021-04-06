@@ -21,7 +21,7 @@ namespace Gx
             m_bounds = m_text.GetLocalBounds();
 
         SetFocus(true);
-        SetHighlightBackColor(sf::Color(150, 185, 215));
+        SetHighlightBackColor(sf::Color::White);
         SetHighlightTextColor(sf::Color::Black);
     }
 
