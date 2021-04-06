@@ -21,7 +21,7 @@ std::unique_ptr<Gx::ResourceMetadata> ProgressBarLoader::LoadMetadata(const void
     auto orientation = attributes.find("orientation");
     if (orientation != attributes.end())
     {
-        if (orientation->get<std::string>() == "vertical")
+        if (orientation->get<std::string>() == "VERTICAL")
             metadata.SetOrientation(Gx::ProgressBar::Vertical);
         else
             metadata.SetOrientation(Gx::ProgressBar::Horizontal);

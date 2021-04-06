@@ -4,7 +4,7 @@
     "texture": "State/Planet/ChannelCount.png"
   },
   "attributes": {
-    "orientation": "horizontal",
+    "orientation": "HORIZONTAL",
     "transform": {
       "position": {
         "x": 110,
