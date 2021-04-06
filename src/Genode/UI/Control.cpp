@@ -204,7 +204,7 @@ namespace Gx
         InputableContainer::OnMouseMove(ev);
     }
 
-    void Control::OnMouseButtonClick(sf::Event::MouseButtonEvent ev)
+    void Control::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
     {
         if (GetGlobalBounds().contains(ev.x, ev.y))
         {
@@ -217,7 +217,7 @@ namespace Gx
                 SetControlState(Control::State::Hover);
         }
 
-        InputableContainer::OnMouseButtonClick(ev);
+        InputableContainer::OnMouseButtonDown(ev);
     }
 
     void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)

@@ -68,7 +68,7 @@ namespace Gx
         virtual bool Input(sf::Event ev);
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-        virtual void OnMouseButtonClick(sf::Event::MouseButtonEvent ev);
+        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
 
         virtual void OnControlChildAdded(Control *control);
