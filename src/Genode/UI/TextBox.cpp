@@ -173,23 +173,7 @@ namespace Gx
         m_onTextEntered = callback;
     }
 
-    size_t TextBox::Erase(size_t index, int length)
-    {
-        if (length < 0)
-            index += length + 1;
-        else if (length > 0)
-            index++;
-        else
-            return index;
-
-        auto str = m_text.GetString();
-        str.erase(index, length == 0 ? 1 : std::abs(length));
-        m_text.SetString(str);
-
-        return index;
-    }
-
-    bool TextBox::IsFitNextCharacter()
+    bool TextBox::IsNextCharacterFit()
     {
         auto string = m_text.GetString();
         auto index  = m_caret.Index;
@@ -204,6 +188,48 @@ namespace Gx
 
         m_text.SetString(string);
         return fit;
+    }
+
+    size_t TextBox::Insert(size_t index, Uint32 unicode, int selectionLength)
+    {
+        // backspace, tab, enter, etc
+        if (unicode <= 31)
+            return index;
+
+        // Max length validation
+        if (m_maxLength > 0 && selectionLength == 0 &&  m_text.GetString().getSize() >= m_maxLength)
+            return index;
+
+        // Max visual bounds validation
+        if (IsNextCharacterFit())
+        {
+            if (m_caret.SelectionLength != 0)
+                index = Erase(index - 1, selectionLength);
+
+            auto string = m_text.GetString();
+            string.insert(index, unicode);
+            m_text.SetString(string);
+
+            return ++index;
+        }
+
+        return index;
+    }
+
+    size_t TextBox::Erase(size_t index, int length)
+    {
+        if (length < 0)
+            index += length + 1;
+        else if (length > 0)
+            index++;
+        else
+            return index;
+
+        auto str = m_text.GetString();
+        str.erase(index, length == 0 ? 1 : std::abs(length));
+        m_text.SetString(str);
+
+        return index;
     }
 
     void TextBox::Update(double delta)
@@ -271,22 +297,9 @@ namespace Gx
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
 
-            size_t index = m_caret.Index - 1;
             int length   = m_caret.SelectionLength;
-            if (length != 0)
-            {
-                m_caret.Index = Erase(index, length);
-                m_caret.SelectionLength = 0;
-            }
-            else
-            {
-                auto str = m_text.GetString();
-                str.erase(index, 1);
-                m_text.SetString(str);
-
-                m_caret.Index--;
-                m_caret.SelectionLength = 0;
-            }
+            m_caret.Index = Erase(m_caret.Index - 1, length == 0 ? -1 : length);
+            m_caret.SelectionLength = 0;
         }
         else if (ev.code == sf::Keyboard::Delete)
         {
@@ -358,24 +371,7 @@ namespace Gx
         if (ev.unicode <= 31)
             return;
 
-        // Max length validation
-        if (m_maxLength > 0 &&  m_text.GetString().getSize() >= m_maxLength)
-            return;
-
-        // Max visual bounds validation
-        if (IsFitNextCharacter())
-        {
-            if (m_caret.SelectionLength != 0)
-                m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
-
-            auto string = m_text.GetString();
-            string.insert(m_caret.Index, ev.unicode);
-            m_text.SetString(string);
-        }
-        else
-            return;
-
-        m_caret.Index++;
+        m_caret.Index = Insert(m_caret.Index, ev.unicode, m_caret.SelectionLength);
         m_caret.SelectionLength = 0;
 
         Invalidate();

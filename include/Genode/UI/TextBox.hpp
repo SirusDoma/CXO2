@@ -52,10 +52,11 @@ namespace Gx
         void SetMaximumTextLength(unsigned int maxLength);
         void SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback);
 
+        size_t Insert(size_t index, Uint32 unicode, int selectionLength = 0);
         size_t Erase(size_t index, int length);
 
     private:
-        bool IsFitNextCharacter();
+        bool IsNextCharacterFit();
 
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
