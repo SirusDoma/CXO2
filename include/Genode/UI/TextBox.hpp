@@ -50,10 +50,13 @@ namespace Gx
 
         unsigned int GetMaximumTextLength() const;
         void SetMaximumTextLength(unsigned int maxLength);
-
         void SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback);
 
-    protected:
+        size_t Erase(size_t index, int length);
+
+    private:
+        bool IsFitNextCharacter();
+
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
@@ -65,7 +68,6 @@ namespace Gx
 
         virtual void Invalidate();
 
-    private:
         class Caret : public Renderable, public Updatable
         {
         public:

@@ -173,6 +173,39 @@ namespace Gx
         m_onTextEntered = callback;
     }
 
+    size_t TextBox::Erase(size_t index, int length)
+    {
+        if (length < 0)
+            index += length + 1;
+        else if (length > 0)
+            index++;
+        else
+            return index;
+
+        auto str = m_text.GetString();
+        str.erase(index, length == 0 ? 1 : std::abs(length));
+        m_text.SetString(str);
+
+        return index;
+    }
+
+    bool TextBox::IsFitNextCharacter()
+    {
+        auto string = m_text.GetString();
+        auto index  = m_caret.Index;
+
+        if (m_caret.SelectionLength != 0)
+            index = Erase(index - 1, m_caret.SelectionLength);
+
+        auto newString = m_text.GetString();
+        newString.insert(index, " ");
+        m_text.SetString(newString);
+        bool fit = m_text.GetLocalBounds().width <= m_bounds.width;
+
+        m_text.SetString(string);
+        return fit;
+    }
+
     void TextBox::Update(double delta)
     {
         m_caret.Update(delta);
@@ -240,20 +273,20 @@ namespace Gx
 
             size_t index = m_caret.Index - 1;
             int length   = m_caret.SelectionLength;
-            if (length < 0)
-                index += length + 1;
-            else if (length > 0)
-                index++;
-
-            auto str = m_text.GetString();
-            str.erase(index, length == 0 ? 1 : std::abs(length));
-            m_text.SetString(str);
-
-            m_caret.SelectionLength = 0;
-            if (length == 0)
-                m_caret.Index--;
+            if (length != 0)
+            {
+                m_caret.Index = Erase(index, length);
+                m_caret.SelectionLength = 0;
+            }
             else
-                m_caret.Index = index;
+            {
+                auto str = m_text.GetString();
+                str.erase(index, 1);
+                m_text.SetString(str);
+
+                m_caret.Index--;
+                m_caret.SelectionLength = 0;
+            }
         }
         else if (ev.code == sf::Keyboard::Delete)
         {
@@ -321,30 +354,30 @@ namespace Gx
         if (!IsEnabled() || !IsFocused())
             return;
 
-        // backspace, tab, enter
-        m_caret.SelectionLength = 0;
-        if (ev.unicode == 8 || ev.unicode == 9 || ev.unicode == 13)
+        // backspace, tab, enter, etc
+        if (ev.unicode <= 31)
             return;
 
-        auto str = m_text.GetString();
-        if (m_maxLength > 0 && str.getSize() >= m_maxLength)
+        // Max length validation
+        if (m_maxLength > 0 &&  m_text.GetString().getSize() >= m_maxLength)
             return;
 
-        str.insert(m_caret.Index, " ");
-        m_text.SetString(str);
-        bool isFit = m_text.GetLocalBounds().width <= m_bounds.width;
-
-        str.erase(m_caret.Index);
-        m_text.SetString(str);
-        if (isFit)
+        // Max visual bounds validation
+        if (IsFitNextCharacter())
         {
-            str.insert(m_caret.Index, ev.unicode);
-            m_text.SetString(str);
+            if (m_caret.SelectionLength != 0)
+                m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
+
+            auto string = m_text.GetString();
+            string.insert(m_caret.Index, ev.unicode);
+            m_text.SetString(string);
         }
         else
             return;
 
         m_caret.Index++;
+        m_caret.SelectionLength = 0;
+
         Invalidate();
     }
 
