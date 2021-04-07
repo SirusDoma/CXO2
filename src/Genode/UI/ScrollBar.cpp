@@ -279,6 +279,9 @@ namespace Gx
     {
         Control::OnMouseWheelScrolled(ev);
 
+        if (!IsEnabled())
+            return;
+
         auto position = sf::Vector2f(ev.x, ev.y);
         float delta   = ev.delta;
         if (m_orientation == ScrollOrientation::Vertical)
