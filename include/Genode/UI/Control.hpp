@@ -70,6 +70,7 @@ namespace Gx
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
+        virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev);
 
         virtual void OnControlChildAdded(Control *control);
         virtual void OnControlChildRemove(Control *control);

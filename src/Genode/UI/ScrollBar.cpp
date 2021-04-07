@@ -8,6 +8,7 @@ namespace Gx
         m_step(1.f),
         m_value(),
         m_maxValue(100.f),
+        m_scrollDelta(),
         m_dragging(false),
         m_anchorPoint()
     {
@@ -19,6 +20,7 @@ namespace Gx
         m_step(1.f),
         m_value(),
         m_maxValue(100.f),
+        m_scrollDelta(),
         m_orientation(orientation),
         m_dragging(false),
         m_anchorPoint()
@@ -32,11 +34,16 @@ namespace Gx
         m_step(1.f),
         m_value(),
         m_maxValue(100.f),
+        m_scrollDelta(),
         m_orientation(orientation),
         m_dragging(false),
         m_anchorPoint()
     {
         SetLocalBounds(bounds);
+    }
+
+    ScrollBar::~ScrollBar()
+    {
     }
 
     const sf::FloatRect ScrollBar::GetLocalBounds() const
@@ -49,6 +56,11 @@ namespace Gx
         if (m_bounds != bounds)
         {
             m_bounds = bounds;
+            if (m_orientation == ScrollOrientation::Horizontal && m_bounds.height == 0)
+                m_bounds.height = m_sprite.GetLocalBounds().height;
+            else if (m_orientation == ScrollOrientation::Vertical && m_bounds.width == 0)
+                m_bounds.width = m_sprite.GetLocalBounds().width;
+
             Invalidate();
         }
     }
@@ -179,8 +191,11 @@ namespace Gx
             return states;
 
         states = Control::Render(target, states);
-        target.draw(m_sprite, states);
+        // TODO: Cache global bounds (or transform) to avoid recalculating bounds on mouse events
+        // m_globalBounds = states.transform.transformRect(GetLocalBounds);
+        // m_scrollGlobalBounds = (m_sprite.GetTransform() * states.transform).transformRect(GetLocalBounds);
 
+        target.draw(m_sprite, states);
         return states;
     }
 
@@ -258,6 +273,32 @@ namespace Gx
     {
         Control::OnMouseButtonUp(ev);
         m_dragging = false;
+    }
+
+    void ScrollBar::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
+    {
+        Control::OnMouseWheelScrolled(ev);
+
+        auto position = sf::Vector2f(ev.x, ev.y);
+        float delta   = ev.delta;
+        if (m_orientation == ScrollOrientation::Vertical)
+            delta *= -1;
+
+        if (GetGlobalBounds().contains(position))
+        {
+            if (m_step != 0)
+            {
+                m_scrollDelta += delta;
+                if (std::abs(m_scrollDelta) >= m_step)
+                {
+                    SetValue(m_value + (m_scrollDelta > 0 ? m_step : -m_step));
+                    m_scrollDelta = 0;
+                }
+            }
+            else
+                SetValue(m_value + ev.delta);
+
+        }
     }
 
     void ScrollBar::Invalidate()

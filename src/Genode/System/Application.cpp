@@ -183,7 +183,10 @@ namespace Gx
                 case sf::Event::MouseMoved:
                 {
                     auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
-                    ev.mouseMove = {static_cast<int>(position.x), static_cast<int>(position.y)};
+                    ev.mouseMove = sf::Event::MouseMoveEvent{
+                        static_cast<int>(position.x),
+                        static_cast<int>(position.y)
+                    };
 
                     break;
                 }
@@ -191,7 +194,23 @@ namespace Gx
                 case sf::Event::MouseButtonReleased:
                 {
                     auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
-                    ev.mouseButton = {ev.mouseButton.button, static_cast<int>(position.x), static_cast<int>(position.y)};
+                    ev.mouseButton = sf::Event::MouseButtonEvent{
+                        ev.mouseButton.button,
+                        static_cast<int>(position.x),
+                        static_cast<int>(position.y)
+                    };
+
+                    break;
+                }
+                case sf::Event::MouseWheelScrolled:
+                {
+                    auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
+                    ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
+                        ev.mouseWheelScroll.wheel,
+                        ev.mouseWheelScroll.delta,
+                        static_cast<int>(position.x),
+                        static_cast<int>(position.y)
+                    };
 
                     break;
                 }

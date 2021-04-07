@@ -279,4 +279,9 @@ namespace Gx
         if (parent)
             parent->OnControlClick(sender, ev);
     }
+
+    void Control::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
+    {
+        Inputable::OnMouseWheelScrolled(ev);
+    }
 }

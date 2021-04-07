@@ -12,6 +12,8 @@ namespace Gx
         enum ScrollOrientation { Horizontal, Vertical };
         
         ScrollBar();
+        virtual ~ScrollBar();
+
         ScrollBar(const sf::Texture &texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
         ScrollBar(const sf::Texture &texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
 
@@ -51,13 +53,14 @@ namespace Gx
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
+        virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev);
 
         virtual void Invalidate();
 
         Sprite         m_sprite;
         sf::FloatRect  m_bounds;
         sf::Vector2f   m_maxBounds;
-        float m_value, m_maxValue, m_step;
+        float m_value, m_maxValue, m_step, m_scrollDelta;
 
         bool m_dragging;
         sf::Vector2f m_anchorPoint;
