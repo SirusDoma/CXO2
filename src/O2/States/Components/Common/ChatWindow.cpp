@@ -129,7 +129,7 @@ void ChatWindow::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
 void ChatWindow::Invalidate()
 {
     unsigned int max = m_maxChatLength > 0 ? m_maxChatLength : m_chats.size();
-    m_offset = std::min(m_offset, max);
+    m_offset = std::min(m_offset, m_chats.size());
 
     if (m_scroll)
     {
