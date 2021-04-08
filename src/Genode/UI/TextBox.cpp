@@ -329,11 +329,14 @@ namespace Gx
         }
         else if (ev.code == sf::Keyboard::Enter)
         {
-            if (m_onTextEntered)
+            // TODO: Do something other than this?
+            if (m_text.GetString().getSize() > 0 && m_onTextEntered)
+            {
                 m_onTextEntered(*this, m_text.GetString());
 
-            m_text.SetString("");
-            m_caret.SelectionLength = 0;
+                m_text.SetString("");
+                m_caret.SelectionLength = 0;
+            }
         }
         else if (ev.control)
         {
