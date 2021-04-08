@@ -45,18 +45,21 @@ void RoomButton::Invalidate()
 {
     m_titleLabel->SetString(m_data.Title);
     m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
-
-    if (m_data.Number % 2 != 0)
-        m_capacityLabel->SetString("(" + std::to_string(m_data.PlayerCount) + "/" + std::to_string(m_data.Capacity) + ")");
-    else
-        m_capacityLabel->SetString("(1/8)");
+    m_capacityLabel->SetString("(" + std::to_string(m_data.PlayerCount) + "/" + std::to_string(m_data.Capacity) + ")");
 
     m_numberLabel->SetValue(m_data.Number);
     m_numberLabel->SetDigitCount(3);
-    m_gameMode->SetFrame("VS");
     m_lock->SetVisible(m_data.Locked);
 
-    if (m_data.SpeedType == SpeedType::HiSpeed)
+    switch (m_data.GameMode)
+    {
+        case GameMode::Single: m_gameMode->SetFrame("Single"); break;
+        case GameMode::Vs:     m_gameMode->SetFrame("VS");     break;
+        case GameMode::Album:  m_gameMode->SetFrame("Album");  break;
+        case GameMode::Couple: m_gameMode->SetFrame("Couple"); break;
+    }
+
+    if (m_data.SongMode == SongMode::User)
     {
         std::string diffName;
         switch (m_data.Difficulty)
@@ -78,7 +81,7 @@ void RoomButton::Invalidate()
 
         m_speedLabel->SetFrame(speedFrame);
     }
-    else if (m_data.SpeedType == SpeedType::RandomSpeed)
+    else if (m_data.SongMode == SongMode::Random)
     {
         std::string speedFrame;
         switch (m_data.Difficulty)

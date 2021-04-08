@@ -10,13 +10,23 @@ enum RoomState
     Playing
 };
 
+enum GameMode
+{
+    Single,
+    Vs,
+    Album,
+    Couple
+};
+
 struct RoomData
 {
+    bool          Available;
     unsigned int  Number;
     sf::String    Title;
     ChartMetadata Chart;
     Difficulty    Difficulty;
-    SpeedType     SpeedType;
+    GameMode      GameMode;
+    SongMode      SongMode;
     RoomState     State;
     float         Speed;
     bool          Locked;
