@@ -29,7 +29,7 @@ namespace Gx
             return;
 
         m_focused = focus;
-        auto uiEvent = Event{false, GetControlState()};
+        auto uiEvent = Event{false, m_focused ? Control::State::Hover : Control::State::Normal};
         if (m_onFocusChanged)
             m_onFocusChanged(*this, uiEvent);
 
