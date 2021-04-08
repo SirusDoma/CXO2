@@ -1,9 +1,9 @@
-#ifndef O2JAM_REPEATER_METADATA_HPP
-#define O2JAM_REPEATER_METADATA_HPP
+#ifndef O2JAM_LIST_METADATA_HPP
+#define O2JAM_LIST_METADATA_HPP
 
 #include <O2/Metadata/TransformMetadata.hpp>
 
-struct RepeaterMetadata : TransformMetadata
+struct ListMetadata : public TransformMetadata
 {
 public:
     int GetVerticalCount() const { return m_verticalCount; }

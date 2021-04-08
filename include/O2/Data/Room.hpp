@@ -24,4 +24,21 @@ struct RoomData
     unsigned int  Capacity    = 8;
 };
 
+struct PlayerInfo
+{
+    unsigned int PlayerID;
+    int Level;
+    sf::String Name;
+    bool Administrator;
+};
+
+struct ChatData
+{
+    PlayerInfo Player;
+    sf::String Message;
+
+    PlayerInfo Receiver;
+    // MegaphoneInfo Megaphone;
+};
+
 #endif

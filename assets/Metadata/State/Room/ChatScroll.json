@@ -1,7 +1,7 @@
 ﻿{
   "type": "SCROLL_BAR",
   "require": {
-    "texture": "Common/VerticalScrollBar.png"
+    "texture": "Common/VScrollBar.png"
   },
   "attributes": {
     "transform": {
@@ -18,7 +18,7 @@
     },
     "orientation": "VERTICAL",
     "step": 1,
-    "maximum": 0,
+    "maximum": 50,
     "bounds": {
       "x": 0,
       "y": 0,

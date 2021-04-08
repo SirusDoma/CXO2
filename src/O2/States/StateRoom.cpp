@@ -56,10 +56,24 @@ void StateRoom::Initialize()
     });
     AddChild(btnCreateRoom);
 
+    auto scrollChat = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
+    AddChild(scrollChat);
+
+    auto btnChatScrollUp = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
+    btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
+    auto btnChatScrollDown = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
+    btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+    AddChild(btnChatScrollUp, btnChatScrollDown);
+
+    auto chatWindow = Create<ChatWindow>("Metadata/State/Room/ChatWindow.json");
+    chatWindow->SetScrollBar(*scrollChat);
+    AddChild(chatWindow);
+
     auto chatBox = Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
-    chatBox->SetTextEnteredCallback([] (auto& textBox, sf::String text)
+    chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
        std::cout << std::string(text) << std::endl;
+       chatWindow->PushMessage(PlayerInfo{1, -1, "CXO2", true}, text);
     });
     AddChild(chatBox);
 
@@ -118,13 +132,6 @@ void StateRoom::Initialize()
     auto btnBack = Create<Gx::Button>("Metadata/State/Room/Btn_Back.json");
     btnBack->SetClickCallback([this] (auto& sender, auto& ev) { OnExitPlanet(); });
     AddChild(btnBack);
-
-    auto scroll = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
-    scroll->SetValueChangedCallback([] (auto& sender, float value)
-    {
-       //std::cout << value << std::endl;
-    });
-    AddChild(scroll);
 
     m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
     Play(m_bgm);

@@ -77,18 +77,36 @@ namespace Gx
         }
     }
 
-    void List::AddChild(Control *control)
+    bool List::IsAvailable() const
     {
-        if (!control || m_horizontalCounter >= m_horizontalCount)
+        return m_verticalCounter <= m_verticalCount &&  m_horizontalCounter <= m_horizontalCount;
+    }
+
+    sf::Vector2f List::GetNextItemPosition() const
+    {
+        return sf::Vector2f(m_horizontalSpacing * m_horizontalCounter, m_verticalSpacing * m_verticalCounter);
+    }
+
+    void List::IncreaseSpacingCounter()
+    {
+        if (!IsAvailable())
             return;
 
-        control->SetPosition(sf::Vector2f(m_horizontalSpacing * m_horizontalCounter, m_verticalSpacing * m_verticalCounter));
         m_verticalCounter++;
         if (m_verticalCounter >= m_verticalCount)
         {
             m_verticalCounter = 0;
             m_horizontalCounter++;
         }
+    }
+
+    void List::AddChild(Control *control)
+    {
+        if (!control || m_horizontalCounter >= m_horizontalCount)
+            return;
+
+        control->SetPosition(GetNextItemPosition());
+        IncreaseSpacingCounter();
 
         Control::AddChild(control);
     }

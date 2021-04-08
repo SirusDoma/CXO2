@@ -8,6 +8,8 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <O2/States/State.hpp>
+#include <O2/States/Components/Common/ChatWindow.hpp>
+
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Room.hpp>
 

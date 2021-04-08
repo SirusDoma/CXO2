@@ -13,8 +13,8 @@
     "bounds": {
       "x": 0,
       "y": 0,
-      "height": 12,
-      "width": 328
+      "width": 328,
+      "height": 12
     },
     "fontSize": 12,
     "maximumLength": 50,

@@ -198,7 +198,7 @@
     <ClInclude Include="include\O2\IO\Metadata\UI\NumberMetadata.hpp" />
     <ClInclude Include="include\O2\IO\Metadata\UI\ProgressBarMetadata.hpp" />
     <ClInclude Include="include\O2\IO\Metadata\UI\RadioButtonMetadata.hpp" />
-    <ClInclude Include="include\O2\IO\Metadata\UI\RepeaterMetadata.hpp" />
+    <ClInclude Include="include\O2\IO\Metadata\UI\ListMetadata.hpp" />
     <ClInclude Include="include\O2\O2Jam.hpp" />
     <ClInclude Include="include\O2\States\State.hpp" />
     <ClInclude Include="include\O2\States\StateAvi.hpp" />

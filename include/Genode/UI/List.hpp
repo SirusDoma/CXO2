@@ -32,6 +32,10 @@ namespace Gx
         void Apply(std::function<void(Control*)> fun);
 
     protected:
+        bool IsAvailable() const;
+        sf::Vector2f GetNextItemPosition() const;
+        void IncreaseSpacingCounter();
+
         virtual void Invalidate();
 
     private:
