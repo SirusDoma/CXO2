@@ -60,10 +60,10 @@ namespace
 
         vertices.append(sf::Vertex(sf::Vector2f(position.x + left - italicShear * top - outlineThickness, position.y + top - outlineThickness), color, sf::Vector2f(u1, v1)));
         vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * top - outlineThickness, position.y + top - outlineThickness), color, sf::Vector2f(u2, v1)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + left - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.5f)), color, sf::Vector2f(u1, v2)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + left - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.5f)), color, sf::Vector2f(u1, v2)));
+        vertices.append(sf::Vertex(sf::Vector2f(position.x + left - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.35f)), color, sf::Vector2f(u1, v2)));
+        vertices.append(sf::Vertex(sf::Vector2f(position.x + left - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.35f)), color, sf::Vector2f(u1, v2)));
         vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * top - outlineThickness, position.y + top - outlineThickness), color, sf::Vector2f(u2, v1)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.5f)), color, sf::Vector2f(u2, v2)));
+        vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * bottom - outlineThickness, position.y + bottom + (outlineThickness * 0.35f)), color, sf::Vector2f(u2, v2)));
     }
 }
 
