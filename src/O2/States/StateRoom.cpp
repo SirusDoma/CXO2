@@ -74,6 +74,16 @@ void StateRoom::Initialize()
     });
     AddChild(chatBox);
 
+    auto btnChatAll     = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatAll.json");
+    auto btnChatFriend  = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatFriend.json");
+    auto btnChatGuild   = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatGuild.json");
+    auto btnChatWhisper = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatWhisper.json");
+
+    auto chatButtonList = Create<Gx::List>("Metadata/State/Room/ChatButtonList.json");
+    chatButtonList->AddChild(btnChatAll, btnChatFriend, btnChatGuild, btnChatWhisper);
+    btnChatAll->SetCheckedState(true);
+    AddChild(chatButtonList);
+
     auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < 6; i++)
     {

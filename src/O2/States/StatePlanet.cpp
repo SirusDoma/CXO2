@@ -12,7 +12,6 @@ StatePlanet::StatePlanet(bool fadeIn) :
     m_useFadeIn(fadeIn),
     m_connecting(false)
 {
-
 }
 
 void StatePlanet::Initialize()

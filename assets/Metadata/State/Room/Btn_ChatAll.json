@@ -1,0 +1,32 @@
+{
+  "type": "RADIO_BUTTON",
+  "require": {
+    "texture": "Common/Btn_ChatAll.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 23,
+          "height": 23
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 23,
+          "y": 0,
+          "width": 23,
+          "height": 23
+        }
+      }
+    }
+  }
+}
