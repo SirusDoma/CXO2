@@ -56,18 +56,15 @@ void StateRoom::Initialize()
     });
     AddChild(btnCreateRoom);
 
+    auto chatWindow = Create<ChatWindow>("Metadata/State/Room/ChatWindow.json");
     auto scrollChat = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
-    AddChild(scrollChat);
+    chatWindow->SetScrollBar(*scrollChat);
 
     auto btnChatScrollUp = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
     btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
     auto btnChatScrollDown = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
     btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
-    AddChild(btnChatScrollUp, btnChatScrollDown);
-
-    auto chatWindow = Create<ChatWindow>("Metadata/State/Room/ChatWindow.json");
-    chatWindow->SetScrollBar(*scrollChat);
-    AddChild(chatWindow);
+    AddChild(chatWindow, scrollChat, btnChatScrollUp, btnChatScrollDown);
 
     auto chatBox = Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
