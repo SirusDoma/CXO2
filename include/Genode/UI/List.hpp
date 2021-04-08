@@ -27,6 +27,10 @@ namespace Gx
 
         virtual void AddChild(Control *control);
         virtual void RemoveChild(Control *control);
+
+        using Control::AddChild;
+        using Control::RemoveChild;
+
         virtual void ClearChildren();
 
         void Apply(std::function<void(Control*)> fun);
