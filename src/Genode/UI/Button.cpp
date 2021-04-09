@@ -70,6 +70,22 @@ namespace Gx
         Invalidate();
     }
 
+    void Button::PerformClick()
+    {
+        auto callback = GetClickCallback();
+        if (callback)
+        {
+            auto uiEvent = Event{false, GetControlState()};
+            callback(*this, uiEvent);
+
+            SetControlState(uiEvent.State);
+            if (uiEvent.Handled)
+                return;
+        }
+
+        OnControlClick(this, sf::Event::MouseButtonEvent{});
+    }
+
     sf::RenderStates Button::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
         if (!IsVislble())

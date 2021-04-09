@@ -34,6 +34,7 @@ namespace Gx
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetLostFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetClickCallback(std::function<void(Control&, Event&)> callback);
+        void SetDoubleClickCallback(std::function<void(Control&, Event&)> callback);
 
         void SetEnabled(bool enabled);
         bool IsEnabled() const;
@@ -62,6 +63,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetGainFocusCallback();
         const std::function<void(Control&, Event&)>& GetLostFocusCallback();
         const std::function<void(Control&, Event&)>& GetClickCallback();
+        const std::function<void(Control&, Event&)>& GetDoubleClickCallback();
 
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -78,14 +80,18 @@ namespace Gx
         virtual void OnControlStateChanged(Control *sender, State state);
         virtual void OnControlPress(Control *sender, sf::Event::MouseButtonEvent ev);
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnControlDoubleClick(Control *sender, sf::Event::MouseButtonEvent ev);
 
         virtual void Invalidate() = 0;
 
     private:
-        State m_state;
-        bool  m_enabled, m_visible, m_focused;
+        const double DOUBLE_CLICK_THRESHOLD = 250.f;
 
-        std::function<void(Control&, Event&)> m_onClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
+        State  m_state;
+        bool   m_enabled, m_visible, m_focused, m_clicked;
+        double m_deltaClickDuration;
+
+        std::function<void(Control&, Event&)> m_onClick, m_onDoubleClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }
 

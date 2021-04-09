@@ -27,6 +27,8 @@ namespace Gx
         void SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
         void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
 
+        void PerformClick();
+
     protected:
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;

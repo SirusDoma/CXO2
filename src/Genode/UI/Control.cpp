@@ -7,8 +7,11 @@ namespace Gx
         m_enabled(true),
         m_visible(true),
         m_focused(false),
+        m_clicked(false),
+        m_deltaClickDuration(),
         m_state(State::Normal),
         m_onClick(),
+        m_onDoubleClick(),
         m_onGainFocus(),
         m_onLostFocus()
     {
@@ -108,9 +111,14 @@ namespace Gx
         m_onLostFocus = callback;
     }
 
-    void Control::SetClickCallback(std::function<void(Control&, Event&)> callback)
+    void Control::SetClickCallback(std::function<void(Control&, Control::Event&)> callback)
     {
         m_onClick = callback;
+    }
+
+    void Control::SetDoubleClickCallback(std::function<void(Control&, Control::Event&)> callback)
+    {
+        m_onDoubleClick = callback;
     }
 
     const std::function<void(Control&, Control::Event&)> &Control::GetFocusChangedCallback()
@@ -131,6 +139,11 @@ namespace Gx
     const std::function<void(Control&, Control::Event&)> &Control::GetClickCallback()
     {
         return m_onClick;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetDoubleClickCallback()
+    {
+        return m_onDoubleClick;
     }
 
     void Control::AddChild(Control *node)
@@ -167,6 +180,16 @@ namespace Gx
     {
         if (!IsEnabled())
             return;
+
+        if (m_clicked)
+        {
+            m_deltaClickDuration += delta;
+            if (m_deltaClickDuration > DOUBLE_CLICK_THRESHOLD)
+            {
+                m_clicked = false;
+                m_deltaClickDuration = 0;
+            }
+        }
 
         UpdatableContainer::Update(delta);
     }
@@ -206,12 +229,36 @@ namespace Gx
 
     void Control::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
     {
-        if (GetGlobalBounds().contains(ev.x, ev.y))
+        bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
+        if (intersect)
         {
             if (m_state == Control::State::Hover)
             {
                 SetControlState(Control::State::Active);
                 OnControlPress(this, ev);
+
+                if (m_clicked)
+                {
+                    m_clicked = false;
+                    if (m_deltaClickDuration <= DOUBLE_CLICK_THRESHOLD)
+                    {
+                        if (m_onDoubleClick)
+                        {
+                            auto uiEvent = Event{false, GetControlState()};
+                            m_onDoubleClick(*this, uiEvent);
+
+                            SetControlState(uiEvent.State);
+                            if (uiEvent.Handled)
+                                return;
+                        }
+
+                        OnControlDoubleClick(this, ev);
+                    }
+                }
+                else
+                    m_clicked = true;
+
+                m_deltaClickDuration = 0;
             }
             else
                 SetControlState(Control::State::Hover);
@@ -244,7 +291,12 @@ namespace Gx
                 SetControlState(Control::State::Hover);
         }
         else
+        {
+            m_clicked = false;
+            m_deltaClickDuration = 0;
+
             SetControlState(Control::State::Normal);
+        }
 
         InputableContainer::OnMouseButtonUp(ev);
     }
@@ -278,6 +330,13 @@ namespace Gx
         auto parent = dynamic_cast<Control*>(GetParent());
         if (parent)
             parent->OnControlClick(sender, ev);
+    }
+
+    void Control::OnControlDoubleClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    {
+        auto parent = dynamic_cast<Control*>(GetParent());
+        if (parent)
+            parent->OnControlDoubleClick(sender, ev);
     }
 
     void Control::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)

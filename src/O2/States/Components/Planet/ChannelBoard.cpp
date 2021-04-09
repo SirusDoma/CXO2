@@ -50,21 +50,6 @@ void ChannelBoard::Initialize()
     m_channelCategory = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
     m_channelListContainer->AddChild(m_channelCategory);
 
-    m_list = m_scene->Create<Gx::List>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
-    auto base = m_scene->GetLocalResources().Resolve<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
-    for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
-    {
-        auto channelButton = std::make_unique<ChannelButton>(*m_scene, *base);
-        channelButton->SetChannelNumber(i + 1);
-        channelButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            m_selectedChannel = i;
-        });
-
-        m_list->AddChild(channelButton.get());
-        m_channelButtons.push_back(std::move(channelButton));
-    }
-    m_channelListContainer->AddChild(m_list);
-
     m_currentPageNumber = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelCurrentPageNumber.json");
     m_maxPageNumber     = m_scene->Create<Gx::Number>("Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
     m_currentPageNumber->SetDigitCount(2);
@@ -110,7 +95,19 @@ void ChannelBoard::Initialize()
         }
     });
 
-    m_channelListContainer->AddChild(btnChannelEnter);
+    m_list = m_scene->Create<Gx::List>("Metadata/State/Planet/ChannelBoard/ChannelList.json");
+    auto base = m_scene->GetLocalResources().Resolve<Gx::RadioButton>("Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
+    for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
+    {
+        auto channelButton = std::make_unique<ChannelButton>(*m_scene, *base);
+        channelButton->SetChannelNumber(i + 1);
+        channelButton->SetClickCallback([=] (auto& sender, auto& ev) { m_selectedChannel = i; });
+        channelButton->SetDoubleClickCallback([=] (auto& sender, auto& ev) { btnChannelEnter->PerformClick(); });
+
+        m_list->AddChild(channelButton.get());
+        m_channelButtons.push_back(std::move(channelButton));
+    }
+    m_channelListContainer->AddChild(m_list, btnChannelEnter);
 
     m_notice = m_scene->Create<Gx::Image>("Metadata/State/Planet/ChannelBoard/Notice.json");
     m_noticePageIndex = 1;
