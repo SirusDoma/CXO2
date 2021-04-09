@@ -60,6 +60,12 @@ void StateRoom::Initialize()
     auto scrollChat = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
     chatWindow->SetScrollBar(*scrollChat);
 
+    auto systemPlayer = PlayerInfo{0, -1, sf::String(), true};
+    chatWindow->PushMessage(systemPlayer, "Welcome to O2Jam");
+    chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper).");
+    chatWindow->PushMessage(systemPlayer, "F8                 : Toggle windows/image cursor mode.");
+    chatWindow->PushMessage(systemPlayer, "F9                 : Toggle equalizer on/off.");
+
     auto btnChatScrollUp = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
     btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
     auto btnChatScrollDown = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
@@ -70,7 +76,7 @@ void StateRoom::Initialize()
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
        std::cout << std::string(text) << std::endl;
-       chatWindow->PushMessage(PlayerInfo{1, -1, "CXO2", true}, text);
+       chatWindow->PushMessage(PlayerInfo{1, -1, "CXO2", false}, text);
     });
     AddChild(chatBox);
 
@@ -83,6 +89,11 @@ void StateRoom::Initialize()
     chatButtonList->AddChild(btnChatAll, btnChatFriend, btnChatGuild, btnChatWhisper);
     btnChatAll->SetCheckedState(true);
     AddChild(chatButtonList);
+
+    auto btnUserRefresh   = Create<Gx::Button>("Metadata/State/Room/Btn_UserRefresh.json");
+    auto btnUserLeft      = Create<Gx::Button>("Metadata/State/Room/Btn_UserLeft.json");
+    auto btnUserRight     = Create<Gx::Button>("Metadata/State/Room/Btn_UserRight.json");
+    AddChild(btnUserRefresh, btnUserLeft, btnUserRight);
 
     auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < 6; i++)

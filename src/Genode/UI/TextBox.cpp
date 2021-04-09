@@ -329,14 +329,35 @@ namespace Gx
         }
         else if (ev.code == sf::Keyboard::Enter)
         {
-            // TODO: Do something other than this?
-            if (m_text.GetString().getSize() > 0 && m_onTextEntered)
+            // Trim front and back string from whitespaces
+            sf::String str = m_text.GetString();
+            for (size_t i = 0; i < str.getSize(); i++)
             {
-                m_onTextEntered(*this, m_text.GetString());
-
-                m_text.SetString("");
-                m_caret.SelectionLength = 0;
+                if (str[i] == L' ' || str[i] == L'\t' || str[i] == L'\n')
+                {
+                    str.erase(i, 1);
+                    i--;
+                }
+                else
+                    break;
             }
+
+            for (size_t i = str.getSize() - 1; i > 0 && !str.isEmpty(); i--)
+            {
+                if (str[i] == L' ' || str[i] == L'\t' || str[i] == L'\n')
+                {
+                    str.erase(i, 1);
+                    i++;
+                }
+                else
+                    break;
+            }
+
+            if (!str.isEmpty() && m_onTextEntered)
+                m_onTextEntered(*this, str);
+
+            m_text.SetString("");
+            m_caret.SelectionLength = 0;
         }
         else if (ev.control)
         {
