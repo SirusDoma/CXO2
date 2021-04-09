@@ -176,14 +176,24 @@ void ChatWindow::Invalidate()
         auto chat = m_chats[i];
         m_labels[index]->SetVisible(true);
 
-        size_t nickLength = 16;
-        auto nickname = chat.Player.Name;
-        if (nickname.getSize() < nickLength)
-        {
-            for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
-                nickname = " " + nickname;
-        }
+        if (chat.Player.Administrator)
+            m_labels[index]->SetColor(sf::Color(200, 155, 55));
+        else
+            m_labels[index]->SetColor(sf::Color::White);
 
-        m_labels[index]->SetString("[" + nickname + "] " + chat.Message);
+        if (chat.Player.PlayerID != 0)
+        {
+            size_t nickLength = 16;
+            auto nickname = chat.Player.Name;
+            if (nickname.getSize() < nickLength)
+            {
+                for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
+                    nickname = " " + nickname;
+            }
+
+            m_labels[index]->SetString("[" + nickname + "] " + chat.Message);
+        }
+        else
+            m_labels[index]->SetString(chat.Message);
     }
 }
