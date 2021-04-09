@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_RoomLeft.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 666,
+        "y": 491
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 46,
+          "height": 22
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 46,
+          "y": 0,
+          "width": 46,
+          "height": 22
+        }
+      }
+    }
+  }
+}

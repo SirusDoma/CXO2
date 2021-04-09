@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_UserRefresh.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 644,
+        "y": 522
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 66,
+          "height": 31
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 66,
+          "y": 0,
+          "width": 66,
+          "height": 31
+        }
+      }
+    }
+  }
+}
