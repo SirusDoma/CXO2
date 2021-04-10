@@ -18,6 +18,9 @@ namespace Gx
         virtual const sf::FloatRect GetLocalBounds() const;
         virtual void SetLocalBounds(sf::FloatRect bounds);
 
+        virtual bool IsFocused() const;
+        virtual void SetFocus(bool focus);
+
         void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
 
@@ -62,6 +65,7 @@ namespace Gx
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
+        virtual void OnControlStateChanged(Control *sender, State state);
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
@@ -100,6 +104,7 @@ namespace Gx
         sf::Color m_highlightColor;
         sf::FloatRect m_bounds;
         unsigned int m_maxLength;
+        bool m_focused;
 
         std::function<void(TextBox&, sf::String)> m_onTextEntered;
     };

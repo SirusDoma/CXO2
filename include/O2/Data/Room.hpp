@@ -47,7 +47,7 @@ struct ChatData
     PlayerInfo Player;
     sf::String Message;
 
-    PlayerInfo Receiver;
+    PlayerInfo Recipient;
     // MegaphoneInfo Megaphone;
 };
 

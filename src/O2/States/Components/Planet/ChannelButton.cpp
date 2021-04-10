@@ -20,10 +20,6 @@ ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
     AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_hover);
 }
 
-ChannelButton::~ChannelButton()
-{
-}
-
 const sf::FloatRect ChannelButton::GetLocalBounds() const
 {
     return RadioButton::GetLocalBounds();

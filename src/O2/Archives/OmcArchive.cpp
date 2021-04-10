@@ -75,6 +75,7 @@ Gx::Int64 OmcArchive::GetFile(unsigned int index, Gx::Uint8 **data) const
             if (i != index)
             {
                 delete[] encodedData;
+                delete[] sampleData;
                 continue;
             }
 

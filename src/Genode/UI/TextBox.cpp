@@ -7,7 +7,8 @@ namespace Gx
         m_text(),
         m_caret(*this),
         m_bounds(),
-        m_maxLength()
+        m_maxLength(),
+        m_focused(false)
     {
     }
 
@@ -15,7 +16,8 @@ namespace Gx
         m_text(string, font, characterSize),
         m_caret(*this),
         m_bounds(bounds),
-        m_maxLength(0)
+        m_maxLength(0),
+        m_focused(false)
     {
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
@@ -33,6 +35,29 @@ namespace Gx
     void TextBox::SetLocalBounds(sf::FloatRect bounds)
     {
         m_bounds = bounds;
+    }
+
+    bool TextBox::IsFocused() const
+    {
+        return m_focused;
+    }
+
+    void TextBox::SetFocus(bool focus)
+    {
+        if (IsFocused() == focus || GetControlState() == Control::State::Active)
+            return;
+
+        m_focused = focus;
+        auto uiEvent = Event{false, GetControlState()};
+        if (GetFocusChangedCallback())
+            GetFocusChangedCallback()(*this, uiEvent);
+
+        if (m_focused && GetGainFocusCallback())
+            GetGainFocusCallback()(*this, uiEvent);
+        else if (!m_focused && GetLostFocusCallback())
+            GetLostFocusCallback()(*this, uiEvent);
+
+        SetControlState(uiEvent.State);
     }
 
     sf::Vector2f TextBox::FindCharacterPosition(std::size_t index) const
@@ -266,6 +291,10 @@ namespace Gx
         return Control::Render(target, states);
     }
 
+    void TextBox::OnControlStateChanged(Control *sender, Control::State state)
+    {
+    }
+
     void TextBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
         float minDistance  = -1;
@@ -299,7 +328,6 @@ namespace Gx
     void TextBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonUp(ev);
-        SetFocus(GetControlState() != Control::State::Normal);
     }
 
     void TextBox::OnKeyDown(sf::Event::KeyEvent ev)
@@ -359,24 +387,47 @@ namespace Gx
             m_text.SetString("");
             m_caret.SelectionLength = 0;
         }
-        else if (ev.control)
+        else if (ev.control || ev.shift)
         {
-            if (ev.code == sf::Keyboard::C || ev.code == sf::Keyboard::X)
+            if (ev.shift)
             {
-                clip::set_text(GetSelectedText());
-                if (ev.code == sf::Keyboard::X)
+                if (ev.code == sf::Keyboard::Left)
                 {
-                    m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
-                    m_caret.SelectionLength = 0;
+                    if (m_caret.Index <= 0)
+                        return;
+
+                    m_caret.Index--;
+                    m_caret.SelectionLength++;
+                }
+                else if (ev.code == sf::Keyboard::Right)
+                {
+                    if (m_caret.Index >= m_text.GetString().getSize())
+                        return;
+
+                    m_caret.Index++;
+                    m_caret.SelectionLength--;
                 }
             }
-            else if (ev.code == sf::Keyboard::V)
-            {
-                auto string = std::string();
-                clip::get_text(string);
 
-                for (size_t index = 0; index < string.size(); index++)
-                    m_caret.Index = Insert(m_caret.Index, string[index]);
+            if (ev.control)
+            {
+                if (ev.code == sf::Keyboard::C || ev.code == sf::Keyboard::X)
+                {
+                    clip::set_text(GetSelectedText());
+                    if (ev.code == sf::Keyboard::X)
+                    {
+                        m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
+                        m_caret.SelectionLength = 0;
+                    }
+                }
+                else if (ev.code == sf::Keyboard::V)
+                {
+                    auto string = std::string();
+                    clip::get_text(string);
+
+                    for (size_t index = 0; index < string.size(); index++)
+                        m_caret.Index = Insert(m_caret.Index, string[index]);
+                }
             }
         }
         else if (!ev.shift)
@@ -392,27 +443,6 @@ namespace Gx
                 m_caret.Index++;
                 m_caret.SelectionLength = 0;
                 m_text.SetFillColor(m_text.GetFillColor());
-            }
-            else
-                return;
-        }
-        else if (ev.shift)
-        {
-            if (ev.code == sf::Keyboard::Left)
-            {
-                if (m_caret.Index <= 0)
-                    return;
-
-                m_caret.Index--;
-                m_caret.SelectionLength++;
-            }
-            else if (ev.code == sf::Keyboard::Right)
-            {
-                if (m_caret.Index >= m_text.GetString().getSize())
-                    return;
-
-                m_caret.Index++;
-                m_caret.SelectionLength--;
             }
             else
                 return;

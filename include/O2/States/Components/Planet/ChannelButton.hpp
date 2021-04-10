@@ -15,8 +15,6 @@ class ChannelButton : public Gx::RadioButton
 {
 public:
     ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy);
-    virtual ~ChannelButton();
-
     virtual const sf::FloatRect GetLocalBounds() const;
 
     int GetChannelNumber() const;

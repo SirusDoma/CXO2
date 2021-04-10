@@ -11,7 +11,8 @@ StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),
     m_planet(planet),
     m_channel(channel),
-    m_buttons()
+    m_roomButtons(),
+    m_chatPanel()
 {
 }
 
@@ -46,7 +47,6 @@ void StateRoom::Initialize()
     auto btnCoupon    = Create<Gx::Button>("Metadata/State/Room/Btn_Coupon.json");
     auto btnFirstStep = Create<Gx::Button>("Metadata/State/Room/Btn_FirstStep.json");
     auto btnOption    = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
-
     AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
     auto btnCreateRoom = Create<Gx::Button>("Metadata/State/Room/Btn_CreateRoom.json");
@@ -56,43 +56,12 @@ void StateRoom::Initialize()
     });
     AddChild(btnCreateRoom);
 
-    auto chatWindow = Create<ChatWindow>("Metadata/State/Room/ChatWindow.json");
-    auto scrollChat = Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
-    chatWindow->SetScrollBar(*scrollChat);
+    m_chatPanel.Initialize(*this);
+    AddChild(&m_chatPanel);
 
-    auto systemPlayer = PlayerInfo{0, -1, sf::String(), true};
-    chatWindow->PushMessage(systemPlayer, "Welcome to O2Jam");
-    chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper).");
-    chatWindow->PushMessage(systemPlayer, "F8                 : Toggle windows/image cursor mode.");
-    chatWindow->PushMessage(systemPlayer, "F9                 : Toggle equalizer on/off.");
-
-    auto btnChatScrollUp = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
-    btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
-    auto btnChatScrollDown = Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
-    btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
-    AddChild(chatWindow, scrollChat, btnChatScrollUp, btnChatScrollDown);
-
-    auto chatBox = Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
-    chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
-    {
-       std::cout << std::string(text) << std::endl;
-       chatWindow->PushMessage(PlayerInfo{1, -1, "CXO2", false}, text);
-    });
-    AddChild(chatBox);
-
-    auto btnChatAll     = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatAll.json");
-    auto btnChatFriend  = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatFriend.json");
-    auto btnChatGuild   = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatGuild.json");
-    auto btnChatWhisper = Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatWhisper.json");
-
-    auto chatButtonList = Create<Gx::List>("Metadata/State/Room/ChatButtonList.json");
-    chatButtonList->AddChild(btnChatAll, btnChatFriend, btnChatGuild, btnChatWhisper);
-    btnChatAll->SetCheckedState(true);
-    AddChild(chatButtonList);
-
-    auto btnUserRefresh   = Create<Gx::Button>("Metadata/State/Room/Btn_UserRefresh.json");
-    auto btnUserLeft      = Create<Gx::Button>("Metadata/State/Room/Btn_UserLeft.json");
-    auto btnUserRight     = Create<Gx::Button>("Metadata/State/Room/Btn_UserRight.json");
+    auto btnUserRefresh = Create<Gx::Button>("Metadata/State/Room/Btn_UserRefresh.json");
+    auto btnUserLeft    = Create<Gx::Button>("Metadata/State/Room/Btn_UserLeft.json");
+    auto btnUserRight   = Create<Gx::Button>("Metadata/State/Room/Btn_UserRight.json");
     AddChild(btnUserRefresh, btnUserLeft, btnUserRight);
 
     auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
@@ -113,9 +82,9 @@ void StateRoom::Initialize()
         };
 
         roomButton->SetRoomData(roomData);
-
         roomList->AddChild(roomButton.get());
-        m_buttons.push_back(std::move(roomButton));
+
+        m_roomButtons.push_back(std::move(roomButton));
     }
     AddChild(roomList);
 
@@ -142,11 +111,14 @@ void StateRoom::Initialize()
         btnShowAll->SetEnabled(true);
         btnShowAll->SetVisible(true);
     });
-
     AddChild(btnWaitingRoom, btnShowAll);
+
+    auto sfxNavigate = Create<sf::Sound>("Metadata/State/Room/Sound/RoomNavigation.json", Gx::ResourceScope::Shared);
 
     auto btnRoomLeft  = Create<Gx::Button>("Metadata/State/Room/Btn_RoomLeft.json");
     auto btnRoomRight = Create<Gx::Button>("Metadata/State/Room/Btn_RoomRight.json");
+    btnRoomLeft->SetClickCallback([=] (auto& sender, auto& ev) { Play(sfxNavigate); });
+    btnRoomRight->SetClickCallback([=] (auto& sender, auto& ev) { Play(sfxNavigate); });
     AddChild(btnRoomLeft, btnRoomRight);
 
     auto btnBack = Create<Gx::Button>("Metadata/State/Room/Btn_Back.json");

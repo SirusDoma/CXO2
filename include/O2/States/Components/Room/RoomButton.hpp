@@ -13,7 +13,6 @@ class RoomButton : public Gx::Control
 {
 public:
     RoomButton(Gx::Scene &scene);
-
     virtual const sf::FloatRect GetLocalBounds() const;
 
     const RoomData GetRoomData() const;

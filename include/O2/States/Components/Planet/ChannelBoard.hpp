@@ -13,10 +13,10 @@
 #include <Genode/UI/List.hpp>
 
 #include <O2/Data/Planet.hpp>
+#include <O2/States/Components/Planet/ChannelButton.hpp>
 
 #include <functional>
 
-class ChannelButton;
 class ChannelBoard : public virtual Gx::Control, public virtual Gx::TaskContainer
 {
 public:
@@ -27,8 +27,8 @@ public:
         ChannelList
     };
 
-    ChannelBoard(Gx::Scene &scene);
-    ~ChannelBoard();
+    ChannelBoard();
+    void Initialize(Gx::Scene &scene);
 
     virtual const sf::FloatRect GetLocalBounds() const;
 
@@ -42,9 +42,8 @@ public:
     void SetEnterChannelCallback(std::function<void(Planet, ChannelInfo)> callback);
 
 private:
-    const unsigned int CHANNEL_LIST_PER_PAGE = 20;
+    constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
 
-    void Initialize();
     void CaptureCurrentState();
 
     virtual void Update(double delta);
@@ -60,7 +59,7 @@ private:
 
     Gx::Scene         *m_scene;
     sf::SoundSource   *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
-    sf::RenderTexture m_duplicateTexture;
+    sf::RenderTexture m_renderTexture;
 
     sf::Vector2f m_position;
     PlanetInfo m_planetInfo;

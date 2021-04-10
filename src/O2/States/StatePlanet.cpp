@@ -10,7 +10,9 @@
 StatePlanet::StatePlanet(bool fadeIn) :
     State(),
     m_useFadeIn(fadeIn),
-    m_connecting(false)
+    m_connecting(false),
+    m_container(),
+    m_channelBoard()
 {
 }
 
@@ -37,8 +39,8 @@ void StatePlanet::Initialize()
     auto thalo    = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Thalo.json");
     auto melpomin = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Melpomin.json");
 
-    m_container = std::make_unique<Gx::UiContainer>();
-    m_container->AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
+    m_container = Gx::UiContainer();
+    m_container.AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
     std::unordered_map<Planet, Gx::RadioButton*> planets = {
         {Planet::Melpomin, melpomin},
         {Planet::Thalo,    thalo},
@@ -74,15 +76,15 @@ void StatePlanet::Initialize()
             }
 
             Mixer::Play(sfx, "sfx");
-            m_channelBoard->Show(planet, [=] { OnEnterPlanet(planet); });
+            m_channelBoard.Show(planet, [=] { OnEnterPlanet(planet); });
         });
     }
 
-    AddChild(m_container.get());
+    AddChild(&m_container);
 
-    m_channelBoard = std::make_unique<ChannelBoard>(*this);
-    m_channelBoard->SetEnterChannelCallback([=] (auto planet, auto channel) { OnEnterChannel(planet, channel); });
-    AddChild(m_channelBoard.get());
+    m_channelBoard.Initialize(*this);
+    m_channelBoard.SetEnterChannelCallback([=] (auto planet, auto channel) { OnEnterChannel(planet, channel); });
+    AddChild(&m_channelBoard);
 
     m_bgm = Create<sf::Music>("Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
     Mixer::Play(m_bgm, "BGM");
@@ -120,7 +122,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
     }
 
     m_connecting = false;
-    m_channelBoard->UpdateChannelList(planetInfo);
+    m_channelBoard.UpdateChannelList(planetInfo);
 }
 
 void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
@@ -139,5 +141,5 @@ void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
 
 bool StatePlanet::IsConnecting()
 {
-    return m_channelBoard->InTransition() || m_connecting;
+    return m_channelBoard.InTransition() || m_connecting;
 }

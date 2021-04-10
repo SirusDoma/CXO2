@@ -18,11 +18,11 @@ public:
     ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned int characterSize = 13);
 
     virtual const sf::FloatRect GetLocalBounds() const;
+    void SetLocalBounds(const sf::FloatRect &bounds);
 
     void SetFont(const sf::Font &font);
     void SetCharacterSize(unsigned int characterSize);
     void SetScrollBar(Gx::ScrollBar &scroll);
-    void SetLocalBounds(const sf::FloatRect &bounds);
 
     const sf::Font *GetFont() const;
     Gx::ScrollBar *GetScrollBar() const;

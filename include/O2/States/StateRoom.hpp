@@ -9,6 +9,7 @@
 
 #include <O2/States/State.hpp>
 #include <O2/States/Components/Common/ChatWindow.hpp>
+#include <O2/States/Components/Room/ChatPanel.hpp>
 
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Room.hpp>
@@ -26,7 +27,8 @@ private:
     sf::Music *m_bgm;
     Planet m_planet;
     ChannelInfo m_channel;
-    std::vector<std::unique_ptr<RoomButton>> m_buttons;
+    ChatPanel m_chatPanel;
+    std::vector<std::unique_ptr<RoomButton>> m_roomButtons;
 };
 
 #endif

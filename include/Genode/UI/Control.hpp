@@ -27,8 +27,8 @@ namespace Gx
         virtual const sf::FloatRect GetLocalBounds() const = 0;
         const sf::FloatRect GetGlobalBounds() const;
 
-        bool IsFocused() const;
-        void SetFocus(bool focus);
+        virtual bool IsFocused() const;
+        virtual void SetFocus(bool focus);
 
         void SetFocusChangedCallback(std::function<void(Control&, Event&)> callback);
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
@@ -85,7 +85,7 @@ namespace Gx
         virtual void Invalidate() = 0;
 
     private:
-        const double DOUBLE_CLICK_THRESHOLD = 250.f;
+        constexpr static const double DOUBLE_CLICK_THRESHOLD = 250.f;
 
         State  m_state;
         bool   m_enabled, m_visible, m_focused, m_clicked;
