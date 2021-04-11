@@ -1,0 +1,24 @@
+{
+  "type": "RADIO_BUTTON",
+  "require": {
+    "texture": "Dialog/Option/Background.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 138,
+        "y": 62
+      }
+    },
+    "states": {
+      "check": {
+        "texCoords": {
+          "x": 503,
+          "y": 62,
+          "width": 104,
+          "height": 36
+        }
+      }
+    }
+  }
+}

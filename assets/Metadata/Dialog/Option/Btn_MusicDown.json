@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "Dialog/Option/Btn_MusicDown.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 50,
+        "y": 286
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 71,
+          "height": 20
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 71,
+          "y": 0,
+          "width": 71,
+          "height": 20
+        }
+      }
+    }
+  }
+}

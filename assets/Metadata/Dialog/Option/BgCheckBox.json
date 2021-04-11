@@ -1,0 +1,24 @@
+{
+  "type": "CHECKBOX",
+  "require": {
+    "texture": "Dialog/Option/Sound_CheckBox.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 203,
+        "y": 111
+      }
+    },
+    "states": {
+      "check": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      }
+    }
+  }
+}

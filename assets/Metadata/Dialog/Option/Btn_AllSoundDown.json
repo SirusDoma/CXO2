@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "Dialog/Option/Btn_AllSoundDown.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 49,
+        "y": 180
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 71,
+          "height": 20
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 71,
+          "y": 0,
+          "width": 71,
+          "height": 20
+        }
+      }
+    }
+  }
+}

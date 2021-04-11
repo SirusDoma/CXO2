@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "Dialog/Option/Btn_Default.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 73,
+        "y": 448
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 87,
+          "height": 26
+        }
+      },
+      "click": {
+        "texCoords": {
+          "x": 87,
+          "y": 0,
+          "width": 87,
+          "height": 26
+        }
+      }
+    }
+  }
+}

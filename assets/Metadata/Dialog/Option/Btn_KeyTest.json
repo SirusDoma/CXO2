@@ -1,0 +1,32 @@
+{
+  "type": "CHECKBOX",
+  "require": {
+    "texture": "Dialog/Option/Btn_KeyTest.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 39,
+        "y": 389
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 73,
+          "height": 26
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 73,
+          "y": 0,
+          "width": 73,
+          "height": 26
+        }
+      }
+    }
+  }
+}

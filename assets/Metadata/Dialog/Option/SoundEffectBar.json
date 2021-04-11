@@ -1,0 +1,21 @@
+﻿{
+  "type": "PROGRESS_BAR",
+  "require": {
+    "texture": "Dialog/Option/SoundEffectBar.png"
+  },
+  "attributes": {
+    "orientation": "HORIZONTAL",
+    "transform": {
+      "position": {
+        "x": 67,
+        "y": 371
+      }
+    },
+    "texCoords": {
+      "x": 0,
+      "y": 0,
+      "width": 239,
+      "height": 10
+    }
+  }
+}

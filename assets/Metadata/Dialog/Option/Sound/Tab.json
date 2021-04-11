@@ -1,0 +1,6 @@
+﻿{
+  "type": "SOUND",
+  "require": {
+    "sound": "bgEffect/01"
+  }
+}
