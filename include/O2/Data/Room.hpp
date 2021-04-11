@@ -20,7 +20,6 @@ enum GameMode
 
 struct RoomData
 {
-    bool          Available;
     unsigned int  Number;
     sf::String    Title;
     ChartMetadata Chart;

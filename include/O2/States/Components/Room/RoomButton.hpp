@@ -12,22 +12,28 @@
 class RoomButton : public Gx::Control
 {
 public:
-    RoomButton(Gx::Scene &scene);
+    RoomButton();
+
+    void Initialize(Gx::Scene &scene);
     virtual const sf::FloatRect GetLocalBounds() const;
+
+    bool IsActive() const;
 
     const RoomData GetRoomData() const;
     void SetRoomData(const RoomData& data);
+    void Deactivate();
 
 private:
+    virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
     virtual void Invalidate();
 
-    Gx::Scene *m_scene;
     Gx::Button *m_button;
     Gx::Label  *m_titleLabel, *m_musicLabel, *m_capacityLabel;
     Gx::Number *m_numberLabel;
-    Gx::Image  *m_speedLabel, *m_gameMode, *m_stateLabel, *m_ohmLevel, *m_lock;
+    Gx::Image  *m_hover, *m_speedLabel, *m_gameMode, *m_stateLabel, *m_ohmLevel, *m_lock;
 
     RoomData m_data;
+    bool m_active;
 };
 
 #endif

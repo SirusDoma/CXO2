@@ -8,8 +8,9 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <O2/States/State.hpp>
-#include <O2/States/Components/Common/ChatWindow.hpp>
 #include <O2/States/Components/Room/ChatPanel.hpp>
+#include <O2/States/Components/Room/RoomList.hpp>
+#include <O2/States/Components/Room/UserList.hpp>
 
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Room.hpp>
@@ -27,8 +28,10 @@ private:
     sf::Music *m_bgm;
     Planet m_planet;
     ChannelInfo m_channel;
+
+    RoomList  m_roomList;
     ChatPanel m_chatPanel;
-    std::vector<std::unique_ptr<RoomButton>> m_roomButtons;
+    UserList  m_userList;
 };
 
 #endif

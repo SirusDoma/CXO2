@@ -123,7 +123,7 @@ namespace Gx
 
     void List::ClearChildren()
     {
-        Node::ClearChildren();
+        Control::ClearChildren();
         m_verticalCounter   = 0;
         m_horizontalCounter = 0;
     }

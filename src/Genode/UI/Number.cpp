@@ -121,6 +121,9 @@ namespace Gx
 
     sf::RenderStates Number::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
+        if (!IsVislble())
+            return states;
+
         states.transform *= GetTransform();
         states.texture    = m_texture;
         target.draw(m_vertices, states);

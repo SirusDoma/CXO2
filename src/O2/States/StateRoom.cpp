@@ -4,15 +4,15 @@
 #include <Genode/UI.hpp>
 
 #include <O2/States/StatePlanet.hpp>
-#include <O2/States/Components/Room/RoomButton.hpp>
 #include <iostream>
 
 StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),
     m_planet(planet),
     m_channel(channel),
-    m_roomButtons(),
-    m_chatPanel()
+    m_roomList(),
+    m_chatPanel(),
+    m_userList()
 {
 }
 
@@ -49,77 +49,71 @@ void StateRoom::Initialize()
     auto btnOption    = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
     AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
-    auto btnCreateRoom = Create<Gx::Button>("Metadata/State/Room/Btn_CreateRoom.json");
-    btnCreateRoom->SetClickCallback([] (auto& sender, auto& event)
-    {
+    auto nicknameLabel = Create<Gx::Label>("Metadata/State/Room/NicknameLabel.json");
+    nicknameLabel->SetString("Lv.-1: CXO2");
+    AddChild(nicknameLabel);
 
-    });
-    AddChild(btnCreateRoom);
+    m_roomList.Initialize(*this);
+    RoomData rooms[] = {
+        RoomData{
+            0,
+            "Let's play together~",
+            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36},
+            Difficulty::Hard,
+            GameMode::Vs,
+            SongMode::User,
+            RoomState::Playing,
+            4.5f,
+            false,
+            2
+        },
+        RoomData{
+            5,
+            "Pimplex's room",
+            ChartMetadata{},
+            Difficulty::Hard,
+            GameMode::Single,
+            SongMode::Random,
+            RoomState::Waiting,
+            3.5f,
+            false,
+        },
+        RoomData{
+            3,
+            "kYo-Abhiem's room",
+            ChartMetadata{"R3", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
+            Difficulty::Hard,
+            GameMode::Vs,
+            SongMode::User,
+            RoomState::Waiting,
+            4.f,
+            false,
+        }
+    };
+
+    for (auto room : rooms)
+        m_roomList.PushRoomData(room);
+
+    AddChild(&m_roomList);
+
+    m_userList.Initialize(*this);
+    PlayerInfo players[] = {
+        PlayerInfo{1, 100, "CXO2"},
+        PlayerInfo{2, 100, "DJZMO"},
+        PlayerInfo{3, 98, "kYo-Abhiem"},
+        PlayerInfo{4, 53, "Pimplex"}
+    };
+
+    for (auto player : players)
+        m_userList.AddPlayer(player);
+
+    for (unsigned int i = 21; i > 4; i--)
+        m_userList.AddPlayer(PlayerInfo{i, static_cast<int>(i), "Dummy"});
+
+    AddChild(&m_userList);
 
     m_chatPanel.Initialize(*this);
     AddChild(&m_chatPanel);
-
-    auto btnUserRefresh = Create<Gx::Button>("Metadata/State/Room/Btn_UserRefresh.json");
-    auto btnUserLeft    = Create<Gx::Button>("Metadata/State/Room/Btn_UserLeft.json");
-    auto btnUserRight   = Create<Gx::Button>("Metadata/State/Room/Btn_UserRight.json");
-    AddChild(btnUserRefresh, btnUserLeft, btnUserRight);
-
-    auto roomList = Create<Gx::List>("Metadata/State/Room/RoomList.json");
-    for (unsigned int i = 0; i < 6; i++)
-    {
-        auto roomButton = std::make_unique<RoomButton>(*this);
-        auto roomData = RoomData{
-            true,
-            i,
-            "Let's play together~",
-            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
-            i <= 2 ? Difficulty::Easy : i <= 4 ? Difficulty::Normal : i <= 6 ? Difficulty::Hard : Difficulty::Master,
-            GameMode::Vs,
-            SongMode::User,
-            i % 2 != 0 ? RoomState::Playing : RoomState::Waiting,
-            (i + 1) * 0.5f,
-            i % 2 == 0,
-        };
-
-        roomButton->SetRoomData(roomData);
-        roomList->AddChild(roomButton.get());
-
-        m_roomButtons.push_back(std::move(roomButton));
-    }
-    AddChild(roomList);
-
-    auto btnShortCut    = Create<Gx::Button>("Metadata/State/Room/Btn_ShortCut.json");
-    AddChild(btnShortCut);
-
-    auto btnShowAll     = Create<Gx::Button>("Metadata/State/Room/Btn_ShowAll.json");
-    auto btnWaitingRoom = Create<Gx::Button>("Metadata/State/Room/Btn_WaitingRoom.json");
-    btnShowAll->SetEnabled(false);
-    btnShowAll->SetVisible(false);
-
-    btnShowAll->SetClickCallback([=] (auto& sender, auto& ev)
-    {
-        btnShowAll->SetEnabled(false);
-        btnShowAll->SetVisible(false);
-        btnWaitingRoom->SetEnabled(true);
-        btnWaitingRoom->SetVisible(true);
-    });
-
-    btnWaitingRoom->SetClickCallback([=] (auto& sender, auto& ev)
-    {
-        btnWaitingRoom->SetEnabled(false);
-        btnWaitingRoom->SetVisible(false);
-        btnShowAll->SetEnabled(true);
-        btnShowAll->SetVisible(true);
-    });
-    AddChild(btnWaitingRoom, btnShowAll);
-
-    auto sfxNavigate = Create<sf::Sound>("Metadata/State/Room/Sound/RoomNavigation.json", Gx::ResourceScope::Shared);
-
-    auto btnRoomLeft  = Create<Gx::Button>("Metadata/State/Room/Btn_RoomLeft.json");
-    auto btnRoomRight = Create<Gx::Button>("Metadata/State/Room/Btn_RoomRight.json");
-    btnRoomLeft->SetClickCallback([=] (auto& sender, auto& ev) { Play(sfxNavigate); });
-    btnRoomRight->SetClickCallback([=] (auto& sender, auto& ev) { Play(sfxNavigate); });
-    AddChild(btnRoomLeft, btnRoomRight);
 
     auto btnBack = Create<Gx::Button>("Metadata/State/Room/Btn_Back.json");
     btnBack->SetClickCallback([this] (auto& sender, auto& ev) { OnExitPlanet(); });

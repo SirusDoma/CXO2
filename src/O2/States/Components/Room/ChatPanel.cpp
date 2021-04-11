@@ -24,8 +24,8 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     chatWindow->PushMessage(systemPlayer, "F9                 : Toggle equalizer on/off.");
 
     auto btnChatScrollUp = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
-    btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
     auto btnChatScrollDown = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
+    btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
     btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
     AddChild(chatWindow, scrollChat, btnChatScrollUp, btnChatScrollDown);
 

@@ -3,14 +3,17 @@
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
 
-RoomButton::RoomButton(Gx::Scene &scene) :
-    m_scene(&scene),
-    m_data()
+RoomButton::RoomButton() :
+    m_data(),
+    m_active(false)
 {
-    m_button   = scene.Create<Gx::Button>("Metadata/State/Room/Btn_Room/Button.json");
-    auto hover = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Hover.json");
-    m_button->SetFocusChangedCallback([hover] (auto& sender, auto& ev) { hover->SetVisible(sender.IsFocused()); });
-    hover->SetVisible(false);
+}
+
+void RoomButton::Initialize(Gx::Scene &scene)
+{
+    m_button = scene.Create<Gx::Button>("Metadata/State/Room/Btn_Room/Button.json");
+    m_hover  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Hover.json");
+    m_hover->SetVisible(false);
 
     m_titleLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/TitleLabel.json");
     m_musicLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/MusicLabel.json");
@@ -22,12 +25,17 @@ RoomButton::RoomButton(Gx::Scene &scene) :
     m_ohmLevel      = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/OhmLevel.json");
     m_lock          = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Lock.json");
 
-    AddChild(m_button, m_titleLabel, m_musicLabel, m_capacityLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, hover);
+    AddChild(m_button, m_titleLabel, m_musicLabel, m_capacityLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, m_hover);
 }
 
 const sf::FloatRect RoomButton::GetLocalBounds() const
 {
     return m_button->GetLocalBounds();
+}
+
+bool RoomButton::IsActive() const
+{
+    return m_active;
 }
 
 const RoomData RoomButton::GetRoomData() const
@@ -37,14 +45,41 @@ const RoomData RoomButton::GetRoomData() const
 
 void RoomButton::SetRoomData(const RoomData &data)
 {
-    m_data = data;
+    m_data   = data;
+    m_active = true;
+
     Invalidate();
+}
+
+void RoomButton::Deactivate()
+{
+    m_data   = RoomData();
+    m_active = false;
+
+    Invalidate();
+}
+
+void RoomButton::OnMouseMove(sf::Event::MouseMoveEvent ev)
+{
+    Control::OnMouseMove(ev);
+    m_hover->SetVisible(IsFocused());
 }
 
 void RoomButton::Invalidate()
 {
+    for (auto child : GetChildren())
+    {
+        auto control = dynamic_cast<Gx::Control*>(child);
+        if (control)
+            control->SetVisible(m_active);
+    }
+
+    m_button->SetVisible(true);
+    m_hover->SetVisible(IsFocused());
+    if (!m_active)
+        return;
+
     m_titleLabel->SetString(m_data.Title);
-    m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
     m_capacityLabel->SetString("(" + std::to_string(m_data.PlayerCount) + "/" + std::to_string(m_data.Capacity) + ")");
 
     m_numberLabel->SetValue(m_data.Number);
@@ -59,6 +94,17 @@ void RoomButton::Invalidate()
         case GameMode::Couple: m_gameMode->SetFrame("Couple"); break;
     }
 
+    std::string speedStr(4, '\0');
+    if (m_data.Speed > 0)
+    {
+        if (std::fmod(m_data.Speed, 1.0))
+            speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", m_data.Speed));
+        else
+            speedStr = std::to_string(static_cast<int>(m_data.Speed));
+    }
+    else
+        speedStr = "R";
+
     if (m_data.SongMode == SongMode::User)
     {
         std::string diffName;
@@ -70,29 +116,13 @@ void RoomButton::Invalidate()
             case Difficulty::Master: diffName = "MX"; m_ohmLevel->SetFrame("Master"); break;
         }
 
-        std::string speedFrame = diffName + std::to_string(static_cast<int>(m_data.Speed));
-        if(std::fmod(m_data.Speed, 1.0))
-        {
-            std::string speedStr(4, '\0');
-            speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", m_data.Speed));
-
-            speedFrame = diffName + speedStr;
-        }
-
-        m_speedLabel->SetFrame(speedFrame);
+        m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
+        m_speedLabel->SetFrame(diffName + speedStr);
     }
     else if (m_data.SongMode == SongMode::Random)
     {
-        std::string speedFrame;
-        switch (m_data.Difficulty)
-        {
-            case Difficulty::Easy:   speedFrame = "EXR"; break;
-            case Difficulty::Normal: speedFrame = "NXR"; break;
-            case Difficulty::Hard:   speedFrame = "HXR"; break;
-            case Difficulty::Master: speedFrame = "MXR"; break;
-        }
-
-        m_speedLabel->SetFrame(speedFrame);
+        m_musicLabel->SetString("Random");
+        m_speedLabel->SetFrame("RX" + speedStr);
     }
 
     if (m_data.State == RoomState::Playing)

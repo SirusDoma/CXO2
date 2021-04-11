@@ -1,5 +1,5 @@
-#ifndef O2JAM_ROOM_CHATPANEL_HPP
-#define O2JAM_ROOM_CHATPANEL_HPP
+#ifndef O2JAM_ROOM_CHAT_PANEL_HPP
+#define O2JAM_ROOM_CHAT_PANEL_HPP
 
 #include <Genode/UI/UiContainer.hpp>
 
