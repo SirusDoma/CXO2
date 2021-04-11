@@ -8,6 +8,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <O2/States/State.hpp>
+#include <O2/States/Components/Common/OptionDialog.hpp>
 #include <O2/States/Components/Room/ChatPanel.hpp>
 #include <O2/States/Components/Room/RoomList.hpp>
 #include <O2/States/Components/Room/UserList.hpp>
@@ -28,6 +29,8 @@ private:
     sf::Music *m_bgm;
     Planet m_planet;
     ChannelInfo m_channel;
+
+    OptionDialog *m_optionDialog;
 
     RoomList  m_roomList;
     ChatPanel m_chatPanel;

@@ -4,13 +4,15 @@
 #include <Genode/UI.hpp>
 
 #include <O2/States/StatePlanet.hpp>
-#include <iostream>
 #include <O2/States/Components/Room/Marquee.hpp>
+
+#include <iostream>
 
 StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),
     m_planet(planet),
     m_channel(channel),
+    m_optionDialog(),
     m_roomList(),
     m_chatPanel(),
     m_userList()
@@ -46,12 +48,18 @@ void StateRoom::Initialize()
     marquee->SetString("Welcome to O2Jam (Live?). Official Website: https://live.o2jam.asia");
     AddChild(marquee);
 
+    m_optionDialog = Create<OptionDialog>("Metadata/Dialog/Option.json");
+    m_optionDialog->Initialize(*this);
+
     auto btnMusicShop = Create<Gx::Button>("Metadata/State/Room/Btn_MusicShop.json");
     auto btnItemShop  = Create<Gx::Button>("Metadata/State/Room/Btn_ItemShop.json");
     auto btnMyRoom    = Create<Gx::Button>("Metadata/State/Room/Btn_MyRoom.json");
     auto btnCoupon    = Create<Gx::Button>("Metadata/State/Room/Btn_Coupon.json");
     auto btnFirstStep = Create<Gx::Button>("Metadata/State/Room/Btn_FirstStep.json");
     auto btnOption    = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
+
+    btnOption->SetClickCallback([&] (auto &sender, auto &ev) { m_optionDialog->Show(this); });
+
     AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
     auto nicknameLabel = Create<Gx::Label>("Metadata/State/Room/NicknameLabel.json");
@@ -125,7 +133,7 @@ void StateRoom::Initialize()
     AddChild(btnBack);
 
     m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
-    Play(m_bgm);
+    //Play(m_bgm);
 }
 
 void StateRoom::OnExitPlanet()
