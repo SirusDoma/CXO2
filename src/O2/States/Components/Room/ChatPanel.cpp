@@ -13,8 +13,8 @@ ChatPanel::ChatPanel()
 
 void ChatPanel::Initialize(Gx::Scene &scene)
 {
-    auto chatWindow = scene.Create<ChatWindow>("Metadata/State/Room/ChatWindow.json");
-    auto scrollChat = scene.Create<Gx::ScrollBar>("Metadata/State/Room/ChatScroll.json");
+    auto chatWindow = scene.Create<ChatWindow>("Metadata/State/Room/ChatPanel/ChatWindow.json");
+    auto scrollChat = scene.Create<Gx::ScrollBar>("Metadata/State/Room/ChatPanel/ChatScroll.json");
     chatWindow->SetScrollBar(*scrollChat);
 
     auto systemPlayer = PlayerInfo{0, -1, sf::String(), true};
@@ -23,13 +23,13 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     chatWindow->PushMessage(systemPlayer, "F8                 : Toggle windows/image cursor mode.");
     chatWindow->PushMessage(systemPlayer, "F9                 : Toggle equalizer on/off.");
 
-    auto btnChatScrollUp = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollUp.json");
-    auto btnChatScrollDown = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ChatScrollDown.json");
+    auto btnChatScrollUp = scene.Create<Gx::Button>("Metadata/State/Room/ChatPanel/Btn_ChatScrollUp.json");
+    auto btnChatScrollDown = scene.Create<Gx::Button>("Metadata/State/Room/ChatPanel/Btn_ChatScrollDown.json");
     btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
     btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
     AddChild(chatWindow, scrollChat, btnChatScrollUp, btnChatScrollDown);
 
-    auto chatBox = scene.Create<Gx::TextBox>("Metadata/State/Room/ChatBox.json");
+    auto chatBox = scene.Create<Gx::TextBox>("Metadata/State/Room/ChatPanel/ChatBox.json");
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
         std::cout << std::string(text) << std::endl;
@@ -37,12 +37,12 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     });
     AddChild(chatBox);
 
-    auto btnChatAll     = scene.Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatAll.json");
-    auto btnChatFriend  = scene.Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatFriend.json");
-    auto btnChatGuild   = scene.Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatGuild.json");
-    auto btnChatWhisper = scene.Create<Gx::RadioButton>("Metadata/State/Room/Btn_ChatWhisper.json");
+    auto btnChatAll     = scene.Create<Gx::RadioButton>("Metadata/State/Room/ChatPanel/Btn_ChatAll.json");
+    auto btnChatFriend  = scene.Create<Gx::RadioButton>("Metadata/State/Room/ChatPanel/Btn_ChatFriend.json");
+    auto btnChatGuild   = scene.Create<Gx::RadioButton>("Metadata/State/Room/ChatPanel/Btn_ChatGuild.json");
+    auto btnChatWhisper = scene.Create<Gx::RadioButton>("Metadata/State/Room/ChatPanel/Btn_ChatWhisper.json");
 
-    auto chatButtonList = scene.Create<Gx::List>("Metadata/State/Room/ChatButtonList.json");
+    auto chatButtonList = scene.Create<Gx::List>("Metadata/State/Room/ChatPanel/ChatButtonList.json");
     chatButtonList->AddChild(btnChatAll, btnChatFriend, btnChatGuild, btnChatWhisper);
     btnChatAll->SetCheckedState(true);
 
