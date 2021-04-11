@@ -1,0 +1,32 @@
+{
+  "type": "BUTTON",
+  "require": {
+    "texture": "State/Room/Btn_UserList_Hover.png"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "states": {
+      "hover": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 148,
+          "height": 21
+        }
+      },
+      "check": {
+        "texCoords": {
+          "x": 0,
+          "y": 0,
+          "width": 148,
+          "height": 21
+        }
+      }
+    }
+  }
+}

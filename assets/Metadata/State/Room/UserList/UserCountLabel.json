@@ -1,0 +1,24 @@
+﻿{
+  "type": "LABEL",
+  "require": {
+    "font": "Common/Font.Unicode.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 645,
+        "y": 245
+      }
+    },
+    "fontSize": 12,
+    "outline": {
+      "thickness": 1,
+      "color": {
+        "a": 255,
+        "r": 25,
+        "g": 25,
+        "b": 25
+      }
+    }
+  }
+}
