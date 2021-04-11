@@ -5,6 +5,7 @@
 
 #include <O2/States/StatePlanet.hpp>
 #include <iostream>
+#include <O2/States/Components/Room/Marquee.hpp>
 
 StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
     State::State(),
@@ -40,6 +41,10 @@ void StateRoom::Initialize()
     channelNumber->SetValue(m_channel.Number);
     channelNumber->SetDigitCount(2);
     AddChild(channelNumber);
+
+    auto marquee = Create<Marquee>("Metadata/State/Room/Marquee.json");
+    marquee->SetString("Welcome to O2Jam (Live?). Official Website: https://live.o2jam.asia");
+    AddChild(marquee);
 
     auto btnMusicShop = Create<Gx::Button>("Metadata/State/Room/Btn_MusicShop.json");
     auto btnItemShop  = Create<Gx::Button>("Metadata/State/Room/Btn_ItemShop.json");

@@ -21,6 +21,7 @@
 #include <O2/Loaders/UI/ScrollBarLoader.hpp>
 
 #include <O2/Loaders/UI/Components/ChatWindowLoader.hpp>
+#include <O2/Loaders/UI/Components/MarqueeLoader.hpp>
 
 void O2Jam::OnStart()
 {
@@ -53,6 +54,7 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
     // O2 Components
     Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
+    Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
 
     // Load global assets
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
