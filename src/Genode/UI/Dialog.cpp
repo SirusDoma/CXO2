@@ -49,6 +49,16 @@ namespace Gx
         m_sprite.SetTexture(texture);
     }
 
+    const sf::IntRect &Dialog::GetTexCoords() const
+    {
+        return m_sprite.GetTexCoords();
+    }
+
+    void Dialog::SetTexCoords(const sf::IntRect &rectangle)
+    {
+        m_sprite.SetTexCoords(rectangle);
+    }
+
     bool Dialog::IsAccepted() const
     {
         return m_accepted;
@@ -126,8 +136,8 @@ namespace Gx
         if (m_scene)
         {
             auto screenSize = m_scene->GetView().getSize();
-            float x = (screenSize.x / 2.f) - (GetLocalBounds().width / 2.f);
-            float y = (screenSize.y / 2.f) - (GetLocalBounds().height / 2.f);
+            unsigned int x = static_cast<unsigned int>((screenSize.x / 2.f) - (GetLocalBounds().width / 2.f));
+            unsigned int y = static_cast<unsigned int>((screenSize.y / 2.f) - (GetLocalBounds().height / 2.f));
 
             SetPosition(x, y);
             if (enableBackDrop)
@@ -138,9 +148,10 @@ namespace Gx
             else
                 m_backdrop = Rectangle(sf::Vector2f(0, 0));
 
-            m_promptText->SetString(prompt);
-            m_scene->PushOverlay(this);
+            if (m_promptText)
+                m_promptText->SetString(prompt);
 
+            m_scene->PushOverlay(this);
             m_shown = true;
 
             sf::RenderTarget& target = m_scene->GetApplication();
