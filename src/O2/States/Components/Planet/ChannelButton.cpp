@@ -109,7 +109,6 @@ void ChannelButton::SetPlanet(Planet planet)
 
 sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const
 {
-    states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha);
     return CheckBox::Render(target, states);
 }
 
