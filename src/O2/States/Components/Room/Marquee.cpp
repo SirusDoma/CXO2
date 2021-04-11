@@ -33,7 +33,8 @@ void Marquee::Update(double delta)
     Label::Update(delta);
 
     auto velocity = sf::Vector2f(m_speed, 0.f) * static_cast<float>(delta / 1000.f);
-    SetPosition(GetPosition() - velocity);
+    auto position = GetPosition() - velocity;
+    SetPosition(position);
 
     auto textBounds = Label::GetLocalBounds();
     float x = GetPosition().x + textBounds.width;
