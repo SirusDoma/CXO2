@@ -133,7 +133,7 @@ void StateRoom::Initialize()
     AddChild(btnBack);
 
     m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
-    //Play(m_bgm);
+    Play(m_bgm);
 }
 
 void StateRoom::OnExitPlanet()
