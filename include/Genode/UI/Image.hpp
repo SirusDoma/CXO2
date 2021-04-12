@@ -31,6 +31,7 @@ namespace Gx
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
         virtual void Invalidate();
+
     private:
         std::unordered_map<std::string, sf::IntRect> m_frames;
     };

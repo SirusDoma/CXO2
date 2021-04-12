@@ -52,8 +52,6 @@ namespace Gx
         void RemoveChild(Control* first, Args... args);
 
     protected:
-        friend class UiContainer;
-
         Control();
 
         const State GetControlState() const;
