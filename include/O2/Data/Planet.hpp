@@ -8,6 +8,22 @@ namespace Planet
     enum class Planet
     {
         None,
+        O2Planet,
+        Aqua,
+        Eliten,
+        Graffiti,
+        Bikini,
+        Crush,
+        Wonderland,
+        Meganut,
+        Crystal,
+        Draconic,
+        Event
+    };
+
+    enum class MusicHall
+    {
+        None,
         Melpomin,
         Thalo,
         Euta,
