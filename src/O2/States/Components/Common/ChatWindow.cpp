@@ -89,9 +89,9 @@ void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(PlayerInfo player, sf::String chat)
+void ChatWindow::PushMessage(Room::PlayerInfo player, sf::String chat)
 {
-    auto chatData = ChatData{player, chat};
+    auto chatData = Room::ChatData{player, chat};
     // Do something if player is self
 
     if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)

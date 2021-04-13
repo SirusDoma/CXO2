@@ -31,7 +31,7 @@ public:
     unsigned int GetMaximumChatLength() const;
     void SetMaximumChatLength(unsigned int max);
 
-    void PushMessage(PlayerInfo player, sf::String chat);
+    void PushMessage(Room::PlayerInfo player, sf::String chat);
 
 private:
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -44,7 +44,7 @@ private:
     sf::FloatRect m_bounds;
     unsigned int m_offset, m_maxChatLength, m_characterSize;
 
-    std::vector<ChatData> m_chats;
+    std::vector<Room::ChatData> m_chats;
     std::vector<std::unique_ptr<Gx::Label>> m_labels;
 };
 

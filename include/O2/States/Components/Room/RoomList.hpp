@@ -14,7 +14,7 @@ public:
     RoomList();
     void Initialize(Gx::Scene &scene);
 
-    void PushRoomData(RoomData room);
+    void PushRoomData(Room::RoomData room);
     void Clear();
 
 private:
@@ -22,7 +22,7 @@ private:
 
     virtual void Invalidate();
 
-    std::map<unsigned int, RoomData> m_rooms;
+    std::map<unsigned int, Room::RoomData> m_rooms;
     std::vector<std::unique_ptr<RoomButton>> m_roomButtons;
 
     unsigned int m_page;

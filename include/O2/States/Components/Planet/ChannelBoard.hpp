@@ -32,14 +32,14 @@ public:
 
     virtual const sf::FloatRect GetLocalBounds() const;
 
-    void Show(Planet planet, std::function<void()> callback);
-    void UpdateChannelList(PlanetInfo info);
+    void Show(Planet::MusicHall hall, std::function<void()> callback);
+    void UpdateChannelList(Planet::PlanetInfo info);
     void ShowChannelList(int page);
     void ShowNotice(int page);
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
-    void SetEnterChannelCallback(std::function<void(Planet, ChannelInfo)> callback);
+    void SetEnterChannelCallback(std::function<void(Planet::MusicHall, Planet::ChannelInfo)> callback);
 
 private:
     constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
@@ -62,12 +62,12 @@ private:
     sf::RenderTexture m_renderTexture;
 
     sf::Vector2f m_position;
-    PlanetInfo m_planetInfo;
+    Planet::PlanetInfo m_planetInfo;
     Tab m_tab;
 
     bool m_animating;
     int m_selectedChannel, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
-    std::function<void(Planet, ChannelInfo)> m_callback;
+    std::function<void(Planet::MusicHall, Planet::ChannelInfo)> m_callback;
     std::vector<std::unique_ptr<ChannelButton>> m_channelButtons;
 };
 

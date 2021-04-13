@@ -38,12 +38,12 @@ bool RoomButton::IsActive() const
     return m_active;
 }
 
-const RoomData RoomButton::GetRoomData() const
+const Room::RoomData RoomButton::GetRoomData() const
 {
     return m_data;
 }
 
-void RoomButton::SetRoomData(const RoomData &data)
+void RoomButton::SetRoomData(const Room::RoomData &data)
 {
     m_data   = data;
     m_active = true;
@@ -53,7 +53,7 @@ void RoomButton::SetRoomData(const RoomData &data)
 
 void RoomButton::Deactivate()
 {
-    m_data   = RoomData();
+    m_data   = Room::RoomData();
     m_active = false;
 
     Invalidate();
@@ -88,10 +88,10 @@ void RoomButton::Invalidate()
 
     switch (m_data.GameMode)
     {
-        case GameMode::Single: m_gameMode->SetFrame("Single"); break;
-        case GameMode::Vs:     m_gameMode->SetFrame("VS");     break;
-        case GameMode::Album:  m_gameMode->SetFrame("Album");  break;
-        case GameMode::Couple: m_gameMode->SetFrame("Couple"); break;
+        case Room::GameMode::Single: m_gameMode->SetFrame("Single"); break;
+        case Room::GameMode::Vs:     m_gameMode->SetFrame("VS");     break;
+        case Room::GameMode::Album:  m_gameMode->SetFrame("Album");  break;
+        case Room::GameMode::Couple: m_gameMode->SetFrame("Couple"); break;
     }
 
     std::string speedStr(4, '\0');
@@ -125,7 +125,7 @@ void RoomButton::Invalidate()
         m_speedLabel->SetFrame("RX" + speedStr);
     }
 
-    if (m_data.State == RoomState::Playing)
+    if (m_data.State == Room::RoomState::Playing)
         m_stateLabel->SetFrame("Playing");
     else
         m_stateLabel->SetFrame("Waiting");

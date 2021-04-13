@@ -8,9 +8,9 @@
 
 #include <iostream>
 
-StateRoom::StateRoom(Planet planet, ChannelInfo channel) :
+StateRoom::StateRoom(Planet::MusicHall hall, Planet::ChannelInfo channel) :
     State::State(),
-    m_planet(planet),
+    m_hall(hall),
     m_channel(channel),
     m_optionDialog(),
     m_roomList(),
@@ -27,14 +27,14 @@ void StateRoom::Initialize()
     AddChild(background);
 
     auto channelCategory = Create<Gx::Image>("Interface/Metadata/State/Room/ChannelCategory.json");
-    switch (m_planet)
+    switch (m_hall)
     {
-        case Planet::Kaliope:  channelCategory->SetFrame("Kaliope");  break;
-        case Planet::Kleo:     channelCategory->SetFrame("Kleo");     break;
-        case Planet::Philix:   channelCategory->SetFrame("Philix");   break;
-        case Planet::Melpomin: channelCategory->SetFrame("Melpomin"); break;
-        case Planet::Thalo:    channelCategory->SetFrame("Thalo");    break;
-        case Planet::Euta:     channelCategory->SetFrame("Euta");     break;
+        case Planet::MusicHall::Kaliope:  channelCategory->SetFrame("Kaliope");  break;
+        case Planet::MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
+        case Planet::MusicHall::Philix:   channelCategory->SetFrame("Philix");   break;
+        case Planet::MusicHall::Melpomin: channelCategory->SetFrame("Melpomin"); break;
+        case Planet::MusicHall::Thalo:    channelCategory->SetFrame("Thalo");    break;
+        case Planet::MusicHall::Euta:     channelCategory->SetFrame("Euta");     break;
         default: break;
     }
     AddChild(channelCategory);
@@ -67,38 +67,38 @@ void StateRoom::Initialize()
     AddChild(nicknameLabel);
 
     m_roomList.Initialize(*this);
-    RoomData rooms[] = {
-        RoomData{
+    Room::RoomData rooms[] = {
+        Room::RoomData{
             0,
             "Let's play together~",
             ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36},
             Difficulty::Hard,
-            GameMode::Vs,
+            Room::GameMode::Vs,
             SongMode::User,
-            RoomState::Playing,
+            Room::RoomState::Playing,
             4.5f,
             false,
             2
         },
-        RoomData{
+        Room::RoomData{
             5,
             "Pimplex's room",
             ChartMetadata{},
             Difficulty::Hard,
-            GameMode::Single,
+            Room::GameMode::Single,
             SongMode::Random,
-            RoomState::Waiting,
+            Room::RoomState::Waiting,
             3.5f,
             false,
         },
-        RoomData{
+        Room::RoomData{
             3,
             "kYo-Abhiem's room",
             ChartMetadata{"R3", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
             Difficulty::Hard,
-            GameMode::Vs,
+            Room::GameMode::Vs,
             SongMode::User,
-            RoomState::Waiting,
+            Room::RoomState::Waiting,
             4.f,
             false,
         }
@@ -110,18 +110,18 @@ void StateRoom::Initialize()
     AddChild(&m_roomList);
 
     m_userList.Initialize(*this);
-    PlayerInfo players[] = {
-        PlayerInfo{1, 100, "CXO2"},
-        PlayerInfo{2, 100, "DJZMO"},
-        PlayerInfo{3, 98, "kYo-Abhiem"},
-        PlayerInfo{4, 53, "Pimplex"}
+    Room::PlayerInfo players[] = {
+        Room::PlayerInfo{1, 100, "CXO2"},
+        Room::PlayerInfo{2, 100, "DJZMO"},
+        Room::PlayerInfo{3, 98, "kYo-Abhiem"},
+        Room::PlayerInfo{4, 53, "Pimplex"}
     };
 
     for (auto player : players)
         m_userList.AddPlayer(player);
 
     for (unsigned int i = 21; i > 4; i--)
-        m_userList.AddPlayer(PlayerInfo{i, static_cast<int>(i), "Dummy"});
+        m_userList.AddPlayer(Room::PlayerInfo{i, static_cast<int>(i), "Dummy"});
 
     AddChild(&m_userList);
 

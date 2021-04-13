@@ -16,7 +16,7 @@ public:
     UserList();
     void Initialize(Gx::Scene &scene);
 
-    void AddPlayer(PlayerInfo player);
+    void AddPlayer(Room::PlayerInfo player);
     void Clear();
 
 private:
@@ -26,7 +26,7 @@ private:
 
     Gx::List  *m_list;
     Gx::Label *m_userCountLabel;
-    std::vector<PlayerInfo> m_users;
+    std::vector<Room::PlayerInfo> m_users;
 
     unsigned int m_selectedUser;
     unsigned int m_page = 1;

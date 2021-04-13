@@ -17,7 +17,7 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     auto scrollChat = scene.Create<Gx::ScrollBar>("Interface/Metadata/State/Room/ChatPanel/ChatScroll.json");
     chatWindow->SetScrollBar(*scrollChat);
 
-    auto systemPlayer = PlayerInfo{0, -1, sf::String(), true};
+    auto systemPlayer = Room::PlayerInfo{0, -1, sf::String(), true};
     chatWindow->PushMessage(systemPlayer, "Welcome to O2Jam");
     chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper).");
     chatWindow->PushMessage(systemPlayer, "F8                 : Toggle windows/image cursor mode.");
@@ -33,7 +33,7 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
         std::cout << std::string(text) << std::endl;
-        chatWindow->PushMessage(PlayerInfo{1, -1, "CXO2", false}, text);
+        chatWindow->PushMessage(Room::PlayerInfo{1, -1, "CXO2", false}, text);
     });
     AddChild(chatBox);
 

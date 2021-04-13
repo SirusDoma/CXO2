@@ -108,7 +108,7 @@ void RoomList::Initialize(Gx::Scene &scene)
     AddChild(btnRoomLeft, btnRoomRight);
 }
 
-void RoomList::PushRoomData(RoomData room)
+void RoomList::PushRoomData(Room::RoomData room)
 {
     m_rooms[room.Number] = room;
     Invalidate();
@@ -130,7 +130,7 @@ void RoomList::Invalidate()
         auto roomButton = m_roomButtons[i].get();
         auto roomNumber = ((m_page - 1) * ROOM_PER_PAGE) + i;
         auto room = m_rooms.find(roomNumber);
-        if (room != m_rooms.end() && (!m_filterWaiting || room->second.State == RoomState::Waiting))
+        if (room != m_rooms.end() && (!m_filterWaiting || room->second.State == Room::RoomState::Waiting))
             roomButton->SetRoomData(room->second);
         else
             roomButton->Deactivate();

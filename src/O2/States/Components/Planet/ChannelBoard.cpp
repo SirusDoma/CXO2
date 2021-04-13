@@ -40,7 +40,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
     m_channelTabButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Planet)
+        if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Hall)
             SwitchTab(Tab::ChannelList);
     });
 
@@ -57,7 +57,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     {
         m_sfxEnter->play();
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
-            m_callback(m_planetInfo.Planet, m_planetInfo.Channels[m_selectedChannel]);
+            m_callback(m_planetInfo.Hall, m_planetInfo.Channels[m_selectedChannel]);
     });
 
     auto btnChannelLeft  = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
@@ -141,7 +141,7 @@ bool ChannelBoard::InTransition() const
     return m_animating;
 }
 
-void ChannelBoard::SetEnterChannelCallback(std::function<void(Planet, ChannelInfo)> callback)
+void ChannelBoard::SetEnterChannelCallback(std::function<void(Planet::MusicHall, Planet::ChannelInfo)> callback)
 {
     m_callback = callback;
 }
@@ -203,12 +203,12 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
     }
 }
 
-void ChannelBoard::Show(Planet planet, std::function<void()> callback)
+void ChannelBoard::Show(Planet::MusicHall hall, std::function<void()> callback)
 {
-    if (m_animating || m_planetInfo.Planet == planet)
+    if (m_animating || m_planetInfo.Hall == hall)
         return;
 
-    m_planetInfo.Planet = planet;
+    m_planetInfo.Hall = hall;
     m_animating = true;
 
     CaptureCurrentState();
@@ -216,14 +216,14 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
 
     m_list->SetVisible(false);
-    switch (planet)
+    switch (hall)
     {
-        case Planet::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
-        case Planet::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
-        case Planet::Philix:   m_channelCategory->SetFrame("Philix");   break;
-        case Planet::Melpomin: m_channelCategory->SetFrame("Melpomin"); break;
-        case Planet::Thalo:    m_channelCategory->SetFrame("Thalo");    break;
-        case Planet::Euta:     m_channelCategory->SetFrame("Euta");     break;
+        case Planet::MusicHall::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
+        case Planet::MusicHall::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
+        case Planet::MusicHall::Philix:   m_channelCategory->SetFrame("Philix");   break;
+        case Planet::MusicHall::Melpomin: m_channelCategory->SetFrame("Melpomin"); break;
+        case Planet::MusicHall::Thalo:    m_channelCategory->SetFrame("Thalo");    break;
+        case Planet::MusicHall::Euta:     m_channelCategory->SetFrame("Euta");     break;
         default: break;
     }
 
@@ -241,7 +241,7 @@ void ChannelBoard::Show(Planet planet, std::function<void()> callback)
     }));
 }
 
-void ChannelBoard::UpdateChannelList(PlanetInfo info)
+void ChannelBoard::UpdateChannelList(Planet::PlanetInfo info)
 {
     m_planetInfo = info;
     m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(info.Channels.size()) / CHANNEL_LIST_PER_PAGE));
@@ -284,7 +284,7 @@ void ChannelBoard::ShowChannelList(int page)
             continue;
         }
 
-        channelButton->SetPlanet(m_planetInfo.Planet);
+        channelButton->SetPlanet(m_planetInfo.Hall);
         channelButton->SetChannelNumber(channelIndex + 1);
         channelButton->SetCheckedState(channelIndex == m_selectedChannel);
         channelButton->SetChannelPopulation(m_planetInfo.Channels[channelIndex].Population);

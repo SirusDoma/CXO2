@@ -54,7 +54,7 @@ void UserList::Initialize(Gx::Scene &scene)
     AddChild(m_list, m_userCountLabel, btnUserRefresh, btnUserLeft, btnUserRight);
 }
 
-void UserList::AddPlayer(PlayerInfo player)
+void UserList::AddPlayer(Room::PlayerInfo player)
 {
     m_users.push_back(player);
     Invalidate();

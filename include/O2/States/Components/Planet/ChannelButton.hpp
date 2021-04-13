@@ -23,8 +23,8 @@ public:
     int GetChannelPopulation() const;
     void SetChannelPopulation(int population);
 
-    Planet GetPlanet() const;
-    void SetPlanet(Planet planet);
+    Planet::MusicHall GetPlanet() const;
+    void SetPlanet(Planet::MusicHall hall);
 
 protected:
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -38,7 +38,7 @@ private:
     Gx::Number      *m_channelNumber;
     Gx::ProgressBar *m_channelCounter;
 
-    Planet m_planet;
+    Planet::MusicHall m_hall;
     int m_population;
 };
 

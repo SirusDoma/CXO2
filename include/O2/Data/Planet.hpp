@@ -3,28 +3,31 @@
 
 #include <vector>
 
-enum Planet
+namespace Planet
 {
-    None,
-    Melpomin,
-    Thalo,
-    Euta,
-    Kaliope,
-    Kleo,
-    Philix
-};
+    enum MusicHall
+    {
+        None,
+        Melpomin,
+        Thalo,
+        Euta,
+        Kaliope,
+        Kleo,
+        Philix
+    };
 
-struct ChannelInfo
-{
-    int Number        = 0;
-    int Population    = 0;
-    int MaxPopulation = 100;
-};
+    struct ChannelInfo
+    {
+        int Number        = 0;
+        int Population    = 0;
+        int MaxPopulation = 100;
+    };
 
-struct PlanetInfo
-{
-    Planet Planet;
-    std::vector<ChannelInfo> Channels = std::vector<ChannelInfo>();
-};
+    struct PlanetInfo
+    {
+        MusicHall Hall;
+        std::vector<ChannelInfo> Channels = std::vector<ChannelInfo>();
+    };
+}
 
 #endif

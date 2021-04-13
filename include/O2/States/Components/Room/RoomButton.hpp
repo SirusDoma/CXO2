@@ -19,8 +19,8 @@ public:
 
     bool IsActive() const;
 
-    const RoomData GetRoomData() const;
-    void SetRoomData(const RoomData& data);
+    const Room::RoomData GetRoomData() const;
+    void SetRoomData(const Room::RoomData& data);
     void Deactivate();
 
 private:
@@ -32,7 +32,7 @@ private:
     Gx::Number *m_numberLabel;
     Gx::Image  *m_hover, *m_speedLabel, *m_gameMode, *m_stateLabel, *m_ohmLevel, *m_lock;
 
-    RoomData m_data;
+    Room::RoomData m_data;
     bool m_active;
 };
 

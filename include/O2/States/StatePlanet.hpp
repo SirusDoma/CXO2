@@ -21,8 +21,8 @@ public:
 private:
     bool IsConnecting();
 
-    void OnEnterPlanet(Planet planet);
-    void OnEnterChannel(Planet planet, ChannelInfo channel);
+    void OnEnterPlanet(Planet::MusicHall hall);
+    void OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo channel);
 
     ChannelBoard    m_channelBoard;
     Gx::UiContainer m_container;

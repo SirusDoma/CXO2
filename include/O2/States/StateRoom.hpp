@@ -20,15 +20,15 @@ class RoomButton;
 class StateRoom : public State
 {
 public:
-    StateRoom(Planet planet, ChannelInfo channel);
+    StateRoom(Planet::MusicHall hall, Planet::ChannelInfo channel);
     virtual void Initialize();
 
 private:
     void OnExitPlanet();
 
     sf::Music *m_bgm;
-    Planet m_planet;
-    ChannelInfo m_channel;
+    Planet::MusicHall m_hall;
+    Planet::ChannelInfo m_channel;
 
     OptionDialog *m_optionDialog;
 

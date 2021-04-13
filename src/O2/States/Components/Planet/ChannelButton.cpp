@@ -51,43 +51,43 @@ void ChannelButton::SetChannelPopulation(int population)
     m_channelCounter->SetVisible(!m_channelFull->IsVislble());
 }
 
-Planet ChannelButton::GetPlanet() const
+Planet::MusicHall ChannelButton::GetPlanet() const
 {
-    return m_planet;
+    return m_hall;
 }
 
-void ChannelButton::SetPlanet(Planet planet)
+void ChannelButton::SetPlanet(Planet::MusicHall hall)
 {
-    if (m_planet == planet)
+    if (m_hall == hall)
         return;
 
     Gx::ResourceMetadata *metadata = nullptr;
-    m_planet = planet;
+    m_hall = hall;
 
     // TODO: Load all and put inside a map
-    switch (m_planet)
+    switch (m_hall)
     {
-        case Planet::Kaliope:
+        case Planet::MusicHall::Kaliope:
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
             m_channelName->SetFrame("Kaliope");
             break;
-        case Planet::Kleo:
+        case Planet::MusicHall::Kleo:
             m_channelName->SetFrame("Kleo");
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
             break;
-        case Planet::Philix:
+        case Planet::MusicHall::Philix:
             m_channelName->SetFrame("Philix");
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
             break;
-        case Planet::Melpomin:
+        case Planet::MusicHall::Melpomin:
             m_channelName->SetFrame("Melpomin");
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
-        case Planet::Thalo:
+        case Planet::MusicHall::Thalo:
             m_channelName->SetFrame("Thalo");
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;
-        case Planet::Euta:
+        case Planet::MusicHall::Euta:
             m_channelName->SetFrame("Euta");
             metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
             break;

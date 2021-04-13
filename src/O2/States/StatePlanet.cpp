@@ -41,18 +41,18 @@ void StatePlanet::Initialize()
 
     m_container = Gx::UiContainer();
     m_container.AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
-    std::unordered_map<Planet, Gx::RadioButton*> planets = {
-        {Planet::Melpomin, melpomin},
-        {Planet::Thalo,    thalo},
-        {Planet::Euta,     euta},
-        {Planet::Kaliope,  kaliope},
-        {Planet::Kleo,     kleo},
-        {Planet::Philix,   philix}
+    std::unordered_map<Planet::MusicHall, Gx::RadioButton*> planets = {
+        {Planet::MusicHall::Melpomin, melpomin},
+        {Planet::MusicHall::Thalo,    thalo},
+        {Planet::MusicHall::Euta,     euta},
+        {Planet::MusicHall::Kaliope,  kaliope},
+        {Planet::MusicHall::Kleo,     kleo},
+        {Planet::MusicHall::Philix,   philix}
     };
 
     auto clickSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
     auto hoverSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
-    for (auto [planet, radio] : planets)
+    for (auto [hall, radio] : planets)
     {
         radio->SetFocusChangedCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
         {
@@ -63,7 +63,7 @@ void StatePlanet::Initialize()
             Mixer::Play(sfx);
         });
 
-        radio->SetClickCallback([this, sfx = clickSfx, planet = planet] (auto& sender, auto& ev)
+        radio->SetClickCallback([this, sfx = clickSfx, hall = hall] (auto& sender, auto& ev)
         {
             auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
             if (!radio)
@@ -76,14 +76,14 @@ void StatePlanet::Initialize()
             }
 
             Mixer::Play(sfx, "sfx");
-            m_channelBoard.Show(planet, [=] { OnEnterPlanet(planet); });
+            m_channelBoard.Show(hall, [=] { OnEnterPlanet(hall); });
         });
     }
 
     AddChild(&m_container);
 
     m_channelBoard.Initialize(*this);
-    m_channelBoard.SetEnterChannelCallback([=] (auto planet, auto channel) { OnEnterChannel(planet, channel); });
+    m_channelBoard.SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
     AddChild(&m_channelBoard);
 
     m_bgm = Create<sf::Music>("Interface/Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
@@ -102,18 +102,18 @@ void StatePlanet::Initialize()
     }
 }
 
-void StatePlanet::OnEnterPlanet(Planet planet)
+void StatePlanet::OnEnterPlanet(Planet::MusicHall hall)
 {
     m_connecting = true;
 
-    auto planetInfo = PlanetInfo();
-    planetInfo.Planet = planet;
+    auto planetInfo = Planet::PlanetInfo();
+    planetInfo.Hall = hall;
 
     for (int x = 0; x < 2; x++)
     {
         for (int i = 1; i <= 20; i++)
         {
-            auto channel = ChannelInfo();
+            auto channel = Planet::ChannelInfo();
             channel.Number     = i;
             channel.Population = static_cast<int>((i / 20.f) * 100.f);
 
@@ -125,7 +125,7 @@ void StatePlanet::OnEnterPlanet(Planet planet)
     m_channelBoard.UpdateChannelList(planetInfo);
 }
 
-void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
+void StatePlanet::OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo channel)
 {
     if (channel.Population >= channel.MaxPopulation)
     {
@@ -136,7 +136,7 @@ void StatePlanet::OnEnterChannel(Planet planet, ChannelInfo channel)
     }
 
     m_connecting = true;
-    QueueSceneEvent([=] { GetDirector().SetScene(new StateRoom(planet, channel)); });
+    QueueSceneEvent([=] { GetDirector().SetScene(new StateRoom(hall, channel)); });
 }
 
 bool StatePlanet::IsConnecting()
