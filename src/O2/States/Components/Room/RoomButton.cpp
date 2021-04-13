@@ -11,19 +11,19 @@ RoomButton::RoomButton() :
 
 void RoomButton::Initialize(Gx::Scene &scene)
 {
-    m_button = scene.Create<Gx::Button>("Metadata/State/Room/Btn_Room/Button.json");
-    m_hover  = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Hover.json");
+    m_button = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Room/Button.json");
+    m_hover  = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/Hover.json");
     m_hover->SetVisible(false);
 
-    m_titleLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/TitleLabel.json");
-    m_musicLabel    = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/MusicLabel.json");
-    m_capacityLabel = scene.Create<Gx::Label>("Metadata/State/Room/Btn_Room/Capacity.json");
-    m_numberLabel   = scene.Create<Gx::Number>("Metadata/State/Room/Btn_Room/RoomNumber.json");
-    m_speedLabel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameSpeed.json");
-    m_stateLabel    = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/State.json");
-    m_gameMode      = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/GameMode.json");
-    m_ohmLevel      = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/OhmLevel.json");
-    m_lock          = scene.Create<Gx::Image>("Metadata/State/Room/Btn_Room/Lock.json");
+    m_titleLabel    = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/TitleLabel.json");
+    m_musicLabel    = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/MusicLabel.json");
+    m_capacityLabel = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/Capacity.json");
+    m_numberLabel   = scene.Create<Gx::Number>("Interface/Metadata/State/Room/Btn_Room/RoomNumber.json");
+    m_speedLabel    = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/GameSpeed.json");
+    m_stateLabel    = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/State.json");
+    m_gameMode      = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/GameMode.json");
+    m_ohmLevel      = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/OhmLevel.json");
+    m_lock          = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/Lock.json");
 
     AddChild(m_button, m_titleLabel, m_musicLabel, m_capacityLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, m_hover);
 }

@@ -1,9 +1,0 @@
-﻿{
-  "type": "MUSIC",
-  "require": {
-    "music": "BGM/bgLogo.ogg"
-  },
-  "attributes": {
-    "loop": false
-  }
-}

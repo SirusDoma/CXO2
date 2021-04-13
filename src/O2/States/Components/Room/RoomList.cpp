@@ -12,12 +12,12 @@ RoomList::RoomList() :
 
 void RoomList::Initialize(Gx::Scene &scene)
 {
-    auto sfxAccept   = scene.Create<sf::Sound>("Metadata/State/Room/Sound/Accept.json", Gx::ResourceScope::Shared);
-    auto sfxToggle   = scene.Create<sf::Sound>("Metadata/State/Room/Sound/Toggle.json", Gx::ResourceScope::Shared);
-    auto sfxInvalid  = scene.Create<sf::Sound>("Metadata/State/Room/Sound/Invalid.json", Gx::ResourceScope::Shared);
-    auto sfxNavigate = scene.Create<sf::Sound>("Metadata/State/Room/Sound/RoomNavigation.json", Gx::ResourceScope::Shared);
+    auto sfxAccept   = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Accept.json", Gx::ResourceScope::Shared);
+    auto sfxToggle   = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Toggle.json", Gx::ResourceScope::Shared);
+    auto sfxInvalid  = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Invalid.json", Gx::ResourceScope::Shared);
+    auto sfxNavigate = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/RoomNavigation.json", Gx::ResourceScope::Shared);
 
-    auto roomList = scene.Create<Gx::List>("Metadata/State/Room/RoomList.json");
+    auto roomList = scene.Create<Gx::List>("Interface/Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < ROOM_PER_PAGE; i++)
     {
         auto roomButton = std::make_unique<RoomButton>();
@@ -37,18 +37,18 @@ void RoomList::Initialize(Gx::Scene &scene)
     }
     AddChild(roomList);
 
-    auto btnCreateRoom = scene.Create<Gx::Button>("Metadata/State/Room/Btn_CreateRoom.json");
+    auto btnCreateRoom = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_CreateRoom.json");
     btnCreateRoom->SetClickCallback([=] (auto& sender, auto& ev)
     {
         sfxAccept->play();
     });
     AddChild(btnCreateRoom);
 
-    auto btnShortCut = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ShortCut.json");
+    auto btnShortCut = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_ShortCut.json");
     AddChild(btnShortCut);
 
-    auto btnShowAll     = scene.Create<Gx::Button>("Metadata/State/Room/Btn_ShowAll.json");
-    auto btnWaitingRoom = scene.Create<Gx::Button>("Metadata/State/Room/Btn_WaitingRoom.json");
+    auto btnShowAll     = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_ShowAll.json");
+    auto btnWaitingRoom = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_WaitingRoom.json");
     btnShowAll->SetEnabled(false);
     btnShowAll->SetVisible(false);
 
@@ -81,8 +81,8 @@ void RoomList::Initialize(Gx::Scene &scene)
     });
     AddChild(btnWaitingRoom, btnShowAll);
 
-    auto btnRoomLeft  = scene.Create<Gx::Button>("Metadata/State/Room/Btn_RoomLeft.json");
-    auto btnRoomRight = scene.Create<Gx::Button>("Metadata/State/Room/Btn_RoomRight.json");
+    auto btnRoomLeft  = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_RoomLeft.json");
+    auto btnRoomRight = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_RoomRight.json");
 
     btnRoomLeft->SetClickCallback([=] (auto& sender, auto& ev)
     {

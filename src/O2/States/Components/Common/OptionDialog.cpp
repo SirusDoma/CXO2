@@ -7,33 +7,33 @@
 
 void OptionDialog::Initialize(Gx::Scene &scene)
 {
-    auto sfxTab = scene.Create<sf::Sound>("Metadata/Dialog/Option/Sound/Tab.json", Gx::ResourceScope::Shared);
+    auto sfxTab = scene.Create<sf::Sound>("Interface/Metadata/Dialog/Option/Sound/Tab.json", Gx::ResourceScope::Shared);
 
-    auto btnDefault = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_Default.json");
-    auto btnSave    = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_Save.json");
+    auto btnDefault = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_Default.json");
+    auto btnSave    = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_Save.json");
     AddChild(btnDefault, btnSave);
 
-    m_background = scene.Create<Gx::Image>("Metadata/Dialog/Option/Background.json");
+    m_background = scene.Create<Gx::Image>("Interface/Metadata/Dialog/Option/Background.json");
     SetTexCoords(m_background->GetFrame("KeyOption"));
 
-    auto gfxCheckBox     = scene.Create<Gx::CheckBox>("Metadata/Dialog/Option/3dCheckBox.json");
-    auto cursorCheckBox  = scene.Create<Gx::CheckBox>("Metadata/Dialog/Option/CursorCheckBox.json");
-    auto keyTestCheckBox = scene.Create<Gx::CheckBox>("Metadata/Dialog/Option/Btn_KeyTest.json");
+    auto gfxCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/3dCheckBox.json");
+    auto cursorCheckBox  = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/CursorCheckBox.json");
+    auto keyTestCheckBox = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/Btn_KeyTest.json");
     m_keyOptionContainer.AddChild(gfxCheckBox, cursorCheckBox, keyTestCheckBox);
 
-    auto bgCheckBox     = scene.Create<Gx::CheckBox>("Metadata/Dialog/Option/BgCheckBox.json");
-    auto allSoundBar    = scene.Create<Gx::ProgressBar>("Metadata/Dialog/Option/AllSoundBar.json");
-    auto musicBar       = scene.Create<Gx::ProgressBar>("Metadata/Dialog/Option/MusicBar.json");
-    auto soundEffectBar = scene.Create<Gx::ProgressBar>("Metadata/Dialog/Option/SoundEffectBar.json");
+    auto bgCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgCheckBox.json");
+    auto allSoundBar    = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/AllSoundBar.json");
+    auto musicBar       = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MusicBar.json");
+    auto soundEffectBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/SoundEffectBar.json");
 
-    auto btnAllSoundUp   = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_AllSoundUp.json");
-    auto btnAllSoundDown = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_AllSoundDown.json");
+    auto btnAllSoundUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_AllSoundUp.json");
+    auto btnAllSoundDown = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_AllSoundDown.json");
 
-    auto btnMusicUp   = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_MusicUp.json");
-    auto btnMusicDown = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_MusicDown.json");
+    auto btnMusicUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_MusicUp.json");
+    auto btnMusicDown = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_MusicDown.json");
 
-    auto btnSoundEffectUp   = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_SoundEffectUp.json");
-    auto btnSoundEffectDown = scene.Create<Gx::Button>("Metadata/Dialog/Option/Btn_SoundEffectDown.json");
+    auto btnSoundEffectUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_SoundEffectUp.json");
+    auto btnSoundEffectDown = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_SoundEffectDown.json");
 
     allSoundBar->SetValue(100.f);
     musicBar->SetValue(100.f);
@@ -44,8 +44,8 @@ void OptionDialog::Initialize(Gx::Scene &scene)
 
     AddChild(&m_keyOptionContainer, &m_soundOptionContainer);
 
-    auto keyTab   = scene.Create<Gx::RadioButton>("Metadata/Dialog/Option/Btn_KeyTab.json");
-    auto soundTab = scene.Create<Gx::RadioButton>("Metadata/Dialog/Option/Btn_SoundTab.json");
+    auto keyTab   = scene.Create<Gx::RadioButton>("Interface/Metadata/Dialog/Option/Btn_KeyTab.json");
+    auto soundTab = scene.Create<Gx::RadioButton>("Interface/Metadata/Dialog/Option/Btn_SoundTab.json");
 
     keyTab->SetCheckStateChangeCallback([=] (auto sender)
     {

@@ -21,7 +21,7 @@ State::State(const std::string &name) :
 
 void State::Initialize()
 {
-    m_dialog = Create<Gx::Dialog>("Metadata/Dialog/Question2.json");
+    m_dialog = Create<Gx::Dialog>("Interface/Metadata/Dialog/Question2.json");
     m_dialog->SetAcceptCallback([=] {
         m_prompted = true;
         GetDirector().GetApplication().Close();

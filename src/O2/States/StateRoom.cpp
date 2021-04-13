@@ -23,10 +23,10 @@ void StateRoom::Initialize()
 {
     State::Initialize();
 
-    auto background = Create<Gx::Sprite>("Metadata/State/Room/Background.json");
+    auto background = Create<Gx::Sprite>("Interface/Metadata/State/Room/Background.json");
     AddChild(background);
 
-    auto channelCategory = Create<Gx::Image>("Metadata/State/Room/ChannelCategory.json");
+    auto channelCategory = Create<Gx::Image>("Interface/Metadata/State/Room/ChannelCategory.json");
     switch (m_planet)
     {
         case Planet::Kaliope:  channelCategory->SetFrame("Kaliope");  break;
@@ -39,30 +39,30 @@ void StateRoom::Initialize()
     }
     AddChild(channelCategory);
 
-    auto channelNumber = Create<Gx::Number>("Metadata/State/Room/ChannelNumber.json");
+    auto channelNumber = Create<Gx::Number>("Interface/Metadata/State/Room/ChannelNumber.json");
     channelNumber->SetValue(m_channel.Number);
     channelNumber->SetDigitCount(2);
     AddChild(channelNumber);
 
-    auto marquee = Create<Marquee>("Metadata/State/Room/Marquee.json");
+    auto marquee = Create<Marquee>("Interface/Metadata/State/Room/Marquee.json");
     marquee->SetString("Welcome to O2Jam (Live?). Official Website: https://live.o2jam.asia");
     AddChild(marquee);
 
-    m_optionDialog = Create<OptionDialog>("Metadata/Dialog/Option.json");
+    m_optionDialog = Create<OptionDialog>("Interface/Metadata/Dialog/Option.json");
     m_optionDialog->Initialize(*this);
 
-    auto btnMusicShop = Create<Gx::Button>("Metadata/State/Room/Btn_MusicShop.json");
-    auto btnItemShop  = Create<Gx::Button>("Metadata/State/Room/Btn_ItemShop.json");
-    auto btnMyRoom    = Create<Gx::Button>("Metadata/State/Room/Btn_MyRoom.json");
-    auto btnCoupon    = Create<Gx::Button>("Metadata/State/Room/Btn_Coupon.json");
-    auto btnFirstStep = Create<Gx::Button>("Metadata/State/Room/Btn_FirstStep.json");
-    auto btnOption    = Create<Gx::Button>("Metadata/State/Room/Btn_Option.json");
+    auto btnMusicShop = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_MusicShop.json");
+    auto btnItemShop  = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_ItemShop.json");
+    auto btnMyRoom    = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_MyRoom.json");
+    auto btnCoupon    = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Coupon.json");
+    auto btnFirstStep = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_FirstStep.json");
+    auto btnOption    = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Option.json");
 
     btnOption->SetClickCallback([&] (auto &sender, auto &ev) { m_optionDialog->Show(this); });
 
     AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
-    auto nicknameLabel = Create<Gx::Label>("Metadata/State/Room/NicknameLabel.json");
+    auto nicknameLabel = Create<Gx::Label>("Interface/Metadata/State/Room/NicknameLabel.json");
     nicknameLabel->SetString("Lv.-1: CXO2");
     AddChild(nicknameLabel);
 
@@ -128,11 +128,11 @@ void StateRoom::Initialize()
     m_chatPanel.Initialize(*this);
     AddChild(&m_chatPanel);
 
-    auto btnBack = Create<Gx::Button>("Metadata/State/Room/Btn_Back.json");
+    auto btnBack = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Back.json");
     btnBack->SetClickCallback([this] (auto& sender, auto& ev) { OnExitPlanet(); });
     AddChild(btnBack);
 
-    m_bgm = Create<sf::Music>("Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
+    m_bgm = Create<sf::Music>("Interface/Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
     Play(m_bgm);
 }
 

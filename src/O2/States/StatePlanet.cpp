@@ -20,24 +20,24 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    auto background = Create<Gx::Sprite>("Metadata/State/Planet/Background.json");
+    auto background = Create<Gx::Sprite>("Interface/Metadata/State/Planet/Background.json");
     AddChild(background);
 
-    auto tower = Create<Gx::Animation>("Metadata/State/Planet/Tower.json");
+    auto tower = Create<Gx::Animation>("Interface/Metadata/State/Planet/Tower.json");
     AddChild(tower);
 
-    auto exitButton = Create<Gx::Button>("Metadata/State/Planet/Btn_Exit.json");
+    auto exitButton = Create<Gx::Button>("Interface/Metadata/State/Planet/Btn_Exit.json");
     exitButton->SetClickCallback([=] (auto& sender, auto& ev) { GetDirector().GetApplication().Close(); });
     AddChild(exitButton);
 
-    m_dialogInfo = Create<Gx::Dialog>("Metadata/Dialog/Information.json");
+    m_dialogInfo = Create<Gx::Dialog>("Interface/Metadata/Dialog/Information.json");
 
-    auto philix   = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Philix.json");
-    auto kleo     = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kleo.json");
-    auto kaliope  = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Kaliope.json");
-    auto euta     = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Euta.json");
-    auto thalo    = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Thalo.json");
-    auto melpomin = Create<Gx::RadioButton>("Metadata/State/Planet/Btn_Melpomin.json");
+    auto philix   = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Philix.json");
+    auto kleo     = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Kleo.json");
+    auto kaliope  = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Kaliope.json");
+    auto euta     = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Euta.json");
+    auto thalo    = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Thalo.json");
+    auto melpomin = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Melpomin.json");
 
     m_container = Gx::UiContainer();
     m_container.AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
@@ -50,8 +50,8 @@ void StatePlanet::Initialize()
         {Planet::Philix,   philix}
     };
 
-    auto clickSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
-    auto hoverSfx = Create<sf::Sound>("Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
+    auto clickSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
+    auto hoverSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
     for (auto [planet, radio] : planets)
     {
         radio->SetFocusChangedCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
@@ -86,7 +86,7 @@ void StatePlanet::Initialize()
     m_channelBoard.SetEnterChannelCallback([=] (auto planet, auto channel) { OnEnterChannel(planet, channel); });
     AddChild(&m_channelBoard);
 
-    m_bgm = Create<sf::Music>("Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
+    m_bgm = Create<sf::Music>("Interface/Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
     Mixer::Play(m_bgm, "BGM");
 
     if (m_useFadeIn)

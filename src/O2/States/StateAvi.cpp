@@ -9,10 +9,10 @@
 
 void StateAvi::Initialize()
 {
-    auto sprite = Create<Gx::Sprite>("Metadata/State/Avi/Background.json");
+    auto sprite = Create<Gx::Sprite>("Interface/Metadata/State/Avi/Background.json");
     AddChild(sprite);
 
-    auto bgm = Create<sf::Music>("Metadata/State/Avi/Music.json", Gx::ResourceScope::Shared);
+    auto bgm = Create<sf::Music>("Interface/Metadata/State/Avi/Music.json", Gx::ResourceScope::Shared);
     Mixer::Play(bgm);
 
     auto sequence = new Gx::Sequence([=] { QueueSceneEvent([=] { GetDirector().SetScene(new StatePlanet()); }); },

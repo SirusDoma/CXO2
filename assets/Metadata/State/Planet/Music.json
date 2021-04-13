@@ -1,9 +1,0 @@
-﻿{
-  "type": "MUSIC",
-  "require": {
-    "music": "BGM/bgMainRoom.ogg"
-  },
-  "attributes": {
-    "loop": true
-  }
-}

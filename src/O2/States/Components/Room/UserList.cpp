@@ -15,11 +15,11 @@ UserList::UserList() :
 
 void UserList::Initialize(Gx::Scene &scene)
 {
-    m_list = scene.Create<Gx::List>("Metadata/State/Room/UserList/UserButtonList.json");
+    m_list = scene.Create<Gx::List>("Interface/Metadata/State/Room/UserList/UserButtonList.json");
     for (auto i = 0; i < USER_PER_PAGE; i++)
     {
-        auto userButton    = scene.Create<Gx::RadioButton>("Metadata/State/Room/UserList/Btn_UserList.json");
-        auto userNickLabel = scene.Create<Gx::Label>("Metadata/State/Room/UserList/NicknameLabel.json");
+        auto userButton    = scene.Create<Gx::RadioButton>("Interface/Metadata/State/Room/UserList/Btn_UserList.json");
+        auto userNickLabel = scene.Create<Gx::Label>("Interface/Metadata/State/Room/UserList/NicknameLabel.json");
         userButton->SetCheckStateChangeCallback([=] (auto sender)
         {
             size_t index = ((m_page - 1) * USER_PER_PAGE) + i;
@@ -34,10 +34,10 @@ void UserList::Initialize(Gx::Scene &scene)
         m_list->AddChild(userButton);
     }
 
-    m_userCountLabel    = scene.Create<Gx::Label>("Metadata/State/Room/UserList/UserCountLabel.json");
-    auto btnUserRefresh = scene.Create<Gx::Button>("Metadata/State/Room/UserList/Btn_UserRefresh.json");
-    auto btnUserLeft    = scene.Create<Gx::Button>("Metadata/State/Room/UserList/Btn_UserLeft.json");
-    auto btnUserRight   = scene.Create<Gx::Button>("Metadata/State/Room/UserList/Btn_UserRight.json");
+    m_userCountLabel    = scene.Create<Gx::Label>("Interface/Metadata/State/Room/UserList/UserCountLabel.json");
+    auto btnUserRefresh = scene.Create<Gx::Button>("Interface/Metadata/State/Room/UserList/Btn_UserRefresh.json");
+    auto btnUserLeft    = scene.Create<Gx::Button>("Interface/Metadata/State/Room/UserList/Btn_UserLeft.json");
+    auto btnUserRight   = scene.Create<Gx::Button>("Interface/Metadata/State/Room/UserList/Btn_UserRight.json");
 
     btnUserLeft->SetClickCallback([=] (auto& sender, auto& ev)
     {
