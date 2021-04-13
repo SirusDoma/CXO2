@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> LabelLoader::LoadMetadata(const void *data
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     LabelMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
 
     auto attributes = json.at("attributes");
     ParseReferences(json["require"], metadata);

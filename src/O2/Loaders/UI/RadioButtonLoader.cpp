@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> RadioButtonLoader::LoadMetadata(const void
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = RadioButtonMetadata();
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     ParseReferences(json["require"], metadata);
 
     std::unordered_map<std::string, Gx::Button::State> stateMap = {

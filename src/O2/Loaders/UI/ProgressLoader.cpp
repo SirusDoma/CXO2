@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ProgressBarLoader::LoadMetadata(const void
     ProgressBarMetadata metadata;
 
     auto attributes = json.at("attributes");
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
 
     ProgressBarLoader::ParseReferences(json["require"], metadata);
     SpriteLoader::ParseSprite(attributes, metadata);

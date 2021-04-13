@@ -10,7 +10,7 @@ std::unique_ptr<Gx::ResourceMetadata> MusicLoader::LoadMetadata(const void* data
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     MusicMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     for (auto resource : json["require"].items())
     {
         if (resource.key() == "music")

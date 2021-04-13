@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ChatWindowLoader::LoadMetadata(const void 
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     ChatWindowMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     auto attributes = json.at("attributes");
 
     ParseReferences(json["require"], metadata);

@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> SpriteLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     SpriteMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     ParseReferences(json["require"], metadata);
     ParseSprite(json["attributes"], metadata);
 

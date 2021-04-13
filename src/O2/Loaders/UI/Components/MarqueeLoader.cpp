@@ -10,7 +10,7 @@ std::unique_ptr<Gx::ResourceMetadata> MarqueeLoader::LoadMetadata(const void *da
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     MarqueeMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
 
     auto attributes = json.at("attributes");
     ParseReferences(json["require"], metadata);

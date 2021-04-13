@@ -10,7 +10,7 @@ std::unique_ptr<Gx::ResourceMetadata> SoundLoader::LoadMetadata(const void* data
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     SoundMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     SoundLoader::ParseReferences(json["require"], metadata);
 
     return std::make_unique<SoundMetadata>(metadata);

@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ScrollBarLoader::LoadMetadata(const void *
     ScrollBarMetadata metadata;
 
     auto attributes = json.at("attributes");
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
 
     ScrollBarLoader::ParseReferences(json["require"], metadata);
     SpriteLoader::ParseSprite(attributes, metadata);

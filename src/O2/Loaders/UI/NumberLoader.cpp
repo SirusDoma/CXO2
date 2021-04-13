@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     NumberMetadata metadata;
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
 
     auto attributes = json.at("attributes");
     NumberLoader::ParseReferences(json["require"], metadata);

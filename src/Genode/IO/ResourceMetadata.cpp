@@ -14,12 +14,12 @@ namespace Gx
         m_references.clear();
     }
 
-    const std::string &ResourceMetadata::GetType() const
+    const std::string &ResourceMetadata::GetResourceType() const
     {
         return m_type;
     }
 
-    void ResourceMetadata::SetType(const std::string &type)
+    void ResourceMetadata::SetResourceType(const std::string &type)
     {
         m_type = type;
     }

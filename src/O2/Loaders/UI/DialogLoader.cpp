@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> DialogLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = DialogMetadata();
 
-    metadata.SetType(json.at("type").get<std::string>());
+    metadata.SetResourceType(json.at("type").get<std::string>());
     ParseReferences(json["require"], metadata);
     ParseDialog(json["attributes"], metadata);
 
