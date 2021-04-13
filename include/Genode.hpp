@@ -1,6 +1,7 @@
 #ifndef GENODE_MAIN_HPP
 #define GENODE_MAIN_HPP
 
+#include <Genode/Utilities.hpp>
 #include <Genode/Entities.hpp>
 #include <Genode/Audio.hpp>
 #include <Genode/Graphics.hpp>

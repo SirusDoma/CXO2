@@ -1,4 +1,6 @@
 #include <Genode/UI/TextBox.hpp>
+#include <Genode/Utilities/StringHelper.hpp>
+
 #include <clip/clip.h>
 
 namespace Gx
@@ -358,31 +360,9 @@ namespace Gx
         else if (ev.code == sf::Keyboard::Enter)
         {
             // Trim front and back string from whitespaces
-            sf::String str = m_text.GetString();
-            for (size_t i = 0; i < str.getSize(); i++)
-            {
-                if (str[i] == L' ' || str[i] == L'\t' || str[i] == L'\n')
-                {
-                    str.erase(i, 1);
-                    i--;
-                }
-                else
-                    break;
-            }
-
-            for (size_t i = str.getSize() - 1; i > 0 && !str.isEmpty(); i--)
-            {
-                if (str[i] == L' ' || str[i] == L'\t' || str[i] == L'\n')
-                {
-                    str.erase(i, 1);
-                    i++;
-                }
-                else
-                    break;
-            }
-
-            if (!str.isEmpty() && m_onTextEntered)
-                m_onTextEntered(*this, str);
+            sf::String string = StringHelper::Trim(m_text.GetString());
+            if (!string.isEmpty() && m_onTextEntered)
+                m_onTextEntered(*this, string);
 
             m_text.SetString("");
             m_caret.SelectionLength = 0;
