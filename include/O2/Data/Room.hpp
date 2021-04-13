@@ -6,19 +6,19 @@
 
 namespace Room
 {
-    enum RoomState
+    enum class RoomState
     {
         Waiting,
         Playing
     };
 
-    enum SongMode
+    enum class SongMode
     {
         Normal,
         Random
     };
 
-    enum GameMode
+    enum class GameMode
     {
         Single,
         Vs,

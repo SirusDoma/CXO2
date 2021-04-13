@@ -5,7 +5,7 @@
 
 namespace Planet
 {
-    enum MusicHall
+    enum class Planet
     {
         None,
         Melpomin,

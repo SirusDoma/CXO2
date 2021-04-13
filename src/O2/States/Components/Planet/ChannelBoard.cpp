@@ -40,7 +40,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     m_channelListContainer = new Gx::UiContainer();
     m_channelTabButton = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
     m_channelTabButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Hall)
+        if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Hall != Planet::MusicHall::None)
             SwitchTab(Tab::ChannelList);
     });
 
