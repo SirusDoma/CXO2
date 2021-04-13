@@ -12,6 +12,12 @@ namespace Room
         Playing
     };
 
+    enum SongMode
+    {
+        Normal,
+        Random
+    };
+
     enum GameMode
     {
         Single,

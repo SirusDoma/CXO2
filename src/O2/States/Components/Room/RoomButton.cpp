@@ -105,7 +105,7 @@ void RoomButton::Invalidate()
     else
         speedStr = "R";
 
-    if (m_data.SongMode == SongMode::User)
+    if (m_data.SongMode == Room::SongMode::Normal)
     {
         std::string diffName;
         switch (m_data.Difficulty)
@@ -119,7 +119,7 @@ void RoomButton::Invalidate()
         m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
         m_speedLabel->SetFrame(diffName + speedStr);
     }
-    else if (m_data.SongMode == SongMode::Random)
+    else if (m_data.SongMode == Room::SongMode::Random)
     {
         m_musicLabel->SetString("Random");
         m_speedLabel->SetFrame("RX" + speedStr);
