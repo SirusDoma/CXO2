@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ScrollBarLoader::LoadMetadata(const void *
     ScrollBarMetadata metadata;
 
     auto attributes = json.at("attributes");
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
 
     ScrollBarLoader::ParseReferences(json["require"], metadata);
     SpriteLoader::ParseSprite(attributes, metadata);
@@ -22,22 +22,22 @@ std::unique_ptr<Gx::ResourceMetadata> ScrollBarLoader::LoadMetadata(const void *
     if (orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
-            metadata.SetOrientation(Gx::ScrollBar::Vertical);
+            metadata.Orientation = Gx::ScrollBar::Vertical;
         else
-            metadata.SetOrientation(Gx::ScrollBar::Horizontal);
+            metadata.Orientation = Gx::ScrollBar::Horizontal;
     }
 
     auto maximum = attributes.find("maximum");
     if (maximum != attributes.end())
-        metadata.SetMaximum(maximum->get<float>());
+        metadata.Maximum = maximum->get<float>();
     else
-        metadata.SetMaximum(100.0f);
+        metadata.Maximum = 100.0f;
 
     auto step = attributes.find("step");
     if (step != attributes.end())
-        metadata.SetStep(step->get<float>());
+        metadata.Step = step->get<float>();
     else
-        metadata.SetStep(1.0f);
+        metadata.Step = 1.0f;
 
     auto bounds = attributes.find("bounds");
     if (bounds != attributes.end())
@@ -47,7 +47,7 @@ std::unique_ptr<Gx::ResourceMetadata> ScrollBarLoader::LoadMetadata(const void *
         bounds->at("y").get_to(y);
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
-        metadata.SetBounds(sf::FloatRect(x, y, w, h));
+        metadata.Bounds = sf::FloatRect(x, y, w, h);
     }
 
     return std::make_unique<ScrollBarMetadata>(metadata);
@@ -62,15 +62,15 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::Load(const Gx::ResourceMetadata 
     if (!context.Texture)
         return nullptr;
 
-    auto scrollBar = std::make_unique<Gx::ScrollBar>(*context.Texture, spec->GetTexCoords(), spec->GetBounds(), spec->GetOrientation());
-    scrollBar->SetColor(spec->GetColor());
-    scrollBar->SetMaximumValue(spec->GetMaximum());
-    scrollBar->SetStep(spec->GetStep());
+    auto scrollBar = std::make_unique<Gx::ScrollBar>(*context.Texture, spec->TexCoords, spec->Bounds, spec->Orientation);
+    scrollBar->SetColor(spec->Color);
+    scrollBar->SetMaximumValue(spec->Maximum);
+    scrollBar->SetStep(spec->Step);
 
-    scrollBar->SetOrigin(spec->GetOrigin());
-    scrollBar->SetPosition(spec->GetPosition());
-    scrollBar->SetScale(spec->GetScale());
-    scrollBar->SetRotation(spec->GetRotation());
+    scrollBar->SetOrigin(spec->Origin);
+    scrollBar->SetPosition(spec->Position);
+    scrollBar->SetScale(spec->Scale);
+    scrollBar->SetRotation(spec->Rotation);
 
     return scrollBar;
 }

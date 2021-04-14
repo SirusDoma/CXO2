@@ -10,7 +10,7 @@ std::unique_ptr<Gx::ResourceMetadata> ButtonLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = ButtonMetadata();
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
 
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
@@ -34,15 +34,15 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::Load(const Gx::ResourceMetadata &metad
         button->SetTexture(*context.Texture);
 
     button->SetName(context.Name);
-    button->SetOrigin(spec->GetOrigin());
-    button->SetPosition(spec->GetPosition());
-    button->SetScale(spec->GetScale());
-    button->SetRotation(spec->GetRotation());
+    button->SetOrigin(spec->Origin);
+    button->SetPosition(spec->Position);
+    button->SetScale(spec->Scale);
+    button->SetRotation(spec->Rotation);
 
     auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
     {
-        for (auto[state, meta] : spec->GetStates())
+        for (auto[state, meta] : spec->States)
             button->SetStateFrame(state, *loader->Load(meta, Gx::ResourceContext()));
     }
 
@@ -62,6 +62,6 @@ void ButtonLoader::ParseButton(Json attributes, std::unordered_map<std::string, 
         SpriteMetadata stateMeta;
         SpriteLoader::ParseSprite(states.at(name), stateMeta);
 
-        metadata.SetState(state, stateMeta);
+        metadata.States[state] = stateMeta;
     }
 }

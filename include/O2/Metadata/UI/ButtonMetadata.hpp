@@ -7,15 +7,10 @@
 
 struct ButtonMetadata : public SpriteMetadata
 {
-public:
-    ButtonMetadata() : m_states() {}
+    ButtonMetadata() : States() {}
     virtual ~ButtonMetadata() {}
 
-    const std::unordered_map<Gx::Control::State, SpriteMetadata> &GetStates() const { return m_states; }
-    void SetState(Gx::Control::State state, SpriteMetadata metadata) { m_states[state] = metadata; }
-
-private:
-    std::unordered_map<Gx::Control::State, SpriteMetadata> m_states;
+    std::unordered_map<Gx::Control::State, SpriteMetadata> States;
 };
 
 #endif

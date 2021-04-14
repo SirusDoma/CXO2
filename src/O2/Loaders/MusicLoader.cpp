@@ -10,18 +10,18 @@ std::unique_ptr<Gx::ResourceMetadata> MusicLoader::LoadMetadata(const void* data
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     MusicMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     for (auto resource : json["require"].items())
     {
         if (resource.key() == "music")
         {
-            metadata.SetSource(resource.value());
+            metadata.Source = resource.value();
             break;
         }
     }
 
     auto attributes = json.at("attributes");
-    metadata.SetLoop(attributes.at("loop").get<bool>());
+    metadata.IsLoop = attributes["loop"].get<bool>();
 
     return std::make_unique<MusicMetadata>(metadata);
 }
@@ -33,7 +33,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::Load(const Gx::ResourceMetadata &metadat
         return nullptr;
 
     Gx::Uint8 *data;
-    if (auto size = context.Resources->GetResourceData(spec->GetSource(), &data))
+    if (auto size = context.Resources->GetResourceData(spec->Source, &data))
     {
         auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto music) {
             delete music;
@@ -46,7 +46,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::Load(const Gx::ResourceMetadata &metadat
             return nullptr;
         }
 
-        music->setLoop(spec->IsLoop());
+        music->setLoop(spec->IsLoop);
         return music;
     }
 

@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> SpriteLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     SpriteMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
     ParseSprite(json["attributes"], metadata);
 
@@ -27,16 +27,16 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::Load(const Gx::ResourceMetadata& metad
 
     auto sprite = std::make_unique<Gx::Sprite>();
     sprite->SetName(context.Name);
-    sprite->SetTexCoords(spec->GetTexCoords());
-    sprite->SetColor(spec->GetColor());
+    sprite->SetTexCoords(spec->TexCoords);
+    sprite->SetColor(spec->Color);
 
     if (context.Texture)
         sprite->SetTexture(*context.Texture);
 
-    sprite->SetOrigin(spec->GetOrigin());
-    sprite->SetPosition(spec->GetPosition());
-    sprite->SetScale(spec->GetScale());
-    sprite->SetRotation(spec->GetRotation());
+    sprite->SetOrigin(spec->Origin);
+    sprite->SetPosition(spec->Position);
+    sprite->SetScale(spec->Scale);
+    sprite->SetRotation(spec->Rotation);
 
     return sprite;
 }
@@ -55,10 +55,10 @@ void SpriteLoader::ParseSprite(Json attributes, SpriteMetadata &metadata)
         color->at("r").get_to(r);
         color->at("g").get_to(g);
         color->at("b").get_to(b);
-        metadata.SetColor(sf::Color(r, g, b, a));
+        metadata.Color = sf::Color(r, g, b, a);
     }
     else
-        metadata.SetColor(sf::Color::White);
+        metadata.Color = sf::Color::White;
 
     auto texCoords  = attributes.find("texCoords");
     if (texCoords != attributes.end())
@@ -68,6 +68,6 @@ void SpriteLoader::ParseSprite(Json attributes, SpriteMetadata &metadata)
         texCoords->at("y").get_to(y);
         texCoords->at("width").get_to(w);
         texCoords->at("height").get_to(h);
-        metadata.SetTexCoords(sf::IntRect(x, y, w, h));
+        metadata.TexCoords = sf::IntRect(x, y, w, h);
     }
 }

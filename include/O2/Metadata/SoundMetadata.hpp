@@ -9,7 +9,6 @@
 
 struct SoundMetadata : public Gx::ResourceMetadata
 {
-    virtual ~SoundMetadata() {}
 };
 
 #endif

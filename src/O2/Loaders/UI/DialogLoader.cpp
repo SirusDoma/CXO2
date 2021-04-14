@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> DialogLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = DialogMetadata();
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
     ParseDialog(json["attributes"], metadata);
 
@@ -28,14 +28,14 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::Load(const Gx::ResourceMetadata &metad
 
     auto dialog = std::make_unique<Gx::Dialog>();
     dialog->SetName(context.Name);
-    dialog->SetOrigin(spec->GetOrigin());
-    dialog->SetPosition(spec->GetPosition());
-    dialog->SetScale(spec->GetScale());
-    dialog->SetRotation(spec->GetRotation());
+    dialog->SetOrigin(spec->Origin);
+    dialog->SetPosition(spec->Position);
+    dialog->SetScale(spec->Scale);
+    dialog->SetRotation(spec->Rotation);
     if (context.Texture)
     {
         dialog->SetTexture(*context.Texture);
-        dialog->SetTexCoords(spec->GetTexCoords());
+        dialog->SetTexCoords(spec->TexCoords);
     }
 
     if (context.Resources)
@@ -44,12 +44,12 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::Load(const Gx::ResourceMetadata &metad
         auto labelLoader  = Gx::ResourceLoaderFactory::GetLoader<Gx::Label>();
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
 
-        auto labelMetadata = spec->GetPromptLabel();
+        auto labelMetadata = spec->PromptLabelMetadata;
         if (labelLoader)
             dialog->SetLabel(labelLoader->Load(labelMetadata, resources->ResolveContext(labelMetadata)).release());
 
-        auto acceptButtonMetadata = spec->GetAcceptButton();
-        auto cancelButtonMetadata = spec->GetCancelButton();
+        auto acceptButtonMetadata = spec->AcceptButtonMetadata;
+        auto cancelButtonMetadata = spec->CancelButtonMetadata;
         if (buttonLoader)
         {
             dialog->SetAcceptButton(buttonLoader->Load(acceptButtonMetadata, resources->ResolveContext(acceptButtonMetadata)).release());
@@ -70,7 +70,7 @@ void DialogLoader::ParseDialog(Json attributes, DialogMetadata &metadata)
         ParseReferences(labelNode["require"], labelMetadata);
 
         LabelLoader::ParseLabel(labelNode["attributes"], labelMetadata);
-        metadata.SetPromptLabel(labelMetadata);
+        metadata.PromptLabelMetadata = labelMetadata;
     }
 
     if (attributes.contains("buttons"))
@@ -90,7 +90,7 @@ void DialogLoader::ParseDialog(Json attributes, DialogMetadata &metadata)
             ParseReferences(acceptNode["require"], acceptMetadata);
             ButtonLoader::ParseButton(acceptNode["attributes"], stateMap, acceptMetadata);
 
-            metadata.SetAcceptButton(acceptMetadata);
+            metadata.AcceptButtonMetadata = acceptMetadata;
         }
 
         if (buttons.contains("cancel"))
@@ -101,7 +101,7 @@ void DialogLoader::ParseDialog(Json attributes, DialogMetadata &metadata)
             ParseReferences(cancelNode["require"], cancelMetadata);
             ButtonLoader::ParseButton(cancelNode["attributes"], stateMap, cancelMetadata);
 
-            metadata.SetCancelButton(cancelMetadata);
+            metadata.CancelButtonMetadata = cancelMetadata;
         }
     }
 }

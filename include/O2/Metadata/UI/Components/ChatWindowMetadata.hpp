@@ -7,19 +7,9 @@
 
 struct ChatWindowMetadata : public TransformMetadata
 {
-public:
-    const sf::FloatRect &GetBounds() const { return m_bounds; }
-    void SetBounds(const sf::FloatRect& bounds) { m_bounds = bounds; }
-
-    unsigned int GetFontSize() const { return m_fontSize; }
-    void SetFontSize(unsigned int fontSize) { m_fontSize = fontSize; }
-
-    unsigned int GetMaximumChatLength() const { return m_maxChatsLength; }
-    void SetMaximumChatLength(unsigned int max) { m_maxChatsLength = max; }
-
-private:
-    sf::FloatRect m_bounds;
-    unsigned int m_fontSize, m_maxChatsLength;
+    sf::FloatRect Bounds;
+    unsigned int  FontSize;
+    unsigned int  MaximumChatsLength;
 };
 
 #endif

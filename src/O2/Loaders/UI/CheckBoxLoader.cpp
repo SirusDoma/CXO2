@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> CheckBoxLoader::LoadMetadata(const void *d
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = CheckBoxMetadata();
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
 
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
@@ -36,15 +36,15 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::Load(const Gx::ResourceMetadata &m
         checkBox->SetTexture(*context.Texture);
 
     checkBox->SetName(context.Name);
-    checkBox->SetOrigin(spec->GetOrigin());
-    checkBox->SetPosition(spec->GetPosition());
-    checkBox->SetScale(spec->GetScale());
-    checkBox->SetRotation(spec->GetRotation());
+    checkBox->SetOrigin(spec->Origin);
+    checkBox->SetPosition(spec->Position);
+    checkBox->SetScale(spec->Scale);
+    checkBox->SetRotation(spec->Rotation);
 
     auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
     {
-        for (auto[state, meta] : spec->GetStates())
+        for (auto[state, meta] : spec->States)
             checkBox->SetStateFrame(state, *loader->Load(meta, Gx::ResourceContext()));
     }
 

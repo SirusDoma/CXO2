@@ -35,11 +35,9 @@ namespace Gx
         ResourceMetadata();
         virtual ~ResourceMetadata();
 
-        const std::string& GetResourceType() const;
-        void SetResourceType(const std::string &type);
-
-        const std::string& GetName() const;
-        void SetName(const std::string &name);
+        std::string ResourceType;
+        std::string Name;
+        std::map<ResourceReference::ResourceType, ResourceReference> References;
 
         void Require(const std::string& name, const std::string& value, const ResourceReference::ResourceType& type);
         void RequireTexture(const std::string& name, const std::string& value);
@@ -51,9 +49,7 @@ namespace Gx
         const ResourceReference* GetResourceReference(const std::string& name) const;
 
     private:
-        std::string m_type;
-        std::string m_name;
-        std::map<ResourceReference::ResourceType, ResourceReference> m_references;
+
     };
 }
 

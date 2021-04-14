@@ -102,8 +102,8 @@ void ChannelButton::SetPlanet(Planet::MusicHall hall)
     auto radioData = dynamic_cast<RadioButtonMetadata*>(metadata);
     if (radioData)
     {
-        for (auto[state, sprite] : radioData->GetStates())
-            SetStateFrame(state, sprite.GetTexCoords());
+        for (auto [state, sprite] : radioData->States)
+            SetStateFrame(state, sprite.TexCoords);
     }
 }
 

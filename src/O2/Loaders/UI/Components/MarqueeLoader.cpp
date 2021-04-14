@@ -10,13 +10,13 @@ std::unique_ptr<Gx::ResourceMetadata> MarqueeLoader::LoadMetadata(const void *da
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     MarqueeMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
 
     auto attributes = json.at("attributes");
     ParseReferences(json["require"], metadata);
     LabelLoader::ParseLabel(attributes, metadata);
 
-    metadata.SetSpeed(attributes.at("speed").get<double>());
+    metadata.Speed = attributes.at("speed").get<double>();
     auto bounds = attributes.find("bounds");
     if (bounds != attributes.end())
     {
@@ -25,7 +25,7 @@ std::unique_ptr<Gx::ResourceMetadata> MarqueeLoader::LoadMetadata(const void *da
         bounds->at("y").get_to(y);
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
-        metadata.SetBounds(sf::FloatRect(x, y, w, h));
+        metadata.Bounds = sf::FloatRect(x, y, w, h);
     }
 
     return std::make_unique<MarqueeMetadata>(metadata);
@@ -41,19 +41,19 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::Load(const Gx::ResourceMetadata &metadat
     if (context.Font)
         marquee->SetFont(*context.Font);
 
-    marquee->SetCharacterSize(spec->GetFontSize());
-    marquee->SetColor(spec->GetColor());
-    marquee->SetOutlineThickness(spec->GetOutlineThickness());
-    marquee->SetOutlineColor(spec->GetOutlineColor());
-    marquee->SetString(spec->GetString());
+    marquee->SetCharacterSize(spec->FontSize);
+    marquee->SetColor(spec->Color);
+    marquee->SetOutlineThickness(spec->OutlineThickness);
+    marquee->SetOutlineColor(spec->OutlineColor);
+    marquee->SetString(spec->String);
 
-    marquee->SetOrigin(spec->GetOrigin());
-    marquee->SetPosition(spec->GetPosition());
-    marquee->SetScale(spec->GetScale());
-    marquee->SetRotation(spec->GetRotation());
+    marquee->SetOrigin(spec->Origin);
+    marquee->SetPosition(spec->Position);
+    marquee->SetScale(spec->Scale);
+    marquee->SetRotation(spec->Rotation);
 
-    marquee->SetSpeed(spec->GetSpeed());
-    marquee->SetLocalBounds(spec->GetBounds());
+    marquee->SetSpeed(spec->Speed);
+    marquee->SetLocalBounds(spec->Bounds);
 
     return marquee;
 }

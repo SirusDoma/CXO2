@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ChatWindowLoader::LoadMetadata(const void 
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     ChatWindowMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     auto attributes = json.at("attributes");
 
     ParseReferences(json["require"], metadata);
@@ -27,18 +27,18 @@ std::unique_ptr<Gx::ResourceMetadata> ChatWindowLoader::LoadMetadata(const void 
         bounds->at("y").get_to(y);
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
-        metadata.SetBounds(sf::FloatRect(x, y, w, h));
+        metadata.Bounds = sf::FloatRect(x, y, w, h);
     }
 
     auto fontSize = attributes.find("fontSize");
     if (fontSize != attributes.end())
-        metadata.SetFontSize(fontSize->get<unsigned int>());
+        metadata.FontSize = fontSize->get<unsigned int>();
     else
-        metadata.SetFontSize(13);
+        metadata.FontSize = 13;
 
     auto maxChatLength = attributes.find("maximumChatLength");
     if (maxChatLength != attributes.end())
-        metadata.SetMaximumChatLength(maxChatLength->get<unsigned int>());
+        metadata.MaximumChatsLength = maxChatLength->get<unsigned int>();
 
     return std::make_unique<ChatWindowMetadata>(metadata);
 }
@@ -49,14 +49,14 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::Load(const Gx::ResourceMetadata &m
     if (!spec || !context.Font)
         return nullptr;
 
-    auto window = std::make_unique<ChatWindow>(*context.Font, spec->GetBounds(), spec->GetFontSize());
-    window->SetMaximumChatLength(spec->GetMaximumChatLength());
+    auto window = std::make_unique<ChatWindow>(*context.Font, spec->Bounds, spec->FontSize);
+    window->SetMaximumChatLength(spec->MaximumChatsLength);
 
     window->SetName(context.Name);
-    window->SetOrigin(spec->GetOrigin());
-    window->SetPosition(spec->GetPosition());
-    window->SetScale(spec->GetScale());
-    window->SetRotation(spec->GetRotation());
+    window->SetOrigin(spec->Origin);
+    window->SetPosition(spec->Position);
+    window->SetScale(spec->Scale);
+    window->SetRotation(spec->Rotation);
 
     return window;
 }

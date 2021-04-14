@@ -10,7 +10,7 @@ std::unique_ptr<Gx::ResourceMetadata> ListLoader::LoadMetadata(const void *data,
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     ListMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     auto attributes = json.at("attributes");
 
     ParseReferences(json["require"], metadata);
@@ -27,15 +27,15 @@ Gx::ResourcePtr<Gx::List> ListLoader::Load(const Gx::ResourceMetadata &metadata,
         return nullptr;
 
     auto list = std::make_unique<Gx::List>(
-        spec->GetVerticalCount(),   spec->GetVerticalSpacing(),
-        spec->GetHorizontalCount(), spec->GetHorizontalSpacing()
+        spec->VerticalCount,   spec->VerticalSpacing,
+        spec->HorizontalCount, spec->HorizontalSpacing
     );
 
     list->SetName(context.Name);
-    list->SetOrigin(spec->GetOrigin());
-    list->SetPosition(spec->GetPosition());
-    list->SetScale(spec->GetScale());
-    list->SetRotation(spec->GetRotation());
+    list->SetOrigin(spec->Origin);
+    list->SetPosition(spec->Position);
+    list->SetScale(spec->Scale);
+    list->SetRotation(spec->Rotation);
 
     return list;
 }
@@ -45,25 +45,25 @@ void ListLoader::ParseList(Json attributes, ListMetadata &metadata)
     auto vertical = attributes.find("vertical");
     if (vertical != attributes.end())
     {
-        metadata.SetVerticalCount(vertical->at("count").get<unsigned int>());
-        metadata.SetVerticalSpacing(vertical->at("spacing").get<float>());
+        metadata.VerticalCount   = vertical->at("count").get<unsigned int>();
+        metadata.VerticalSpacing = vertical->at("spacing").get<float>();
     }
     else
     {
-        metadata.SetVerticalCount(1);
-        metadata.SetVerticalSpacing(0.f);
+        metadata.VerticalCount   = 1;
+        metadata.VerticalSpacing = 0.f;
     }
 
     auto horizontal = attributes.find("horizontal");
     if (horizontal != attributes.end())
     {
-        metadata.SetHorizontalCount(horizontal->at("count").get<unsigned int>());
-        metadata.SetHorizontalSpacing(horizontal->at("spacing").get<float>());
+        metadata.HorizontalCount   = horizontal->at("count").get<unsigned int>();
+        metadata.HorizontalSpacing = horizontal->at("spacing").get<float>();
     }
     else
     {
-        metadata.SetHorizontalCount(1);
-        metadata.SetHorizontalSpacing(0.f);
+        metadata.HorizontalCount   = 1;
+        metadata.HorizontalSpacing = 0.f;
     }
 }
 

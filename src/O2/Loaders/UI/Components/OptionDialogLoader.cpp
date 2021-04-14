@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> OptionDialogLoader::LoadMetadata(const voi
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = DialogMetadata();
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
     DialogLoader::ParseDialog(json["attributes"], metadata);
 
@@ -28,14 +28,14 @@ Gx::ResourcePtr<OptionDialog> OptionDialogLoader::Load(const Gx::ResourceMetadat
 
     auto dialog = std::make_unique<OptionDialog>();
     dialog->SetName(context.Name);
-    dialog->SetOrigin(spec->GetOrigin());
-    dialog->SetPosition(spec->GetPosition());
-    dialog->SetScale(spec->GetScale());
-    dialog->SetRotation(spec->GetRotation());
+    dialog->SetOrigin(spec->Origin);
+    dialog->SetPosition(spec->Position);
+    dialog->SetScale(spec->Scale);
+    dialog->SetRotation(spec->Rotation);
     if (context.Texture)
     {
         dialog->SetTexture(*context.Texture);
-        dialog->SetTexCoords(spec->GetTexCoords());
+        dialog->SetTexCoords(spec->TexCoords);
     }
 
     if (context.Resources)
@@ -44,12 +44,12 @@ Gx::ResourcePtr<OptionDialog> OptionDialogLoader::Load(const Gx::ResourceMetadat
         auto labelLoader  = Gx::ResourceLoaderFactory::GetLoader<Gx::Label>();
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
 
-        auto labelMetadata = spec->GetPromptLabel();
+        auto labelMetadata = spec->PromptLabelMetadata;
         if (labelLoader)
             dialog->SetLabel(labelLoader->Load(labelMetadata, resources->ResolveContext(labelMetadata)).release());
 
-        auto acceptButtonMetadata = spec->GetAcceptButton();
-        auto cancelButtonMetadata = spec->GetCancelButton();
+        auto acceptButtonMetadata = spec->AcceptButtonMetadata;
+        auto cancelButtonMetadata = spec->CancelButtonMetadata;
         if (buttonLoader)
         {
             dialog->SetAcceptButton(buttonLoader->Load(acceptButtonMetadata, resources->ResolveContext(acceptButtonMetadata)).release());

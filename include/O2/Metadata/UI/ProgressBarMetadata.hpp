@@ -12,16 +12,8 @@
 
 struct ProgressBarMetadata : public SpriteMetadata
 {
-public:
-    float GetMaximum() const { return m_maximum; }
-    void SetMaximum(float maximum) { m_maximum = maximum; }
-
-    Gx::ProgressBar::Orientation GetOrientation() const { return m_orientation; }
-    void SetOrientation(Gx::ProgressBar::Orientation orientation) { m_orientation = orientation; }
-
-private:
-    float m_maximum;
-    Gx::ProgressBar::Orientation m_orientation;
+    float Maximum;
+    Gx::ProgressBar::Orientation Orientation;
 };
 
 #endif

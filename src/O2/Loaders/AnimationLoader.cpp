@@ -17,8 +17,8 @@ std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *
     SpriteLoader::ParseSprite(json["attributes"], metadata);
 
     auto attributes = json.at("attributes");
-    metadata.SetDuration(sf::milliseconds(attributes.at("duration").get<unsigned int>()));
-    metadata.SetLoop(attributes.at("isLoop").get<bool>());
+    metadata.Duration = sf::milliseconds(attributes["duration"].get<unsigned int>());
+    metadata.IsLoop = attributes["isLoop"].get<bool>();
 
     auto frames = attributes.at("frames");
     for (auto frame : frames)
@@ -29,7 +29,7 @@ std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *
         frame.at("width").get_to(width);
         frame.at("height").get_to(height);
 
-        metadata.AddFrame(sf::IntRect(x, y, width, height));
+        metadata.Frames.push_back(sf::IntRect(x, y, width, height));
     }
 
     return std::make_unique<AnimationMetadata>(metadata);
@@ -43,14 +43,14 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::Load(const Gx::ResourceMetadata 
 
     auto animation = std::make_unique<Gx::Animation>();
     animation->SetName(context.Name);
-    animation->SetLoop(spec->isLoop());
-    animation->SetDuration(spec->GetDuration());
+    animation->SetLoop(spec->IsLoop);
+    animation->SetDuration(spec->Duration);
 
     auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
         animation->SetSprite(std::move(loader->Load(metadata, context)).release());
 
-    for (auto frame : spec->GetFrames())
+    for (auto frame : spec->Frames)
         animation->AddFrame(frame);
 
     return animation;

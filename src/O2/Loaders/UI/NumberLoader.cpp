@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     NumberMetadata metadata;
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
 
     auto attributes = json.at("attributes");
     NumberLoader::ParseReferences(json["require"], metadata);
@@ -24,7 +24,7 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
         unsigned int w, h;
         digitSize->at("width").get_to(w);
         digitSize->at("height").get_to(h);
-        metadata.SetDigitSize(sf::Vector2u(w, h));
+        metadata.DigitSize = sf::Vector2u(w, h);
     }
 
     auto frames = attributes.find("characters");
@@ -37,7 +37,7 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
             frame.at("y").get_to(y);
             frame.at("width").get_to(w);
             frame.at("height").get_to(h);
-            metadata.SetDigitFrame(std::stoi(digit), sf::IntRect(x, y, w, h));
+            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(x, y, w, h);
         }
     }
 
@@ -49,16 +49,16 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
         color->at("r").get_to(r);
         color->at("g").get_to(g);
         color->at("b").get_to(b);
-        metadata.SetColor(sf::Color(r, g, b, a));
+        metadata.Color = sf::Color(r, g, b, a);
     }
     else
-        metadata.SetColor(sf::Color::White);
+        metadata.Color = sf::Color::White;
 
     auto spacing = attributes.find("letterSpacing");
     if (spacing != attributes.end())
-        metadata.SetLetterSpacing(spacing->get<float>());
+        metadata.LetterSpacing = spacing->get<float>();
     else
-        metadata.SetLetterSpacing(0.f);
+        metadata.LetterSpacing = 0.f;
 
     return std::make_unique<NumberMetadata>(metadata);
 }
@@ -74,22 +74,22 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::Load(const Gx::ResourceMetadata &metad
         number->SetTexture(*context.Texture);
 
     number->SetName(context.Name);
-    number->SetColor(spec->GetColor());
+    number->SetColor(spec->Color);
 
-    if (spec->GetDigitSize() != sf::Vector2u() || spec->GetDigitFrames().size() > 0)
+    if (spec->DigitSize != sf::Vector2u() || spec->DigitFrames.size() > 0)
     {
-        number->SetDigitsSize(spec->GetDigitSize());
-        for (auto frame : spec->GetDigitFrames())
+        number->SetDigitsSize(spec->DigitSize);
+        for (auto frame : spec->DigitFrames)
             number->SetDigitFrame(frame.first, frame.second);
     }
     else
         number->SetDigitsSize(sf::Vector2u(context.Texture->getSize().x / 10, context.Texture->getSize().y));
 
-    number->SetLetterSpacing(spec->GetLetterSpacing());
-    number->SetOrigin(spec->GetOrigin());
-    number->SetPosition(spec->GetPosition());
-    number->SetScale(spec->GetScale());
-    number->SetRotation(spec->GetRotation());
+    number->SetLetterSpacing(spec->LetterSpacing);
+    number->SetOrigin(spec->Origin);
+    number->SetPosition(spec->Position);
+    number->SetScale(spec->Scale);
+    number->SetRotation(spec->Rotation);
 
     return number;
 }

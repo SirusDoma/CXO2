@@ -13,15 +13,10 @@
 
 struct ImageMetadata : public SpriteMetadata
 {
-public:
-    ImageMetadata() : m_frames() {}
+    ImageMetadata() : Frames() {}
     virtual ~ImageMetadata() {}
 
-    const std::unordered_map<std::string, sf::IntRect> &GetFrames() const { return m_frames; }
-    void AddFrame(const std::string& key, const sf::IntRect& frame) { m_frames[key] = frame; }
-
-private:
-    std::unordered_map<std::string, sf::IntRect> m_frames;
+    std::unordered_map<std::string, sf::IntRect> Frames;
 };
 
 #endif

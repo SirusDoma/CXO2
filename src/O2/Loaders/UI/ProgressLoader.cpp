@@ -13,7 +13,7 @@ std::unique_ptr<Gx::ResourceMetadata> ProgressBarLoader::LoadMetadata(const void
     ProgressBarMetadata metadata;
 
     auto attributes = json.at("attributes");
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
 
     ProgressBarLoader::ParseReferences(json["require"], metadata);
     SpriteLoader::ParseSprite(attributes, metadata);
@@ -22,16 +22,16 @@ std::unique_ptr<Gx::ResourceMetadata> ProgressBarLoader::LoadMetadata(const void
     if (orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
-            metadata.SetOrientation(Gx::ProgressBar::Vertical);
+            metadata.Orientation = Gx::ProgressBar::Vertical;
         else
-            metadata.SetOrientation(Gx::ProgressBar::Horizontal);
+            metadata.Orientation = Gx::ProgressBar::Horizontal;
     }
 
     auto maximum = attributes.find("maximum");
     if (maximum != attributes.end())
-        metadata.SetMaximum(maximum->get<float>());
+        metadata.Maximum = maximum->get<float>();
     else
-        metadata.SetMaximum(100.0f);
+        metadata.Maximum = 100.0f;
 
     return std::make_unique<ProgressBarMetadata>(metadata);
 }
@@ -46,15 +46,15 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::Load(const Gx::ResourceMetad
     if (context.Texture)
         progressBar->SetTexture(*context.Texture);
 
-    progressBar->SetTexCoords(spec->GetTexCoords());
-    progressBar->SetOrientation(spec->GetOrientation());
-    progressBar->SetMaximumValue(spec->GetMaximum());
-    progressBar->SetColor(spec->GetColor());
+    progressBar->SetTexCoords(spec->TexCoords);
+    progressBar->SetOrientation(spec->Orientation);
+    progressBar->SetMaximumValue(spec->Maximum);
+    progressBar->SetColor(spec->Color);
 
-    progressBar->SetOrigin(spec->GetOrigin());
-    progressBar->SetPosition(spec->GetPosition());
-    progressBar->SetScale(spec->GetScale());
-    progressBar->SetRotation(spec->GetRotation());
+    progressBar->SetOrigin(spec->Origin);
+    progressBar->SetPosition(spec->Position);
+    progressBar->SetScale(spec->Scale);
+    progressBar->SetRotation(spec->Rotation);
 
     return progressBar;
 }

@@ -12,7 +12,7 @@ std::unique_ptr<Gx::ResourceMetadata> RadioButtonLoader::LoadMetadata(const void
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     auto metadata = RadioButtonMetadata();
 
-    metadata.SetResourceType(json.at("type").get<std::string>());
+    metadata.ResourceType = json.at("type").get<std::string>();
     ParseReferences(json["require"], metadata);
 
     std::unordered_map<std::string, Gx::Button::State> stateMap = {
@@ -36,15 +36,15 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::Load(const Gx::ResourceMetad
         radio->SetTexture(*context.Texture);
 
     radio->SetName(context.Name);
-    radio->SetOrigin(spec->GetOrigin());
-    radio->SetPosition(spec->GetPosition());
-    radio->SetScale(spec->GetScale());
-    radio->SetRotation(spec->GetRotation());
+    radio->SetOrigin(spec->Origin);
+    radio->SetPosition(spec->Position);
+    radio->SetScale(spec->Scale);
+    radio->SetRotation(spec->Rotation);
 
     auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Sprite>();
     if (loader)
     {
-        for (auto[state, meta] : spec->GetStates())
+        for (auto[state, meta] : spec->States)
             radio->SetStateFrame(state, *loader->Load(meta, Gx::ResourceContext()));
     }
 
