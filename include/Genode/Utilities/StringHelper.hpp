@@ -10,9 +10,22 @@ namespace Gx
     public:
         static sf::String ToPascalCase(const sf::String &input)
         {
-            sf::String result = input;
-            result[0] = std::toupper(result[0]);
+            sf::String result = "";
+            bool transform = true;
 
+            for (size_t i = 0; i < input.getSize(); i++)
+            {
+                char curChar = input[i];
+                if (transform)
+                {
+                    result += sf::String(static_cast<char>(std::toupper(curChar)));
+                    transform = false;
+                }
+                else if (curChar == L' ' || curChar == L'_' || curChar == L'-')
+                    transform = true;
+                else
+                    result += curChar;
+            }
             return result;
         }
 
