@@ -22,7 +22,16 @@ namespace Gx
 
         ResourcePtr<sf::Font> FontLoader::Load(const ResourceMetadata &metadata, const ResourceContext& context) const
         {
-            auto required = metadata.GetResourceReference(ResourceReference::Font);
+            ResourceReference* required = nullptr;
+            for (auto ref : metadata.References)
+            {
+                if (ref.Type == ResourceReference::Font)
+                {
+                    required = &ref;
+                    break;
+                }
+            }
+
             if (required)
             {
                 auto font = std::make_unique<sf::Font>();

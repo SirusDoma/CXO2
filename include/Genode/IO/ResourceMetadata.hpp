@@ -24,9 +24,9 @@ namespace Gx
             Metadata
         };
 
-        const std::string Name;
-        const std::string Value;
-        const ResourceType Type;
+        std::string Name;
+        std::string Value;
+        ResourceType Type;
     };
 
     class ResourceMetadata

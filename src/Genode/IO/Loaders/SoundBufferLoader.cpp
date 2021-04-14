@@ -17,7 +17,16 @@ namespace Gx
 
         ResourcePtr<sf::SoundBuffer> SoundBufferLoader::Load(const ResourceMetadata &metadata, const ResourceContext& context) const
         {
-            auto required = metadata.GetResourceReference(ResourceReference::SoundBuffer);
+            ResourceReference* required = nullptr;
+            for (auto ref : metadata.References)
+            {
+                if (ref.Type == ResourceReference::SoundBuffer)
+                {
+                    required = &ref;
+                    break;
+                }
+            }
+
             if (required)
             {
                 Gx::Uint8 *data;
