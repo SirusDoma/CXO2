@@ -37,19 +37,13 @@ namespace Gx
 
         std::string ResourceType;
         std::string Name;
-        std::map<ResourceReference::ResourceType, ResourceReference> References;
+        std::vector<ResourceReference> References;
 
         void Require(const std::string& name, const std::string& value, const ResourceReference::ResourceType& type);
         void RequireTexture(const std::string& name, const std::string& value);
         void RequireFont(const std::string& name, const std::string& value);
         void RequireSoundBuffer(const std::string& name, const std::string& value);
         void RequireMetadata(const std::string& name, const std::string& value);
-
-        const ResourceReference* GetResourceReference(const ResourceReference::ResourceType& type) const;
-        const ResourceReference* GetResourceReference(const std::string& name) const;
-
-    private:
-
     };
 }
 

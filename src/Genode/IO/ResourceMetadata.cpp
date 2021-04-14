@@ -16,7 +16,7 @@ namespace Gx
 
     void ResourceMetadata::Require(const std::string &name, const std::string &value, const ResourceReference::ResourceType &type)
     {
-        References.insert(std::make_pair(type, ResourceReference{name, value, type}));
+        References.push_back(ResourceReference{name, value, type});
     }
 
     void ResourceMetadata::RequireTexture(const std::string &name, const std::string &value)
@@ -37,25 +37,5 @@ namespace Gx
     void ResourceMetadata::RequireMetadata(const std::string &name, const std::string &value)
     {
         Require(name, value, ResourceReference::Metadata);
-    }
-
-    const ResourceReference* ResourceMetadata::GetResourceReference(const ResourceReference::ResourceType &type) const
-    {
-        auto it = References.find(type);
-        if (it != References.end())
-            return &it->second;
-
-        return nullptr;
-    }
-
-    const ResourceReference *ResourceMetadata::GetResourceReference(const std::string &name) const
-    {
-        for (auto it = References.begin(); it != References.end(); ++it)
-        {
-            if (it->second.Name == name)
-                return &it->second;
-        }
-
-        return nullptr;
     }
 }

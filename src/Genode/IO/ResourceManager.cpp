@@ -8,8 +8,10 @@ namespace Gx
         m_containers()
     {
         Register<sf::Texture>();
+        Register<sf::Image>();
         Register<sf::Font>();
         Register<sf::SoundBuffer>();
+        Register<sf::Shader>();
         Register<ResourceMetadata>();
     }
 
@@ -20,19 +22,20 @@ namespace Gx
     ResourceContext ResourceManager::ResolveContext(const ResourceMetadata &metadata)
     {
         auto context = ResourceContext();
+        context.Name      = metadata.Name;
         context.Resources = this;
-        for (auto type : {ResourceReference::Texture, ResourceReference::Font, ResourceReference::SoundBuffer })
+        for (auto ref : metadata.References)
         {
-            auto ref = metadata.GetResourceReference(type);
-            if (!ref)
-                continue;
-
-            if (ref->Type == ResourceReference::Texture)
-                context.Texture = Load<sf::Texture>(ref->Value);
-            else if (ref->Type == ResourceReference::Font)
-                context.Font = Load<sf::Font>(ref->Value);
-            else if (ref->Type == ResourceReference::SoundBuffer)
-                context.SoundBuffer = Load<sf::SoundBuffer>(ref->Value);
+            switch (ref.Type)
+            {
+                case ResourceReference::Texture:     context.Texture     = Load<sf::Texture>(ref.Value);     break;
+                case ResourceReference::Image:       context.Image       = Load<sf::Image>(ref.Value);       break;
+                case ResourceReference::Font:        context.Font        = Load<sf::Font>(ref.Value);        break;
+                case ResourceReference::SoundBuffer: context.SoundBuffer = Load<sf::SoundBuffer>(ref.Value); break;
+                case ResourceReference::Shader:      context.Shader      = Load<sf::Shader>(ref.Value);      break;
+                case ResourceReference::Metadata:    context.Metadata    = LoadMetadata<ResourceMetadata>(ref.Value); break;
+                default: break;
+            }
         }
 
         return context;
