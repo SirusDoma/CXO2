@@ -1,8 +1,10 @@
 #ifndef O2JAM_ROOM_HPP
 #define O2JAM_ROOM_HPP
 
-#include <O2/Data/Game.hpp>
 #include <O2/Metadata/Chart/ChartMetadata.hpp>
+
+#include <O2/Data/Game.hpp>
+#include <O2/Data/Character.hpp>
 
 namespace Room
 {
@@ -47,6 +49,9 @@ namespace Room
         int Level;
         sf::String Name;
         bool Administrator;
+        Character::Gender Gender;
+        unsigned int Gem;
+        unsigned int Cash;
     };
 
     struct ChatData
