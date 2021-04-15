@@ -28,14 +28,14 @@ void Item::SetType(Equipment::Type type)
     m_type = type;
 }
 
-Planet::Planet Item::GetPlanet() const
+Planet::Planet Item::GetOrigin() const
 {
-    return m_planet;
+    return m_origin;
 }
 
-void Item::SetPlanet(Planet::Planet planet)
+void Item::SetOrigin(Planet::Planet planet)
 {
-    m_planet = planet;
+    m_origin = planet;
 }
 
 Character::Gender Item::GetGender() const

@@ -25,8 +25,8 @@ public:
     Equipment::Type GetType() const;
     void SetType(Equipment::Type type);
 
-    Planet::Planet GetPlanet() const;
-    void SetPlanet(Planet::Planet planet);
+    Planet::Planet GetOrigin() const;
+    void SetOrigin(Planet::Planet planet);
 
     Character::Gender GetGender() const;
     void SetGender(Character::Gender gender);
@@ -62,7 +62,7 @@ private:
 
     unsigned int      m_id;
     Equipment::Type   m_type;
-    Planet::Planet    m_planet;
+    Planet::Planet    m_origin;
     Character::Gender m_gender;
     bool              m_isNew;
     Shop::Currency    m_priceCurrency;

@@ -22,7 +22,7 @@ struct ItemMetadata : Gx::ResourceMetadata
 
     unsigned int      ID;
     Equipment::Type   EquipmentType;
-    Planet::Planet    Planet;
+    Planet::Planet    Origin;
     Character::Gender Gender;
     bool              IsNew;
     Shop::Currency    PriceCurrency;

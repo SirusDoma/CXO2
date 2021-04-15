@@ -1,6 +1,6 @@
 #include <O2/Loaders/Character/ItemLoader.hpp>
-
 #include <Genode/Utilities/StringHelper.hpp>
+
 #include <magic_enum.hpp>
 
 ItemLoader::ItemLoader()
@@ -12,7 +12,11 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
     Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     ItemMetadata metadata;
 
-    metadata.ResourceType = json.at("type").get<std::string>();
+    if (auto type =  json["type"]; !type.empty())
+        metadata.ResourceType = type.get<std::string>();
+    else
+        metadata.ResourceType = "ITEM";
+
     auto attributes = json["attributes"];
     if (!attributes.empty())
     {
@@ -24,8 +28,8 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
         if (auto parse = magic_enum::enum_cast<Character::Gender>( attributes["gender"].get<std::string>()); parse.has_value())
             metadata.Gender = parse.value();
 
-        if (auto parse = magic_enum::enum_cast<Planet::Planet>(attributes["planet"].get<std::string>()); parse.has_value())
-            metadata.Planet = parse.value();
+        if (auto parse = magic_enum::enum_cast<Planet::Planet>(attributes["origin"].get<std::string>()); parse.has_value())
+            metadata.Origin = parse.value();
 
         if (auto parse = magic_enum::enum_cast<Equipment::Type>(attributes["type"].get<std::string>()); parse.has_value())
             metadata.EquipmentType = parse.value();
@@ -34,14 +38,14 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
         if (!price.empty())
         {
             if (auto parse = magic_enum::enum_cast<Shop::Currency>(price["currency"].get<std::string>()); parse.has_value())
+            {
                 metadata.PriceCurrency = parse.value();
-
-            if (metadata.PriceCurrency == Shop::Currency::Gem)
-                metadata.Price = price["gem"].get<unsigned int>();
-            else
-                metadata.Price = price["mCash"].get<unsigned int>();
+                if (metadata.PriceCurrency == Shop::Currency::Gem)
+                    metadata.Price = price["gem"].get<unsigned int>();
+                else
+                    metadata.Price = price["mCash"].get<unsigned int>();
+            }
         }
-
     }
 
     auto require = json["require"];
@@ -108,7 +112,7 @@ Gx::ResourcePtr<Item> ItemLoader::Load(const Gx::ResourceMetadata &metadata, con
     item->SetIsNew(spec->IsNew);
     item->SetType(spec->EquipmentType);
     item->SetGender(spec->Gender);
-    item->SetPlanet(spec->Planet);
+    item->SetOrigin(spec->Origin);
     item->SetPriceCurrency(spec->PriceCurrency);
     item->SetPrice(spec->Price);
 
@@ -119,7 +123,12 @@ Gx::ResourcePtr<Item> ItemLoader::Load(const Gx::ResourceMetadata &metadata, con
         item->SetLargePreview(context.Resources->Resolve<Gx::Sprite>(spec->LargePreview));
 
     for (auto ref : spec->References)
-        item->SetRenderableItem(ref.Gender, ref.RenderType, ref.Instrument, context.Resources->Resolve<Gx::Animation>(ref.Reference));
+    {
+        auto animation = context.Resources->Resolve<Gx::Animation>(ref.Reference);
+        animation->SetLoop(true);
+
+        item->SetRenderableItem(ref.Gender, ref.RenderType, ref.Instrument, std::move(animation));
+    }
 
     return item;
 }
