@@ -42,6 +42,12 @@ namespace Gx
         R* Load(const std::string& source);
 
         template<typename R>
+        R* Load(const Gx::ResourceMetadata& metadata);
+
+        template<typename R>
+        R* Load(const std::string& name, const Gx::ResourceMetadata& metadata);
+
+        template<typename R>
         ResourceMetadata* LoadMetadata(const std::string& source);
 
         ResourceContext ResolveContext(const ResourceMetadata& metadata);

@@ -172,4 +172,22 @@ namespace Gx
         auto resolver = [this, source] { return Resolve<R>(source); };
         return container->Add(source, resolver, true);
     }
+
+    template<typename R>
+    R *ResourceManager::Load(const ResourceMetadata& metadata)
+    {
+        return Load<R>(metadata.Name, metadata);
+    }
+
+    template<typename R>
+    R *ResourceManager::Load(const std::string &name, const ResourceMetadata &metadata)
+    {
+        auto container = GetContainer<R>();
+        auto loader    = ResourceLoaderFactory::GetLoader<R>();
+        if (!container || !loader)
+            return nullptr;
+
+        auto resolver = [this, loader, &metadata] { return loader->Load(metadata, ResolveContext(metadata)); };
+        return container->Add(name, resolver, true);
+    }
 }
