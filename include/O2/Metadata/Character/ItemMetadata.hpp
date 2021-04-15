@@ -1,0 +1,34 @@
+#ifndef O2JAM_CHARACTER_ITEM_METADATA_HPP
+#define O2JAM_CHARACTER_ITEM_METADATA_HPP
+
+#include <O2/Data/Character.hpp>
+#include <O2/Data/Equipment.hpp>
+#include <O2/Data/Planet.hpp>
+#include <O2/Data/Shop.hpp>
+
+#include <SFML/System/String.hpp>
+
+struct ItemMetadata : Gx::ResourceMetadata
+{
+    ItemMetadata() : References() {};
+
+    struct ItemSpriteMetadata
+    {
+        Character::Gender     Gender;
+        Equipment::RenderType RenderType;
+        Equipment::Instrument Instrument;
+        std::string           Reference;
+    };
+
+    unsigned int      ID;
+    Equipment::Type   EquipmentType;
+    Planet::Planet    Planet;
+    Character::Gender Gender;
+    bool              IsNew;
+    Shop::Currency    PriceCurrency;
+    unsigned int      Price;
+    sf::String        Name, Description, SmallPreview, LargePreview;
+    std::vector<ItemSpriteMetadata> References;
+};
+
+#endif
