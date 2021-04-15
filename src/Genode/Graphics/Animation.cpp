@@ -12,7 +12,7 @@ namespace Gx
     {
     }
 
-    Animation::Animation(Gx::Sprite *sprite, const sf::Time &duration, std::initializer_list<sf::IntRect> frames) :
+    Animation::Animation(Gx::Sprite *sprite, const sf::Time &duration, std::initializer_list<Frame> frames) :
         m_sprite(sprite),
         m_duration(duration),
         m_frames(frames),
@@ -23,28 +23,23 @@ namespace Gx
 
     Animation::~Animation()
     {
-        if (m_sprite)
-            delete m_sprite;
-
-        m_sprite = nullptr;
     }
 
-    void Animation::AddFrame(const sf::IntRect &frame)
+    void Animation::AddFrame(const Frame &frame)
     {
         m_frames.push_back(frame);
+        if (m_frames.size() == 1)
+            SetFrame(0);
     }
 
     Gx::Sprite *Animation::GetSprite() const
     {
-        return m_sprite;
+        return m_sprite.get();
     }
 
-    void Animation::SetSprite(Gx::Sprite *sprite)
+    void Animation::SetSprite(Sprite *sprite)
     {
-        if (m_sprite)
-            delete m_sprite;
-
-        m_sprite = sprite;
+        m_sprite = std::unique_ptr<Sprite>(sprite);
     }
 
     void Animation::SetDuration(const sf::Time &duration)
@@ -114,7 +109,7 @@ namespace Gx
             if (m_currentFrame >= m_frames.size())
               m_currentFrame = 0;
 
-            m_sprite->SetTexCoords(m_frames[m_currentFrame]);
+            SetFrame(m_currentFrame);
         }
 
         UpdatableContainer::Update(delta);
@@ -126,9 +121,7 @@ namespace Gx
         if (!m_sprite)
             return states;
 
-        auto drawable = static_cast<sf::Drawable*>(m_sprite);
-        target.draw(*drawable, states);
-
+        target.draw(*m_sprite.get(), states);
         return RenderableContainer::Render(target, states);
     }
 
@@ -144,7 +137,19 @@ namespace Gx
         m_elapsed = sf::Time::Zero;
 
         m_currentFrame = 0;
-        if (m_frames.size() > 0)
-            m_sprite->SetTexCoords(m_frames[m_currentFrame]);
+        SetFrame(m_currentFrame);
+    }
+
+    void Animation::SetFrame(unsigned int frame)
+    {
+        if (frame >= 0 && frame < m_frames.size())
+        {
+            m_sprite->SetTexCoords(m_frames[m_currentFrame].TexCoords);
+
+            m_sprite->SetOrigin(m_frames[m_currentFrame].Origin);
+            m_sprite->SetPosition(m_frames[m_currentFrame].Position);
+            m_sprite->SetRotation(m_frames[m_currentFrame].Rotation);
+            m_sprite->SetScale(m_frames[m_currentFrame].Scale);
+        }
     }
 }

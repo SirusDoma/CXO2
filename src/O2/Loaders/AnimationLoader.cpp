@@ -17,20 +17,27 @@ std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *
     SpriteLoader::ParseSprite(json["attributes"], metadata);
 
     auto attributes = json.at("attributes");
-    metadata.Duration = sf::milliseconds(attributes["duration"].get<unsigned int>());
-    metadata.IsLoop = attributes["isLoop"].get<bool>();
-
-    auto frames = attributes.at("frames");
+    auto frames     = attributes.at("frames");
     for (auto frame : frames)
     {
-        unsigned int x, y, width, height;
-        frame.at("x").get_to(x);
-        frame.at("y").get_to(y);
-        frame.at("width").get_to(width);
-        frame.at("height").get_to(height);
+        SpriteMetadata frameMetadata;
+        SpriteLoader::ParseSprite(frame, frameMetadata);
 
-        metadata.Frames.push_back(sf::IntRect(x, y, width, height));
+        metadata.Frames.push_back(Gx::Animation::Frame
+        {
+            frameMetadata.TexCoords,
+            frameMetadata.Origin,
+            frameMetadata.Position,
+            frameMetadata.Rotation,
+            frameMetadata.Scale
+        });
     }
+
+    metadata.IsLoop = !attributes["isLoop"].empty() && attributes["isLoop"].get<bool>();
+    if (!attributes["duration"].empty())
+        metadata.Duration = sf::milliseconds(attributes["duration"].get<unsigned int>());
+    else
+        metadata.Duration = sf::milliseconds(metadata.Frames.size() * 65);
 
     return std::make_unique<AnimationMetadata>(metadata);
 }

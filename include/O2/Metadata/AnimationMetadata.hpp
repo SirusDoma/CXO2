@@ -9,9 +9,9 @@ struct AnimationMetadata : public SpriteMetadata
     AnimationMetadata() : Frames() {}
     virtual ~AnimationMetadata() {}
 
-    bool                     IsLoop;
-    sf::Time                 Duration;
-    std::vector<sf::IntRect> Frames;
+    bool     IsLoop;
+    sf::Time Duration;
+    std::vector<Gx::Animation::Frame> Frames;
 };
 
 #endif

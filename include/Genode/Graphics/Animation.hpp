@@ -14,11 +14,7 @@ namespace Gx
     class Animation : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
     {
     public:
-        Animation();
-        Animation(Sprite *sprite, const sf::Time& duration, std::initializer_list<sf::IntRect> frames);
-        virtual ~Animation();
-
-        enum AnimationState
+        enum class AnimationState
         {
             Initial,
             Playing,
@@ -26,9 +22,22 @@ namespace Gx
             Completed
         };
 
+        struct Frame
+        {
+            sf::IntRect  TexCoords;
+            sf::Vector2f Origin;
+            sf::Vector2f Position;
+            float        Rotation;
+            sf::Vector2f Scale;
+        };
+
+        Animation();
+        Animation(Sprite *sprite, const sf::Time& duration, std::initializer_list<Frame> frames);
+        virtual ~Animation();
+
         template<typename... Args>
-        void AddFrame(sf::IntRect first, Args... args);
-        void AddFrame(const sf::IntRect &frame);
+        void AddFrame(const Frame &first, Args... args);
+        void AddFrame(const Frame &frame);
 
         Gx::Sprite *GetSprite() const;
         void SetSprite(Gx::Sprite *sprite);
@@ -47,19 +56,20 @@ namespace Gx
         virtual void Stop();
         virtual void Reset();
 
-    protected:
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
 
     private:
-        Sprite *m_sprite;
+        void SetFrame(unsigned int index);
+
+        std::unique_ptr<Sprite> m_sprite;
         AnimationState m_state;
 
         sf::Time m_duration;
         sf::Time m_elapsed;
-        double m_currentFrame;
+        unsigned int m_currentFrame;
         bool m_loop;
-        std::vector<sf::IntRect> m_frames;
+        std::vector<Frame> m_frames;
     };
 }
 
