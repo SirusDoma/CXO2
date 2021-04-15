@@ -88,18 +88,6 @@ namespace Gx
 
         m_state    = AnimationState::Playing;
         m_elapsed += sf::milliseconds(delta);
-        if (m_elapsed >= m_duration)
-        {
-            if (!IsLoop())
-            {
-                m_state   = AnimationState::Completed;
-                m_elapsed = sf::Time::Zero;
-
-                return;
-            }
-
-            m_elapsed = sf::milliseconds(m_elapsed.asMilliseconds() % m_duration.asMilliseconds());
-        }
 
         auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / m_frames.size());
         if (m_elapsed >= frameTime)
@@ -107,7 +95,17 @@ namespace Gx
             m_elapsed %= frameTime;
             m_currentFrame++;
             if (m_currentFrame >= m_frames.size())
-              m_currentFrame = 0;
+            {
+                if (!IsLoop())
+                {
+                    m_state = AnimationState::Completed;
+                    m_elapsed = sf::Time::Zero;
+
+                    return;
+                }
+
+                m_currentFrame = 0;
+            }
 
             SetFrame(m_currentFrame);
         }
