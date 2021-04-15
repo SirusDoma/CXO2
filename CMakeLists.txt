@@ -28,20 +28,23 @@ add_subdirectory(extlibs/headers/clip)
 set(EXECUTABLE_NAME "OTwo")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
+# Compiler Flags
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fbracket-depth=512") # Required for magic enum
+
 # Specific OS Directories and Flags
 if(WIN32)
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
     # Windows (Visual Studio) Compiler Flags
-    set(SFML_STATIC_LIBRARIES TRUE)
-    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_DEBUG  ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
     )
 
     # External Libs Compiler Flags
+    set(SFML_STATIC_LIBRARIES TRUE)
+    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     # Set dependencies libs path
@@ -109,6 +112,10 @@ endif()
 
 # Link Clip
 target_link_libraries(${EXECUTABLE_NAME} clip)
+
+# Link Magic Enum
+find_package(magic_enum CONFIG REQUIRED)
+target_link_libraries(${EXECUTABLE_NAME} magic_enum::magic_enum)
 
 # Link SFML
 find_package(SFML 2.5.1 COMPONENTS audio graphics system window REQUIRED)
