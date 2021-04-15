@@ -25,6 +25,8 @@
 #include <O2/Loaders/UI/Components/OptionDialogLoader.hpp>
 #include <O2/Loaders/UI/Components/MarqueeLoader.hpp>
 
+#include <O2/Loaders/Character/ItemLoader.hpp>
+
 void O2Jam::OnStart()
 {
     // Render settings
@@ -59,6 +61,11 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
     Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
     Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
+    // Character
+    Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
+
+    // Register shared resource container
+    m_resources.Register<Item>();
 
     // Load global assets
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
