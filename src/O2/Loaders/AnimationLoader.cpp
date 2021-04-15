@@ -17,19 +17,33 @@ std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *
     SpriteLoader::ParseSprite(json["attributes"], metadata);
 
     auto attributes = json.at("attributes");
-    auto frames     = attributes.at("frames");
-    for (auto frame : frames)
+    auto frames     = attributes["frames"];
+    if (!frames.empty())
     {
-        SpriteMetadata frameMetadata;
-        SpriteLoader::ParseSprite(frame, frameMetadata);
+        for (auto frame : frames)
+        {
+            SpriteMetadata frameMetadata;
+            SpriteLoader::ParseSprite(frame, frameMetadata);
 
+            metadata.Frames.push_back(Gx::Animation::Frame
+            {
+                frameMetadata.TexCoords,
+                frameMetadata.Origin,
+                frameMetadata.Position,
+                frameMetadata.Rotation,
+                frameMetadata.Scale
+            });
+        }
+    }
+    else
+    {
         metadata.Frames.push_back(Gx::Animation::Frame
         {
-            frameMetadata.TexCoords,
-            frameMetadata.Origin,
-            frameMetadata.Position,
-            frameMetadata.Rotation,
-            frameMetadata.Scale
+            metadata.TexCoords,
+            metadata.Origin,
+            metadata.Position,
+            metadata.Rotation,
+            metadata.Scale
         });
     }
 
