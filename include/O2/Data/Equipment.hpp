@@ -45,10 +45,10 @@ namespace Equipment
     enum class Instrument
     {
         None,
-        Piano,
         Bass,
-        Drum,
-        Guitar
+        Guitar,
+        Piano,
+        Drum
     };
 }
 
