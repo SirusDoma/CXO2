@@ -1,5 +1,12 @@
 #include <O2/Character/Avatar.hpp>
 
+Avatar::Avatar() :
+    m_playerInfo(),
+    m_instrument(Equipment::Instrument::None),
+    m_items()
+{
+}
+
 Avatar::Avatar(Room::PlayerInfo playerInfo) :
     m_playerInfo(playerInfo),
     m_instrument(Equipment::Instrument::None),
@@ -12,7 +19,17 @@ const Room::PlayerInfo &Avatar::GetPlayerInfo() const
     return m_playerInfo;
 }
 
-void Avatar::Equip(Item *item)
+void Avatar::SetPlayerInfo(const Room::PlayerInfo &playerInfo)
+{
+    m_playerInfo = playerInfo;
+}
+
+bool Avatar::IsEquiped(const Item *item) const
+{
+    return m_items.find(item->GetType()) == m_items.end();
+}
+
+void Avatar::Equip(const Item *item)
 {
     if (item)
     {
@@ -31,7 +48,7 @@ void Avatar::Equip(Item *item)
     }
 }
 
-void Avatar::Unequip(Item *item)
+void Avatar::Unequip(const Item *item)
 {
     if (!item)
         return;
@@ -55,6 +72,16 @@ void Avatar::Unequip(Item *item)
 
         m_items.erase(iterator);
     }
+}
+
+const Equipment::Instrument &Avatar::GetEquipedInstrumentType() const
+{
+    return m_instrument;
+}
+
+const std::map<Equipment::Type, const Item *> &Avatar::GetEquipedItems() const
+{
+    return m_items;
 }
 
 void Avatar::Update(double delta)

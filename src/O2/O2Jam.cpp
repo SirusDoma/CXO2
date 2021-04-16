@@ -27,6 +27,7 @@
 
 #include <O2/Loaders/Character/ItemLoader.hpp>
 #include <O2/Loaders/Character/ItemDataLoader.hpp>
+#include <O2/Loaders/Character/AvatarLoader.hpp>
 
 #include <O2/Character/ItemFactory.hpp>
 
@@ -67,6 +68,7 @@ void O2Jam::OnStart()
     // Character
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
+    Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
 
     // Register shared resource container
     m_resources.Register<Item>();
@@ -78,9 +80,12 @@ void O2Jam::OnStart()
     m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/Planet.ojm");
 
-//    auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
-//    for (auto item : itemData->Items)
-//        m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
+    /** Uncomment to load all items at startup
+     *
+    auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
+    for (auto item : itemData->Items)
+        m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
+    */
 
     // Load application modules here
     ShareResources(m_resources);

@@ -12,11 +12,18 @@
 class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
+    Avatar();
     Avatar(Room::PlayerInfo playerInfo);
-    const Room::PlayerInfo &GetPlayerInfo() const;
 
-    void Equip(Item* item);
-    void Unequip(Item* item);
+    const Room::PlayerInfo &GetPlayerInfo() const;
+    void SetPlayerInfo(const Room::PlayerInfo& playerInfo);
+
+    bool IsEquiped(const Item* item) const;
+    void Equip(const Item* item);
+    void Unequip(const Item* item);
+
+    const std::map<Equipment::Type, const Item*> &GetEquipedItems() const;
+    const Equipment::Instrument &GetEquipedInstrumentType() const;
 
 private:
     constexpr static const Equipment::Type TYPE_RENDER_ORDER[] = {
@@ -64,9 +71,9 @@ private:
     virtual void Update(double delta);
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
-    Room::PlayerInfo                 m_playerInfo;
-    Equipment::Instrument            m_instrument;
-    std::map<Equipment::Type, Item*> m_items;
+    Room::PlayerInfo                       m_playerInfo;
+    Equipment::Instrument                  m_instrument;
+    std::map<Equipment::Type, const Item*> m_items;
 };
 
 #endif
