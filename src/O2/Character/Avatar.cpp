@@ -31,6 +31,32 @@ void Avatar::Equip(Item *item)
     }
 }
 
+void Avatar::Unequip(Item *item)
+{
+    if (!item)
+        return;
+
+    auto iterator = m_items.find(item->GetType());
+    if (iterator == m_items.end())
+        return;
+
+    if (iterator->second == item)
+    {
+        switch (item->GetType())
+        {
+            case Equipment::Type::Piano:
+            case Equipment::Type::Bass:
+            case Equipment::Type::Drum:
+            case Equipment::Type::Guitar:
+                m_instrument = Equipment::Instrument::None;
+                break;
+            default: break;
+        }
+
+        m_items.erase(iterator);
+    }
+}
+
 void Avatar::Update(double delta)
 {
     UpdatableContainer::Update(delta);
@@ -69,4 +95,3 @@ sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates state
 
     return RenderableContainer::Render(target, states);
 }
-
