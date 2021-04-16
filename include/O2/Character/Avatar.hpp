@@ -16,7 +16,9 @@ public:
     Avatar(Room::PlayerInfo playerInfo);
 
     const Room::PlayerInfo &GetPlayerInfo() const;
+
     void SetPlayerInfo(const Room::PlayerInfo& playerInfo);
+    void SetDefaultItem(const Item *item);
 
     bool IsEquiped(const Item* item) const;
     void Equip(const Item* item);
@@ -73,7 +75,7 @@ private:
 
     Room::PlayerInfo                       m_playerInfo;
     Equipment::Instrument                  m_instrument;
-    std::map<Equipment::Type, const Item*> m_items;
+    std::map<Equipment::Type, const Item*> m_items, m_defaultItems;
 };
 
 #endif

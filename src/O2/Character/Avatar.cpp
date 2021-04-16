@@ -3,14 +3,16 @@
 Avatar::Avatar() :
     m_playerInfo(),
     m_instrument(Equipment::Instrument::None),
-    m_items()
+    m_items(),
+    m_defaultItems()
 {
 }
 
 Avatar::Avatar(Room::PlayerInfo playerInfo) :
     m_playerInfo(playerInfo),
     m_instrument(Equipment::Instrument::None),
-    m_items()
+    m_items(),
+    m_defaultItems()
 {
 }
 
@@ -22,6 +24,16 @@ const Room::PlayerInfo &Avatar::GetPlayerInfo() const
 void Avatar::SetPlayerInfo(const Room::PlayerInfo &playerInfo)
 {
     m_playerInfo = playerInfo;
+}
+
+void Avatar::SetDefaultItem(const Item *item)
+{
+    if (item)
+    {
+        m_defaultItems[item->GetType()] = item;
+        if (auto it = m_items.find(item->GetType()); it == m_items.end())
+            Equip(item);
+    }
 }
 
 bool Avatar::IsEquiped(const Item *item) const
@@ -71,6 +83,10 @@ void Avatar::Unequip(const Item *item)
         }
 
         m_items.erase(iterator);
+
+        iterator = m_defaultItems.find(item->GetType());
+        if (iterator != m_items.end())
+            Equip(iterator->second);
     }
 }
 

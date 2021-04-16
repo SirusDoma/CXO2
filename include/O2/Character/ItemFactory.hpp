@@ -10,6 +10,7 @@ class ItemFactory
 {
 public:
     static void Initialize(Gx::ResourceManager &sharedResources);
+    static const std::map<Equipment::Type, Item*> GetDefaultItems(const Character::Gender &gender);
     static Item *GetItem(unsigned int id);
 
 private:
