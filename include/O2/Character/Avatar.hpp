@@ -14,7 +14,9 @@ class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public G
 public:
     Avatar(Room::PlayerInfo playerInfo);
     const Room::PlayerInfo &GetPlayerInfo() const;
+
     void Equip(Item* item);
+    void Unequip(Item* item);
 
 private:
     constexpr static const Equipment::Type TYPE_RENDER_ORDER[] = {
