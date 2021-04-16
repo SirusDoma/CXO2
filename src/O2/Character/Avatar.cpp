@@ -54,11 +54,11 @@ sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates state
     states.transform *= GetTransform();
     for (auto type : TYPE_RENDER_ORDER)
     {
-        auto find = m_items.find(type);
-        if (find == m_items.end())
+        auto iterator = m_items.find(type);
+        if (iterator == m_items.end())
             continue;
 
-        auto item = find->second;
+        auto item = iterator->second;
         for (auto renderType : PART_RENDER_ORDER)
         {
             auto animation = item->GetRenderableItem(m_playerInfo.Gender, renderType, m_instrument);
