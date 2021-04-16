@@ -28,6 +28,8 @@
 #include <O2/Loaders/Character/ItemLoader.hpp>
 #include <O2/Loaders/Character/ItemDataLoader.hpp>
 
+#include <O2/Character/ItemFactory.hpp>
+
 void O2Jam::OnStart()
 {
     // Render settings
@@ -71,13 +73,14 @@ void O2Jam::OnStart()
     m_resources.Register<ItemData>();
 
     // Load global assets
+    ItemFactory::Initialize(m_resources);
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/Planet.ojm");
 
-    auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
-    for (auto item : itemData->Items)
-        m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
+//    auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
+//    for (auto item : itemData->Items)
+//        m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
 
     // Load application modules here
     ShareResources(m_resources);

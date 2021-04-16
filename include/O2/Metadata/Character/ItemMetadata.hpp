@@ -6,9 +6,11 @@
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Shop.hpp>
 
+#include <Genode/IO/ResourceMetadata.hpp>
+
 #include <SFML/System/String.hpp>
 
-struct ItemMetadata : Gx::ResourceMetadata
+struct ItemMetadata : public Gx::ResourceMetadata
 {
     ItemMetadata() : References() {};
 
