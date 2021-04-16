@@ -15,19 +15,20 @@ const Room::PlayerInfo &Avatar::GetPlayerInfo() const
 void Avatar::Equip(Item *item)
 {
     if (item)
-        m_items[item->GetType()] = item;
-
-    switch (item->GetType())
     {
-        case Equipment::Type::Piano:  m_instrument = Equipment::Instrument::Piano;  break;
-        case Equipment::Type::Bass:   m_instrument = Equipment::Instrument::Bass;   break;
-        case Equipment::Type::Drum:   m_instrument = Equipment::Instrument::Drum;   break;
-        case Equipment::Type::Guitar: m_instrument = Equipment::Instrument::Guitar; break;
-        default: break;
-    }
+        m_items[item->GetType()] = item;
+        switch (item->GetType())
+        {
+            case Equipment::Type::Piano:  m_instrument = Equipment::Instrument::Piano;  break;
+            case Equipment::Type::Bass:   m_instrument = Equipment::Instrument::Bass;   break;
+            case Equipment::Type::Drum:   m_instrument = Equipment::Instrument::Drum;   break;
+            case Equipment::Type::Guitar: m_instrument = Equipment::Instrument::Guitar; break;
+            default: break;
+        }
 
-    //for (auto [_, item] : m_items)
-    //    item->ResetRenderables();
+        //for (auto [_, item] : m_items)
+        //    item->ResetRenderables();
+    }
 }
 
 void Avatar::Update(double delta)
