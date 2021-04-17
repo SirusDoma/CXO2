@@ -62,4 +62,8 @@ namespace Gx
 
         return nullptr;
     }
+
+    void Mixer::Update(double delta)
+    {
+    }
 }

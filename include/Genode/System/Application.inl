@@ -1,25 +1,28 @@
 namespace Gx
 {
     template<typename T>
-    bool Application::Install()
+    T *Application::Install()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
-        return Install(new T());
+        return Install(std::make_unique<T>());
     }
 
     template<typename T>
-    bool Application::Install(T* mod)
+    T *Application::Install(T *instance)
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
 
         auto target = GetModule<T>();
         if (!target)
         {
-            m_modules.push_back(static_cast<Module*>(mod));
-            return true;
+            auto ptr = std::unique_ptr<Module>(static_cast<Module*>(instance));
+            auto mod = ptr.get();
+            m_modules.push_back(std::move(ptr));
+
+            return dynamic_cast<T*>(mod);
         }
 
-        return false;
+        return nullptr;
     }
 
     template<typename T>
@@ -29,12 +32,10 @@ namespace Gx
 
         for (size_t i = 0; i < m_modules.size(); i++)
         {
-            T* target = dynamic_cast<T*>(m_modules.at(i));
+            T* target = dynamic_cast<T*>(m_modules.at(i).get());
             if (target)
             {
                 m_modules.erase(m_modules.begin() + i);
-
-                delete target;
                 return true;
             }
         }
@@ -46,9 +47,9 @@ namespace Gx
     T* Application::GetModule() const
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
-        for (auto mod : m_modules)
+        for (auto &mod : m_modules)
         {
-            auto target = dynamic_cast<T*>(mod);
+            auto target = dynamic_cast<T*>(mod.get());
             if (target)
             {
                 return target;

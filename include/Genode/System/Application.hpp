@@ -10,6 +10,9 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Audio/Mixer.hpp>
 
+#include <vector>
+#include <memory>
+
 namespace Gx
 {
     class Scene;
@@ -33,10 +36,10 @@ namespace Gx
         void SetCursor(const Cursor &cursor);
 
         template<typename T>
-        bool Install();
+        T *Install();
 
         template<typename T>
-        bool Install(T *instance);
+        T *Install(T *instance);
 
         template<typename T>
         bool Uninstall();
@@ -72,7 +75,7 @@ namespace Gx
         sf::Clock m_timer;
         Cursor m_cursor;
 
-        std::vector<Module *> m_modules;
+        std::vector<std::unique_ptr<Module>> m_modules;
 
         unsigned int m_frames;
         unsigned int m_renderFreq;

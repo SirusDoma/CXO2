@@ -83,7 +83,7 @@ namespace Gx
             delta = end - start;
 
             // Update installed modules
-            for (auto mod : m_modules)
+            for (auto &mod : m_modules)
             {
                 if (mod && mod->CheckFrequency(delta))
                     mod->Update(delta);

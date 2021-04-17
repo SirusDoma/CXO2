@@ -9,7 +9,7 @@ namespace Gx
     class Module : public virtual Updatable
     {
     public:
-        friend class Application;
+        virtual ~Module();
 
         double GetFrequency() const;
         void SetFrequency(double freq);
@@ -17,9 +17,9 @@ namespace Gx
     protected:
         Module();
         Module(double freq);
-        virtual ~Module();
 
     private:
+        friend class Application;
         bool CheckFrequency(double delta);
 
         double m_frequency;

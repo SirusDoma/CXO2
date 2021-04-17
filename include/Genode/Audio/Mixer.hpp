@@ -5,6 +5,7 @@
 
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceManager.hpp>
+#include <Genode/System/Module.hpp>
 
 #include <vector>
 #include <memory>
@@ -15,7 +16,7 @@ namespace Gx
     class SoundGroup;
     using SoundGroupContainer  = std::unordered_map<std::string, ResourcePtr<SoundGroup>>;
 
-    class Mixer
+    class Mixer : public Module
     {
     public:
         friend class SceneDirector;
@@ -24,11 +25,13 @@ namespace Gx
         virtual ~Mixer();
 
         sf::SoundSource* Play(sf::SoundSource *source, const std::string &group = "default");
+        SoundGroup *GetGroup(const std::string &name);
+
         void Pause(const std::string &group);
         void Stop(const std::string &group);
         void StopAll();
 
-        SoundGroup *GetGroup(const std::string &name);
+        virtual void Update(double delta);
 
     private:
         SoundGroupContainer  m_groups;
