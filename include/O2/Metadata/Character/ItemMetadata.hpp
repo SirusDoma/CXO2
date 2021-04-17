@@ -17,7 +17,7 @@ struct ItemMetadata : public Gx::ResourceMetadata
     struct ItemSpriteMetadata
     {
         Character::Gender     Gender;
-        Equipment::RenderPart RenderType;
+        Equipment::RenderPart RenderPart;
         Equipment::Instrument Instrument;
         std::string           Reference;
     };

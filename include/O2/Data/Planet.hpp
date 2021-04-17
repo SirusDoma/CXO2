@@ -7,7 +7,7 @@ namespace Planet
 {
     enum class Planet
     {
-        None,
+        Unknown,
         O2Planet,
         Aqua,
         Eliten,

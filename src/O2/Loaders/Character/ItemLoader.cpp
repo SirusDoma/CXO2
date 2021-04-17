@@ -57,7 +57,7 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
         }
 
         auto gender     = Character::Gender::Male;
-        auto renderType = Equipment::RenderPart::Body;
+        auto renderPart = Equipment::RenderPart::Body;
         auto instrument = Equipment::Instrument::None;
 
         for (auto [genderKey, partAttributes] : require.items())
@@ -72,7 +72,7 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
             {
                 key = Gx::StringHelper::ToPascalCase(partKey);
                 if (auto parse = magic_enum::enum_cast<Equipment::RenderPart>( std::string(key)); parse.has_value())
-                    renderType = parse.value();
+                    renderPart = parse.value();
                 else
                     continue;
 
@@ -88,7 +88,7 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
                     else
                         continue;
 
-                    metadata.References.push_back(ItemMetadata::ItemSpriteMetadata{gender, renderType, instrument, reference.get<std::string>()});
+                    metadata.References.push_back(ItemMetadata::ItemSpriteMetadata{gender, renderPart, instrument, reference.get<std::string>()});
                 }
             }
         }

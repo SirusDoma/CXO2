@@ -17,7 +17,7 @@ const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Chara
         "Avatar/default/LeftArm.json",
         "Avatar/default/LeftHand.json",
         "Avatar/default/RightArm.json",
-        "Avatar/default/RightHand.json",
+        "Avatar/default/RightHand.json"
     };
 
     for (auto name : names)
@@ -27,17 +27,36 @@ const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Chara
             items[item->GetType()] = item;
     }
 
-    std::string name = "";
+    names = {};
     if (gender == Character::Gender::Male)
-        name = "Avatar/default/Face_Male.json";
-    else if (gender == Character::Gender::Female)
-        name = "Avatar/default/Face_Female.json";
-
-    if (!name.empty())
     {
-        auto item = m_resources->Load<Item>(name);
-        if (item)
-            items[item->GetType()] = item;
+        names = {
+            "Avatar/default/Male/Face.json",
+            "Avatar/default/Male/Hair.json",
+            "Avatar/default/Male/Jacket.json",
+            "Avatar/default/Male/Pants.json",
+            "Avatar/default/Male/Shoes.json"
+        };
+    }
+    else if (gender == Character::Gender::Female)
+    {
+        names = {
+            "Avatar/default/Female/Face.json",
+            "Avatar/default/Female/Hair.json",
+            "Avatar/default/Female/Jacket.json",
+            "Avatar/default/Female/Pants.json",
+            "Avatar/default/Female/Shoes.json"
+        };
+    }
+
+    if (names.size() > 0)
+    {
+        for (auto name : names)
+        {
+            auto item = m_resources->Load<Item>(name);
+            if (item)
+                items[item->GetType()] = item;
+        }
     }
 
     return items;

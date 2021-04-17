@@ -45,6 +45,9 @@ void Avatar::Equip(const Item *item)
 {
     if (item)
     {
+        if (item->GetGender() != Character::Gender::Any && item->GetGender() != m_playerInfo.Gender)
+            return;
+
         m_items[item->GetType()] = item;
         switch (item->GetType())
         {
@@ -54,9 +57,6 @@ void Avatar::Equip(const Item *item)
             case Equipment::Type::Guitar: m_instrument = Equipment::Instrument::Guitar; break;
             default: break;
         }
-
-        //for (auto [_, item] : m_items)
-        //    item->ResetRenderables();
     }
 }
 
