@@ -6,6 +6,8 @@
 #include <O2/States/StatePlanet.hpp>
 #include <O2/States/Components/Room/Marquee.hpp>
 
+#include <O2/Character/ItemFactory.hpp>
+
 #include <iostream>
 
 StateRoom::StateRoom(Planet::MusicHall hall, Planet::ChannelInfo channel) :
@@ -45,7 +47,7 @@ void StateRoom::Initialize()
     AddChild(channelNumber);
 
     auto marquee = Create<Marquee>("Interface/Metadata/State/Room/Marquee.json");
-    marquee->SetString("Welcome to O2Jam (Live?). Official Website: https://live.o2jam.asia");
+    marquee->SetString("Welcome to O2Jam! Let's play together~");
     AddChild(marquee);
 
     m_optionDialog = Create<OptionDialog>("Interface/Metadata/Dialog/Option.json");
@@ -132,6 +134,12 @@ void StateRoom::Initialize()
     btnBack->SetClickCallback([this] (auto& sender, auto& ev) { OnExitPlanet(); });
     AddChild(btnBack);
 
+    auto player = players[0];
+    player.Gender = Character::Gender::Male;
+    m_avatar = Create<Avatar>("Interface/Metadata/State/Room/Avatar.json");
+    m_avatar->SetPlayerInfo(player);
+    AddChild(m_avatar);
+
     m_bgm = Create<sf::Music>("Interface/Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
     Play(m_bgm);
 }
@@ -139,4 +147,15 @@ void StateRoom::Initialize()
 void StateRoom::OnExitPlanet()
 {
     QueueSceneEvent([this] { GetDirector().SetScene(new StatePlanet(false)); });
+}
+
+void StateRoom::Update(double delta)
+{
+    Scene::Update(delta);
+}
+
+sf::RenderStates StateRoom::Render(sf::RenderTarget &target, sf::RenderStates states) const
+{
+    states = Scene::Render(target, states);
+    return states;
 }
