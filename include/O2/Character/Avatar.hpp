@@ -28,7 +28,7 @@ public:
     const Equipment::Instrument &GetEquipedInstrumentType() const;
 
 private:
-    constexpr static const Equipment::Type TYPE_RENDER_ORDER[] = {
+    constexpr static const Equipment::Type RENDER_TYPE_ORDER[] = {
         Equipment::Type::Wings,
         Equipment::Type::Body,
         Equipment::Type::LeftArm,
@@ -55,11 +55,11 @@ private:
         Equipment::Type::Pet,
     };
 
-    constexpr static const Equipment::RenderType PART_RENDER_ORDER[] = {
-        Equipment::RenderType::Body,
-        Equipment::RenderType::LeftArm,
-        Equipment::RenderType::RightArm,
-        Equipment::RenderType::Head
+    constexpr static const Equipment::RenderPart RENDER_PART_ORDER[] = {
+        Equipment::RenderPart::Cape,
+        Equipment::RenderPart::Body,
+        Equipment::RenderPart::LeftArm,
+        Equipment::RenderPart::RightArm,
     };
 
     constexpr static const Equipment::Instrument INSTRUMENT_RENDER_ORDER[] = {

@@ -29,17 +29,21 @@ namespace Equipment
         MusicalAccessories,
         Pet,
         HairAccessories,
-        AttributiveItem
+        AttributiveItem,
+        NicknameChanger,
+        PenaltyResetter,
+        BagExpansion,
+        Costume
     };
 
-    enum class RenderType
+    enum class RenderPart
     {
         SmallPreview,
         LargePreview,
         Body,
         RightArm,
         LeftArm,
-        Head
+        Cape
     };
 
     enum class Instrument

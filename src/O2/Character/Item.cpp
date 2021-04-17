@@ -2,6 +2,7 @@
 
 
 Item::Item() :
+    m_prices(),
     m_smallPreview(),
     m_largePreview(),
     m_renderables()
@@ -58,26 +59,6 @@ void Item::SetIsNew(bool isNew)
     m_isNew = isNew;
 }
 
-Shop::Currency Item::GetPriceCurrency() const
-{
-    return m_priceCurrency;
-}
-
-void Item::SetPriceCurrency(Shop::Currency currency)
-{
-    m_priceCurrency = currency;
-}
-
-unsigned int Item::GetPrice() const
-{
-    return m_price;
-}
-
-void Item::SetPrice(unsigned int price)
-{
-    m_price = price;
-}
-
 const sf::String &Item::GetName() const
 {
     return m_name;
@@ -96,6 +77,25 @@ const sf::String &Item::GetDescription() const
 void Item::SetDescription(const sf::String &description)
 {
     m_description = description;
+}
+
+bool Item::IsBuyableWith(const Shop::Currency &currency) const
+{
+    return m_prices.find(currency) != m_prices.end();
+}
+
+unsigned int Item::GetPrice(const Shop::Currency &currency) const
+{
+    auto iterator = m_prices.find(currency);
+    if (iterator != m_prices.end())
+        return iterator->second;
+
+    return 0;
+}
+
+void Item::SetPrice(const Shop::Currency &currency, unsigned int price)
+{
+    m_prices[currency] = price;
 }
 
 const Gx::Sprite *Item::GetSmallPreview() const
@@ -120,13 +120,13 @@ void Item::SetLargePreview(Gx::ResourcePtr<Gx::Sprite> largePreview)
         m_largePreview = std::move(largePreview);
 }
 
-void Item::SetRenderableItem(Character::Gender gender, Equipment::RenderType renderType, Equipment::Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)
+void Item::SetRenderableItem(Character::Gender gender, Equipment::RenderPart renderType, Equipment::Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)
 {
     if (animation)
         m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
 }
 
-Gx::Animation *Item::GetRenderableItem(Character::Gender gender, Equipment::RenderType renderType, Equipment::Instrument instrument) const
+Gx::Animation *Item::GetRenderableItem(Character::Gender gender, Equipment::RenderPart renderType, Equipment::Instrument instrument) const
 {
     auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
     if (find != m_renderables.end())
@@ -134,6 +134,16 @@ Gx::Animation *Item::GetRenderableItem(Character::Gender gender, Equipment::Rend
 
     return nullptr;
 }
+
+std::vector<Gx::Animation *> Item::GetRenderables() const
+{
+    auto renderables = std::vector<Gx::Animation *>();
+    for (auto& [_, renderable] : m_renderables)
+        renderables.push_back(renderable.get());
+
+    return renderables;
+}
+
 
 void Item::ResetRenderables()
 {

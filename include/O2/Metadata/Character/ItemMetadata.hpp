@@ -17,7 +17,7 @@ struct ItemMetadata : public Gx::ResourceMetadata
     struct ItemSpriteMetadata
     {
         Character::Gender     Gender;
-        Equipment::RenderType RenderType;
+        Equipment::RenderPart RenderType;
         Equipment::Instrument Instrument;
         std::string           Reference;
     };
@@ -27,9 +27,8 @@ struct ItemMetadata : public Gx::ResourceMetadata
     Planet::Planet    Origin;
     Character::Gender Gender;
     bool              IsNew;
-    Shop::Currency    PriceCurrency;
-    unsigned int      Price;
     sf::String        Name, Description, SmallPreview, LargePreview;
+    std::map<Shop::Currency, unsigned int> Prices;
     std::vector<ItemSpriteMetadata> References;
 };
 

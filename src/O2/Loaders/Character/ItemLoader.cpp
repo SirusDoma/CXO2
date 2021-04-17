@@ -37,13 +37,11 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
         auto price =  attributes["price"];
         if (!price.empty())
         {
-            if (auto parse = magic_enum::enum_cast<Shop::Currency>(price["currency"].get<std::string>()); parse.has_value())
+            for (auto [priceKey, priceValue] : price.items())
             {
-                metadata.PriceCurrency = parse.value();
-                if (metadata.PriceCurrency == Shop::Currency::Gem)
-                    metadata.Price = price["gem"].get<unsigned int>();
-                else
-                    metadata.Price = price["mCash"].get<unsigned int>();
+                std::string currencyString = Gx::StringHelper::ToPascalCase(priceKey);
+                if (auto parse = magic_enum::enum_cast<Shop::Currency>(currencyString); parse.has_value())
+                    metadata.Prices[parse.value()] = priceValue.get<unsigned int>();
             }
         }
     }
@@ -59,7 +57,7 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
         }
 
         auto gender     = Character::Gender::Male;
-        auto renderType = Equipment::RenderType::Body;
+        auto renderType = Equipment::RenderPart::Body;
         auto instrument = Equipment::Instrument::None;
 
         for (auto [genderKey, partAttributes] : require.items())
@@ -73,7 +71,7 @@ std::unique_ptr<Gx::ResourceMetadata> ItemLoader::LoadMetadata(const void *data,
             for (auto [partKey, instrumentAttributes] : partAttributes.items())
             {
                 key = Gx::StringHelper::ToPascalCase(partKey);
-                if (auto parse = magic_enum::enum_cast<Equipment::RenderType>( std::string(key)); parse.has_value())
+                if (auto parse = magic_enum::enum_cast<Equipment::RenderPart>( std::string(key)); parse.has_value())
                     renderType = parse.value();
                 else
                     continue;
@@ -113,8 +111,9 @@ Gx::ResourcePtr<Item> ItemLoader::Load(const Gx::ResourceMetadata &metadata, con
     item->SetType(spec->EquipmentType);
     item->SetGender(spec->Gender);
     item->SetOrigin(spec->Origin);
-    item->SetPriceCurrency(spec->PriceCurrency);
-    item->SetPrice(spec->Price);
+
+    for (auto [currency, price] : spec->Prices)
+        item->SetPrice(currency, price);
 
     if (!spec->SmallPreview.isEmpty())
         item->SetSmallPreview(context.Resources->Resolve<Gx::Sprite>(spec->SmallPreview));
@@ -127,7 +126,7 @@ Gx::ResourcePtr<Item> ItemLoader::Load(const Gx::ResourceMetadata &metadata, con
         auto animation = context.Resources->Resolve<Gx::Animation>(ref.Reference);
         animation->SetLoop(true);
 
-        item->SetRenderableItem(ref.Gender, ref.RenderType, ref.Instrument, std::move(animation));
+        item->SetRenderableItem(ref.Gender, ref.RenderPart, ref.Instrument, std::move(animation));
     }
 
     return item;
