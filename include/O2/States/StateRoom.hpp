@@ -15,6 +15,8 @@
 
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Room.hpp>
+#include <O2/Character/Item.hpp>
+#include <O2/Character/Avatar.hpp>
 
 class RoomButton;
 class StateRoom : public State
@@ -24,11 +26,16 @@ public:
     virtual void Initialize();
 
 private:
+    virtual void Update(double delta);
+    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+
     void OnExitPlanet();
 
     sf::Music *m_bgm;
     Planet::MusicHall m_hall;
     Planet::ChannelInfo m_channel;
+    Avatar *m_avatar;
+    Item *m_item;
 
     OptionDialog *m_optionDialog;
 
