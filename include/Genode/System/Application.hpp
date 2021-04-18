@@ -4,10 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include <Genode/System/Config.hpp>
 #include <Genode/System/Module.hpp>
 #include <Genode/Graphics/Cursor.hpp>
-#include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Audio/Mixer.hpp>
 
@@ -18,9 +16,8 @@
 namespace Gx
 {
     class Scene;
-
     class SceneDirector;
-
+    class Config;
     class Application
     {
     public:

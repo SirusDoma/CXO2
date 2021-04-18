@@ -1,6 +1,7 @@
 ﻿#include <Genode/System/Application.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
+#include <Genode/System/Config.hpp>
 
 namespace Gx
 {
