@@ -31,8 +31,12 @@
 
 #include <O2/Character/ItemFactory.hpp>
 
+#include <O2/Config/GameConfig.hpp>
+
 void O2Jam::OnStart()
 {
+    auto config = GameConfig();
+
     // Render settings
     auto& window = GetRenderWindow();
     window.setVerticalSyncEnabled(true);
@@ -69,6 +73,14 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
     Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
+
+    // Setup configuration
+    SetConfigResolver<GameConfig>([] (auto &app)
+    {
+        // TODO: Load game config from file
+        auto config = std::make_unique<GameConfig>();
+        return config;
+    });
 
     // Register shared resource container
     m_resources.Register<Item>();

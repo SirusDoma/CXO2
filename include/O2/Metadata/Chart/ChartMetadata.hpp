@@ -5,8 +5,8 @@
 
 enum Difficulty
 {
-    Easy   = 0,
-    Normal = 1,
+    Easy,
+    Normal,
     Hard,
     Master
 };
