@@ -64,17 +64,17 @@ namespace Gx
         while (m_window.isOpen())
         {
             // Poll window event
-            m_event = sf::Event();
-            while (m_window.pollEvent(m_event))
+            auto event = sf::Event();
+            while (m_window.pollEvent(event))
             {
                 // Call window event handlers based on received event
-                switch (m_event.type)
+                switch (event.type)
                 {
                     case sf::Event::Closed:      OnClose();             break;
                     case sf::Event::GainedFocus: OnFocusChanged(true);  break;
                     case sf::Event::LostFocus:   OnFocusChanged(false); break;
-                    case sf::Event::Resized:     OnResized(m_event.size);    break;
-                    default:                     OnInputReceived(m_event);   break;
+                    case sf::Event::Resized:     OnResized(event.size);    break;
+                    default:                     OnInputReceived(event);   break;
                 }
             }
 
@@ -127,17 +127,11 @@ namespace Gx
         return m_window;
     }
 
-    sf::Event Application::GetLastEvent() const
-    {
-        return m_event;
-    }
-
     void Application::ShareResources(ResourceManager &resources)
     {
         if (m_director)
             m_director->SetSharedResources(resources);
     }
-
 
     void Application::UseMixer(Mixer &mixer)
     {
@@ -166,11 +160,12 @@ namespace Gx
         m_window.setMouseCursor(*m_cursor.GetHandle());
     }
 
-    void Application::OnClose()
+    void Application::OnFocusChanged(bool focus)
     {
-        // Ask game permission first before closing
-        if (m_director->Close()) 
-            m_window.close();
+    }
+
+    void Application::OnResized(sf::Event::SizeEvent ev)
+    {
     }
 
     void Application::OnInputReceived(sf::Event ev)
@@ -220,7 +215,6 @@ namespace Gx
         }
 
         // Pass input into active scene via director
-        m_event = ev;
         m_director->Input(ev);
 
         // Move cursor
@@ -236,12 +230,11 @@ namespace Gx
         //    m_cursor.setTextureRect(sf::IntRect(0, 0, m_cursorFrame->width, m_cursorFrame->height));
     }
 
-    void Application::OnFocusChanged(bool focus)
+    void Application::OnClose()
     {
-    }
-
-    void Application::OnResized(sf::Event::SizeEvent ev)
-    {
+        // Ask game permission first before closing
+        if (m_director->Close())
+            m_window.close();
     }
 
     Application::operator sf::RenderTarget&() const
