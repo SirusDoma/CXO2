@@ -13,16 +13,26 @@ namespace Gx
     class Image : public virtual Control, public virtual Sprite
     {
     public:
+        struct Frame
+        {
+            sf::IntRect  TexCoords;
+            sf::Vector2f Origin;
+            sf::Vector2f Position;
+            float        Rotation;
+            sf::Vector2f Scale;
+        };
+
         using Sprite::Sprite;
         virtual ~Image();
 
         virtual const sf::FloatRect GetLocalBounds() const;
 
         unsigned int GetFrameCount() const;
-        const sf::IntRect &GetFrame(const std::string &name);
-        const sf::IntRect &GetFrame(unsigned int index);
+        const Frame *GetFrame(const std::string &name);
+        const Frame *GetFrame(unsigned int index);
 
         void AddFrame(const std::string &name, const sf::IntRect &texCoords);
+        void AddFrame(const std::string &name, const Frame &frame);
         void SetFrame(const std::string &name);
         void SetFrame(unsigned int index);
 
@@ -33,7 +43,9 @@ namespace Gx
         virtual void Invalidate();
 
     private:
-        std::unordered_map<std::string, sf::IntRect> m_frames;
+        void ApplyFrame(const Frame &frame);
+
+        std::unordered_map<std::string, Frame> m_frames;
     };
 }
 

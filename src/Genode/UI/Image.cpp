@@ -16,15 +16,18 @@ namespace Gx
         return m_frames.size() > 0 ? m_frames.size() : 1;
     }
 
-    const sf::IntRect &Image::GetFrame(const std::string &name)
+    const Image::Frame *Image::GetFrame(const std::string &name)
     {
-        return m_frames[name];
+        if (auto it = m_frames.find(name); it != m_frames.end())
+            return &it->second;
+
+        return nullptr;
     }
 
-    const sf::IntRect &Image::GetFrame(unsigned int index)
+    const Image::Frame *Image::GetFrame(unsigned int index)
     {
         if (index < 0 || index >= m_frames.size())
-            return GetTexCoords();
+            return nullptr;
 
         unsigned int it = 0;
         for (auto [name, _] : m_frames)
@@ -35,25 +38,45 @@ namespace Gx
             it++;
         }
 
-        return GetTexCoords();
+        return nullptr;
     }
 
     void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)
     {
-        m_frames[name] = texCoords;
+        m_frames[name] = Frame{texCoords};
+        if (GetTexCoords() == sf::IntRect())
+            SetFrame(name);
+    }
+
+    void Image::AddFrame(const std::string &name, const Image::Frame &frame)
+    {
+        m_frames[name] = frame;
         if (GetTexCoords() == sf::IntRect())
             SetFrame(name);
     }
 
     void Image::SetFrame(const std::string &name)
     {
-        SetTexCoords(GetFrame(name));
-        Invalidate();
+        if (auto frame = GetFrame(name); frame)
+            ApplyFrame(*frame);
     }
 
     void Image::SetFrame(unsigned int index)
     {
-        SetTexCoords(GetFrame(index));
+        if (auto frame = GetFrame(index); frame)
+            ApplyFrame(*frame);
+    }
+
+    void Image::ApplyFrame(const Image::Frame &frame)
+    {
+        SetTexCoords(frame.TexCoords);
+
+        SetOrigin(frame.Origin);
+        SetPosition(frame.Position);
+        SetRotation(frame.Rotation);
+        SetScale(frame.Scale);
+
+        Invalidate();
     }
 
     void Image::Update(double delta)

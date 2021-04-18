@@ -16,7 +16,7 @@ struct ImageMetadata : public SpriteMetadata
     ImageMetadata() : Frames() {}
     virtual ~ImageMetadata() {}
 
-    std::unordered_map<std::string, sf::IntRect> Frames;
+    std::unordered_map<std::string, Gx::Image::Frame> Frames;
 };
 
 #endif

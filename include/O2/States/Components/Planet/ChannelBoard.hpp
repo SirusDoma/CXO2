@@ -42,6 +42,7 @@ public:
     void SetEnterChannelCallback(std::function<void(Planet::MusicHall, Planet::ChannelInfo)> callback);
 
 private:
+    // TODO: Use Gx::List count
     constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
 
     void CaptureCurrentState();
@@ -53,13 +54,14 @@ private:
 
     Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
     Gx::Button      *m_channelTabButton, *m_noticeTabButton;
-    Gx::UiContainer *m_channelListContainer;
     Gx::List        *m_list;
     Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
 
     Gx::Scene         *m_scene;
     sf::SoundSource   *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
     sf::RenderTexture m_renderTexture;
+
+    std::unique_ptr<Gx::UiContainer> m_channelListContainer;
 
     sf::Vector2f m_position;
     Planet::PlanetInfo m_planetInfo;

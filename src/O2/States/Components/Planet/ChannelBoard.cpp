@@ -23,6 +23,8 @@ ChannelBoard::ChannelBoard() :
 
 void ChannelBoard::Initialize(Gx::Scene &scene)
 {
+    // TODO: CHANNEL BOARD LOADER
+
     m_scene      = &scene;
     m_background = scene.Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Background.json");
     m_position   = m_background->GetPosition();
@@ -37,7 +39,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     m_sfxNavigate = scene.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/ChannelNavigation.json", Gx::ResourceScope::Shared);
     m_sfxEnter    = scene.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/ChannelEnter.json", Gx::ResourceScope::Shared);
 
-    m_channelListContainer = new Gx::UiContainer();
+    m_channelListContainer = std::make_unique<Gx::UiContainer>();
     m_channelTabButton = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
     m_channelTabButton->SetClickCallback([=] (auto& sender, auto& ev) {
         if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Hall != Planet::MusicHall::None)
@@ -50,6 +52,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     m_currentPageNumber = scene.Create<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/ChannelCurrentPageNumber.json");
     m_maxPageNumber     = scene.Create<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
     m_currentPageNumber->SetDigitCount(2);
+    m_currentPageNumber->SetValue(1);
     m_maxPageNumber->SetDigitCount(2);
 
     auto btnChannelEnter = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
@@ -125,7 +128,7 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
     m_duplicateImage.SetPosition(m_position);
     m_duplicateImage.SetVisible(false);
 
-    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer, m_notice, m_currentPageNumber, m_maxPageNumber, btnChannelLeft, btnChannelRight);
+    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer.get(), m_notice, m_currentPageNumber, m_maxPageNumber, btnChannelLeft, btnChannelRight);
 }
 
 const sf::FloatRect ChannelBoard::GetLocalBounds() const
