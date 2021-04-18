@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include <Genode/System/Config.hpp>
 #include <Genode/System/Module.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
@@ -11,6 +12,7 @@
 #include <Genode/Audio/Mixer.hpp>
 
 #include <vector>
+#include <functional>
 #include <memory>
 
 namespace Gx
@@ -32,8 +34,13 @@ namespace Gx
         void Close();
 
         unsigned int GetRenderFrequency() const;
-        sf::Event GetLastEvent() const;
         void SetCursor(const Cursor &cursor);
+
+        template<typename T>
+        T &GetConfig();
+
+        template<typename T>
+        void SetConfigResolver(std::function<std::unique_ptr<T>(const Application&)> resolver);
 
         template<typename T>
         T *Install();
@@ -53,15 +60,18 @@ namespace Gx
         sf::RenderWindow &GetRenderWindow() const;
 
         virtual void OnStart();
-        virtual void OnClose();
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
         virtual void OnInputReceived(sf::Event ev);
+        virtual void OnClose();
 
         void ShareResources(ResourceManager &resources);
         void UseMixer(Mixer &mixer);
 
     private:
+        using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
+        using ConfigResolverMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Config>(const Application&)>>;
+
         mutable sf::RenderWindow m_window;
         sf::Event m_event;
 
@@ -74,6 +84,9 @@ namespace Gx
 
         sf::Clock m_timer;
         Cursor m_cursor;
+
+        ConfigMap         m_configs;
+        ConfigResolverMap m_configResolvers;
 
         std::vector<std::unique_ptr<Module>> m_modules;
 

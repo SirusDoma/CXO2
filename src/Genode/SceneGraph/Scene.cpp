@@ -56,7 +56,7 @@ namespace Gx
 
     Application &Scene::GetApplication() const
     {
-        return GetDirector().GetApplication();
+        return m_director->GetApplication();
     }
 
     SceneDirector& Scene::GetDirector() const
@@ -99,7 +99,7 @@ namespace Gx
         if (!m_overlays.empty())
             m_overlays.pop_back();
 
-        Input(GetApplication().GetLastEvent());
+        Input(m_lastInput);
     }
 
     void Scene::QueueSceneEvent(std::function<void()> evt)
@@ -187,6 +187,7 @@ namespace Gx
 
     bool Scene::Input(sf::Event ev)
     {
+        m_lastInput = ev;
         if (!m_overlays.empty())
         {
             auto inputable = dynamic_cast<Inputable*>(m_overlays.back());

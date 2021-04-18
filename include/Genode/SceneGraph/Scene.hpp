@@ -81,6 +81,8 @@ namespace Gx
 
         SceneDirector     *m_director;
         std::vector<Node*> m_overlays;
+
+        sf::Event m_lastInput;
         std::queue<std::function<void()>> m_events;
 
         void SetDirector(SceneDirector& director);
