@@ -99,14 +99,18 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::Load(const Gx::ResourceMetadata &metadat
 
     auto image = std::make_unique<Gx::Image>();
     image->SetName(context.Name);
-    image->SetTexCoords(spec->TexCoords);
     image->SetColor(spec->Color);
+
+    if (spec->Frames.size() > 0)
+    {
+        for (auto frame : spec->Frames)
+            image->AddFrame(frame.first, frame.second);
+    }
+    else
+        image->SetTexCoords(spec->TexCoords);
 
     if (context.Texture)
         image->SetTexture(*context.Texture);
-
-    for (auto frame : spec->Frames)
-        image->AddFrame(frame.first, frame.second);
 
     image->SetOrigin(spec->Origin);
     image->SetPosition(spec->Position);
