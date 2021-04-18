@@ -49,8 +49,8 @@ void TransformLoader::ParseTransform(Json attributes, TransformMetadata &metadat
     auto scale = sf::Vector2f(1.f, 1.f);
     if (s != attributes.end())
     {
-        s->at("scale").at("x").get_to(scale.x);
-        s->at("scale").at("y").get_to(scale.y);
+        s->at("x").get_to(scale.x);
+        s->at("y").get_to(scale.y);
     }
     metadata.Scale = scale;
 
