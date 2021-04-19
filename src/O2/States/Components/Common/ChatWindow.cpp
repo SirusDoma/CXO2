@@ -148,7 +148,8 @@ void ChatWindow::Invalidate()
 
             if (i == 0)
             {
-                SetVerticalRepeat(max, label->GetCharacterSize() + 5.f);
+                // TODO: Configurable spacing
+                SetVerticalRepeat(max, label->GetCharacterSize() + 5.5f);
                 SetHorizontalRepeat(1, 0);
             }
 
@@ -181,6 +182,9 @@ void ChatWindow::Invalidate()
         else
             m_labels[index]->SetColor(sf::Color::White);
 
+        // TODO: Configurable outline
+        m_labels[index]->SetOutlineThickness(0.10f);
+        m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
         if (chat.Player.PlayerID != 0)
         {
             size_t nickLength = 16;

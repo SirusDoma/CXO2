@@ -19,9 +19,10 @@ void ChatPanel::Initialize(Gx::Scene &scene)
 
     auto systemPlayer = Room::PlayerInfo{0, -1, sf::String(), true};
     chatWindow->PushMessage(systemPlayer, "Welcome to O2Jam");
-    chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper).");
-    chatWindow->PushMessage(systemPlayer, "F8                 : Toggle windows/image cursor mode.");
-    chatWindow->PushMessage(systemPlayer, "F9                 : Toggle equalizer on/off.");
+    chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper)");
+    chatWindow->PushMessage(systemPlayer, "F7            : Effect 2D/3D mode setting");
+    chatWindow->PushMessage(systemPlayer, "F8            : Cursor mode setting");
+    chatWindow->PushMessage(systemPlayer, "F9            : Toggle equalizer on/off");
 
     auto btnChatScrollUp = scene.Create<Gx::Button>("Interface/Metadata/State/Room/ChatPanel/Btn_ChatScrollUp.json");
     auto btnChatScrollDown = scene.Create<Gx::Button>("Interface/Metadata/State/Room/ChatPanel/Btn_ChatScrollDown.json");
