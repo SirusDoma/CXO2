@@ -12,7 +12,7 @@
 
 namespace Gx
 {
-    class Control : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer
+    class Control : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer
     {
     public:
         enum State { Normal, Hover, Active };

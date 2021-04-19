@@ -6,11 +6,11 @@
 #include <Genode/UI/Control.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
-#include <unordered_map>
+#include <map>
 
 namespace Gx
 {
-    class Image : public virtual Control, public virtual Sprite
+    class Image : public Control, public Sprite
     {
     public:
         struct Frame
@@ -28,8 +28,11 @@ namespace Gx
         virtual const sf::FloatRect GetLocalBounds() const;
 
         unsigned int GetFrameCount() const;
-        const Frame *GetFrame(const std::string &name);
-        const Frame *GetFrame(unsigned int index);
+        const Frame *GetFrame(const std::string &name) const;
+        const Frame *GetFrame(unsigned int index) const;
+
+        bool ContainsFrame(const std::string &name) const;
+        bool ContainsFrame(unsigned int index) const;
 
         void AddFrame(const std::string &name, const sf::IntRect &texCoords);
         void AddFrame(const std::string &name, const Frame &frame);
@@ -45,7 +48,7 @@ namespace Gx
     private:
         void ApplyFrame(const Frame &frame);
 
-        std::unordered_map<std::string, Frame> m_frames;
+        std::map<std::string, Frame> m_frames;
     };
 }
 
