@@ -1,4 +1,5 @@
 #include <O2/Character/ItemFactory.hpp>
+#include <iostream>
 
 ItemFactory::ItemFactory()
 {
@@ -31,36 +32,35 @@ const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Chara
             items[item->GetType()] = item;
     }
 
-    names = {};
-    if (gender == Character::Gender::Male)
+    auto apply = [&] (std::initializer_list<std::string> equipments)
     {
-        names = {
-            "Avatar/default/Male/Face.json",
-            "Avatar/default/Male/Hair.json",
-            "Avatar/default/Male/Jacket.json",
-            "Avatar/default/Male/Pants.json",
-            "Avatar/default/Male/Shoes.json"
-        };
-    }
-    else if (gender == Character::Gender::Female)
-    {
-        names = {
-            "Avatar/default/Female/Face.json",
-            "Avatar/default/Female/Hair.json",
-            "Avatar/default/Female/Jacket.json",
-            "Avatar/default/Female/Pants.json",
-            "Avatar/default/Female/Shoes.json"
-        };
-    }
-
-    if (names.size() > 0)
-    {
-        for (auto name : names)
+        for (auto name : equipments)
         {
             auto item = m_resources->Load<Item>(name);
             if (item)
                 items[item->GetType()] = item;
         }
+    };
+
+    if (gender == Character::Gender::Male)
+    {
+        apply({
+            "Avatar/default/Male/Face.json",
+            "Avatar/default/Male/Hair.json",
+            "Avatar/default/Male/Jacket.json",
+            "Avatar/default/Male/Pants.json",
+            "Avatar/default/Male/Shoes.json"
+        });
+    }
+    else if (gender == Character::Gender::Female)
+    {
+        apply({
+            "Avatar/default/Female/Face.json",
+            "Avatar/default/Female/Hair.json",
+            "Avatar/default/Female/Jacket.json",
+            "Avatar/default/Female/Pants.json",
+            "Avatar/default/Female/Shoes.json"
+        });
     }
 
     return items;
