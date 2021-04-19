@@ -11,7 +11,7 @@ namespace Gx
 {
     class Scene;
     class Button;
-    class Dialog : public UiContainer
+    class Dialog : public virtual UiContainer
     {
     public:
         Dialog();
@@ -43,6 +43,7 @@ namespace Gx
         void Close();
 
     protected:
+        virtual void OnKeyDown(sf::Event::KeyEvent ev);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
         virtual void OnShown(Scene &scene);

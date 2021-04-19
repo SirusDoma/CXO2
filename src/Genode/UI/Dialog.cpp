@@ -190,6 +190,16 @@ namespace Gx
         return RenderableContainer::Render(target, states);
     }
 
+    void Dialog::OnKeyDown(sf::Event::KeyEvent ev)
+    {
+        UiContainer::OnKeyDown(ev);
+
+        if (ev.code == sf::Keyboard::Enter)
+            OnAccepted();
+        else if (ev.code == sf::Keyboard::Escape)
+            OnCancelled();
+    }
+
     void Dialog::OnShown(Scene &scene)
     {
     }
