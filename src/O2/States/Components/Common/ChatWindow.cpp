@@ -183,7 +183,7 @@ void ChatWindow::Invalidate()
             m_labels[index]->SetColor(sf::Color::White);
 
         // TODO: Configurable outline
-        m_labels[index]->SetOutlineThickness(0.10f);
+        m_labels[index]->SetOutlineThickness(0.05f);
         m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
         if (chat.Player.PlayerID != 0)
         {

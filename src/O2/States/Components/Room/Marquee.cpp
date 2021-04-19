@@ -44,7 +44,6 @@ void Marquee::Update(double delta)
     m_renderTexture.clear(sf::Color::Transparent);
     {
         Text::Render(m_renderTexture, sf::RenderStates::Default);
-        Text::Render(m_renderTexture, sf::RenderStates::Default);
     }
     m_renderTexture.display();
 }
