@@ -87,31 +87,31 @@ void OptionDialog::Initialize(Gx::Scene &scene)
     }
 
     m_bgmCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgCheckBox.json");
-    m_allVolumeBar    = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/AllVolumeBar.json");
+    m_masterVolumeBar    = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MasterVolumeBar.json");
     m_musicVolumeBar  = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MusicBar.json");
     m_effectVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/SoundEffectBar.json");
 
-    auto btnAllSoundUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_AllSoundUp.json");
-    auto btnAllSoundDown = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_AllSoundDown.json");
-    btnAllSoundUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    auto btnMasterVolumeUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_MasterVolumeUp.json");
+    auto btnMasterVolumeDown = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_MasterVolumeDown.json");
+    btnMasterVolumeUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
-        m_allVolumeBar->SetValue(m_allVolumeBar->GetValue() + 1);
-        m_musicVolumeBar->SetValue(m_allVolumeBar->GetValue());
-        m_effectVolumeBar->SetValue(m_allVolumeBar->GetValue());
+        m_masterVolumeBar->SetValue(m_masterVolumeBar->GetValue() + 1);
+        m_musicVolumeBar->SetValue(m_masterVolumeBar->GetValue());
+        m_effectVolumeBar->SetValue(m_masterVolumeBar->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(m_allVolumeBar->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(m_allVolumeBar->GetValue());
+        m_config.MusicVolume  = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
+        m_config.EffectVolume = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
 
         // TODO: Play BGM (if it's not played) and SFX (Non loop)
     });
-    btnAllSoundDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnMasterVolumeDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
-        m_allVolumeBar->SetValue(m_allVolumeBar->GetValue() - 1);
-        m_musicVolumeBar->SetValue(m_allVolumeBar->GetValue());
-        m_effectVolumeBar->SetValue(m_allVolumeBar->GetValue());
+        m_masterVolumeBar->SetValue(m_masterVolumeBar->GetValue() - 1);
+        m_musicVolumeBar->SetValue(m_masterVolumeBar->GetValue());
+        m_effectVolumeBar->SetValue(m_masterVolumeBar->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(m_allVolumeBar->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(m_allVolumeBar->GetValue());
+        m_config.MusicVolume  = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
+        m_config.EffectVolume = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
 
         // TODO: Play BGM (if it's not played) and SFX (Non loop)
     });
@@ -152,8 +152,8 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         // TODO: Play SFX (Non loop)
     });
 
-    m_soundOptionContainer.AddChild(m_bgmCheckBox, m_allVolumeBar, m_musicVolumeBar, m_effectVolumeBar,
-        btnAllSoundUp, btnAllSoundDown, btnMusicUp, btnMusicDown, btnSoundEffectUp, btnSoundEffectDown);
+    m_soundOptionContainer.AddChild(m_bgmCheckBox, m_masterVolumeBar, m_musicVolumeBar, m_effectVolumeBar,
+        btnMasterVolumeUp, btnMasterVolumeDown, btnMusicUp, btnMusicDown, btnSoundEffectUp, btnSoundEffectDown);
 
     AddChild(&m_keyOptionContainer, &m_soundOptionContainer);
 
@@ -305,7 +305,7 @@ void OptionDialog::Invalidate()
     m_keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
     m_bgmCheckBox->SetCheckedState(m_config.UseBGM);
 
-    m_allVolumeBar->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : m_allVolumeBar->GetValue());
+    m_masterVolumeBar->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : m_masterVolumeBar->GetValue());
     m_musicVolumeBar->SetValue(m_config.MusicVolume);
     m_effectVolumeBar->SetValue(m_config.EffectVolume);
 

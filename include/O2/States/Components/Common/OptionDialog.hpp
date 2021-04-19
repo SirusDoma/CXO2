@@ -33,7 +33,7 @@ private:
     Gx::Image       *m_background, *m_keySelect;
     Gx::CheckBox    *m_gfxCheckBox, *m_cursorCheckBox, *m_keyTestCheckBox, *m_bgmCheckBox;
     Gx::RadioButton *m_keyTab, *m_soundTab;
-    Gx::ProgressBar *m_allVolumeBar, *m_musicVolumeBar, *m_effectVolumeBar;
+    Gx::ProgressBar *m_masterVolumeBar, *m_musicVolumeBar, *m_effectVolumeBar;
     sf::Sound       *m_sfxNavigation;
     Gx::UiContainer  m_keyOptionContainer, m_soundOptionContainer;
     std::map<EventChannel, Gx::Image*> m_keyTexts, m_keyDowns;
