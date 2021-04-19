@@ -21,8 +21,8 @@ void OptionDialog::Initialize(Gx::Scene &scene)
             return;
         }
 
-        auto app = &scene.GetApplication();
-        app->SetConfig(m_config);
+        auto& app = scene.GetApplication();
+        app.SetConfig(m_config);
 
         m_keyTestCheckBox->SetCheckedState(false);
         m_keyChannel = EventChannel::Note1;
@@ -195,8 +195,8 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 {
     Dialog::OnShown(scene);
 
-    auto app    = &scene.GetApplication();
-    auto config = app->GetConfig<GameConfig>();
+    auto& app   = scene.GetApplication();
+    auto config = app.GetConfig<GameConfig>();
     m_config    = GameConfig(config);
 
     SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
