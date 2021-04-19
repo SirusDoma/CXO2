@@ -98,6 +98,9 @@ void O2Jam::OnStart()
     m_resources.Register<Item>();
     m_resources.Register<ItemData>();
 
+    // Trigger resource load for Item
+    Require<ItemFactory>();
+
     // Load global assets
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
