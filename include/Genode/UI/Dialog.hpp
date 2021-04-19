@@ -52,6 +52,7 @@ namespace Gx
         virtual void OnAccepted();
         virtual void OnCancelled();
 
+        const Scene *GetScene();
         virtual void Invalidate();
 
     private:

@@ -162,6 +162,7 @@ namespace Gx
             m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
 
             OnShown(*scene);
+            Invalidate();
         }
     }
 
@@ -224,6 +225,11 @@ namespace Gx
             m_onCancelled();
 
         Close();
+    }
+
+    const Scene *Dialog::GetScene()
+    {
+        return m_scene;
     }
 
     void Dialog::Invalidate()
