@@ -305,7 +305,7 @@ void OptionDialog::Invalidate()
     m_keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
     m_bgmCheckBox->SetCheckedState(m_config.UseBGM);
 
-    m_allVolumeBar->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : 100.f);
+    m_allVolumeBar->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : m_allVolumeBar->GetValue());
     m_musicVolumeBar->SetValue(m_config.MusicVolume);
     m_effectVolumeBar->SetValue(m_config.EffectVolume);
 
