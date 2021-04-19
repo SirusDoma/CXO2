@@ -9,13 +9,12 @@ namespace Gx
 {
     class Renderable : public virtual sf::Drawable
     {
-    protected:
-        friend class Scene;
-        friend class RenderableContainer;
-
+    public:
+        Renderable() {};
         virtual ~Renderable() {};
-
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const = 0;
+
+    protected:
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const { Render(target, states); }
     };
 }
