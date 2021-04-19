@@ -84,7 +84,10 @@ namespace Gx
 
     sf::Vector2f List::GetNextItemPosition() const
     {
-        return sf::Vector2f(m_horizontalSpacing * m_horizontalCounter, m_verticalSpacing * m_verticalCounter);
+        return sf::Vector2f(
+            static_cast<int>(m_horizontalSpacing * m_horizontalCounter),
+            static_cast<int>(m_verticalSpacing * m_verticalCounter))
+        ;
     }
 
     void List::IncreaseSpacingCounter()
