@@ -11,7 +11,7 @@
 
 namespace Gx
 {
-    class Animation : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
+    class Animation : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
         enum class AnimationState

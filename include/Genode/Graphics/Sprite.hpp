@@ -40,7 +40,7 @@ namespace Gx
 {
     typedef std::shared_ptr<const sf::Texture> TextureHandle;
 
-    class Sprite : virtual public Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
+    class Sprite : virtual public Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual Colorable
     {
     public:
         Sprite();

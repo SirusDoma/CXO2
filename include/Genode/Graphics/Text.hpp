@@ -64,7 +64,7 @@ namespace Gx
 {
     typedef std::shared_ptr<const sf::Font> FontHandle;
 
-    class Text : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
+    class Text : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
         enum Style

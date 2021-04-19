@@ -35,7 +35,7 @@
 
 namespace Gx
 {
-    class Shape : public virtual Node, public RenderableContainer, public UpdatableContainer, public InputableContainer, public Colorable
+    class Shape : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
         virtual ~Shape();
