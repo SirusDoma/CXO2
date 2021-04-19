@@ -34,6 +34,7 @@ namespace Gx
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetLostFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetClickCallback(std::function<void(Control&, Event&)> callback);
+        void SetHoldClickCallback(std::function<void(Control&, Event&)> callback);
         void SetDoubleClickCallback(std::function<void(Control&, Event&)> callback);
 
         void SetEnabled(bool enabled);
@@ -61,6 +62,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetGainFocusCallback();
         const std::function<void(Control&, Event&)>& GetLostFocusCallback();
         const std::function<void(Control&, Event&)>& GetClickCallback();
+        const std::function<void(Control&, Event&)>& GetHoldClickCallback();
         const std::function<void(Control&, Event&)>& GetDoubleClickCallback();
 
         virtual void Update(double delta);
@@ -84,12 +86,13 @@ namespace Gx
 
     private:
         constexpr static const double DOUBLE_CLICK_THRESHOLD = 250.f;
+        constexpr static const double HOLD_CLICK_THRESHOLD   = 50.f;
 
         State  m_state;
         bool   m_enabled, m_visible, m_focused, m_clicked;
-        double m_deltaClickDuration;
+        double m_deltaClickDuration, m_deltaHoldDuration;
 
-        std::function<void(Control&, Event&)> m_onClick, m_onDoubleClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
+        std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }
 

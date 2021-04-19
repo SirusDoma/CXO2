@@ -11,6 +11,7 @@ namespace Gx
         m_deltaClickDuration(),
         m_state(State::Normal),
         m_onClick(),
+        m_onHoldClick(),
         m_onDoubleClick(),
         m_onGainFocus(),
         m_onLostFocus()
@@ -116,6 +117,11 @@ namespace Gx
         m_onClick = callback;
     }
 
+    void Control::SetHoldClickCallback(std::function<void(Control &, Event &)> callback)
+    {
+        m_onHoldClick = callback;
+    }
+
     void Control::SetDoubleClickCallback(std::function<void(Control&, Control::Event&)> callback)
     {
         m_onDoubleClick = callback;
@@ -139,6 +145,11 @@ namespace Gx
     const std::function<void(Control&, Control::Event&)> &Control::GetClickCallback()
     {
         return m_onClick;
+    }
+
+    const std::function<void(Control&, Control::Event&)> &Control::GetHoldClickCallback()
+    {
+        return m_onHoldClick;
     }
 
     const std::function<void(Control&, Control::Event&)> &Control::GetDoubleClickCallback()
@@ -190,6 +201,20 @@ namespace Gx
                 m_deltaClickDuration = 0;
             }
         }
+
+        if (GetControlState() == Control::State::Active && m_onHoldClick)
+        {
+            m_deltaHoldDuration += delta;
+            if (m_deltaHoldDuration >= HOLD_CLICK_THRESHOLD)
+            {
+                auto uiEvent = Event{false, GetControlState()};
+                m_onHoldClick(*this, uiEvent);
+
+                m_deltaHoldDuration = 0;
+            }
+        }
+        else
+            m_deltaHoldDuration = 0;
 
         UpdatableContainer::Update(delta);
     }
