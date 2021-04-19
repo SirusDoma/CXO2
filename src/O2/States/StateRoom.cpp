@@ -25,6 +25,9 @@ void StateRoom::Initialize()
 {
     State::Initialize();
 
+    auto& app   = GetApplication();
+    auto& items = app.Require<ItemFactory>();
+
     auto background = Create<Gx::Sprite>("Interface/Metadata/State/Room/Background.json");
     AddChild(background);
 
@@ -138,6 +141,9 @@ void StateRoom::Initialize()
     player.Gender = Character::Gender::Male;
     m_avatar = Create<Avatar>("Interface/Metadata/State/Room/Avatar.json");
     m_avatar->SetPlayerInfo(player);
+    for (auto [_, item] : items.GetDefaultItems(player.Gender))
+        m_avatar->SetDefaultItem(item);
+
     AddChild(m_avatar);
 
     m_bgm = Create<sf::Music>("Interface/Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);

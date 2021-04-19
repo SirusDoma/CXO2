@@ -1,5 +1,4 @@
 #include <O2/Character/Avatar.hpp>
-#include <O2/Character/ItemFactory.hpp>
 
 Avatar::Avatar() :
     m_playerInfo(),
@@ -26,11 +25,6 @@ const Room::PlayerInfo &Avatar::GetPlayerInfo() const
 void Avatar::SetPlayerInfo(const Room::PlayerInfo &playerInfo)
 {
     m_playerInfo = playerInfo;
-    if (m_defaultItems.empty())
-    {
-        for (auto [_, item] : ItemFactory::GetDefaultItems(m_playerInfo.Gender))
-            SetDefaultItem(item);
-    }
 }
 
 void Avatar::SetDefaultItem(const Item *item)

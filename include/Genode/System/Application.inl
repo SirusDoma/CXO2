@@ -25,39 +25,51 @@ namespace Gx
     template<typename T>
     void Application::SetConfig(const T &config)
     {
+        static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
+
         m_configs[typeid(T)] = std::make_unique<T>(config);
     }
 
     template<typename T>
-    void Application::SetConfigResolver(std::function<std::unique_ptr<T>(const Application&)> resolver)
+    void Application::SetConfig(std::function<std::unique_ptr<T>(const Application&)> resolver)
     {
         static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
+
         m_configResolvers[typeid(T)] = resolver;
     }
 
     template<typename T>
-    T *Application::Install()
+    T &Application::Install()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
-        return Install(std::make_unique<T>());
+
+        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
+            return static_cast<T&>(*iterator->second.get());
+
+        auto iterator = m_moduleResolvers.find(typeid(T));
+        bool managed  = iterator != m_moduleResolvers.end();
+        auto instance = managed ? &iterator->second(*this) : new T();
+        m_moduleResolvers.erase(iterator);
+
+        auto [module, _] = m_modules.insert({typeid(T), ResourcePtr<Module>{instance, [managed] (auto ptr)
+        {
+            if (!managed)
+                delete ptr;
+        }}});
+
+        return static_cast<T&>(*module->second.get());
     }
 
     template<typename T>
-    T *Application::Install(T *instance)
+    bool Application::Resolve(std::function<T&(Application&)> resolver)
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
 
-        auto target = GetModule<T>();
-        if (!target)
-        {
-            auto ptr = std::unique_ptr<Module>(static_cast<Module*>(instance));
-            auto mod = ptr.get();
-            m_modules.push_back(std::move(ptr));
+        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
+            return false;
 
-            return dynamic_cast<T*>(mod);
-        }
-
-        return nullptr;
+        m_moduleResolvers[typeid(T)] = resolver;
+        return true;
     }
 
     template<typename T>
@@ -65,32 +77,20 @@ namespace Gx
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
 
-        for (size_t i = 0; i < m_modules.size(); i++)
-        {
-            T* target = dynamic_cast<T*>(m_modules.at(i).get());
-            if (target)
-            {
-                m_modules.erase(m_modules.begin() + i);
-                return true;
-            }
-        }
+        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
+            return m_modules.erase(iterator) == m_modules.end();
 
         return false;
     }
 
     template<typename T>
-    T* Application::GetModule() const
+    T &Application::Require()
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
-        for (auto &mod : m_modules)
-        {
-            auto target = dynamic_cast<T*>(mod.get());
-            if (target)
-            {
-                return target;
-            }
-        }
 
-        return nullptr;
+        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
+            return static_cast<T&>(*iterator->second.get());
+
+        return Install<T>();
     }
 }

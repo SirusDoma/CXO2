@@ -1,6 +1,10 @@
 #include <O2/Character/ItemFactory.hpp>
 
-void ItemFactory::Initialize(Gx::ResourceManager &sharedResources)
+ItemFactory::ItemFactory()
+{
+}
+
+ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
 {
     m_resources = &sharedResources;
     m_itemData  = static_cast<ItemData*>(m_resources->LoadMetadata<ItemData>("Avatar/Itemdata.json"));

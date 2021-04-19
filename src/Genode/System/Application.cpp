@@ -2,6 +2,7 @@
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Config.hpp>
+#include <Genode/System/Module.hpp>
 
 namespace Gx
 {
@@ -80,10 +81,11 @@ namespace Gx
             delta = end - start;
 
             // Update installed modules
-            for (auto &mod : m_modules)
+            for (auto& [_, module] : m_modules)
             {
-                if (mod && mod->CheckFrequency(delta))
-                    mod->Update(delta);
+                auto updatable = dynamic_cast<Updatable*>(module.get());
+                if (updatable)
+                    updatable->Update(delta);
             }
 
             // Render the window

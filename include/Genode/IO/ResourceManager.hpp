@@ -5,15 +5,16 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/IO/ResourceMetadata.hpp>
+#include <Genode/System/Module.hpp>
 
 #include <memory>
 
 namespace Gx
 {
-    enum ResourceScope { Local, Shared };
+    enum class ResourceScope { Local, Shared };
 
     class Node;
-    class ResourceManager
+    class ResourceManager : public Module
     {
     public:
         using ResourceContainerMap = std::unordered_map<std::type_index, std::unique_ptr<priv::BaseContainer>>;

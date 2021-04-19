@@ -75,11 +75,23 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
 
     // Setup configuration
-    SetConfigResolver<GameConfig>([] (auto &app)
+    SetConfig<GameConfig>([] (auto &app)
     {
         // TODO: Load game config from file
         auto config = std::make_unique<GameConfig>();
         return config;
+    });
+
+    // Module configuration
+    Resolve<Gx::ResourceManager>([=] (auto& app) -> Gx::ResourceManager& { return m_resources; });
+    Resolve<Gx::Mixer>([=] (auto& app) -> Gx::Mixer&
+    {
+        return m_mixer;
+    });
+    Resolve<ItemFactory>([=] (auto& app) -> ItemFactory&
+    {
+        m_itemFactory = ItemFactory(Require<Gx::ResourceManager>());
+        return m_itemFactory;
     });
 
     // Register shared resource container
@@ -87,7 +99,6 @@ void O2Jam::OnStart()
     m_resources.Register<ItemData>();
 
     // Load global assets
-    ItemFactory::Initialize(m_resources);
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/Planet.ojm");

@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-#include <Genode/System/Module.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Audio/Mixer.hpp>
@@ -18,6 +17,7 @@ namespace Gx
     class Scene;
     class SceneDirector;
     class Config;
+    class Module;
     class Application
     {
     public:
@@ -40,19 +40,19 @@ namespace Gx
         void SetConfig(const T& config);
 
         template<typename T>
-        void SetConfigResolver(std::function<std::unique_ptr<T>(const Application&)> resolver);
+        void SetConfig(std::function<std::unique_ptr<T>(const Application&)> resolver);
 
         template<typename T>
-        T *Install();
+        T &Install();
 
         template<typename T>
-        T *Install(T *instance);
+        bool Resolve(std::function<T&(Application&)> resolver);
 
         template<typename T>
         bool Uninstall();
 
         template<typename T>
-        T *GetModule() const;
+        T &Require();
 
         operator sf::RenderTarget&() const;
 
@@ -71,6 +71,9 @@ namespace Gx
         using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
         using ConfigResolverMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Config>(const Application&)>>;
 
+        using ModuleMap         = std::unordered_map<std::type_index, ResourcePtr<Module>>;
+        using ModuleResolverMap = std::unordered_map<std::type_index, std::function<Module&(Application&)>>;
+
         mutable sf::RenderWindow m_window;
         sf::Event m_event;
 
@@ -86,7 +89,8 @@ namespace Gx
         ConfigMap         m_configs;
         ConfigResolverMap m_configResolvers;
 
-        std::vector<std::unique_ptr<Module>> m_modules;
+        ModuleMap         m_modules;
+        ModuleResolverMap m_moduleResolvers;
 
         unsigned int m_frames;
         unsigned int m_renderFreq;
