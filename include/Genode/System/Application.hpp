@@ -66,7 +66,6 @@ namespace Gx
         virtual void OnClose();
 
         void ShareResources(ResourceManager &resources);
-        void UseMixer(Mixer &mixer);
 
     private:
         using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
@@ -77,7 +76,6 @@ namespace Gx
 
         SceneDirector  *m_director;
         ResourceManager m_resources;
-        Mixer           m_mixer;
 
         sf::VideoMode m_mode;
         sf::VideoMode m_virtualMode;

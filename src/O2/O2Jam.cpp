@@ -101,5 +101,4 @@ void O2Jam::OnStart()
 
     // Load application modules here
     ShareResources(m_resources);
-    UseMixer(m_mixer);
 }

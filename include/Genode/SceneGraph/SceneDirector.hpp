@@ -24,18 +24,15 @@ namespace Gx
 
         Application &GetApplication() const;
         ResourceManager &GetSharedResources() const;
-        Mixer &GetMixer() const;
 
     private:
         const sf::RenderTarget  *m_target;
         Application             *m_application;
         ResourceManager         *m_resources;
-        Mixer                   *m_mixer;
         std::unique_ptr<Scene>   m_scene;
 
         void Initialize();
         void SetSharedResources(ResourceManager &resources);
-        void SetMixer(Mixer &mixer);
 
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
         virtual void Update(double delta);

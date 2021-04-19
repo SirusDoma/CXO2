@@ -16,8 +16,7 @@ namespace Gx
         m_renderFreq(0),
         m_frames(0),
         m_cursor(),
-        m_resources(),
-        m_mixer()
+        m_resources()
     {
         m_mode        = mode;
         m_virtualMode = virtualMode;
@@ -47,12 +46,9 @@ namespace Gx
         // Trigger callback
         OnStart();
 
-        // Fallback mixer and resources
+        // Fallback resources
         if (!m_director->m_resources)
             ShareResources(m_resources);
-
-        if (!m_director->m_mixer)
-            UseMixer(m_mixer);
 
         // Initialize scene
         m_director->Initialize();
@@ -132,12 +128,6 @@ namespace Gx
     {
         if (m_director)
             m_director->SetSharedResources(resources);
-    }
-
-    void Application::UseMixer(Mixer &mixer)
-    {
-        if (m_director)
-            m_director->SetMixer(mixer);
     }
 
     void Application::OnStart()

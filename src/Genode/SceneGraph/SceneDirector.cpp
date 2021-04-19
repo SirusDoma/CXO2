@@ -7,8 +7,7 @@ namespace Gx
         m_application(&app),
         m_scene(scene),
         m_target(&target),
-        m_resources(),
-        m_mixer()
+        m_resources()
     {
     }
 
@@ -50,16 +49,6 @@ namespace Gx
     ResourceManager &SceneDirector::GetSharedResources() const
     {
         return *m_resources;
-    }
-
-    Mixer &SceneDirector::GetMixer() const
-    {
-        return *m_mixer;
-    }
-
-    void SceneDirector::SetMixer(Mixer &mixer)
-    {
-        m_mixer = &mixer;
     }
 
     void SceneDirector::SetSharedResources(ResourceManager &resources)
