@@ -16,7 +16,7 @@ namespace Gx
         return m_frames.size() > 0 ? m_frames.size() : 1;
     }
 
-    const Image::Frame *Image::GetFrame(const std::string &name)
+    const Image::Frame *Image::GetFrame(const std::string &name) const
     {
         if (auto it = m_frames.find(name); it != m_frames.end())
             return &it->second;
@@ -24,7 +24,7 @@ namespace Gx
         return nullptr;
     }
 
-    const Image::Frame *Image::GetFrame(unsigned int index)
+    const Image::Frame *Image::GetFrame(unsigned int index) const
     {
         if (index < 0 || index >= m_frames.size())
             return nullptr;
@@ -39,6 +39,18 @@ namespace Gx
         }
 
         return nullptr;
+    }
+
+
+    bool Image::ContainsFrame(const std::string &name) const
+    {
+        auto it = m_frames.find(name);
+        return it != m_frames.end();
+    }
+
+    bool Image::ContainsFrame(unsigned int index) const
+    {
+        return index >= 0 && index < m_frames.size();
     }
 
     void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)
