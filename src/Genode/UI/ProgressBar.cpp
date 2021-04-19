@@ -107,6 +107,9 @@ namespace Gx
         if (value > m_maximum)
             value = m_maximum;
 
+        if (value < 0)
+            value = 0;
+
         if (m_value != value)
         {
             m_value = value;
