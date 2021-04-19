@@ -45,6 +45,9 @@ namespace Gx
     protected:
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
 
+        virtual void OnShown(Scene &scene);
+        virtual void OnClose();
+
         virtual void OnAccepted();
         virtual void OnCancelled();
 

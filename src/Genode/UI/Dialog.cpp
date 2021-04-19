@@ -139,6 +139,7 @@ namespace Gx
             unsigned int x = static_cast<unsigned int>((screenSize.x / 2.f) - (GetLocalBounds().width / 2.f));
             unsigned int y = static_cast<unsigned int>((screenSize.y / 2.f) - (GetLocalBounds().height / 2.f));
 
+            SetOrigin(0.f, 0.f);
             SetPosition(x, y);
             if (enableBackDrop)
             {
@@ -159,6 +160,8 @@ namespace Gx
 
             m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
             m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+
+            OnShown(*scene);
         }
     }
 
@@ -169,6 +172,8 @@ namespace Gx
 
         m_scene->CloseOverlay();
         m_shown = false;
+
+        OnClose();
     }
 
     sf::RenderStates Dialog::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -183,6 +188,14 @@ namespace Gx
         target.draw(m_sprite, states);
 
         return RenderableContainer::Render(target, states);
+    }
+
+    void Dialog::OnShown(Scene &scene)
+    {
+    }
+
+    void Dialog::OnClose()
+    {
     }
 
     void Dialog::OnAccepted()
