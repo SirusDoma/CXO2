@@ -37,6 +37,9 @@ namespace Gx
         T &GetConfig();
 
         template<typename T>
+        void SetConfig(const T& config);
+
+        template<typename T>
         void SetConfigResolver(std::function<std::unique_ptr<T>(const Application&)> resolver);
 
         template<typename T>

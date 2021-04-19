@@ -23,6 +23,12 @@ namespace Gx
     }
 
     template<typename T>
+    void Application::SetConfig(const T &config)
+    {
+        m_configs[typeid(T)] = std::make_unique<T>(config);
+    }
+
+    template<typename T>
     void Application::SetConfigResolver(std::function<std::unique_ptr<T>(const Application&)> resolver)
     {
         static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
