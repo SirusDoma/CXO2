@@ -60,7 +60,7 @@ void StateRoom::Initialize()
     auto btnFirstStep = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_FirstStep.json");
     auto btnOption    = Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Option.json");
 
-    btnOption->SetClickCallback([&] (auto &sender, auto &ev) { m_optionDialog->Show(this); });
+    btnOption->SetClickCallback([&] (auto &sender, auto &ev) { m_optionDialog->Show(this, "", false); });
 
     AddChild(btnMusicShop, btnItemShop, btnMyRoom, btnCoupon, btnFirstStep, btnOption);
 
