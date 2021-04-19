@@ -24,6 +24,10 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         auto app = &scene.GetApplication();
         app->SetConfig(m_config);
 
+        m_keyTestCheckBox->SetCheckedState(false);
+        m_keyChannel = EventChannel::Note1;
+        m_keySelect->SetFrame(0);
+
         // TODO: Add tooltip
         Invalidate();
     });
