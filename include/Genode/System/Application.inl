@@ -6,7 +6,7 @@ namespace Gx
         static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
 
         if (auto it = m_configs.find(typeid(T)); it != m_configs.end())
-            return *it->second.get();
+            return static_cast<T&>(*it->second.get());
 
         if (auto it = m_configResolvers.find(typeid(T)); it != m_configResolvers.end())
         {
@@ -19,7 +19,7 @@ namespace Gx
         else
             m_configs[typeid(T)] = std::make_unique<T>();
 
-        return *m_configs[typeid(T)].get();
+        return static_cast<T&>(*m_configs[typeid(T)].get());
     }
 
     template<typename T>
