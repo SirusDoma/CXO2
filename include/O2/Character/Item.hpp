@@ -6,9 +6,11 @@
 #include <O2/Data/Planet.hpp>
 #include <O2/Data/Shop.hpp>
 
-#include <SFML/System/String.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/Graphics/Animation.hpp>
+#include <Genode/IO/ResourceMetadata.hpp>
+
+#include <SFML/System/String.hpp>
 
 #include <tuple>
 #include <unordered_map>

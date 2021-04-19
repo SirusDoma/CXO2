@@ -3,8 +3,10 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-#include <Genode/Entities.hpp>
-#include <Genode/SceneGraph.hpp>
+#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph/RenderableContainer.hpp>
+#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/SceneGraph/InputableContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <initializer_list>

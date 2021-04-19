@@ -6,7 +6,6 @@
 #include <SFML/Window/Event.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
-#include <Genode/Entities.hpp>
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
