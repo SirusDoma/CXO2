@@ -118,3 +118,14 @@ void O2Jam::OnStart()
     // Load application modules here
     ShareResources(m_resources);
 }
+
+void O2Jam::OnFocusChanged(bool focus)
+{
+    Application::OnFocusChanged(focus);
+
+    auto config = GetConfig<GameConfig>();
+    if (!focus)
+        m_mixer.SetVolume(0.f);
+    else
+        m_mixer.SetVolume(config.MusicVolume);
+}

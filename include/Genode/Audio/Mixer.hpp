@@ -35,9 +35,16 @@ namespace Gx
         void Pause(const std::string &group);
         void Pause(SoundGroup *group);
 
+        void Resume(const std::string &group);
+        void Resume(SoundGroup *group);
+
         void Stop(const std::string &group);
         void Stop(SoundGroup *group);
 
+        void SetVolume(float volume);
+        void SetPan(float pan);
+
+        void ResumeAll();
         void PauseAll();
         void StopAll();
 

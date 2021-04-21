@@ -12,6 +12,7 @@ public:
 
 protected:
     virtual void OnStart();
+    virtual void OnFocusChanged(bool focus);
 
 private:
     Gx::ResourceManager m_resources = Gx::ResourceManager();

@@ -105,6 +105,18 @@ namespace Gx
             group->Pause();
     }
 
+    void Mixer::Resume(const std::string &group)
+    {
+        if (m_groups.find(group) != m_groups.end())
+            Resume(m_groups[group].get());
+    }
+
+    void Mixer::Resume(SoundGroup *group)
+    {
+        if (group)
+            group->Resume();
+    }
+
     void Mixer::Stop(const std::string &group)
     {
         auto iterator = m_groups.find(group);
@@ -125,13 +137,32 @@ namespace Gx
         }
     }
 
+    void Mixer::SetVolume(float volume)
+    {
+        m_masterGroup->SetVolume(volume);
+        for (auto& [_, group] : m_groups)
+            group->SetVolume(volume);
+    }
+
+    void Mixer::SetPan(float pan)
+    {
+        m_masterGroup->SetPan(pan);
+        for (auto& [_, group] : m_groups)
+            group->SetPan(pan);
+    }
+
+    void Mixer::ResumeAll()
+    {
+        m_masterGroup->Resume();
+        for (auto& [_, group] : m_groups)
+            group->Resume();
+    }
+
     void Mixer::PauseAll()
     {
         m_masterGroup->Pause();
         for (auto& [_, group] : m_groups)
             group->Pause();
-
-        m_groups.clear();
     }
 
     void Mixer::StopAll()
