@@ -14,28 +14,48 @@
 namespace Gx
 {
     class SoundGroup;
-    using SoundGroupContainer  = std::unordered_map<std::string, ResourcePtr<SoundGroup>>;
-
     class Mixer : public Module
     {
     public:
-        friend class SceneDirector;
-
         Mixer();
+        Mixer(Mixer &&other);
+        Mixer(Gx::ResourceManager &sharedResource);
         virtual ~Mixer();
 
-        sf::SoundSource* Play(sf::SoundSource *source, const std::string &group = "default");
-        SoundGroup *GetGroup(const std::string &name);
+        template<typename R>
+        R* Create(const std::string &source);
+
+        SoundGroup *GetMasterSoundGroup() const;
+        SoundGroup *GetSoundGroup(const std::string &name) const;
+
+        sf::SoundSource* Play(sf::SoundSource *source);
+        sf::SoundSource* Play(sf::SoundSource *source, std::string groupName);
+        sf::SoundSource* Play(sf::SoundSource *source, SoundGroup *group);
 
         void Pause(const std::string &group);
+        void Pause(SoundGroup *group);
+
         void Stop(const std::string &group);
+        void Stop(SoundGroup *group);
+
+        void PauseAll();
         void StopAll();
 
         virtual void Update(double delta);
 
+        Mixer &operator =(Mixer&& right);
+
     private:
-        SoundGroupContainer  m_groups;
+        using SoundGroupContainer  = std::map<std::string, std::unique_ptr<SoundGroup>>;
+        using SoundSourceContainer = std::vector<ResourcePtr<sf::SoundSource>>;
+
+        std::unique_ptr<SoundGroup> m_masterGroup;
+        SoundGroupContainer         m_groups;
+
+        SoundSourceContainer m_sources;
+        Gx::ResourceManager *m_resources;
     };
 }
 
+#include <Genode/Audio/Mixer.inl>
 #endif

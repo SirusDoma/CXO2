@@ -86,6 +86,7 @@ void O2Jam::OnStart()
     Resolve<Gx::ResourceManager>([=] (auto& app) -> Gx::ResourceManager& { return m_resources; });
     Resolve<Gx::Mixer>([=] (auto& app) -> Gx::Mixer&
     {
+        m_mixer = Gx::Mixer(Require<Gx::ResourceManager>());
         return m_mixer;
     });
     Resolve<ItemFactory>([=] (auto& app) -> ItemFactory&
@@ -98,8 +99,9 @@ void O2Jam::OnStart()
     m_resources.Register<Item>();
     m_resources.Register<ItemData>();
 
-    // Trigger resource load for Item
-    Require<ItemFactory>();
+    // Force to load item metadata at startup
+    for (auto gender : {Character::Gender::Male, Character::Gender::Female})
+        Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");

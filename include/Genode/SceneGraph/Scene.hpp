@@ -19,7 +19,7 @@
 namespace Gx
 {
     class SceneDirector;
-    class Scene : public virtual Node, public RenderableContainer, public virtual UpdatableContainer, public InputableContainer, public TaskContainer, public Mixer
+    class Scene : public virtual Node, public RenderableContainer, public virtual UpdatableContainer, public InputableContainer, public TaskContainer
     {
     public:
         friend SceneDirector;
@@ -68,9 +68,6 @@ namespace Gx
     private:
         template<typename R>
         R* CreateNode(const std::string &source, ResourceScope scope = ResourceScope::Local);
-
-        template<typename R>
-        R* CreateSoundSource(const std::string &source, ResourceScope scope = ResourceScope::Local);
 
         mutable sf::View m_view;
         std::unique_ptr<ResourceManager> m_resources;

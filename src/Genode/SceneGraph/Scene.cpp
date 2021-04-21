@@ -13,7 +13,6 @@ namespace Gx
 
     Scene::Scene(const std::string &name) :
         Node(),
-        Mixer(),
         RenderableContainer(),
         UpdatableContainer(),
         InputableContainer(),

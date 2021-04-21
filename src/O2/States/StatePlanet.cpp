@@ -20,6 +20,9 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
+    auto& app   = GetApplication();
+    auto& mixer = app.Require<Gx::Mixer>();
+
     auto background = Create<Gx::Sprite>("Interface/Metadata/State/Planet/Background.json");
     AddChild(background);
 
@@ -50,20 +53,20 @@ void StatePlanet::Initialize()
         {Planet::MusicHall::Philix,   philix}
     };
 
-    auto clickSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Click.json", Gx::ResourceScope::Shared);
-    auto hoverSfx = Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Hover.json", Gx::ResourceScope::Shared);
+    auto clickSfx = mixer.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Click.json");
+    auto hoverSfx = mixer.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/Hover.json");
     for (auto [hall, radio] : planets)
     {
-        radio->SetFocusChangedCallback([this, sfx = hoverSfx] (auto &sender, auto &ev)
+        radio->SetFocusChangedCallback([&, sfx = hoverSfx] (auto &sender, auto &ev)
         {
             auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
             if (!radio || !radio->IsFocused() || radio->IsChecked())
                 return;
 
-            Mixer::Play(sfx);
+            mixer.Play(sfx, "SFX");
         });
 
-        radio->SetClickCallback([this, sfx = clickSfx, hall = hall] (auto& sender, auto& ev)
+        radio->SetClickCallback([&, sfx = clickSfx, hall = hall] (auto& sender, auto& ev)
         {
             auto radio = dynamic_cast<Gx::RadioButton*>(&sender);
             if (!radio)
@@ -75,7 +78,7 @@ void StatePlanet::Initialize()
                 return;
             }
 
-            Mixer::Play(sfx, "sfx");
+            mixer.Play(sfx, "SFX");
             m_channelBoard.Show(hall, [=] { OnEnterPlanet(hall); });
         });
     }
@@ -86,8 +89,8 @@ void StatePlanet::Initialize()
     m_channelBoard.SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
     AddChild(&m_channelBoard);
 
-    m_bgm = Create<sf::Music>("Interface/Metadata/State/Planet/Music.json", Gx::ResourceScope::Shared);
-    Mixer::Play(m_bgm, "BGM");
+    m_bgm = mixer.Create<sf::Music>("Interface/Metadata/State/Planet/Music.json");
+    mixer.Play(m_bgm, "BGM");
 
     if (m_useFadeIn)
     {
@@ -136,7 +139,11 @@ void StatePlanet::OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo cha
     }
 
     m_connecting = true;
-    QueueSceneEvent([=] { GetDirector().SetScene(new StateRoom(hall, channel)); });
+    QueueSceneEvent([=]
+    {
+        GetApplication().Require<Gx::Mixer>().Stop("BGM");
+        GetDirector().SetScene(new StateRoom(hall, channel));
+    });
 }
 
 bool StatePlanet::IsConnecting()

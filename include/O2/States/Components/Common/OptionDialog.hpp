@@ -42,6 +42,7 @@ private:
     EventChannel m_keyChannel;
 
     bool m_keyTestEnabled;
+    Gx::Mixer *m_mixer;
 };
 
 #endif

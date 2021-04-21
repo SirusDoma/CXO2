@@ -10,8 +10,10 @@
 
 void OptionDialog::Initialize(Gx::Scene &scene)
 {
-    m_sfxNavigation = scene.Create<sf::Sound>("Interface/Metadata/Dialog/Option/Sound/Tab.json", Gx::ResourceScope::Shared);
+    auto& app = scene.GetApplication();
+    m_mixer   = &app.Require<Gx::Mixer>();
 
+    m_sfxNavigation = m_mixer->Create<sf::Sound>("Interface/Metadata/Dialog/Option/Sound/Tab.json");
     auto btnSave = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_Save.json");
     btnSave->SetClickCallback([=, &scene] (auto &sender, auto &ev)
     {
@@ -165,7 +167,7 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (!sender->IsChecked())
             return;
 
-        m_sfxNavigation->play();
+        m_mixer->Play(m_sfxNavigation);
         SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
 
         m_keyOptionContainer.SetEnabled(true);
@@ -179,7 +181,7 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (!sender->IsChecked())
             return;
 
-        m_sfxNavigation->play();
+        m_mixer->Play(m_sfxNavigation);
         SetTexCoords(m_background->GetFrame("SoundOption")->TexCoords);
 
         m_keyOptionContainer.SetEnabled(false);
@@ -212,7 +214,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 
 void OptionDialog::OnClose()
 {
-    m_sfxNavigation->play();
+    m_mixer->Play(m_sfxNavigation);
 }
 
 void OptionDialog::Update(double delta)

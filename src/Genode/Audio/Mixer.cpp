@@ -4,27 +4,90 @@
 namespace Gx
 {
     Mixer::Mixer() :
-        m_groups()
+        m_masterGroup(),
+        m_groups(),
+        m_sources(),
+        m_resources()
     {
+        m_masterGroup = std::unique_ptr<SoundGroup>(new SoundGroup("master"));
+    }
+
+    Mixer::Mixer(ResourceManager &sharedResource) :
+        m_masterGroup(),
+        m_groups(),
+        m_sources(),
+        m_resources(&sharedResource)
+    {
+        m_masterGroup = std::unique_ptr<SoundGroup>(new SoundGroup("master"));
+    }
+
+    Mixer::Mixer(Mixer &&other) :
+        m_masterGroup(),
+        m_groups(),
+        m_sources(),
+        m_resources()
+    {
+        *this = std::move(other);
     }
 
     Mixer::~Mixer()
     {
         m_groups.clear();
+        m_sources.clear();
     }
 
-    sf::SoundSource* Mixer::Play(sf::SoundSource *source, const std::string &groupName)
+    SoundGroup *Mixer::GetMasterSoundGroup() const
+    {
+        return m_masterGroup.get();
+    }
+
+    SoundGroup *Mixer::GetSoundGroup(const std::string &group) const
+    {
+        auto iterator = m_groups.find(group);
+        if (iterator != m_groups.end())
+            return iterator->second.get();
+
+        return nullptr;
+    }
+
+    sf::SoundSource* Mixer::Play(sf::SoundSource *source)
+    {
+        return Play(source, m_masterGroup.get());
+    }
+
+    sf::SoundSource *Mixer::Play(sf::SoundSource *source, std::string groupName)
     {
         if (source)
         {
-            auto iterator = m_groups.find(groupName);
-            if (iterator == m_groups.end())
+            if (groupName.empty() || groupName == "master")
+                return Play(source, m_masterGroup.get());
+
+            if (auto iterator = m_groups.find(groupName); iterator == m_groups.end())
+                m_groups[groupName] = std::unique_ptr<SoundGroup>(new SoundGroup(groupName));
+
+            return Play(source, m_groups[groupName].get());
+        }
+
+        return nullptr;
+    }
+
+    sf::SoundSource *Mixer::Play(sf::SoundSource *source, SoundGroup *group)
+    {
+        if (source)
+        {
+            if (!group)
+                return Play(source);
+
+            if (group != m_masterGroup.get())
+                m_masterGroup->Remove(source);
+
+            for (auto& iterator : m_groups)
             {
-                m_groups[groupName] = std::make_unique<SoundGroup>(groupName);
-                return m_groups[groupName]->Play(source);
+                if (iterator.second.get() != group)
+                    iterator.second->Remove(source);
             }
-            else
-                return iterator->second->Play(source);
+
+            return group->Play(source);
         }
 
         return nullptr;
@@ -33,7 +96,13 @@ namespace Gx
     void Mixer::Pause(const std::string &group)
     {
         if (m_groups.find(group) != m_groups.end())
-            m_groups[group]->Pause();
+            Pause(m_groups[group].get());
+    }
+
+    void Mixer::Pause(SoundGroup *group)
+    {
+        if (group)
+            group->Pause();
     }
 
     void Mixer::Stop(const std::string &group)
@@ -46,24 +115,45 @@ namespace Gx
         }
     }
 
+    void Mixer::Stop(SoundGroup *group)
+    {
+        if (group)
+        {
+            group->Stop();
+            if (auto iterator = m_groups.find(group->GetName()); iterator != m_groups.end())
+                m_groups.erase(iterator);
+        }
+    }
+
+    void Mixer::PauseAll()
+    {
+        m_masterGroup->Pause();
+        for (auto& [_, group] : m_groups)
+            group->Pause();
+
+        m_groups.clear();
+    }
+
     void Mixer::StopAll()
     {
+        m_masterGroup->Stop();
         for (auto& [_, group] : m_groups)
             group->Stop();
 
         m_groups.clear();
     }
 
-    SoundGroup *Mixer::GetGroup(const std::string &group)
-    {
-        auto iterator = m_groups.find(group);
-        if (iterator != m_groups.end())
-            return iterator->second.get();
-
-        return nullptr;
-    }
-
     void Mixer::Update(double delta)
     {
+    }
+
+    Mixer &Mixer::operator=(Mixer &&right)
+    {
+        m_masterGroup = std::move(right.m_masterGroup);
+        m_groups      = std::move(right.m_groups);
+        m_sources     = std::move(right.m_sources);
+        m_resources   = std::move(right.m_resources);
+
+        return *this;
     }
 }

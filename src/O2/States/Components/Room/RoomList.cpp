@@ -12,21 +12,24 @@ RoomList::RoomList() :
 
 void RoomList::Initialize(Gx::Scene &scene)
 {
-    auto sfxAccept   = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Accept.json", Gx::ResourceScope::Shared);
-    auto sfxToggle   = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Toggle.json", Gx::ResourceScope::Shared);
-    auto sfxInvalid  = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Invalid.json", Gx::ResourceScope::Shared);
-    auto sfxNavigate = scene.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/RoomNavigation.json", Gx::ResourceScope::Shared);
+    auto& app   = scene.GetApplication();
+    auto& mixer = app.Require<Gx::Mixer>();
+
+    auto sfxAccept   = mixer.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Accept.json");
+    auto sfxToggle   = mixer.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Toggle.json");
+    auto sfxInvalid  = mixer.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/Invalid.json");
+    auto sfxNavigate = mixer.Create<sf::Sound>("Interface/Metadata/State/Room/Sound/RoomNavigation.json");
 
     auto roomList = scene.Create<Gx::List>("Interface/Metadata/State/Room/RoomList.json");
     for (unsigned int i = 0; i < ROOM_PER_PAGE; i++)
     {
         auto roomButton = std::make_unique<RoomButton>();
         roomButton->Initialize(scene);
-        roomButton->SetClickCallback([=, button = roomButton.get()] (auto& sender, auto& ev)
+        roomButton->SetClickCallback([&, sfx = sfxInvalid, button = roomButton.get()] (auto& sender, auto& ev)
         {
            if (!button->IsActive())
            {
-               sfxInvalid->play();
+               mixer.Play(sfx, "SFX");
                return;
            }
         });
@@ -38,9 +41,9 @@ void RoomList::Initialize(Gx::Scene &scene)
     AddChild(roomList);
 
     auto btnCreateRoom = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_CreateRoom.json");
-    btnCreateRoom->SetClickCallback([=] (auto& sender, auto& ev)
+    btnCreateRoom->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
     {
-        sfxAccept->play();
+        mixer.Play(sfxAccept, "SFX");
     });
     AddChild(btnCreateRoom);
 
@@ -52,9 +55,9 @@ void RoomList::Initialize(Gx::Scene &scene)
     btnShowAll->SetEnabled(false);
     btnShowAll->SetVisible(false);
 
-    btnShowAll->SetClickCallback([=] (auto& sender, auto& ev)
+    btnShowAll->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
     {
-        sfxToggle->play();
+        mixer.Play(sfxToggle, "SFX");
 
         btnShowAll->SetEnabled(false);
         btnShowAll->SetVisible(false);
@@ -66,9 +69,9 @@ void RoomList::Initialize(Gx::Scene &scene)
         Invalidate();
     });
 
-    btnWaitingRoom->SetClickCallback([=] (auto& sender, auto& ev)
+    btnWaitingRoom->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
     {
-        sfxToggle->play();
+        mixer.Play(sfxToggle, "SFX");
 
         btnWaitingRoom->SetEnabled(false);
         btnWaitingRoom->SetVisible(false);
@@ -84,9 +87,9 @@ void RoomList::Initialize(Gx::Scene &scene)
     auto btnRoomLeft  = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_RoomLeft.json");
     auto btnRoomRight = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_RoomRight.json");
 
-    btnRoomLeft->SetClickCallback([=] (auto& sender, auto& ev)
+    btnRoomLeft->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
     {
-        sfxNavigate->play();
+        mixer.Play(sfxNavigate, "SFX");
 
         if (m_page > 1)
         {
@@ -95,9 +98,9 @@ void RoomList::Initialize(Gx::Scene &scene)
         }
     });
 
-    btnRoomRight->SetClickCallback([=] (auto& sender, auto& ev)
+    btnRoomRight->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
     {
-        sfxNavigate->play();
+        mixer.Play(sfxNavigate, "SFX");
 
         if (m_page < static_cast<unsigned int>(std::round(100.f / ROOM_PER_PAGE)))
         {

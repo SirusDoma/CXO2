@@ -27,6 +27,7 @@ void StateRoom::Initialize()
 
     auto& app   = GetApplication();
     auto& items = app.Require<ItemFactory>();
+    auto& mixer = app.Require<Gx::Mixer>();
 
     auto background = Create<Gx::Sprite>("Interface/Metadata/State/Room/Background.json");
     AddChild(background);
@@ -146,12 +147,13 @@ void StateRoom::Initialize()
 
     AddChild(m_avatar);
 
-    m_bgm = Create<sf::Music>("Interface/Metadata/State/Room/Music.json", Gx::ResourceScope::Shared);
-    Play(m_bgm);
+    m_bgm = mixer.Create<sf::Music>("Interface/Metadata/State/Room/Music.json");
+    mixer.Play(m_bgm, "BGM");
 }
 
 void StateRoom::OnExitPlanet()
 {
+    GetApplication().Require<Gx::Mixer>().Stop("BGM");
     QueueSceneEvent([this] { GetDirector().SetScene(new StatePlanet(false)); });
 }
 
