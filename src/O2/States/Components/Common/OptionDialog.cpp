@@ -1,5 +1,8 @@
 #include <O2/States/Components/Common/OptionDialog.hpp>
 
+#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Audio/SoundGroup.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
@@ -13,7 +16,11 @@ void OptionDialog::Initialize(Gx::Scene &scene)
     auto& app = scene.GetApplication();
     m_mixer   = &app.Require<Gx::Mixer>();
 
+    m_bgAllTest     = m_mixer->Create<sf::Music>("Interface/Metadata/Dialog/Option/SampleSong.json");
+    m_bgTest        = m_mixer->Create<sf::Music>("Interface/Metadata/Dialog/Option/MusicVolume.json");
+    m_efTest        = m_mixer->Create<sf::Sound>("Interface/Metadata/Dialog/Option/SampleEffect.json");
     m_sfxNavigation = m_mixer->Create<sf::Sound>("Interface/Metadata/Dialog/Option/Sound/Tab.json");
+
     auto btnSave = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_Save.json");
     btnSave->SetClickCallback([=, &scene] (auto &sender, auto &ev)
     {
@@ -29,6 +36,15 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_keyTestCheckBox->SetCheckedState(false);
         m_keyChannel = EventChannel::Note1;
         m_keySelect->SetFrame(0);
+
+        if (auto bgGroup = m_mixer->GetSoundGroup("BGM"); bgGroup)
+        {
+            bgGroup->SetVolume(m_config.MusicVolume);
+            bgGroup->SetEnabled(m_config.UseBGM);
+        }
+
+        if (auto sfxGroup = m_mixer->GetSoundGroup("SFX"); sfxGroup)
+            sfxGroup->SetVolume(m_config.EffectVolume);
 
         // TODO: Add tooltip
         Invalidate();
@@ -95,6 +111,7 @@ void OptionDialog::Initialize(Gx::Scene &scene)
     }
 
     m_bgmCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgCheckBox.json");
+    m_bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseBGM = sender->IsChecked(); });
     m_masterVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MasterVolumeBar.json");
     m_musicVolumeBar  = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MusicBar.json");
     m_effectVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/SoundEffectBar.json");
@@ -110,7 +127,17 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_config.MusicVolume  = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
         m_config.EffectVolume = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
 
-        // TODO: Play BGM (if it's not played) and SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_bgAllTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+            m_mixer->Play(m_bgAllTest, "BGTest");
+        }
+
+        m_mixer->Play(m_efTest, "EFTest");
+        m_mixer->GetSoundGroup("BGTest")->SetVolume(m_masterVolumeBar->GetValue());
+        m_mixer->GetSoundGroup("EFTest")->SetVolume(m_masterVolumeBar->GetValue());
     });
     btnMasterVolumeDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
@@ -121,7 +148,17 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_config.MusicVolume  = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
         m_config.EffectVolume = static_cast<unsigned int>(m_masterVolumeBar->GetValue());
 
-        // TODO: Play BGM (if it's not played) and SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_bgAllTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+            m_mixer->Play(m_bgAllTest, "BGTest");
+        }
+
+        m_mixer->Play(m_efTest, "EFTest");
+        m_mixer->GetSoundGroup("BGTest")->SetVolume(m_masterVolumeBar->GetValue());
+        m_mixer->GetSoundGroup("EFTest")->SetVolume(m_masterVolumeBar->GetValue());
     });
 
     auto btnMusicUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_MusicUp.json");
@@ -132,14 +169,30 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_musicVolumeBar->SetValue(m_musicVolumeBar->GetValue() + 1);
         m_config.MusicVolume = static_cast<unsigned int>(m_musicVolumeBar->GetValue());
 
-        // TODO: Play BGM (if it's not played) and SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_bgTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+            m_mixer->Play(m_bgTest, "BGTest");
+        }
+
+        m_mixer->GetSoundGroup("BGTest")->SetVolume(m_musicVolumeBar->GetValue());
     });
     btnMusicDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         m_musicVolumeBar->SetValue(m_musicVolumeBar->GetValue() - 1);
         m_config.MusicVolume = static_cast<unsigned int>(m_musicVolumeBar->GetValue());
 
-        // TODO: Play BGM (if it's not played) and SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_bgTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+            m_mixer->Play(m_bgTest, "BGTest");
+        }
+
+        m_mixer->GetSoundGroup("BGTest")->SetVolume(m_musicVolumeBar->GetValue());
     });
 
     auto btnSoundEffectUp   = scene.Create<Gx::Button>("Interface/Metadata/Dialog/Option/Btn_SoundEffectUp.json");
@@ -150,14 +203,30 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_effectVolumeBar->SetValue(m_effectVolumeBar->GetValue() + 1);
         m_config.EffectVolume = static_cast<unsigned int>(m_effectVolumeBar->GetValue());
 
-        // TODO: Play SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_efTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+        }
+
+        m_mixer->Play(m_efTest, "EFTest");
+        m_mixer->GetSoundGroup("EFTest")->SetVolume(m_effectVolumeBar->GetValue());
     });
     btnSoundEffectDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         m_effectVolumeBar->SetValue(m_effectVolumeBar->GetValue() - 1);
         m_config.EffectVolume = static_cast<unsigned int>(m_effectVolumeBar->GetValue());
 
-        // TODO: Play SFX (Non loop)
+        m_mixer->Pause("BGM");
+        if (m_efTest->getStatus() != sf::SoundSource::Playing)
+        {
+            m_mixer->Stop("BGTest");
+            m_mixer->Stop("EFTest");
+        }
+
+        m_mixer->Play(m_efTest, "EFTest");
+        m_mixer->GetSoundGroup("EFTest")->SetVolume(m_effectVolumeBar->GetValue());
     });
 
     m_soundOptionContainer.AddChild(m_bgmCheckBox, m_masterVolumeBar, m_musicVolumeBar, m_effectVolumeBar,
@@ -173,7 +242,21 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (!sender->IsChecked())
             return;
 
-        m_mixer->Play(m_sfxNavigation);
+        m_mixer->Play(m_sfxNavigation, "SFX");
+        if (m_bgAllTest->getStatus() == sf::SoundSource::Playing || m_bgTest->getStatus() == sf::SoundSource::Playing || m_efTest->getStatus() == sf::SoundSource::Playing)
+            m_mixer->Play("BGM");
+        else
+            m_mixer->Resume("BGM");
+
+        m_mixer->Stop("BGTest");
+        m_mixer->Stop("EFTest");
+
+        if (auto bgGroup = m_mixer->GetSoundGroup("BGM"); bgGroup)
+            bgGroup->SetVolume(m_config.MusicVolume);
+
+        if (auto sfxGroup = m_mixer->GetSoundGroup("SFX"); sfxGroup)
+            sfxGroup->SetVolume(m_config.EffectVolume);
+
         SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
 
         m_keyOptionContainer.SetEnabled(true);
@@ -187,7 +270,14 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (!sender->IsChecked())
             return;
 
-        m_mixer->Play(m_sfxNavigation);
+        m_mixer->Play(m_sfxNavigation, "SFX");
+        m_mixer->Pause("BGM");
+        m_mixer->Stop("BGTest");
+        m_mixer->Stop("EFTest");
+
+        m_mixer->Play(m_bgAllTest, "BGTest");
+        m_mixer->GetSoundGroup("BGTest")->SetVolume(m_config.MusicVolume);
+
         SetTexCoords(m_background->GetFrame("SoundOption")->TexCoords);
 
         m_keyOptionContainer.SetEnabled(false);
@@ -208,6 +298,8 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     m_config    = GameConfig(config);
 
     SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
+    m_keyTab->SetCheckedState(true);
+    m_soundTab->SetCheckedState(false);
     m_keyOptionContainer.SetEnabled(true);
     m_keyOptionContainer.SetVisible(true);
     m_soundOptionContainer.SetEnabled(false);
@@ -220,7 +312,14 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 
 void OptionDialog::OnClose()
 {
-    m_mixer->Play(m_sfxNavigation);
+    m_mixer->Stop("BGTest");
+    m_mixer->Stop("EFTest");
+    if (m_keyTab->IsChecked())
+        m_mixer->Resume("BGM");
+    else
+        m_mixer->Play("BGM");
+
+    m_mixer->Play(m_sfxNavigation, "SFX");
 }
 
 void OptionDialog::Update(double delta)
