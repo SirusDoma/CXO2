@@ -10,6 +10,7 @@
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <initializer_list>
+#include <functional>
 
 namespace Gx
 {
@@ -54,6 +55,10 @@ namespace Gx
         virtual void SetColor(const sf::Color &color);
 
         const AnimationState GetState() const;
+        void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
+
+        bool GetVisible() const;
+        void SetVisible(bool visible);
 
         virtual void Stop();
         virtual void Reset();
@@ -66,12 +71,15 @@ namespace Gx
 
         std::unique_ptr<Sprite> m_sprite;
         AnimationState m_state;
+        bool m_visible;
 
         sf::Time m_duration;
         sf::Time m_elapsed;
         unsigned int m_currentFrame;
         bool m_loop;
         std::vector<Frame> m_frames;
+
+        std::function<void(Animation &sender)> m_animationCallback;
     };
 }
 

@@ -8,7 +8,9 @@ namespace Gx
         m_frames(),
         m_elapsed(sf::Time::Zero),
         m_currentFrame(0),
-        m_state(AnimationState::Initial)
+        m_state(AnimationState::Initial),
+        m_visible(true),
+        m_animationCallback()
     {
     }
 
@@ -17,7 +19,9 @@ namespace Gx
         m_duration(duration),
         m_frames(frames),
         m_elapsed(sf::Time::Zero),
-        m_currentFrame(0)
+        m_currentFrame(0),
+        m_visible(true),
+        m_animationCallback()
     {
     }
 
@@ -81,13 +85,35 @@ namespace Gx
         return m_state;
     }
 
+    void Animation::SetAnimationCallback(const std::function<void(Animation &)> &animationCallback)
+    {
+        m_animationCallback = animationCallback;
+    }
+
+    bool Animation::GetVisible() const
+    {
+        return m_visible;
+    }
+
+    void Animation::SetVisible(bool visible)
+    {
+        m_visible = visible;
+    }
+
     void Animation::Update(double delta)
     {
         if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
             return UpdatableContainer::Update(delta);
 
-        m_state    = AnimationState::Playing;
-        m_elapsed += sf::milliseconds(delta);
+        bool trigger = m_state != AnimationState::Playing;
+        m_state      = AnimationState::Playing;
+        m_elapsed   += sf::milliseconds(delta);
+
+        if (trigger)
+        {
+            if (m_animationCallback)
+                m_animationCallback(*this);
+        }
 
         auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / m_frames.size());
         if (m_elapsed >= frameTime)
@@ -100,6 +126,8 @@ namespace Gx
                 {
                     m_state = AnimationState::Completed;
                     m_elapsed = sf::Time::Zero;
+                    if (m_animationCallback)
+                        m_animationCallback(*this);
 
                     return;
                 }
@@ -115,6 +143,9 @@ namespace Gx
 
     sf::RenderStates Animation::Render(sf::RenderTarget &target, sf::RenderStates states) const
     {
+        if (!m_visible)
+            return states;
+
         states.transform *= GetTransform();
         if (!m_sprite)
             return states;
@@ -127,12 +158,18 @@ namespace Gx
     {
         m_state   = AnimationState::Stopped;
         m_elapsed = sf::Time::Zero;
+
+        if (m_animationCallback)
+            m_animationCallback(*this);
     }
 
     void Animation::Reset()
     {
         m_state   = AnimationState::Initial;
         m_elapsed = sf::Time::Zero;
+
+        if (m_animationCallback)
+            m_animationCallback(*this);
 
         m_currentFrame = 0;
         SetFrame(m_currentFrame);
