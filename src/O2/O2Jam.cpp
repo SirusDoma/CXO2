@@ -23,13 +23,12 @@
 
 #include <O2/Loaders/UI/Components/ChatWindowLoader.hpp>
 #include <O2/Loaders/UI/Components/OptionDialogLoader.hpp>
+#include <O2/Loaders/UI/Components/CreateRoomDialogLoader.hpp>
 #include <O2/Loaders/UI/Components/MarqueeLoader.hpp>
 
 #include <O2/Loaders/Character/ItemLoader.hpp>
 #include <O2/Loaders/Character/ItemDataLoader.hpp>
 #include <O2/Loaders/Character/AvatarLoader.hpp>
-
-#include <O2/Character/ItemFactory.hpp>
 
 #include <O2/Config/GameConfig.hpp>
 
@@ -68,6 +67,7 @@ void O2Jam::OnStart()
     // O2 Components
     Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
     Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
+    Gx::ResourceLoaderFactory::Register<CreateRoomDialog, CreateRoomDialogLoader>();
     Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
     // Character
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();

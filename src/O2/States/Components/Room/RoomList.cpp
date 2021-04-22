@@ -1,6 +1,7 @@
 #include <O2/States/Components/Room/RoomList.hpp>
 
 #include <Genode/UI/List.hpp>
+#include <O2/States/Components/Room/CreateRoomDialog.hpp>
 
 RoomList::RoomList() :
     m_rooms(),
@@ -40,10 +41,13 @@ void RoomList::Initialize(Gx::Scene &scene)
     }
     AddChild(roomList);
 
-    auto btnCreateRoom = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_CreateRoom.json");
-    btnCreateRoom->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev)
+    auto btnCreateRoom    = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_CreateRoom.json");
+    auto createRoomDialog = scene.Create<CreateRoomDialog>("Interface/Metadata/Dialog/CreateRoom.json");
+    createRoomDialog->Initialize(scene.GetApplication());
+    btnCreateRoom->SetClickCallback([=, &mixer, &scene] (auto& sender, auto& ev)
     {
         mixer.Play(sfxAccept, "SFX");
+        createRoomDialog->Show(&scene, "", false);
     });
     AddChild(btnCreateRoom);
 

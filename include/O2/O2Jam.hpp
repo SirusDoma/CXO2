@@ -3,6 +3,7 @@
 
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
+
 #include <O2/Character/ItemFactory.hpp>
 
 class O2Jam : public Gx::Application
