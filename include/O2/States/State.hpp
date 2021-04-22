@@ -20,6 +20,7 @@ protected:
 
 private:
     Gx::Dialog* m_dialog;
+    sf::Sound*  m_sound;
     bool m_prompted;
 };
 
