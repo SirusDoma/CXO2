@@ -1,6 +1,7 @@
 #ifndef GENODE_AUDIO_SOUNDGROUP_HPP
 #define GENODE_AUDIO_SOUNDGROUP_HPP
 
+#include <Genode/Entities/Updatable.hpp>
 #include <SFML/Audio.hpp>
 
 #include <memory>
@@ -9,7 +10,7 @@
 
 namespace Gx
 {
-    class SoundGroup
+    class SoundGroup : public Updatable
     {
     public:
         ~SoundGroup();
@@ -17,6 +18,7 @@ namespace Gx
         const std::string &GetName() const;
         void SetName(const std::string &name);
 
+        void Play();
         void Resume();
         void Pause();
         void Stop();
@@ -33,6 +35,8 @@ namespace Gx
 
         sf::SoundSource* Play(sf::SoundSource *source);
         bool Remove(sf::SoundSource *source);
+
+        virtual void Update(double delta);
 
         std::string m_name;
         float m_volume, m_pan;

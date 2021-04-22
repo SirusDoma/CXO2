@@ -25,6 +25,22 @@ namespace Gx
         m_name = name;
     }
 
+    void SoundGroup::Play()
+    {
+        for (auto source : m_sources)
+        {
+            // TODO: expose playing offset?
+            if (auto sound = dynamic_cast<sf::Sound*>(source); sound)
+                sound->setPlayingOffset(sf::Time::Zero);
+            else if (auto music = dynamic_cast<sf::Music*>(source); music)
+                music->setPlayingOffset(sf::Time::Zero);
+            else
+                source->stop(); // isn't thread-safe
+
+            source->play();
+        }
+    }
+
     void SoundGroup::Resume()
     {
         for (auto source : m_sources)
@@ -44,6 +60,8 @@ namespace Gx
     {
         for (auto source : m_sources)
             source->stop();
+
+        m_sources.clear();
     }
 
     float SoundGroup::GetVolume() const
@@ -107,5 +125,13 @@ namespace Gx
         }
 
         return false;
+    }
+
+    void SoundGroup::Update(double delta)
+    {
+        m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource *src)
+        {
+            return !src || src->getStatus() == sf::SoundSource::Stopped;
+        }), m_sources.end());
     }
 }

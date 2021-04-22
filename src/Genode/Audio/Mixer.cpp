@@ -55,17 +55,17 @@ namespace Gx
         return Play(source, m_masterGroup.get());
     }
 
-    sf::SoundSource *Mixer::Play(sf::SoundSource *source, std::string groupName)
+    sf::SoundSource *Mixer::Play(sf::SoundSource *source, const std::string &group)
     {
         if (source)
         {
-            if (groupName.empty() || groupName == "master")
+            if (group.empty() || group == "master")
                 return Play(source, m_masterGroup.get());
 
-            if (auto iterator = m_groups.find(groupName); iterator == m_groups.end())
-                m_groups[groupName] = std::unique_ptr<SoundGroup>(new SoundGroup(groupName));
+            if (auto iterator = m_groups.find(group); iterator == m_groups.end())
+                m_groups[group] = std::unique_ptr<SoundGroup>(new SoundGroup(group));
 
-            return Play(source, m_groups[groupName].get());
+            return Play(source, m_groups[group].get());
         }
 
         return nullptr;
@@ -93,16 +93,54 @@ namespace Gx
         return nullptr;
     }
 
+    void Mixer::Play(const std::string &groupName)
+    {
+        if (!groupName.empty())
+        {
+            SoundGroup *group = nullptr;
+            if (groupName != "master")
+            {
+                if (auto iterator = m_groups.find(groupName); iterator != m_groups.end())
+                    group = iterator->second.get();
+            }
+            else
+                group = m_masterGroup.get();
+
+            if (!group)
+                return;
+
+            group->Play();
+        }
+    }
+
+    void Mixer::Play(SoundGroup *group)
+    {
+        if (group)
+            group->Play();
+    }
+
     void Mixer::Pause(const std::string &group)
     {
         if (m_groups.find(group) != m_groups.end())
             Pause(m_groups[group].get());
     }
 
+    void Mixer::Pause(sf::SoundSource *source)
+    {
+        if (source)
+            source->pause();
+    }
+
     void Mixer::Pause(SoundGroup *group)
     {
         if (group)
             group->Pause();
+    }
+
+    void Mixer::Resume(sf::SoundSource *source)
+    {
+        if (source && source->getStatus() == sf::SoundSource::Paused)
+            source->play();
     }
 
     void Mixer::Resume(const std::string &group)
@@ -115,6 +153,15 @@ namespace Gx
     {
         if (group)
             group->Resume();
+    }
+
+    void Mixer::Stop(sf::SoundSource *source)
+    {
+        if (source)
+        {
+            source->stop();
+            Update(0);
+        }
     }
 
     void Mixer::Stop(const std::string &group)
@@ -137,18 +184,11 @@ namespace Gx
         }
     }
 
-    void Mixer::SetVolume(float volume)
+    void Mixer::PlayAll()
     {
-        m_masterGroup->SetVolume(volume);
+        m_masterGroup->Play();
         for (auto& [_, group] : m_groups)
-            group->SetVolume(volume);
-    }
-
-    void Mixer::SetPan(float pan)
-    {
-        m_masterGroup->SetPan(pan);
-        for (auto& [_, group] : m_groups)
-            group->SetPan(pan);
+            group->Play();
     }
 
     void Mixer::ResumeAll()
@@ -170,12 +210,26 @@ namespace Gx
         m_masterGroup->Stop();
         for (auto& [_, group] : m_groups)
             group->Stop();
+    }
 
-        m_groups.clear();
+    void Mixer::SetVolume(float volume)
+    {
+        m_masterGroup->SetVolume(volume);
+        for (auto& [_, group] : m_groups)
+            group->SetVolume(volume);
+    }
+
+    void Mixer::SetPan(float pan)
+    {
+        m_masterGroup->SetPan(pan);
+        for (auto& [_, group] : m_groups)
+            group->SetPan(pan);
     }
 
     void Mixer::Update(double delta)
     {
+        for (auto& [_, group] : m_groups)
+            group->Update(delta);
     }
 
     Mixer &Mixer::operator=(Mixer &&right)
