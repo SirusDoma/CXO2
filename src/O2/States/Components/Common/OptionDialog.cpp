@@ -110,7 +110,7 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_keyOptionContainer.AddChild(keyDown);
     }
 
-    m_bgmCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgCheckBox.json");
+    m_bgmCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgmCheckBox.json");
     m_bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseBGM = sender->IsChecked(); });
     m_masterVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MasterVolumeBar.json");
     m_musicVolumeBar  = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MusicBar.json");
