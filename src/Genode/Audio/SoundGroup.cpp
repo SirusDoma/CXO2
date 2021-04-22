@@ -5,7 +5,8 @@ namespace Gx
     SoundGroup::SoundGroup(const std::string &name) :
         m_sources(),
         m_volume(100.f),
-        m_pan(0.f)
+        m_pan(0.f),
+        m_enabled(true)
     {
         SetName(name);
     }
@@ -27,6 +28,9 @@ namespace Gx
 
     void SoundGroup::Play()
     {
+        if (!m_enabled)
+            return;
+
         for (auto source : m_sources)
         {
             // TODO: expose playing offset?
@@ -43,6 +47,9 @@ namespace Gx
 
     void SoundGroup::Resume()
     {
+        if (!m_enabled)
+            return;
+
         for (auto source : m_sources)
         {
             if (source->getStatus() == sf::SoundSource::Paused)
@@ -52,12 +59,18 @@ namespace Gx
 
     void SoundGroup::Pause()
     {
+        if (!m_enabled)
+            return;
+
         for (auto source : m_sources)
             source->pause();
     }
 
     void SoundGroup::Stop()
     {
+        if (!m_enabled)
+            return;
+
         for (auto source : m_sources)
             source->stop();
 
@@ -71,6 +84,9 @@ namespace Gx
 
     void SoundGroup::SetVolume(float volume)
     {
+        if (!m_enabled)
+            return;
+
         volume = std::min(volume, 100.f);
         volume = std::max(volume, 0.f);
 
@@ -89,7 +105,7 @@ namespace Gx
 
     void SoundGroup::SetPan(float pan)
     {
-        if (m_pan != pan)
+        if (m_pan != pan && m_enabled)
         {
             m_pan = pan;
             for (auto source : m_sources)
@@ -97,9 +113,22 @@ namespace Gx
         }
     }
 
+    bool SoundGroup::IsEnabled() const
+    {
+        return m_enabled;
+    }
+
+    void SoundGroup::SetEnabled(bool enable)
+    {
+        if (!enable)
+            Pause();
+
+        m_enabled = enable;
+    }
+
     sf::SoundSource* SoundGroup::Play(sf::SoundSource *source)
     {
-        if (source)
+        if (source && m_enabled)
         {
             auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
             if (iterator == m_sources.end())
@@ -117,7 +146,7 @@ namespace Gx
 
     bool SoundGroup::Remove(sf::SoundSource *source)
     {
-        if (source)
+        if (source && m_enabled)
         {
             auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
             if (iterator != m_sources.end())

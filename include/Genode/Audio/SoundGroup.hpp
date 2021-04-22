@@ -29,6 +29,9 @@ namespace Gx
         float GetPan() const;
         void SetPan(float pan);
 
+        bool IsEnabled() const;
+        void SetEnabled(bool enable);
+
     private:
         friend class Mixer;
         SoundGroup(const std::string &name);
@@ -40,6 +43,7 @@ namespace Gx
 
         std::string m_name;
         float m_volume, m_pan;
+        bool m_enabled;
 
         std::vector<sf::SoundSource*> m_sources;
     };
