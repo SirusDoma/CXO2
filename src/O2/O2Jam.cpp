@@ -123,9 +123,11 @@ void O2Jam::OnFocusChanged(bool focus)
 {
     Application::OnFocusChanged(focus);
 
-    auto config = GetConfig<GameConfig>();
-    if (!focus)
-        m_mixer.SetVolume(0.f);
+    if (focus)
+    {
+        m_mixer.Stop("SFX");
+        m_mixer.Play("BGM");
+    }
     else
-        m_mixer.SetVolume(config.MusicVolume);
+        m_mixer.PauseAll();
 }
