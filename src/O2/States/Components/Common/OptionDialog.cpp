@@ -78,18 +78,24 @@ void OptionDialog::Initialize(Gx::Scene &scene)
             m_keyChannel = channel;
             m_keySelect->SetFrame(i - 1);
         });
-
-        auto keyDown = scene.Create<Gx::Image>("Interface/Metadata/Dialog/Option/KeyDown.json");
-        keyDown->SetFrame("Note" + std::to_string(i));
-
         m_keyTexts[channel] = keytext;
+
+        m_keyOptionContainer.AddChild(keytext);
+    }
+
+    for (unsigned int i = 1; i <= 7; i++)
+    {
+        auto keyDown = scene.Create<Gx::Image>("Interface/Metadata/Dialog/Option/KeyDown.json");
+        auto channel = static_cast<EventChannel>(i + 1);
+
+        keyDown->SetFrame("Note" + std::to_string(i));
         m_keyDowns[channel] = keyDown;
 
-        m_keyOptionContainer.AddChild(keytext, keyDown);
+        m_keyOptionContainer.AddChild(keyDown);
     }
 
     m_bgmCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/BgCheckBox.json");
-    m_masterVolumeBar    = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MasterVolumeBar.json");
+    m_masterVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MasterVolumeBar.json");
     m_musicVolumeBar  = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/MusicBar.json");
     m_effectVolumeBar = scene.Create<Gx::ProgressBar>("Interface/Metadata/Dialog/Option/SoundEffectBar.json");
 
