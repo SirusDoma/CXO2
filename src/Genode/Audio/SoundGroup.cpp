@@ -26,6 +26,23 @@ namespace Gx
         m_name = name;
     }
 
+    sf::SoundSource::Status SoundGroup::GetStatus() const
+    {
+        bool paused = false;
+        for (auto source : m_sources)
+        {
+            if (source->getStatus() == sf::SoundSource::Playing)
+                return sf::SoundSource::Playing;
+            else if (source->getStatus() == sf::SoundSource::Paused)
+                paused = true;
+        }
+
+        if (paused)
+            return sf::SoundSource::Paused;
+
+        return sf::SoundSource::Stopped;
+    }
+
     void SoundGroup::Play()
     {
         if (!m_enabled)

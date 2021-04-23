@@ -18,6 +18,8 @@ namespace Gx
         const std::string &GetName() const;
         void SetName(const std::string &name);
 
+        sf::SoundSource::Status GetStatus() const;
+
         void Play();
         void Resume();
         void Pause();
