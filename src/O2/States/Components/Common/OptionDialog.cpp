@@ -242,20 +242,23 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (!sender->IsChecked())
             return;
 
+        auto bgGroup = m_mixer->GetSoundGroup("BGTest");
+        auto efGroup = m_mixer->GetSoundGroup("EFTest");
         m_mixer->Play(m_sfxNavigation, "SFX");
-        if (m_bgAllTest->getStatus() == sf::SoundSource::Playing || m_bgTest->getStatus() == sf::SoundSource::Playing || m_efTest->getStatus() == sf::SoundSource::Playing)
+
+        if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Playing))
             m_mixer->Play("BGM");
         else
             m_mixer->Resume("BGM");
 
-        m_mixer->Stop("BGTest");
-        m_mixer->Stop("EFTest");
+        m_mixer->Stop(bgGroup);
+        m_mixer->Stop(efGroup);
 
-        if (auto bgGroup = m_mixer->GetSoundGroup("BGM"); bgGroup)
+        if (bgGroup)
             bgGroup->SetVolume(m_config.MusicVolume);
 
-        if (auto sfxGroup = m_mixer->GetSoundGroup("SFX"); sfxGroup)
-            sfxGroup->SetVolume(m_config.EffectVolume);
+        if (efGroup)
+            efGroup->SetVolume(m_config.EffectVolume);
 
         SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
 
