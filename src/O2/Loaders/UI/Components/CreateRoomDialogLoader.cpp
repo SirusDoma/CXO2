@@ -42,16 +42,15 @@ Gx::ResourcePtr<CreateRoomDialog> CreateRoomDialogLoader::Load(const Gx::Resourc
     {
         auto resources = context.Resources;
 
-        resources->Register<Gx::RadioButton>();
-        resources->Register<Gx::Animation>();
+        dialog->SetJamModeButton(resources->Resolve<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_JamMode.json"));
+        dialog->SetVsModeButton(resources->Resolve<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_VsMode.json"));
+        dialog->SetSingleModeButton(resources->Resolve<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_SingleMode.json"));
 
-        dialog->SetJamModeButton(resources->Load<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_JamMode.json"));
-        dialog->SetVsModeButton(resources->Load<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_VsMode.json"));
-        dialog->SetSingleModeButton(resources->Load<Gx::RadioButton>("Interface/Metadata/Dialog/CreateRoom/Btn_SingleMode.json"));
+        dialog->SetJamAnimation(resources->Resolve<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/JamModeAnimation.json"));
+        dialog->SetVsModeAnimation(resources->Resolve<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/VsModeAnimation.json"));
+        dialog->SetSingleModeAnimation(resources->Resolve<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/SingleModeAnimation.json"));
 
-        dialog->SetJamAnimation(resources->Load<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/JamModeAnimation.json"));
-        dialog->SetVsModeAnimation(resources->Load<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/VsModeAnimation.json"));
-        dialog->SetSingleModeAnimation(resources->Load<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/SingleModeAnimation.json"));
+        dialog->SetLevelLimitCheckBox(resources->Resolve<Gx::CheckBox>("Interface/Metadata/Dialog/CreateRoom/LevelLimitCheckBox.json"));
 
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
         auto acceptButtonMetadata = spec->AcceptButtonMetadata;

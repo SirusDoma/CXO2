@@ -3,6 +3,10 @@
 
 void CreateRoomDialog::Initialize(Gx::Application &app)
 {
+    auto& mixer        = app.Require<Gx::Mixer>();
+    auto sfxCreateMode = mixer.Create<sf::Sound>("Interface/Metadata/Dialog/CreateRoom/ModeSound.json");
+
+    m_jamModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
     m_jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
@@ -20,6 +24,7 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
         m_vsModeButton->SetCheckedState(true);
     });
 
+    m_vsModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
     m_vsModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
@@ -30,6 +35,7 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
         m_vsModeAnimation->SetVisible(true);
     });
 
+    m_singleModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
     m_singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
@@ -40,27 +46,27 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
         m_singleModeButton->SetVisible(false);
     });
 
-    AddChild(m_jamModeButton, m_vsModeButton, m_singleModeButton);
+    AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get());
 }
 
-void CreateRoomDialog::SetJamModeButton(Gx::RadioButton *jamModeButton)
+void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton)
 {
-    m_jamModeButton = jamModeButton;
+    m_jamModeButton = std::move(jamModeButton);
 }
 
-void CreateRoomDialog::SetVsModeButton(Gx::RadioButton *vsModeButton)
+void CreateRoomDialog::SetVsModeButton(Gx::ResourcePtr<Gx::RadioButton> vsModeButton)
 {
-    m_vsModeButton = vsModeButton;
+    m_vsModeButton = std::move(vsModeButton);
 }
 
-void CreateRoomDialog::SetSingleModeButton(Gx::RadioButton *singleModeButton)
+void CreateRoomDialog::SetSingleModeButton(Gx::ResourcePtr<Gx::RadioButton> singleModeButton)
 {
-    m_singleModeButton = singleModeButton;
+    m_singleModeButton = std::move(singleModeButton);
 }
 
-void CreateRoomDialog::SetJamAnimation(Gx::Animation *jamAnimation)
+void CreateRoomDialog::SetJamAnimation(Gx::ResourcePtr<Gx::Animation> jamAnimation)
 {
-    m_jamAnimation = jamAnimation;
+    m_jamAnimation = std::move(jamAnimation);
     m_jamAnimation->SetAnimationCallback([=] (Gx::Animation& sender)
     {
         sender.SetVisible(sender.GetState() != Gx::Animation::AnimationState::Stopped && sender.GetState() != Gx::Animation::AnimationState::Completed);
@@ -68,12 +74,12 @@ void CreateRoomDialog::SetJamAnimation(Gx::Animation *jamAnimation)
     });
     m_jamAnimation->Stop();
 
-    Node::AddChild(m_jamAnimation);
+    Node::AddChild(m_jamAnimation.get());
 }
 
-void CreateRoomDialog::SetVsModeAnimation(Gx::Animation *vsModeAnimation)
+void CreateRoomDialog::SetVsModeAnimation(Gx::ResourcePtr<Gx::Animation> vsModeAnimation)
 {
-    m_vsModeAnimation = vsModeAnimation;
+    m_vsModeAnimation = std::move(vsModeAnimation);
     m_vsModeAnimation->SetAnimationCallback([=] (Gx::Animation& sender)
     {
         sender.SetVisible(sender.GetState() != Gx::Animation::AnimationState::Stopped && sender.GetState() != Gx::Animation::AnimationState::Completed);
@@ -81,12 +87,12 @@ void CreateRoomDialog::SetVsModeAnimation(Gx::Animation *vsModeAnimation)
     });
     m_vsModeAnimation->Stop();
 
-    Node::AddChild(m_vsModeAnimation);
+    Node::AddChild(m_vsModeAnimation.get());
 }
 
-void CreateRoomDialog::SetSingleModeAnimation(Gx::Animation *singleModeAnimation)
+void CreateRoomDialog::SetSingleModeAnimation(Gx::ResourcePtr<Gx::Animation> singleModeAnimation)
 {
-    m_singleModeAnimation = singleModeAnimation;
+    m_singleModeAnimation = std::move(singleModeAnimation);
     m_singleModeAnimation->SetAnimationCallback([=] (Gx::Animation& sender)
     {
         sender.SetVisible(sender.GetState() != Gx::Animation::AnimationState::Stopped && sender.GetState() != Gx::Animation::AnimationState::Completed);
@@ -94,11 +100,11 @@ void CreateRoomDialog::SetSingleModeAnimation(Gx::Animation *singleModeAnimation
     });
     m_singleModeAnimation->Stop();
 
-    Node::AddChild(m_singleModeAnimation);
+    Node::AddChild(m_singleModeAnimation.get());
 }
 
-void CreateRoomDialog::SetLevelLimit(Gx::CheckBox *levelLimit)
+void CreateRoomDialog::SetLevelLimitCheckBox(Gx::ResourcePtr<Gx::CheckBox> levelLimitCheckBox)
 {
-    m_levelLimit = levelLimit;
-    AddChild(m_levelLimit);
+    m_levelLimitCheckBox = std::move(levelLimitCheckBox);
+    AddChild(m_levelLimitCheckBox.get());
 }
