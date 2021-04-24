@@ -80,6 +80,7 @@ namespace Gx
         m_fillColor(255, 255, 255),
         m_outlineColor(0, 0, 0),
         m_outlineThickness(0),
+        m_masked(false),
         m_vertices(sf::Triangles),
         m_outlineVertices(sf::Triangles),
         m_bounds(),
@@ -99,6 +100,7 @@ namespace Gx
         m_fillColor(255, 255, 255),
         m_outlineColor(0, 0, 0),
         m_outlineThickness(0),
+        m_masked(false),
         m_vertices(sf::Triangles),
         m_outlineVertices(sf::Triangles),
         m_bounds(),
@@ -121,6 +123,11 @@ namespace Gx
     {
         m_font = &font;
         m_geometryNeedUpdate = true;
+    }
+
+    bool Text::IsMasked() const
+    {
+        return m_masked;
     }
 
     void Text::SetCharacterSize(unsigned int size)
@@ -192,13 +199,13 @@ namespace Gx
             // (if geometry is updated anyway, we can skip this step)
             if (!m_geometryNeedUpdate)
             {
-                if (m_string[index] == L' ' || m_string[index] == L'\n' && m_string[index] == L'\t')
+                if (!m_masked && (m_string[index] == L' ' || m_string[index] == L'\n' && m_string[index] == L'\t'))
                     return;
 
                 size_t start = 0;
                 for (size_t i = 0; i < index; ++i)
                 {
-                    if (m_string[i] != L' ' && m_string[i] != L'\n' && m_string[i] != L'\t')
+                    if (m_masked || (m_string[i] != L' ' && m_string[i] != L'\n' && m_string[i] != L'\t'))
                         start++;
                 }
 
@@ -246,6 +253,15 @@ namespace Gx
     const sf::Font* Text::GetFont() const
     {
         return m_font;
+    }
+
+    void Text::SetMasked(bool masked)
+    {
+        if (m_masked != masked)
+        {
+            m_masked = masked;
+            m_geometryNeedUpdate = true;
+        }
     }
 
     unsigned int Text::GetCharacterSize() const
@@ -311,6 +327,8 @@ namespace Gx
         for (std::size_t i = 0; i < index; ++i)
         {
             Uint32 curChar = m_string[i];
+            if (m_masked)
+                curChar = L'*';
 
             // Apply the kerning offset
             position.x += m_font->getKerning(prevChar, curChar, m_characterSize);
@@ -430,6 +448,8 @@ namespace Gx
         for (std::size_t i = 0; i < m_string.getSize(); ++i)
         {
             Uint32 curChar = m_string[i];
+            if (m_masked)
+                curChar = L'*';
 
             sf::Color fillColor = m_fillColor;
             if (m_colorMap.find(i) != m_colorMap.end())

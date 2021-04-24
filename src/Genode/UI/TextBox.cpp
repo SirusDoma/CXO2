@@ -57,6 +57,11 @@ namespace Gx
         m_text.SetFont(font);
     }
 
+    void TextBox::SetMasked(bool masked)
+    {
+        m_text.SetMasked(masked);
+    }
+
     void TextBox::SetCharacterSize(unsigned int size)
     {
         m_text.SetCharacterSize(size);
@@ -115,6 +120,11 @@ namespace Gx
     const sf::Font *TextBox::GetFont() const
     {
         return m_text.GetFont();
+    }
+
+    bool TextBox::IsMasked() const
+    {
+        return m_text.IsMasked();
     }
 
     unsigned int TextBox::GetCharacterSize() const

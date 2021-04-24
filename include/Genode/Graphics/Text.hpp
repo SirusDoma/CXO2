@@ -81,6 +81,7 @@ namespace Gx
 
         void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
+        void SetMasked(bool masked);
 
         void SetCharacterSize(unsigned int size);
         void SetLineSpacing(float spacingFactor);
@@ -95,6 +96,7 @@ namespace Gx
 
         const sf::String& GetString() const;
         const sf::Font* GetFont() const;
+        bool IsMasked() const;
 
         unsigned int GetCharacterSize() const;
         float GetLetterSpacing() const;
@@ -126,6 +128,7 @@ namespace Gx
         sf::Color               m_fillColor;
         sf::Color               m_outlineColor;
         float                   m_outlineThickness;
+        bool                    m_masked;
         mutable sf::VertexArray m_vertices;
         mutable sf::VertexArray m_outlineVertices;
         mutable sf::FloatRect   m_bounds;

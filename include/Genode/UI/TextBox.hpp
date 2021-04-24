@@ -20,6 +20,7 @@ namespace Gx
 
         void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
+        void SetMasked(bool masked);
 
         void SetCharacterSize(unsigned int size);
         void SetLineSpacing(float spacingFactor);
@@ -35,6 +36,7 @@ namespace Gx
 
         const sf::String& GetString() const;
         const sf::Font* GetFont() const;
+        bool IsMasked() const;
 
         unsigned int GetCharacterSize() const;
         float GetLetterSpacing() const;
