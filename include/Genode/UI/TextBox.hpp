@@ -21,6 +21,7 @@ namespace Gx
         void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
         void SetMasked(bool masked);
+        void SetNumericModeEnabled(bool enabled);
 
         void SetCharacterSize(unsigned int size);
         void SetLineSpacing(float spacingFactor);
@@ -37,6 +38,7 @@ namespace Gx
         const sf::String& GetString() const;
         const sf::Font* GetFont() const;
         bool IsMasked() const;
+        bool IsNumericMode() const;
 
         unsigned int GetCharacterSize() const;
         float GetLetterSpacing() const;
@@ -117,8 +119,8 @@ namespace Gx
         sf::FloatRect m_bounds;
         unsigned int m_maxLength;
         bool m_permanentFocus;
-
         bool m_focused;
+        bool m_numeric;
         Control::State m_state;
 
         std::function<void(TextBox&, sf::String)> m_onTextEntered;

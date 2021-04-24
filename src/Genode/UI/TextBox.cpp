@@ -12,6 +12,7 @@ namespace Gx
         m_maxLength(),
         m_permanentFocus(false),
         m_focused(),
+        m_numeric(false),
         m_state(Control::State::Normal)
     {
     }
@@ -23,6 +24,7 @@ namespace Gx
         m_maxLength(0),
         m_permanentFocus(false),
         m_focused(),
+        m_numeric(false),
         m_state(Control::State::Normal)
     {
         if (m_bounds == sf::FloatRect())
@@ -60,6 +62,16 @@ namespace Gx
     void TextBox::SetMasked(bool masked)
     {
         m_text.SetMasked(masked);
+    }
+
+    void TextBox::SetNumericModeEnabled(bool enabled)
+    {
+        if (m_numeric != enabled)
+        {
+            m_numeric = enabled;
+            if (m_numeric)
+                SetString("");
+        }
     }
 
     void TextBox::SetCharacterSize(unsigned int size)
@@ -125,6 +137,11 @@ namespace Gx
     bool TextBox::IsMasked() const
     {
         return m_text.IsMasked();
+    }
+
+    bool TextBox::IsNumericMode() const
+    {
+        return m_numeric;
     }
 
     unsigned int TextBox::GetCharacterSize() const
@@ -514,6 +531,10 @@ namespace Gx
 
         // backspace, tab, enter, etc
         if (ev.unicode <= 31)
+            return;
+
+        // Only accept numbers
+        if (m_numeric && (ev.unicode < 48 || ev.unicode > 57))
             return;
 
         m_caret.Index = Insert(m_caret.Index, ev.unicode, m_caret.SelectionLength);
