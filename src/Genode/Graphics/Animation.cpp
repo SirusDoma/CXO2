@@ -8,6 +8,8 @@ namespace Gx
         m_frames(),
         m_elapsed(sf::Time::Zero),
         m_currentFrame(0),
+        m_currentRepeat(0),
+        m_repeatCount(0),
         m_state(AnimationState::Initial),
         m_visible(true),
         m_animationCallback()
@@ -20,6 +22,8 @@ namespace Gx
         m_frames(frames),
         m_elapsed(sf::Time::Zero),
         m_currentFrame(0),
+        m_currentRepeat(0),
+        m_repeatCount(0),
         m_visible(true),
         m_animationCallback()
     {
@@ -54,6 +58,17 @@ namespace Gx
     const sf::Time& Animation::GetDuration() const
     {
         return m_duration;
+    }
+
+    unsigned int Animation::GetRepeatCount() const
+    {
+        return m_repeatCount;
+    }
+
+    void Animation::SetRepeatCount(unsigned int repeatCount)
+    {
+        m_repeatCount = repeatCount;
+        m_currentRepeat = 0;
     }
 
     void Animation::SetLoop(bool loop)
@@ -122,15 +137,19 @@ namespace Gx
             m_currentFrame++;
             if (m_currentFrame >= m_frames.size())
             {
-                if (!IsLoop())
+                if (!IsLoop() && m_currentRepeat >= m_repeatCount)
                 {
-                    m_state = AnimationState::Completed;
-                    m_elapsed = sf::Time::Zero;
+                    m_state         = AnimationState::Completed;
+                    m_elapsed       = sf::Time::Zero;
+                    m_currentRepeat = 0;
                     if (m_animationCallback)
                         m_animationCallback(*this);
 
                     return;
                 }
+
+                if (m_currentRepeat < m_repeatCount)
+                    m_currentRepeat++;
 
                 m_currentFrame = 0;
             }
@@ -167,6 +186,7 @@ namespace Gx
     {
         m_state   = AnimationState::Initial;
         m_elapsed = sf::Time::Zero;
+        m_currentRepeat = 0;
 
         if (m_animationCallback)
             m_animationCallback(*this);

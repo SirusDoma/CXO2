@@ -48,6 +48,9 @@ namespace Gx
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);
 
+        unsigned int GetRepeatCount() const;
+        void SetRepeatCount(unsigned int repeatCount);
+
         bool IsLoop() const;
         void SetLoop(bool loop);
 
@@ -76,6 +79,8 @@ namespace Gx
         sf::Time m_duration;
         sf::Time m_elapsed;
         unsigned int m_currentFrame;
+        unsigned int m_currentRepeat;
+        unsigned int m_repeatCount;
         bool m_loop;
         std::vector<Frame> m_frames;
 
