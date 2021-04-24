@@ -212,6 +212,7 @@ namespace Gx
     {
         m_caret.Index = index;
         m_caret.SelectionLength = selectionLength;
+        SetFocus(true);
 
         Invalidate();
     }
@@ -320,7 +321,7 @@ namespace Gx
 
             SetControlState(uiEvent.State);
             if (!m_focused)
-                Select(m_caret.Index, 0);
+                m_caret.SelectionLength = 0;
 
             Invalidate();
         }
@@ -382,9 +383,7 @@ namespace Gx
                 break;
         }
 
-        SetFocus(true);
         Select(selectIndex, 0);
-
         Control::OnControlClick(sender, ev);
     }
 
