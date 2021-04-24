@@ -15,6 +15,9 @@ public:
     void Initialize(Gx::Application &app);
     virtual void OnShown(Gx::Scene &scene);
 
+    void SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox);
+    void SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox);
+
     void SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton);
     void SetVsModeButton(Gx::ResourcePtr<Gx::RadioButton> vsModeButton);
     void SetSingleModeButton(Gx::ResourcePtr<Gx::RadioButton> singleModeButton);
@@ -24,14 +27,14 @@ public:
     void SetSingleModeAnimation(Gx::ResourcePtr<Gx::Animation> singleModeAnimation);
 
     void SetLevelLimitCheckBox(Gx::ResourcePtr<Gx::CheckBox> levelLimit);
-    void SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox);
-    void SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox);
+    void SetMinLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox);
+    void SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox);
 
 private:
     Gx::ResourcePtr<Gx::RadioButton> m_jamModeButton, m_vsModeButton, m_singleModeButton;
     Gx::ResourcePtr<Gx::Animation>   m_jamAnimation, m_vsModeAnimation, m_singleModeAnimation;
     Gx::ResourcePtr<Gx::CheckBox>    m_levelLimitCheckBox;
-    Gx::ResourcePtr<Gx::TextBox>     m_titleTextBox, m_passwordTextBox;
+    Gx::ResourcePtr<Gx::TextBox>     m_titleTextBox, m_passwordTextBox, m_minLevelLimitTextBox, m_maxLevelLimitTextBox;
 };
 
 #endif

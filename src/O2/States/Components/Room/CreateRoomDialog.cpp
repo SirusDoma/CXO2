@@ -56,8 +56,27 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
     m_titleTextBox->SetString("CXO2's Room");
     m_titleTextBox->SelectAll();
     m_passwordTextBox->SetString("");
+
+    m_levelLimitCheckBox->SetCheckedState(false);
+    m_minLevelLimitTextBox->SetEnabled(false);
+    m_maxLevelLimitTextBox->SetEnabled(false);
+    m_minLevelLimitTextBox->SetString("");
+    m_maxLevelLimitTextBox->SetString("");
 }
 
+void CreateRoomDialog::SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox)
+{
+    m_titleTextBox = std::move(titleTextBox);
+    m_titleTextBox->SetFocus(true);
+    AddChild(m_titleTextBox.get());
+}
+
+void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox)
+{
+    m_passwordTextBox = std::move(passwordTextBox);
+    m_passwordTextBox->SetMasked(true);
+    AddChild(m_passwordTextBox.get());
+}
 
 void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton)
 {
@@ -114,19 +133,29 @@ void CreateRoomDialog::SetSingleModeAnimation(Gx::ResourcePtr<Gx::Animation> sin
 void CreateRoomDialog::SetLevelLimitCheckBox(Gx::ResourcePtr<Gx::CheckBox> levelLimitCheckBox)
 {
     m_levelLimitCheckBox = std::move(levelLimitCheckBox);
+    m_levelLimitCheckBox->SetCheckStateChangeCallback([=] (auto sender)
+    {
+        m_minLevelLimitTextBox->SetEnabled(sender->IsChecked());
+        m_maxLevelLimitTextBox->SetEnabled(sender->IsChecked());
+
+        if (!sender->IsChecked())
+        {
+            m_minLevelLimitTextBox->SetString("");
+            m_maxLevelLimitTextBox->SetString("");
+        }
+    });
+
     AddChild(m_levelLimitCheckBox.get());
 }
 
-void CreateRoomDialog::SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox)
+void CreateRoomDialog::SetMinLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox)
 {
-    m_titleTextBox = std::move(titleTextBox);
-    m_titleTextBox->SetFocus(true);
-    AddChild(m_titleTextBox.get());
+    m_minLevelLimitTextBox = std::move(textBox);
+    AddChild(m_minLevelLimitTextBox.get());
 }
 
-void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox)
+void CreateRoomDialog::SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox)
 {
-    m_passwordTextBox = std::move(passwordTextBox);
-    m_passwordTextBox->SetMasked(true);
-    AddChild(m_passwordTextBox.get());
+    m_maxLevelLimitTextBox = std::move(textBox);
+    AddChild(m_maxLevelLimitTextBox.get());
 }
