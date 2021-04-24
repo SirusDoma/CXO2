@@ -29,6 +29,8 @@ namespace Gx
         virtual bool Input(sf::Event ev);
 
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnKeyDown(sf::Event::KeyEvent ev);
+
         virtual void Invalidate();
 
     private:

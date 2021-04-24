@@ -1,5 +1,6 @@
 ﻿#include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/RadioButton.hpp>
+#include <Genode/UI/TextBox.hpp>
 
 namespace Gx
 {
@@ -35,6 +36,43 @@ namespace Gx
             return;
 
         m_activeRadio = radio;
+    }
+
+    void UiContainer::OnKeyDown(sf::Event::KeyEvent ev)
+    {
+        Inputable::OnKeyDown(ev);
+
+        if (!IsEnabled() || ev.code != sf::Keyboard::Tab)
+            return;
+
+        TextBox *first   = nullptr;
+        TextBox *current = nullptr;
+
+        for (auto child : GetChildren())
+        {
+            auto textBox = dynamic_cast<TextBox*>(child);
+            if (!textBox || !textBox->IsEnabled())
+                continue;
+
+            if (current && !textBox->IsFocused())
+            {
+                current->SetFocus(false);
+                textBox->SetFocus(true);
+                return;
+            }
+
+            if (!first)
+                first = textBox;
+
+            if (textBox->IsFocused())
+                current = textBox;
+        }
+
+        if (first && current)
+        {
+            current->SetFocus(false);
+            first->SetFocus(true);
+        }
     }
 
     sf::RenderStates UiContainer::Render(sf::RenderTarget &target, sf::RenderStates states) const
