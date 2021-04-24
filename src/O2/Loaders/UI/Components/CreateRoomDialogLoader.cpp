@@ -51,6 +51,8 @@ Gx::ResourcePtr<CreateRoomDialog> CreateRoomDialogLoader::Load(const Gx::Resourc
         dialog->SetSingleModeAnimation(resources->Resolve<Gx::Animation>("Interface/Metadata/Dialog/CreateRoom/SingleModeAnimation.json"));
 
         dialog->SetLevelLimitCheckBox(resources->Resolve<Gx::CheckBox>("Interface/Metadata/Dialog/CreateRoom/LevelLimitCheckBox.json"));
+        dialog->SetTitleTextBox(resources->Resolve<Gx::TextBox>("Interface/Metadata/Dialog/CreateRoom/TitleTextBox.json"));
+        dialog->SetPasswordTextBox(resources->Resolve<Gx::TextBox>("Interface/Metadata/Dialog/CreateRoom/PasswordTextBox.json"));
 
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
         auto acceptButtonMetadata = spec->AcceptButtonMetadata;

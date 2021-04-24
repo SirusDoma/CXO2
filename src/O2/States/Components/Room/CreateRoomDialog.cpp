@@ -49,6 +49,19 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
     AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get());
 }
 
+void CreateRoomDialog::OnShown(Gx::Scene &scene)
+{
+    Dialog::OnShown(scene);
+
+    m_vsModeButton->SetCheckedState(true);
+    m_vsModeAnimation->Stop();
+
+    m_titleTextBox->SetString("CXO2's Room");
+    m_titleTextBox->SelectAll();
+    m_passwordTextBox->SetString("");
+}
+
+
 void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton)
 {
     m_jamModeButton = std::move(jamModeButton);
@@ -107,4 +120,17 @@ void CreateRoomDialog::SetLevelLimitCheckBox(Gx::ResourcePtr<Gx::CheckBox> level
 {
     m_levelLimitCheckBox = std::move(levelLimitCheckBox);
     AddChild(m_levelLimitCheckBox.get());
+}
+
+void CreateRoomDialog::SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox)
+{
+    m_titleTextBox = std::move(titleTextBox);
+    m_titleTextBox->SetFocus(true);
+    AddChild(m_titleTextBox.get());
+}
+
+void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox)
+{
+    m_passwordTextBox = std::move(passwordTextBox);
+    AddChild(m_passwordTextBox.get());
 }
