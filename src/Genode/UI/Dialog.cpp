@@ -234,5 +234,6 @@ namespace Gx
 
     void Dialog::Invalidate()
     {
+        UiContainer::Invalidate();
     }
 }
