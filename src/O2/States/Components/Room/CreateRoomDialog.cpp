@@ -132,5 +132,6 @@ void CreateRoomDialog::SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox
 void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordTextBox)
 {
     m_passwordTextBox = std::move(passwordTextBox);
+    m_passwordTextBox->SetMasked(true);
     AddChild(m_passwordTextBox.get());
 }
