@@ -354,7 +354,7 @@ namespace Gx
             target.draw(m_caret.GetHighlight(), states);
 
         target.draw(m_text, states);
-        if (IsFocused())
+        if (IsFocused() && IsEnabled())
             target.draw(m_caret, states);
 
         return Control::Render(target, states);
@@ -403,7 +403,10 @@ namespace Gx
         Control::OnMouseButtonUp(ev);
 
         if (GetControlState() == Control::State::Normal)
+        {
             SetFocus(false);
+            Invalidate();
+        }
     }
 
     void TextBox::OnKeyDown(sf::Event::KeyEvent ev)
