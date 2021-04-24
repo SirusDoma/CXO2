@@ -115,7 +115,7 @@ sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderState
 void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)
 {
     if (m_hover)
-        m_hover->SetVisible(state == Gx::Control::Hover || state == Gx::Control::Active);
+        m_hover->SetVisible(state == Gx::Control::State::Hover || state == Gx::Control::State::Active);
 
     Control::OnControlStateChanged(sender, state);
 }

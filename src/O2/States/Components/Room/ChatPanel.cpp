@@ -31,6 +31,7 @@ void ChatPanel::Initialize(Gx::Scene &scene)
     AddChild(chatWindow, scrollChat, btnChatScrollUp, btnChatScrollDown);
 
     auto chatBox = scene.Create<Gx::TextBox>("Interface/Metadata/State/Room/ChatPanel/ChatBox.json");
+    chatBox->SetPermanentFocusEnabled(true);
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
         std::cout << std::string(text) << std::endl;

@@ -10,7 +10,9 @@ namespace Gx
         m_caret(*this),
         m_bounds(),
         m_maxLength(),
-        m_focused(false)
+        m_permanentFocus(false),
+        m_focused(),
+        m_state(Control::State::Normal)
     {
     }
 
@@ -19,12 +21,13 @@ namespace Gx
         m_caret(*this),
         m_bounds(bounds),
         m_maxLength(0),
-        m_focused(false)
+        m_permanentFocus(false),
+        m_focused(),
+        m_state(Control::State::Normal)
     {
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
 
-        SetFocus(true);
         SetHighlightBackColor(sf::Color::White);
         SetHighlightTextColor(sf::Color::Black);
     }
@@ -37,29 +40,6 @@ namespace Gx
     void TextBox::SetLocalBounds(sf::FloatRect bounds)
     {
         m_bounds = bounds;
-    }
-
-    bool TextBox::IsFocused() const
-    {
-        return m_focused;
-    }
-
-    void TextBox::SetFocus(bool focus)
-    {
-        if (IsFocused() == focus || GetControlState() == Control::State::Active)
-            return;
-
-        m_focused = focus;
-        auto uiEvent = Event{false, GetControlState()};
-        if (GetFocusChangedCallback())
-            GetFocusChangedCallback()(*this, uiEvent);
-
-        if (m_focused && GetGainFocusCallback())
-            GetGainFocusCallback()(*this, uiEvent);
-        else if (!m_focused && GetLostFocusCallback())
-            GetLostFocusCallback()(*this, uiEvent);
-
-        SetControlState(uiEvent.State);
     }
 
     sf::Vector2f TextBox::FindCharacterPosition(std::size_t index) const
@@ -218,6 +198,20 @@ namespace Gx
         return fit;
     }
 
+    void TextBox::Select(size_t index, int selectionLength)
+    {
+        m_caret.Index = index;
+        m_caret.SelectionLength = selectionLength;
+
+        Invalidate();
+    }
+
+    void TextBox::SelectAll()
+    {
+        int length = GetString().getSize();
+        Select(length, -length);
+    }
+
     sf::String TextBox::GetSelectedText() const
     {
         auto index  = m_caret.Index - 1;
@@ -274,6 +268,69 @@ namespace Gx
         return index;
     }
 
+    bool TextBox::IsPermanentFocus() const
+    {
+        return m_permanentFocus;
+    }
+
+    void TextBox::SetPermanentFocusEnabled(bool enable)
+    {
+        if (m_permanentFocus != enable)
+        {
+            m_permanentFocus = enable;
+            if (m_permanentFocus)
+                SetFocus(true);
+        }
+    }
+
+    bool TextBox::IsFocused() const
+    {
+        if (m_permanentFocus)
+            return true;
+
+        return m_focused;
+    }
+
+    void TextBox::SetFocus(bool focus)
+    {
+        if (m_permanentFocus)
+            focus = true;
+
+        if (m_focused != focus)
+        {
+            m_focused = focus;
+            auto uiEvent = Event{false, GetControlState()};
+            if (GetFocusChangedCallback())
+                GetFocusChangedCallback()(*this, uiEvent);
+
+            if (m_focused && GetGainFocusCallback())
+                GetGainFocusCallback()(*this, uiEvent);
+            else if (!m_focused && GetLostFocusCallback())
+                GetLostFocusCallback()(*this, uiEvent);
+
+            SetControlState(uiEvent.State);
+            if (!m_focused)
+                Select(m_caret.Index, 0);
+
+            Invalidate();
+        }
+    }
+
+    const Control::State TextBox::GetControlState() const
+    {
+        return m_state;
+    }
+
+    void TextBox::SetControlState(const Control::State &state)
+    {
+        if (m_state != state)
+        {
+            m_state = state;
+            if (IsEnabled())
+                OnControlStateChanged(this, m_state);
+        }
+    }
+
     void TextBox::Update(double delta)
     {
         m_caret.Update(delta);
@@ -301,9 +358,11 @@ namespace Gx
     {
         float minDistance  = -1;
         size_t selectIndex = m_caret.Index;
+
+        auto bounds = GetGlobalBounds();
         for (size_t index = 0; index <= m_text.GetString().getSize(); index++)
         {
-            float distance = std::abs((FindCharacterPosition(index).x + GetPosition().x) - ev.x);
+            float distance = std::abs((FindCharacterPosition(index).x + bounds.left) - ev.x);
             if (minDistance == -1 || distance < minDistance)
             {
                 selectIndex = index;
@@ -314,22 +373,27 @@ namespace Gx
         }
 
         SetFocus(true);
-        m_caret.Index = selectIndex;
+        Select(selectIndex, 0);
 
-        Invalidate();
+        Control::OnControlClick(sender, ev);
     }
 
     void TextBox::OnMouseMove(sf::Event::MouseMoveEvent ev)
     {
-        bool focused = IsFocused();
         Control::OnMouseMove(ev);
+    }
 
-        SetFocus(focused);
+    void TextBox::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
+    {
+        Control::OnMouseButtonDown(ev);
     }
 
     void TextBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonUp(ev);
+
+        if (GetControlState() == Control::State::Normal)
+            SetFocus(false);
     }
 
     void TextBox::OnKeyDown(sf::Event::KeyEvent ev)
@@ -342,7 +406,7 @@ namespace Gx
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
 
-            int length   = m_caret.SelectionLength;
+            int length    = m_caret.SelectionLength;
             m_caret.Index = Erase(m_caret.Index - 1, length == 0 ? -1 : length);
             m_caret.SelectionLength = 0;
         }
@@ -531,7 +595,7 @@ namespace Gx
             m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, Instance.GetCharacterSize()));
         }
 
-        m_cursor.SetPosition(Instance.FindCharacterPosition(Index));
+        m_cursor.SetPosition(Instance.FindCharacterPosition(Index) + sf::Vector2f(0.f, 1.5f));
         m_cursor.SetFillColor(Instance.GetColor());
 
         if (SelectionLength != 0)
@@ -545,7 +609,7 @@ namespace Gx
 
             auto charPos = Instance.FindCharacterPosition(index);
             auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
-            m_highlight.SetPosition(sf::Vector2f(charPos.x, charPos.y + 0.65f));
+            m_highlight.SetPosition(sf::Vector2f(charPos.x, m_cursor.GetPosition().y));
             m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), Instance.GetCharacterSize()));
         }
         else

@@ -15,7 +15,7 @@ namespace Gx
     class Control : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer
     {
     public:
-        enum State { Normal, Hover, Active };
+        enum class State { Normal, Hover, Active };
         struct Event
         {
             bool Handled;
@@ -55,8 +55,8 @@ namespace Gx
     protected:
         Control();
 
-        const State GetControlState() const;
-        void SetControlState(const State &state);
+        virtual const State GetControlState() const;
+        virtual void SetControlState(const State &state);
 
         const std::function<void(Control&, Event&)>& GetFocusChangedCallback();
         const std::function<void(Control&, Event&)>& GetGainFocusCallback();

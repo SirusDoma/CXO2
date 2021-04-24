@@ -18,9 +18,6 @@ namespace Gx
         virtual const sf::FloatRect GetLocalBounds() const;
         virtual void SetLocalBounds(sf::FloatRect bounds);
 
-        virtual bool IsFocused() const;
-        virtual void SetFocus(bool focus);
-
         void SetString(const sf::String& string);
         void SetFont(const sf::Font& font);
 
@@ -51,16 +48,28 @@ namespace Gx
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;
 
+        bool IsPermanentFocus() const;
+        void SetPermanentFocusEnabled(bool enable);
+
+        virtual bool IsFocused() const;
+        virtual void SetFocus(bool focus);
+
         unsigned int GetMaximumTextLength() const;
         void SetMaximumTextLength(unsigned int maxLength);
         void SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback);
 
+        void Select(size_t index, int selectionLength);
+        void SelectAll();
         sf::String GetSelectedText() const;
+
         size_t Insert(size_t index, Uint32 unicode, int selectionLength = 0);
         size_t Erase(size_t index, int length);
 
     private:
         bool IsNextCharacterFit();
+
+        virtual void SetControlState(const State &state);
+        virtual const State GetControlState() const;
 
         virtual void Update(double delta);
         virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
@@ -68,6 +77,7 @@ namespace Gx
         virtual void OnControlStateChanged(Control *sender, State state);
         virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
+        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
         virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
         virtual void OnKeyDown(sf::Event::KeyEvent ev);
         virtual void OnKeyType(sf::Event::TextEvent ev);
@@ -104,7 +114,10 @@ namespace Gx
         sf::Color m_highlightColor;
         sf::FloatRect m_bounds;
         unsigned int m_maxLength;
+        bool m_permanentFocus;
+
         bool m_focused;
+        Control::State m_state;
 
         std::function<void(TextBox&, sf::String)> m_onTextEntered;
     };

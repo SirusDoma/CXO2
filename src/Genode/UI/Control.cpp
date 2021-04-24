@@ -257,7 +257,7 @@ namespace Gx
         bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
         if (intersect)
         {
-            if (m_state == Control::State::Hover)
+            if (GetControlState() == Control::State::Hover)
             {
                 SetControlState(Control::State::Active);
                 OnControlPress(this, ev);
@@ -296,7 +296,7 @@ namespace Gx
     {
         if (GetGlobalBounds().contains(ev.x, ev.y))
         {
-            if (m_state == Control::State::Active)
+            if (GetControlState() == Control::State::Active)
             {
                 if (m_onClick)
                 {
