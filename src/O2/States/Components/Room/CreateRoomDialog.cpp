@@ -36,6 +36,10 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
     {
         m_singleModeAnimation->Reset();
         m_singleModeAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
+
+        m_passwordTextBox->SetEnabled(!sender->IsChecked());
+        if (!m_passwordTextBox->IsEnabled())
+            m_passwordTextBox->SetString("");
     });
 
     AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get());
@@ -151,11 +155,13 @@ void CreateRoomDialog::SetLevelLimitCheckBox(Gx::ResourcePtr<Gx::CheckBox> level
 void CreateRoomDialog::SetMinLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox)
 {
     m_minLevelLimitTextBox = std::move(textBox);
+    m_minLevelLimitTextBox->SetNumericModeEnabled(true);
     AddChild(m_minLevelLimitTextBox.get());
 }
 
 void CreateRoomDialog::SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox)
 {
     m_maxLevelLimitTextBox = std::move(textBox);
+    m_maxLevelLimitTextBox->SetNumericModeEnabled(true);
     AddChild(m_maxLevelLimitTextBox.get());
 }
