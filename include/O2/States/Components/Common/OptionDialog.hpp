@@ -8,6 +8,7 @@
 
 #include <O2/Chart/EventChannel.hpp>
 #include <O2/Config/GameConfig.hpp>
+#include <Genode/UI/ToolTip.hpp>
 
 class OptionDialog : public Gx::Dialog
 {
@@ -34,6 +35,7 @@ private:
     Gx::CheckBox    *m_gfxCheckBox, *m_cursorCheckBox, *m_keyTestCheckBox, *m_bgmCheckBox;
     Gx::RadioButton *m_keyTab, *m_soundTab;
     Gx::ProgressBar *m_masterVolumeBar, *m_musicVolumeBar, *m_effectVolumeBar;
+    Gx::ToolTip     *m_toolTip;
     sf::Music       *m_bgAllTest, *m_bgTest;
     sf::Sound       *m_sfxNavigation, *m_efTest;
     Gx::UiContainer  m_keyOptionContainer, m_soundOptionContainer;

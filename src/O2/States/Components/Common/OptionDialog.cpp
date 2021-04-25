@@ -26,7 +26,8 @@ void OptionDialog::Initialize(Gx::Scene &scene)
     {
         if (!ValidateConfig())
         {
-            // TODO: Tool Tip
+            m_toolTip->SetString("Invalid Keysetting.");
+            m_toolTip->Show(this);
             return;
         }
 
@@ -46,7 +47,8 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         if (auto sfxGroup = m_mixer->GetSoundGroup("SFX"); sfxGroup)
             sfxGroup->SetVolume(m_config.EffectVolume);
 
-        // TODO: Add tooltip
+        m_toolTip->SetString("Setting has been saved.");
+        m_toolTip->Show(this);
         Invalidate();
     });
 
@@ -56,13 +58,17 @@ void OptionDialog::Initialize(Gx::Scene &scene)
         m_config.Reset();
         btnSave->PerformClick();
 
-        // TODO: Add tooltip
+        m_toolTip->SetString("Setting has reset to default.");
+        m_toolTip->Show(this);
     });
 
     AddChild(btnDefault, btnSave);
 
     m_background = scene.Create<Gx::Image>("Interface/Metadata/Dialog/Option/Background.json");
     SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
+
+    m_toolTip = scene.Create<Gx::ToolTip>("Interface/Metadata/Dialog/Option/ToolTip.json");
+    AddChild(m_toolTip);
 
     m_gfxCheckBox     = scene.Create<Gx::CheckBox>("Interface/Metadata/Dialog/Option/3dCheckBox.json");
     m_gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.Use3D = sender->IsChecked(); });
