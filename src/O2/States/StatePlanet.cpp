@@ -116,8 +116,8 @@ void StatePlanet::OnEnterPlanet(Planet::MusicHall hall)
     {
         for (int i = 1; i <= 20; i++)
         {
-            auto channel = Planet::ChannelInfo();
-            channel.Number     = i;
+            auto channel       = Planet::ChannelInfo();
+            channel.Number     = (x * 20) + i;
             channel.Population = static_cast<int>((i / 20.f) * 100.f);
 
             planetInfo.Channels.push_back(channel);
