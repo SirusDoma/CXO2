@@ -1,8 +1,6 @@
 #ifndef O2JAM_STATE_ROOM_HPP
 #define O2JAM_STATE_ROOM_HPP
 
-#include <SFML/Audio.hpp>
-
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Sequence.hpp>
@@ -31,17 +29,15 @@ private:
 
     void OnExitPlanet();
 
-    sf::Music *m_bgm;
-    Planet::MusicHall m_hall;
+    sf::Music          *m_bgm;
+    Planet::MusicHall   m_hall;
     Planet::ChannelInfo m_channel;
-    Avatar *m_avatar;
-    Item *m_item;
-
-    OptionDialog *m_optionDialog;
-
-    RoomList  m_roomList;
-    ChatPanel m_chatPanel;
-    UserList  m_userList;
+    Avatar             *m_avatar;
+    Item               *m_item;
+    RoomList            m_roomList;
+    ChatPanel           m_chatPanel;
+    UserList            m_userList;
+    OptionDialog       *m_optionDialog;
 };
 
 #endif

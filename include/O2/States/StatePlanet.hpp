@@ -1,8 +1,6 @@
 #ifndef O2JAM_STATE_PLANET_HPP
 #define O2JAM_STATE_PLANET_HPP
 
-#include <SFML/Audio.hpp>
-
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Sequence.hpp>
@@ -26,12 +24,10 @@ private:
 
     ChannelBoard    m_channelBoard;
     Gx::UiContainer m_container;
-
-    sf::Music  *m_bgm;
-    Gx::Dialog *m_dialogInfo;
-
-    bool m_useFadeIn;
-    bool m_connecting;
+    sf::Music      *m_bgm;
+    Gx::Dialog     *m_dialogInfo;
+    bool            m_useFadeIn;
+    bool            m_connecting;
 };
 
 #endif
