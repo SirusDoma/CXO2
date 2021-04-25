@@ -47,8 +47,11 @@ namespace Gx
 
     void Control::SetEnabled(bool enabled)
     {
-        m_enabled = enabled;
-        Invalidate();
+        if (m_enabled != enabled)
+        {
+            m_enabled = enabled;
+            Invalidate();
+        }
     }
 
     bool Control::IsEnabled() const
@@ -58,8 +61,11 @@ namespace Gx
 
     void Control::SetVisible(bool visible)
     {
-        m_visible = visible;
-        Invalidate();
+        if (m_visible != visible)
+        {
+            m_visible = visible;
+            Invalidate();
+        }
     }
 
     bool Control::IsVislble() const
