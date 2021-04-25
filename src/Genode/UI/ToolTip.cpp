@@ -31,7 +31,7 @@ const sf::FloatRect Gx::ToolTip::GetLocalBounds() const
 
 void Gx::ToolTip::Show(Gx::Control *parent)
 {
-    Show(parent ? parent->GetPosition() : sf::Vector2f());
+    Show(parent ? sf::Vector2f (parent->GetLocalBounds().width, parent->GetLocalBounds().height) / 2.f : sf::Vector2f(), parent ? Alignment::Center : Alignment::Left);
 }
 
 void Gx::ToolTip::Show(sf::Vector2f position, Alignment alignment)
