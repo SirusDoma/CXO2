@@ -11,6 +11,7 @@
 
 #include <O2/Loaders/UI/ImageLoader.hpp>
 #include <O2/Loaders/UI/LabelLoader.hpp>
+#include <O2/Loaders/UI/ToolTipLoader.hpp>
 #include <O2/Loaders/UI/NumberLoader.hpp>
 #include <O2/Loaders/UI/ButtonLoader.hpp>
 #include <O2/Loaders/UI/CheckBoxLoader.hpp>
@@ -55,6 +56,7 @@ void O2Jam::OnStart()
     // UI
     Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Number, NumberLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::CheckBox, CheckBoxLoader>();
