@@ -85,7 +85,14 @@ void O2Jam::OnStart()
     });
 
     // Module configuration
-    Resolve<Gx::ResourceManager>([=] (auto& app) -> Gx::ResourceManager& { return m_resources; });
+    Resolve<Gx::ResourceManager>([=] (auto& app) -> Gx::ResourceManager&
+    {
+        // Register shared resource container
+        m_resources.Register<Item>();
+        m_resources.Register<ItemData>();
+
+        return m_resources;
+    });
     Resolve<Gx::Mixer>([=] (auto& app) -> Gx::Mixer&
     {
         m_mixer = Gx::Mixer(Require<Gx::ResourceManager>());
@@ -96,10 +103,6 @@ void O2Jam::OnStart()
         m_itemFactory = ItemFactory(Require<Gx::ResourceManager>());
         return m_itemFactory;
     });
-
-    // Register shared resource container
-    m_resources.Register<Item>();
-    m_resources.Register<ItemData>();
 
     // Force to load item metadata at startup
     for (auto gender : {Character::Gender::Male, Character::Gender::Female})
