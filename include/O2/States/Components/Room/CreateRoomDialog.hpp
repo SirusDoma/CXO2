@@ -34,6 +34,9 @@ public:
 
     void SetToolTip(Gx::ResourcePtr<Gx::ToolTip> toolTip);
 
+protected:
+    virtual void OnAccepted();
+
 private:
     Gx::ResourcePtr<Gx::RadioButton> m_jamModeButton, m_vsModeButton, m_singleModeButton;
     Gx::ResourcePtr<Gx::Animation>   m_jamAnimation, m_vsModeAnimation, m_singleModeAnimation;

@@ -19,7 +19,7 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
         }
 
         m_toolTip->SetString("JAM Mode is not available.");
-        m_toolTip->Show(sf::Vector2f(GetLocalBounds().width, GetLocalBounds().height) / 2.f, Gx::ToolTip::Alignment::Center);
+        m_toolTip->Show(this);
 
         m_jamModeButton->SetCheckedState(false);
         m_vsModeButton->SetCheckedState(true);
@@ -172,4 +172,44 @@ void CreateRoomDialog::SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> text
 void CreateRoomDialog::SetToolTip(Gx::ResourcePtr<Gx::ToolTip> toolTip)
 {
     m_toolTip = std::move(toolTip);
+}
+
+void CreateRoomDialog::OnAccepted()
+{
+    if (m_titleTextBox->GetString().isEmpty())
+    {
+        m_toolTip->SetString("Please enter a room name.");
+        m_toolTip->Show(this);
+        return;
+    }
+
+    if (m_levelLimitCheckBox->IsChecked())
+    {
+        if (m_minLevelLimitTextBox->GetString().isEmpty() || m_maxLevelLimitTextBox->GetString().isEmpty())
+        {
+            m_toolTip->SetString("Please set level limit. Ex) 10 ~ 20");
+            m_toolTip->Show(this);
+
+            return;
+        }
+
+        m_toolTip->SetString("");
+        unsigned int min = std::stoi(std::string(m_minLevelLimitTextBox->GetString()));
+        unsigned int max = std::stoi(std::string(m_maxLevelLimitTextBox->GetString()));
+
+        if (min > 100 || max > 100)
+            m_toolTip->SetString("Wrong level selected. You can enter level range from 1 to 100");
+        else if (min > max)
+            m_toolTip->SetString("You must enter higher numbers in HIGH LEVEL");
+
+        if (!m_toolTip->GetString().isEmpty())
+        {
+            m_toolTip->Show(this);
+            return;
+        }
+    }
+
+
+
+    Dialog::OnAccepted();
 }
