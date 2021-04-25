@@ -118,6 +118,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::Load(const Gx::ResourceMetadata &met
     toolTip->SetContainerFillColor(spec->ContainerFillColor);
     toolTip->SetContainerOutlineColor(spec->ContainerOutlineColor);
     toolTip->SetContainerOutlineThickness(spec->ContainerOutlineThickness);
+    toolTip->Hide();
 
     toolTip->SetOrigin(spec->Origin);
     toolTip->SetPosition(spec->Position);
