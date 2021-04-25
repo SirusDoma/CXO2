@@ -1,6 +1,5 @@
 #include <O2/States/Components/Room/CreateRoomDialog.hpp>
 
-
 void CreateRoomDialog::Initialize(Gx::Application &app)
 {
     auto& mixer        = app.Require<Gx::Mixer>();
@@ -19,7 +18,9 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
             m_jamAnimation->SetVisible(true);
         }
 
-        // TODO: Tooltip, Jam mode placeholder
+        m_toolTip->SetString("JAM Mode is not available.");
+        m_toolTip->Show(sf::Vector2f(GetLocalBounds().width, GetLocalBounds().height) / 2.f, Gx::ToolTip::Alignment::Center);
+
         m_jamModeButton->SetCheckedState(false);
         m_vsModeButton->SetCheckedState(true);
     });
@@ -42,7 +43,7 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
             m_passwordTextBox->SetString("");
     });
 
-    AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get());
+    AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get(), m_toolTip.get());
 }
 
 void CreateRoomDialog::OnShown(Gx::Scene &scene)
@@ -56,6 +57,7 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
     m_jamAnimation->Stop();
     m_singleModeAnimation->Stop();
     m_vsModeAnimation->SetRepeatCount(1);
+    m_vsModeAnimation->Reset();
 
     m_titleTextBox->SetString("CXO2's Room");
     m_titleTextBox->SelectAll();
@@ -66,6 +68,7 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
     m_maxLevelLimitTextBox->SetEnabled(false);
     m_minLevelLimitTextBox->SetString("");
     m_maxLevelLimitTextBox->SetString("");
+    m_toolTip->Hide();
 }
 
 void CreateRoomDialog::SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox)
@@ -164,4 +167,9 @@ void CreateRoomDialog::SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> text
     m_maxLevelLimitTextBox = std::move(textBox);
     m_maxLevelLimitTextBox->SetNumericModeEnabled(true);
     AddChild(m_maxLevelLimitTextBox.get());
+}
+
+void CreateRoomDialog::SetToolTip(Gx::ResourcePtr<Gx::ToolTip> toolTip)
+{
+    m_toolTip = std::move(toolTip);
 }

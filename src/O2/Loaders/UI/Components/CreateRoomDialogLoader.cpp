@@ -57,6 +57,8 @@ Gx::ResourcePtr<CreateRoomDialog> CreateRoomDialogLoader::Load(const Gx::Resourc
         dialog->SetMinLevelLimitTextBox(resources->Resolve<Gx::TextBox>("Interface/Metadata/Dialog/CreateRoom/MinLevelLimitTextBox.json"));
         dialog->SetMaxLevelLimitTextBox(resources->Resolve<Gx::TextBox>("Interface/Metadata/Dialog/CreateRoom/MaxLevelLimitTextBox.json"));
 
+        dialog->SetToolTip(resources->Resolve<Gx::ToolTip>("Interface/Metadata/Dialog/CreateRoom/ToolTip.json"));
+
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
         auto acceptButtonMetadata = spec->AcceptButtonMetadata;
         auto cancelButtonMetadata = spec->CancelButtonMetadata;
