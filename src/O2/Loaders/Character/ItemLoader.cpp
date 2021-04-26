@@ -1,4 +1,6 @@
 #include <O2/Loaders/Character/ItemLoader.hpp>
+
+#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <magic_enum.hpp>

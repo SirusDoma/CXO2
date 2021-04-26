@@ -1,6 +1,8 @@
 ﻿#include <O2/Loaders/MusicLoader.hpp>
 #include <O2/Metadata/MusicMetadata.hpp>
 
+#include <Genode/IO/ResourceManager.hpp>
+
 MusicLoader::MusicLoader()
 {
 }

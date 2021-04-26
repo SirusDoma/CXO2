@@ -4,8 +4,7 @@
 #include <Genode/IO/Json.hpp>
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceContext.hpp>
-#include <Genode/IO/ResourceLoader.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 
 template<typename R>
 class O2JamResourceLoader : public Gx::ResourceLoader<R>
