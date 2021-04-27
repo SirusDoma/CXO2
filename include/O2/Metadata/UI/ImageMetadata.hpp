@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
+#include <Genode/UI/Image.hpp>
 #include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>
 

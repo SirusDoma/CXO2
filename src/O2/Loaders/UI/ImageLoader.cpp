@@ -16,8 +16,43 @@ std::unique_ptr<Gx::ResourceMetadata> ImageLoader::LoadMetadata(const void *data
     auto attributes = json.at("attributes");
 
     ParseReferences(json["require"], metadata);
-    SpriteLoader::ParseSprite(attributes, metadata);
+    ParseImage(attributes, metadata);
 
+    return std::make_unique<ImageMetadata>(metadata);
+}
+
+Gx::ResourcePtr<Gx::Image> ImageLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
+{
+    auto spec = dynamic_cast<const ImageMetadata*>(&metadata);
+    if (!spec)
+        return nullptr;
+
+    auto image = std::make_unique<Gx::Image>();
+    image->SetName(context.Name);
+    image->SetColor(spec->Color);
+
+    if (spec->Frames.size() > 0)
+    {
+        for (auto frame : spec->Frames)
+            image->AddFrame(frame.first, frame.second);
+    }
+    else
+        image->SetTexCoords(spec->TexCoords);
+
+    if (context.Texture)
+        image->SetTexture(*context.Texture);
+
+    image->SetOrigin(spec->Origin);
+    image->SetPosition(spec->Position);
+    image->SetScale(spec->Scale);
+    image->SetRotation(spec->Rotation);
+
+    return image;
+}
+
+void ImageLoader::ParseImage(Json attributes, ImageMetadata &metadata)
+{
+    SpriteLoader::ParseSprite(attributes, metadata);
     if (attributes.contains("frames"))
     {
         auto frames = attributes.at("frames");
@@ -87,35 +122,4 @@ std::unique_ptr<Gx::ResourceMetadata> ImageLoader::LoadMetadata(const void *data
             metadata.Rotation, metadata.Scale
         };
     }
-
-    return std::make_unique<ImageMetadata>(metadata);
-}
-
-Gx::ResourcePtr<Gx::Image> ImageLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
-{
-    auto spec = dynamic_cast<const ImageMetadata*>(&metadata);
-    if (!spec)
-        return nullptr;
-
-    auto image = std::make_unique<Gx::Image>();
-    image->SetName(context.Name);
-    image->SetColor(spec->Color);
-
-    if (spec->Frames.size() > 0)
-    {
-        for (auto frame : spec->Frames)
-            image->AddFrame(frame.first, frame.second);
-    }
-    else
-        image->SetTexCoords(spec->TexCoords);
-
-    if (context.Texture)
-        image->SetTexture(*context.Texture);
-
-    image->SetOrigin(spec->Origin);
-    image->SetPosition(spec->Position);
-    image->SetScale(spec->Scale);
-    image->SetRotation(spec->Rotation);
-
-    return image;
 }

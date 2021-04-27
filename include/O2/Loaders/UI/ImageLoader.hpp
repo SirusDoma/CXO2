@@ -2,7 +2,7 @@
 #define O2JAM_IMAGE_LOADER_HPP
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
-#include <Genode/UI/Image.hpp>
+#include <O2/Metadata/UI/ImageMetadata.hpp>
 
 class ImageLoader : public O2JamResourceLoader<Gx::Image>
 {
@@ -12,6 +12,7 @@ public :
     virtual std::unique_ptr<Gx::ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
     virtual Gx::ResourcePtr<Gx::Image> Load(const Gx::ResourceMetadata& metadata, const Gx::ResourceContext& context = Gx::ResourceContext()) const;
 
+    static void ParseImage(Json attributes, ImageMetadata &metadata);
 };
 
 #endif

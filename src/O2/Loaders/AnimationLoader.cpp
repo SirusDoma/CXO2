@@ -51,7 +51,7 @@ std::unique_ptr<Gx::ResourceMetadata> AnimationLoader::LoadMetadata(const void *
     if (!attributes["duration"].empty())
         metadata.Duration = sf::milliseconds(attributes["duration"].get<unsigned int>());
     else
-        metadata.Duration = sf::milliseconds(metadata.Frames.size() * 65);
+        metadata.Duration = sf::milliseconds(metadata.Frames.size() * 60);
 
     return std::make_unique<AnimationMetadata>(metadata);
 }
