@@ -17,10 +17,10 @@
 
 #include <functional>
 
-class ChannelBoard : public virtual Gx::Control, public virtual Gx::TaskContainer
+class ChannelBoard : public Gx::Image, public Gx::TaskContainer
 {
 public:
-
+    constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
     enum Tab
     {
         Notice,
@@ -29,6 +29,18 @@ public:
 
     ChannelBoard();
     void Initialize(Gx::Scene &scene);
+
+    void SetNotice(Gx::ResourcePtr<Gx::Image> notice);
+    void SetChannelCategory(Gx::ResourcePtr<Gx::Image> channelCategory);
+    void SetChannelTabButton(Gx::ResourcePtr<Gx::Button> channelTabButton);
+    void SetNoticeTabButton(Gx::ResourcePtr<Gx::Button> noticeTabButton);
+    void SetChannelEnterButton(Gx::ResourcePtr<Gx::Button> btnChannelEnter);
+    void SetNavigateLeftButton(Gx::ResourcePtr<Gx::Button> btnNavigateLeft);
+    void SetNavigateRightButton(Gx::ResourcePtr<Gx::Button> btnNavigateRight);
+    void SetChannelList(Gx::ResourcePtr<Gx::List> list);
+    void SetCurrentPageNumber(Gx::ResourcePtr<Gx::Number> currentPageNumber);
+    void SetMaxPageNumber(Gx::ResourcePtr<Gx::Number> maxPageNumber);
+    void AddChannelButton(Gx::ResourcePtr<ChannelButton> button);
 
     virtual const sf::FloatRect GetLocalBounds() const;
 
@@ -41,10 +53,10 @@ public:
     bool InTransition() const;
     void SetEnterChannelCallback(std::function<void(Planet::MusicHall, Planet::ChannelInfo)> callback);
 
-private:
-    // TODO: Use Gx::List count
-    constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
+    unsigned int GetChannelsPerPage() const;
+    void SetChannelsPerPage(unsigned int channelsPerPage);
 
+private:
     void CaptureCurrentState();
 
     virtual void Update(double delta);
@@ -52,25 +64,27 @@ private:
 
     virtual void Invalidate();
 
-    Gx::Image       *m_background, *m_notice, *m_channelCategory, m_duplicateImage;
-    Gx::Button      *m_channelTabButton, *m_noticeTabButton;
-    Gx::List        *m_list;
-    Gx::Number      *m_currentPageNumber, *m_maxPageNumber;
+    Gx::Application *m_app;
+    sf::SoundSource *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
 
-    Gx::Scene         *m_scene;
-    sf::SoundSource   *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
+    Gx::Image m_duplicateImage;
     sf::RenderTexture m_renderTexture;
 
     std::unique_ptr<Gx::UiContainer> m_channelListContainer;
+    Gx::ResourcePtr<Gx::Image>  m_notice, m_channelCategory;
+    Gx::ResourcePtr<Gx::Button> m_channelTabButton, m_noticeTabButton, m_channelEnterButton, m_navigateLeftButton, m_btnNavigateRightButton;
+    Gx::ResourcePtr<Gx::List>   m_channelList;
+    Gx::ResourcePtr<Gx::Number> m_currentPageNumber, m_maxPageNumber;
 
-    sf::Vector2f m_position;
     Planet::PlanetInfo m_planetInfo;
-    Tab m_tab;
+    ChannelBoard::Tab  m_tab;
 
-    bool m_animating;
-    int m_selectedChannel, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
     std::function<void(Planet::MusicHall, Planet::ChannelInfo)> m_callback;
-    std::vector<std::unique_ptr<ChannelButton>> m_channelButtons;
+    std::vector<Gx::ResourcePtr<ChannelButton>>                 m_channelButtons;
+
+    bool         m_animating;
+    int          m_selectedChannel;
+    unsigned int m_channelsPerPage, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
 };
 
 #endif

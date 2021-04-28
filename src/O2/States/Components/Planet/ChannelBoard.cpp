@@ -4,10 +4,8 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Move.hpp>
 
-#include <O2/States/Components/Planet/ChannelButton.hpp>
-
 ChannelBoard::ChannelBoard() :
-    Gx::Control(),
+    Gx::Image(),
     Gx::TaskContainer(),
     m_planetInfo(),
     m_tab(),
@@ -23,53 +21,87 @@ ChannelBoard::ChannelBoard() :
 
 void ChannelBoard::Initialize(Gx::Scene &scene)
 {
-    // TODO: CHANNEL BOARD LOADER
-
-    auto& app   = scene.GetApplication();
-    auto& mixer = app.Require<Gx::Mixer>();
-
-    m_scene      = &scene;
-    m_background = scene.Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Background.json");
-    m_position   = m_background->GetPosition();
-
-    SetOrigin(m_background->GetOrigin());
-    SetPosition(m_position);
-
-    m_background->SetOrigin(0.f, 0.f);
-    m_background->SetPosition(0.f, 0.f);
+    m_app       = &scene.GetApplication();
+    auto& mixer = m_app->Require<Gx::Mixer>();
 
     m_sfxPopup    = mixer.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/OpenChannel.json");
     m_sfxNavigate = mixer.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/ChannelNavigation.json");
     m_sfxEnter    = mixer.Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/ChannelEnter.json");
 
     m_channelListContainer = std::make_unique<Gx::UiContainer>();
-    m_channelTabButton = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
-    m_channelTabButton->SetClickCallback([=] (auto& sender, auto& ev) {
+    m_channelListContainer->AddChild(m_channelCategory.get(), m_channelList.get(), m_channelEnterButton.get());
+
+    m_noticePageIndex = 1;
+    m_noticeMaxPage   = m_notice->GetFrameCount();
+    SwitchTab(Tab::Notice);
+
+    m_renderTexture.create(GetLocalBounds().width, GetLocalBounds().height);
+    m_renderTexture.setSmooth(true);
+    m_duplicateImage.SetOrigin(GetOrigin());
+    m_duplicateImage.SetPosition(GetPosition());
+    m_duplicateImage.SetVisible(false);
+
+    AddChild(m_channelTabButton.get(), m_noticeTabButton.get(), m_channelListContainer.get(),
+        m_notice.get(), m_currentPageNumber.get(), m_maxPageNumber.get(), m_navigateLeftButton.get(), m_btnNavigateRightButton.get());
+}
+
+unsigned int ChannelBoard::GetChannelsPerPage() const
+{
+    return m_channelsPerPage;
+}
+
+void ChannelBoard::SetChannelsPerPage(unsigned int channelsPerPage)
+{
+    m_channelsPerPage = channelsPerPage;
+}
+
+void ChannelBoard::SetNotice(Gx::ResourcePtr<Gx::Image> notice)
+{
+    m_notice = std::move(notice);
+}
+
+void ChannelBoard::SetChannelCategory(Gx::ResourcePtr<Gx::Image> channelCategory)
+{
+    m_channelCategory = std::move(channelCategory);
+}
+
+void ChannelBoard::SetChannelTabButton(Gx::ResourcePtr<Gx::Button> channelTabButton)
+{
+    m_channelTabButton = std::move(channelTabButton);
+    m_channelTabButton->SetClickCallback([=] (auto& sender, auto& ev)
+    {
         if (m_tab != Tab::ChannelList && !m_animating && m_planetInfo.Hall != Planet::MusicHall::None)
             SwitchTab(Tab::ChannelList);
     });
+}
 
-    m_channelCategory = scene.Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
-    m_channelListContainer->AddChild(m_channelCategory);
-
-    m_currentPageNumber = scene.Create<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/ChannelCurrentPageNumber.json");
-    m_maxPageNumber     = scene.Create<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/ChannelMaxPageNumber.json");
-    m_currentPageNumber->SetDigitCount(2);
-    m_currentPageNumber->SetValue(1);
-    m_maxPageNumber->SetDigitCount(2);
-
-    auto btnChannelEnter = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
-    btnChannelEnter->SetClickCallback([&] (auto& sender, auto& ev)
+void ChannelBoard::SetNoticeTabButton(Gx::ResourcePtr<Gx::Button> noticeTabButton)
+{
+    m_noticeTabButton = std::move(noticeTabButton);
+    m_noticeTabButton->SetClickCallback([=] (auto& sender, auto& ev)
     {
-        mixer.Play(m_sfxEnter, "SFX");
+        if (m_tab != Tab::Notice && !m_animating)
+            SwitchTab(Tab::Notice);
+    });
+}
+
+void ChannelBoard::SetChannelEnterButton(Gx::ResourcePtr<Gx::Button> btnChannelEnter)
+{
+    m_channelEnterButton = std::move(btnChannelEnter);
+    m_channelEnterButton->SetClickCallback([&] (auto& sender, auto& ev)
+    {
+        m_app->Require<Gx::Mixer>().Play(m_sfxEnter, "SFX");
         if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
             m_callback(m_planetInfo.Hall, m_planetInfo.Channels[m_selectedChannel]);
     });
+}
 
-    auto btnChannelLeft  = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json");
-    btnChannelLeft->SetClickCallback([&] (auto& sender, auto& ev)
+void ChannelBoard::SetNavigateLeftButton(Gx::ResourcePtr<Gx::Button> btnNavigateLeft)
+{
+    m_navigateLeftButton = std::move(btnNavigateLeft);
+    m_navigateLeftButton->SetClickCallback([&] (auto& sender, auto& ev)
     {
-        mixer.Play(m_sfxNavigate, "SFX");
+        m_app->Require<Gx::Mixer>().Play(m_sfxNavigate, "SFX");
         if (m_tab == Tab::ChannelList)
         {
             if (m_channelPageIndex > 1)
@@ -81,11 +113,14 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
                 ShowNotice(m_noticePageIndex - 1);
         }
     });
+}
 
-    auto btnChannelRight = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json");
-    btnChannelRight->SetClickCallback([&] (auto& sender, auto& ev)
+void ChannelBoard::SetNavigateRightButton(Gx::ResourcePtr<Gx::Button> btnNavigateRight)
+{
+    m_btnNavigateRightButton = std::move(btnNavigateRight);
+    m_btnNavigateRightButton->SetClickCallback([&] (auto& sender, auto& ev)
     {
-        mixer.Play(m_sfxNavigate, "SFX");
+        m_app->Require<Gx::Mixer>().Play(m_sfxNavigate, "SFX");
         if (m_tab == Tab::ChannelList)
         {
             if (m_channelPageIndex < m_channelMaxPage)
@@ -97,49 +132,38 @@ void ChannelBoard::Initialize(Gx::Scene &scene)
                 ShowNotice(m_noticePageIndex + 1);
         }
     });
+}
 
-    m_list = scene.Create<Gx::List>("Interface/Metadata/State/Planet/ChannelBoard/ChannelList.json");
-    auto base = scene.GetLocalResources().Resolve<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
-    for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
-    {
-        auto channelButton = std::make_unique<ChannelButton>(*m_scene, *base);
-        channelButton->SetChannelNumber(i + 1);
-        channelButton->SetClickCallback([=] (auto& sender, auto& ev) { m_selectedChannel = i; });
-        channelButton->SetDoubleClickCallback([=] (auto& sender, auto& ev) { btnChannelEnter->PerformClick(); });
+void ChannelBoard::SetChannelList(Gx::ResourcePtr<Gx::List> list)
+{
+    m_channelList = std::move(list);
+}
 
-        m_list->AddChild(channelButton.get());
-        m_channelButtons.push_back(std::move(channelButton));
-    }
-    m_channelListContainer->AddChild(m_list, btnChannelEnter);
+void ChannelBoard::SetCurrentPageNumber(Gx::ResourcePtr<Gx::Number> currentPageNumber)
+{
+    m_currentPageNumber = std::move(currentPageNumber);
+    m_currentPageNumber->SetDigitCount(2);
+    m_currentPageNumber->SetValue(1);
+}
 
-    m_notice = scene.Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Notice.json");
-    m_noticePageIndex = 1;
-    m_noticeMaxPage   = m_notice->GetFrameCount();
+void ChannelBoard::SetMaxPageNumber(Gx::ResourcePtr<Gx::Number> maxPageNumber)
+{
+    m_maxPageNumber = std::move(maxPageNumber);
+    m_maxPageNumber->SetDigitCount(2);
+}
 
-    m_noticeTabButton  = scene.Create<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_NoticeTab.json");
-    m_noticeTabButton->SetClickCallback([=] (auto& sender, auto& ev)
-    {
-        if (m_tab != Tab::Notice && !m_animating)
-            SwitchTab(Tab::Notice);
-    });
+void ChannelBoard::AddChannelButton(Gx::ResourcePtr<ChannelButton> button)
+{
+    button->SetClickCallback([&] (auto& sender, auto& ev) { m_selectedChannel = button->GetChannelNumber() - 1; });
+    button->SetDoubleClickCallback([=] (auto& sender, auto& ev) { m_channelEnterButton->PerformClick(); });
 
-    SwitchTab(Tab::Notice);
-
-    m_renderTexture.create(GetLocalBounds().width, GetLocalBounds().height);
-    m_renderTexture.setSmooth(true);
-    m_duplicateImage.SetOrigin(GetOrigin());
-    m_duplicateImage.SetPosition(m_position);
-    m_duplicateImage.SetVisible(false);
-
-    AddChild(m_background, m_channelTabButton, m_noticeTabButton, m_channelListContainer.get(), m_notice, m_currentPageNumber, m_maxPageNumber, btnChannelLeft, btnChannelRight);
+    m_channelButtons.push_back(std::move(button));
+    m_channelList->AddChild(m_channelButtons.back().get());
 }
 
 const sf::FloatRect ChannelBoard::GetLocalBounds() const
 {
-    if (m_background)
-        return m_background->GetLocalBounds();
-
-    return sf::FloatRect();
+    return Gx::Image::GetLocalBounds();
 }
 
 bool ChannelBoard::InTransition() const
@@ -166,13 +190,10 @@ void ChannelBoard::CaptureCurrentState()
 
 void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
 {
-    if (!m_background)
-        return;
-
     m_tab = tab;
     if (m_tab == Tab::ChannelList)
     {
-        m_background->SetFrame("ChannelList");
+        SetFrame("ChannelList");
         m_notice->SetVisible(false);
 
         m_channelTabButton->SetVisible(false);
@@ -189,7 +210,7 @@ void ChannelBoard::SwitchTab(ChannelBoard::Tab tab)
     }
     else
     {
-        m_background->SetFrame("Notice");
+        SetFrame("Notice");
         m_notice->SetVisible(true);
 
         m_channelTabButton->SetVisible(true);
@@ -219,9 +240,11 @@ void ChannelBoard::Show(Planet::MusicHall hall, std::function<void()> callback)
 
     CaptureCurrentState();
     SwitchTab(Tab::ChannelList);
-    SetPosition(800 + m_background->GetLocalBounds().width, m_position.y);
 
-    m_list->SetVisible(false);
+    auto position = GetPosition();
+    SetPosition(800 + GetLocalBounds().width, GetPosition().y);
+
+    m_channelList->SetVisible(false);
     switch (hall)
     {
         case Planet::MusicHall::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
@@ -241,9 +264,9 @@ void ChannelBoard::Show(Planet::MusicHall hall, std::function<void()> callback)
             callback();
     },
     {
-        new Gx::Action([=] { m_scene->GetApplication().Require<Gx::Mixer>().Play(m_sfxPopup, "SFX"); }),
-        new Gx::Move(this, m_position - sf::Vector2f(30, 0), sf::milliseconds(200)),
-        new Gx::Move(this, m_position, sf::milliseconds(100))
+        new Gx::Action([=] { m_app->Require<Gx::Mixer>().Play(m_sfxPopup, "SFX"); }),
+        new Gx::Move(this, position - sf::Vector2f(30, 0), sf::milliseconds(200)),
+        new Gx::Move(this, position, sf::milliseconds(100))
     }));
 }
 
@@ -273,8 +296,8 @@ void ChannelBoard::ShowChannelList(int page)
     if (end > m_planetInfo.Channels.size())
         end   = m_planetInfo.Channels.size();
 
-    auto children = m_list->GetChildren();
-    m_list->SetVisible(true);
+    auto children = m_channelList->GetChildren();
+    m_channelList->SetVisible(true);
     for (int i = 0; i < CHANNEL_LIST_PER_PAGE; i++)
     {
         auto channelButton = dynamic_cast<ChannelButton*>(children[i]);
@@ -325,7 +348,7 @@ void ChannelBoard::Update(double delta)
 sf::RenderStates ChannelBoard::Render(sf::RenderTarget &target, sf::RenderStates states) const
 {
     target.draw(m_duplicateImage, states);
-    return Control::Render(target, states);
+    return Image::Render(target, states);
 }
 
 void ChannelBoard::Invalidate()

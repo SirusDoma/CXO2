@@ -11,8 +11,7 @@ StatePlanet::StatePlanet(bool fadeIn) :
     State(),
     m_useFadeIn(fadeIn),
     m_connecting(false),
-    m_container(),
-    m_channelBoard()
+    m_container()
 {
 }
 
@@ -79,15 +78,16 @@ void StatePlanet::Initialize()
             }
 
             mixer.Play(sfx, "SFX");
-            m_channelBoard.Show(hall, [=] { OnEnterPlanet(hall); });
+            m_channelBoard->Show(hall, [=] { OnEnterPlanet(hall); });
         });
     }
 
     AddChild(&m_container);
 
-    m_channelBoard.Initialize(*this);
-    m_channelBoard.SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
-    AddChild(&m_channelBoard);
+    m_channelBoard = Create<ChannelBoard>("Interface/Metadata/State/Planet/ChannelBoard.json");
+    m_channelBoard->Initialize(*this);
+    m_channelBoard->SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
+    AddChild(m_channelBoard);
 
     m_bgm = mixer.Create<sf::Music>("Interface/Metadata/State/Planet/Music.json");
     mixer.Play(m_bgm, "BGM");
@@ -125,7 +125,7 @@ void StatePlanet::OnEnterPlanet(Planet::MusicHall hall)
     }
 
     m_connecting = false;
-    m_channelBoard.UpdateChannelList(planetInfo);
+    m_channelBoard->UpdateChannelList(planetInfo);
 }
 
 void StatePlanet::OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo channel)
@@ -148,5 +148,5 @@ void StatePlanet::OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo cha
 
 bool StatePlanet::IsConnecting()
 {
-    return m_channelBoard.InTransition() || m_connecting;
+    return m_channelBoard->InTransition() || m_connecting;
 }

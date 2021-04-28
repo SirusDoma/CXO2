@@ -1,9 +1,9 @@
 #ifndef O2JAM_PLANET_CHANNEL_BUTTON_HPP
 #define O2JAM_PLANET_CHANNEL_BUTTON_HPP
 
-#include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
+#include <Genode/IO/ResourceMetadata.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
@@ -14,7 +14,7 @@
 class ChannelButton : public Gx::RadioButton
 {
 public:
-    ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy);
+    ChannelButton();
     virtual const sf::FloatRect GetLocalBounds() const;
 
     int GetChannelNumber() const;
@@ -26,17 +26,27 @@ public:
     Planet::MusicHall GetPlanet() const;
     void SetPlanet(Planet::MusicHall hall);
 
+    void SetDefaultMetadata(const Gx::ResourceMetadata *metadata);
+    void SetHighMetadata(const Gx::ResourceMetadata *highMetadata);
+    void SetIntermediateMetadata(const Gx::ResourceMetadata *intermediateMetadata);
+    void SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata);
+
+    void SetHover(Gx::ResourcePtr<Gx::Image> hover);
+    void SetChannelName(Gx::ResourcePtr<Gx::Image> channelName);
+    void SetChannelFull(Gx::ResourcePtr<Gx::Image> channelFull);
+    void SetChannelNumberCounter(Gx::ResourcePtr<Gx::Number> channelNumber);
+    void SetChannelCounter(Gx::ResourcePtr<Gx::ProgressBar> channelCounter);
+
 protected:
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
     virtual void OnControlStateChanged(Control *sender, State state);
 
     virtual void Invalidate();
 
-private:
-    Gx::Scene       *m_scene;
-    Gx::Image       *m_hover, *m_channelName, *m_channelFull;
-    Gx::Number      *m_channelNumber;
-    Gx::ProgressBar *m_channelCounter;
+    Gx::ResourcePtr<Gx::Image>       m_hover, m_channelName, m_channelFull;
+    Gx::ResourcePtr<Gx::Number>      m_channelNumber;
+    Gx::ResourcePtr<Gx::ProgressBar> m_channelCounter;
+    const Gx::ResourceMetadata *m_defaultMetadata, *m_highMetadata, *m_intermediateMetadata, *m_beginnerMetadata;
 
     Planet::MusicHall m_hall;
     int m_population;

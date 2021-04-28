@@ -22,7 +22,7 @@ private:
     void OnEnterPlanet(Planet::MusicHall hall);
     void OnEnterChannel(Planet::MusicHall hall, Planet::ChannelInfo channel);
 
-    ChannelBoard    m_channelBoard;
+    ChannelBoard   *m_channelBoard;
     Gx::UiContainer m_container;
     sf::Music      *m_bgm;
     Gx::Dialog     *m_dialogInfo;

@@ -22,6 +22,8 @@
 #include <O2/Loaders/UI/TextBoxLoader.hpp>
 #include <O2/Loaders/UI/ScrollBarLoader.hpp>
 
+#include <O2/Loaders/UI/Components/ChannelButtonLoader.hpp>
+#include <O2/Loaders/UI/Components/ChannelBoardLoader.hpp>
 #include <O2/Loaders/UI/Components/ChatWindowLoader.hpp>
 #include <O2/Loaders/UI/Components/OptionDialogLoader.hpp>
 #include <O2/Loaders/UI/Components/CreateRoomDialogLoader.hpp>
@@ -30,6 +32,9 @@
 #include <O2/Loaders/Character/ItemLoader.hpp>
 #include <O2/Loaders/Character/ItemDataLoader.hpp>
 #include <O2/Loaders/Character/AvatarLoader.hpp>
+
+#include <O2/States/Components/Planet/ChannelButton.hpp>
+#include <O2/States/Components/Planet/ChannelBoard.hpp>
 
 #include <O2/Config/GameConfig.hpp>
 
@@ -67,6 +72,8 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
     // O2 Components
+    Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
     Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
     Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
     Gx::ResourceLoaderFactory::Register<CreateRoomDialog, CreateRoomDialogLoader>();

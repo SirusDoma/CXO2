@@ -1,23 +1,11 @@
 ﻿#include <O2/States/Components/Planet/ChannelButton.hpp>
-
-#include <Genode/IO/ResourceManager.hpp>
 #include <O2/Metadata/UI/RadioButtonMetadata.hpp>
 
-ChannelButton::ChannelButton(Gx::Scene &scene, const Gx::RadioButton &copy) :
-    Gx::RadioButton(copy),
-    m_scene(&scene),
+ChannelButton::ChannelButton() :
+    Gx::RadioButton(),
+    m_hall(),
     m_population()
 {
-    m_channelName    = m_scene->Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
-    m_channelNumber  = m_scene->Create<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
-    m_channelNumber->SetDigitCount(2);
-    m_channelCounter = m_scene->Create<Gx::ProgressBar>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
-    m_channelFull    = m_scene->Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
-    m_channelFull->SetVisible(false);
-    m_hover          = m_scene->Create<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Hover.json");
-    m_hover->SetVisible(false);
-
-    AddChild(m_channelNumber, m_channelName, m_channelCounter, m_channelFull, m_hover);
 }
 
 const sf::FloatRect ChannelButton::GetLocalBounds() const
@@ -61,50 +49,101 @@ void ChannelButton::SetPlanet(Planet::MusicHall hall)
     if (m_hall == hall)
         return;
 
-    Gx::ResourceMetadata *metadata = nullptr;
+    const Gx::ResourceMetadata *metadata = nullptr;
     m_hall = hall;
 
     // TODO: Load all and put inside a map
     switch (m_hall)
     {
         case Planet::MusicHall::Kaliope:
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/High.json");
+            metadata = m_highMetadata;
             m_channelName->SetFrame("Kaliope");
             break;
         case Planet::MusicHall::Kleo:
             m_channelName->SetFrame("Kleo");
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
+            metadata = m_intermediateMetadata;
             break;
         case Planet::MusicHall::Philix:
             m_channelName->SetFrame("Philix");
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json");
+            metadata = m_intermediateMetadata;
             break;
         case Planet::MusicHall::Melpomin:
             m_channelName->SetFrame("Melpomin");
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_beginnerMetadata;
             break;
         case Planet::MusicHall::Thalo:
             m_channelName->SetFrame("Thalo");
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_beginnerMetadata;
             break;
         case Planet::MusicHall::Euta:
             m_channelName->SetFrame("Euta");
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json");
+            metadata = m_beginnerMetadata;
             break;
         default:
-            metadata = m_scene->GetLocalResources().LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Background.json");
+            metadata = m_defaultMetadata;
             break;
     }
 
     if (!metadata)
         return;
 
-    auto radioData = dynamic_cast<RadioButtonMetadata*>(metadata);
+    auto radioData = dynamic_cast<const RadioButtonMetadata*>(metadata);
     if (radioData)
     {
         for (auto [state, sprite] : radioData->States)
             SetStateFrame(state, sprite.TexCoords);
     }
+}
+
+void ChannelButton::SetDefaultMetadata(const Gx::ResourceMetadata *metadata)
+{
+    m_defaultMetadata = metadata;
+}
+
+void ChannelButton::SetHighMetadata(const Gx::ResourceMetadata *highMetadata)
+{
+    m_highMetadata = highMetadata;
+}
+
+void ChannelButton::SetIntermediateMetadata(const Gx::ResourceMetadata *intermediateMetadata)
+{
+    m_intermediateMetadata = intermediateMetadata;
+}
+
+void ChannelButton::SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata)
+{
+    m_beginnerMetadata = beginnerMetadata;
+}
+
+void ChannelButton::SetHover(Gx::ResourcePtr<Gx::Image> hover)
+{
+    m_hover = std::move(hover);
+    m_hover->SetVisible(false);
+    AddChild(m_hover.get());
+}
+
+void ChannelButton::SetChannelName(Gx::ResourcePtr<Gx::Image> channelName)
+{
+    m_channelName = std::move(channelName);
+    AddChild(m_channelName.get());
+}
+
+void ChannelButton::SetChannelFull(Gx::ResourcePtr<Gx::Image> channelFull)
+{
+    m_channelFull = std::move(channelFull);
+    AddChild(m_channelFull.get());
+}
+
+void ChannelButton::SetChannelNumberCounter(Gx::ResourcePtr<Gx::Number> channelNumber)
+{
+    m_channelNumber = std::move(channelNumber);
+    AddChild(m_channelNumber.get());
+}
+
+void ChannelButton::SetChannelCounter(Gx::ResourcePtr<Gx::ProgressBar> channelCounter)
+{
+    m_channelCounter = std::move(channelCounter);
+    AddChild(m_channelCounter.get());
 }
 
 sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const

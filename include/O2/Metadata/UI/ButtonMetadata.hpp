@@ -2,6 +2,7 @@
 #define O2JAM_BUTTON_METADATA_HPP
 
 #include <O2/Metadata/SpriteMetadata.hpp>
+#include <Genode/UI/Control.hpp>
 
 #include <unordered_map>
 
