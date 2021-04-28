@@ -308,11 +308,14 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 
     SetTexCoords(m_background->GetFrame("KeyOption")->TexCoords);
     m_keyTab->SetCheckedState(true);
+    m_mixer->Stop(m_sfxNavigation);
+
     m_soundTab->SetCheckedState(false);
     m_keyOptionContainer.SetEnabled(true);
     m_keyOptionContainer.SetVisible(true);
     m_soundOptionContainer.SetEnabled(false);
     m_soundOptionContainer.SetVisible(false);
+    m_toolTip->Hide();
 
     m_keyTestEnabled = false;
     m_keyChannel = EventChannel::Note1;
