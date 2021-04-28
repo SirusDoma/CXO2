@@ -1,4 +1,4 @@
-#include <O2/States/Components/Room/ChatPanel.hpp>
+#include <O2/States/Components/Common/ChatPanel.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
@@ -13,6 +13,7 @@ ChatPanel::ChatPanel()
 
 void ChatPanel::Initialize(Gx::Scene &scene)
 {
+    // TODO determine which assets to use
     auto chatWindow = scene.Create<ChatWindow>("Interface/Metadata/State/Room/ChatPanel/ChatWindow.json");
     auto scrollChat = scene.Create<Gx::ScrollBar>("Interface/Metadata/State/Room/ChatPanel/ChatScroll.json");
     chatWindow->SetScrollBar(*scrollChat);

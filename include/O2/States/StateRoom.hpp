@@ -7,7 +7,7 @@
 
 #include <O2/States/State.hpp>
 #include <O2/States/Components/Common/OptionDialog.hpp>
-#include <O2/States/Components/Room/ChatPanel.hpp>
+#include <O2/States/Components/Common/ChatPanel.hpp>
 #include <O2/States/Components/Room/RoomList.hpp>
 #include <O2/States/Components/Room/UserList.hpp>
 
