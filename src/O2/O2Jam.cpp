@@ -111,6 +111,13 @@ void O2Jam::OnStart()
         return m_itemFactory;
     });
 
+    /** Uncomment to load all items at startup
+     *
+     auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
+     for (auto item : itemData->Items)
+         m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
+    */
+
     // Force to load item metadata at startup
     for (auto gender : {Character::Gender::Male, Character::Gender::Female})
         Require<ItemFactory>().GetDefaultItems(gender);
@@ -119,13 +126,6 @@ void O2Jam::OnStart()
     m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
     m_resources.LoadArchive<OmcArchive>("Music/Planet.ojm");
-
-    /** Uncomment to load all items at startup
-     *
-    auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
-    for (auto item : itemData->Items)
-        m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
-    */
 
     // Load application modules here
     ShareResources(m_resources);
