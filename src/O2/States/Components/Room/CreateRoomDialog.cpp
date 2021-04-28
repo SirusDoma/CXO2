@@ -6,42 +6,8 @@ void CreateRoomDialog::Initialize(Gx::Application &app)
     auto sfxCreateMode = mixer.Create<sf::Sound>("Interface/Metadata/Dialog/CreateRoom/ModeSound.json");
 
     m_jamModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-    m_jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
-    {
-        if (!sender->IsChecked())
-            return;
-
-        if (m_jamAnimation->GetState() != Gx::Animation::AnimationState::Playing)
-        {
-            m_jamModeButton->SetVisible(false);
-            m_jamAnimation->Reset();
-            m_jamAnimation->SetVisible(true);
-        }
-
-        m_toolTip->SetString("JAM Mode is not available.");
-        m_toolTip->Show(this);
-
-        m_jamModeButton->SetCheckedState(false);
-        m_vsModeButton->SetCheckedState(true);
-    });
-
     m_vsModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-    m_vsModeButton->SetCheckStateChangeCallback([=] (auto sender)
-    {
-        m_vsModeAnimation->Reset();
-        m_vsModeAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
-    });
-
     m_singleModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-    m_singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
-    {
-        m_singleModeAnimation->Reset();
-        m_singleModeAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
-
-        m_passwordTextBox->SetEnabled(!sender->IsChecked());
-        if (!m_passwordTextBox->IsEnabled())
-            m_passwordTextBox->SetString("");
-    });
 
     AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get(), m_toolTip.get());
 }
@@ -88,16 +54,48 @@ void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordT
 void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton)
 {
     m_jamModeButton = std::move(jamModeButton);
+    m_jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    {
+        if (!sender->IsChecked())
+            return;
+
+        if (m_jamAnimation->GetState() != Gx::Animation::AnimationState::Playing)
+        {
+            m_jamModeButton->SetVisible(false);
+            m_jamAnimation->Reset();
+            m_jamAnimation->SetVisible(true);
+        }
+
+        m_toolTip->SetString("JAM Mode is not available.");
+        m_toolTip->Show(this);
+
+        m_jamModeButton->SetCheckedState(false);
+        m_vsModeButton->SetCheckedState(true);
+    });
 }
 
 void CreateRoomDialog::SetVsModeButton(Gx::ResourcePtr<Gx::RadioButton> vsModeButton)
 {
     m_vsModeButton = std::move(vsModeButton);
+    m_vsModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    {
+        m_vsModeAnimation->Reset();
+        m_vsModeAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
+    });
 }
 
 void CreateRoomDialog::SetSingleModeButton(Gx::ResourcePtr<Gx::RadioButton> singleModeButton)
 {
     m_singleModeButton = std::move(singleModeButton);
+    m_singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    {
+        m_singleModeAnimation->Reset();
+        m_singleModeAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
+
+        m_passwordTextBox->SetEnabled(!sender->IsChecked());
+        if (!m_passwordTextBox->IsEnabled())
+            m_passwordTextBox->SetString("");
+    });
 }
 
 void CreateRoomDialog::SetJamAnimation(Gx::ResourcePtr<Gx::Animation> jamAnimation)
