@@ -46,7 +46,7 @@ namespace Gx
         T &Install();
 
         template<typename T>
-        bool Resolve(std::function<T&(Application&)> resolver);
+        bool Provide(std::function<T&(Application&)> resolver);
 
         template<typename T>
         bool Uninstall();

@@ -61,7 +61,7 @@ namespace Gx
     }
 
     template<typename T>
-    bool Application::Resolve(std::function<T&(Application&)> resolver)
+    bool Application::Provide(std::function<T & (Application &)> resolver)
     {
         static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
 

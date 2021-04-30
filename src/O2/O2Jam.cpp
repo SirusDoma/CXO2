@@ -92,24 +92,27 @@ void O2Jam::OnStart()
     });
 
     // Module configuration
-    Resolve<Gx::ResourceManager>([=] (auto& app) -> Gx::ResourceManager&
-    {
-        // Register shared resource container
-        m_resources.Register<Item>();
-        m_resources.Register<ItemData>();
+    Provide<Gx::ResourceManager>(
+        [=](auto &app) -> Gx::ResourceManager & {
+            // Register shared resource container
+            m_resources.Register<Item>();
+            m_resources.Register<ItemData>();
 
-        return m_resources;
-    });
-    Resolve<Gx::Mixer>([=] (auto& app) -> Gx::Mixer&
-    {
-        m_mixer = Gx::Mixer(Require<Gx::ResourceManager>());
-        return m_mixer;
-    });
-    Resolve<ItemFactory>([=] (auto& app) -> ItemFactory&
-    {
-        m_itemFactory = ItemFactory(Require<Gx::ResourceManager>());
-        return m_itemFactory;
-    });
+            return m_resources;
+        }
+    );
+    Provide<Gx::Mixer>(
+        [=](auto &app) -> Gx::Mixer & {
+            m_mixer = Gx::Mixer(Require<Gx::ResourceManager>());
+            return m_mixer;
+        }
+    );
+    Provide<ItemFactory>(
+        [=](auto &app) -> ItemFactory & {
+            m_itemFactory = ItemFactory(Require<Gx::ResourceManager>());
+            return m_itemFactory;
+        }
+    );
 
     /** Uncomment to load all items at startup
      *
