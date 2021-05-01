@@ -85,7 +85,6 @@ void StatePlanet::Initialize()
     AddChild(&m_container);
 
     m_channelBoard = Create<ChannelBoard>("Interface/Metadata/State/Planet/ChannelBoard.json");
-    m_channelBoard->Initialize(*this);
     m_channelBoard->SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
     AddChild(m_channelBoard);
 

@@ -28,20 +28,6 @@ public:
     };
 
     ChannelBoard();
-    void Initialize(Gx::Scene &scene);
-
-    void SetNotice(Gx::ResourcePtr<Gx::Image> notice);
-    void SetChannelCategory(Gx::ResourcePtr<Gx::Image> channelCategory);
-    void SetChannelTabButton(Gx::ResourcePtr<Gx::Button> channelTabButton);
-    void SetNoticeTabButton(Gx::ResourcePtr<Gx::Button> noticeTabButton);
-    void SetChannelEnterButton(Gx::ResourcePtr<Gx::Button> btnChannelEnter);
-    void SetNavigateLeftButton(Gx::ResourcePtr<Gx::Button> btnNavigateLeft);
-    void SetNavigateRightButton(Gx::ResourcePtr<Gx::Button> btnNavigateRight);
-    void SetChannelList(Gx::ResourcePtr<Gx::List> list);
-    void SetCurrentPageNumber(Gx::ResourcePtr<Gx::Number> currentPageNumber);
-    void SetMaxPageNumber(Gx::ResourcePtr<Gx::Number> maxPageNumber);
-    void AddChannelButton(Gx::ResourcePtr<ChannelButton> button);
-
     virtual const sf::FloatRect GetLocalBounds() const;
 
     void Show(Planet::MusicHall hall, std::function<void()> callback);
@@ -57,6 +43,7 @@ public:
     void SetChannelsPerPage(unsigned int channelsPerPage);
 
 private:
+    virtual void Initialize();
     void CaptureCurrentState();
 
     virtual void Update(double delta);
@@ -65,6 +52,7 @@ private:
     virtual void Invalidate();
 
     Gx::Application *m_app;
+    Gx::Mixer       *m_mixer;
     sf::SoundSource *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
 
     Gx::Image m_duplicateImage;

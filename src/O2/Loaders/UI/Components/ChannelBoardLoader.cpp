@@ -54,23 +54,5 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::Load(const Gx::ResourceMetadat
     channelBoard->SetScale(spec->Scale);
     channelBoard->SetRotation(spec->Rotation);
 
-    channelBoard->SetChannelTabButton(context.Resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json"));
-    channelBoard->SetNoticeTabButton(context.Resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_NoticeTab.json"));
-    channelBoard->SetChannelCategory(context.Resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/ChannelCategory.json"));
-    channelBoard->SetChannelList(context.Resources->Resolve<Gx::List>("Interface/Metadata/State/Planet/ChannelBoard/ChannelList.json"));
-    channelBoard->SetChannelEnterButton(context.Resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json"));
-    channelBoard->SetNavigateLeftButton(context.Resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelLeft.json"));
-    channelBoard->SetNavigateRightButton(context.Resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelRight.json"));
-    channelBoard->SetNotice(context.Resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Notice.json"));
-    channelBoard->SetCurrentPageNumber(context.Resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/CurrentPageNumber.json"));
-    channelBoard->SetMaxPageNumber(context.Resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/MaxPageNumber.json"));
-
-    for (int i = 0; i < spec->ChannelCount; i++)
-    {
-        auto channelButton = context.Resources->Resolve<ChannelButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel.json");
-        channelButton->SetChannelNumber(i + 1);
-        channelBoard->AddChannelButton(std::move(channelButton));
-    }
-
     return channelBoard;
 }
