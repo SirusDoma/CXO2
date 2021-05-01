@@ -42,10 +42,7 @@ namespace Gx
         R& RegisterLocalResource();
 
         bool Destroy(Node* node);
-        bool Destroy(sf::SoundSource *source);
-
         ResourceManager &GetLocalResources() const;
-        virtual ResourceManager &GetSharedResources() const;
 
         void PushOverlay(Node *overlay);
         void CloseOverlay();
@@ -66,9 +63,6 @@ namespace Gx
         virtual void ProcessSceneEvents();
 
     private:
-        template<typename R>
-        R* CreateNode(const std::string &source, ResourceScope scope = ResourceScope::Local);
-
         mutable sf::View m_view;
         std::unique_ptr<ResourceManager> m_resources;
 

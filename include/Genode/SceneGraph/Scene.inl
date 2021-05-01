@@ -4,26 +4,20 @@ namespace Gx
     R* Scene::Create(const std::string &source, ResourceScope scope)
     {
         static_assert(std::is_base_of<Gx::Node, R>::value, "Parameter must be a Gx::Node");
-        return CreateNode<R>(source, scope);
-    }
-
-    template<typename R>
-    R *Scene::CreateNode(const std::string &source, ResourceScope scope)
-    {
-        static_assert(std::is_base_of<Gx::Node, R>::value, "Parameter must be a Gx::Node");
 
         auto resources = m_resources.get();
         if (scope == ResourceScope::Shared)
-            resources = &GetSharedResources();
+            resources = &GetApplication().Require<Gx::ResourceManager>();
 
         if (!resources)
             return nullptr;
 
         auto resource = resources->Resolve<R>(source);
         auto deleter  = resource.get_deleter();
+        auto entity   = resource.release();
 
-        m_entities.push_back(ResourcePtr<Node>{dynamic_cast<Node*>(resource.release()), [deleter] (auto node) { deleter(dynamic_cast<R*>(node)); }});
-        return dynamic_cast<R*>(m_entities.back().get());
+        m_entities.push_back(ResourcePtr<Node>{dynamic_cast<Node*>(entity), [deleter] (auto node) { deleter(dynamic_cast<R*>(node)); }});
+        return dynamic_cast<R*>(entity);
     }
 
     template<typename R>

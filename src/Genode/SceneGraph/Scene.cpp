@@ -83,11 +83,6 @@ namespace Gx
         return *m_resources;
     }
 
-    ResourceManager &Scene::GetSharedResources() const
-    {
-        return GetDirector().GetSharedResources();
-    }
-
     void Scene::PushOverlay(Node *overlay)
     {
         if (overlay)
@@ -128,18 +123,6 @@ namespace Gx
             if (director.GetScene() != this)
                 return;
         }
-    }
-
-    bool Scene::Destroy(sf::SoundSource *source)
-    {
-        if (!source)
-            return false;
-
-        auto iterator = std::find_if(m_sources.begin(), m_sources.end(), [source] (const auto& e) { return source == e.get(); });
-        if (iterator != m_sources.end())
-            return m_sources.erase(iterator) == m_sources.end();
-
-        return false;
     }
 
     bool Scene::Destroy(Node *resource)
