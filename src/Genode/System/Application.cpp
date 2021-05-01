@@ -29,9 +29,18 @@ namespace Gx
         delete m_director;
     }
 
+    Application &Application::Instance()
+    {
+        return *m_instance;
+    }
+
     int Application::Start(Scene *scene)
     {
-        // Construct resources
+        if (m_instance && m_instance != this)
+            throw "Only single application instance allowed";
+
+        // Initialize application instance and director
+        m_instance = this;
         m_director = new SceneDirector(*this, scene, m_window);
 
         // Set render frequency

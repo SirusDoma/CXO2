@@ -22,6 +22,7 @@ namespace Gx
     {
     public:
         const std::string TITLE = "O2-JAM";
+        static Application &Instance();
 
         Application(sf::VideoMode mode, bool fullScreen = false);
         Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
@@ -73,6 +74,8 @@ namespace Gx
 
         using ModuleMap         = std::unordered_map<std::type_index, ResourcePtr<Module>>;
         using ModuleResolverMap = std::unordered_map<std::type_index, std::function<Module&(Application&)>>;
+
+        inline static Application *m_instance = nullptr;
 
         mutable sf::RenderWindow m_window;
         sf::Event m_event;
