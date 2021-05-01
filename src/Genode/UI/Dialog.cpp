@@ -127,6 +127,11 @@ namespace Gx
         m_onCancelled = callback;
     }
 
+    void Dialog::Show(Scene *scene, bool enableBackdrop)
+    {
+        Show(scene, std::string(), enableBackdrop);
+    }
+
     void Dialog::Show(Scene *scene, const std::string& prompt, bool enableBackDrop)
     {
         if (m_shown)

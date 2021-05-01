@@ -37,6 +37,7 @@ namespace Gx
         void SetAcceptCallback(std::function<void()> callback);
         void SetCancelCallback(std::function<void()> callback);
 
+        void Show(Scene *scene, bool enableBackdrop = true);
         void Show(Scene *scene, const std::string& prompt = std::string(), bool enableBackdrop = true);
         bool IsShown() const;
 
