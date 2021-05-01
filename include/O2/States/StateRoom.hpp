@@ -6,7 +6,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <O2/States/State.hpp>
-#include <O2/States/Components/Common/OptionDialog.hpp>
+#include <O2/Dialogs/OptionDialog.hpp>
 #include <O2/States/Components/Common/ChatPanel.hpp>
 #include <O2/States/Components/Room/RoomList.hpp>
 #include <O2/States/Components/Room/UserList.hpp>
