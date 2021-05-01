@@ -1,5 +1,5 @@
-#ifndef O2JAM_ROOM_CREATE_ROOM_DIALOG_HPP
-#define O2JAM_ROOM_CREATE_ROOM_DIALOG_HPP
+#ifndef O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
+#define O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
 
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/ToolTip.hpp>
@@ -14,7 +14,7 @@ class CreateRoomDialog : public Gx::Dialog
 public:
     using Gx::Dialog::Dialog;
 
-    void Initialize(Gx::Application &app);
+    virtual void Initialize();
     virtual void OnShown(Gx::Scene &scene);
 
     void SetTitleTextBox(Gx::ResourcePtr<Gx::TextBox> titleTextBox);
@@ -33,11 +33,13 @@ public:
     void SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> textBox);
 
     void SetToolTip(Gx::ResourcePtr<Gx::ToolTip> toolTip);
+    void SetCreateModeSoundEffect(Gx::ResourcePtr<sf::Sound> sound);
 
 protected:
     virtual void OnAccepted();
 
 private:
+    Gx::ResourcePtr<sf::Sound>       m_sfxCreateMode;
     Gx::ResourcePtr<Gx::RadioButton> m_jamModeButton, m_vsModeButton, m_singleModeButton;
     Gx::ResourcePtr<Gx::Animation>   m_jamAnimation, m_vsModeAnimation, m_singleModeAnimation;
     Gx::ResourcePtr<Gx::CheckBox>    m_levelLimitCheckBox;

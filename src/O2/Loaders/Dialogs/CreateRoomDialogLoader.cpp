@@ -1,4 +1,4 @@
-#include <O2/Loaders/UI/Components/CreateRoomDialogLoader.hpp>
+#include <O2/Loaders/Dialogs/CreateRoomDialogLoader.hpp>
 #include <O2/Loaders/UI/DialogLoader.hpp>
 
 #include <Genode/UI/Button.hpp>
@@ -55,6 +55,7 @@ Gx::ResourcePtr<CreateRoomDialog> CreateRoomDialogLoader::Load(const Gx::Resourc
         dialog->SetMaxLevelLimitTextBox(resources->Resolve<Gx::TextBox>("Interface/Metadata/Dialog/CreateRoom/MaxLevelLimitTextBox.json"));
 
         dialog->SetToolTip(resources->Resolve<Gx::ToolTip>("Interface/Metadata/Dialog/CreateRoom/ToolTip.json"));
+        dialog->SetCreateModeSoundEffect(resources->Resolve<sf::Sound>("Interface/Metadata/Dialog/CreateRoom/ModeSound.json"));
 
         auto buttonLoader = Gx::ResourceLoaderFactory::GetLoader<Gx::Button>();
         auto acceptButtonMetadata = spec->AcceptButtonMetadata;

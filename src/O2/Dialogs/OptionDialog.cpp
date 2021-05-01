@@ -1,4 +1,4 @@
-#include <O2/States/Components/Common/OptionDialog.hpp>
+#include <O2/Dialogs/OptionDialog.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>

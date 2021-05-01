@@ -1,5 +1,5 @@
-#ifndef O2JAM_COMMON_OPTION_DIALOG_HPP
-#define O2JAM_COMMON_OPTION_DIALOG_HPP
+#ifndef O2JAM_DIALOG_OPTION_DIALOG_HPP
+#define O2JAM_DIALOG_OPTION_DIALOG_HPP
 
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/Image.hpp>

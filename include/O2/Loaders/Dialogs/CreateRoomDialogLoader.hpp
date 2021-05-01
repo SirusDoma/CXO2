@@ -3,7 +3,7 @@
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 
-#include <O2/States/Components/Room/CreateRoomDialog.hpp>
+#include <O2/Dialogs/CreateRoomDialog.hpp>
 #include <O2/Metadata/UI/DialogMetadata.hpp>
 
 class CreateRoomDialogLoader : public O2JamResourceLoader<CreateRoomDialog>

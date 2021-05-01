@@ -1,4 +1,4 @@
-#include <O2/Loaders/UI/Components/OptionDialogLoader.hpp>
+#include <O2/Loaders/Dialogs/OptionDialogLoader.hpp>
 #include <O2/Loaders/UI/DialogLoader.hpp>
 
 #include <Genode/UI/Button.hpp>

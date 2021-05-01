@@ -3,7 +3,7 @@
 
 #include <O2/Loaders/O2JamResourceLoader.hpp>
 
-#include <O2/States/Components/Common/OptionDialog.hpp>
+#include <O2/Dialogs/OptionDialog.hpp>
 #include <O2/Metadata/UI/DialogMetadata.hpp>
 
 class OptionDialogLoader : public O2JamResourceLoader<OptionDialog>

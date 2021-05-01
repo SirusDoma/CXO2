@@ -1,7 +1,7 @@
 #include <O2/States/Components/Room/RoomList.hpp>
 
 #include <Genode/UI/List.hpp>
-#include <O2/States/Components/Room/CreateRoomDialog.hpp>
+#include <O2/Dialogs/CreateRoomDialog.hpp>
 #include <O2/States/StateWaiting7K.hpp>
 
 RoomList::RoomList() :
@@ -43,8 +43,7 @@ void RoomList::Initialize(Gx::Scene &scene)
     AddChild(roomList);
 
     auto btnCreateRoom    = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_CreateRoom.json");
-    auto createRoomDialog = scene.Create<CreateRoomDialog>("Interface/Metadata/Dialog/CreateRoom.json");
-    createRoomDialog->Initialize(scene.GetApplication());
+    auto createRoomDialog = scene.Create<CreateRoomDialog>("Interface/Metadata/Dialog/CreateRoom.json", Gx::ResourceScope::Shared);
     createRoomDialog->SetAcceptCallback([&] ()
     {
         mixer.StopAll();

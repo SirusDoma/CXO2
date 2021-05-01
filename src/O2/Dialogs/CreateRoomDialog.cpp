@@ -1,15 +1,8 @@
-#include <O2/States/Components/Room/CreateRoomDialog.hpp>
+#include <O2/Dialogs/CreateRoomDialog.hpp>
 
-void CreateRoomDialog::Initialize(Gx::Application &app)
+void CreateRoomDialog::Initialize()
 {
-    auto& mixer        = app.Require<Gx::Mixer>();
-    auto sfxCreateMode = mixer.Create<sf::Sound>("Interface/Metadata/Dialog/CreateRoom/ModeSound.json");
-
-    m_jamModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-    m_vsModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-    m_singleModeButton->SetClickCallback([=, &mixer = mixer] (auto& sender, auto& ev) { mixer.Play(sfxCreateMode, "SFX"); });
-
-    AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get(), m_toolTip.get());
+    AddChild(m_jamModeButton.get(), m_vsModeButton.get(), m_singleModeButton.get());
 }
 
 void CreateRoomDialog::OnShown(Gx::Scene &scene)
@@ -25,6 +18,7 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
     m_vsModeAnimation->SetRepeatCount(1);
     m_vsModeAnimation->Reset();
 
+    // TODO: Add ProfileController
     m_titleTextBox->SetString("CXO2's Room");
     m_titleTextBox->SelectAll();
     m_passwordTextBox->SetString("");
@@ -54,6 +48,13 @@ void CreateRoomDialog::SetPasswordTextBox(Gx::ResourcePtr<Gx::TextBox> passwordT
 void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamModeButton)
 {
     m_jamModeButton = std::move(jamModeButton);
+    m_jamModeButton->SetClickCallback(
+        [&] (auto& sender, auto& ev)
+        {
+            GetScene()->GetApplication().Require<Gx::Mixer>().Play(m_sfxCreateMode.get(), "SFX");
+        }
+    );
+
     m_jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
@@ -77,6 +78,12 @@ void CreateRoomDialog::SetJamModeButton(Gx::ResourcePtr<Gx::RadioButton> jamMode
 void CreateRoomDialog::SetVsModeButton(Gx::ResourcePtr<Gx::RadioButton> vsModeButton)
 {
     m_vsModeButton = std::move(vsModeButton);
+    m_vsModeButton->SetClickCallback(
+        [&] (auto& sender, auto& ev)
+        {
+            GetScene()->GetApplication().Require<Gx::Mixer>().Play(m_sfxCreateMode.get(), "SFX");
+        }
+    );
     m_vsModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         m_vsModeAnimation->Reset();
@@ -87,6 +94,12 @@ void CreateRoomDialog::SetVsModeButton(Gx::ResourcePtr<Gx::RadioButton> vsModeBu
 void CreateRoomDialog::SetSingleModeButton(Gx::ResourcePtr<Gx::RadioButton> singleModeButton)
 {
     m_singleModeButton = std::move(singleModeButton);
+    m_singleModeButton->SetClickCallback(
+        [&] (auto& sender, auto& ev)
+        {
+            GetScene()->GetApplication().Require<Gx::Mixer>().Play(m_sfxCreateMode.get(), "SFX");
+        }
+    );
     m_singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         m_singleModeAnimation->Reset();
@@ -170,6 +183,12 @@ void CreateRoomDialog::SetMaxLevelLimitTextBox(Gx::ResourcePtr<Gx::TextBox> text
 void CreateRoomDialog::SetToolTip(Gx::ResourcePtr<Gx::ToolTip> toolTip)
 {
     m_toolTip = std::move(toolTip);
+    AddChild(m_toolTip.get());
+}
+
+void CreateRoomDialog::SetCreateModeSoundEffect(Gx::ResourcePtr<sf::Sound> sound)
+{
+    m_sfxCreateMode = std::move(sound);
 }
 
 void CreateRoomDialog::OnAccepted()
@@ -206,8 +225,6 @@ void CreateRoomDialog::OnAccepted()
             return;
         }
     }
-
-
 
     Dialog::OnAccepted();
 }
