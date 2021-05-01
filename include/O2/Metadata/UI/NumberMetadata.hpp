@@ -14,6 +14,7 @@ struct NumberMetadata : public TransformMetadata
     sf::Vector2u DigitSize;
     float        LetterSpacing;
     unsigned int Value;
+    unsigned int DigitCount;
     std::unordered_map<unsigned int, sf::IntRect>  DigitFrames;
 };
 
