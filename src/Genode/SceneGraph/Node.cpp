@@ -15,6 +15,10 @@ namespace Gx
         m_children.clear();
     }
 
+    void Node::Initialize()
+    {
+    }
+
     std::string Node::GetName() const
     {
         return m_name;
@@ -89,6 +93,8 @@ namespace Gx
         if (child && std::find(m_children.begin(), m_children.end(), child) == m_children.end())
         {
             child->m_parent = this;
+            child->Initialize();
+
             m_children.push_back(child);
         }
     }
@@ -97,12 +103,12 @@ namespace Gx
     {
         if (child)
         {
+            if (child->m_parent == this)
+                child->m_parent = nullptr;
+
             auto iterator = std::find(m_children.begin(), m_children.end(), child);
             if (iterator != m_children.end())
-            {
-                child->m_parent = nullptr;
                 m_children.erase(iterator);
-            }
         }
     }
 

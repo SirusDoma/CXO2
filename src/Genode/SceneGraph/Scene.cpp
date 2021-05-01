@@ -90,13 +90,20 @@ namespace Gx
 
     void Scene::PushOverlay(Node *overlay)
     {
-        m_overlays.push_back(overlay);
+        if (overlay)
+        {
+            AddChild(overlay);
+            m_overlays.push_back(overlay);
+        }
     }
 
     void Scene::CloseOverlay()
     {
         if (!m_overlays.empty())
+        {
+            RemoveChild(m_overlays.back());
             m_overlays.pop_back();
+        }
 
         Input(m_lastInput);
     }
@@ -170,16 +177,6 @@ namespace Gx
 
     void Scene::Update(double delta)
     {
-        if (!m_overlays.empty())
-        {
-            for (auto overlay : m_overlays)
-            {
-                auto updatable = dynamic_cast<Updatable*>(overlay);
-                if (updatable)
-                    updatable->Update(delta);
-            }
-        }
-
         UpdatableContainer::Update(delta);
         TaskContainer::Update(delta);
     }

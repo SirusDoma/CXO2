@@ -39,6 +39,7 @@ namespace Gx
         protected:
             Node();
             virtual void SetParent(Node* node);
+            virtual void Initialize();
 
         private:
             Node* m_parent;
