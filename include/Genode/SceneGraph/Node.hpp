@@ -9,6 +9,7 @@
 
 namespace Gx
 {
+    class Scene;
     class Node : public Transformable
     {
     public:
@@ -20,6 +21,7 @@ namespace Gx
         std::string GetTag() const;
         void SetTag(const std::string& tag);
 
+        Scene* GetScene() const;
         Node* GetParent() const;
         std::vector<Node*> GetChildren() const;
         std::vector<Node*> GetChildrenByTag(const std::string& tag) const;

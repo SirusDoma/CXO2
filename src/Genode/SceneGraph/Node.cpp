@@ -1,7 +1,7 @@
-﻿#include <algorithm>
-#include <cstdarg>
+﻿#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph/Scene.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
+#include <algorithm>
 
 namespace Gx
 {
@@ -37,6 +37,21 @@ namespace Gx
     void Node::SetTag(const std::string &tag)
     {
         m_tag = tag;
+    }
+
+    Scene *Node::GetScene() const
+    {
+        auto parent = GetParent();
+        while (parent)
+        {
+            auto scene = dynamic_cast<Scene*>(parent);
+            if (scene)
+                return scene;
+
+            parent = parent->GetParent();
+        }
+
+        return nullptr;
     }
 
     Node *Node::GetParent() const
