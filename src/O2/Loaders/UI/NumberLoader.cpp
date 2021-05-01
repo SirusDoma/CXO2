@@ -60,6 +60,12 @@ std::unique_ptr<Gx::ResourceMetadata> NumberLoader::LoadMetadata(const void *dat
     else
         metadata.LetterSpacing = 0.f;
 
+    auto value = attributes.find("value");
+    if (value != attributes.end())
+        metadata.Value = value->get<unsigned int>();
+    else
+        metadata.Value = 0;
+
     return std::make_unique<NumberMetadata>(metadata);
 }
 
@@ -86,6 +92,8 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::Load(const Gx::ResourceMetadata &metad
         number->SetDigitsSize(sf::Vector2u(context.Texture->getSize().x / 10, context.Texture->getSize().y));
 
     number->SetLetterSpacing(spec->LetterSpacing);
+    number->SetValue(spec->Value);
+
     number->SetOrigin(spec->Origin);
     number->SetPosition(spec->Position);
     number->SetScale(spec->Scale);
