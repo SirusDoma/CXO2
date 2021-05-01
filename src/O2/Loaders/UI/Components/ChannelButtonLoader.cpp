@@ -46,11 +46,5 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::Load(const Gx::ResourceMetad
     channelButton->SetIntermediateMetadata(context.Resources->LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Intermediate.json"));
     channelButton->SetBeginnerMetadata(context.Resources->LoadMetadata<Gx::RadioButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Beginner.json"));
 
-    channelButton->SetChannelName(context.Resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json"));
-    channelButton->SetChannelNumberCounter(context.Resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json"));
-    channelButton->SetChannelCounter(context.Resources->Resolve<Gx::ProgressBar>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json"));
-    channelButton->SetChannelFull(context.Resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json"));
-    channelButton->SetHover(context.Resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Hover.json"));
-
     return channelButton;
 }

@@ -1,4 +1,6 @@
 ﻿#include <O2/States/Components/Planet/ChannelButton.hpp>
+
+#include <Genode/SceneGraph/Scene.hpp>
 #include <O2/Metadata/UI/RadioButtonMetadata.hpp>
 
 ChannelButton::ChannelButton() :
@@ -6,6 +8,22 @@ ChannelButton::ChannelButton() :
     m_hall(),
     m_population()
 {
+}
+
+void ChannelButton::Initialize()
+{
+    auto scene     = dynamic_cast<Gx::Scene*>(GetRoot());
+    auto resources = &scene->GetLocalResources();
+
+    m_channelName    = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
+    m_channelNumber  = resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
+    m_channelCounter = resources->Resolve<Gx::ProgressBar>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
+    m_channelFull    = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
+    m_hover          = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Hover.json");
+
+    m_hover->SetVisible(false);
+
+    AddChild(m_channelName.get(), m_channelNumber.get(), m_channelCounter.get(), m_channelFull.get(), m_hover.get());
 }
 
 const sf::FloatRect ChannelButton::GetLocalBounds() const
@@ -113,37 +131,6 @@ void ChannelButton::SetIntermediateMetadata(const Gx::ResourceMetadata *intermed
 void ChannelButton::SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata)
 {
     m_beginnerMetadata = beginnerMetadata;
-}
-
-void ChannelButton::SetHover(Gx::ResourcePtr<Gx::Image> hover)
-{
-    m_hover = std::move(hover);
-    m_hover->SetVisible(false);
-    AddChild(m_hover.get());
-}
-
-void ChannelButton::SetChannelName(Gx::ResourcePtr<Gx::Image> channelName)
-{
-    m_channelName = std::move(channelName);
-    AddChild(m_channelName.get());
-}
-
-void ChannelButton::SetChannelFull(Gx::ResourcePtr<Gx::Image> channelFull)
-{
-    m_channelFull = std::move(channelFull);
-    AddChild(m_channelFull.get());
-}
-
-void ChannelButton::SetChannelNumberCounter(Gx::ResourcePtr<Gx::Number> channelNumber)
-{
-    m_channelNumber = std::move(channelNumber);
-    AddChild(m_channelNumber.get());
-}
-
-void ChannelButton::SetChannelCounter(Gx::ResourcePtr<Gx::ProgressBar> channelCounter)
-{
-    m_channelCounter = std::move(channelCounter);
-    AddChild(m_channelCounter.get());
 }
 
 sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const

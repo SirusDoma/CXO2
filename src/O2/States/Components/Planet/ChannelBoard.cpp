@@ -31,7 +31,10 @@ void ChannelBoard::Initialize()
     m_sfxEnter    = m_mixer->Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/ChannelEnter.json");
 
     m_channelListContainer = std::make_unique<Gx::UiContainer>();
+    AddChild(m_channelListContainer.get());
+
     m_channelCategory  = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/ChannelCategory.json");
+    m_channelListContainer->AddChild(m_channelCategory.get());
 
     m_channelTabButton = resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelTab.json");
     m_channelTabButton->SetClickCallback(
@@ -52,9 +55,13 @@ void ChannelBoard::Initialize()
     );
 
     m_channelList = resources->Resolve<Gx::List>("Interface/Metadata/State/Planet/ChannelBoard/ChannelList.json");
+    m_channelListContainer->AddChild(m_channelList.get());
+
     for (int i = 0; i < m_channelsPerPage; i++)
     {
         auto channelButton = resources->Resolve<ChannelButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel.json");
+        m_channelList->AddChild(channelButton.get());
+
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetClickCallback(
             [&] (auto& sender, auto& ev)
@@ -70,7 +77,6 @@ void ChannelBoard::Initialize()
         );
 
         m_channelButtons.push_back(std::move(channelButton));
-        m_channelList->AddChild(m_channelButtons.back().get());
     }
 
     m_currentPageNumber = resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/CurrentPageNumber.json");
@@ -79,6 +85,7 @@ void ChannelBoard::Initialize()
     m_maxPageNumber->SetDigitCount(2);
 
     m_channelEnterButton = resources->Resolve<Gx::Button>("Interface/Metadata/State/Planet/ChannelBoard/Btn_ChannelEnter.json");
+    m_channelListContainer->AddChild(m_channelEnterButton.get());
     m_channelEnterButton->SetClickCallback(
         [&] (auto& sender, auto& ev)
         {
@@ -135,8 +142,8 @@ void ChannelBoard::Initialize()
     m_duplicateImage.SetPosition(GetPosition());
     m_duplicateImage.SetVisible(false);
 
-    m_channelListContainer->AddChild(m_channelCategory.get(), m_channelList.get(), m_channelEnterButton.get());
-    AddChild(m_channelTabButton.get(), m_noticeTabButton.get(), m_channelListContainer.get(),
+
+    AddChild(m_channelTabButton.get(), m_noticeTabButton.get(),
         m_notice.get(), m_currentPageNumber.get(), m_maxPageNumber.get(), m_navigateLeftButton.get(), m_btnNavigateRightButton.get());
 }
 

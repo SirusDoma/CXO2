@@ -31,13 +31,9 @@ public:
     void SetIntermediateMetadata(const Gx::ResourceMetadata *intermediateMetadata);
     void SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata);
 
-    void SetHover(Gx::ResourcePtr<Gx::Image> hover);
-    void SetChannelName(Gx::ResourcePtr<Gx::Image> channelName);
-    void SetChannelFull(Gx::ResourcePtr<Gx::Image> channelFull);
-    void SetChannelNumberCounter(Gx::ResourcePtr<Gx::Number> channelNumber);
-    void SetChannelCounter(Gx::ResourcePtr<Gx::ProgressBar> channelCounter);
+private:
+    virtual void Initialize();
 
-protected:
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
     virtual void OnControlStateChanged(Control *sender, State state);
 
