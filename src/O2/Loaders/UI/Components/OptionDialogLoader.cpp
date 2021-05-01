@@ -10,14 +10,11 @@ OptionDialogLoader::OptionDialogLoader()
 
 std::unique_ptr<Gx::ResourceMetadata> OptionDialogLoader::LoadMetadata(const void *data, std::size_t size) const
 {
-    Json json = Json::parse(std::string(reinterpret_cast<const char*>(data), size));
-    auto metadata = DialogMetadata();
+    auto loader = Gx::ResourceLoaderFactory::GetLoader<Gx::Dialog>();
+    if (!loader)
+        return nullptr;
 
-    metadata.ResourceType = json.at("type").get<std::string>();
-    ParseReferences(json["require"], metadata);
-    DialogLoader::ParseDialog(json["attributes"], metadata);
-
-    return std::make_unique<DialogMetadata>(metadata);
+    return loader->LoadMetadata(data, size);
 }
 
 Gx::ResourcePtr<OptionDialog> OptionDialogLoader::Load(const Gx::ResourceMetadata &metadata, const Gx::ResourceContext &context) const
