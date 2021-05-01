@@ -25,8 +25,8 @@
 #include <O2/Loaders/UI/Components/ChannelButtonLoader.hpp>
 #include <O2/Loaders/UI/Components/ChannelBoardLoader.hpp>
 #include <O2/Loaders/UI/Components/ChatWindowLoader.hpp>
-#include <O2/Loaders/UI/Components/OptionDialogLoader.hpp>
-#include <O2/Loaders/UI/Components/CreateRoomDialogLoader.hpp>
+#include <O2/Loaders/Dialogs/OptionDialogLoader.hpp>
+#include <O2/Loaders/Dialogs/CreateRoomDialogLoader.hpp>
 #include <O2/Loaders/UI/Components/MarqueeLoader.hpp>
 
 #include <O2/Loaders/Character/ItemLoader.hpp>
