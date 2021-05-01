@@ -39,16 +39,15 @@ namespace Gx
         m_tag = tag;
     }
 
-    Scene *Node::GetScene() const
+    Node *Node::GetRoot() const
     {
-        auto parent = GetParent();
-        while (parent)
+        auto root = GetParent();
+        while (root)
         {
-            auto scene = dynamic_cast<Scene*>(parent);
-            if (scene)
-                return scene;
+            if (!root->m_parent)
+                return root;
 
-            parent = parent->GetParent();
+            root = root->m_parent;
         }
 
         return nullptr;

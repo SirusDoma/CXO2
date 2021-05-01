@@ -21,7 +21,7 @@ ChannelBoard::ChannelBoard() :
 
 void ChannelBoard::Initialize()
 {
-    auto scene     = GetScene();
+    auto scene     = dynamic_cast<Gx::Scene*>(GetRoot());
     m_app          = &scene->GetApplication();
     auto resources = &scene->GetLocalResources();
     m_mixer        = &m_app->Require<Gx::Mixer>();
