@@ -6,10 +6,6 @@
 
 int main()
 {
-//    sf::Texture hcursor;
-//    hcursor.loadFromFile(Gx::FileHelper::GetFullName("Common/CursorSingle.png"));
-//    Gx::Cursor cursor = Gx::Cursor(hcursor);
-
     O2Jam o2jam(sf::VideoMode(800, 600), sf::VideoMode(800, 600));
     o2jam.Start(new StateAvi());
 
