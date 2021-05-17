@@ -39,20 +39,6 @@ namespace Gx
         m_tag = tag;
     }
 
-    Node *Node::GetRoot() const
-    {
-        auto root = GetParent();
-        while (root)
-        {
-            if (!root->m_parent)
-                return root;
-
-            root = root->m_parent;
-        }
-
-        return nullptr;
-    }
-
     Node *Node::GetParent() const
     {
         return m_parent;
@@ -107,8 +93,6 @@ namespace Gx
         if (child && std::find(m_children.begin(), m_children.end(), child) == m_children.end())
         {
             child->m_parent = this;
-            child->Initialize();
-
             m_children.push_back(child);
         }
     }

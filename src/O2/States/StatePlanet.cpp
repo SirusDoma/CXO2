@@ -36,18 +36,18 @@ void StatePlanet::Initialize()
 
     auto philix   = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Philix.json");
     auto kleo     = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Kleo.json");
-    auto kaliope  = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Kaliope.json");
+    auto kalliope = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Kaliope.json");
     auto euta     = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Euta.json");
     auto thalo    = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Thalo.json");
     auto melpomin = Create<Gx::RadioButton>("Interface/Metadata/State/Planet/Btn_Melpomin.json");
 
     m_container = Gx::UiContainer();
-    m_container.AddChild(philix, kleo, kaliope, euta, thalo, melpomin);
+    m_container.AddChild(philix, kleo, kalliope, euta, thalo, melpomin);
     std::unordered_map<Planet::MusicHall, Gx::RadioButton*> planets = {
         {Planet::MusicHall::Melpomin, melpomin},
         {Planet::MusicHall::Thalo,    thalo},
         {Planet::MusicHall::Euta,     euta},
-        {Planet::MusicHall::Kaliope,  kaliope},
+        {Planet::MusicHall::Kalliope, kalliope},
         {Planet::MusicHall::Kleo,     kleo},
         {Planet::MusicHall::Philix,   philix}
     };
@@ -85,6 +85,7 @@ void StatePlanet::Initialize()
     AddChild(&m_container);
 
     m_channelBoard = Create<ChannelBoard>("Interface/Metadata/State/Planet/ChannelBoard.json");
+    m_channelBoard->Initialize(*this);
     m_channelBoard->SetEnterChannelCallback([=] (auto hall, auto channel) { OnEnterChannel(hall, channel); });
     AddChild(m_channelBoard);
 

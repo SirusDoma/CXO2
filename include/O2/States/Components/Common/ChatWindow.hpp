@@ -22,13 +22,13 @@ public:
 
     void SetFont(const sf::Font &font);
     void SetCharacterSize(unsigned int characterSize);
-    void SetScrollBar(Gx::ScrollBar &scroll);
 
     const sf::Font *GetFont() const;
-    Gx::ScrollBar *GetScrollBar() const;
+    unsigned int GetScrollOffset() const;
     unsigned int GetCharacterSize() const;
-
     unsigned int GetMaximumChatLength() const;
+
+    void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int max);
 
     void PushMessage(Room::PlayerInfo player, sf::String chat);

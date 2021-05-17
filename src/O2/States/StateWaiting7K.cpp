@@ -24,7 +24,7 @@ void StateWaiting7K::Initialize()
     btnBack->SetClickCallback([&] (auto& sender, auto& ev)
     {
         mixer.StopAll();
-        QueueSceneEvent([=] () { GetDirector().SetScene(new StateRoom(Planet::MusicHall::Kaliope, Planet::ChannelInfo{1})); });
+        QueueSceneEvent([=] () { GetDirector().SetScene(new StateRoom(Planet::MusicHall::Kalliope, Planet::ChannelInfo{1})); });
     });
 
     AddChild(btnBack);

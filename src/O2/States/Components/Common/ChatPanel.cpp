@@ -13,12 +13,13 @@ ChatPanel::ChatPanel()
 
 void ChatPanel::Initialize(Gx::Scene &scene)
 {
-    // TODO determine which assets to use
+    // TODO determine which assets to use for State Room and State Waiting
     auto chatWindow = scene.Create<ChatWindow>("Interface/Metadata/State/Room/ChatPanel/ChatWindow.json");
-    auto scrollChat = scene.Create<Gx::ScrollBar>("Interface/Metadata/State/Room/ChatPanel/ChatScroll.json");
-    chatWindow->SetScrollBar(*scrollChat);
-
     auto systemPlayer = Room::PlayerInfo{0, -1, sf::String(), true};
+
+    auto scrollChat = scene.Create<Gx::ScrollBar>("Interface/Metadata/State/Room/ChatPanel/ChatScroll.json");
+    scrollChat->SetValueChangedCallback([=] (auto& sender, float value) { chatWindow->SetScrollOffset(static_cast<unsigned int>(value)); });
+
     chatWindow->PushMessage(systemPlayer, "Welcome to O2Jam");
     chatWindow->PushMessage(systemPlayer, "/w Receiver   : Send message (whisper)");
     chatWindow->PushMessage(systemPlayer, "F7            : Effect 2D/3D mode setting");

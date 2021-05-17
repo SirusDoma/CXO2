@@ -28,6 +28,8 @@ public:
     };
 
     ChannelBoard();
+    virtual void Initialize(Gx::Scene &scene);
+
     virtual const sf::FloatRect GetLocalBounds() const;
 
     void Show(Planet::MusicHall hall, std::function<void()> callback);
@@ -43,7 +45,6 @@ public:
     void SetChannelsPerPage(unsigned int channelsPerPage);
 
 private:
-    virtual void Initialize();
     void CaptureCurrentState();
 
     virtual void Update(double delta);

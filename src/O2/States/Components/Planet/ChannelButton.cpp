@@ -10,11 +10,9 @@ ChannelButton::ChannelButton() :
 {
 }
 
-void ChannelButton::Initialize()
+void ChannelButton::Initialize(Gx::Scene &scene)
 {
-    auto scene     = dynamic_cast<Gx::Scene*>(GetRoot());
-    auto resources = &scene->GetLocalResources();
-
+    auto resources = &scene.GetLocalResources();
     m_channelName    = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
     m_channelNumber  = resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
     m_channelCounter = resources->Resolve<Gx::ProgressBar>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
@@ -73,7 +71,7 @@ void ChannelButton::SetPlanet(Planet::MusicHall hall)
     // TODO: Load all and put inside a map
     switch (m_hall)
     {
-        case Planet::MusicHall::Kaliope:
+        case Planet::MusicHall::Kalliope:
             metadata = m_highMetadata;
             m_channelName->SetFrame("Kaliope");
             break;

@@ -35,7 +35,7 @@ void StateRoom::Initialize()
     auto channelCategory = Create<Gx::Image>("Interface/Metadata/State/Room/ChannelCategory.json");
     switch (m_hall)
     {
-        case Planet::MusicHall::Kaliope:  channelCategory->SetFrame("Kaliope");  break;
+        case Planet::MusicHall::Kalliope:  channelCategory->SetFrame("Kaliope");  break;
         case Planet::MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
         case Planet::MusicHall::Philix:   channelCategory->SetFrame("Philix");   break;
         case Planet::MusicHall::Melpomin: channelCategory->SetFrame("Melpomin"); break;

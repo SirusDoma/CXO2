@@ -15,6 +15,8 @@ class ChannelButton : public Gx::RadioButton
 {
 public:
     ChannelButton();
+    virtual void Initialize(Gx::Scene &scene);
+
     virtual const sf::FloatRect GetLocalBounds() const;
 
     int GetChannelNumber() const;
@@ -32,8 +34,6 @@ public:
     void SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata);
 
 private:
-    virtual void Initialize();
-
     virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
     virtual void OnControlStateChanged(Control *sender, State state);
 

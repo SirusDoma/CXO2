@@ -20,7 +20,6 @@ namespace Gx
         std::string GetTag() const;
         void SetTag(const std::string& tag);
 
-        Node* GetRoot() const;
         Node* GetParent() const;
         std::vector<Node*> GetChildren() const;
         std::vector<Node*> GetChildrenByTag(const std::string& tag) const;

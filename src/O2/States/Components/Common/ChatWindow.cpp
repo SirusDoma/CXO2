@@ -57,21 +57,17 @@ void ChatWindow::SetCharacterSize(unsigned int characterSize)
     }
 }
 
-Gx::ScrollBar *ChatWindow::GetScrollBar() const
+unsigned int ChatWindow::GetScrollOffset() const
 {
-    return m_scroll;
+    return m_offset;
 }
 
-void ChatWindow::SetScrollBar(Gx::ScrollBar &scroll)
+void ChatWindow::SetScrollOffset(unsigned int offset)
 {
-    if (m_scroll != &scroll)
+    if (m_offset != offset)
     {
-        m_scroll = &scroll;
-        m_scroll->SetValueChangedCallback([=] (auto& sender, float value)
-        {
-            m_offset = static_cast<unsigned int>(value);
-            Invalidate();
-        });
+        m_offset = offset;
+        Invalidate();
     }
 }
 

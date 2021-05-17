@@ -27,7 +27,7 @@ namespace Planet
         Melpomin,
         Thalo,
         Euta,
-        Kaliope,
+        Kalliope,
         Kleo,
         Philix
     };

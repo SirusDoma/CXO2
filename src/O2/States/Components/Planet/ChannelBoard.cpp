@@ -19,11 +19,10 @@ ChannelBoard::ChannelBoard() :
 {
 }
 
-void ChannelBoard::Initialize()
+void ChannelBoard::Initialize(Gx::Scene &scene)
 {
-    auto scene     = dynamic_cast<Gx::Scene*>(GetRoot());
-    m_app          = &scene->GetApplication();
-    auto resources = &scene->GetLocalResources();
+    m_app          = &scene.GetApplication();
+    auto resources = &scene.GetLocalResources();
     m_mixer        = &m_app->Require<Gx::Mixer>();
 
     m_sfxPopup    = m_mixer->Create<sf::Sound>("Interface/Metadata/State/Planet/Sound/OpenChannel.json");
@@ -62,6 +61,7 @@ void ChannelBoard::Initialize()
         auto channelButton = resources->Resolve<ChannelButton>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel.json");
         m_channelList->AddChild(channelButton.get());
 
+        channelButton->Initialize(scene);
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetClickCallback(
             [&] (auto& sender, auto& ev)
@@ -243,7 +243,7 @@ void ChannelBoard::Show(Planet::MusicHall hall, std::function<void()> callback)
     m_channelList->SetVisible(false);
     switch (hall)
     {
-        case Planet::MusicHall::Kaliope:  m_channelCategory->SetFrame("Kaliope");  break;
+        case Planet::MusicHall::Kalliope:  m_channelCategory->SetFrame("Kaliope");  break;
         case Planet::MusicHall::Kleo:     m_channelCategory->SetFrame("Kleo");     break;
         case Planet::MusicHall::Philix:   m_channelCategory->SetFrame("Philix");   break;
         case Planet::MusicHall::Melpomin: m_channelCategory->SetFrame("Melpomin"); break;
