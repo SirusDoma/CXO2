@@ -118,7 +118,7 @@ find_package(magic_enum CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML 2.5.1 COMPONENTS audio graphics system window REQUIRED)
+find_package(SFML 2.6.1 COMPONENTS audio graphics system window REQUIRED)
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
     target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)

@@ -1,0 +1,19 @@
+#ifndef O2JAM_PROGRESS_BAR_METADATA_HPP
+#define O2JAM_PROGRESS_BAR_METADATA_HPP
+
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
+
+#include <Genode/IO/ResourceMetadata.hpp>
+#include <Genode/IO/Json.hpp>
+#include <Genode/UI/ProgressBar.hpp>
+
+#include <OTwo/Metadata/SpriteMetadata.hpp>
+
+struct ProgressBarMetadata : public SpriteMetadata
+{
+    float Maximum;
+    Gx::ProgressBar::Orientation Orientation;
+};
+
+#endif

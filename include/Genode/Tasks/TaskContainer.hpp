@@ -1,6 +1,7 @@
 #ifndef GENODE_TASKS_TASK_CONTAINER_HPP
 #define GENODE_TASKS_TASK_CONTAINER_HPP
 
+#include <memory>
 #include <Genode/Entities/Updatable.hpp>
 #include <Genode/Tasks/Task.hpp>
 
