@@ -3,7 +3,8 @@
 
 #include <Genode/Graphics/Sprite.hpp>
 
-#include <Genode/IO/ResourceMetadata.hpp>
+#include <Genode/IO/Resource.hpp>
+#include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
@@ -14,38 +15,44 @@
 class ChannelButton : public Gx::RadioButton
 {
 public:
+    enum Mode
+    {
+        Beginner,
+        Intermediate,
+        High
+    };
+
     ChannelButton();
-    virtual void Initialize(Gx::Scene &scene);
+    void Initialize() override;
 
-    virtual const sf::FloatRect GetLocalBounds() const;
+    const sf::FloatRect GetLocalBounds() const override;
 
-    int GetChannelNumber() const;
-    void SetChannelNumber(int channelNumber);
+    unsigned int GetChannelNumber() const;
+    void SetChannelNumber(unsigned int channelNumber);
 
-    int GetChannelPopulation() const;
-    void SetChannelPopulation(int population);
+    unsigned int GetChannelPopulation() const;
+    void SetChannelPopulation(unsigned int population);
 
-    Planet::MusicHall GetPlanet() const;
-    void SetPlanet(Planet::MusicHall hall);
+    MusicHall GetPlanet() const;
+    void SetMusicHall(MusicHall hall);
 
-    void SetDefaultMetadata(const Gx::ResourceMetadata *metadata);
-    void SetHighMetadata(const Gx::ResourceMetadata *highMetadata);
-    void SetIntermediateMetadata(const Gx::ResourceMetadata *intermediateMetadata);
-    void SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata);
+    void AddStateFrame(Mode mode, State state, const sf::IntRect &frame);
 
 private:
-    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-    virtual void OnControlStateChanged(Control *sender, State state);
+    using StateMap = std::unordered_map<Mode, std::unordered_map<Gx::RadioButton::State, sf::IntRect>>;
 
-    virtual void Invalidate();
+    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    void OnControlStateChanged(Control *sender, State state) override;
+    void Invalidate() override;
 
-    Gx::ResourcePtr<Gx::Image>       m_hover, m_channelName, m_channelFull;
-    Gx::ResourcePtr<Gx::Number>      m_channelNumber;
-    Gx::ResourcePtr<Gx::ProgressBar> m_channelCounter;
-    const Gx::ResourceMetadata *m_defaultMetadata, *m_highMetadata, *m_intermediateMetadata, *m_beginnerMetadata;
+    Gx::Image       *m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
+    Gx::Number      *m_numberIndicator;
+    Gx::ProgressBar *m_populationCounter;
 
-    Planet::MusicHall m_hall;
-    int m_population;
+    StateMap m_states;
+    MusicHall m_hall;
+    unsigned int m_population;
+    bool m_initialized;
 };
 
 #endif

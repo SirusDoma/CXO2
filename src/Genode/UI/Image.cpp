@@ -50,7 +50,7 @@ namespace Gx
 
     bool Image::ContainsFrame(unsigned int index) const
     {
-        return index >= 0 && index < m_frames.size();
+        return index < m_frames.size();
     }
 
     void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)

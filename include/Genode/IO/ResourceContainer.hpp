@@ -1,54 +1,50 @@
 #ifndef GENODE_IO_CACHE_HPP
 #define GENODE_IO_CACHE_HPP
 
-#include <SFML/Audio/AlResource.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Font.hpp>
+#include <Genode/IO/Resource.hpp>
+#include <Genode/IO/IOException.hpp>
 
-#include <Genode/IO/Archive.hpp>
-#include <Genode/IO/FileSystem.hpp>
-#include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/IO/ResourceMetadata.hpp>
-#include <Genode/IO/ResourceContext.hpp>
-#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/System/Primitives.hpp>
+#include <Genode/System/NonCopyable.hpp>
 
-#include <memory>
-#include <unordered_map>
 #include <functional>
+#include <unordered_map>
 #include <string>
 
 namespace Gx
 {
-    namespace priv
+    enum CacheMode
     {
-        class BaseContainer
-        {
-        public:
-            virtual ~BaseContainer() {}
-        };
-    }
+        None,
+        Update,
+        Reuse
+    };
 
     template<typename R>
-    class ResourceContainer : public priv::BaseContainer
+    class ResourceContainer final : NonCopyable
     {
     public:
         ResourceContainer();
         ~ResourceContainer();
 
-        R* Add(const std::string& name, ResourcePtr<R> resource, bool useCache = true);
-        R* Add(const std::string& name, std::function<ResourcePtr<R>()> resolver, bool useCache = true);
-        bool Remove(R* resource);
+        R& Store(const std::string& id, ResourcePtr<R> resource, CacheMode mode = CacheMode::Reuse);
+        R& Store(const std::string& id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode = CacheMode::Reuse);
 
-        R* Find(const std::string& name) const;
-        R& Get(const std::string& name) const;
+        bool Destroy(R* resource);
+        bool Destroy(const std::string& id);
 
-        bool   Contains(const std::string& name) const;
+        R* Find(const std::string& id) const;
+        R& Get(const std::string& id) const;
+
+        bool   Contains(const std::string& id) const;
         Uint64 Count() const;
-        bool   Remove(const std::string& name);
+
         void   Clear();
 
     private:
-        std::map<std::string, ResourcePtr<R>> m_caches;
+        using ResourceMap = std::unordered_map<std::string, ResourcePtr<R>>;
+
+        ResourceMap m_caches;
     };
 }
 

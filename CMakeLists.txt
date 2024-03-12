@@ -28,9 +28,6 @@ add_subdirectory(extlibs/headers/clip)
 set(EXECUTABLE_NAME "OTwo")
 add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
-# Compiler Flags
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fbracket-depth=512") # Required for magic enum
-
 # Specific OS Directories and Flags
 if(WIN32)
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
@@ -38,6 +35,7 @@ if(WIN32)
 
     # Windows (Visual Studio) Compiler Flags
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        WIN32_EXECUTABLE FALSE
         RUNTIME_OUTPUT_DIRECTORY_DEBUG  ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
     )
@@ -110,6 +108,10 @@ else()
     target_link_libraries(${EXECUTABLE_NAME} stdc++fs)
 endif()
 
+# Link JSON
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(${EXECUTABLE_NAME} nlohmann_json::nlohmann_json)
+
 # Link Clip
 target_link_libraries(${EXECUTABLE_NAME} clip)
 
@@ -118,10 +120,10 @@ find_package(magic_enum CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML 2.6.1 COMPONENTS audio graphics system window REQUIRED)
+find_package(SFML 2.6.1 COMPONENTS main audio graphics system window REQUIRED)
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
-    target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)
+    target_link_libraries(${EXECUTABLE_NAME} sfml-main sfml-audio sfml-graphics sfml-system sfml-window)
 else()
     message(FATAL_ERROR "SFML not found")
 endif()

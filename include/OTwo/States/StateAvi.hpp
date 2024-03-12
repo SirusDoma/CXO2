@@ -4,14 +4,14 @@
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/States/State.hpp>
 
-class StateAvi : public Gx::Scene
+class StateAvi : public State
 {
 public:
+    StateAvi() = default;
+    StateAvi(State &state);
+
     virtual void Initialize();
     virtual bool Close(bool quit = false);
-
-private:
-    Gx::ResourcePtr<sf::Music> m_bgm;
 };
 
 #endif

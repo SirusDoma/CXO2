@@ -9,6 +9,19 @@ ChatWindow::ChatWindow() :
 {
 }
 
+ChatWindow::ChatWindow(ChatWindow &&copy) :
+    m_font(copy.m_font),
+    m_scroll(copy.m_scroll),
+    m_bounds(copy.m_bounds),
+    m_offset(copy.m_offset),
+    m_maxChatLength(copy.m_maxChatLength),
+    m_characterSize(copy.m_characterSize),
+    m_chats(copy.m_chats),
+    m_labels(std::move(copy.m_labels))
+{
+}
+
+
 ChatWindow::ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned int characterSize) :
     m_font(&font),
     m_scroll(),
@@ -71,6 +84,19 @@ void ChatWindow::SetScrollOffset(unsigned int offset)
     }
 }
 
+void ChatWindow::SetScrollBar(Gx::ScrollBar &scrollBar)
+{
+    if (m_scroll != &scrollBar)
+    {
+        m_scroll = &scrollBar;
+        m_scroll->SetValueChangedCallback([=] (auto& sender, float value)
+        {
+            m_offset = static_cast<unsigned int>(value);
+           Invalidate();
+        });
+    }
+}
+
 unsigned int ChatWindow::GetMaximumChatLength() const
 {
     return m_maxChatLength;
@@ -85,9 +111,9 @@ void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(Room::PlayerInfo player, sf::String chat)
+void ChatWindow::PushMessage(Player player, const std::string &chat)
 {
-    auto chatData = Room::ChatData{player, chat};
+    auto chatData = ChatData{ player, chat };
     // Do something if player is self
 
     if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
@@ -95,6 +121,12 @@ void ChatWindow::PushMessage(Room::PlayerInfo player, sf::String chat)
 
     m_chats.push_back(chatData);
     Invalidate();
+}
+
+
+void ChatWindow::PushSystemMessage(const std::string &chat)
+{
+    PushMessage(Player{0}, chat);
 }
 
 sf::RenderStates ChatWindow::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -173,7 +205,7 @@ void ChatWindow::Invalidate()
         auto chat = m_chats[i];
         m_labels[index]->SetVisible(true);
 
-        if (chat.Player.Administrator)
+        if (chat.Sender.Administrator || chat.Sender.ID == 0)
             m_labels[index]->SetColor(sf::Color(200, 155, 55));
         else
             m_labels[index]->SetColor(sf::Color::White);
@@ -181,10 +213,10 @@ void ChatWindow::Invalidate()
         // TODO: Configurable outline
         m_labels[index]->SetOutlineThickness(0.05f);
         m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
-        if (chat.Player.PlayerID != 0)
+        if (chat.Sender.ID != 0)
         {
             size_t nickLength = 16;
-            auto nickname = chat.Player.Name;
+            auto nickname = chat.Sender.Name;
             if (nickname.getSize() < nickLength)
             {
                 for (size_t j = 0; j < nickLength - nickname.getSize(); j++)

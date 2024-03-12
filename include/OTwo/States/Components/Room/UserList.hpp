@@ -14,19 +14,14 @@ class UserList : public Gx::UiContainer
 {
 public:
     UserList();
-    void Initialize(Gx::Scene &scene);
+    void Initialize() override;
 
-    void AddPlayer(Room::PlayerInfo player);
+    void AddUser(Player user);
     void Clear();
 
 private:
-    constexpr static const unsigned int USER_PER_PAGE = 10;
-
     virtual void Invalidate();
-
-    Gx::List  *m_list;
-    Gx::Label *m_userCountLabel;
-    std::vector<Room::PlayerInfo> m_users;
+    std::vector<Player> m_users;
 
     unsigned int m_selectedUser;
     unsigned int m_page = 1;

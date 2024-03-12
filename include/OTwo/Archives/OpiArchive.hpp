@@ -4,11 +4,11 @@
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
-#include <OTwo/Archives/O2FileEntry.hpp>
+#include <OTwo/Archives/FileInfo.hpp>
 
 #include <unordered_map>
 
-class OpiArchive : public Gx::Archive
+class OpiArchive final : public Gx::Archive
 {
 public:
     enum Signature : Gx::Uint32
@@ -18,27 +18,32 @@ public:
         OPI = 02,
     };
 
-    OpiArchive();
-    ~OpiArchive();
+    OpiArchive() = default;
+    ~OpiArchive() override = default;
 
     Signature GetSignature() const;
+    bool LoadFromFile(const std::string& fileName) override;
 
-    virtual bool Open(const std::string& fileName);
-    virtual bool Contains(const std::string& name) const;
+    Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
-    virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
-    virtual std::vector<FileEntry> GetFileEntries();
+    bool Contains(const std::string& name) const override;
+    std::vector<Gx::FileInfo> GetFileEntries() const override;
+    std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
+
+    Gx::Int64 ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const override;
+    void WriteFile(const std::string &fileName, void *data, Gx::Int64 size) const override { throw Gx::NotSupportedException(); }
+
+    Gx::Int64 GetFileSize(const std::string &fileName) const override;
 
 private:
     const unsigned int ITEM_HEADER_SIZE = 152;
 
-    bool Read(void* data, Gx::Uint64 size) const;
-    virtual Gx::Int64 GetFile(const Archive::FileEntry* entry, Gx::Uint8** data) const;
+    bool ReadStream(void* data, Gx::Uint64 size) const;
  
     Signature m_signature;
     Gx::Uint32 m_count;
 
-    mutable std::unordered_map<std::string, O2FileEntry> m_entries;
+    mutable std::unordered_map<std::string, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
 

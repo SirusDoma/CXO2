@@ -1,4 +1,8 @@
-#include <OTwo/Character/Item.hpp>
+#include <OTwo/Avatar/Item.hpp>
+#include <OTwo/Data/Shop.hpp>
+#include <OTwo/Data/Planet.hpp>
+#include <OTwo/Data/Character.hpp>
+#include <OTwo/Data/Equipment.hpp>
 
 
 Item::Item() :
@@ -9,42 +13,42 @@ Item::Item() :
 {
 }
 
-unsigned int Item::GetId() const
+unsigned int Item::GetID() const
 {
     return 0;
 }
 
-void Item::SetId(unsigned int id)
+void Item::SetID(unsigned int id)
 {
     m_id = id;
 }
 
-Equipment::Type Item::GetType() const
+EquipmentType Item::GetType() const
 {
     return m_type;
 }
 
-void Item::SetType(Equipment::Type type)
+void Item::SetType(EquipmentType type)
 {
     m_type = type;
 }
 
-Planet::Planet Item::GetOrigin() const
+PlanetType Item::GetOrigin() const
 {
     return m_origin;
 }
 
-void Item::SetOrigin(Planet::Planet planet)
+void Item::SetOrigin(PlanetType planet)
 {
     m_origin = planet;
 }
 
-Character::Gender Item::GetGender() const
+Gender Item::GetGender() const
 {
     return m_gender;
 }
 
-void Item::SetGender(Character::Gender gender)
+void Item::SetGender(Gender gender)
 {
     m_gender = gender;
 }
@@ -79,12 +83,12 @@ void Item::SetDescription(const sf::String &description)
     m_description = description;
 }
 
-bool Item::IsBuyableWith(const Shop::Currency &currency) const
+bool Item::IsBuyableWith(const Currency &currency) const
 {
     return m_prices.find(currency) != m_prices.end();
 }
 
-unsigned int Item::GetPrice(const Shop::Currency &currency) const
+unsigned int Item::GetPrice(const Currency &currency) const
 {
     auto iterator = m_prices.find(currency);
     if (iterator != m_prices.end())
@@ -93,7 +97,7 @@ unsigned int Item::GetPrice(const Shop::Currency &currency) const
     return 0;
 }
 
-void Item::SetPrice(const Shop::Currency &currency, unsigned int price)
+void Item::SetPrice(const Currency &currency, unsigned int price)
 {
     m_prices[currency] = price;
 }
@@ -120,13 +124,13 @@ void Item::SetLargePreview(Gx::ResourcePtr<Gx::Sprite> largePreview)
         m_largePreview = std::move(largePreview);
 }
 
-void Item::SetRenderableItem(Character::Gender gender, Equipment::RenderPart renderType, Equipment::Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)
+void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)
 {
     if (animation)
         m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
 }
 
-Gx::Animation *Item::GetRenderableItem(Character::Gender gender, Equipment::RenderPart renderType, Equipment::Instrument instrument) const
+Gx::Animation *Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const
 {
     auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
     if (find != m_renderables.end())

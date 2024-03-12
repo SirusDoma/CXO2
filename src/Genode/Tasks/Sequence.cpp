@@ -15,7 +15,7 @@ namespace Gx
     {
     }
 
-    Sequence::Sequence(std::function<void()> callback, std::initializer_list<Task *> tasks) :
+    Sequence::Sequence(std::function<void()> callback, std::initializer_list<Task*> tasks) :
         m_iterator(),
         m_tasks(tasks)
     {
@@ -24,9 +24,6 @@ namespace Gx
 
     Sequence::~Sequence()
     {
-        for (auto task : m_tasks)
-            delete task;
-
         m_tasks.clear();
     }
 
@@ -44,10 +41,7 @@ namespace Gx
         {
             auto iterator = std::find(m_tasks.begin(), m_tasks.end(), task);
             if (iterator != m_tasks.end())
-            {
-                delete* iterator;
                 m_tasks.erase(iterator);
-            }
         }
 
         return this;
@@ -66,15 +60,20 @@ namespace Gx
         else if (m_iterator == m_tasks.end())
             return Complete();
 
-        auto task = *m_iterator;
-        if (task)
+        if (m_iterator != m_tasks.end())
         {
+            auto task = *m_iterator;
             task->Update(delta);
             if (task->GetState() == TaskState::Completed || task->GetState() == TaskState::Stopped)
                 ++m_iterator;
         }
         else
             ++m_iterator;
+    }
+
+    void Sequence::Complete()
+    {
+        Task::Complete();
     }
 
     void Sequence::Reset()
@@ -85,4 +84,10 @@ namespace Gx
         for (auto task : m_tasks)
             task->Reset();
     }
+
+    std::initializer_list<Task *> Sequence::ListOf(std::initializer_list<Task *> &&tasks)
+    {
+        return tasks;
+    }
+
 }

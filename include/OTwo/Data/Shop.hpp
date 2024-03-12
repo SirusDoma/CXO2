@@ -1,14 +1,11 @@
-#ifndef O2JAM_SHOP_HPP
-#define O2JAM_SHOP_HPP
+#ifndef O2JAM_SHOP_DATA_HPP
+#define O2JAM_SHOP_DATA_HPP
 
-namespace Shop
+enum class Currency
 {
-    enum class Currency
-    {
-        None,
-        Gem,
-        MCash
-    };
-}
+    None,
+    Gem,
+    MCash
+};
 
 #endif

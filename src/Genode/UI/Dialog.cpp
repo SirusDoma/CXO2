@@ -69,16 +69,13 @@ namespace Gx
         return m_shown;
     }
 
-    void Dialog::SetLabel(Label *label)
+    void Dialog::SetLabel(Label &label)
     {
-        if (!label)
-            return;
-
         if (m_promptText)
-            RemoveChild(m_promptText.get());
+            RemoveChild(m_promptText);
 
-        m_promptText = std::unique_ptr<Gx::Label>(label);
-        AddChild(m_promptText.get());
+        m_promptText = &label;
+        AddChild(m_promptText);
     }
 
     void Dialog::SetPromptString(const std::string &prompt)
@@ -89,42 +86,36 @@ namespace Gx
         m_promptText->SetString(prompt);
     }
 
-    void Dialog::SetAcceptButton(Button *acceptButton)
+    void Dialog::SetAcceptButton(Button &acceptButton)
     {
-        if (!acceptButton)
-            return;
-
         if (m_acceptButton)
-            RemoveChild(m_acceptButton.get());
+            RemoveChild(m_acceptButton);
 
-        m_acceptButton = std::unique_ptr<Gx::Button>(acceptButton);
-        m_acceptButton->SetClickCallback([this] (auto& sender, auto& ev) { OnAccepted(); });
+        m_acceptButton = &acceptButton;
+        m_acceptButton->SetClickCallback([&] (auto& sender, auto& ev) { OnAccepted(); });
 
-        AddChild(m_acceptButton.get());
+        AddChild(m_acceptButton);
     }
 
-    void Dialog::SetCancelButton(Button *cancelButton)
+    void Dialog::SetCancelButton(Button &cancelButton)
     {
-        if (!cancelButton)
-            return;
-
         if (m_cancelButton)
-            RemoveChild(m_cancelButton.get());
+            RemoveChild(m_cancelButton);
 
-        m_cancelButton = std::unique_ptr<Gx::Button>(cancelButton);
-        m_cancelButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCancelled(); });
+        m_cancelButton = &cancelButton;
+        m_cancelButton->SetClickCallback([&] (auto& sender, auto& ev) { OnCancelled(); });
 
-        AddChild(m_cancelButton.get());
+        AddChild(m_cancelButton);
     }
 
     void Dialog::SetAcceptCallback(std::function<void()> callback)
     {
-        m_onAccepted = callback;
+        m_onAccepted = std::move(callback);
     }
 
     void Dialog::SetCancelCallback(std::function<void()> callback)
     {
-        m_onCancelled = callback;
+        m_onCancelled = std::move(callback);
     }
 
     void Dialog::Show(Scene *scene)
@@ -163,8 +154,11 @@ namespace Gx
             sf::RenderTarget& target = m_scene->GetApplication();
             auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(static_cast<sf::RenderWindow&>(target)));
 
-            m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
-            m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+            if (m_acceptButton)
+                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+
+            if (m_cancelButton)
+                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
 
             OnShown(*scene);
             Invalidate();
@@ -173,7 +167,7 @@ namespace Gx
 
     void Dialog::Close()
     {
-        if (!m_shown)
+        if (!m_scene || m_scene->GetCurrentOverlay() != this)
             return;
 
         m_scene->CloseOverlay();
@@ -235,6 +229,21 @@ namespace Gx
     const Scene *Dialog::GetScene()
     {
         return m_scene;
+    }
+
+    Label *Dialog::GetLabel() const
+    {
+        return m_promptText;
+    }
+
+    Button *Dialog::GetAcceptButton() const
+    {
+        return m_acceptButton;
+    }
+
+    Button *Dialog::GetCancelButton() const
+    {
+        return m_cancelButton;
     }
 
     void Dialog::Invalidate()

@@ -9,18 +9,17 @@ namespace Gx
 
     TaskContainer::~TaskContainer()
     {
-        StopAll();
     }
 
     void TaskContainer::Run(Task* task)
     {
         if (task)
-            m_tasks.push_back(std::shared_ptr<Task>(task));
+            m_tasks.push_back(task);
     }
 
     void TaskContainer::Stop(Task* task)
     {
-        auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto node) { return task == node.get(); });
+        auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto t) { return task == t; });
         if (iterator != m_tasks.end())
         {
             // Run update before deleting

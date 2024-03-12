@@ -1,48 +1,50 @@
-#include <Genode/IO/Loaders/TextureLoader.hpp>
-#include <Genode/IO/Loaders/FontLoader.hpp>
-#include <Genode/IO/Loaders/SoundBufferLoader.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 
-namespace
-{
-    void EnsureDefaultDeserializersRegistered()
-    {
-        static bool registered = false;
-        if (!registered)
-        {
-            Gx::ResourceLoaderFactory::Register<sf::Texture,     Gx::priv::TextureLoader>();
-            Gx::ResourceLoaderFactory::Register<sf::Font,        Gx::priv::FontLoader>();
-            Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, Gx::priv::SoundBufferLoader>();
-
-            registered = true;
-        }
-    }
-}
+#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Font.hpp>
 
 namespace Gx
 {
-    template<typename R, typename D>
-    inline void ResourceLoaderFactory::Register()
+    template<typename R, class L>
+    void ResourceLoaderFactory::Register()
+    {
+        static_assert(std::is_base_of_v<ResourceLoader<R>, L>, "Parameter must be a Gx::ResourceLoader.");
+        Remove<R>();
+
+        auto factory = std::make_unique<LoaderFactory<R>>();
+        factory->Create = [] { return std::make_unique<L>(); };
+
+        m_loaders[typeid(R)] = std::move(factory);
+    }
+
+    template<typename R>
+    void ResourceLoaderFactory::Register(std::function<std::unique_ptr<ResourceLoader<R>>()> loader)
     {
         Remove<R>();
 
-        m_loaders[typeid(R)] = [] { return new D(); };
+        auto factory = std::make_unique<LoaderFactory<R>>();
+        factory->Create = loader;
+
+        m_loaders[typeid(R)] = std::move(factory);
     }
 
     template<typename R>
-    inline bool ResourceLoaderFactory::Remove()
+    bool ResourceLoaderFactory::Remove()
     {
         return m_loaders.erase(typeid(R)) != 0;
     }
-    
+
     template<typename R>
-    inline ResourceLoader<R>* ResourceLoaderFactory::GetLoader()
+    std::unique_ptr<ResourceLoader<R>> ResourceLoaderFactory::GetLoader()
     {
-        EnsureDefaultDeserializersRegistered();
+        EnsureDefaultLoadersRegistered();
 
-        auto iterator = m_loaders.find(typeid(R));
-        if (iterator != m_loaders.end())
-            return static_cast<ResourceLoader<R>*>(iterator->second());
+        const auto it = m_loaders.find(typeid(R));
+        if (it == m_loaders.end())
+            return nullptr;
 
-        return nullptr;
+        auto factory = static_cast<LoaderFactory<R>*>(it->second.get());
+        return factory->Create();
     }
 }

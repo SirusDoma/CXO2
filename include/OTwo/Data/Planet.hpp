@@ -1,49 +1,46 @@
-#ifndef O2JAM_PLANET_HPP
-#define O2JAM_PLANET_HPP
+#ifndef O2JAM_PLANET_DATA_HPP
+#define O2JAM_PLANET_DATA_HPP
 
 #include <vector>
 
-namespace Planet
+enum class PlanetType
 {
-    enum class Planet
-    {
-        Unknown,
-        O2Planet,
-        Aqua,
-        Eliten,
-        Graffiti,
-        Bikini,
-        Crush,
-        Wonderland,
-        Meganut,
-        Crystal,
-        Draconic,
-        Event
-    };
+    Unknown,
+    O2Planet,
+    Aqua,
+    Eliten,
+    Graffiti,
+    Bikini,
+    Crush,
+    Wonderland,
+    Meganut,
+    Crystal,
+    Draconic,
+    Event
+};
 
-    enum class MusicHall
-    {
-        None,
-        Melpomin,
-        Thalo,
-        Euta,
-        Kalliope,
-        Kleo,
-        Philix
-    };
+enum class MusicHall
+{
+    None,
+    Melpomin,
+    Thalo,
+    Euta,
+    Kalliope,
+    Kleo,
+    Philix
+};
+struct Channel
+{
+    int ID            = 0;
+    int Population    = 0;
+    int MaxPopulation = 100;
+};
 
-    struct ChannelInfo
-    {
-        int Number        = 0;
-        int Population    = 0;
-        int MaxPopulation = 100;
-    };
-
-    struct PlanetInfo
-    {
-        MusicHall Hall;
-        std::vector<ChannelInfo> Channels = std::vector<ChannelInfo>();
-    };
-}
+struct Planet
+{
+    PlanetType PlanetType = PlanetType::O2Planet;
+    MusicHall Hall = MusicHall::None;
+    std::vector<Channel> Channels;
+};
 
 #endif

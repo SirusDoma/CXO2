@@ -1,7 +1,4 @@
-﻿#include <algorithm>
-#include <cstdarg>
-
-#include <Genode/SceneGraph/Scene.hpp>
+﻿#include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 
 namespace Gx
@@ -13,34 +10,19 @@ namespace Gx
 
     Scene::Scene(const std::string &name) :
         Node(),
-        RenderableContainer(),
         UpdatableContainer(),
+        RenderableContainer(),
         InputableContainer(),
         m_director(nullptr),
-        m_events(),
         m_overlays(),
-        m_entities()
+        m_events()
     {
         SetName(name);
         SetTag("Scene");
-        RegisterLocalResource<ResourceManager>();
-    }
-
-    Scene::Scene(ResourceManager& resources) :
-        Scene::Scene(typeid(this).name(), resources)
-    {
-    }
-
-    Scene::Scene(const std::string &name, ResourceManager& resources) :
-        Scene::Scene(name)
-    {
-       m_resources = std::unique_ptr<ResourceManager>(&resources);
     }
 
     Scene::~Scene()
     {
-        m_entities.clear();
-        m_sources.clear();
         m_overlays.clear();
     }
 
@@ -78,9 +60,12 @@ namespace Gx
         m_view = view;
     }
 
-    ResourceManager &Scene::GetLocalResources() const
+    Node *Scene::GetCurrentOverlay() const
     {
-        return *m_resources;
+        if (m_overlays.size() > 0)
+            return m_overlays.back();
+
+        return nullptr;
     }
 
     void Scene::PushOverlay(Node *overlay)
@@ -103,7 +88,7 @@ namespace Gx
         Input(m_lastInput);
     }
 
-    void Scene::QueueSceneEvent(std::function<void()> evt)
+    void Scene::PushEvent(std::function<void()> evt)
     {
         if (evt)
             m_events.push(evt);
@@ -111,7 +96,7 @@ namespace Gx
 
     void Scene::ProcessSceneEvents()
     {
-        auto& director = GetDirector();
+        const auto& director = GetDirector();
         while (!m_events.empty())
         {
             auto event = m_events.front();
@@ -120,24 +105,9 @@ namespace Gx
             if (event)
                 event();
 
-            if (director.GetScene() != this)
+            if (&director.GetPresentedScene() != this)
                 return;
         }
-    }
-
-    bool Scene::Destroy(Node *resource)
-    {
-        if (!resource)
-            return false;
-
-        auto iterator = std::find_if(m_entities.begin(), m_entities.end(), [resource] (const auto& e) { return resource == e.get(); });
-        if (iterator != m_entities.end())
-        {
-            RemoveChild(resource);
-            return m_entities.erase(iterator) == m_entities.end();
-        }
-
-        return false;
     }
 
     sf::RenderStates Scene::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -147,10 +117,9 @@ namespace Gx
 
         if (!m_overlays.empty())
         {
-            for (auto overlay : m_overlays)
+            for (const auto overlay : m_overlays)
             {
-                auto renderable = dynamic_cast<Renderable *>(overlay);
-                if (renderable)
+                if (const auto renderable = dynamic_cast<Renderable*>(overlay))
                     renderable->Render(target, states);
             }
         }
@@ -158,19 +127,18 @@ namespace Gx
         return states;
     }
 
-    void Scene::Update(double delta)
+    void Scene::Update(const double delta)
     {
         UpdatableContainer::Update(delta);
         TaskContainer::Update(delta);
     }
 
-    bool Scene::Input(sf::Event ev)
+    bool Scene::Input(const sf::Event ev)
     {
         m_lastInput = ev;
         if (!m_overlays.empty())
         {
-            auto inputable = dynamic_cast<Inputable*>(m_overlays.back());
-            if (inputable)
+            if (auto inputable = dynamic_cast<Inputable*>(m_overlays.back()))
                 return inputable->Input(ev);
 
             return false;

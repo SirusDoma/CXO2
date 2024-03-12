@@ -1,7 +1,7 @@
 #ifndef O2JAM_LIST_METADATA_HPP
 #define O2JAM_LIST_METADATA_HPP
 
-#include <OTwo/Metadata/TransformMetadata.hpp>
+#include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
 struct ListMetadata : public TransformMetadata
 {
@@ -9,6 +9,11 @@ struct ListMetadata : public TransformMetadata
     int   HorizontalCount;
     float VerticalSpacing;
     float HorizontalSpacing;
+
+    ResourceType ItemType = ResourceType::None;
+    std::string ItemName = std::string();
+    Gx::Json ItemSource;
+    int ItemCount = 0;
 };
 
 #endif

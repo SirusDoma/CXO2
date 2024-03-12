@@ -13,9 +13,9 @@
 #include <Genode/UI/List.hpp>
 
 #include <OTwo/Data/Planet.hpp>
-#include <OTwo/States/Components/Planet/ChannelButton.hpp>
 
 #include <functional>
+#include "ChannelButton.hpp"
 
 class ChannelBoard : public Gx::Image, public Gx::TaskContainer
 {
@@ -28,51 +28,48 @@ public:
     };
 
     ChannelBoard();
-    virtual void Initialize(Gx::Scene &scene);
 
-    virtual const sf::FloatRect GetLocalBounds() const;
+    void Initialize() override;
+    const sf::FloatRect GetLocalBounds() const override;
 
-    void Show(Planet::MusicHall hall, std::function<void()> callback);
-    void UpdateChannelList(Planet::PlanetInfo info);
-    void ShowChannelList(int page);
-    void ShowNotice(int page);
+    void Show(MusicHall hall, std::function<void()> callback);
+    void UpdateChannelList(Planet planet);
+    void ShowChannelList(unsigned int page);
+    void ShowNotice(unsigned int page);
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
-    void SetEnterChannelCallback(std::function<void(Planet::MusicHall, Planet::ChannelInfo)> callback);
+    void SetChannelEnterCallback(std::function<void(MusicHall, Channel)> callback);
 
     unsigned int GetChannelsPerPage() const;
     void SetChannelsPerPage(unsigned int channelsPerPage);
 
+    void SetChannelButton(ChannelButton &button);
+
 private:
     void CaptureCurrentState();
 
-    virtual void Update(double delta);
-    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+    void Update(double delta) override;
+    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-    virtual void Invalidate();
+    void Invalidate() override;
 
-    Gx::Application *m_app;
-    Gx::Mixer       *m_mixer;
-    sf::SoundSource *m_sfxPopup, *m_sfxNavigate, *m_sfxEnter;
-
+    ChannelButton *m_channelButton;
     Gx::Image m_duplicateImage;
     sf::RenderTexture m_renderTexture;
 
-    std::unique_ptr<Gx::UiContainer> m_channelListContainer;
-    Gx::ResourcePtr<Gx::Image>  m_notice, m_channelCategory;
-    Gx::ResourcePtr<Gx::Button> m_channelTabButton, m_noticeTabButton, m_channelEnterButton, m_navigateLeftButton, m_btnNavigateRightButton;
-    Gx::ResourcePtr<Gx::List>   m_channelList;
-    Gx::ResourcePtr<Gx::Number> m_currentPageNumber, m_maxPageNumber;
+    Planet m_planet;
+    ChannelBoard::Tab m_tab;
+    std::function<void(MusicHall, Channel)> m_callback;
 
-    Planet::PlanetInfo m_planetInfo;
-    ChannelBoard::Tab  m_tab;
+    bool m_transitioning, m_animationEnabled;
+public:
+    bool IsAnimationEnabled() const;
 
-    std::function<void(Planet::MusicHall, Planet::ChannelInfo)> m_callback;
-    std::vector<Gx::ResourcePtr<ChannelButton>>                 m_channelButtons;
+    void SetAnimationEnabled(bool animationEnabled);
 
-    bool         m_animating;
-    int          m_selectedChannel;
+private:
+    int m_selectedChannel;
     unsigned int m_channelsPerPage, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
 };
 

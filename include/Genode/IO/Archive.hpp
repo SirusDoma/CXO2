@@ -1,28 +1,37 @@
 #ifndef GENODE_IO_ARCHIVE_HPP
 #define GENODE_IO_ARCHIVE_HPP
 
-#include <Genode/IO/FileSystem.hpp>
-#include <Genode/System/Primitives.hpp>
-
 #include <string>
 #include <vector>
 
+#include <Genode/System/Primitives.hpp>
+#include <Genode/IO/Resource.hpp>
+#include <Genode/IO/FileSystem/FileSystemController.hpp>
+
 namespace Gx
 {
-    class Archive : public FileSystem<Archive>
+    class Archive : public FileSystemController
     {
     public:
-        friend class ResourceManager;
 
-        Archive();
-        virtual ~Archive();
+        Archive() = default;
+        ~Archive() override = default;
 
         std::string GetFileName() const;
-        virtual bool Open(const std::string& fileName);
 
-        virtual Int64 GetFile(const std::string& name, Uint8** data) const = 0;
-        virtual std::vector<FileEntry> GetFileEntries() const = 0;
-        
+        virtual bool LoadFromFile(const std::string& fileName);
+
+        ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override = 0;
+
+        bool Contains(const std::string& fileName) const override = 0;
+        std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const override = 0;
+        std::vector<FileInfo> GetFileEntries() const override = 0;
+
+        Int64 ReadFile(const std::string& name, void *data, Int64 size) const override = 0;
+        virtual Int64 ReadFile(const FileInfo &entry, void *data) const;
+
+        Int64 GetFileSize(const std::string &fileName) const override = 0;
+
     private:
         std::string m_filename;
     };

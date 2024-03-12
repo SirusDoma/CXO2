@@ -6,18 +6,19 @@
 
 namespace Gx
 {
-    namespace priv
+    class TextureLoader final : public ResourceLoader<sf::Texture>
     {
-        class TextureLoader : public Gx::ResourceLoader<sf::Texture>
-        {
-        public:
-            virtual bool IsMetadataRequired() const;
+    private:
+        bool m_smooth = true;
 
-            virtual std::unique_ptr<ResourceMetadata> LoadMetadata(const void *data, std::size_t size) const;
-            virtual ResourcePtr<sf::Texture> Load(const ResourceMetadata &metadata, const ResourceContext& context = ResourceContext()) const;
-            virtual ResourcePtr<sf::Texture> Load(const void *data, std::size_t size) const;
-        };
-    }
+    public:
+        TextureLoader() = default;
+        void UseSmooth(bool smooth);
+
+        ResourcePtr<sf::Texture> LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const override;
+        ResourcePtr<sf::Texture> LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const override;
+        ResourcePtr<sf::Texture> LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const override;
+    };
 }
 
 #endif

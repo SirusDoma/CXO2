@@ -3,12 +3,12 @@ namespace Gx
     template<typename T>
     T &Application::GetConfig()
     {
-        static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
+        static_assert(std::is_base_of_v<Config, T>, "Parameter must be a Gx::Config");
 
         if (auto it = m_configs.find(typeid(T)); it != m_configs.end())
             return static_cast<T&>(*it->second.get());
 
-        if (auto it = m_configResolvers.find(typeid(T)); it != m_configResolvers.end())
+        if (auto it = m_configurators.find(typeid(T)); it != m_configurators.end())
         {
             auto configPtr = it->second(*this);
             if (configPtr)
@@ -25,57 +25,53 @@ namespace Gx
     template<typename T>
     void Application::SetConfig(const T &config)
     {
-        static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
+        static_assert(std::is_base_of_v<Config, T>, "Parameter must be a Gx::Config");
 
         m_configs[typeid(T)] = std::make_unique<T>(config);
     }
 
     template<typename T>
-    void Application::SetConfig(std::function<std::unique_ptr<T>(const Application&)> resolver)
+    void Application::SetConfig(std::function<std::unique_ptr<T>(const Application&)> builder)
     {
-        static_assert(std::is_base_of<Config, T>::value, "Parameter must be a Gx::Config");
+        static_assert(std::is_base_of_v<Config, T>, "Parameter must be a Gx::Config");
 
-        m_configResolvers[typeid(T)] = resolver;
+        m_configurators[typeid(T)] = builder;
     }
 
     template<typename T>
     T &Application::Install()
     {
-        static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
+        static_assert(std::is_base_of_v<Module, T>, "Parameter must be a Gx::Module");
 
-        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
+        if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end() && iterator->second)
             return static_cast<T&>(*iterator->second.get());
 
-        auto iterator = m_moduleResolvers.find(typeid(T));
-        bool managed  = iterator != m_moduleResolvers.end();
-        auto instance = managed ? &iterator->second(*this) : new T();
-        m_moduleResolvers.erase(iterator);
+        if (auto iterator = m_factories.find(typeid(T)); iterator != m_factories.end())
+            m_modules[typeid(T)] = std::move(iterator->second(*this));
 
-        auto [module, _] = m_modules.insert({typeid(T), ResourcePtr<Module>{instance, [managed] (auto ptr)
-        {
-            if (!managed)
-                delete ptr;
-        }}});
+        // In case when the factory return nullptr
+        if (!m_modules[typeid(T)])
+            m_modules[typeid(T)] = std::move(std::make_unique<T>());
 
-        return static_cast<T&>(*module->second.get());
+        return static_cast<T&>(*m_modules[typeid(T)].get());
     }
 
     template<typename T>
-    bool Application::Provide(std::function<T & (Application &)> resolver)
+    bool Application::Provide(std::function<std::unique_ptr<T>(Application&)> builder)
     {
-        static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
+        static_assert(std::is_base_of_v<Module, T>, "Parameter must be a Gx::Module");
 
         if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
             return false;
 
-        m_moduleResolvers[typeid(T)] = resolver;
+        m_factories[typeid(T)] = builder;
         return true;
     }
 
     template<typename T>
     bool Application::Uninstall()
     {
-        static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
+        static_assert(std::is_base_of_v<Module, T>, "Parameter must be a Gx::Module");
 
         if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
             return m_modules.erase(iterator) == m_modules.end();
@@ -86,7 +82,7 @@ namespace Gx
     template<typename T>
     T &Application::Require()
     {
-        static_assert(std::is_base_of<Module, T>::value, "Parameter must be a Gx::Module");
+        static_assert(std::is_base_of_v<Module, T>, "Parameter must be a Gx::Module");
 
         if (auto iterator = m_modules.find(typeid(T)); iterator != m_modules.end())
             return static_cast<T&>(*iterator->second.get());

@@ -2,7 +2,7 @@
 #define O2JAM_NUMBER_METADATA_HPP
 
 #include <SFML/Graphics/Rect.hpp>
-#include <OTwo/Metadata/TransformMetadata.hpp>
+#include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
 #include <unordered_map>
 

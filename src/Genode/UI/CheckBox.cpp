@@ -21,7 +21,7 @@ namespace Gx
 
     void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback)
     {
-        m_onCheckStateChanged = callback;
+        m_onCheckStateChanged = std::move(callback);
     }
 
     sf::RenderStates CheckBox::Render(sf::RenderTarget &target, sf::RenderStates states) const

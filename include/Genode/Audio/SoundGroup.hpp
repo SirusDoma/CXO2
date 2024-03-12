@@ -24,6 +24,7 @@ namespace Gx
         void Resume();
         void Pause();
         void Stop();
+        void Clear();
 
         float GetVolume() const;
         void SetVolume(float volume);

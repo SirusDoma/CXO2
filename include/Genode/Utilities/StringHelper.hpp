@@ -62,10 +62,39 @@ namespace Gx
 
             return result;
         }
-        
+
         static const sf::String Trim(const sf::String &input)
         {
             return TrimEnd(TrimStart(input));
+        }
+
+        static const sf::String RemoveExtension(const std::string& fileName) {
+            if (fileName == "." || fileName == "..")
+                return fileName;
+
+            auto pos = fileName.find_last_of("\\/.");
+            if (pos != std::string::npos && fileName[pos] == '.')
+                return fileName.substr(0, pos);
+
+            return fileName;
+        }
+
+        template<typename T>
+        static const sf::String GetTypeName(bool withNamespace = true)
+        {
+            auto name = std::string(typeid(T).name());
+            if (auto pos = name.find(' '); pos != std::string::npos) {
+                name = name.substr(pos + 1);
+            }
+
+            if (!withNamespace)
+            {
+                if (auto pos = name.find_last_of(':'); pos != std::string::npos) {
+                    name = name.substr(pos + 1);
+                }
+            }
+
+            return name;
         }
     };
 }

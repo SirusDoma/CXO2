@@ -105,32 +105,32 @@ namespace Gx
 
     void Control::SetFocusChangedCallback(std::function<void(Control&, Control::Event&)> callback)
     {
-        m_onFocusChanged = callback;
+        m_onFocusChanged = std::move(callback);
     }
 
     void Control::SetGainFocusCallback(std::function<void(Control&, Control::Event&)> callback)
     {
-        m_onGainFocus = callback;
+        m_onGainFocus = std::move(callback);
     }
 
     void Control::SetLostFocusCallback(std::function<void(Control&, Control::Event&)> callback)
     {
-        m_onLostFocus = callback;
+        m_onLostFocus = std::move(callback);
     }
 
     void Control::SetClickCallback(std::function<void(Control&, Control::Event&)> callback)
     {
-        m_onClick = callback;
+        m_onClick = std::move(callback);
     }
 
     void Control::SetHoldClickCallback(std::function<void(Control &, Event &)> callback)
     {
-        m_onHoldClick = callback;
+        m_onHoldClick = std::move(callback);
     }
 
     void Control::SetDoubleClickCallback(std::function<void(Control&, Control::Event&)> callback)
     {
-        m_onDoubleClick = callback;
+        m_onDoubleClick = std::move(callback);
     }
 
     const std::function<void(Control&, Control::Event&)> &Control::GetFocusChangedCallback()
@@ -174,6 +174,14 @@ namespace Gx
         Invalidate();
     }
 
+    void Control::AddChild(Gx::Node *node)
+    {
+        if (auto control = dynamic_cast<Gx::Control*>(node); control)
+            AddChild(control);
+        else
+            Node::AddChild(node);
+    }
+
     void Control::RemoveChild(Control *node)
     {
         if (!node)
@@ -182,6 +190,14 @@ namespace Gx
         OnControlChildRemove(node);
         Node::RemoveChild(node);
         Invalidate();
+    }
+
+    void Control::RemoveChild(Gx::Node *node)
+    {
+        if (auto control = dynamic_cast<Gx::Control*>(node); control)
+            RemoveChild(control);
+        else
+            Node::RemoveChild(node);
     }
 
     sf::RenderStates Control::Render(sf::RenderTarget &target, sf::RenderStates states) const

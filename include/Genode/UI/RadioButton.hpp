@@ -11,6 +11,8 @@ namespace Gx
     class RadioButton : public CheckBox
     {
     public:
+        virtual ~RadioButton() = default;
+
         using CheckBox::CheckBox;
 
         virtual void SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback);

@@ -3,11 +3,34 @@
 
 namespace Gx
 {
-    SceneDirector::SceneDirector(Application &app, Scene *scene, const sf::RenderTarget &target) :
+    SceneDirector::SceneDirector(SceneDirector &&director) :
+        m_application(director.m_application),
+        m_target(director.m_target),
+        m_currentScene(std::move(director.m_currentScene)),
+        m_nextScene(std::move(director.m_nextScene)),
+        m_factories(director.m_factories),
+        m_caches(std::move(director.m_caches)),
+        m_staged()
+    {
+    }
+
+    SceneDirector::SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene) :
         m_application(&app),
-        m_scene(scene),
         m_target(&target),
-        m_resources()
+        m_currentScene(&scene),
+        m_factories(),
+        m_caches(),
+        m_staged()
+    {
+    }
+
+    SceneDirector::SceneDirector(Application &app, sf::RenderTarget &target) :
+        m_application(&app),
+        m_target(&target),
+        m_currentScene(),
+        m_factories(),
+        m_caches(),
+        m_staged()
     {
     }
 
@@ -15,30 +38,41 @@ namespace Gx
     {
     }
 
-    void SceneDirector::Initialize()
+    void SceneDirector::Stage()
     {
-        if (m_scene)
+        if (m_nextScene && !m_staged)
         {
-            m_scene->SetDirector(*this);
-            if (m_target)
-                m_scene->SetView(m_target->getView());
+            m_currentScene = std::move(m_nextScene);
+            m_nextScene = nullptr;
 
-            m_scene->Initialize();
+            m_currentScene->SetDirector(*this);
+            if (m_target)
+                m_currentScene->SetView(m_target->getView());
+
+            m_currentScene->Initialize();
+            m_staged = true;
         }
     }
 
-    Scene* SceneDirector::GetScene() const
+    void SceneDirector::Unstage()
     {
-        return m_scene.get();
+        if (m_currentScene)
+            m_currentScene->Close();
     }
 
-    void SceneDirector::SetScene(Scene* scene)
+    bool SceneDirector::IsCacheEnabled() const
     {
-        if (m_scene)
-            m_scene->Close();
+        return m_cacheEnabled;
+    }
 
-        m_scene = std::unique_ptr<Scene>(scene);
-        Initialize();
+    void SceneDirector::SetCacheEnabled(bool cacheEnabled)
+    {
+        m_cacheEnabled = cacheEnabled;
+    }
+
+    Scene &SceneDirector::GetPresentedScene() const
+    {
+        return *m_currentScene;
     }
 
     Application &SceneDirector::GetApplication() const
@@ -46,49 +80,49 @@ namespace Gx
         return *m_application;
     }
 
-    ResourceManager &SceneDirector::GetSharedResources() const
-    {
-        return *m_resources;
-    }
-
-    void SceneDirector::SetSharedResources(ResourceManager &resources)
-    {
-        m_resources = &resources;
-    }
-
     sf::RenderStates SceneDirector::Render(sf::RenderTarget& target, sf::RenderStates states) const
     {
-        if (m_scene)
-            return m_scene->Render(target, states);
+        if (m_currentScene)
+            return m_currentScene->Render(target, states);
 
         return states;
     }
 
     void SceneDirector::Update(double delta)
     {
-        if (m_scene)
-            m_scene->Update(delta);
+        Stage();
+
+        if (m_currentScene)
+            m_currentScene->Update(delta);
     }
 
     bool SceneDirector::Input(sf::Event ev)
     {
-        if (m_scene)
-            return m_scene->Input(ev);
+        Stage();
+
+        if (m_currentScene)
+            return m_currentScene->Input(ev);
 
         return false;
     }
 
     void SceneDirector::ProcessEvents()
     {
-        if (m_scene)
-            m_scene->ProcessSceneEvents();
+        if (m_currentScene)
+            m_currentScene->ProcessSceneEvents();
     }
 
     bool SceneDirector::Close()
     {
-        if (m_scene)
-            return m_scene->Close(true);
+        if (m_currentScene)
+            return m_currentScene->Close(true);
 
         return true;
+    }
+
+    void SceneDirector::Unload()
+    {
+        m_currentScene = nullptr;
+        m_nextScene = nullptr;
     }
 }

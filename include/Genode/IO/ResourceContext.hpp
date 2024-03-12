@@ -1,30 +1,65 @@
 #ifndef GENODE_IO_RESOURCE_CONTEXT_HPP
 #define GENODE_IO_RESOURCE_CONTEXT_HPP
 
-#include <SFML/Audio/SoundBuffer.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Shader.hpp>
 
-#include <memory>
+#include <Genode/IO/ResourceContainer.hpp>
+#include <SFML/System/InputStream.hpp>
+#include <string>
 
 namespace Gx
 {
     class ResourceManager;
     class ResourceContext
     {
-    // TODO: Multiple resources for same type of resource, use vector for each? or use resource contianer / resource manager?
-    // Resources must guaranteed loaded before hand
     public:
-        std::string             Name;
-        const sf::Texture*      Texture;
-        const sf::Image*        Image;
-        const sf::Font*         Font;
-        const sf::SoundBuffer*  SoundBuffer;
-        const sf::Shader*       Shader;
-        const ResourceMetadata* Metadata;
-        ResourceManager*        Resources;
+        static const ResourceContext Default;
+
+        explicit ResourceContext(const std::string &id);
+        ResourceContext(const std::string &id, ResourceManager &resources, CacheMode mode = CacheMode::None);
+
+        virtual ~ResourceContext() = default;
+
+        static ResourceContext Rebind(const std::string &id, const ResourceContext &ctx);
+
+        const std::string &GetID() const;
+        bool Available() const;
+
+        template<typename R>
+        R* Find(const std::string &id) const;
+
+        template<typename R>
+        R& Acquire(const std::string &id) const;
+
+        template<typename R>
+        R& Acquire(const std::string &id, const std::string &path) const;
+
+        template<typename R>
+        R& Acquire(const std::string &id, const void* data, std::size_t dataSize) const;
+
+        template<typename R>
+        R& Acquire(const std::string &id, sf::InputStream &stream) const;
+
+        template<typename R>
+        R& Store(const std::string &id, R& resource) const;
+
+        template<typename R>
+        R& Store(const std::string &id, ResourcePtr<R> resource) const;
+
+        CacheMode GetCacheMode() const;
+
+    protected:
+        ResourceContext();
+
+        ResourceManager *GetResourceManager() const;
+
+    private:
+        ResourceContext(const std::string &id, ResourceManager *resources, CacheMode mode = CacheMode::None);
+
+        const std::string m_id;
+        const CacheMode m_cacheMode = CacheMode::None;
+        mutable ResourceManager *m_resources;
     };
 }
 
+#include <Genode/IO/ResourceContext.inl>
 #endif

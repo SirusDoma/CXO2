@@ -1,193 +1,230 @@
-#include <Genode/IO/FileHelper.hpp>
-#include <Genode/SceneGraph/Node.hpp>
-#include "ResourceManager.hpp"
-
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/IO/ResourceLoader.hpp>
 
 namespace Gx
 {
-    template<typename A>
-    A* ResourceManager::LoadArchive(const std::string& fileName)
+    template<typename R>
+    void ResourceManager::Register()
     {
-        static_assert(std::is_base_of<Archive, A>::value, "Parameter must be a Gx::Archive");
+        if (m_containers.find(typeid(R)) != m_containers.end())
+            return;
 
-        auto name = FileHelper::GetFileName(fileName);
-        auto it = m_archives.find(fileName);
-        if (it != m_archives.end())
-            return nullptr;
-
-        m_archives[name] = std::make_unique<A>();
-        if (!m_archives[name]->Open(FileHelper::GetFullName(fileName)))
-        {
-            m_archives.erase(m_archives.find(name));
-            return nullptr;
-        }
-
-        auto prefix = FileHelper::GetFileName(fileName, false) + "/";
-        for (auto entry : m_archives[name]->GetFileEntries())
-        {
-            auto entryName = prefix + entry.Name;
-            m_entries[entryName] = entry;
-            m_entries[entryName].Parent = m_archives[name].get();
-        }
-
-        return static_cast<A*>(m_archives[name].get());
+        m_containers[typeid(R)] = std::make_unique<ManagedContainer<R>>(std::make_unique<ResourceContainer<R>>());
     }
 
     template<typename R>
-    ResourceContainer<R>* ResourceManager::Register()
-    {
-        auto container = GetContainer<R>();
-        if (container)
-            return container;
-
-        m_containers[typeid(R)] = std::make_unique<ResourceContainer<R>>();
-        return static_cast<ResourceContainer<R>*>(m_containers[typeid(R)].get());
-    }
-
-    template<typename R>
-    bool ResourceManager::Unregister()
+    bool ResourceManager::Release()
     {
         return m_containers.erase(typeid(R)) != 0;
     }
 
     template<typename R>
-    ResourceContainer<R>* ResourceManager::GetContainer()
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id)
     {
-        auto iterator = m_containers.find(typeid(R));
-        if (iterator != m_containers.end())
-            return static_cast<ResourceContainer<R>*>(iterator->second.get());
+        Register<R>();
 
-        return nullptr;
+        auto resource = Find<R>(id);
+        if (!resource)
+            return nullptr;
+
+        return std::make_unique<R>(*resource);
     }
 
     template<typename R>
-    bool ResourceManager::Contains(const std::string &name)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, const std::string &fileName)
     {
-        auto iterator = m_entries.find(name);
-        if (iterator != m_entries.end())
-            return true;
+        Register<R>();
 
-        auto container = GetContainer<R>();
-        if (!container)
-            return false;
-
-        return container->Contains(name);
+        auto resource = &AddFromFile<R>(id, fileName, CacheMode::Reuse);
+        return std::make_unique<R>(*resource);
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Resolve(const std::string &source)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, void *data, std::size_t size)
     {
+        Register<R>();
+
+        auto resource = &AddFromMemory<R>(id, data, size, CacheMode::Reuse);
+        return std::make_unique<R>(*resource);
+    }
+
+    template<typename R>
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, sf::InputStream &stream)
+    {
+        Register<R>();
+
+        auto resource = &AddFromStream<R>(id, stream, CacheMode::Reuse);
+        return std::make_unique<R>(*resource);
+    }
+
+    template<typename R>
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, std::function<ResourcePtr<R>()> deserializer)
+    {
+        Register<R>();
+
+        auto resource = &AddFromStream<R>(id, deserializer, CacheMode::Reuse);
+        return std::make_unique<R>(*resource);
+    }
+
+
+    template<typename R>
+    R &ResourceManager::AddFromFile(const std::string &idOrFileName, CacheMode mode)
+    {
+        Register<R>();
+
         auto loader = ResourceLoaderFactory::GetLoader<R>();
         if (!loader)
-            return nullptr;
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
 
-        auto metaContainer = GetContainer<ResourceMetadata>();
-        if (loader->IsMetadataRequired() && metaContainer)
-        {
-            if (auto metadata = metaContainer->Find(source))
-                return loader->Load(*metadata, ResolveContext(*metadata));
-        }
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto deserializer = [&, this] () {
+            auto ctx = std::move(m_contextBuilder(idOrFileName, *this, mode));
+            return loader->LoadFromFile(idOrFileName, *ctx);
+        };
 
-        Uint8 *data;
-        if (auto size = GetResourceData(source, &data))
-        {
-            ResourcePtr<R> resource;
-            if (loader->IsMetadataRequired())
-            {
-                auto metadata = loader->LoadMetadata(data, size);
-                if (!metadata)
-                    return nullptr;
-
-                if (metaContainer)
-                {
-                    auto cachedMeta = metaContainer->Add(source, std::move(metadata));
-                    resource = loader->Load(*cachedMeta, ResolveContext(*cachedMeta));
-                }
-                else
-                    resource = loader->Load(*metadata, ResolveContext(*metadata));
-
-                // metadata can be deleted immediately
-                delete[] data;
-                data = nullptr;
-
-                return resource;
-            }
-            else
-            {
-                resource = loader->Load(data, size);
-                if (!loader->IsResourceStream())
-                {
-                    delete[] data;
-                    data = nullptr;
-                }
-
-                std::function<void(R *)> deleter = [data, loader](auto ptr) {
-                    delete ptr;
-                    if (loader->IsResourceStream())
-                        delete[] data;
-                };
-
-                return ResourcePtr<R>{resource.release(), deleter};
-            }
-        }
-
-        return nullptr;
+        return managed->Container->Store(idOrFileName, deserializer, mode);
     }
 
     template<typename R>
-    ResourceMetadata *ResourceManager::LoadMetadata(const std::string &source)
+    R &ResourceManager::AddFromFile(const std::string &id, const std::string &fileName, CacheMode mode)
     {
-        auto container = GetContainer<ResourceMetadata>();
-        if (!container)
-            return nullptr;
-
-        if (auto metadata = container->Find(source))
-            return dynamic_cast<ResourceMetadata*>(metadata);
+        Register<R>();
 
         auto loader = ResourceLoaderFactory::GetLoader<R>();
-        if (!loader || !loader->IsMetadataRequired())
+        if (!loader)
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto deserializer = [&, this] () {
+            auto ctx = std::move(m_contextBuilder(id, *this, mode));
+            return loader->LoadFromFile(fileName, *ctx);
+        };
+
+        return managed->Container->Store(id, deserializer, mode);
+    }
+
+    template<typename R>
+    R &ResourceManager::AddFromMemory(const std::string &id, void *data, std::size_t size, CacheMode mode)
+    {
+        Register<R>();
+
+        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        if (!loader)
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto deserializer = [&, this] () {
+            auto ctx = std::move(m_contextBuilder(id, *this, mode));
+            return loader->LoadFromMemory(data, size, *ctx);
+        };
+
+        return managed->Container->Store(id, deserializer, mode);
+    }
+
+    template<typename R>
+    R &ResourceManager::AddFromStream(const std::string &id, sf::InputStream &stream, CacheMode mode)
+    {
+        Register<R>();
+
+        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        if (!loader)
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto deserializer = [&, this] () {
+            auto ctx = std::move(m_contextBuilder(id, *this, mode));
+            return loader->LoadFromStream(stream, *ctx);
+        };
+
+        return &managed->Container->Store(id, deserializer, mode);
+    }
+
+    template<typename R>
+    R &ResourceManager::AddFromDeserializer(const std::string &id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode)
+    {
+        Register<R>();
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto &result = managed->Container->Store(id, deserializer, mode);
+
+        return result;
+    }
+
+    template<typename R, class... Args>
+    R &ResourceManager::Create(const std::string &id, Args&&... args)
+    {
+        Register<R>();
+
+        ResourcePtr<R> resource = std::make_unique<R>(std::forward<Args>(args)...);
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        return managed->Container->Store(id, std::move(resource), CacheMode::None);
+    }
+
+    template<typename R>
+    R &ResourceManager::Store(const std::string &id, R &resource, CacheMode mode)
+    {
+        Register<R>();
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        return managed->Container->Store(id, std::make_unique<R>(resource), mode);
+    }
+
+    template<typename R>
+    R &ResourceManager::Store(const std::string &id, ResourcePtr<R> resource, CacheMode mode)
+    {
+        if (!resource)
+            throw ResourceStoreException("[" + id + "] Cannot store empty resource.");
+
+        Register<R>();
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        return managed->Container->Store(id, std::move(resource), mode);
+    }
+
+    template<typename R>
+    R *ResourceManager::Find(const std::string &id) const
+    {
+        const auto it = m_containers.find(typeid(R));
+        if (it == m_containers.end())
             return nullptr;
 
-        Uint8 *data;
-        if (auto size = GetResourceData(source, &data))
+        auto managed = dynamic_cast<ManagedContainer<R>*>(it->second.get());
+        if (!managed)
+            return nullptr;
+
+        return managed->Container->Find(id);
+    }
+
+    template<typename R>
+    bool ResourceManager::Destroy(const R &resource)
+    {
+        const auto it = m_containers.find(typeid(R));
+        if (it == m_containers.end())
+            return false;
+
+        auto managed = static_cast<ManagedContainer<R>*>(it->second.get());
+        return managed->Container->Destroy(resource);
+    }
+
+    template<typename R>
+    bool ResourceManager::Destroy(const std::string &id)
+    {
+        Register<R>();
+
+        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        return managed->Container->Destroy(id);
+    }
+
+    template<typename R>
+    unsigned int ResourceManager::Count() const
+    {
+        if (auto it = m_containers.find(typeid(R)); it != m_containers.end())
         {
-            auto metadata = loader->LoadMetadata(data, size);
-
-            delete[] data;
-            data = nullptr;
-
-            return dynamic_cast<ResourceMetadata*>(container->Add(source, std::move(metadata)));
+            auto managed = dynamic_cast<const ManagedContainer<R>*>(it->second.get());
+            return managed->Container->Count();
         }
 
-        return nullptr;
-    }
-
-    template<typename R>
-    R* ResourceManager::Load(const std::string &source)
-    {
-        auto container = GetContainer<R>();
-        if (!container)
-            return nullptr;
-
-        auto resolver = [this, source] { return Resolve<R>(source); };
-        return container->Add(source, resolver, true);
-    }
-
-    template<typename R>
-    R *ResourceManager::Load(const ResourceMetadata& metadata)
-    {
-        return Load<R>(metadata.Name, metadata);
-    }
-
-    template<typename R>
-    R *ResourceManager::Load(const std::string &name, const ResourceMetadata &metadata)
-    {
-        auto container = GetContainer<R>();
-        auto loader    = ResourceLoaderFactory::GetLoader<R>();
-        if (!container || !loader)
-            return nullptr;
-
-        auto resolver = [this, loader, &metadata] { return loader->Load(metadata, ResolveContext(metadata)); };
-        return container->Add(name, resolver, true);
+        return 0;
     }
 }

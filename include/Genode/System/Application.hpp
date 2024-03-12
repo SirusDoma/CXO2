@@ -4,21 +4,20 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+#include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Audio/Mixer.hpp>
 
-#include <vector>
 #include <functional>
 #include <memory>
 
 namespace Gx
 {
     class Scene;
-    class SceneDirector;
     class Config;
     class Module;
-    class Application
+    class Application : NonCopyable
     {
     public:
         const std::string TITLE = "O2-JAM";
@@ -26,13 +25,16 @@ namespace Gx
 
         Application(sf::VideoMode mode, bool fullScreen = false);
         Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
-        ~Application();
+        virtual ~Application();
 
-        int Start(Scene *scene);
+        int Start();
+        int Start(Scene &scene);
         void Close();
 
+        SceneDirector &GetSceneDirector() const;
+
         unsigned int GetRenderFrequency() const;
-        void SetCursor(const Cursor &cursor);
+        void SetCursor(Cursor &cursor);
 
         template<typename T>
         T &GetConfig();
@@ -41,13 +43,13 @@ namespace Gx
         void SetConfig(const T& config);
 
         template<typename T>
-        void SetConfig(std::function<std::unique_ptr<T>(const Application&)> resolver);
+        void SetConfig(std::function<std::unique_ptr<T>(const Application&)> builder);
 
         template<typename T>
         T &Install();
 
         template<typename T>
-        bool Provide(std::function<T&(Application&)> resolver);
+        bool Provide(std::function<std::unique_ptr<T>(Application&)> builder);
 
         template<typename T>
         bool Uninstall();
@@ -60,44 +62,44 @@ namespace Gx
     protected:
         sf::RenderWindow &GetRenderWindow() const;
 
-        virtual void OnStart();
+        virtual void Boot();
+        virtual void Shutdown();
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
         virtual void OnInputReceived(sf::Event ev);
         virtual void OnClose();
 
-        void ShareResources(ResourceManager &resources);
-
     private:
         using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
         using ConfigResolverMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Config>(const Application&)>>;
 
-        using ModuleMap         = std::unordered_map<std::type_index, ResourcePtr<Module>>;
-        using ModuleResolverMap = std::unordered_map<std::type_index, std::function<Module&(Application&)>>;
+        using ModuleMap        = std::unordered_map<std::type_index, std::unique_ptr<Module>>;
+        using ModuleFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Module>(Application&)>>;
 
         inline static Application *m_instance = nullptr;
 
         mutable sf::RenderWindow m_window;
+        mutable SceneDirector m_director;
         sf::Event m_event;
 
-        SceneDirector  *m_director;
         ResourceManager m_resources;
 
         sf::VideoMode m_mode;
         sf::VideoMode m_virtualMode;
 
         sf::Clock m_timer;
-        Cursor m_cursor;
+        Cursor* m_cursor;
 
         ConfigMap         m_configs;
-        ConfigResolverMap m_configResolvers;
+        ConfigResolverMap m_configurators;
 
-        ModuleMap         m_modules;
-        ModuleResolverMap m_moduleResolvers;
+        ModuleMap        m_modules;
+        ModuleFactoryMap m_factories;
 
         unsigned int m_frames;
         unsigned int m_renderFreq;
         bool m_fullScreen;
+        bool m_closeRequested;
     };
 }
 

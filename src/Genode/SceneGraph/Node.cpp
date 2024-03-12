@@ -1,5 +1,4 @@
 ﻿#include <Genode/SceneGraph/Node.hpp>
-#include <Genode/SceneGraph/Scene.hpp>
 
 #include <algorithm>
 
@@ -12,7 +11,6 @@ namespace Gx
 
     Node::~Node()
     {
-        m_children.clear();
     }
 
     void Node::Initialize()
@@ -90,10 +88,18 @@ namespace Gx
 
     void Node::AddChild(Node* child)
     {
-        if (child && std::find(m_children.begin(), m_children.end(), child) == m_children.end())
+        if (child)
         {
-            child->m_parent = this;
-            m_children.push_back(child);
+            if (std::find(m_children.begin(), m_children.end(), child) == m_children.end())
+            {
+                if (child->m_parent)
+                    child->m_parent->RemoveChild(child);
+
+                child->SetParent(this);
+                m_children.push_back(child);
+            }
+            else
+                child->SetParent(this);
         }
     }
 

@@ -6,7 +6,7 @@
 #include <Genode/IO.hpp>
 #include <Genode/System/Primitives.hpp>
 
-#include <OTwo/Archives/O2FileEntry.hpp>
+#include <OTwo/Archives/FileInfo.hpp>
 
 #include <unordered_map>
 
@@ -33,27 +33,35 @@ struct M30SampleHeader
     int   PcmSamples;
 };
 
-class M30Archive : public Gx::Archive
+class M30Archive final : public Gx::Archive
 {
 public:
-    M30Archive();
-    ~M30Archive();
+    M30Archive() = default;
+    ~M30Archive() override = default;
 
-    virtual bool Open(const std::string& fileName);
-    virtual bool Contains(const std::string& name) const;
+    bool LoadFromFile(const std::string& fileName) override;
 
-    Gx::Int64 GetFile(unsigned int index, Gx::Uint8** data) const;
-    virtual Gx::Int64 GetFile(const std::string& name, Gx::Uint8** data) const;
-    virtual std::vector<FileEntry> GetFileEntries() const;
+    Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
+    Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
+
+    bool Contains(const std::string& name) const override;
+    std::vector<Gx::FileInfo> GetFileEntries() const override;
+    std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
+
+    Gx::Int64 ReadFile(unsigned int index, void *data, Gx::Int64 size) const;
+    Gx::Int64 ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const override;
+    void WriteFile(const std::string &fileName, void *data, Gx::Int64 size) const override { throw Gx::NotSupportedException(); }
+
+    Gx::Int64 GetFileSize(const std::string &fileName) const override;
 
 private:
-    static Gx::Uint8* DecodeSample(Gx::Uint8* in, int length, int encodingCode);
+    bool ReadStream(void* data, Gx::Uint64 size) const;
+    Gx::Int64 ReadFile(const FileInfo &entry, void *data, Gx::Int64 size) const;
 
-    bool Read(void* data, Gx::Uint64 size) const;
-    virtual Gx::Int64 GetFile(const FileEntry* entry, Gx::Uint8** data) const;
+    static Gx::Uint8* DecodeSample(const Gx::Uint8* encoded, int length, int encodingCode);
 
     M30Header m_header;
-    mutable std::unordered_map<unsigned int, O2FileEntry> m_entries;
+    mutable std::unordered_map<unsigned int, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
 

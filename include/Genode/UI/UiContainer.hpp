@@ -36,6 +36,7 @@ namespace Gx
     private:
         sf::FloatRect m_localBounds;
         RadioButton *m_activeRadio;
+        bool m_radioHandled;
         std::function<void(RadioButton*)> m_radioCallback;
     };
 }

@@ -1,29 +1,42 @@
 #ifndef GENODE_IO_DESERIALIZER_FACRORY_HPP
 #define GENODE_IO_DESERIALIZER_FACRORY_HPP
 
-#include <Genode/IO/ResourceLoader.hpp>
-
-#include <unordered_map>
 #include <typeindex>
 #include <typeinfo>
 #include <functional>
+#include <unordered_map>
+#include <memory>
 
 namespace Gx
 {
-    using LoaderMap = std::unordered_map<std::type_index, std::function<priv::BaseLoader*()>>;
+    template<typename T>
+    class ResourceLoader;
     class ResourceLoaderFactory
     {
     public:
-        template<typename R, typename D>
+        template<typename R, typename L>
         static void Register();
+
+        template<typename R>
+        static void Register(std::function<std::unique_ptr<ResourceLoader<R>>()> factory);
 
         template<typename R>
         static bool Remove();
 
         template<typename R>
-        static ResourceLoader<R>* GetLoader();
+        static std::unique_ptr<ResourceLoader<R>> GetLoader();
 
     private:
+        static void EnsureDefaultLoadersRegistered();
+        struct BaseLoaderFactory {};
+
+        template<typename R>
+        struct LoaderFactory : BaseLoaderFactory
+        {
+            std::function<std::unique_ptr<ResourceLoader<R>>()> Create;
+        };
+        using LoaderMap = std::unordered_map<std::type_index, std::unique_ptr<BaseLoaderFactory>>;
+
         inline static LoaderMap m_loaders;
     };
 }

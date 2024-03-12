@@ -1,5 +1,6 @@
-#include <OTwo/Character/ItemFactory.hpp>
-#include <iostream>
+#include <OTwo/Avatar/ItemFactory.hpp>
+#include <OTwo/Data/Character.hpp>
+#include <OTwo/Data/Equipment.hpp>
 
 ItemFactory::ItemFactory()
 {
@@ -8,12 +9,12 @@ ItemFactory::ItemFactory()
 ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
 {
     m_resources = &sharedResources;
-    m_itemData  = static_cast<ItemData*>(m_resources->LoadMetadata<ItemData>("Avatar/Itemdata.json"));
+    m_itemData  = &m_resources->AddFromFile<ItemData>("Avatar/Itemdata.json");
 }
 
-const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Character::Gender &gender)
+const std::map<EquipmentType, Item *> ItemFactory::GetDefaultItems(const Gender &gender)
 {
-    auto items = std::map<Equipment::Type, Item *>();
+    auto items = std::map<EquipmentType, Item *>();
     if (!m_resources)
         return items;
 
@@ -27,22 +28,20 @@ const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Chara
 
     for (auto name : names)
     {
-        auto item = m_resources->Load<Item>(name);
-        if (item)
-            items[item->GetType()] = item;
+        auto& item = m_resources->AddFromFile<Item>(name);
+        items[item.GetType()] = &item;
     }
 
     auto apply = [&] (std::initializer_list<std::string> equipments)
     {
         for (auto name : equipments)
         {
-            auto item = m_resources->Load<Item>(name);
-            if (item)
-                items[item->GetType()] = item;
+            auto& item = m_resources->AddFromFile<Item>(name);
+            items[item.GetType()] = &item;
         }
     };
 
-    if (gender == Character::Gender::Male)
+    if (gender == Gender::Male)
     {
         apply({
             "Avatar/default/Male/Face.json",
@@ -52,7 +51,7 @@ const std::map<Equipment::Type, Item *> ItemFactory::GetDefaultItems(const Chara
             "Avatar/default/Male/Shoes.json"
         });
     }
-    else if (gender == Character::Gender::Female)
+    else if (gender == Gender::Female)
     {
         apply({
             "Avatar/default/Female/Face.json",
@@ -76,5 +75,5 @@ Item *ItemFactory::GetItem(unsigned int id)
         return nullptr;
 
     ItemMetadata metadata = iterator->second;
-    return m_resources->Load<Item>("Avatar/Items/" + std::to_string(id) + ".json", iterator->second);
+    return &m_resources->AddFromFile<Item>("Avatar/Items/metadata/" + std::to_string(id) + ".json");
 }

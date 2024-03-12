@@ -11,11 +11,11 @@ namespace Gx
     {
     public:
         Renderable() {};
-        virtual ~Renderable() {};
+        ~Renderable() override {};
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
     protected:
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const { Render(target, states); }
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const override { Render(target, states); }
     };
 }
 

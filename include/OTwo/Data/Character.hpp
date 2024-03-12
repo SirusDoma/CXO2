@@ -1,14 +1,11 @@
-#ifndef O2JAM_CHARACTER_HPP
-#define O2JAM_CHARACTER_HPP
+#ifndef O2JAM_CHARACTER_DATA_HPP
+#define O2JAM_CHARACTER_DATA_HPP
 
-namespace Character
+enum class Gender
 {
-    enum class Gender
-    {
-        Any,
-        Male,
-        Female
-    };
-}
+    Any,
+    Male,
+    Female
+};
 
 #endif

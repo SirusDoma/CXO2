@@ -3,28 +3,30 @@
 namespace Gx
 {
     Animation::Animation() :
-        m_sprite(nullptr),
-        m_duration(sf::Time::Zero),
+        m_sprite(std::make_unique<Gx::Sprite>()),
         m_frames(),
+        m_duration(sf::Time::Zero),
         m_elapsed(sf::Time::Zero),
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
         m_state(AnimationState::Initial),
         m_visible(true),
+        m_loop(false),
         m_animationCallback()
     {
     }
 
-    Animation::Animation(Gx::Sprite *sprite, const sf::Time &duration, std::initializer_list<Frame> frames) :
-        m_sprite(sprite),
-        m_duration(duration),
+    Animation::Animation(Gx::Sprite &sprite, const sf::Time &duration, std::initializer_list<Frame> frames) :
+        m_sprite(&sprite),
         m_frames(frames),
+        m_duration(duration),
         m_elapsed(sf::Time::Zero),
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
         m_visible(true),
+        m_loop(false),
         m_animationCallback()
     {
     }
@@ -37,17 +39,20 @@ namespace Gx
     {
         m_frames.push_back(frame);
         if (m_frames.size() == 1)
-            SetFrame(0);
+        {
+            m_currentFrame = 0;
+            SetFrame(m_currentFrame);
+        }
     }
 
-    Gx::Sprite *Animation::GetSprite() const
+    Gx::Sprite &Animation::GetSprite() const
     {
-        return m_sprite.get();
+        return *m_sprite.get();
     }
 
-    void Animation::SetSprite(Sprite *sprite)
+    void Animation::SetSprite(Sprite &sprite)
     {
-        m_sprite = std::unique_ptr<Sprite>(sprite);
+        m_sprite = std::make_unique<Sprite>(sprite);
     }
 
     void Animation::SetDuration(const sf::Time &duration)
@@ -197,14 +202,19 @@ namespace Gx
 
     void Animation::SetFrame(unsigned int frame)
     {
-        if (frame >= 0 && frame < m_frames.size())
+        if (frame < m_frames.size())
         {
-            m_sprite->SetTexCoords(m_frames[m_currentFrame].TexCoords);
+            m_sprite->SetTexCoords(m_frames[frame].TexCoords);
 
-            m_sprite->SetOrigin(m_frames[m_currentFrame].Origin);
-            m_sprite->SetPosition(m_frames[m_currentFrame].Position);
-            m_sprite->SetRotation(m_frames[m_currentFrame].Rotation);
-            m_sprite->SetScale(m_frames[m_currentFrame].Scale);
+            m_sprite->SetOrigin(m_frames[frame].Origin);
+            m_sprite->SetPosition(m_frames[frame].Position);
+            m_sprite->SetRotation(m_frames[frame].Rotation);
+            m_sprite->SetScale(m_frames[frame].Scale);
         }
+    }
+
+    unsigned int Animation::GetFrameCount() const
+    {
+        return m_frames.size();
     }
 }

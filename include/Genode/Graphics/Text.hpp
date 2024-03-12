@@ -119,7 +119,7 @@ namespace Gx
     private:
         using ColorMap = std::unordered_map<size_t, sf::Color>;
 
-        sf::String             m_string;
+        sf::String              m_string;
         const sf::Font*         m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;

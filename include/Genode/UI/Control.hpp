@@ -46,6 +46,9 @@ namespace Gx
         virtual void AddChild(Control *node);
         virtual void RemoveChild(Control *node);
 
+        void AddChild(Gx::Node *node) override;
+        void RemoveChild(Gx::Node *node) override;
+
         template<typename... Args>
         void AddChild(Control* first, Args... args);
 

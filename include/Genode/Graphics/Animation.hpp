@@ -35,15 +35,16 @@ namespace Gx
         };
 
         Animation();
-        Animation(Sprite *sprite, const sf::Time& duration, std::initializer_list<Frame> frames);
+        Animation(Sprite &sprite, const sf::Time& duration, std::initializer_list<Frame> frames);
         virtual ~Animation();
 
         template<typename... Args>
         void AddFrame(const Frame &first, Args... args);
         void AddFrame(const Frame &frame);
+        unsigned int GetFrameCount() const;
 
-        Gx::Sprite *GetSprite() const;
-        void SetSprite(Gx::Sprite *sprite);
+        Gx::Sprite &GetSprite() const;
+        void SetSprite(Gx::Sprite &sprite);
 
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);

@@ -1,55 +1,41 @@
 ﻿#include <Genode/IO/Loaders/TextureLoader.hpp>
-#include <Genode/IO/FileHelper.hpp>
+#include <Genode/IO/FileSystem/LocalFileSystem.hpp>
+
 
 namespace Gx
 {
-    namespace priv
+    void TextureLoader::UseSmooth(bool smooth)
     {
-        bool TextureLoader::IsMetadataRequired() const
-        {
-            return false;
-        }
+        m_smooth = smooth;
+    }
 
-        std::unique_ptr<ResourceMetadata> TextureLoader::LoadMetadata(const void *data, std::size_t size) const
-        {
+    ResourcePtr<sf::Texture> TextureLoader::LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const
+    {
+        auto resource = std::make_unique<sf::Texture>();
+        if (!resource->loadFromFile(LocalFileSystem::Instance().GetFullName(fileName)))
             return nullptr;
-        }
 
-        ResourcePtr<sf::Texture> TextureLoader::Load(const ResourceMetadata &metadata, const ResourceContext& context) const
-        {
-            ResourceReference* required = nullptr;
-            for (auto ref : metadata.References)
-            {
-                if (ref.Type == ResourceReference::Texture)
-                {
-                    required = &ref;
-                    break;
-                }
-            }
+        resource->setSmooth(m_smooth);
+        return resource;
+    }
 
-            if (required)
-            {
-                Gx::Uint8 *data;
-                if (auto size = Gx::FileHelper::ReadFile(required->Value, &data))
-                {
-                    auto texture = Load(data, size);
-                    delete data;
-
-                    return texture;
-                }
-            }
-
+    ResourcePtr<sf::Texture> TextureLoader::LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const
+    {
+        auto resource = std::make_unique<sf::Texture>();
+        if (!resource->loadFromMemory(data, size))
             return nullptr;
-        }
 
-        ResourcePtr<sf::Texture> TextureLoader::Load(const void *data, std::size_t size) const
-        {
-            auto texture = std::make_unique<sf::Texture>();
-            if (!texture->loadFromMemory(data, size))
-                return nullptr;
+        resource->setSmooth(m_smooth);
+        return resource;
+    }
 
-            texture->setSmooth(true);
-            return texture;
-        }
+    ResourcePtr<sf::Texture> TextureLoader::LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const
+    {
+        auto resource = std::make_unique<sf::Texture>();
+        if (!resource->loadFromStream(stream))
+            return nullptr;
+
+        resource->setSmooth(m_smooth);
+        return resource;
     }
 }

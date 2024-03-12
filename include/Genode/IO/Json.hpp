@@ -1,11 +1,12 @@
 #ifndef GENODE_IO_JSON_HPP
 #define GENODE_IO_JSON_HPP
 
-#include <sstream>
-#include <iomanip>
 #include <string>
+#include <nlohmann/json.hpp>
 
-#include <json/json.hpp>
-typedef nlohmann::json Json;
+namespace Gx
+{
+    typedef nlohmann::ordered_json Json;
+}
 
 #endif

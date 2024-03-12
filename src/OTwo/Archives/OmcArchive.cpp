@@ -1,174 +1,111 @@
 ﻿#include <OTwo/Archives/OmcArchive.hpp>
+
+#include <SFML/System/MemoryInputStream.hpp>
+
 #include <sstream>
 
-OmcArchive::OmcArchive() :
-    m_header(),
-    m_fileStream(),
-    m_entries()
+bool OmcArchive::LoadFromFile(const std::string &fileName)
 {
-}
-
-OmcArchive::~OmcArchive()
-{
-}
-
-bool OmcArchive::Open(const std::string &fileName)
-{
-    if (!Archive::Open(fileName))
+    if (!Archive::LoadFromFile(fileName))
         return false;
 
-    m_fileStream.open(fileName);
+    m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName));
     m_fileStream.seek(0);
 
-    if (!Read(&m_header, sizeof(m_header)))
+    if (!ReadStream(&m_header, sizeof(m_header)))
         return false;
 
-    auto signature = std::string(m_header.Signature, 3);
-    if (signature != "OMC" && signature != "OJM")
+    if (const auto signature = std::string(m_header.Signature, 3); signature != "OMC" && signature != "OJM") {
         return false;
+    }
 
-    auto entries = GetFileEntries();
+    const auto entries = GetFileEntries();
     return entries.size() > 0; // == m_header.FxCount + m_header.BgCount;
+}
+
+Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
+{
+    const auto it = m_entries.find(index);
+    if (it == m_entries.end())
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+
+    const auto header = it->second;
+    const auto data = new Gx::Uint8[header.GetSize()];
+    if (const int read = ReadFile(index, data, header.GetSize()); read <= 0)
+        delete[] data;
+
+    const auto stream = new sf::MemoryInputStream();
+    stream->open(data, header.GetSize());
+
+    return Gx::ResourcePtr<sf::InputStream>(stream, [data] (const sf::InputStream *ms) {
+        delete[] data;
+        delete ms;
+    });
+}
+
+Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) const
+{
+    for (auto const& [index, header] : m_entries)
+    {
+        if (header.GetName() != fileName)
+            continue;
+
+        const auto data = new Gx::Uint8[header.GetSize()];
+        if (const int read = ReadFile(index, data, header.GetSize()); read <= 0)
+        {
+            delete[] data;
+            throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file.");
+        }
+
+        const auto stream = new sf::MemoryInputStream();
+        stream->open(data, header.GetSize());
+
+        return Gx::ResourcePtr<sf::InputStream>(stream, [data] (const sf::InputStream *ms) {
+            delete[] data;
+            delete ms;
+        });
+    }
+
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
 }
 
 bool OmcArchive::Contains(const std::string &name) const
 {
     for (auto const& [key, header] : m_entries)
     {
-        if (header.Name == name)
+        if (header.GetName() == name)
             return true;
     }
 
     return false;
 }
 
-Gx::Int64 OmcArchive::GetFile(unsigned int index, Gx::Uint8 **data) const
+
+std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
 {
-    auto iterator = m_entries.find(index);
-    if (iterator == m_entries.end())
-        return -1;
-
-    if (index < 1000)
-    {
-        m_fileStream.seek(m_header.FxStartOffset);
-
-        // This is the reason why we can't seek straight to desired sample
-        int accKeyByte = 0xFF;
-        int accCounter = 0;
-
-        for (unsigned int i = 0; i < m_header.FxCount; i++)
-        {
-            OmcWaveHeader waveHeader;
-            if (!Read(&waveHeader, sizeof(waveHeader)))
-                return -1;
-
-            auto encodedData = new Gx::Uint8[waveHeader.ChunkSize];
-            if (!Read(encodedData, waveHeader.ChunkSize))
-            {
-                delete[] encodedData;
-                return -1;
-            }
-
-            // Still need to decode even not desired sample to increment accKeyByte and accCounter
-            auto sampleData = DecodeWave(encodedData, waveHeader.ChunkSize, &accKeyByte, &accCounter);
-            int pcm = 16, fileSize = waveHeader.ChunkSize + 36;
-            if (i != index)
-            {
-                delete[] encodedData;
-                delete[] sampleData;
-                continue;
-            }
-
-            // Build complete wave sample
-            std::stringstream waveStream;
-            waveStream.write("RIFF", 4);
-            waveStream.write((char *) &fileSize, sizeof(fileSize));
-            waveStream.write("WAVE", 4);
-            waveStream.write("fmt ", 4);
-            waveStream.write((char *) &pcm, sizeof(pcm));
-            waveStream.write((char *) &waveHeader.AudioFormat, sizeof(waveHeader.AudioFormat));
-            waveStream.write((char *) &waveHeader.ChannelCount, sizeof(waveHeader.ChannelCount));
-            waveStream.write((char *) &waveHeader.SampleRate, sizeof(waveHeader.SampleRate));
-            waveStream.write((char *) &waveHeader.BitRate, sizeof(waveHeader.BitRate));
-            waveStream.write((char *) &waveHeader.BlockAlign, sizeof(waveHeader.BlockAlign));
-            waveStream.write((char *) &waveHeader.BitsPerSample, sizeof(waveHeader.BitsPerSample));
-            waveStream.write("data", 4);
-            waveStream.write((char *) &waveHeader.ChunkSize, sizeof(waveHeader.ChunkSize));
-            waveStream.write((char *) sampleData, waveHeader.ChunkSize);
-
-            auto buffer = waveStream.str();
-            unsigned int read = buffer.length();
-
-            *data = new Gx::Uint8[read];
-            memcpy((char *) &(*data)[0], buffer.data(), read);
-
-            delete[] encodedData;
-            delete[] sampleData;
-
-            return read;
-        }
-
-        return -1;
-    }
-    else
-    {
-        m_fileStream.seek(iterator->second.Offset);
-
-        OmcOggHeader oggHeader;
-        if (!Read(&oggHeader, sizeof(oggHeader)))
-            return -1;
-
-        *data = new Gx::Uint8[oggHeader.Size];
-        return m_fileStream.read(*data, oggHeader.Size);
-    }
-}
-
-Gx::Int64 OmcArchive::GetFile(const std::string &name, Gx::Uint8 **data) const
-{
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.Name == name)
-            return GetFile(key, data);
-    }
-
-    return -1;
-}
-
-Gx::Int64 OmcArchive::GetFile(const FileEntry* entry, Gx::Uint8** data) const
-{
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.Name == entry->Name)
-            return GetFile(key, data);
-    }
-
-    return -1;
-}
-
-std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
-{
-    std::vector<FileEntry> result;
+    std::vector<Gx::FileInfo> result;
     m_entries.clear();
 
     m_fileStream.seek(m_header.FxStartOffset);
     for (unsigned int i = 0; i < m_header.FxCount; i++)
     {
-        auto entry   = O2FileEntry();
-        auto offset  = m_fileStream.tell();
+        const auto offset  = m_fileStream.tell();
         if (offset == -1)
             continue;
 
         auto waveHeader = OmcWaveHeader();
-        if (!Read(&waveHeader, sizeof(waveHeader)))
+        if (!ReadStream(&waveHeader, sizeof(waveHeader)))
             continue;
 
         if (m_fileStream.seek(m_fileStream.tell() + waveHeader.ChunkSize) == -1)
             continue;
 
-        entry.Parent = this;
-        entry.Name   = std::string(waveHeader.Name, sizeof(waveHeader.Name)).c_str();
-        entry.Size   = waveHeader.ChunkSize;
-        entry.Offset = offset;
+        auto entry = FileInfo(
+            *this,
+            std::string(waveHeader.Name, sizeof(waveHeader.Name)).c_str(),
+            waveHeader.ChunkSize + 44, // wav header
+            offset
+        );
 
         m_entries[i] = entry;
         result.push_back(entry);
@@ -177,22 +114,23 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
     m_fileStream.seek(m_header.BgStartOffset);
     for (unsigned int i = 0; i < m_header.BgCount; i++)
     {
-        auto entry   = O2FileEntry();
-        auto offset  = m_fileStream.tell();
+        const auto offset  = m_fileStream.tell();
         if (offset == -1)
             continue;
 
         auto oggHeader = OmcOggHeader();
-        if (!Read(&oggHeader, sizeof(oggHeader)))
+        if (!ReadStream(&oggHeader, sizeof(oggHeader)))
             continue;
 
         if (m_fileStream.seek(m_fileStream.tell() + oggHeader.Size) == -1)
             continue;
 
-        entry.Parent = this;
-        entry.Name   = std::string(oggHeader.Name, sizeof(oggHeader.Name)).c_str();
-        entry.Size   = oggHeader.Size;
-        entry.Offset = offset;
+        auto entry = FileInfo(
+            *this,
+            std::string(oggHeader.Name, sizeof(oggHeader.Name)).c_str(),
+            oggHeader.Size,
+            offset
+        );
 
         m_entries[i + 1000] = entry;
         result.push_back(entry);
@@ -201,20 +139,139 @@ std::vector<Gx::Archive::FileEntry> OmcArchive::GetFileEntries() const
     return result;
 }
 
+
+std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string &fileName) const
+{
+    for (auto const& [key, header] : m_entries)
+    {
+        if (header.GetName() == fileName)
+            return std::make_unique<FileInfo>(header);
+    }
+
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+}
+
+Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 size) const
+{
+    const auto iterator = m_entries.find(index);
+    if (iterator == m_entries.end())
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+
+    if (index < 1000)
+    {
+        m_fileStream.seek(m_header.FxStartOffset);
+
+        // We can't seek straight to desired sample because we need to calculate these counters
+        int accKeyByte = 0xFF;
+        int accCounter = 0;
+
+        for (unsigned int i = 0; i < m_header.FxCount; i++)
+        {
+            OmcWaveHeader waveHeader;
+            if (!ReadStream(&waveHeader, sizeof(waveHeader)))
+                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header.");
+
+            const auto encodedData = new Gx::Uint8[waveHeader.ChunkSize];
+            if (!ReadStream(encodedData, waveHeader.ChunkSize))
+            {
+                delete[] encodedData;
+                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the encoded WAV data.");
+            }
+
+            // Still need to decode even not desired sample to increment accKeyByte and accCounter
+            const auto decodedData = DecodeWave(encodedData, waveHeader.ChunkSize, &accKeyByte, &accCounter);
+            int pcm = 16, fileSize = waveHeader.ChunkSize + 36;
+            if (i != index)
+            {
+                delete[] encodedData;
+                delete[] decodedData;
+                continue;
+            }
+
+            // Build complete wave sample
+            std::stringstream waveStream;
+            waveStream.write("RIFF", 4);
+            waveStream.write(reinterpret_cast<char*>(&fileSize), sizeof(fileSize));
+            waveStream.write("WAVE", 4);
+            waveStream.write("fmt ", 4);
+            waveStream.write(reinterpret_cast<char*>(&pcm), sizeof(pcm));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.AudioFormat), sizeof(waveHeader.AudioFormat));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.ChannelCount), sizeof(waveHeader.ChannelCount));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.SampleRate), sizeof(waveHeader.SampleRate));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.BitRate), sizeof(waveHeader.BitRate));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.BlockAlign), sizeof(waveHeader.BlockAlign));
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.BitsPerSample), sizeof(waveHeader.BitsPerSample));
+            waveStream.write("data", 4);
+            waveStream.write(reinterpret_cast<char*>(&waveHeader.ChunkSize), sizeof(waveHeader.ChunkSize));
+            waveStream.write(reinterpret_cast<char*>(decodedData), waveHeader.ChunkSize);
+
+            const auto buffer = waveStream.str();
+            const unsigned int read = buffer.length();
+
+            if (size <= 0 || size > read)
+                size = read;
+
+            memcpy(data, buffer.data(), size);
+            delete[] encodedData;
+            delete[] decodedData;
+
+            return read;
+        }
+
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+    }
+    else
+    {
+        if (m_fileStream.seek(iterator->second.GetOffset()) == -1)
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to seek into the OGG data.");
+
+        OmcOggHeader oggHeader;
+        if (!ReadStream(&oggHeader, sizeof(oggHeader)))
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the OGG header.");
+
+        if (size > oggHeader.Size)
+            size = oggHeader.Size;
+
+        return m_fileStream.read(data, size);
+    }
+}
+
+Gx::Int64 OmcArchive::ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const
+{
+    for (auto const& [key, header] : m_entries)
+    {
+        if (header.GetName() == fileName)
+            return ReadFile(key, data, size);
+    }
+
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+}
+
+Gx::Int64 OmcArchive::GetFileSize(const std::string &fileName) const
+{
+    for (auto const& [key, header] : m_entries)
+    {
+        if (header.GetName() == fileName)
+            return header.GetSize();
+    }
+
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+}
+
 std::string OmcArchive::GetExtension(const std::string& name) const
 {
     for (auto const& [key, header] : m_entries)
     {
-        if (header.Name == name)
+        if (header.GetName() == name)
             return key < 1000 ? ".wav" : ".ogg";
     }
 
     return "";
 }
 
-bool OmcArchive::Read(void *data, Gx::Uint64 size) const
+bool OmcArchive::ReadStream(void *data, Gx::Uint64 size) const
 {
-    auto read = m_fileStream.read(data, size);
+    const auto read = m_fileStream.read(data, size);
     return read == size;
 }
 
@@ -262,14 +319,13 @@ Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, in
 {
     auto *out = new Gx::Uint8[length];
     int key = ((length % 17) << 4) + (length % 17);
-    int blockSize = length / 17;
+    const int blockSize = length / 17;
 
     memcpy(out, in, length);
-    int inOffset, outOffset;
     for(int block = 0; block < 17; block++)
     {
-        inOffset = blockSize * block;
-        outOffset = blockSize * WAVE_REARRANGE_TABLE[key];
+        const int inOffset = blockSize * block;
+        const int outOffset = blockSize * WAVE_REARRANGE_TABLE[key];
 
         memcpy(&out[outOffset], &in[inOffset], blockSize);
         key++;
@@ -278,9 +334,8 @@ Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, in
     for(int i = 0; i < length; i++)
     {
         Gx::Uint8 currentByte = out[i], temp = out[i];
-        int accXor = ((*accKeyByte << *accCounter) & 0x80);
-        if (accXor != 0)
-            currentByte = (Gx::Uint8) ~currentByte;
+        if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)
+            currentByte = static_cast<Gx::Uint8>(~currentByte);
 
         out[i] = currentByte;
         *accCounter += 1;

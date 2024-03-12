@@ -5,19 +5,19 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include <Genode/UI/Image.hpp>
-#include <Genode/IO/ResourceMetadata.hpp>
+#include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>
 
-#include <OTwo/Metadata/SpriteMetadata.hpp>
+#include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
 
-#include <unordered_map>
+#include <map>
 
 struct ImageMetadata : public SpriteMetadata
 {
     ImageMetadata() : Frames() {}
     virtual ~ImageMetadata() {}
 
-    std::unordered_map<std::string, Gx::Image::Frame> Frames;
+    std::map<std::string, Gx::Image::Frame> Frames;
 };
 
 #endif

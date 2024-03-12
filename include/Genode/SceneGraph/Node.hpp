@@ -30,6 +30,12 @@ namespace Gx
         virtual void RemoveChild(Node* child);
         virtual void ClearChildren();
 
+        template<typename T>
+        T *GetParent() const;
+
+        template<typename T>
+        T* FindChild(const std::string& name) const;
+
         template<typename... Args>
         void AddChild(Node* first, Args... args);
 

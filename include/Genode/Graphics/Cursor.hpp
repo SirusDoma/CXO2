@@ -15,11 +15,12 @@ namespace Gx
     public:
         Cursor();
         Cursor(const sf::Texture& texture);
+        ~Cursor();
 
-        sf::Cursor* GetHandle();
+        sf::Cursor &GetHandle() const;
 
     private:
-        sf::Cursor*  m_cursor;
+        mutable sf::Cursor   m_cursor;
         Gx::Uint8*   m_source;
         sf::Vector2u m_size;
     };

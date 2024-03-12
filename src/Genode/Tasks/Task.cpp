@@ -30,17 +30,17 @@ namespace Gx
 
     void Task::OnStart(std::function<void()> callback)
     {
-        m_onStart = callback;
+        m_onStart = std::move(callback);
     }
 
     void Task::OnStopped(std::function<void()> callback)
     {
-        m_onStop = callback;
+        m_onStop = std::move(callback);
     }
 
     void Task::OnCompleted(std::function<void()> callback)
     {
-        m_onComplete = callback;
+        m_onComplete = std::move(callback);
     }
 
     void Task::Update(double delta)

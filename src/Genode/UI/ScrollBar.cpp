@@ -132,7 +132,7 @@ namespace Gx
 
     void ScrollBar::SetValueChangedCallback(std::function<void(ScrollBar &, float)> callback)
     {
-        m_onValueChanged = callback;
+        m_onValueChanged = std::move(callback);
     }
 
     float ScrollBar::GetStep() const

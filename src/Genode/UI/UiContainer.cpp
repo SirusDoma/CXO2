@@ -6,7 +6,8 @@ namespace Gx
 {
     UiContainer::UiContainer() :
         m_localBounds(),
-        m_activeRadio()
+        m_activeRadio(),
+        m_radioHandled(false)
     {
     }
 
@@ -21,7 +22,7 @@ namespace Gx
 
     void UiContainer::SetRadioActiveCallback(std::function<void(RadioButton *)> callback)
     {
-        m_radioCallback = callback;
+        m_radioCallback = std::move(callback);
     }
 
     void UiContainer::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)

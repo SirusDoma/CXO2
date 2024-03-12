@@ -17,16 +17,17 @@ namespace Gx
         m_renderFreq(0),
         m_frames(0),
         m_cursor(),
-        m_resources()
+        m_resources(),
+        m_director(SceneDirector(*this, m_window))
     {
-        m_mode        = mode;
-        m_virtualMode = virtualMode;
-        m_fullScreen  = fullScreen;
+        m_mode           = mode;
+        m_virtualMode    = virtualMode;
+        m_fullScreen     = fullScreen;
+        m_closeRequested = false;
     }
 
     Application::~Application()
     {
-        delete m_director;
     }
 
     Application &Application::Instance()
@@ -34,14 +35,13 @@ namespace Gx
         return *m_instance;
     }
 
-    int Application::Start(Scene *scene)
+    int Application::Start()
     {
         if (m_instance && m_instance != this)
-            throw "Only single application instance allowed";
+            throw Exception("Only single application instance allowed");
 
         // Initialize application instance and director
         m_instance = this;
-        m_director = new SceneDirector(*this, scene, m_window);
 
         // Set render frequency
         m_window.setVerticalSyncEnabled(true);
@@ -53,15 +53,8 @@ namespace Gx
         view.setCenter(m_virtualMode.width / 2.0f, m_virtualMode.height / 2.0f);
         m_window.setView(view);
 
-        // Trigger callback
-        OnStart();
-
-        // Fallback resources
-        if (!m_director->m_resources)
-            ShareResources(m_resources);
-
-        // Initialize scene
-        m_director->Initialize();
+        // Bootstrap the game
+        Boot();
 
         // Setup timer
         m_timer = sf::Clock();
@@ -77,12 +70,19 @@ namespace Gx
                 // Call window event handlers based on received event
                 switch (event.type)
                 {
-                    case sf::Event::Closed:      OnClose();             break;
-                    case sf::Event::GainedFocus: OnFocusChanged(true);  break;
-                    case sf::Event::LostFocus:   OnFocusChanged(false); break;
-                    case sf::Event::Resized:     OnResized(event.size);    break;
-                    default:                     OnInputReceived(event);   break;
+                    case sf::Event::Closed:      OnClose();              break;
+                    case sf::Event::GainedFocus: OnFocusChanged(true);   break;
+                    case sf::Event::LostFocus:   OnFocusChanged(false);  break;
+                    case sf::Event::Resized:     OnResized(event.size);  break;
+                    default:                     OnInputReceived(event); break;
                 }
+            }
+
+            // Check if window is closed after polling the events
+            if (m_closeRequested || !m_window.isOpen())
+            {
+                m_window.close();
+                break;
             }
 
             // Calculate delta
@@ -101,12 +101,12 @@ namespace Gx
             m_window.clear(sf::Color::White);
             {
                 // Game routine (update + render)
-                m_director->Update(delta);
-                m_director->Render(m_window, sf::RenderStates::Default);
+                m_director.Update(delta);
+                m_director.Render(m_window, sf::RenderStates::Default);
             }
             m_window.display();
 
-            m_director->ProcessEvents();
+            m_director.ProcessEvents();
 
             // Track the number of frames rendered in a second
             fpsDelta += delta;
@@ -126,8 +126,17 @@ namespace Gx
             m_frames++;
         }
 
+        // Clean up
+        Shutdown();
+
         // Application exit code
         return 0;
+    }
+
+    int Application::Start(Scene &scene)
+    {
+        m_director.Present(scene);
+        return Start();
     }
 
     sf::RenderWindow &Application::GetRenderWindow() const
@@ -135,15 +144,17 @@ namespace Gx
         return m_window;
     }
 
-    void Application::ShareResources(ResourceManager &resources)
+    SceneDirector &Application::GetSceneDirector() const
     {
-        if (m_director)
-            m_director->SetSharedResources(resources);
+        return m_director;
     }
 
-    void Application::OnStart()
+    void Application::Boot()
     {
-        ShareResources(m_resources);
+    }
+
+    void Application::Shutdown()
+    {
     }
 
     void Application::Close()
@@ -156,10 +167,10 @@ namespace Gx
         return m_renderFreq;
     }
 
-    void Application::SetCursor(const Cursor& cursor)
+    void Application::SetCursor(Cursor& cursor)
     {
-        m_cursor = cursor;
-        m_window.setMouseCursor(*m_cursor.GetHandle());
+        m_cursor = &cursor;
+        m_window.setMouseCursor(m_cursor->GetHandle());
     }
 
     void Application::OnFocusChanged(bool focus)
@@ -217,9 +228,9 @@ namespace Gx
         }
 
         // Pass input into active scene via director
-        m_director->Input(ev);
+        m_director.Input(ev);
 
-        // Move cursor
+        //// Move cursor
         //if (ev.type == sf::Event::MouseMoved)
         //    m_cursor.setPosition(static_cast<float>(ev.mouseMove.x), static_cast<float>(ev.mouseMove.y));
 
@@ -235,8 +246,8 @@ namespace Gx
     void Application::OnClose()
     {
         // Ask game permission first before closing
-        if (m_director->Close())
-            m_window.close();
+        if (m_director.Close())
+            m_closeRequested = true;
     }
 
     Application::operator sf::RenderTarget&() const

@@ -1,27 +1,40 @@
 ﻿#include <OTwo/States/Components/Planet/ChannelButton.hpp>
-
-#include <Genode/SceneGraph/Scene.hpp>
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
+#include <OTwo/States/State.hpp>
 
 ChannelButton::ChannelButton() :
     Gx::RadioButton(),
+    m_initialized(false),
     m_hall(),
-    m_population()
+    m_population(),
+    m_numberIndicator(),
+    m_nameIndicator(),
+    m_fullIndicator(),
+    m_focusIndicator(),
+    m_populationCounter(),
+    m_states()
 {
 }
 
-void ChannelButton::Initialize(Gx::Scene &scene)
+void ChannelButton::Initialize()
 {
-    auto resources = &scene.GetLocalResources();
-    m_channelName    = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelName.json");
-    m_channelNumber  = resources->Resolve<Gx::Number>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelNumber.json");
-    m_channelCounter = resources->Resolve<Gx::ProgressBar>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelCount.json");
-    m_channelFull    = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/ChannelFull.json");
-    m_hover          = resources->Resolve<Gx::Image>("Interface/Metadata/State/Planet/ChannelBoard/Btn_Channel/Hover.json");
+    auto parent = GetParent<::State>();
+    if (!parent || m_initialized)
+        return;
 
-    m_hover->SetVisible(false);
+    // TODO: FIX ALL CHANNEL BUTTON USING SAME CHILDREN POINTERS
+    // MOVE GX::LIST DECLARATION TO CHANNELBOARD.JSON
+    m_numberIndicator   = FindChild<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
+    m_nameIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NAME");
+    m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");;
+    m_focusIndicator    = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FOCUS");
+    m_populationCounter = FindChild<Gx::ProgressBar>("IDC_PROGRESS_BAR_CHANNEL_COUNTER");
 
-    AddChild(m_channelName.get(), m_channelNumber.get(), m_channelCounter.get(), m_channelFull.get(), m_hover.get());
+    if (m_focusIndicator)
+    {
+        m_focusIndicator->SetVisible(false);
+        m_initialized = true;
+    }
 }
 
 const sf::FloatRect ChannelButton::GetLocalBounds() const
@@ -29,106 +42,98 @@ const sf::FloatRect ChannelButton::GetLocalBounds() const
     return RadioButton::GetLocalBounds();
 }
 
-int ChannelButton::GetChannelNumber() const
+unsigned int ChannelButton::GetChannelNumber() const
 {
-    return m_channelNumber->GetValue();
+    if (!m_numberIndicator)
+        return 0;
+
+    return m_numberIndicator->GetValue();
 }
 
-void ChannelButton::SetChannelNumber(int channelNumber)
+void ChannelButton::SetChannelNumber(unsigned int channelNumber)
 {
-    m_channelNumber->SetValue(channelNumber);
+    if (!m_numberIndicator)
+        return;
+
+    m_numberIndicator->SetValue(channelNumber);
 }
 
-int ChannelButton::GetChannelPopulation() const
+unsigned int ChannelButton::GetChannelPopulation() const
 {
-    return static_cast<int>(m_channelCounter->GetValue());
+    return m_population;
 }
 
-void ChannelButton::SetChannelPopulation(int population)
+void ChannelButton::SetChannelPopulation(unsigned int population)
 {
     m_population = population;
+    if (!m_populationCounter)
+        return;
 
     float percentage = static_cast<float>(population) / 20.0f;
-    m_channelCounter->SetValue(static_cast<int>(std::ceil(percentage) * 20.0f));
+    m_populationCounter->SetValue(static_cast<int>(std::ceil(percentage) * 20.0f));
 
-    m_channelFull->SetVisible(m_population >= m_channelCounter->GetMaximumValue());
-    m_channelCounter->SetVisible(!m_channelFull->IsVislble());
+    m_fullIndicator->SetVisible(m_population >= m_populationCounter->GetMaximumValue());
+    m_populationCounter->SetVisible(!m_fullIndicator->IsVislble());
 }
 
-Planet::MusicHall ChannelButton::GetPlanet() const
+MusicHall ChannelButton::GetPlanet() const
 {
     return m_hall;
 }
 
-void ChannelButton::SetPlanet(Planet::MusicHall hall)
+void ChannelButton::AddStateFrame(ChannelButton::Mode mode, Gx::Control::State state, const sf::IntRect &frame)
+{
+    if (auto it = m_states.find(mode); it == m_states.end())
+        m_states[mode] = std::unordered_map<State, sf::IntRect>();
+
+    m_states[mode][state] = frame;
+}
+
+void ChannelButton::SetMusicHall(MusicHall hall)
 {
     if (m_hall == hall)
         return;
 
-    const Gx::ResourceMetadata *metadata = nullptr;
+    Mode mode;
     m_hall = hall;
 
     // TODO: Load all and put inside a map
     switch (m_hall)
     {
-        case Planet::MusicHall::Kalliope:
-            metadata = m_highMetadata;
-            m_channelName->SetFrame("Kaliope");
+        case MusicHall::Kalliope:
+            mode = Mode::High;
+            m_nameIndicator->SetFrame("Kalliope");
             break;
-        case Planet::MusicHall::Kleo:
-            m_channelName->SetFrame("Kleo");
-            metadata = m_intermediateMetadata;
+        case MusicHall::Kleo:
+            mode = Mode::Intermediate;
+            m_nameIndicator->SetFrame("Kleo");
             break;
-        case Planet::MusicHall::Philix:
-            m_channelName->SetFrame("Philix");
-            metadata = m_intermediateMetadata;
+        case MusicHall::Philix:
+            mode = Mode::Intermediate;
+            m_nameIndicator->SetFrame("Philix");
             break;
-        case Planet::MusicHall::Melpomin:
-            m_channelName->SetFrame("Melpomin");
-            metadata = m_beginnerMetadata;
+        case MusicHall::Melpomin:
+            mode = Mode::Beginner;
+            m_nameIndicator->SetFrame("Melpomin");
             break;
-        case Planet::MusicHall::Thalo:
-            m_channelName->SetFrame("Thalo");
-            metadata = m_beginnerMetadata;
+        case MusicHall::Thalo:
+            mode = Mode::Beginner;
+            m_nameIndicator->SetFrame("Thalo");
             break;
-        case Planet::MusicHall::Euta:
-            m_channelName->SetFrame("Euta");
-            metadata = m_beginnerMetadata;
+        case MusicHall::Euta:
+            mode = Mode::Beginner;
+            m_nameIndicator->SetFrame("Euta");
             break;
         default:
-            metadata = m_defaultMetadata;
-            break;
+            return;
     }
 
-    if (!metadata)
-        return;
-
-    auto radioData = dynamic_cast<const RadioButtonMetadata*>(metadata);
-    if (radioData)
+    int size = m_states.size();
+    if (auto it = m_states.find(mode); it != m_states.end())
     {
-        for (auto [state, sprite] : radioData->States)
-            SetStateFrame(state, sprite.TexCoords);
+        for (auto [state, frame] : it->second)
+            SetStateFrame(state, frame);
     }
-}
-
-void ChannelButton::SetDefaultMetadata(const Gx::ResourceMetadata *metadata)
-{
-    m_defaultMetadata = metadata;
-}
-
-void ChannelButton::SetHighMetadata(const Gx::ResourceMetadata *highMetadata)
-{
-    m_highMetadata = highMetadata;
-}
-
-void ChannelButton::SetIntermediateMetadata(const Gx::ResourceMetadata *intermediateMetadata)
-{
-    m_intermediateMetadata = intermediateMetadata;
-}
-
-void ChannelButton::SetBeginnerMetadata(const Gx::ResourceMetadata *beginnerMetadata)
-{
-    m_beginnerMetadata = beginnerMetadata;
 }
 
 sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const
@@ -138,8 +143,8 @@ sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderState
 
 void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)
 {
-    if (m_hover)
-        m_hover->SetVisible(state == Gx::Control::State::Hover || state == Gx::Control::State::Active);
+    if (m_focusIndicator)
+        m_focusIndicator->SetVisible(state == Gx::Control::State::Hover || state == Gx::Control::State::Active);
 
     Control::OnControlStateChanged(sender, state);
 }

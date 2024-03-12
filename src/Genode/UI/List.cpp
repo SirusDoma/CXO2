@@ -26,7 +26,6 @@ namespace Gx
     {
     }
 
-
     void List::SetVerticalRepeat(int count, float spacing)
     {
         m_verticalCount   = count;
@@ -86,8 +85,8 @@ namespace Gx
     {
         return sf::Vector2f(
             static_cast<int>(m_horizontalSpacing * m_horizontalCounter),
-            static_cast<int>(m_verticalSpacing * m_verticalCounter))
-        ;
+            static_cast<int>(m_verticalSpacing * m_verticalCounter)
+        );
     }
 
     void List::IncreaseSpacingCounter()

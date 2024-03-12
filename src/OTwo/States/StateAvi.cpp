@@ -6,30 +6,35 @@
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <OTwo/States/StatePlanet.hpp>
+#include <OTwo/States/StateTest.hpp>
+
+StateAvi::StateAvi(State &state) :
+    State::State(state)
+{
+}
 
 void StateAvi::Initialize()
 {
-    auto& app   = GetApplication();
-    auto& mixer = app.Require<Gx::Mixer>();
+    State::Initialize();
 
-    auto sprite = Create<Gx::Sprite>("Interface/Metadata/State/Avi/Background.json");
-    AddChild(sprite);
-
-    auto bgm = mixer.Create<sf::Music>("Interface/Metadata/State/Avi/Music.json");
+    auto& director  = GetDirector();
+    auto& mixer     = Require<Gx::Mixer>();
+    auto background = Load<Gx::Sprite>("STATE_AVI/IDC_IMAGE_STATE_AVI");
+    auto bgm        = Load<sf::Music>("STATE_AVI/IDC_MUSIC");
     mixer.Play(bgm, "BGM");
 
-    auto sequence = new Gx::Sequence([&] { QueueSceneEvent([&]
+    auto splash = Create<Gx::Sequence>([&]
         {
-            mixer.StopAll();
-            GetDirector().SetScene(new StatePlanet());
-        }); },
+            director.Present<StatePlanet>();
+        },
+        Gx::Sequence::ListOf(
         {
-            new Gx::Fade(sprite, 255, sf::seconds(2.25f)),
-            new Gx::Fade(sprite, 000, sf::seconds(2.25f))
-        }
+            Create<Gx::Fade>(background, 255, sf::seconds(2.25f)),
+            Create<Gx::Fade>(background, 000, sf::seconds(2.25f))
+        })
     );
 
-    Run(sequence);
+    Run(splash);
 }
 
 bool StateAvi::Close(bool quit)

@@ -6,34 +6,33 @@ namespace Gx
     Mixer::Mixer() :
         m_masterGroup(),
         m_groups(),
-        m_sources(),
-        m_resources()
+        m_sources()
     {
-        m_masterGroup = std::unique_ptr<SoundGroup>(new SoundGroup("master"));
+        m_masterGroup = ResourcePtr<SoundGroup>(new SoundGroup("master"), [] (auto ptr)
+        {
+            ptr->Stop();
+            delete ptr;
+        });
     }
 
-    Mixer::Mixer(ResourceManager &sharedResource) :
-        m_masterGroup(),
-        m_groups(),
-        m_sources(),
-        m_resources(&sharedResource)
+    Mixer::Mixer(Mixer &&right) noexcept:
+        m_masterGroup(std::move(right.m_masterGroup)),
+        m_groups(std::move(right.m_groups)),
+        m_sources(std::move(right.m_sources))
     {
-        m_masterGroup = std::unique_ptr<SoundGroup>(new SoundGroup("master"));
     }
 
-    Mixer::Mixer(Mixer &&other) :
-        m_masterGroup(),
-        m_groups(),
-        m_sources(),
-        m_resources()
+    Mixer &Mixer::operator=(Mixer &&right) noexcept
     {
-        *this = std::move(other);
+        m_masterGroup = std::move(right.m_masterGroup);
+        m_groups      = std::move(right.m_groups);
+        m_sources     = std::move(right.m_sources);
+
+        return *this;
     }
 
     Mixer::~Mixer()
     {
-        m_groups.clear();
-        m_sources.clear();
     }
 
     SoundGroup *Mixer::GetMasterSoundGroup() const
@@ -41,13 +40,13 @@ namespace Gx
         return m_masterGroup.get();
     }
 
-    SoundGroup *Mixer::GetSoundGroup(const std::string &group) const
+    SoundGroup *Mixer::GetSoundGroup(const std::string &group)
     {
         auto iterator = m_groups.find(group);
-        if (iterator != m_groups.end())
-            return iterator->second.get();
+        if (iterator == m_groups.end())
+            m_groups[group] = ResourcePtr<SoundGroup>(new SoundGroup(group), [] (auto ptr) { delete ptr; });
 
-        return nullptr;
+        return m_groups[group].get();
     }
 
     sf::SoundSource* Mixer::Play(sf::SoundSource *source)
@@ -63,7 +62,7 @@ namespace Gx
                 return Play(source, m_masterGroup.get());
 
             if (auto iterator = m_groups.find(group); iterator == m_groups.end())
-                m_groups[group] = std::unique_ptr<SoundGroup>(new SoundGroup(group));
+                m_groups[group] = ResourcePtr<SoundGroup>(new SoundGroup(group), [] (auto ptr) { delete ptr; });
 
             return Play(source, m_groups[group].get());
         }
@@ -209,7 +208,10 @@ namespace Gx
     {
         m_masterGroup->Stop();
         for (auto& [_, group] : m_groups)
+        {
             group->Stop();
+            group->Clear();
+        }
     }
 
     void Mixer::SetVolume(float volume)
@@ -232,13 +234,9 @@ namespace Gx
             group->Update(delta);
     }
 
-    Mixer &Mixer::operator=(Mixer &&right)
+    void Mixer::Clear()
     {
-        m_masterGroup = std::move(right.m_masterGroup);
-        m_groups      = std::move(right.m_groups);
-        m_sources     = std::move(right.m_sources);
-        m_resources   = std::move(right.m_resources);
-
-        return *this;
+        m_sources.clear();
+        m_groups.clear();
     }
 }

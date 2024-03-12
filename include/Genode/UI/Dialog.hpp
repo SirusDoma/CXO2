@@ -29,10 +29,14 @@ namespace Gx
         bool IsAccepted() const;
         virtual const sf::FloatRect GetLocalBounds() const;
 
-        void SetLabel(Label *label);
+        Label *GetLabel() const;
+        Button *GetAcceptButton() const;
+        Button *GetCancelButton() const;
+
+        void SetLabel(Label &label);
         void SetPromptString(const std::string& prompt);
-        void SetAcceptButton(Button *acceptButton);
-        void SetCancelButton(Button *cancelButton);
+        void SetAcceptButton(Button &acceptButton);
+        void SetCancelButton(Button &cancelButton);
 
         void SetAcceptCallback(std::function<void()> callback);
         void SetCancelCallback(std::function<void()> callback);
@@ -54,13 +58,14 @@ namespace Gx
         virtual void OnCancelled();
 
         const Scene *GetScene();
+
         virtual void Invalidate();
 
     private:
         mutable Gx::Sprite m_sprite;
 
-        std::unique_ptr<Button> m_acceptButton, m_cancelButton;
-        std::unique_ptr<Label>  m_promptText;
+        Button *m_acceptButton, *m_cancelButton;
+        Label  *m_promptText;
 
         Scene *m_scene;
         Rectangle m_backdrop;

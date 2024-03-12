@@ -5,7 +5,7 @@
 
 #include <Genode/System/Module.hpp>
 #include <Genode/Entities/Updatable.hpp>
-#include <Genode/IO/ResourceMetadata.hpp>
+#include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <vector>
@@ -19,15 +19,13 @@ namespace Gx
     {
     public:
         Mixer();
-        Mixer(Mixer &&other);
-        Mixer(Gx::ResourceManager &sharedResource);
+        Mixer(Mixer&& right) noexcept;
         virtual ~Mixer();
 
-        template<typename R>
-        R *Create(const std::string &source);
+        Mixer &operator=(Mixer&& right) noexcept;
 
         SoundGroup *GetMasterSoundGroup() const;
-        SoundGroup *GetSoundGroup(const std::string &name) const;
+        SoundGroup *GetSoundGroup(const std::string &name);
 
         sf::SoundSource *Play(sf::SoundSource *source);
         sf::SoundSource *Play(sf::SoundSource *source, const std::string &group);
@@ -52,24 +50,21 @@ namespace Gx
         void ResumeAll();
         void PauseAll();
         void StopAll();
+        void Clear();
 
         void SetVolume(float volume);
         void SetPan(float pan);
 
-
         virtual void Update(double delta);
 
-        Mixer &operator =(Mixer&& right);
-
     private:
-        using SoundGroupContainer  = std::map<std::string, std::unique_ptr<SoundGroup>>;
+        using SoundGroupContainer  = std::map<std::string, ResourcePtr<SoundGroup>>;
         using SoundSourceContainer = std::vector<ResourcePtr<sf::SoundSource>>;
 
-        std::unique_ptr<SoundGroup> m_masterGroup;
-        SoundGroupContainer         m_groups;
+        ResourcePtr<SoundGroup> m_masterGroup;
+        SoundGroupContainer     m_groups;
 
         SoundSourceContainer m_sources;
-        Gx::ResourceManager *m_resources;
     };
 }
 

@@ -29,15 +29,7 @@ namespace Gx
             return;
 
         m_pairs.push_back(radio);
-        for (auto pair : radio->m_pairs)
-            m_pairs.push_back(pair);
-
         radio->m_pairs.push_back(this);
-        for (auto pair : m_pairs)
-        {
-            pair->m_pairs.push_back(radio);
-            radio->m_pairs.push_back(pair);
-        }
     }
 
     void RadioButton::Unpair(RadioButton *radio)
@@ -76,6 +68,6 @@ namespace Gx
 
     void RadioButton::SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback)
     {
-        m_onCheckStateChanged = callback;
+        m_onCheckStateChanged = std::move(callback);
     }
 }

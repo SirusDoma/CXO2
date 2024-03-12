@@ -1,30 +1,32 @@
-#include <OTwo/Character/Avatar.hpp>
+#include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/Data/Character.hpp>
+#include <OTwo/Data/Equipment.hpp>
 
 Avatar::Avatar() :
-    m_playerInfo(),
-    m_instrument(Equipment::Instrument::None),
-    m_items(),
-    m_defaultItems()
+        m_player(),
+        m_instrument(Instrument::None),
+        m_items(),
+        m_defaultItems()
 {
 }
 
-Avatar::Avatar(Room::PlayerInfo playerInfo) :
-    m_playerInfo(),
-    m_instrument(Equipment::Instrument::None),
-    m_items(),
-    m_defaultItems()
+Avatar::Avatar(Player playerInfo) :
+        m_player(),
+        m_instrument(Instrument::None),
+        m_items(),
+        m_defaultItems()
 {
-    SetPlayerInfo(playerInfo);
+    SetPlayer(playerInfo);
 }
 
-const Room::PlayerInfo &Avatar::GetPlayerInfo() const
+const Player &Avatar::GetPlayer() const
 {
-    return m_playerInfo;
+    return m_player;
 }
 
-void Avatar::SetPlayerInfo(const Room::PlayerInfo &playerInfo)
+void Avatar::SetPlayer(const Player &playerInfo)
 {
-    m_playerInfo = playerInfo;
+    m_player = playerInfo;
 }
 
 void Avatar::SetDefaultItem(const Item *item)
@@ -46,16 +48,16 @@ void Avatar::Equip(const Item *item)
 {
     if (item)
     {
-        if (item->GetGender() != Character::Gender::Any && item->GetGender() != m_playerInfo.Gender)
+        if (item->GetGender() != Gender::Any && item->GetGender() != m_player.Gender)
             return;
 
         m_items[item->GetType()] = item;
         switch (item->GetType())
         {
-            case Equipment::Type::Piano:  m_instrument = Equipment::Instrument::Piano;  break;
-            case Equipment::Type::Bass:   m_instrument = Equipment::Instrument::Bass;   break;
-            case Equipment::Type::Drum:   m_instrument = Equipment::Instrument::Drum;   break;
-            case Equipment::Type::Guitar: m_instrument = Equipment::Instrument::Guitar; break;
+            case EquipmentType::Piano: m_instrument = Instrument::Piano;  break;
+            case EquipmentType::Bass: m_instrument = Instrument::Bass;   break;
+            case EquipmentType::Drum: m_instrument = Instrument::Drum;   break;
+            case EquipmentType::Guitar: m_instrument = Instrument::Guitar; break;
             default: break;
         }
     }
@@ -74,11 +76,11 @@ void Avatar::Unequip(const Item *item)
     {
         switch (item->GetType())
         {
-            case Equipment::Type::Piano:
-            case Equipment::Type::Bass:
-            case Equipment::Type::Drum:
-            case Equipment::Type::Guitar:
-                m_instrument = Equipment::Instrument::None;
+            case EquipmentType::Piano:
+            case EquipmentType::Bass:
+            case EquipmentType::Drum:
+            case EquipmentType::Guitar:
+                m_instrument = Instrument::None;
                 break;
             default: break;
         }
@@ -91,12 +93,12 @@ void Avatar::Unequip(const Item *item)
     }
 }
 
-const Equipment::Instrument &Avatar::GetEquipedInstrumentType() const
+const Instrument &Avatar::GetEquipedInstrumentType() const
 {
     return m_instrument;
 }
 
-const std::map<Equipment::Type, const Item *> &Avatar::GetEquipedItems() const
+const std::map<EquipmentType, const Item *> &Avatar::GetEquipedItems() const
 {
     return m_items;
 }
@@ -115,10 +117,10 @@ void Avatar::Update(double delta)
 sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates states) const
 {
     states.transform *= GetTransform();
-    auto iterator = m_items.find(Equipment::Type::Costume);
+    auto iterator = m_items.find(EquipmentType::Costume);
     if (iterator != m_items.end())
     {
-        auto animation = iterator->second->GetRenderableItem(m_playerInfo.Gender, Equipment::RenderPart::Body, Equipment::Instrument::None);
+        auto animation = iterator->second->GetRenderableItem(m_player.Gender, RenderPart::Body, Instrument::None);
         if (animation)
         {
             animation->Render(target, states);
@@ -134,7 +136,7 @@ sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates state
             if (iterator == m_items.end())
                 continue;
 
-            auto animation = iterator->second->GetRenderableItem(m_playerInfo.Gender, part, m_instrument);
+            auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
             if (animation)
                 animation->Render(target, states);
         }

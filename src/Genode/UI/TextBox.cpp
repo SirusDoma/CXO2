@@ -205,7 +205,7 @@ namespace Gx
 
     void TextBox::SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback)
     {
-        m_onTextEntered = callback;
+        m_onTextEntered = std::move(callback);
     }
 
     bool TextBox::IsNextCharacterFit()

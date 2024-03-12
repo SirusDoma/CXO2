@@ -4,56 +4,66 @@
 #include <OTwo/Archives/M30Archive.hpp>
 #include <OTwo/Archives/OmcArchive.hpp>
 
-#include <OTwo/Loaders/SpriteLoader.hpp>
-#include <OTwo/Loaders/SoundLoader.hpp>
-#include <OTwo/Loaders/MusicLoader.hpp>
-#include <OTwo/Loaders/AnimationLoader.hpp>
+#include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
-#include <OTwo/Loaders/UI/ImageLoader.hpp>
-#include <OTwo/Loaders/UI/LabelLoader.hpp>
-#include <OTwo/Loaders/UI/ToolTipLoader.hpp>
-#include <OTwo/Loaders/UI/NumberLoader.hpp>
-#include <OTwo/Loaders/UI/ButtonLoader.hpp>
-#include <OTwo/Loaders/UI/CheckBoxLoader.hpp>
-#include <OTwo/Loaders/UI/RadioButtonLoader.hpp>
-#include <OTwo/Loaders/UI/ProgressBarLoader.hpp>
-#include <OTwo/Loaders/UI/ListLoader.hpp>
-#include <OTwo/Loaders/UI/DialogLoader.hpp>
-#include <OTwo/Loaders/UI/TextBoxLoader.hpp>
-#include <OTwo/Loaders/UI/ScrollBarLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
+#include <OTwo/IO/Loaders/Audio/SoundLoader.hpp>
+#include <OTwo/IO/Loaders/Audio/MusicLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
 
-#include <OTwo/Loaders/UI/Components/ChannelButtonLoader.hpp>
-#include <OTwo/Loaders/UI/Components/ChannelBoardLoader.hpp>
-#include <OTwo/Loaders/UI/Components/ChatWindowLoader.hpp>
-#include <OTwo/Loaders/Dialogs/OptionDialogLoader.hpp>
-#include <OTwo/Loaders/Dialogs/CreateRoomDialogLoader.hpp>
-#include <OTwo/Loaders/UI/Components/MarqueeLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ImageLoader.hpp>
+#include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ToolTipLoader.hpp>
+#include <OTwo/IO/Loaders/UI/NumberLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
+#include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
+#include <OTwo/IO/Loaders/UI/RadioButtonLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ProgressBarLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ListLoader.hpp>
+#include <OTwo/IO/Loaders/UI/DialogLoader.hpp>
+#include <OTwo/IO/Loaders/UI/TextBoxLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ScrollBarLoader.hpp>
+#include <OTwo/IO/Loaders/UI/UiContainerLoader.hpp>
 
-#include <OTwo/Loaders/Character/ItemLoader.hpp>
-#include <OTwo/Loaders/Character/ItemDataLoader.hpp>
-#include <OTwo/Loaders/Character/AvatarLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Common/MarqueeLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Common/ChatPanelLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Common/ChatWindowLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Planet/ChannelButtonLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Planet/ChannelBoardLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Room/RoomContainerLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Room/RoomButtonLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 
-#include <OTwo/States/Components/Planet/ChannelButton.hpp>
-#include <OTwo/States/Components/Planet/ChannelBoard.hpp>
+#include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
+#include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
+#include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
+
+#include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
+
+#include <OTwo/Data/Character.hpp>
+#include <OTwo/Data/UserState.hpp>
+
+#include <OTwo/States/SceneDirectorDecorator.hpp>
+#include <OTwo/States/StateTest.hpp>
+#include <OTwo/States/StateAvi.hpp>
+#include <OTwo/States/StatePlanet.hpp>
+#include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 
-void O2Jam::OnStart()
+void O2Jam::Boot()
 {
-    auto config = GameConfig();
-
-    // Render settings
-    auto& window = GetRenderWindow();
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(0);
+    Gx::Application::Boot();
 
     // Asset Path
-    Gx::FileHelper::AddAssetPath("./Assets");
-    Gx::FileHelper::AddAssetPath("./Image");
-    Gx::FileHelper::AddAssetPath("./Music");
+    Gx::LocalFileSystem::Instance().AddAssetPath("./Assets");
+    Gx::LocalFileSystem::Instance().AddAssetPath("./Image");
+    Gx::LocalFileSystem::Instance().AddAssetPath("./Music");
 
     // -- Register resource metadata loaders
     // Basic Resource
+    Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Sound, SoundLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
@@ -71,17 +81,31 @@ void O2Jam::OnStart()
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
-    // O2 Components
+    Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
+    // O2Jam Components
+    Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
+    Gx::ResourceLoaderFactory::Register<ChatPanel, ChatPanelLoader>();
+    Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
     Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
     Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
-    Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
-    Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
-    Gx::ResourceLoaderFactory::Register<CreateRoomDialog, CreateRoomDialogLoader>();
-    Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
-    // Character
+    Gx::ResourceLoaderFactory::Register<RoomContainer, RoomContainerLoader>();
+    Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
+//    Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
+//    Gx::ResourceLoaderFactory::Register<CreateRoomDialog, CreateRoomDialogLoader>();
+    // Avatar
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
     Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
+    // SceneGraph
+    Gx::ResourceLoaderFactory::Register<State, StateLoader>();
+
+    auto config = GameConfig();
+
+    // Render settings
+    auto& window = GetRenderWindow();
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(0);
 
     // Setup configuration
     SetConfig<GameConfig>([] (auto &app)
@@ -92,63 +116,105 @@ void O2Jam::OnStart()
     });
 
     // Module configuration
-    Provide<Gx::ResourceManager>(
-        [=](auto &app) -> Gx::ResourceManager & {
-            // Register shared resource container
-            m_resources.Register<Item>();
-            m_resources.Register<ItemData>();
+    Provide<Gx::ResourceManager>([](auto &app)
+    {
+        // Register shared resource container
+        auto resources = std::make_unique<Gx::ResourceManager>();
+        resources->Register<Item>();
+        resources->Register<ItemData>();
 
-            return m_resources;
-        }
-    );
-    Provide<Gx::Mixer>(
-        [=](auto &app) -> Gx::Mixer & {
-            m_mixer = Gx::Mixer(Require<Gx::ResourceManager>());
-            return m_mixer;
-        }
-    );
-    Provide<ItemFactory>(
-        [=](auto &app) -> ItemFactory & {
-            m_itemFactory = ItemFactory(Require<Gx::ResourceManager>());
-            return m_itemFactory;
-        }
-    );
+        return resources;
+    });
 
-    /** Uncomment to load all items at startup
-     *
-     auto itemData = static_cast<ItemData*>(m_resources.LoadMetadata<ItemData>("Avatar/Itemdata.json"));
-     for (auto item : itemData->Items)
-         m_resources.Load<Item>("Avatar/Items/" + std::to_string(item.first) + ".json", item.second);
-    */
+    Provide<Gx::Mixer>([](auto &app)
+    {
+        auto mixer = std::make_unique<Gx::Mixer>();
+        return mixer;
+    });
+
+    Provide<ItemFactory>([&](auto &app)
+    {
+        auto factory = std::make_unique<ItemFactory>(Require<Gx::ResourceManager>());
+        return factory;
+    });
+
+    Provide<UserState>([&](auto &app) {
+       auto state = std::make_unique<UserState>();
+       auto player   = Player();
+       player.ID     = 1;
+       player.Name   = "CXO2";
+       player.Level  = -1;
+       player.Gender = Gender::Male;
+
+       state->SetPlayer(player);
+       return state;
+    });
 
     // Force to load item metadata at startup
-    for (auto gender : {Character::Gender::Male, Character::Gender::Female})
+    for (auto gender : {Gender::Male, Gender::Female})
         Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
-    m_resources.LoadArchive<OmcArchive>("Music/BGM.ojm");
-    m_resources.LoadArchive<OmcArchive>("Music/bgEffect.ojm");
-    m_resources.LoadArchive<OmcArchive>("Music/Planet.ojm");
+    auto& resources = Require<Gx::ResourceManager>();
+    auto& bgm       = resources.Create<OmcArchive>("BGM");
+    auto& bgEffect  = resources.Create<OmcArchive>("BgEffect");
+    auto& bgPlanet  = resources.Create<OmcArchive>("BgPlanet");
 
-    // Load application modules here
-    ShareResources(m_resources);
+    if (bgm.LoadFromFile("Music/BGM.ojm"))
+        Gx::FileSystem::Mount(bgm);
+
+    if (bgEffect.LoadFromFile("Music/bgEffect.ojm"))
+        Gx::FileSystem::Mount(bgEffect);
+
+    if (bgPlanet.LoadFromFile("Music/Planet.ojm"))
+        Gx::FileSystem::Mount(bgPlanet);
+
+    auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
+    director.Register<StateTest>("Interface/State/Test.json");
+    director.Register<StateAvi>("Interface/State/Avi.json");
+    director.Register<StatePlanet>("Interface/State/Planet.json");
+    director.Register<StateRoom>("Interface/State/Room.json");
+    director.Register<StateWaiting7K>("Interface/State/Waiting.json");
+
+    director.Present<StateAvi>();
+}
+
+void O2Jam::Shutdown()
+{
+    Application::Shutdown();
+
+    auto& resources = Require<Gx::ResourceManager>();
+    auto& mixer    = Require<Gx::Mixer>();
+    auto& director = GetSceneDirector();
+
+    mixer.Clear();
+    director.Unload();
+    resources.Clear();
 }
 
 void O2Jam::OnFocusChanged(bool focus)
 {
     Application::OnFocusChanged(focus);
 
-    auto config = GetConfig<GameConfig>();
+    auto& director = GetSceneDirector();
+    auto config    = GetConfig<GameConfig>();
+    auto& mixer    = Require<Gx::Mixer>();
+
     if (focus)
     {
-        m_mixer.SetVolume(config.MusicVolume);
+        mixer.SetVolume(config.MusicVolume);
+        if (director.IsPresenting<StateAvi>())
+            return;
 
-        m_mixer.Stop("SFX");
-        m_mixer.Play("BGM");
+        mixer.Stop("SFX");
+        mixer.Play("BGM");
     }
     else
     {
-        m_mixer.SetVolume(0.f);
-        m_mixer.PauseAll();
+        mixer.SetVolume(0.f);
+        if (director.IsPresenting<StateAvi>())
+            return;
+
+        mixer.PauseAll();
     }
 }

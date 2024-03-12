@@ -4,59 +4,58 @@
 #include <Genode/UI/Image.hpp>
 
 RoomButton::RoomButton() :
-    m_data(),
+    m_room(),
+    m_hover(nullptr),
     m_active(false)
 {
 }
 
-void RoomButton::Initialize(Gx::Scene &scene)
+void RoomButton::Initialize()
 {
-    m_button = scene.Create<Gx::Button>("Interface/Metadata/State/Room/Btn_Room/Button.json");
-    m_hover  = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/Hover.json");
+    //m_button = FindChild<Gx::Button>("Interface/Metadata/State/Room/Btn_Room/Button.json");
+    m_hover  = FindChild<Gx::Image>("IDC_IMAGE_ROOM_HOVER");
     m_hover->SetVisible(false);
+    Reset();
 
-    m_titleLabel    = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/TitleLabel.json");
-    m_musicLabel    = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/MusicLabel.json");
-    m_capacityLabel = scene.Create<Gx::Label>("Interface/Metadata/State/Room/Btn_Room/Capacity.json");
-    m_numberLabel   = scene.Create<Gx::Number>("Interface/Metadata/State/Room/Btn_Room/RoomNumber.json");
-    m_speedLabel    = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/GameSpeed.json");
-    m_stateLabel    = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/State.json");
-    m_gameMode      = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/GameMode.json");
-    m_ohmLevel      = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/OhmLevel.json");
-    m_lock          = scene.Create<Gx::Image>("Interface/Metadata/State/Room/Btn_Room/Lock.json");
+    auto number   = FindChild<Gx::Number>("IDC_NUMBER_ROOM_ID");
+    auto title    = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
+    auto music    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
+    auto capacity = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
+    auto speed    = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
+    auto state    = FindChild<Gx::Image>("IDC_IMAGE_STATE");
+    auto gameMode = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
+    auto ohmLevel = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
+    auto lock     = FindChild<Gx::Image>("IDC_IMAGE_LOCK");
 
-    AddChild(m_button, m_titleLabel, m_musicLabel, m_capacityLabel, m_numberLabel, m_speedLabel, m_stateLabel, m_gameMode, m_ohmLevel, m_lock, m_hover);
 }
 
 const sf::FloatRect RoomButton::GetLocalBounds() const
 {
-    return m_button->GetLocalBounds();
+    return Gx::Image::GetLocalBounds();
+}
+
+const RoomData RoomButton::GetRoomData() const
+{
+    return m_room;
+}
+
+void RoomButton::SetRoomData(const RoomData &data)
+{
+    m_room = data;
+    m_active = true;
+    Invalidate();
+}
+
+void RoomButton::Reset()
+{
+    m_room = RoomData();
+    m_active = false;
+    Invalidate();
 }
 
 bool RoomButton::IsActive() const
 {
     return m_active;
-}
-
-const Room::RoomData RoomButton::GetRoomData() const
-{
-    return m_data;
-}
-
-void RoomButton::SetRoomData(const Room::RoomData &data)
-{
-    m_data   = data;
-    m_active = true;
-
-    Invalidate();
-}
-
-void RoomButton::Deactivate()
-{
-    m_data   = Room::RoomData();
-    m_active = false;
-
-    Invalidate();
 }
 
 void RoomButton::OnMouseMove(sf::Event::MouseMoveEvent ev)
@@ -74,59 +73,70 @@ void RoomButton::Invalidate()
             control->SetVisible(m_active);
     }
 
-    m_button->SetVisible(true);
-    m_hover->SetVisible(IsFocused());
+    if (m_hover)
+        m_hover->SetVisible(IsFocused());
+
     if (!m_active)
         return;
 
-    m_titleLabel->SetString(m_data.Title);
-    m_capacityLabel->SetString("(" + std::to_string(m_data.PlayerCount) + "/" + std::to_string(m_data.Capacity) + ")");
+    auto number   = FindChild<Gx::Number>("IDC_NUMBER_ROOM_ID");
+    auto title    = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
+    auto music    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
+    auto capacity = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
+    auto speed    = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
+    auto state    = FindChild<Gx::Image>("IDC_IMAGE_STATE");
+    auto gameMode = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
+    auto ohmLevel = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
+    auto lock     = FindChild<Gx::Image>("IDC_IMAGE_LOCK");
 
-    m_numberLabel->SetValue(m_data.Number);
-    m_numberLabel->SetDigitCount(3);
-    m_lock->SetVisible(m_data.Locked);
+    title->SetString(m_room.Title);
+    capacity->SetString("(" + std::to_string(m_room.PlayerCount) + "/" + std::to_string(m_room.Capacity) + ")");
 
-    switch (m_data.GameMode)
+    number->SetValue(m_room.ID);
+    number->SetDigitCount(3);
+    lock->SetVisible(m_room.Locked);
+
+    switch (m_room.GameMode)
     {
-        case Room::GameMode::Single: m_gameMode->SetFrame("Single"); break;
-        case Room::GameMode::Vs:     m_gameMode->SetFrame("VS");     break;
-        case Room::GameMode::Album:  m_gameMode->SetFrame("Album");  break;
-        case Room::GameMode::Couple: m_gameMode->SetFrame("Couple"); break;
+        case GameMode::Single: gameMode->SetFrame("Single"); break;
+        case GameMode::Versus:     gameMode->SetFrame("VS");     break;
+        case GameMode::Album:  gameMode->SetFrame("Album");  break;
+        case GameMode::Couple: gameMode->SetFrame("Couple"); break;
     }
 
     std::string speedStr(4, '\0');
-    if (m_data.Speed > 0)
+    if (m_room.Speed > 0)
     {
-        if (std::fmod(m_data.Speed, 1.0))
-            speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", m_data.Speed));
+        if (std::fmod(m_room.Speed, 1.0))
+            speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", m_room.Speed));
         else
-            speedStr = std::to_string(static_cast<int>(m_data.Speed));
+            speedStr = std::to_string(static_cast<int>(m_room.Speed));
     }
     else
         speedStr = "R";
 
-    if (m_data.SongMode == Room::SongMode::Normal)
+    if (m_room.SongMode == SongMode::Normal)
     {
         std::string diffName;
-        switch (m_data.Difficulty)
+        switch (m_room.Difficulty)
         {
-            case Difficulty::Easy:   diffName = "EX"; m_ohmLevel->SetFrame("Beginner"); break;
-            case Difficulty::Normal: diffName = "NX"; m_ohmLevel->SetFrame("Intermediate"); break;
-            case Difficulty::Hard:   diffName = "HX"; m_ohmLevel->SetFrame("High"); break;
-            case Difficulty::Master: diffName = "MX"; m_ohmLevel->SetFrame("Master"); break;
+            case Difficulty::Easy:   diffName = "EX"; ohmLevel->SetFrame("Beginner"); break;
+            case Difficulty::Normal: diffName = "NX"; ohmLevel->SetFrame("Intermediate"); break;
+            case Difficulty::Hard:   diffName = "HX"; ohmLevel->SetFrame("High"); break;
+            case Difficulty::Master: diffName = "MX"; ohmLevel->SetFrame("Master"); break;
         }
 
-        m_musicLabel->SetString("Lv." + std::to_string(m_data.Chart.Level) + " - " + m_data.Chart.Title);
-        m_speedLabel->SetFrame(diffName + speedStr);
+        music->SetString("Lv." + std::to_string(m_room.Chart.Level) + " - " + m_room.Chart.Title);
+        speed->SetFrame(diffName + speedStr);
     }
-    else if (m_data.SongMode == Room::SongMode::Random)
+    else if (m_room.SongMode == SongMode::Random)
     {
-        m_musicLabel->SetString("Random");
-        m_speedLabel->SetFrame("RX" + speedStr);
+        music->SetString("Random");
+        speed->SetFrame("RX" + speedStr);
     }
 
-    if (m_data.State == Room::RoomState::Playing)
-        m_stateLabel->SetFrame("Playing");
+    if (m_room.State == RoomState::Playing)
+        state->SetFrame("Playing");
     else
-        m_stateLabel->SetFrame("Waiting");
+        state->SetFrame("Waiting");
 }

@@ -1,42 +1,42 @@
 #include <OTwo/States/StateWaiting7K.hpp>
 
+#include <OTwo/States/StateRoom.hpp>
+
+#include <OTwo/Data/Room.hpp>
+#include <OTwo/Data/UserState.hpp>
+
+#include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
+
 #include <Genode/UI/Button.hpp>
 
-#include <OTwo/States/StatePlanet.hpp>
-#include <OTwo/States/StateRoom.hpp>
-#include <OTwo/Data/Room.hpp>
-
-#include <OTwo/Character/Avatar.hpp>
-#include <OTwo/Character/ItemFactory.hpp>
+StateWaiting7K::StateWaiting7K(State &state) :
+    State(state)
+{
+}
 
 void StateWaiting7K::Initialize()
 {
     State::Initialize();
 
-    auto& app   = GetApplication();
-    auto& items = app.Require<ItemFactory>();
-    auto& mixer = app.Require<Gx::Mixer>();
+    auto& app      = GetApplication();
+    auto& director = GetDirector();
+    auto& items    = app.Require<ItemFactory>();
+    auto& mixer    = app.Require<Gx::Mixer>();
+    auto& state    = app.Require<UserState>();
 
-    auto background = Create<Gx::Sprite>("Interface/Metadata/State/Waiting/Background.json");
-    AddChild(background);
+    auto bgm = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
 
-    auto btnBack = Create<Gx::Button>("Interface/Metadata/State/Waiting/Btn_Back.json");
-    btnBack->SetClickCallback([&] (auto& sender, auto& ev)
-    {
-        mixer.StopAll();
-        QueueSceneEvent([=] () { GetDirector().SetScene(new StateRoom(Planet::MusicHall::Kalliope, Planet::ChannelInfo{1})); });
+    auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
+    btnBack->SetClickCallback([&] (auto& sender, auto& ev) {
+        director.Present<StateRoom>();
     });
 
-    AddChild(btnBack);
-
-    auto player = Room::PlayerInfo{1, 100, "CXO2", false, Character::Gender::Male};
-    auto avatar = Create<Avatar>("Interface/Metadata/State/Waiting/Avatar.json");
-    avatar->SetPlayerInfo(player);
-    for (auto [_, item] : items.GetDefaultItems(player.Gender))
+    auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
+    avatar->SetPlayer(state.GetPlayer());
+    for (auto [_, item] : items.GetDefaultItems(state.GetPlayer().Gender))
         avatar->SetDefaultItem(item);
 
-    AddChild(avatar);
-
-    auto bgm = mixer.Create<sf::Music>("Interface/Metadata/State/Waiting/Music.json");
     mixer.Play(bgm, "BGM");
 }
+

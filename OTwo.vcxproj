@@ -61,14 +61,14 @@
     <ClCompile Include="src\Genode\UI\Dialog.cpp" />
     <ClCompile Include="src\Genode\UI\Image.cpp" />
     <ClCompile Include="src\Genode\UI\Label.cpp" />
-    <ClCompile Include="src\Genode\UI\Number.cpp" />
+    <ClCompile Include="src\Genode\UI\ID.cpp" />
     <ClCompile Include="src\Genode\UI\ProgressBar.cpp" />
     <ClCompile Include="src\Genode\UI\RadioButton.cpp" />
     <ClCompile Include="src\Genode\UI\List.cpp" />
     <ClCompile Include="src\Genode\UI\UiContainer.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\O2\Components\Planet\ChannelBoard.cpp" />
-    <ClCompile Include="src\O2\Components\Planet\ChannelButton.cpp" />
+    <ClCompile Include="src\O2\Components\PlanetType\ChannelBoard.cpp" />
+    <ClCompile Include="src\O2\Components\PlanetType\ChannelButton.cpp" />
     <ClCompile Include="src\O2\Components\Room\RoomButton.cpp" />
     <ClCompile Include="src\O2\IO\Archives\M30Archive.cpp" />
     <ClCompile Include="src\O2\IO\Archives\OmcArchive.cpp" />
@@ -122,9 +122,9 @@
     <ClInclude Include="include\Genode\IO\Archive.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\SoundBufferLoader.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceContainer.hpp" />
-    <ClInclude Include="include\Genode\IO\FileHelper.hpp" />
+    <ClInclude Include="include\Genode\IO\LocalFileSystem" />
     <ClInclude Include="include\Genode\IO\FileSystem.hpp" />
-    <ClInclude Include="include\Genode\IO\ResourceContext.hpp" />
+    <ClInclude Include="include\Genode\IO\ResourceContextDecorator.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceMetadata.hpp" />
     <ClInclude Include="include\Genode\IO\ResourceLoaderFactory.hpp" />
     <ClInclude Include="include\Genode\IO\Loaders\FontLoader.hpp" />
@@ -157,16 +157,16 @@
     <ClInclude Include="include\Genode\UI\Dialog.hpp" />
     <ClInclude Include="include\Genode\UI\Image.hpp" />
     <ClInclude Include="include\Genode\UI\Label.hpp" />
-    <ClInclude Include="include\Genode\UI\Number.hpp" />
+    <ClInclude Include="include\Genode\UI\ID.hpp" />
     <ClInclude Include="include\Genode\UI\ProgressBar.hpp" />
     <ClInclude Include="include\Genode\UI\RadioButton.hpp" />
     <ClInclude Include="include\Genode\UI\List.hpp" />
     <ClInclude Include="include\Genode\UI\UiContainer.hpp" />
-    <ClInclude Include="include\O2\Components\Planet\ChannelBoard.hpp" />
-    <ClInclude Include="include\O2\Components\Planet\ChannelButton.hpp" />
+    <ClInclude Include="include\O2\Components\PlanetType\ChannelBoard.hpp" />
+    <ClInclude Include="include\O2\Components\PlanetType\ChannelButton.hpp" />
     <ClInclude Include="include\O2\Components\Room\RoomButton.hpp" />
     <ClInclude Include="include\O2\Data\Game.hpp" />
-    <ClInclude Include="include\O2\Data\Planet.hpp" />
+    <ClInclude Include="include\O2\Data\PlanetType.hpp" />
     <ClInclude Include="include\O2\Data\Room.hpp" />
     <ClInclude Include="include\O2\IO\Archives\M30Archive.hpp" />
     <ClInclude Include="include\O2\IO\Archives\O2FileEntry.hpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="include\O2\IO\Archives\OpiArchive.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\AnimationLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\MusicLoader.hpp" />
-    <ClInclude Include="include\O2\IO\Loaders\O2JamResourceLoader.hpp" />
+    <ClInclude Include="include\O2\IO\Loaders\ResourceLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\SoundLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\SpriteLoader.hpp" />
     <ClInclude Include="include\O2\IO\Loaders\TransformLoader.hpp" />
@@ -219,7 +219,7 @@
     <None Include="include\Genode\Tasks\Timeline.inl" />
     <None Include="include\Genode\UI\Control.inl" />
     <None Include="include\Genode\UI\RadioButton.inl" />
-    <None Include="include\O2\IO\Loaders\O2JamResourceLoader.inl" />
+    <None Include="include\O2\IO\Loaders\ResourceLoader.inl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

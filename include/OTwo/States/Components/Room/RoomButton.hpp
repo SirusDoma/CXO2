@@ -1,5 +1,5 @@
-#ifndef O2JAM_ROOM_ROOMBUTTON_HPP
-#define O2JAM_ROOM_ROOMBUTTON_HPP
+#ifndef O2JAM_ROOM_ROOM_BUTTON_HPP
+#define O2JAM_ROOM_ROOM_BUTTON_HPP
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Button.hpp>
@@ -9,30 +9,26 @@
 
 #include <OTwo/Data/Room.hpp>
 
-class RoomButton : public Gx::Control
+class RoomButton : public Gx::Image
 {
 public:
     RoomButton();
 
-    void Initialize(Gx::Scene &scene);
+    void Initialize();
     virtual const sf::FloatRect GetLocalBounds() const;
 
     bool IsActive() const;
 
-    const Room::RoomData GetRoomData() const;
-    void SetRoomData(const Room::RoomData& data);
-    void Deactivate();
+    const RoomData GetRoomData() const;
+    void SetRoomData(const RoomData& data);
+    void Reset();
 
 private:
     virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
     virtual void Invalidate();
 
-    Gx::Button *m_button;
-    Gx::Label  *m_titleLabel, *m_musicLabel, *m_capacityLabel;
-    Gx::Number *m_numberLabel;
-    Gx::Image  *m_hover, *m_speedLabel, *m_gameMode, *m_stateLabel, *m_ohmLevel, *m_lock;
-
-    Room::RoomData m_data;
+    RoomData m_room;
+    Gx::Image *m_hover;
     bool m_active;
 };
 

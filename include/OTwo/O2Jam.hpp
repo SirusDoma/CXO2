@@ -4,21 +4,21 @@
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
-#include <OTwo/Character/ItemFactory.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
+#include <OTwo/Archives/OmcArchive.hpp>
+#include <OTwo/Data/UserState.hpp>
 
 class O2Jam : public Gx::Application
 {
 public:
     using Gx::Application::Application;
 
-protected:
-    virtual void OnStart();
-    virtual void OnFocusChanged(bool focus);
+    virtual ~O2Jam() {};
 
-private:
-    Gx::ResourceManager m_resources = Gx::ResourceManager();
-    Gx::Mixer m_mixer = Gx::Mixer();
-    ItemFactory m_itemFactory;
+protected:
+    virtual void Boot();
+    virtual void Shutdown();
+    virtual void OnFocusChanged(bool focus);
 };
 
 #endif

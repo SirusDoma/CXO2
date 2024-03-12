@@ -22,7 +22,7 @@ namespace Gx
         virtual void OnKeyUp(sf::Event::KeyEvent ev)    {}
         virtual void OnKeyType(sf::Event::TextEvent ev) {}
 
-        virtual bool Input(sf::Event ev)
+        virtual bool Input(const sf::Event ev)
         {
             switch (ev.type)
             {
