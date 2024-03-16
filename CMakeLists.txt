@@ -62,15 +62,18 @@ elseif(APPLE)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-    # Set dependencies libs path
+#    # Set dependencies libs path
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
-    set(FreeType_LIB ${MODULES_DIR}/Framework/freetype.framework)
-    set(OpenAL_LIB ${MODULES_DIR}/Framework/openal32.framework)
-    set(Ogg_LIB ${MODULES_DIR}/Framework/ogg.framework)
-    set(FLAC_LIB ${MODULES_DIR}/Framework/flac.framework)
-    set(Vorbis_LIB ${MODULES_DIR}/Framework/vorbis.framework)
-    set(VorbisEnc_LIB ${MODULES_DIR}/Framework/vorbisenc.framework)
-    set(VorbisFile_LIB ${MODULES_DIR}/Framework/vorbisfile.framework)
+    set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
+    set(OpenAL_LIB ${MODULES_DIR}/libopenal.a)
+    set(Ogg_LIB ${MODULES_DIR}/libogg.a)
+    set(FLAC_LIB ${MODULES_DIR}/libFLAC.a)
+    set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
+    set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
+    set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
+
+    target_link_libraries(${EXECUTABLE_NAME} "-framework CoreAudio")
+    target_link_libraries(${EXECUTABLE_NAME} "-framework AudioUnit")
 else()
     # Compiler Flags
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
@@ -120,10 +123,18 @@ find_package(magic_enum CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML 2.6.1 COMPONENTS main audio graphics system window REQUIRED)
+find_package(SFML 2.6.1 COMPONENTS audio graphics system window REQUIRED)
+if (WINDOWS)
+    find_package(SFML 2.6.1 COMPONENTS main REQUIRED)
+endif()
+
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
-    target_link_libraries(${EXECUTABLE_NAME} sfml-main sfml-audio sfml-graphics sfml-system sfml-window)
+    if (WINDOWS)
+        target_link_libraries(${EXECUTABLE_NAME} sfml-main)
+    endif()
+
+    target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)
 else()
     message(FATAL_ERROR "SFML not found")
 endif()
