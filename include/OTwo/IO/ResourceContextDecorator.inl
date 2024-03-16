@@ -6,6 +6,10 @@
 
 #include <any>
 
+template<typename T>
+struct TypeChecker : std::false_type
+{ };
+
 template<typename R>
 Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string &id) const
 {
@@ -74,7 +78,7 @@ R* ResourceContextDecorator::Find(const ResourceMetadata &metadata) const
     }
     else
     {
-        static_assert(false, "Resource type is not supported.");
+        static_assert(TypeChecker<R>::value, "Resource type is not supported.");
         throw Gx::NotSupportedException("Resource type is not supported.");
     }
 

@@ -9,8 +9,6 @@ class MusicLoader : public ResourceLoader<sf::Music>
 public :
     MusicLoader() = default;
 
-
-
     Gx::ResourcePtr<sf::Music> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
     Gx::ResourcePtr<sf::Music> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
 

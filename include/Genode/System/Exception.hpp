@@ -2,6 +2,7 @@
 #define GENODE_EXCEPTION_HPP
 
 #include <stdexcept>
+#include <string>
 
 namespace Gx
 {
