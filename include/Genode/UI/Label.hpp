@@ -10,15 +10,15 @@ namespace Gx
     {
     public:
         using Text::Text;
-        virtual ~Label();
+        ~Label() override = default;
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
     protected:
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
     };
 }
 

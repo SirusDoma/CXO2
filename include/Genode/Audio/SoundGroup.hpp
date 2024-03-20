@@ -42,7 +42,7 @@ namespace Gx
         sf::SoundSource* Play(sf::SoundSource *source);
         bool Remove(sf::SoundSource *source);
 
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
         std::string m_name;
         float m_volume, m_pan;

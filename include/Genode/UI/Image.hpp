@@ -23,9 +23,9 @@ namespace Gx
         };
 
         using Sprite::Sprite;
-        virtual ~Image();
+        ~Image() override = default;
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         unsigned int GetFrameCount() const;
         const Frame *GetFrame(const std::string &name) const;
@@ -40,10 +40,10 @@ namespace Gx
         void SetFrame(unsigned int index);
 
     protected:
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         void ApplyFrame(const Frame &frame);

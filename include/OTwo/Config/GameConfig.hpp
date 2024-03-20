@@ -13,7 +13,7 @@ struct GameConfig : public Gx::Config
         Reset();
     }
 
-    virtual void Reset()
+    void Reset() override
     {
         Use3D           = true;
         UseBGM          = true;

@@ -18,10 +18,6 @@ namespace Gx
     {
     }
 
-    Control::~Control()
-    {
-    }
-
     bool Control::IsFocused() const
     {
         return m_focused;
@@ -89,7 +85,7 @@ namespace Gx
         }
     }
 
-    const sf::FloatRect Control::GetGlobalBounds() const
+    sf::FloatRect Control::GetGlobalBounds() const
     {
         auto parent    = GetParent();
         auto transform = sf::Transform::Identity;

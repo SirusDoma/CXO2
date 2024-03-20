@@ -8,7 +8,7 @@ class ChatPanel : public Gx::UiContainer
 {
 public:
     ChatPanel();
-    void Initialize();
+    void Initialize() override;
 
     void SetInputEnabled(bool enabled);
 

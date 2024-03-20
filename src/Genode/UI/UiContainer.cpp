@@ -11,11 +11,7 @@ namespace Gx
     {
     }
 
-    UiContainer::~UiContainer()
-    {
-    }
-
-    const sf::FloatRect UiContainer::GetLocalBounds() const
+    sf::FloatRect UiContainer::GetLocalBounds() const
     {
         return m_localBounds;
     }

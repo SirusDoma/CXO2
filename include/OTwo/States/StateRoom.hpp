@@ -21,7 +21,7 @@
 class StateRoom : public State
 {
 public:
-    StateRoom(State& state);
+    explicit StateRoom(State& state);
     void Initialize() override;
 
 private:

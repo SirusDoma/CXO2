@@ -30,11 +30,7 @@ namespace Gx
         m_sprite = Sprite(texture, rectangle);
     }
 
-    Dialog::~Dialog()
-    {
-    }
-
-    const sf::FloatRect Dialog::GetLocalBounds() const
+    sf::FloatRect Dialog::GetLocalBounds() const
     {
         return m_sprite.GetLocalBounds();
     }

@@ -16,7 +16,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
     auto frames = attributes.find("frames");
     if (frames != attributes.end())
     {
-        for (auto frame : frames->items())
+        for (const auto& frame : frames->items())
         {
             SpriteMetadata frameMetadata;
             if (!SpriteLoader::ParseMetadata(frame.value(), frameMetadata, context))
@@ -63,7 +63,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
     auto animation = std::make_unique<Gx::Animation>();
     animation->SetName(metadata->Name);
 
-    for (auto frame : metadata->Frames)
+    for (const auto& frame : metadata->Frames)
         animation->AddFrame(frame);
 
     animation->SetLoop(metadata->IsLoop);

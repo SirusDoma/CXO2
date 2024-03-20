@@ -18,7 +18,7 @@ public:
     ChatWindow(ChatWindow &&copy);
     ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned int characterSize = 13);
 
-    virtual const sf::FloatRect GetLocalBounds() const;
+    sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect &bounds);
 
     void SetFont(const sf::Font &font);
@@ -37,9 +37,9 @@ public:
     void PushSystemMessage(const std::string &chat);
 
 private:
-    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-    virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev);
-    virtual void Invalidate();
+    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
+    void Invalidate() override;
 
     const sf::Font *m_font;
     Gx::ScrollBar *m_scroll;

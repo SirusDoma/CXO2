@@ -14,8 +14,8 @@ namespace Gx
         Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration);
 
     protected:
-        virtual void Update(double delta);
-        virtual void Reset();
+        void Update(double delta) override;
+        void Reset() override;
 
     private:
         Transformable* m_target;

@@ -18,20 +18,20 @@ namespace Gx
     {
     public:
         UiContainer();
-        virtual ~UiContainer();
+        ~UiContainer() override = default;
 
-        const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
         void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
     protected:
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-        virtual void Update(double delta);
-        virtual bool Input(sf::Event ev);
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        void Update(double delta) override;
+        bool Input(sf::Event ev) override;
 
-        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
-        virtual void OnKeyDown(sf::Event::KeyEvent ev);
+        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
+        void OnKeyDown(sf::Event::KeyEvent ev) override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         sf::FloatRect m_localBounds;

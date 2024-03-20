@@ -11,7 +11,7 @@ namespace Gx
     {
     public:
         TaskContainer();
-        virtual ~TaskContainer();
+        ~TaskContainer() override = default;
 
         void Run(Task* task);
         void Stop(Task* task);
@@ -25,7 +25,7 @@ namespace Gx
         void StopAll();
 
     protected:
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
     private:
         std::vector<Task*> m_tasks;

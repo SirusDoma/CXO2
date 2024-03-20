@@ -9,10 +9,6 @@ namespace Gx
         Reset();
     }
 
-    Task::~Task()
-    {
-    }
-
     const Task::TaskState Task::GetState() const
     {
         return m_state;

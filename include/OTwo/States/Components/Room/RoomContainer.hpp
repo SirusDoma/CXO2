@@ -13,7 +13,7 @@ class RoomContainer : public Gx::UiContainer
 public:
     RoomContainer();
 
-    void Initialize();
+    void Initialize() override;
 
     void PushRoomData(RoomData room);
     void Clear();
@@ -27,7 +27,7 @@ public:
 private:
     constexpr static const unsigned int MAX_NUMBER_OF_ROOM = 100;
 
-    virtual void Invalidate();
+    void Invalidate() override;
 
     std::map<unsigned int, RoomData> m_rooms;
 

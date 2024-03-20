@@ -26,7 +26,7 @@ namespace Gx
         SetTexCoords(texCoords);
     }
 
-    const sf::FloatRect ProgressBar::GetLocalBounds() const
+    sf::FloatRect ProgressBar::GetLocalBounds() const
     {
         return sf::FloatRect(0, 0, m_texCoords.width, m_texCoords.height);
     }

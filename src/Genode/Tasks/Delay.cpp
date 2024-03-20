@@ -12,10 +12,6 @@ namespace Gx
     {
     }
 
-    Delay::~Delay()
-    {
-    }
-
     sf::Time Delay::GetDuration() const
     {
         return m_duration;

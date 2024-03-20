@@ -19,7 +19,7 @@ namespace Gx
         explicit Button(const sf::Texture& texture);
         Button(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
@@ -33,8 +33,8 @@ namespace Gx
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;
 
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void Invalidate();
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
+        void Invalidate() override;
 
     private:
         mutable Gx::Sprite m_sprite;

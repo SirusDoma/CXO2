@@ -8,11 +8,11 @@ namespace Gx
     class Action : public Task
     {
     public:
-        Action(std::function<void()> callback);
-        virtual ~Action();
+        explicit Action(std::function<void()> callback);
+        ~Action() override = default;
 
     protected:
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
     private:
         std::function<void()> m_callback;

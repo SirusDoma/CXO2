@@ -20,7 +20,7 @@ namespace Gx
     public:
         Mixer();
         Mixer(Mixer&& right) noexcept;
-        virtual ~Mixer();
+        ~Mixer() override = default;
 
         Mixer &operator=(Mixer&& right) noexcept;
 
@@ -55,7 +55,7 @@ namespace Gx
         void SetVolume(float volume);
         void SetPan(float pan);
 
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
     private:
         using SoundGroupContainer  = std::map<std::string, ResourcePtr<SoundGroup>>;

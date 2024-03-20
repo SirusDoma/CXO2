@@ -29,7 +29,7 @@ void RoomButton::Initialize()
 
 }
 
-const sf::FloatRect RoomButton::GetLocalBounds() const
+sf::FloatRect RoomButton::GetLocalBounds() const
 {
     return Gx::Image::GetLocalBounds();
 }
@@ -99,9 +99,10 @@ void RoomButton::Invalidate()
     switch (m_room.GameMode)
     {
         case GameMode::Single: gameMode->SetFrame("Single"); break;
-        case GameMode::Versus:     gameMode->SetFrame("VS");     break;
+        case GameMode::Versus: gameMode->SetFrame("VS");     break;
         case GameMode::Album:  gameMode->SetFrame("Album");  break;
         case GameMode::Couple: gameMode->SetFrame("Couple"); break;
+        default: break;
     }
 
     std::string speedStr(4, '\0');

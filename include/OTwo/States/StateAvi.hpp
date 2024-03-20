@@ -8,10 +8,10 @@ class StateAvi : public State
 {
 public:
     StateAvi() = default;
-    StateAvi(State &state);
+    explicit StateAvi(State &state);
 
-    virtual void Initialize();
-    virtual bool Close(bool quit = false);
+    void Initialize() override;
+    bool Close(bool quit) override;
 };
 
 #endif

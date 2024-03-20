@@ -26,10 +26,6 @@ namespace Gx
         return *this;
     }
 
-    ResourceManager::~ResourceManager()
-    {
-    }
-
     void ResourceManager::ConfigureContextBuilder(const ContextBuilder &builder)
     {
         m_contextBuilder = builder;

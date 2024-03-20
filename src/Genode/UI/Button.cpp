@@ -32,7 +32,7 @@ namespace Gx
         m_sprite.SetTexture(texture);
     }
 
-    const sf::FloatRect Button::GetLocalBounds() const
+    sf::FloatRect Button::GetLocalBounds() const
     {
         // Use frame for active state first before looking for other frames
         auto bounds = m_stateData[GetControlState()].GetLocalBounds();

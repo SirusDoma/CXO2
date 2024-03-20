@@ -5,10 +5,10 @@ namespace Gx
 {
     struct Config
     {
-        Config() {};
-        virtual ~Config() {};
+        Config() = default;
+        virtual ~Config() = default;
 
-        virtual void Reset() = 0;
+        virtual void Reset() {};
     };
 }
 

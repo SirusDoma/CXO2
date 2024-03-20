@@ -6,18 +6,18 @@
 
 namespace Gx
 {
-    class ScrollBar : public Control
+    class ScrollBar : public Control, public virtual Colorable
     {
     public:
         enum ScrollOrientation { Horizontal, Vertical };
         
         ScrollBar();
-        virtual ~ScrollBar();
+        ~ScrollBar() override = default;
 
         ScrollBar(const sf::Texture &texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
         ScrollBar(const sf::Texture &texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
         void SetLocalBounds(const sf::FloatRect &bounds);
 
         const sf::Texture *GetTexture() const;
@@ -26,8 +26,8 @@ namespace Gx
         const sf::IntRect &GetTexCoords() const;
         void SetTexCoords(const sf::IntRect &rectangle);
 
-        virtual const sf::Color &GetColor() const;
-        virtual void SetColor(const sf::Color &color);
+        const sf::Color &GetColor() const override;
+        void SetColor(const sf::Color &color) override;
         
         ScrollOrientation GetScrollOrientation() const;
         void SetScrollOrientation(ScrollOrientation orientation);
@@ -48,14 +48,14 @@ namespace Gx
     private:
         sf::FloatRect GetScrollBarGlobalBounds() const;
 
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev);
+        void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
+        void OnMouseButtonDown(sf::Event::MouseButtonEvent ev) override;
+        void OnMouseButtonUp(sf::Event::MouseButtonEvent ev) override;
+        void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
         Sprite         m_sprite;
         sf::FloatRect  m_bounds;

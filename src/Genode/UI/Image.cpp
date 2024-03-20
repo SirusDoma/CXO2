@@ -2,11 +2,7 @@
 
 namespace Gx
 {
-    Image::~Image()
-    {
-    }
-
-    const sf::FloatRect Image::GetLocalBounds() const
+    sf::FloatRect Image::GetLocalBounds() const
     {
         return Sprite::GetLocalBounds();
     }

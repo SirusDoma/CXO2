@@ -13,12 +13,12 @@ class O2Jam : public Gx::Application
 public:
     using Gx::Application::Application;
 
-    virtual ~O2Jam() {};
+    virtual ~O2Jam() = default;
 
 protected:
-    virtual void Boot();
-    virtual void Shutdown();
-    virtual void OnFocusChanged(bool focus);
+    void Boot() override;
+    void Shutdown() override;
+    void OnFocusChanged(bool focus) override;
 };
 
 #endif

@@ -18,7 +18,7 @@ namespace Gx
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        virtual ~Dialog();
+        ~Dialog() override = default;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
@@ -27,7 +27,7 @@ namespace Gx
         void SetTexCoords(const sf::IntRect& rectangle);
 
         bool IsAccepted() const;
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         Label *GetLabel() const;
         Button *GetAcceptButton() const;
@@ -48,8 +48,8 @@ namespace Gx
         void Close();
 
     protected:
-        virtual void OnKeyDown(sf::Event::KeyEvent ev);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void OnKeyDown(sf::Event::KeyEvent ev) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
         virtual void OnShown(Scene &scene);
         virtual void OnClose();
@@ -59,7 +59,7 @@ namespace Gx
 
         const Scene *GetScene();
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         mutable Gx::Sprite m_sprite;

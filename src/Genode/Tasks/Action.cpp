@@ -3,11 +3,7 @@
 namespace Gx
 {
     Action::Action(std::function<void()> callback) :
-        m_callback(callback)
-    {
-    }
-
-    Action::~Action()
+        m_callback(std::move(callback))
     {
     }
 

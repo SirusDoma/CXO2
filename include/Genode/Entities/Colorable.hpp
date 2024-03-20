@@ -12,7 +12,7 @@ namespace Gx
         virtual const sf::Color& GetColor() const = 0;
 
     protected:
-        virtual ~Colorable() {};
+        virtual ~Colorable() = default;
     };
 }
 

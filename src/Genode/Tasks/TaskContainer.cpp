@@ -7,10 +7,6 @@ namespace Gx
     {
     }
 
-    TaskContainer::~TaskContainer()
-    {
-    }
-
     void TaskContainer::Run(Task* task)
     {
         if (task)

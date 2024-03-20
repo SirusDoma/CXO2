@@ -17,7 +17,7 @@ namespace Gx
         explicit ProgressBar(const sf::Texture& texture);
         ProgressBar(const sf::Texture& texture, const sf::IntRect &texCoords);
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
@@ -25,8 +25,8 @@ namespace Gx
         const sf::IntRect& GetTexCoords() const;
         void SetTexCoords(const sf::IntRect &texCoords);
 
-        const sf::Color& GetColor() const;
-        void SetColor(const sf::Color &color);
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color &color) override;
 
         const Orientation GetOrientation() const;
         void SetOrientation(const Orientation &orientation);
@@ -38,10 +38,10 @@ namespace Gx
         void SetValue(float value);
 
     protected:
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
     private:
         sf::VertexArray    m_vertices;
         const sf::Texture* m_texture;

@@ -22,10 +22,10 @@ namespace Gx
             const State State;
         };
 
-        virtual ~Control();
+        ~Control() override = default;
 
-        virtual const sf::FloatRect GetLocalBounds() const = 0;
-        const sf::FloatRect GetGlobalBounds() const;
+        virtual sf::FloatRect GetLocalBounds() const = 0;
+        sf::FloatRect GetGlobalBounds() const;
 
         virtual bool IsFocused() const;
         virtual void SetFocus(bool focus);
@@ -68,14 +68,14 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetHoldClickCallback();
         const std::function<void(Control&, Event&)>& GetDoubleClickCallback();
 
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-        virtual bool Input(sf::Event ev);
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        bool Input(sf::Event ev) override;
 
-        virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev);
+        void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
+        void OnMouseButtonDown(sf::Event::MouseButtonEvent ev) override;
+        void OnMouseButtonUp(sf::Event::MouseButtonEvent ev) override;
+        void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
 
         virtual void OnControlChildAdded(Control *control);
         virtual void OnControlChildRemove(Control *control);

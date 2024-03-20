@@ -24,7 +24,7 @@ Gx::ToolTip::ToolTip(const sf::String &string, const sf::Font &font, unsigned in
 {
 }
 
-const sf::FloatRect Gx::ToolTip::GetLocalBounds() const
+sf::FloatRect Gx::ToolTip::GetLocalBounds() const
 {
     return m_rectangle.GetLocalBounds();
 }

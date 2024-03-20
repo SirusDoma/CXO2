@@ -30,7 +30,7 @@ public:
     ChannelBoard();
 
     void Initialize() override;
-    const sf::FloatRect GetLocalBounds() const override;
+    sf::FloatRect GetLocalBounds() const override;
 
     void Show(MusicHall hall, std::function<void()> callback);
     void UpdateChannelList(Planet planet);
@@ -39,6 +39,10 @@ public:
     void SwitchTab(Tab tab);
 
     bool InTransition() const;
+
+    bool IsAnimationEnabled() const;
+    void SetAnimationEnabled(bool animationEnabled);
+
     void SetChannelEnterCallback(std::function<void(MusicHall, Channel)> callback);
 
     unsigned int GetChannelsPerPage() const;
@@ -63,12 +67,6 @@ private:
     std::function<void(MusicHall, Channel)> m_callback;
 
     bool m_transitioning, m_animationEnabled;
-public:
-    bool IsAnimationEnabled() const;
-
-    void SetAnimationEnabled(bool animationEnabled);
-
-private:
     int m_selectedChannel;
     unsigned int m_channelsPerPage, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
 };

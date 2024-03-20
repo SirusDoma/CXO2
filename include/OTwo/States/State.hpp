@@ -19,10 +19,10 @@ class State : public virtual Gx::Scene
 public:
     State();
     State(State &state);
-    State(const std::string& name);
+    explicit State(const std::string& name);
     State(const std::string& name, Gx::ResourceManager &resources);
 
-    virtual ~State();
+    ~State() override;
 
     template<typename R>
     R* Load(const std::string &source, ResourceScope scope = ResourceScope::Local);
@@ -46,10 +46,10 @@ public:
     R* Find(const std::string &id, ResourceScope scope = ResourceScope::Local);
 
     Gx::ResourceManager &GetLocalResources() const;
-    virtual bool Close(bool quit = false);
+    bool Close(bool quit) override;
 
 protected:
-    virtual void Initialize();
+    void Initialize() override;
 
 private:
     void LoadCommonResources();

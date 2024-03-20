@@ -14,8 +14,8 @@ class RoomButton : public Gx::Image
 public:
     RoomButton();
 
-    void Initialize();
-    virtual const sf::FloatRect GetLocalBounds() const;
+    void Initialize() override;
+    sf::FloatRect GetLocalBounds() const override;
 
     bool IsActive() const;
 
@@ -24,8 +24,8 @@ public:
     void Reset();
 
 private:
-    virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-    virtual void Invalidate();
+    void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
+    void Invalidate() override;
 
     RoomData m_room;
     Gx::Image *m_hover;

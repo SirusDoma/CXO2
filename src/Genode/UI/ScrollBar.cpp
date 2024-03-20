@@ -42,11 +42,7 @@ namespace Gx
         SetLocalBounds(bounds);
     }
 
-    ScrollBar::~ScrollBar()
-    {
-    }
-
-    const sf::FloatRect ScrollBar::GetLocalBounds() const
+    sf::FloatRect ScrollBar::GetLocalBounds() const
     {
         return m_bounds;
     }

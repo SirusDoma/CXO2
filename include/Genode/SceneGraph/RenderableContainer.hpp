@@ -12,11 +12,11 @@ namespace Gx
     class RenderableContainer : public virtual Node, public virtual Renderable
     {
     public:
-        virtual ~RenderableContainer();
+        ~RenderableContainer() override;
 
     protected:
         RenderableContainer();
-        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const  override;;
     };
 }
 

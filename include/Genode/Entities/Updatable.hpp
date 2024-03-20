@@ -7,7 +7,7 @@ namespace Gx
     {
     public:
         virtual void Update(double delta) = 0;
-        virtual ~Updatable() {};
+        virtual ~Updatable() = default;
     };
 }
 

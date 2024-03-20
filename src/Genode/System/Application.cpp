@@ -26,10 +26,6 @@ namespace Gx
         m_closeRequested = false;
     }
 
-    Application::~Application()
-    {
-    }
-
     Application &Application::Instance()
     {
         return *m_instance;

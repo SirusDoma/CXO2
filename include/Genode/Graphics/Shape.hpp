@@ -54,8 +54,8 @@ namespace Gx
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;
         
-        virtual const sf::Color& GetColor() const;
-        virtual void SetColor(const sf::Color& color);
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color& color) override;
 
         virtual std::size_t GetPointCount() const = 0;
         virtual sf::Vector2f GetPoint(std::size_t index) const = 0;
@@ -68,7 +68,7 @@ namespace Gx
         void Update();
 
     private:
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
 
         void UpdateFillColors();
         void UpdateTexCoords();

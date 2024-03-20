@@ -23,7 +23,7 @@ namespace Gx
         SetValue(0);
     }
 
-    const sf::FloatRect Number::GetLocalBounds() const
+    sf::FloatRect Number::GetLocalBounds() const
     {
         return sf::FloatRect(0, 0, m_width, m_height);
     }

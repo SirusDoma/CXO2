@@ -9,11 +9,11 @@ namespace Gx
     class UpdatableContainer : public virtual Node, public virtual Updatable
     {
     public:
-        virtual ~UpdatableContainer();
+        ~UpdatableContainer() override;
 
     protected:
         UpdatableContainer();
-        virtual void Update(double delta);
+        void Update(double delta) override;
     };
 }
 

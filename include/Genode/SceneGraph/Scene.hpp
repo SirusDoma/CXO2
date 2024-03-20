@@ -25,9 +25,9 @@ namespace Gx
         friend SceneDirector;
 
         Scene();
-        Scene(const std::string& name);
+        explicit Scene(const std::string& name);
 
-        virtual ~Scene();
+        ~Scene() override;
 
         Application &GetApplication() const;
         SceneDirector &GetDirector() const;
@@ -40,12 +40,12 @@ namespace Gx
         void PushEvent(std::function<void()> evt);
 
     protected:
-        virtual void Initialize();
-        virtual bool Close(bool quit = false);
+        void Initialize() override;
+        virtual bool Close(bool quit);
 
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-        virtual void Update(double delta);
-        virtual bool Input(sf::Event ev);
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        void Update(double delta) override;
+        bool Input(sf::Event ev) override;
 
         virtual void ProcessSceneEvents();
 

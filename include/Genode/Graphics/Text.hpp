@@ -88,7 +88,7 @@ namespace Gx
         void SetLetterSpacing(float spacingFactor);
         void SetStyle(Uint32 style);
 
-        virtual void SetColor(const sf::Color& color);
+        void SetColor(const sf::Color& color) override;
         void SetFillColor(const sf::Color& color);
         void SetFillColor(const sf::Color& color, size_t index);
         void SetOutlineColor(const sf::Color& color);
@@ -103,7 +103,7 @@ namespace Gx
         float GetLineSpacing() const;
         Uint32 GetStyle() const;
 
-        virtual const sf::Color& GetColor() const;
+        const sf::Color& GetColor() const override;
         const sf::Color& GetFillColor() const;
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;
@@ -114,7 +114,7 @@ namespace Gx
 
     protected:
         void EnsureGeometryUpdate() const;
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     private:
         using ColorMap = std::unordered_map<size_t, sf::Color>;

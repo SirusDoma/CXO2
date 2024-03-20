@@ -19,10 +19,10 @@ namespace Gx
         virtual void SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback);
 
     protected:
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
-        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
+        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         bool m_isChecked = false;

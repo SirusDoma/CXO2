@@ -20,7 +20,7 @@ public:
     void Clear();
 
 private:
-    virtual void Invalidate();
+    void Invalidate() override;
     std::vector<Player> m_users;
 
     unsigned int m_selectedUser;

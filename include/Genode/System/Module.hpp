@@ -6,11 +6,9 @@ namespace Gx
     class Module
     {
     public:
-        Module() {};
-        virtual ~Module() = 0;
+        Module() = default;
+        virtual ~Module() = default;
     };
-
-    inline Module::~Module() {};
 }
 
 #endif

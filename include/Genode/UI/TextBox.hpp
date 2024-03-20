@@ -8,14 +8,14 @@
 
 namespace Gx
 {
-    class TextBox : public Control
+    class TextBox : public Control, public virtual Colorable
     {
     public:
         TextBox();
         TextBox(const sf::String& string, const sf::Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
         virtual void SetLocalBounds(sf::FloatRect bounds);
 
         void SetString(const sf::String& string);
@@ -28,7 +28,7 @@ namespace Gx
         void SetLetterSpacing(float spacingFactor);
         void SetStyle(Uint32 style);
 
-        virtual void SetColor(const sf::Color& color);
+        void SetColor(const sf::Color& color) override;
         void SetFillColor(const sf::Color& color);
         virtual void SetHighlightBackColor(const sf::Color& color);
         void SetHighlightTextColor(const sf::Color& color);
@@ -45,7 +45,7 @@ namespace Gx
         float GetLineSpacing() const;
         Uint32 GetStyle() const;
 
-        virtual const sf::Color& GetColor() const;
+        const sf::Color& GetColor() const override;
         const sf::Color& GetFillColor() const;
         virtual const sf::Color& GetHighlightBackColor() const;
         const sf::Color& GetHighlightTextColor() const;
@@ -55,8 +55,8 @@ namespace Gx
         bool IsPermanentFocus() const;
         void SetPermanentFocusEnabled(bool enable);
 
-        virtual bool IsFocused() const;
-        virtual void SetFocus(bool focus);
+        bool IsFocused() const override;
+        void SetFocus(bool focus) override;
 
         unsigned int GetMaximumTextLength() const;
         void SetMaximumTextLength(unsigned int maxLength);
@@ -72,21 +72,21 @@ namespace Gx
     private:
         bool IsNextCharacterFit();
 
-        virtual void SetControlState(const State &state);
-        virtual const State GetControlState() const;
+        void SetControlState(const State &state) override;
+        const State GetControlState() const override;
 
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void OnControlStateChanged(Control *sender, State state);
-        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseMove(sf::Event::MouseMoveEvent ev);
-        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev);
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev);
-        virtual void OnKeyDown(sf::Event::KeyEvent ev);
-        virtual void OnKeyType(sf::Event::TextEvent ev);
+        void OnControlStateChanged(Control *sender, State state) override;
+        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
+        void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
+        void OnMouseButtonDown(sf::Event::MouseButtonEvent ev) override;
+        void OnMouseButtonUp(sf::Event::MouseButtonEvent ev) override;
+        void OnKeyDown(sf::Event::KeyEvent ev) override;
+        void OnKeyType(sf::Event::TextEvent ev) override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
         class Caret : public Renderable, public Updatable
         {
@@ -95,13 +95,13 @@ namespace Gx
             int Index;
             int SelectionLength;
 
-            Caret(TextBox &instance);
+            explicit Caret(TextBox &instance);
             void Reset(bool visible = false);
             const Rectangle &GetHighlight() const;
             void SetHighlightColor(sf::Color color);
 
-            virtual void Update(double delta);
-            virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+            void Update(double delta) override;
+            sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
             void Invalidate();
 

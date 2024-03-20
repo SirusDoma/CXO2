@@ -37,7 +37,7 @@ void ChannelButton::Initialize()
     }
 }
 
-const sf::FloatRect ChannelButton::GetLocalBounds() const
+sf::FloatRect ChannelButton::GetLocalBounds() const
 {
     return RadioButton::GetLocalBounds();
 }

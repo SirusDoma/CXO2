@@ -7,12 +7,10 @@
 #include <OTwo/Data/Equipment.hpp>
 #include <OTwo/Data/Character.hpp>
 
-#include <SFML/System/String.hpp>
+#include <string>
 
 struct ItemMetadata : ResourceMetadata
 {
-    ItemMetadata() : References() {};
-
     struct ItemSpriteMetadata
     {
         Gender      Gender;
@@ -26,9 +24,9 @@ struct ItemMetadata : ResourceMetadata
     PlanetType                       Origin;
     Gender                           Gender;
     bool                             IsNew;
-    sf::String                       Name, Description, SmallPreview, LargePreview;
+    std::string                      Name, Description, SmallPreview, LargePreview;
     std::map<Currency, unsigned int> Prices;
-    std::vector<ItemSpriteMetadata>  References;
+    std::vector<ItemSpriteMetadata>  References = std::vector<ItemSpriteMetadata>();
 };
 
 #endif

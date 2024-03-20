@@ -15,7 +15,7 @@ namespace Gx
         ToolTip();
         ToolTip(const sf::String &string, const sf::Font &font, unsigned int characterSize = 30);
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         void Show(Control *parent);
         void Show(sf::Vector2f position, Alignment alignment = Alignment::Center);
@@ -38,10 +38,10 @@ namespace Gx
         void SetContainerOutlineThickness(float outlineThickness);
 
     protected:
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         Rectangle    m_rectangle;

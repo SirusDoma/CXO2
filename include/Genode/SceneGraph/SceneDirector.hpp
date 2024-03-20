@@ -16,10 +16,10 @@ namespace Gx
     class SceneDirector : public Renderable, public Updatable, public Inputable
     {
     public:
-        SceneDirector(SceneDirector &&director);
+        SceneDirector(SceneDirector &&director) noexcept;
         SceneDirector(Application &app, sf::RenderTarget &target);
         SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene);
-        ~SceneDirector();
+        ~SceneDirector() override;
 
         sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
         void Update(double delta) override;

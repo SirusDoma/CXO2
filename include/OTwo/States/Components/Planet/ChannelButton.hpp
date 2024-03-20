@@ -25,7 +25,7 @@ public:
     ChannelButton();
     void Initialize() override;
 
-    const sf::FloatRect GetLocalBounds() const override;
+    sf::FloatRect GetLocalBounds() const override;
 
     unsigned int GetChannelNumber() const;
     void SetChannelNumber(unsigned int channelNumber);

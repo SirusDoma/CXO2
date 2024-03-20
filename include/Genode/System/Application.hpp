@@ -1,13 +1,15 @@
 #ifndef GENODE_SYSTEM_APPLICATION_HPP
 #define GENODE_SYSTEM_APPLICATION_HPP
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include <Genode/System/Config.hpp>
 
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Audio/Mixer.hpp>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
 #include <functional>
 #include <memory>
@@ -15,7 +17,6 @@
 namespace Gx
 {
     class Scene;
-    class Config;
     class Module;
     class Application : NonCopyable
     {
@@ -23,9 +24,9 @@ namespace Gx
         const std::string TITLE = "O2-JAM";
         static Application &Instance();
 
-        Application(sf::VideoMode mode, bool fullScreen = false);
+        explicit Application(sf::VideoMode mode, bool fullScreen = false);
         Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
-        virtual ~Application();
+        virtual ~Application() = default;
 
         int Start();
         int Start(Scene &scene);

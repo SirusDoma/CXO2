@@ -10,8 +10,8 @@ namespace Gx
     class Renderable : public virtual sf::Drawable
     {
     public:
-        Renderable() {};
-        ~Renderable() override {};
+        Renderable() = default;
+        ~Renderable() override = default;
         virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
     protected:

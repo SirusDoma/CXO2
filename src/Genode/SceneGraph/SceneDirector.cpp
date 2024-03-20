@@ -3,14 +3,15 @@
 
 namespace Gx
 {
-    SceneDirector::SceneDirector(SceneDirector &&director) :
+    SceneDirector::SceneDirector(SceneDirector &&director) noexcept :
         m_application(director.m_application),
         m_target(director.m_target),
         m_currentScene(std::move(director.m_currentScene)),
         m_nextScene(std::move(director.m_nextScene)),
-        m_factories(director.m_factories),
+        m_factories(std::move(director.m_factories)),
         m_caches(std::move(director.m_caches)),
-        m_staged()
+        m_staged(),
+        m_cacheEnabled()
     {
     }
 
@@ -20,7 +21,8 @@ namespace Gx
         m_currentScene(&scene),
         m_factories(),
         m_caches(),
-        m_staged()
+        m_staged(),
+        m_cacheEnabled()
     {
     }
 
@@ -30,7 +32,8 @@ namespace Gx
         m_currentScene(),
         m_factories(),
         m_caches(),
-        m_staged()
+        m_staged(),
+        m_cacheEnabled()
     {
     }
 
@@ -57,7 +60,7 @@ namespace Gx
     void SceneDirector::Unstage()
     {
         if (m_currentScene)
-            m_currentScene->Close();
+            m_currentScene->Close(false);
     }
 
     bool SceneDirector::IsCacheEnabled() const

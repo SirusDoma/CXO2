@@ -19,7 +19,7 @@ namespace Gx
 
         ResourceManager();
         ResourceManager(ResourceManager &&other) noexcept;
-        virtual ~ResourceManager();
+        virtual ~ResourceManager() = default;
 
         ResourceManager& operator=(ResourceManager&& right) noexcept;
 

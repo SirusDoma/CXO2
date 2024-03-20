@@ -2,11 +2,7 @@
 
 namespace Gx
 {
-    Label::~Label()
-    {
-    }
-
-    const sf::FloatRect Label::GetLocalBounds() const
+    sf::FloatRect Label::GetLocalBounds() const
     {
         return Text::GetLocalBounds();
     }

@@ -36,7 +36,7 @@ namespace Gx
 
         Animation();
         Animation(Sprite &sprite, const sf::Time& duration, std::initializer_list<Frame> frames);
-        virtual ~Animation();
+        ~Animation() override = default;
 
         template<typename... Args>
         void AddFrame(const Frame &first, Args... args);
@@ -55,8 +55,8 @@ namespace Gx
         bool IsLoop() const;
         void SetLoop(bool loop);
 
-        virtual const sf::Color& GetColor() const;
-        virtual void SetColor(const sf::Color &color);
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color &color) override;
 
         const AnimationState GetState() const;
         void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
@@ -67,8 +67,8 @@ namespace Gx
         virtual void Stop();
         virtual void Reset();
 
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     private:
         void SetFrame(unsigned int index);

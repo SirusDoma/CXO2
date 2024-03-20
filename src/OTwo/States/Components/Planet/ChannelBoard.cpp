@@ -13,7 +13,9 @@ ChannelBoard::ChannelBoard() :
     m_channelPageIndex(),
     m_channelMaxPage(),
     m_noticePageIndex(),
-    m_noticeMaxPage()
+    m_noticeMaxPage(),
+    m_channelButton(),
+    m_selectedChannel()
 {
 }
 
@@ -169,7 +171,7 @@ void ChannelBoard::SetChannelsPerPage(unsigned int channelsPerPage)
     m_channelsPerPage = channelsPerPage;
 }
 
-const sf::FloatRect ChannelBoard::GetLocalBounds() const
+sf::FloatRect ChannelBoard::GetLocalBounds() const
 {
     return Gx::Image::GetLocalBounds();
 }

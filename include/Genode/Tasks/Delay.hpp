@@ -9,14 +9,14 @@ namespace Gx
     {
     public:
         Delay();
-        Delay(sf::Time duration);
-        virtual ~Delay();
+        explicit Delay(sf::Time duration);
+        ~Delay() override = default;
 
         sf::Time GetDuration() const;
         void SetDuration(const sf::Time& duration);
 
     protected:
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
     private:
         sf::Time m_duration;

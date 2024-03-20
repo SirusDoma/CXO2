@@ -34,7 +34,7 @@ namespace Gx
         SetHighlightTextColor(sf::Color::Black);
     }
 
-    const sf::FloatRect TextBox::GetLocalBounds() const
+    sf::FloatRect TextBox::GetLocalBounds() const
     {
         return m_bounds;
     }

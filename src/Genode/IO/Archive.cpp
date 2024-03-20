@@ -21,7 +21,7 @@ namespace Gx
         return ReadFile(entry.GetName(), data, entry.GetSize());
     }
 
-    std::string Archive::GetFileName() const
+    const std::string & Archive::GetFileName() const
     {
         return m_filename;
     }

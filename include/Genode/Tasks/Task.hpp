@@ -22,7 +22,7 @@ namespace Gx
             Completed
         };
 
-        virtual ~Task();
+        ~Task() override = default;
 
         const TaskState GetState() const;
         virtual const sf::Time GetElapsed() const;
@@ -31,7 +31,7 @@ namespace Gx
         void OnStopped(std::function<void()> callback);
         void OnCompleted(std::function<void()> callback);
 
-        virtual void Update(double delta);
+        void Update(double delta) override;
         virtual void Reset();
 
     protected:

@@ -15,8 +15,8 @@ namespace Gx
         Fade(Colorable* target, Uint8 opacity, const sf::Time& duration);
 
     protected:
-        virtual void Update(double delta);
-        virtual void Reset();
+        void Update(double delta) override;
+        void Reset() override;
 
     private:
         Colorable* m_target;

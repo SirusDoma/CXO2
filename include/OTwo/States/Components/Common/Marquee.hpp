@@ -13,17 +13,17 @@ public:
 
     using Gx::Label::Label;
 
-    virtual const sf::FloatRect GetLocalBounds() const;
+    sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect &bounds);
 
     double GetSpeed() const;
     void SetSpeed(double speed);
 
 private:
-    virtual void Update(double delta);
-    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+    void Update(double delta) override;
+    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-    virtual void Invalidate();
+    void Invalidate() override;
 
     sf::FloatRect m_bounds;
     Gx::Sprite m_sprite;

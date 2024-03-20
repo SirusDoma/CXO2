@@ -33,7 +33,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata 
 
     if (metadata->Frames.size() > 0)
     {
-        for (auto frame : metadata->Frames)
+        for (const auto& frame : metadata->Frames)
             image->AddFrame(frame.first, frame.second);
     }
     else

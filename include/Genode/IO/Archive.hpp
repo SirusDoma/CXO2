@@ -17,7 +17,7 @@ namespace Gx
         Archive() = default;
         ~Archive() override = default;
 
-        std::string GetFileName() const;
+        const std::string &GetFileName() const;
 
         virtual bool LoadFromFile(const std::string& fileName);
 

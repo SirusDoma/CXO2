@@ -31,10 +31,6 @@ namespace Gx
     {
     }
 
-    Animation::~Animation()
-    {
-    }
-
     void Animation::AddFrame(const Frame &frame)
     {
         m_frames.push_back(frame);

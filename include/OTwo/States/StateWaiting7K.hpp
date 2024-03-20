@@ -6,9 +6,9 @@
 class StateWaiting7K : public State
 {
 public:
-    StateWaiting7K(State& state);
+    explicit StateWaiting7K(State& state);
 
-    virtual void Initialize();
+    void Initialize() override;
 };
 
 #endif

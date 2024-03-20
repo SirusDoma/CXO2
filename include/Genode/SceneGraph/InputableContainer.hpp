@@ -11,11 +11,11 @@ namespace Gx
     class InputableContainer : public virtual Node, public Inputable
     {
     public:
-        virtual ~InputableContainer();
+        ~InputableContainer() override;
 
     protected:
         InputableContainer();
-        virtual bool Input(sf::Event ev);
+        bool Input(sf::Event ev) override;
     };
 }
 

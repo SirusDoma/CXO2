@@ -16,23 +16,23 @@ class OptionDialog : public Gx::Dialog
 public:
     using Gx::Dialog::Dialog;
 
-    OptionDialog(const Gx::Dialog &copy);
+    explicit OptionDialog(const Gx::Dialog &copy);
 
-    void Initialize();
+    void Initialize() override;
 
 private:
     bool ValidateConfig();
 
-    virtual void OnShown(Gx::Scene &scene);
-    virtual void OnClose();
+    void OnShown(Gx::Scene &scene) override;
+    void OnClose() override;
 
-    virtual void Update(double delta);
+    void Update(double delta) override;
 
-    virtual void OnKeyDown(sf::Event::KeyEvent ev);
-    virtual void OnKeyUp(sf::Event::KeyEvent ev);
-    virtual void OnKeyType(sf::Event::TextEvent ev);
+    void OnKeyDown(sf::Event::KeyEvent ev) override;
+    void OnKeyUp(sf::Event::KeyEvent ev) override;
+    void OnKeyType(sf::Event::TextEvent ev) override;
 
-    virtual void Invalidate();
+    void Invalidate() override;
 
     ::State *m_parent;
     std::map<EventChannel, Gx::Image*> m_keyTexts, m_keyDowns;

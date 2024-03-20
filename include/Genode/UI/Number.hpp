@@ -19,13 +19,13 @@ namespace Gx
         Number();
         explicit Number(const sf::Texture& texture);
 
-        virtual const sf::FloatRect GetLocalBounds() const;
+        sf::FloatRect GetLocalBounds() const override;
 
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
 
-        virtual const sf::Color & GetColor() const;
-        virtual void SetColor(const sf::Color &color);
+        const sf::Color & GetColor() const override;
+        void SetColor(const sf::Color &color) override;
 
         float GetLetterSpacing() const;
         void SetLetterSpacing(float spacing);
@@ -42,9 +42,9 @@ namespace Gx
         void Align(Alignment alignment);
 
     protected:
-        virtual void Update(double delta);
-        virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
-        virtual void Invalidate();
+        void Update(double delta) override;
+        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        void Invalidate() override;
 
     private:
         sf::VertexArray   m_vertices;

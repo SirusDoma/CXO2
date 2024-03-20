@@ -49,13 +49,13 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata &meta,
     for (auto [currency, price] : metadata->Prices)
         item->SetPrice(currency, price);
 
-    if (!metadata->SmallPreview.isEmpty())
+    if (!metadata->SmallPreview.empty())
         item->SetSmallPreview(spriteLoader.LoadFromFile(metadata->SmallPreview, ctx));
 
-    if (!metadata->LargePreview.isEmpty())
+    if (!metadata->LargePreview.empty())
         item->SetLargePreview(spriteLoader.LoadFromFile(metadata->LargePreview, ctx));
 
-    for (auto ref : metadata->References)
+    for (const auto& ref : metadata->References)
     {
         auto animation = animationLoader.LoadFromFile(ref.Reference, ctx);
         animation->SetLoop(true);

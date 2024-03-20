@@ -22,10 +22,6 @@ namespace Gx
     {
     }
 
-    List::~List()
-    {
-    }
-
     void List::SetVerticalRepeat(int count, float spacing)
     {
         m_verticalCount   = count;

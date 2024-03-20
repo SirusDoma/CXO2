@@ -49,17 +49,17 @@ namespace Gx
 
         void SetTexture(const sf::Texture& texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rectangle);
-        virtual void SetColor(const sf::Color& color);
+        void SetColor(const sf::Color& color) override;
 
         const sf::Texture* GetTexture() const;
         const sf::IntRect& GetTexCoords() const;
-        virtual const sf::Color& GetColor() const;
+        const sf::Color& GetColor() const override;
 
         sf::FloatRect GetLocalBounds() const;
         sf::FloatRect GetGlobalBounds() const;
 
     protected:
-        virtual sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const;
+        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     private:
         void UpdatePositions();

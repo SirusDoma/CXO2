@@ -13,7 +13,7 @@ namespace Gx
         List(int verticalCount, float verticalSpacing);
         List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
 
-        virtual ~List();
+        ~List() override = default;
 
         void SetVerticalRepeat(int count, float spacing);
         void SetHorizontalRepeat(int count, float spacing);
@@ -25,13 +25,13 @@ namespace Gx
         float GetVerticalSpacing() const;
         float GetHorizontalSpacing() const;
 
-        virtual void AddChild(Control *control);
-        virtual void RemoveChild(Control *control);
+        void AddChild(Control *control) override;
+        void RemoveChild(Control *control) override;
 
         using Control::AddChild;
         using Control::RemoveChild;
 
-        virtual void ClearChildren();
+        void ClearChildren() override;
 
         void Apply(std::function<void(Control*)> fun);
 
@@ -40,7 +40,7 @@ namespace Gx
         sf::Vector2f GetNextItemPosition() const;
         void IncreaseSpacingCounter();
 
-        virtual void Invalidate();
+        void Invalidate() override;
 
     private:
         int m_verticalCount, m_horizontalCount;

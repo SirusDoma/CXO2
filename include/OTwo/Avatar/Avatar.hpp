@@ -71,8 +71,8 @@ private:
         Instrument::Drum
     };
 
-    virtual void Update(double delta);
-    virtual sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const;
+    void Update(double delta) override;
+    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
     Player                      m_player;
     Instrument                  m_instrument;

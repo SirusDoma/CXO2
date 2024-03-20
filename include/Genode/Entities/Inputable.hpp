@@ -11,7 +11,7 @@ namespace Gx
         friend class Scene;
         friend class InputableContainer;
 
-        virtual ~Inputable() {}
+        virtual ~Inputable() = default;
 
         virtual void OnMouseMove(sf::Event::MouseMoveEvent ev)                 {}
         virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev)         {}

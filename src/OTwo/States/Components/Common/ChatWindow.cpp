@@ -32,7 +32,7 @@ ChatWindow::ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned
 
 }
 
-const sf::FloatRect ChatWindow::GetLocalBounds() const
+sf::FloatRect ChatWindow::GetLocalBounds() const
 {
     return m_bounds;
 }

@@ -36,7 +36,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     auto channelBoard = std::make_unique<ChannelBoard>();
     if (metadata->Frames.size() > 0)
     {
-        for (auto frame : metadata->Frames)
+        for (const auto& frame : metadata->Frames)
             channelBoard->AddFrame(frame.first, frame.second);
     }
     else

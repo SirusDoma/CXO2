@@ -12,7 +12,7 @@ Marquee::Marquee(const Marquee &copy) :
 {
 }
 
-const sf::FloatRect Marquee::GetLocalBounds() const
+sf::FloatRect Marquee::GetLocalBounds() const
 {
     return m_bounds;
 }

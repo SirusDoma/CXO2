@@ -8,10 +8,10 @@ class StateTest : public State
 {
 public:
     StateTest() = default;
-    StateTest(State &state);
+    explicit StateTest(State &state);
 
-    virtual void Initialize();
-    virtual bool Close(bool quit = false);
+    void Initialize() override;
+    bool Close(bool quit = false) override;
 };
 
 #endif

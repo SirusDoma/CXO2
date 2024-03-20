@@ -12,10 +12,8 @@
 #include <OTwo/States/Components/Room/RoomContainer.hpp>
 #include <OTwo/States/Components/Room/RoomButton.hpp>
 
-
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>
-
 
 void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPopulator &populator, Gx::ResourceContext &ctx)
 {

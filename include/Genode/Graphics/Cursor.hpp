@@ -14,7 +14,7 @@ namespace Gx
     {
     public:
         Cursor();
-        Cursor(const sf::Texture& texture);
+        explicit Cursor(const sf::Texture& texture);
         ~Cursor();
 
         sf::Cursor &GetHandle() const;

@@ -12,7 +12,7 @@ namespace Gx
     class Node : public Transformable
     {
     public:
-        virtual ~Node();
+        ~Node() override;
 
         std::string GetName() const;
         void SetName(const std::string& name);

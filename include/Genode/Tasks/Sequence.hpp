@@ -14,7 +14,7 @@ namespace Gx
         Sequence(std::initializer_list<Task*> tasks);
         //Sequence(std::function<void()> callback);
         Sequence(std::function<void()> callback, std::initializer_list<Task*> tasks);
-        virtual ~Sequence();
+        ~Sequence() override;
 
         template<typename... Args>
         Sequence* Add(Task* first, Args... args);
@@ -28,11 +28,11 @@ namespace Gx
         //static Sequence* Routine(T* task, unsigned int count, sf::Time delay = sf::Time::Zero);
         static std::initializer_list<Task*> ListOf(std::initializer_list<Task*> &&tasks);
 
-        virtual void Reset();
+        void Reset() override;
 
     protected:
-        virtual void Update(double delta);
-        virtual void Complete();
+        void Update(double delta) override;
+        void Complete() override;
 
     private:
         std::vector<Task*>::iterator m_iterator;

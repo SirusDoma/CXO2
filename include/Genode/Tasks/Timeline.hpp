@@ -19,7 +19,7 @@ namespace Gx
         };
 
         Timeline();
-        virtual ~Timeline();
+        ~Timeline() override;
 
         template<typename... Args>
         Timeline* Add(KeyFrame* first, Args... args);
@@ -29,10 +29,10 @@ namespace Gx
         Timeline* Remove(KeyFrame* first, Args... args);
         Timeline* Remove(KeyFrame* frame);
 
-        virtual void Reset();
+        void Reset() override;
 
     protected:
-        virtual void Update(double delta);
+        void Update(double delta) override;
 
     private:
         std::vector<const KeyFrame*> m_frames;

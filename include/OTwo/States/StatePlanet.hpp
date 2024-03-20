@@ -7,11 +7,11 @@
 class StatePlanet : public State
 {
 public:
-    StatePlanet(State& state);
-    virtual void Initialize();
+    explicit StatePlanet(State& state);
+    void Initialize() override;
 
 private:
-    bool IsConnecting();
+    bool IsConnecting() const;
 
     void OnMusicHallSelected(MusicHall hall);
     void OnChannelEnter(MusicHall hall, Channel channel);

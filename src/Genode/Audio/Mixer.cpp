@@ -31,10 +31,6 @@ namespace Gx
         return *this;
     }
 
-    Mixer::~Mixer()
-    {
-    }
-
     SoundGroup *Mixer::GetMasterSoundGroup() const
     {
         return m_masterGroup.get();
