@@ -13,9 +13,12 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (!TransformLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-    
+    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    {
+        if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
+            return nullptr;
+    }
+
     if (auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())
         metadata.FontSize = fontSize->get<unsigned int>();
     else

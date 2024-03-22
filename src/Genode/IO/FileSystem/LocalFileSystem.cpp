@@ -2,8 +2,10 @@
 
 #include <SFML/System/FileInputStream.hpp>
 
-#include <algorithm>
 #include <Genode/IO/FileSystem/FileInfo.hpp>
+
+#include <algorithm>
+#include <iostream>
 
 #if defined(__cpp_lib_filesystem)
 #include <filesystem>
@@ -24,6 +26,18 @@ namespace Gx
             instance = ResourcePtr<LocalFileSystem>(new LocalFileSystem(), [] (auto ptr) { delete ptr; });
 
         return *instance.get();
+    }
+
+    void LocalFileSystem::SetWorkingDirectory(const std::string &inputPath)
+    {
+        auto workingDir = path(inputPath);
+        if (workingDir.has_filename() || is_directory(workingDir))
+            workingDir = workingDir.parent_path();
+
+        if (!exists(workingDir))
+            return;
+
+        std::filesystem::current_path(workingDir);
     }
 
     std::vector<std::string> LocalFileSystem::GetAssetPaths()

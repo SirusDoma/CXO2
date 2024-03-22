@@ -6,6 +6,8 @@
 #include <OTwo/Data/Game.hpp>
 #include <OTwo/Data/Character.hpp>
 
+#include <string>
+
 enum class RoomState
 {
     Waiting,
@@ -31,7 +33,7 @@ enum class GameMode
 struct RoomData
 {
     unsigned int  ID;
-    sf::String    Title;
+    std::string   Title;
     ChartMetadata Chart;
     Difficulty    Difficulty;
     GameMode      GameMode;
@@ -39,15 +41,17 @@ struct RoomData
     RoomState     State;
     float         Speed;
     bool          Locked;
-    unsigned int  PlayerCount = 1;
-    unsigned int  Capacity    = 8;
+    unsigned int  PlayerCount   = 1;
+    unsigned int  Capacity      = 8;
+    unsigned int  MinLevelLimit = 0;
+    unsigned int  MaxLevelLimit = 0;
 };
 
 struct Player
 {
     unsigned int ID;
     int Level;
-    sf::String Name;
+    std::string Name;
     bool Administrator;
     Gender Gender;
     unsigned int Gem;
@@ -57,7 +61,7 @@ struct Player
 struct ChatData
 {
     Player Sender;
-    sf::String Message;
+    std::string Message;
 
     Player Recipient;
     // MegaphoneInfo Megaphone;

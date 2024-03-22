@@ -40,12 +40,12 @@ void UserState::SetChannelID(unsigned int channelId)
     m_channelID = channelId;
 }
 
-unsigned int UserState::GetRoomID() const
+const RoomData &UserState::GetRoomData() const
 {
-    return m_roomID;
+    return m_room;
 }
 
-void UserState::SetRoomID(unsigned int roomId)
+void UserState::SetRoomData(const RoomData &room)
 {
-    m_roomID = roomId;
+    m_room = room;
 }

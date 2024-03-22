@@ -230,3 +230,57 @@ void CreateRoomDialog::OnAccepted()
 
     Dialog::OnAccepted();
 }
+
+GameMode CreateRoomDialog::GetRoomMode()
+{
+    auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
+    auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
+    auto versusModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
+
+    if (jamModeButton && jamModeButton->IsChecked())
+        return GameMode::Jam;
+
+    if (singleModeButton && singleModeButton->IsChecked())
+        return GameMode::Single;
+
+    return GameMode::Versus;
+}
+
+std::string CreateRoomDialog::GetRoomName() const
+{
+    if (auto titleTextBox = FindChild<Gx::TextBox>("IDC_EDIT_TITLE"); titleTextBox)
+        return titleTextBox->GetString();
+
+    return {};
+}
+
+std::string CreateRoomDialog::GetRoomPassword() const
+{
+    if (auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD"); passwordTextBox)
+        return passwordTextBox->GetString();
+
+    return {};
+}
+
+unsigned int CreateRoomDialog::GetMinLevelLimit() const
+{
+    auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
+    auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
+
+    if (minLevelLimitTextBox && levelLimitCheckBox && levelLimitCheckBox->IsChecked())
+        return std::stoi(std::string(minLevelLimitTextBox->GetString()));
+
+    return 0;
+}
+
+unsigned int CreateRoomDialog::GetMaxLevelLimit() const
+{
+    auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
+    auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
+
+    if (maxLevelLimitTextBox && levelLimitCheckBox && levelLimitCheckBox->IsChecked())
+        return std::stoi(std::string(maxLevelLimitTextBox->GetString()));
+
+    return 0;
+}
+

@@ -1,7 +1,7 @@
 #ifndef O2JAM_CHART_METADATA_HPP
 #define O2JAM_CHART_METADATA_HPP
 
-#include <SFML/System/String.hpp>
+#include <string>
 
 enum Difficulty
 {
@@ -13,11 +13,12 @@ enum Difficulty
 
 struct ChartMetadata
 {
-    sf::String Title;
-    sf::String Artist;
-    sf::String NoteDesigner;
-    sf::String Genre;
+    std::string Title;
+    std::string Artist;
+    std::string NoteDesigner;
+    std::string Genre;
     unsigned int Level;
+    bool New;
 };
 
 #endif

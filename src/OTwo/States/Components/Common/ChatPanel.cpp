@@ -42,7 +42,12 @@ ChatWindow *ChatPanel::GetChatWindow() const
 
 void ChatPanel::SetInputEnabled(bool enabled)
 {
-    auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
-    if (chatBox)
+    if (auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
         chatBox->SetEnabled(enabled);
+}
+
+void ChatPanel::SetMaximumTextLength(unsigned int length)
+{
+    if (auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
+        chatBox->SetMaximumTextLength(length);
 }

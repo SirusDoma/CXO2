@@ -430,6 +430,11 @@ namespace Gx
         if (!IsEnabled() || !IsFocused())
             return;
 
+        bool control = ev.control;
+#ifdef __APPLE__
+        control = ev.system;
+#endif
+
         if (ev.code == sf::Keyboard::Backspace || (ev.code == sf::Keyboard::Delete && m_caret.SelectionLength != 0))
         {
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
@@ -460,7 +465,7 @@ namespace Gx
             m_text.SetString("");
             m_caret.SelectionLength = 0;
         }
-        else if (ev.control || ev.shift)
+        else if (control || ev.shift)
         {
             if (ev.shift)
             {
@@ -482,7 +487,7 @@ namespace Gx
                 }
             }
 
-            if (ev.control)
+            if (control)
             {
                 if (ev.code == sf::Keyboard::C || ev.code == sf::Keyboard::X)
                 {
@@ -532,6 +537,12 @@ namespace Gx
         // backspace, tab, enter, etc
         if (ev.unicode <= 31)
             return;
+
+#ifdef __APPLE__
+        // Delete key
+        if (ev.unicode == 127)
+            return;
+#endif
 
         // Only accept numbers
         if (m_numeric && (ev.unicode < 48 || ev.unicode > 57))

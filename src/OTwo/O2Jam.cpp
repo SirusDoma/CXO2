@@ -57,9 +57,9 @@ void O2Jam::Boot()
     Gx::Application::Boot();
 
     // Asset Path
-    Gx::LocalFileSystem::Instance().AddAssetPath("./Assets");
-    Gx::LocalFileSystem::Instance().AddAssetPath("./Image");
-    Gx::LocalFileSystem::Instance().AddAssetPath("./Music");
+    Gx::LocalFileSystem::AddAssetPath("./Assets");
+    Gx::LocalFileSystem::AddAssetPath("./Image");
+    Gx::LocalFileSystem::AddAssetPath("./Music");
 
     // -- Register resource metadata loaders
     // Basic Resource

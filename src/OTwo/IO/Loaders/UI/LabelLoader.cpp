@@ -1,9 +1,11 @@
 ﻿#include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+
+#include <magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
@@ -38,6 +40,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetPosition(metadata->Position);
     label->SetScale(metadata->Scale);
     label->SetRotation(metadata->Rotation);
+    label->SetAlignment(metadata->Alignment);
 
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
@@ -108,6 +111,17 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
         metadata.OutlineThickness = 0.f;
         metadata.OutlineColor = sf::Color::Transparent;
     }
+
+    auto alignment = attributes.find("alignment");
+    if (alignment != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gx::Label::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.Alignment = parsed.value();
+        else
+            metadata.Alignment = Gx::Label::Alignment::None;
+    }
+    else
+        metadata.Alignment = Gx::Label::Alignment::None;
 
     return true;
 }

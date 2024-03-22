@@ -31,7 +31,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.DigitCount = 1;
 
-    auto frames = attributes.find("characters");
+    auto frames = attributes.find("digits");
     if (frames != attributes.end())
     {
         for (auto [digit, frame] : frames->items())

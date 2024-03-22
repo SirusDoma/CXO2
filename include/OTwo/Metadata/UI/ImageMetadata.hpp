@@ -14,10 +14,16 @@
 
 struct ImageMetadata : public SpriteMetadata
 {
-    ImageMetadata() : Frames() {}
-    virtual ~ImageMetadata() {}
+    struct FrameMetadata
+    {
+        std::string first;
+        Gx::Image::Frame second;
+    };
 
-    std::map<std::string, Gx::Image::Frame> Frames;
+    ImageMetadata() : Frames() {}
+    ~ImageMetadata() override = default;
+
+    std::vector<FrameMetadata> Frames;
 };
 
 #endif

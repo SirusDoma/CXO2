@@ -449,8 +449,8 @@ namespace Gx
                 curChar = L'*';
 
             sf::Color fillColor = m_fillColor;
-            if (m_colorMap.find(i) != m_colorMap.end())
-                fillColor = m_colorMap[i];
+            if (auto color = m_colorMap.find(i); color != m_colorMap.end())
+                fillColor = color->second;
 
             // Skip the \r char to avoid weird graphical issues
             if (curChar == L'\r')
@@ -568,6 +568,8 @@ namespace Gx
         m_bounds.top = minY;
         m_bounds.width = maxX - minX;
         m_bounds.height = maxY - minY;
+
+        OnGeometryUpdated();
     }
 
 }

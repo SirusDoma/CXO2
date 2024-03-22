@@ -31,7 +31,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata 
     auto image = std::make_unique<Gx::Image>();
     auto ctx = ResourceContextDecorator::Decorate(context);
 
-    if (metadata->Frames.size() > 0)
+    if (!metadata->Frames.empty())
     {
         for (const auto& frame : metadata->Frames)
             image->AddFrame(frame.first, frame.second);
@@ -72,14 +72,15 @@ bool ImageLoader::ParseMetadata(const Gx::Json &attributes, ImageMetadata &metad
     auto frames = attributes.find("frames");
     if (frames == attributes.end())
     {
-        metadata.Frames["default"] = Gx::Image::Frame
-        {
-            metadata.TexCoords,
-            metadata.Origin,
-            metadata.Position,
-            metadata.Rotation,
-            metadata.Scale
-        };
+        metadata.Frames.push_back({ "default", Gx::Image::Frame
+            {
+                metadata.TexCoords,
+                metadata.Origin,
+                metadata.Position,
+                metadata.Rotation,
+                metadata.Scale
+            }
+        });
 
         return true;
     }
@@ -136,7 +137,7 @@ bool ImageLoader::ParseMetadata(const Gx::Json &attributes, ImageMetadata &metad
             texCoords = sf::IntRect(x, y, w, h);
         }
         frame.TexCoords = texCoords;
-        metadata.Frames[frameName] = frame;
+        metadata.Frames.push_back({frameName, frame});
     }
 
     return true;

@@ -3,6 +3,7 @@
 
 #include <Genode/UI/UiContainer.hpp>
 #include <OTwo/States/Components/Common/ChatWindow.hpp>
+#include <Genode/UI/TextBox.hpp>
 
 class ChatPanel : public Gx::UiContainer
 {
@@ -11,6 +12,7 @@ public:
     void Initialize() override;
 
     void SetInputEnabled(bool enabled);
+    void SetMaximumTextLength(unsigned int length);
 
     ChatWindow *GetChatWindow() const;
 };

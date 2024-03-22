@@ -9,16 +9,32 @@ namespace Gx
     class Label : public virtual Control, public virtual Text
     {
     public:
+        enum Alignment
+        {
+            None,
+            Left,
+            Center,
+            Right
+        };
+
         using Text::Text;
         ~Label() override = default;
 
         sf::FloatRect GetLocalBounds() const override;
 
+        Alignment GetAlignment() const;
+        void SetAlignment(Alignment alignment);
+
     protected:
         void Update(double delta) override;
         sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
 
+        void OnGeometryUpdated() const override;
         void Invalidate() override;
+
+    private:
+        mutable bool m_alignmentUpdated = false;
+        Alignment m_alignment = Alignment::None;
     };
 }
 

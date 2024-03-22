@@ -13,7 +13,7 @@ class O2Jam : public Gx::Application
 public:
     using Gx::Application::Application;
 
-    virtual ~O2Jam() = default;
+    ~O2Jam() override = default;
 
 protected:
     void Boot() override;

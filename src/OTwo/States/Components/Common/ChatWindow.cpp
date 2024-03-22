@@ -217,9 +217,9 @@ void ChatWindow::Invalidate()
         {
             size_t nickLength = 16;
             auto nickname = chat.Sender.Name;
-            if (nickname.getSize() < nickLength)
+            if (nickname.length() < nickLength)
             {
-                for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
+                for (size_t j = 0; j < nickLength - nickname.length(); j++)
                     nickname = " " + nickname;
             }
 

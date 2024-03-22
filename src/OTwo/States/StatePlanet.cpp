@@ -22,15 +22,15 @@ void StatePlanet::Initialize()
     auto& mixer   = Require<Gx::Mixer>();
 
     auto bgm      = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
-    auto clickSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_CLICK");
-    auto hoverSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_HOVER");
+    auto clickSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
+    auto hoverSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
 
-    auto melpomin = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_MELPOMIN");
-    auto thalo    = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_THALO");
-    auto euta     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_EUTA");
-    auto kalliope = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_KALLIOPE");
-    auto kleo     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_KLEO");
-    auto philix   = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PHILIX");
+    auto euta     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_01");
+    auto thalo    = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_02");
+    auto melpomin = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_03");
+    auto kalliope = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_HIGH_01");
+    auto kleo     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_INTERMEDIATE_01");
+    auto philix   = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PREMIUM_01");
 
     auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
     channelBoard->Initialize();
@@ -100,7 +100,7 @@ void StatePlanet::Initialize()
     mixer.Play(bgm, "BGM");
 }
 
-bool StatePlanet::IsConnecting()
+bool StatePlanet::IsConnecting() const
 {
     return m_connecting;
 }

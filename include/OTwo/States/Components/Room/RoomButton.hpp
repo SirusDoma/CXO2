@@ -19,7 +19,7 @@ public:
 
     bool IsActive() const;
 
-    const RoomData GetRoomData() const;
+    const RoomData &GetRoomData() const;
     void SetRoomData(const RoomData& data);
     void Reset();
 

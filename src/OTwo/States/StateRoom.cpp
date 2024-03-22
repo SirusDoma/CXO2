@@ -21,9 +21,9 @@ void StateRoom::Initialize()
     auto& items    = Require<ItemFactory>();
 
     auto bgm         = Load<sf::Music>("STATE_ROOM/IDC_MUSIC");
-    auto sfxAccept   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_ACCEPT");
-    auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_NAVIGATION");
-    auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_TOGGLE");
+    auto sfxAccept   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_02");
+    auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_07");
+    auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_14");
 
     auto player = state.GetPlayer();
     auto nicknameLabel = Load<Gx::Label>("STATE_ROOM/IDC_TEXT_NICKNAME");
@@ -34,7 +34,7 @@ void StateRoom::Initialize()
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
-    auto notice = Load<Marquee>("IDC_MARQUEE_NOTICE");
+    auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");
 
     auto channelCategory = Load<Gx::Image>("STATE_ROOM/IDC_IMAGE_CHANNEL_CATEGORY");
@@ -54,6 +54,7 @@ void StateRoom::Initialize()
 
     auto chatPanel = Load<ChatPanel>("STATE_ROOM/IDC_CHAT_PANEL");
     chatPanel->Initialize();
+    chatPanel->SetMaximumTextLength(50);
 
     auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam");
@@ -77,7 +78,7 @@ void StateRoom::Initialize()
         RoomData{
             0,
             "Let's play together~",
-            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36},
+            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36, true},
             Difficulty::Hard,
             GameMode::Versus,
             SongMode::Normal,
@@ -107,6 +108,10 @@ void StateRoom::Initialize()
             RoomState::Waiting,
             4.f,
             false,
+            1,
+            8,
+            20,
+            80
         }
     };
 
@@ -121,14 +126,28 @@ void StateRoom::Initialize()
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
-                state.SetRoomID(3);
+                state.SetRoomData(RoomData{
+                    4,
+                    createRoomDialog->GetRoomName(),
+                    ChartMetadata{"V3 (O2 Version)", "BeautifulDay", "NoteFactory", "Classical", 21},
+                    Difficulty::Normal,
+                    createRoomDialog->GetRoomMode(),
+                    SongMode::Normal,
+                    RoomState::Waiting,
+                    3.5f,
+                    !createRoomDialog->GetRoomPassword().empty(),
+                    1,
+                    8,
+                    createRoomDialog->GetMinLevelLimit(),
+                    createRoomDialog->GetMaxLevelLimit()
+                });
                 director.Present<StateWaiting7K>();
             });
         });
     }
 
     auto showAllButton     = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_ALL");
-    auto waitingRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_WAITING_ROOM");
+    auto waitingRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_WAITING");
 
     showAllButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
         mixer.Play(sfxToggle, "SFX");

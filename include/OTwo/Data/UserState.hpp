@@ -21,15 +21,15 @@ public:
     unsigned int GetChannelID() const;
     void SetChannelID(unsigned int channelId);
 
-    unsigned int GetRoomID() const;
-    void SetRoomID(unsigned int roomId);
+    const RoomData &GetRoomData() const;
+    void SetRoomData(const RoomData &room);
 
 private:
     Player m_player;
     PlanetType m_planet = PlanetType::O2Planet;
     MusicHall m_hall;
     unsigned int m_channelID;
-    unsigned int m_roomID;
+    RoomData m_room;
 };
 
 #endif //O2JAM_USERSTATE_HPP

@@ -114,6 +114,8 @@ namespace Gx
 
     protected:
         void EnsureGeometryUpdate() const;
+        virtual void OnGeometryUpdated() const {};
+
         sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     private:
@@ -127,6 +129,7 @@ namespace Gx
         Uint32                  m_style;
         sf::Color               m_fillColor;
         sf::Color               m_outlineColor;
+        ColorMap                m_colorMap;
         float                   m_outlineThickness;
         bool                    m_masked;
         mutable sf::VertexArray m_vertices;
@@ -134,7 +137,6 @@ namespace Gx
         mutable sf::FloatRect   m_bounds;
         mutable bool            m_geometryNeedUpdate; 
         mutable Uint64          m_fontTextureId;
-        mutable ColorMap        m_colorMap;
     };
 
 }

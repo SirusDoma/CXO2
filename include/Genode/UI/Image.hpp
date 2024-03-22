@@ -6,7 +6,7 @@
 #include <Genode/UI/Control.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace Gx
 {
@@ -20,6 +20,7 @@ namespace Gx
             sf::Vector2f Position;
             float        Rotation;
             sf::Vector2f Scale;
+            std::string  Name;
         };
 
         using Sprite::Sprite;
@@ -28,16 +29,21 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
 
         unsigned int GetFrameCount() const;
-        const Frame *GetFrame(const std::string &name) const;
-        const Frame *GetFrame(unsigned int index) const;
+        Frame *GetFrame(const std::string &name) const;
+        Frame *GetFrame(unsigned int index) const;
+        Frame *GetCurrentFrame() const;
 
         bool ContainsFrame(const std::string &name) const;
         bool ContainsFrame(unsigned int index) const;
 
         void AddFrame(const std::string &name, const sf::IntRect &texCoords);
         void AddFrame(const std::string &name, const Frame &frame);
+
         void SetFrame(const std::string &name);
         void SetFrame(unsigned int index);
+
+        void NextFrame();
+        void PreviousFrame();
 
     protected:
         void Update(double delta) override;
@@ -46,9 +52,12 @@ namespace Gx
         void Invalidate() override;
 
     private:
-        void ApplyFrame(const Frame &frame);
+        void ApplyFrame(Frame &frame);
 
-        std::map<std::string, Frame> m_frames;
+        mutable unsigned int m_currentIndex = 0;
+        Frame *m_currentFrame = nullptr;
+        std::unordered_map<std::string, Frame> m_frames;
+        std::unordered_map<unsigned int, std::string> m_indices;
     };
 }
 
