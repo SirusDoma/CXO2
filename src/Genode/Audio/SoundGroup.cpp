@@ -90,6 +90,8 @@ namespace Gx
 
         for (auto source : m_sources)
             source->stop();
+
+        m_sources.clear();
     }
 
     float SoundGroup::GetVolume() const

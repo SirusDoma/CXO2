@@ -8,11 +8,7 @@ namespace Gx
         m_groups(),
         m_sources()
     {
-        m_masterGroup = ResourcePtr<SoundGroup>(new SoundGroup("master"), [] (auto ptr)
-        {
-            ptr->Stop();
-            delete ptr;
-        });
+        m_masterGroup = std::make_unique<SoundGroup>("master");
     }
 
     Mixer::Mixer(Mixer &&right) noexcept:
