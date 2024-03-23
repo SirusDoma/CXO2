@@ -10,16 +10,12 @@ CreateRoomDialog::CreateRoomDialog(const Gx::Dialog &copy) :
 {
 }
 
-
 void CreateRoomDialog::Initialize()
 {
     if (m_initialized)
         return;
 
-    // Rewire parent and callbacks due to copy constructor
-    for (auto child : GetChildren())
-        AddChild(child);
-
+    // Rewire callbacks due to copy constructor
     if (auto acceptButton = GetAcceptButton(); acceptButton)
         SetAcceptButton(*acceptButton);
 

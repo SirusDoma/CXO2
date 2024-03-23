@@ -36,7 +36,7 @@ public:
     template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>
     R* Make(const std::string &id, Args&&... args);
 
-    template<typename R>
+    template<typename R, typename T>
     R *Instantiate(const std::string &id, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>

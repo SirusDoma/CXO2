@@ -12,28 +12,30 @@ namespace Gx
         return !m_frames.empty() ? m_frames.size() : 1;
     }
 
-    Image::Frame *Image::GetFrame(const std::string &name) const
+    const Image::Frame *Image::GetFrame(const std::string &name) const
     {
         if (auto it = m_frames.find(name); it != m_frames.end())
-            return const_cast<Image::Frame*>(&it->second);
+            return &it->second;
 
         return nullptr;
     }
 
-    Image::Frame *Image::GetFrame(unsigned int index) const
+    const Image::Frame *Image::GetFrame(unsigned int index) const
     {
-        if (index < 0 || index >= m_indices.size())
+        if (index < 0 || index >= m_frames.size())
             return nullptr;
 
-        if (auto i = m_indices.find(index); i != m_indices.end())
-            return GetFrame(i->second);
-
-        return nullptr;
+        return GetFrame(m_indices[index]);
     }
 
-    Image::Frame *Image::GetCurrentFrame() const
+    const Image::Frame *Image::GetCurrentFrame() const
     {
         return m_currentFrame;
+    }
+
+    const std::string &Image::GetCurrentFrameName() const
+    {
+        return m_frameName;
     }
 
     bool Image::ContainsFrame(const std::string &name) const
@@ -49,21 +51,20 @@ namespace Gx
 
     void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)
     {
-        m_indices[m_indices.size()] = name;
-        m_frames[name] = Frame{
-            .TexCoords = texCoords,
-            .Name      = name
-        };
+        if (m_frames.find(name) == m_frames.end())
+            m_indices.push_back(name);
+
+        m_frames[name] = Frame{texCoords};
         if (GetTexCoords() == sf::IntRect())
             SetFrame(name);
     }
 
     void Image::AddFrame(const std::string &name, const Image::Frame &frame)
     {
-        m_indices[m_indices.size()] = name;
-        m_frames[name] = frame;
-        m_frames[name].Name = name;
+        if (m_frames.find(name) == m_frames.end())
+            m_indices.push_back(name);
 
+        m_frames[name] = frame;
         if (GetTexCoords() == sf::IntRect())
             SetFrame(name);
     }
@@ -71,35 +72,22 @@ namespace Gx
     void Image::SetFrame(const std::string &name)
     {
         if (auto frame = GetFrame(name); frame)
+        {
+            m_frameName = name;
             ApplyFrame(*frame);
+        }
     }
 
     void Image::SetFrame(unsigned int index)
     {
         if (auto frame = GetFrame(index); frame)
         {
-            m_currentIndex = index;
+            m_frameName = m_indices[index];
             ApplyFrame(*frame);
         }
     }
 
-    void Image::NextFrame()
-    {
-        if (m_currentIndex++; !ContainsFrame(m_currentIndex))
-            m_currentIndex = 0;
-
-        SetFrame(m_currentIndex);
-    }
-
-    void Image::PreviousFrame()
-    {
-        if (m_currentIndex--; !ContainsFrame(m_currentIndex))
-            m_currentIndex = m_frames.size() - 1;
-
-        SetFrame(m_currentIndex);
-    }
-
-    void Image::ApplyFrame(Image::Frame &frame)
+    void Image::ApplyFrame(const Image::Frame &frame)
     {
         m_currentFrame = &frame;
 

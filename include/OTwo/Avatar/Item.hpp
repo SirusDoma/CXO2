@@ -10,12 +10,11 @@
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/IO/Resource.hpp>
 
-#include <SFML/System/String.hpp>
-
 #include <tuple>
 #include <unordered_map>
 #include <memory>
 #include <map>
+#include <string>
 
 class Item
 {
@@ -37,11 +36,11 @@ public:
     bool IsNew() const;
     void SetIsNew(bool isNew);
 
-    const sf::String &GetName() const;
-    void SetName(const sf::String &name);
+    const std::string &GetName() const;
+    void SetName(const std::string &name);
 
-    const sf::String &GetDescription() const;
-    void SetDescription(const sf::String &description);
+    const std::string &GetDescription() const;
+    void SetDescription(const std::string &description);
 
     bool IsBuyableWith(const Currency &currency) const;
 
@@ -62,15 +61,16 @@ public:
 
 private:
     using RenderableKey = std::tuple<Gender, RenderPart, Instrument>;
+    using PriceMap      = std::unordered_map<Currency, unsigned int>;
 
-    unsigned int      m_id;
-    EquipmentType   m_type;
-    PlanetType    m_origin;
-    Gender m_gender;
-    bool              m_isNew;
-    unsigned int      m_price;
-    sf::String        m_name, m_description;
-    mutable std::unordered_map<Currency, unsigned int> m_prices;
+    unsigned int     m_id;
+    EquipmentType    m_type;
+    PlanetType       m_origin;
+    Gender           m_gender;
+    bool             m_isNew;
+    unsigned int     m_price;
+    std::string      m_name, m_description;
+    mutable PriceMap m_prices;
 
     Gx::ResourcePtr<Gx::Sprite> m_smallPreview, m_largePreview;
     std::map<RenderableKey, Gx::ResourcePtr<Gx::Animation>> m_renderables;

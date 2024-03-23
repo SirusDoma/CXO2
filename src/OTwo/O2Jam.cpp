@@ -176,7 +176,7 @@ void O2Jam::Boot()
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
 
-    director.Present<StateAvi>();
+    director.Present<StatePlanet>();
 }
 
 void O2Jam::Shutdown()

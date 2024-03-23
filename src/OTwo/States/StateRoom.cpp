@@ -34,6 +34,50 @@ void StateRoom::Initialize()
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
+    if (auto item = items.GetItem(993); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(994); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(995); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(425); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(700); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(63); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(908); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(1401); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(44); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(56); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(1494); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(1460); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(1055); item)
+        avatar->Equip(item);
+
+    if (auto item = items.GetItem(231); item)
+        avatar->Equip(item);
+
+
+
     auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");
 

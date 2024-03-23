@@ -12,9 +12,9 @@ ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
     m_itemData  = &m_resources->AddFromFile<ItemData>("Avatar/Itemdata.json");
 }
 
-const std::map<EquipmentType, Item *> ItemFactory::GetDefaultItems(const Gender &gender)
+std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gender &gender)
 {
-    auto items = std::map<EquipmentType, Item *>();
+    auto items = std::unordered_map<EquipmentType, Item*>();
     if (!m_resources)
         return items;
 
@@ -34,7 +34,7 @@ const std::map<EquipmentType, Item *> ItemFactory::GetDefaultItems(const Gender 
 
     auto apply = [&] (std::initializer_list<std::string> equipments)
     {
-        for (auto name : equipments)
+        for (auto& name : equipments)
         {
             auto& item = m_resources->AddFromFile<Item>(name);
             items[item.GetType()] = &item;

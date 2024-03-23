@@ -63,22 +63,22 @@ void Item::SetIsNew(bool isNew)
     m_isNew = isNew;
 }
 
-const sf::String &Item::GetName() const
+const std::string &Item::GetName() const
 {
     return m_name;
 }
 
-void Item::SetName(const sf::String &name)
+void Item::SetName(const std::string &name)
 {
     m_name = name;
 }
 
-const sf::String &Item::GetDescription() const
+const std::string &Item::GetDescription() const
 {
     return m_description;
 }
 
-void Item::SetDescription(const sf::String &description)
+void Item::SetDescription(const std::string &description)
 {
     m_description = description;
 }

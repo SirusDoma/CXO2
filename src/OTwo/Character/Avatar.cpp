@@ -3,18 +3,18 @@
 #include <OTwo/Data/Equipment.hpp>
 
 Avatar::Avatar() :
-        m_player(),
-        m_instrument(Instrument::None),
-        m_items(),
-        m_defaultItems()
+    m_player(),
+    m_instrument(Instrument::None),
+    m_items(),
+    m_defaultItems()
 {
 }
 
 Avatar::Avatar(Player playerInfo) :
-        m_player(),
-        m_instrument(Instrument::None),
-        m_items(),
-        m_defaultItems()
+    m_player(),
+    m_instrument(Instrument::None),
+    m_items(),
+    m_defaultItems()
 {
     SetPlayer(playerInfo);
 }
@@ -98,7 +98,7 @@ const Instrument &Avatar::GetEquipedInstrumentType() const
     return m_instrument;
 }
 
-const std::map<EquipmentType, const Item *> &Avatar::GetEquipedItems() const
+const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems() const
 {
     return m_items;
 }
@@ -107,39 +107,37 @@ void Avatar::Update(double delta)
 {
     UpdatableContainer::Update(delta);
 
-    for (auto [_, item] : m_items)
+    for (auto [type, part] : RENDER_ORDER)
     {
-        for (auto animation : item->GetRenderables())
+        auto iterator = m_items.find(type);
+        if (iterator == m_items.end())
+            continue;
+
+        auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
+        if (animation)
             animation->Update(delta);
+
+        if (type == EquipmentType::Costume && part == RenderPart::Body)
+            break;
     }
 }
 
 sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates states) const
 {
     states.transform *= GetTransform();
-    auto iterator = m_items.find(EquipmentType::Costume);
-    if (iterator != m_items.end())
+
+    for (auto [type, part] : RENDER_ORDER)
     {
-        auto animation = iterator->second->GetRenderableItem(m_player.Gender, RenderPart::Body, Instrument::None);
+        auto iterator = m_items.find(type);
+        if (iterator == m_items.end())
+            continue;
+
+        auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
         if (animation)
-        {
             animation->Render(target, states);
-            return RenderableContainer::Render(target, states);
-        }
-    }
 
-    for (auto part : RENDER_PART_ORDER)
-    {
-        for (auto type : RENDER_TYPE_ORDER)
-        {
-            iterator = m_items.find(type);
-            if (iterator == m_items.end())
-                continue;
-
-            auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
-            if (animation)
-                animation->Render(target, states);
-        }
+        if (type == EquipmentType::Costume && part == RenderPart::Body)
+            break;
     }
 
     return RenderableContainer::Render(target, states);

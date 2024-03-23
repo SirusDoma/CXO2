@@ -1,21 +1,24 @@
 #ifndef O2JAM_ITEM_FACTORY_HPP
 #define O2JAM_ITEM_FACTORY_HPP
 
-#include <OTwo/Metadata/Avatar/ItemData.hpp>
 #include <OTwo/Avatar/Item.hpp>
+#include <OTwo/Metadata/Avatar/ItemData.hpp>
+
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/Equipment.hpp>
 
 #include <Genode/System/Module.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
+#include <unordered_map>
+
 class ItemFactory : public Gx::Module
 {
 public:
     ItemFactory();
-    ItemFactory(Gx::ResourceManager &sharedResources);
+    explicit ItemFactory(Gx::ResourceManager &sharedResources);
 
-    const std::map<EquipmentType, Item*> GetDefaultItems(const Gender &gender);
+    std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender &gender);
     Item *GetItem(unsigned int id);
 
 private:

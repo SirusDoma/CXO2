@@ -25,6 +25,9 @@ namespace Gx
         float GetVerticalSpacing() const;
         float GetHorizontalSpacing() const;
 
+        void AddChild(Gx::Node *node) override;
+        void RemoveChild(Gx::Node *node) override;
+
         void AddChild(Control *control) override;
         void RemoveChild(Control *control) override;
 

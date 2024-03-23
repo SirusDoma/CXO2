@@ -93,17 +93,42 @@ R *State::Make(const std::string &id, Args &&... args)
     return child;
 }
 
-template<typename R>
+template<typename R, typename T>
 R *State::Instantiate(const std::string &id, ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||
-        std::is_base_of_v<sf::SoundSource, R>,
+        std::is_base_of_v<sf::SoundSource, R> ||
+        std::is_base_of_v<Gx::Node, T> ||
+        std::is_base_of_v<sf::SoundSource, T>,
         "Parameter must be a Gx::Node or sf::SoundSource"
     );
 
-    auto resource = Find<R>(id, scope);
-    return Create<R>(*resource);
+    auto prefab = Load<T>(id, scope);
+    if (!prefab)
+        return nullptr;
+
+    auto resources = m_resources.get();
+    if (scope == ResourceScope::Shared)
+        resources = &Require<Gx::ResourceManager>();
+
+    if (!resources)
+        return nullptr;
+
+    if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
+        RemoveChild(prefab);
+
+    auto name = id;
+    if (!resources->Find<T>(name))
+        name = GetName() + "/" + id;
+
+    auto resource = Create<R>(std::move(*prefab));
+    resources->Destroy<T>(name);
+
+    if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
+        AddChild(resource);
+
+    return resource;
 }
 
 template<typename R>

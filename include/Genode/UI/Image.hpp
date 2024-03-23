@@ -13,14 +13,13 @@ namespace Gx
     class Image : public Control, public Sprite
     {
     public:
-        struct Frame
+        struct Frame final
         {
-            sf::IntRect  TexCoords;
-            sf::Vector2f Origin;
-            sf::Vector2f Position;
-            float        Rotation;
-            sf::Vector2f Scale;
-            std::string  Name;
+            sf::IntRect  TexCoords = sf::IntRect();
+            sf::Vector2f Origin    = sf::Vector2f();
+            sf::Vector2f Position  = sf::Vector2f();
+            float        Rotation  = 0.f;
+            sf::Vector2f Scale     = sf::Vector2f(1.f, 1.f);
         };
 
         using Sprite::Sprite;
@@ -29,21 +28,18 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
 
         unsigned int GetFrameCount() const;
-        Frame *GetFrame(const std::string &name) const;
-        Frame *GetFrame(unsigned int index) const;
-        Frame *GetCurrentFrame() const;
+        const Frame *GetFrame(const std::string &name) const;
+        const Frame *GetFrame(unsigned int index) const;
+        const Frame *GetCurrentFrame() const;
+        const std::string &GetCurrentFrameName() const;
 
         bool ContainsFrame(const std::string &name) const;
         bool ContainsFrame(unsigned int index) const;
 
         void AddFrame(const std::string &name, const sf::IntRect &texCoords);
         void AddFrame(const std::string &name, const Frame &frame);
-
         void SetFrame(const std::string &name);
         void SetFrame(unsigned int index);
-
-        void NextFrame();
-        void PreviousFrame();
 
     protected:
         void Update(double delta) override;
@@ -52,12 +48,12 @@ namespace Gx
         void Invalidate() override;
 
     private:
-        void ApplyFrame(Frame &frame);
+        void ApplyFrame(const Frame &frame);
 
-        mutable unsigned int m_currentIndex = 0;
-        Frame *m_currentFrame = nullptr;
+        std::string m_frameName;
+        const Frame *m_currentFrame;
+        std::vector<std::string> m_indices;
         std::unordered_map<std::string, Frame> m_frames;
-        std::unordered_map<unsigned int, std::string> m_indices;
     };
 }
 

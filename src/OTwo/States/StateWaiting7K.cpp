@@ -9,6 +9,7 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 
 #include <Genode/UI/Button.hpp>
+#include <OTwo/States/Components/Waiting/MapSelector.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -28,6 +29,7 @@ void StateWaiting7K::Initialize()
 
     auto bgm         = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
     auto sfxNavigate = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
+    auto sfxTeam     = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
 
     auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (state.GetMusicHall())
@@ -80,29 +82,23 @@ void StateWaiting7K::Initialize()
     auto teamA = teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
     teamA->SetCheckedState(true);
 
-    auto mapSelector = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
-    auto map = mapSelector->FindChild<Gx::Image>("IDC_IMAGE_MAP");
-    map->SetFrame(0);
+    for (auto node : teamButtons->GetChildren())
+    {
+        auto teamButton = dynamic_cast<Gx::RadioButton*>(node);
+        if (!teamButton)
+            continue;
 
-    auto mapName = mapSelector->FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
-    mapName->SetString("Random");
+        teamButton->SetCheckStateChangeCallback([=, &mixer] (auto sender)
+        {
+            if (!sender->IsChecked())
+                return;
 
-    auto mapLeftButton = mapSelector->FindChild<Gx::Button>("IDC_BUTTON_MAP_LEFT");
-    mapLeftButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev){
-        map->PreviousFrame();
-        mapName->SetString(map->GetCurrentFrame()->Name);
+            mixer.Play(sfxTeam);
+        });
+    }
 
-        mixer.Play(sfxNavigate);
-    });
-
-    auto mapRightButton = mapSelector->FindChild<Gx::Button>("IDC_BUTTON_MAP_RIGHT");
-    mapRightButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev){
-        map->NextFrame();
-        mapName->SetString(map->GetCurrentFrame()->Name);
-
-        mixer.Play(sfxNavigate);
-    });
-
+    auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
+    mapSelector->Initialize();
 
     auto readyButton = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
     readyButton->SetVisible(false);
@@ -116,13 +112,34 @@ void StateWaiting7K::Initialize()
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
-    avatar->SetPlayer(state.GetPlayer());
-    for (auto [_, item] : items.GetDefaultItems(state.GetPlayer().Gender))
-        avatar->SetDefaultItem(item);
-//
-//    if (auto item = items.GetItem(1537); item)
-//        avatar->Equip(item);
+    //auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
+    auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
+
+    int index = 0;
+    for (auto child : avatarList->GetChildren())
+    {
+        auto avatar = dynamic_cast<Avatar*>(child);
+        if (!avatar)
+            continue;
+
+        avatar->SetPlayer(state.GetPlayer());
+
+        if (index == 0)
+        {
+            for (auto [_, item]: items.GetDefaultItems(state.GetPlayer().Gender))
+                avatar->SetDefaultItem(item);
+
+            if (auto item = items.GetItem(232); item)
+                avatar->Equip(item);
+        }
+        else
+        {
+            if (auto item = items.GetItem(1534 + index); item)
+                avatar->Equip(item);
+        }
+
+        index++;
+    }
 
     auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto& sender, auto& ev) {

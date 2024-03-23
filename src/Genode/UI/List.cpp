@@ -98,6 +98,22 @@ namespace Gx
         }
     }
 
+    void List::AddChild(Node *node)
+    {
+        if (!node || m_horizontalCounter >= m_horizontalCount)
+            return;
+
+        node->SetPosition(GetNextItemPosition());
+        IncreaseSpacingCounter();
+
+        Node::AddChild(node);
+    }
+
+    void List::RemoveChild(Node *node)
+    {
+        Node::RemoveChild(node);
+    }
+
     void List::AddChild(Control *control)
     {
         if (!control || m_horizontalCounter >= m_horizontalCount)

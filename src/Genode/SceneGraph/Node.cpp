@@ -5,12 +5,25 @@
 namespace Gx
 {
     Node::Node() :
+        Transformable(),
         m_parent(nullptr)
     {
     }
 
-    Node::~Node()
+    Node::Node(const Node &copy) :
+        Transformable(copy),
+        m_parent(copy.m_parent),
+        m_name(copy.m_name),
+        m_tag(copy.m_tag),
+        m_children(copy.m_children)
     {
+        for (auto child : m_children)
+        {
+            if (auto parent = child->GetParent(); parent)
+                parent->RemoveChild(child);
+
+            child->SetParent(this);
+        }
     }
 
     void Node::Initialize()

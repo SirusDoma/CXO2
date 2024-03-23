@@ -12,7 +12,8 @@ namespace Gx
     class Node : public Transformable
     {
     public:
-        ~Node() override;
+        Node(const Gx::Node &copy);
+        ~Node() override = default;
 
         std::string GetName() const;
         void SetName(const std::string& name);

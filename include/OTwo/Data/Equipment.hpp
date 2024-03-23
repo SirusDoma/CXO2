@@ -13,7 +13,7 @@ enum class EquipmentType
     Glasses,
     Earrings,
     Necklace,
-    Armlet,
+    Amulet,
     Accessories,
     Glove,
     Pants,
