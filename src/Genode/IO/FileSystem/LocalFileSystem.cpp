@@ -5,7 +5,6 @@
 #include <Genode/IO/FileSystem/FileInfo.hpp>
 
 #include <algorithm>
-#include <iostream>
 
 #if defined(__cpp_lib_filesystem)
 #include <filesystem>
@@ -36,6 +35,11 @@ namespace Gx
 
         if (!exists(workingDir))
             return;
+
+#ifdef __APPLE__
+        if (workingDir.string().find(".app/"))
+            workingDir = workingDir.parent_path().parent_path().parent_path();
+#endif
 
         std::filesystem::current_path(workingDir);
     }

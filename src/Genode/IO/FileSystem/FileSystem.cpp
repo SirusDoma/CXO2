@@ -35,7 +35,7 @@ namespace Gx
                 return controller->Open(name);
         }
 
-        throw ResourceAccessException(fileName, "File is not exists or not supported.");
+        throw ResourceAccessException(fileName, "File is not exists or not supported.\n" + fileName);
     }
 
     bool FileSystem::Contains(std::string &fileName)
