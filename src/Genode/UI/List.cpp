@@ -13,6 +13,7 @@ namespace Gx
     }
 
     List::List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing) :
+        m_order(Order::Vertical),
         m_verticalCount(verticalCount),
         m_verticalSpacing(verticalSpacing),
         m_horizontalCount(horizontalCount),
@@ -20,6 +21,16 @@ namespace Gx
         m_verticalCounter(),
         m_horizontalCounter()
     {
+    }
+
+    List::Order List::GetOrder() const
+    {
+        return m_order;
+    }
+
+    void List::SetOrder(List::Order order)
+    {
+        m_order = order;
     }
 
     void List::SetVerticalRepeat(int count, float spacing)
@@ -59,7 +70,7 @@ namespace Gx
         return m_horizontalSpacing;
     }
 
-    void List::Apply(std::function<void(Control *)> fun)
+    void List::Apply(const std::function<void(Control *)>& fun)
     {
         if (!fun)
             return;
@@ -79,10 +90,10 @@ namespace Gx
 
     sf::Vector2f List::GetNextItemPosition() const
     {
-        return sf::Vector2f(
-            static_cast<int>(m_horizontalSpacing * m_horizontalCounter),
-            static_cast<int>(m_verticalSpacing * m_verticalCounter)
-        );
+        return {
+            std::ceil(m_horizontalSpacing * static_cast<float>(m_horizontalCounter)),
+            std::ceil(m_verticalSpacing * static_cast<float>(m_verticalCounter))
+        };
     }
 
     void List::IncreaseSpacingCounter()
@@ -90,17 +101,29 @@ namespace Gx
         if (!IsAvailable())
             return;
 
-        m_verticalCounter++;
-        if (m_verticalCounter >= m_verticalCount)
+        if (m_order == Order::Vertical)
         {
-            m_verticalCounter = 0;
+            m_verticalCounter++;
+            if (m_verticalCounter >= m_verticalCount)
+            {
+                m_verticalCounter = 0;
+                m_horizontalCounter++;
+            }
+        }
+        else
+        {
             m_horizontalCounter++;
+            if (m_horizontalCounter >= m_horizontalCount)
+            {
+                m_horizontalCounter = 0;
+                m_verticalCounter++;
+            }
         }
     }
 
     void List::AddChild(Node *node)
     {
-        if (!node || m_horizontalCounter >= m_horizontalCount)
+        if (!node || (m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_verticalCounter >= m_verticalCount))
             return;
 
         node->SetPosition(GetNextItemPosition());
@@ -116,7 +139,7 @@ namespace Gx
 
     void List::AddChild(Control *control)
     {
-        if (!control || m_horizontalCounter >= m_horizontalCount)
+        if (!control || (m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_verticalCounter >= m_verticalCount))
             return;
 
         control->SetPosition(GetNextItemPosition());

@@ -9,6 +9,7 @@ struct ListMetadata : public TransformMetadata
     int   HorizontalCount;
     float VerticalSpacing;
     float HorizontalSpacing;
+    Gx::List::Order Order;
 
     ResourceType ItemType = ResourceType::None;
     std::string ItemName = std::string();

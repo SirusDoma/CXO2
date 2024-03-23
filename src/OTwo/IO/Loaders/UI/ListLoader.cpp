@@ -1,9 +1,10 @@
 ﻿#include <OTwo/IO/Loaders/UI/ListLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <magic_enum.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+
+#include <magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
 {
@@ -39,6 +40,15 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
         metadata.HorizontalSpacing = 0.f;
     }
 
+    auto order = attributes.find("order");
+    if (order != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gx::List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.Order = parsed.value();
+    }
+    else
+        metadata.Order = Gx::List::Order::Vertical;
+
     if (auto prefab = attributes.find("prefab"); prefab != attributes.end())
     {
         if (auto data = prefab->find("count"); data != prefab->end())
@@ -70,6 +80,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
     list->SetPosition(metadata->Position);
     list->SetScale(metadata->Scale);
     list->SetRotation(metadata->Rotation);
+    list->SetOrder(metadata->Order);
 
     if (context.Available())
     {

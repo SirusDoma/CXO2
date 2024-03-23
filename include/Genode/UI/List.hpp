@@ -9,11 +9,20 @@ namespace Gx
     class List : public virtual UiContainer
     {
     public:
+        enum Order
+        {
+            Vertical,
+            Horizontal
+        };
+
         List();
         List(int verticalCount, float verticalSpacing);
         List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
 
         ~List() override = default;
+
+        Order GetOrder() const;
+        void SetOrder(Order order);
 
         void SetVerticalRepeat(int count, float spacing);
         void SetHorizontalRepeat(int count, float spacing);
@@ -36,7 +45,7 @@ namespace Gx
 
         void ClearChildren() override;
 
-        void Apply(std::function<void(Control*)> fun);
+        void Apply(const std::function<void(Control*)>& fun);
 
     protected:
         bool IsAvailable() const;
@@ -46,6 +55,7 @@ namespace Gx
         void Invalidate() override;
 
     private:
+        Order m_order;
         int m_verticalCount, m_horizontalCount;
         float m_verticalSpacing, m_horizontalSpacing;
 
