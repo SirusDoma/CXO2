@@ -11,6 +11,7 @@ file(GLOB_RECURSE SRCS src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
+file(GLOB_RECURSE HEADERS extlibs/headers/*.h)
 include_directories(src)
 include_directories(include)
 include_directories(extlibs/headers)
@@ -23,6 +24,9 @@ set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
 set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
 set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
 add_subdirectory(extlibs/headers/clip)
+# -- Boxer Flags
+set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
+add_subdirectory(extlibs/headers/boxer)
 
 # Executable
 set(EXECUTABLE_NAME "OTwo")
@@ -44,6 +48,7 @@ if(WIN32)
     set(SFML_STATIC_LIBRARIES TRUE)
     set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET boxer PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     # Set dependencies libs path
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
@@ -62,7 +67,20 @@ elseif(APPLE)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-#    # Set dependencies libs path
+    # MacOS Bundle flag
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        BUNDLE TRUE
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER com.o2jam.${EXECUTABLE_NAME}
+        MACOSX_BUNDLE_BUNDLE_NAME ${EXECUTABLE_NAME}
+        MACOSX_BUNDLE_BUNDLE_VERSION "3.10"
+        MACOSX_BUNDLE_LONG_VERSION_STRING "3.10"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "3.10"
+        MACOSX_BUNDLE_COPYRIGHT "Copyright O2Media"
+        MACOSX_BUNDLE_OUTPUT_DIRECTORY ${OUTPUT_DIR}
+    )
+
+    # Set dependencies libs path
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
     set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
     set(OpenAL_LIB ${MODULES_DIR}/libopenal.a)
@@ -117,6 +135,9 @@ target_link_libraries(${EXECUTABLE_NAME} nlohmann_json::nlohmann_json)
 
 # Link Clip
 target_link_libraries(${EXECUTABLE_NAME} clip)
+
+# Link Boxer
+target_link_libraries(${EXECUTABLE_NAME} Boxer)
 
 # Link Magic Enum
 find_package(magic_enum CONFIG REQUIRED)
