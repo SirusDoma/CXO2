@@ -34,9 +34,6 @@ void StateRoom::Initialize()
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
-    if (auto item = items.GetItem(221); item)
-        avatar->Equip(item);
-
     auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");
 
