@@ -20,14 +20,14 @@ namespace Gx
     }
 
     ResourceContext::ResourceContext(const std::string &id, ResourceManager &resources, CacheMode mode) :
-        m_id(std::move(id)),
+        m_id(id),
         m_resources(&resources),
         m_cacheMode(mode)
     {
     }
 
     ResourceContext::ResourceContext(const std::string &id, ResourceManager *resources, CacheMode mode) :
-        m_id(std::move(id)),
+        m_id(id),
         m_resources(resources),
         m_cacheMode(mode)
     {
@@ -38,7 +38,7 @@ namespace Gx
         if (!ctx.Available())
             return ResourceContext(id);
 
-        return ResourceContext(id, ctx.m_resources, ctx.m_cacheMode);
+        return {id, ctx.m_resources, ctx.m_cacheMode};
     }
 
     const std::string &ResourceContext::GetID() const

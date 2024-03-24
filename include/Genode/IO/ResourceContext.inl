@@ -19,10 +19,10 @@ namespace Gx
             throw ResourceAccessException(id, "ResourceManager is not set within this context.");
 
         auto resource = m_resources->Find<R>(id);
-        if (!resource)
-            throw ResourceAccessException(id);
+        if (resource)
+            return *resource;
 
-        return *resource;
+        return m_resources->AddFromFile<R>(id, id, CacheMode::Reuse);
     }
 
     template<typename R>

@@ -24,10 +24,10 @@ namespace Gx
         Register<R>();
 
         auto resource = Find<R>(id);
-        if (!resource)
-            return nullptr;
+        if (resource)
+            return std::make_unique<R>(*resource);
 
-        return std::make_unique<R>(*resource);
+        return Instantiate<R>(id, id);
     }
 
     template<typename R>
@@ -62,7 +62,7 @@ namespace Gx
     {
         Register<R>();
 
-        auto resource = &AddFromStream<R>(id, deserializer, CacheMode::Reuse);
+        auto resource = &AddFromDeserializer<R>(id, deserializer, CacheMode::Reuse);
         return std::make_unique<R>(*resource);
     }
 
