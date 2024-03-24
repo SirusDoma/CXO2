@@ -46,6 +46,11 @@ void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPop
             populator.Populate(name, LoadResource<Gx::Sprite>(name, json, ctx), ctx);
             break;
         }
+        case ResourceMetadata::ResourceType::Shape:
+        {
+            populator.Populate(name, LoadResource<Gx::Shape>(name, json, ctx), ctx);
+            break;
+        }
         case ResourceMetadata::ResourceType::Image:
         {
             populator.Populate(name, LoadResource<Gx::Image>(name, json, ctx), ctx);

@@ -22,7 +22,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-
 #ifndef GENODE_GRAPHICS_CIRCLE_HPP
 #define GENODE_GRAPHICS_CIRCLE_HPP
 
@@ -39,9 +38,9 @@ namespace Gx
         float GetRadius() const;
 
         void SetPointCount(std::size_t count);
-        virtual std::size_t GetPointCount() const;
+        std::size_t GetPointCount() const override;
 
-        virtual sf::Vector2f GetPoint(std::size_t index) const;
+        sf::Vector2f GetPoint(std::size_t index) const override;
 
     private:
         float       m_radius;     

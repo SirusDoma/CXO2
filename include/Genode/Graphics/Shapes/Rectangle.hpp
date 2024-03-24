@@ -22,7 +22,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-
 #ifndef GENODE_GRAPHICS_RECTANGLE_HPP
 #define GENODE_GRAPHICS_RECTANGLE_HPP
 
@@ -38,8 +37,8 @@ namespace Gx
         void SetSize(const sf::Vector2f& size);
         const sf::Vector2f& GetSize() const;
 
-        virtual std::size_t GetPointCount() const;
-        virtual sf::Vector2f GetPoint(std::size_t index) const;
+        std::size_t GetPointCount() const override;
+        sf::Vector2f GetPoint(std::size_t index) const override;
 
     private:
         sf::Vector2f m_size;

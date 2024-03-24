@@ -66,17 +66,14 @@ namespace Gx
     {
     }
 
-    void Shape::SetTexture(const sf::Texture* texture, bool resetRect)
+    void Shape::SetTexture(const sf::Texture &texture, bool resetRect)
     {
-        if (texture)
-        {
-            // Recompute the texture area if requested, or if there was no texture & rect before
-            if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
-                SetTexCoords(sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y));
-        }
+        // Recompute the texture area if requested, or if there was no texture & rect before
+        if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
+            SetTexCoords(sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
 
         // Assign the new texture
-        m_texture = texture;
+        m_texture = &texture;
     }
 
     const sf::Texture* Shape::GetTexture() const
@@ -220,12 +217,14 @@ namespace Gx
 
     void Shape::UpdateTexCoords()
     {
+        auto convertedTextureRect = sf::FloatRect(m_textureRect);
+
         for (std::size_t i = 0; i < m_vertices.getVertexCount(); ++i)
         {
             float xratio = m_insideBounds.width > 0 ? (m_vertices[i].position.x - m_insideBounds.left) / m_insideBounds.width : 0;
             float yratio = m_insideBounds.height > 0 ? (m_vertices[i].position.y - m_insideBounds.top) / m_insideBounds.height : 0;
-            m_vertices[i].texCoords.x = m_textureRect.left + m_textureRect.width * xratio;
-            m_vertices[i].texCoords.y = m_textureRect.top + m_textureRect.height * yratio;
+            m_vertices[i].texCoords.x = convertedTextureRect.left + convertedTextureRect.width * xratio;
+            m_vertices[i].texCoords.y = convertedTextureRect.top + convertedTextureRect.height * yratio;
         }
     }
 
@@ -262,7 +261,7 @@ namespace Gx
             if (dotProduct(n2, m_vertices[0].position - p1) > 0)
                 n2 = -n2;
 
-            // Combine them to Get the extrusion direction
+            // Combine them to get the extrusion direction
             float factor = 1.f + (n1.x * n2.x + n1.y * n2.y);
             sf::Vector2f normal = (n1 + n2) / factor;
 

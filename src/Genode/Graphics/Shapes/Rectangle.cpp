@@ -53,10 +53,10 @@ namespace Gx
         switch (index)
         {
             default:
-            case 0: return sf::Vector2f(0, 0);
-            case 1: return sf::Vector2f(m_size.x, 0);
-            case 2: return sf::Vector2f(m_size.x, m_size.y);
-            case 3: return sf::Vector2f(0, m_size.y);
+            case 0: return {0, 0};
+            case 1: return {m_size.x, 0};
+            case 2: return {m_size.x, m_size.y};
+            case 3: return {0, m_size.y};
         }
     }
 

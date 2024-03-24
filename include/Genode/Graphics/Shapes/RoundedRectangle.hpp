@@ -11,40 +11,48 @@
 // subject to the following restrictions:
 //
 // 1. The origin of this software must not be misrepresented;
-//    you must not claim that you wrote the original software.
-//    If you use this software in a product, an acknowledgment
-//    in the product documentation would be appreciated but is not required.
+// you must not claim that you wrote the original software.
+// If you use this software in a product, an acknowledgment
+// in the product documentation would be appreciated but is not required.
 //
 // 2. Altered source versions must be plainly marked as such,
-//    and must not be misrepresented as being the original software.
+// and must not be misrepresented as being the original software.
 //
 // 3. This notice may not be removed or altered from any source distribution.
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_POLYGON_HPP
-#define GENODE_GRAPHICS_POLYGON_HPP
+#ifndef GENODE_GRAPHICS_ROUNDED_RECTANGLE_HPP
+#define GENODE_GRAPHICS_ROUNDED_RECTANGLE_HPP
 
 #include <Genode/Graphics/Shape.hpp>
-#include <vector>
 
 namespace Gx
 {
-    class Polygon : public Shape
+    class RoundedRectangle : public Shape
     {
     public:
-        explicit Polygon(std::size_t pointCount = 0);
+        explicit RoundedRectangle(const sf::Vector2f& size = sf::Vector2f(0, 0), float cornerRadius = 0, unsigned int cornerPointCount = 0);
 
-        void SetPointCount(std::size_t count);
+        void SetSize(const sf::Vector2f& size);
+        const sf::Vector2f& GetSize() const;
+
+        void SetCornerRadius(float radius);
+        float GetCornerRadius() const;
+
+        void SetCornerPointCount(unsigned int cornerPointCount);
+        unsigned int GetCornerPointCount() const;
+
         std::size_t GetPointCount() const override;
-
-        void SetPoint(std::size_t index, const sf::Vector2f& point);
         sf::Vector2f GetPoint(std::size_t index) const override;
 
     private:
-        std::vector<sf::Vector2f> m_points;
+        sf::Vector2f m_size;
+        float m_cornerRadius;
+        unsigned int m_cornerPointCount;
     };
 
-} 
+}
+
 
 #endif

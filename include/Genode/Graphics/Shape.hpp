@@ -40,7 +40,7 @@ namespace Gx
     public:
         virtual ~Shape();
 
-        void SetTexture(const sf::Texture* texture, bool resetRect = false);
+        void SetTexture(const sf::Texture &texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rect);
 
         void SetFillColor(const sf::Color& color);

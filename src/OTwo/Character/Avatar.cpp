@@ -149,3 +149,10 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
 
     return RenderableContainer::Render(target, states);
 }
+
+void Avatar::Clear()
+{
+    m_player = Player();
+    m_items.clear();
+    m_instrument = Instrument::None;
+}

@@ -1,10 +1,11 @@
 ﻿#include <OTwo/IO/Loaders/UI/ProgressBarLoader.hpp>
-
-#include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <OTwo/Metadata/UI/ProgressBarMetadata.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+
+#include <OTwo/Metadata/UI/ProgressBarMetadata.hpp>
+
+#include <OTwo/IO/ResourceContextDecorator.hpp>
 
 Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

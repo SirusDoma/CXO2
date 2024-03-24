@@ -24,6 +24,7 @@ public:
     bool IsEquiped(const Item* item) const;
     void Equip(const Item* item);
     void Unequip(const Item* item);
+    void Clear();
 
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
     const Instrument &GetEquipedInstrumentType() const;
@@ -49,6 +50,15 @@ private:
         { EquipmentType::Body, RenderPart::Body },
         { EquipmentType::Body, RenderPart::LeftArm },
         { EquipmentType::Body, RenderPart::RightArm },
+        { EquipmentType::LeftArm, RenderPart::Cape },
+        { EquipmentType::LeftArm, RenderPart::Body },
+        { EquipmentType::LeftArm, RenderPart::LeftArm },
+        { EquipmentType::LeftArm, RenderPart::RightArm },
+        { EquipmentType::RightArm, RenderPart::Cape },
+        { EquipmentType::RightArm, RenderPart::LeftArm },
+        { EquipmentType::RightArm, RenderPart::RightArm },
+        { EquipmentType::Jacket, RenderPart::Cape },
+        { EquipmentType::Jacket, RenderPart::Body },
         { EquipmentType::Hair, RenderPart::Cape },
         { EquipmentType::Face, RenderPart::Cape },
         { EquipmentType::Face, RenderPart::Body },
@@ -73,15 +83,6 @@ private:
         { EquipmentType::HairAccessories, RenderPart::Body },
         { EquipmentType::HairAccessories, RenderPart::LeftArm },
         { EquipmentType::HairAccessories, RenderPart::RightArm },
-        { EquipmentType::LeftArm, RenderPart::Cape },
-        { EquipmentType::LeftArm, RenderPart::Body },
-        { EquipmentType::LeftArm, RenderPart::LeftArm },
-        { EquipmentType::LeftArm, RenderPart::RightArm },
-        { EquipmentType::RightArm, RenderPart::Cape },
-        { EquipmentType::RightArm, RenderPart::LeftArm },
-        { EquipmentType::RightArm, RenderPart::RightArm },
-        { EquipmentType::Jacket, RenderPart::Cape },
-        { EquipmentType::Jacket, RenderPart::Body },
         { EquipmentType::Jacket, RenderPart::RightArm },
         { EquipmentType::Shoes, RenderPart::Cape },
         { EquipmentType::Shoes, RenderPart::Body },

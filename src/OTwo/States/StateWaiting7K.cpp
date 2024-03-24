@@ -122,11 +122,21 @@ void StateWaiting7K::Initialize()
         if (!avatar)
             continue;
 
-        avatar->SetPlayer(state.GetPlayer());
+        auto player = state.GetPlayer();
+        if (index == 2)
+        {
+            player = Player(player);
+            player.Gender = Gender::Female;
+        }
+        avatar->SetPlayer(player);
+
+        auto namePlate = avatar->FindChild<Gx::Image>("IDC_IMAGE_NAME_PLATE");
+        if (namePlate)
+            namePlate->SetColor(sf::Color::Green);
 
         if (index == 0 || index == 1 || index == 2)
         {
-            for (auto [_, item]: items.GetDefaultItems(state.GetPlayer().Gender))
+            for (auto [_, item]: items.GetDefaultItems(player.Gender))
                 avatar->SetDefaultItem(item);
 
             if (auto item = items.GetItem(232); item)

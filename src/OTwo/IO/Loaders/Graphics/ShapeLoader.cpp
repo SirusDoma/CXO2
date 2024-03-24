@@ -1,0 +1,219 @@
+﻿#include <OTwo/IO/Loaders/Graphics/ShapeLoader.hpp>
+#include <OTwo/IO/Loaders/MetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+
+#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Metadata/Graphics/ShapeMetadata.hpp>
+
+#include <Genode/Graphics/Shapes/Circle.hpp>
+#include <Genode/Graphics/Shapes/Polygon.hpp>
+#include <Genode/Graphics/Shapes/Rectangle.hpp>
+#include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
+
+#include <magic_enum.hpp>
+
+Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+{
+    auto metadata = std::make_unique<ShapeMetadata>();
+
+    auto attributes = json.at("attributes");
+    auto type = attributes.find("type");
+    if (type == attributes.end())
+        return nullptr;
+
+    if (auto parsed = magic_enum::enum_cast<ShapeMetadata::Type>(type->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+        metadata->ShapeType = parsed.value();
+    else
+        return nullptr;
+
+    if (metadata->ShapeType == ShapeMetadata::Type::Circle)
+    {
+        metadata = std::make_unique<CircleMetadata>();
+        metadata->ShapeType = ShapeMetadata::Type::Circle;
+
+        auto circle = dynamic_cast<CircleMetadata*>(metadata.get());
+
+        auto radius = attributes.find("radius");
+        if (type != attributes.end())
+            circle->Radius = radius->get<float>();
+        else
+            circle->Radius = 0;
+
+        auto pointCount = attributes.find("pointCount");
+        if (pointCount != attributes.end())
+            circle->PointCount = pointCount->get<unsigned int>();
+        else
+            circle->PointCount = 30;
+    }
+    else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
+    {
+        metadata = std::make_unique<PolygonMetadata>();
+        metadata->ShapeType = ShapeMetadata::Type::Polygon;
+
+        auto polygon = dynamic_cast<PolygonMetadata*>(metadata.get());
+        auto pointCount = attributes.find("pointCount");
+        if (pointCount != attributes.end())
+            polygon->PointCount = pointCount->get<unsigned int>();
+        else
+            polygon->PointCount = 30;
+    }
+    else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
+    {
+        metadata = std::make_unique<RectangleMetadata>();
+        metadata->ShapeType = ShapeMetadata::Type::Rectangle;
+
+        auto rectangle = dynamic_cast<RectangleMetadata*>(metadata.get());
+        auto width = attributes.find("width");
+        if (width != attributes.end())
+            rectangle->Width = width->get<unsigned int>();
+        else
+            rectangle->Width = 0;
+
+        auto height = attributes.find("height");
+        if (height != attributes.end())
+            rectangle->Height = height->get<unsigned int>();
+        else
+            rectangle->Height = 0;
+    }
+    else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
+    {
+        metadata = std::make_unique<RoundedRectangleMetadata>();
+        metadata->ShapeType = ShapeMetadata::Type::RoundedRectangle;
+
+        auto rectangle = dynamic_cast<RoundedRectangleMetadata*>(metadata.get());
+        auto width = attributes.find("width");
+        if (width != attributes.end())
+            rectangle->Width = width->get<unsigned int>();
+        else
+            rectangle->Width = 0;
+
+        auto height = attributes.find("height");
+        if (height != attributes.end())
+            rectangle->Height = height->get<unsigned int>();
+        else
+            rectangle->Height = 0;
+
+        auto radius = attributes.find("cornerRadius");
+        if (type != attributes.end())
+            rectangle->CornerRadius = radius->get<float>();
+        else
+            rectangle->CornerRadius = 1.f;
+
+        auto pointCount = attributes.find("cornerPointCount");
+        if (pointCount != attributes.end())
+            rectangle->CornerPointCount = pointCount->get<unsigned int>();
+        else
+            rectangle->CornerPointCount = 30;
+    }
+    else
+        return nullptr;
+
+    if (!MetadataLoader::Parse(json, *metadata, context))
+        return nullptr;
+
+    if (auto transform = attributes.find("transform"); transform != attributes.end())
+        TransformLoader::ParseMetadata(transform.value(), *metadata, context);
+
+    auto color = attributes.find("color");
+    if (color != attributes.end())
+    {
+        unsigned int a, r, g, b;
+        color->at("a").get_to(a);
+        color->at("r").get_to(r);
+        color->at("g").get_to(g);
+        color->at("b").get_to(b);
+        metadata->Color = sf::Color(r, g, b, a);
+    }
+    else
+        metadata->Color = sf::Color::Black;
+
+    if (auto it = attributes.find("outlineThickness"); it != attributes.end())
+        metadata->OutlineThickness = it->get<float>();
+    else
+        metadata->OutlineThickness = 0.f;
+
+    auto outlineColor = attributes.find("outlineColor");
+    if (outlineColor != attributes.end())
+    {
+        unsigned int a, r, g, b;
+        outlineColor->at("a").get_to(a);
+        outlineColor->at("r").get_to(r);
+        outlineColor->at("g").get_to(g);
+        outlineColor->at("b").get_to(b);
+        metadata->OutlineColor = sf::Color(r, g, b, a);
+    }
+    else
+        metadata->OutlineColor = sf::Color::Transparent;
+
+    auto texCoords  = attributes.find("texCoords");
+    if (texCoords != attributes.end())
+    {
+        unsigned int x, y, w, h;
+        texCoords->at("x").get_to(x);
+        texCoords->at("y").get_to(y);
+        texCoords->at("width").get_to(w);
+        texCoords->at("height").get_to(h);
+        metadata->TexCoords = sf::IntRect(x, y, w, h);
+    }
+    
+    return LoadFromMetadata(*metadata, context);
+}
+
+Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+{
+    auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
+    if (!metadata)
+        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+    
+    std::unique_ptr<Gx::Shape> shape;
+    if (metadata->ShapeType == ShapeMetadata::Circle)
+    {
+        auto circle = dynamic_cast<const CircleMetadata*>(&meta);
+        shape = std::make_unique<Gx::Circle>(circle->Radius, circle->PointCount);
+
+    }
+    else if (metadata->ShapeType == ShapeMetadata::Polygon)
+    {
+        auto polygon = dynamic_cast<const PolygonMetadata*>(&meta);
+        shape = std::make_unique<Gx::Polygon>(polygon->PointCount);
+    }
+    else if (metadata->ShapeType == ShapeMetadata::Rectangle)
+    {
+        auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta);
+        shape = std::make_unique<Gx::Rectangle>(sf::Vector2f(rectangle->Width, rectangle->Height));
+    }
+    else if (metadata->ShapeType == ShapeMetadata::RoundedRectangle)
+    {
+        auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta);
+        shape = std::make_unique<Gx::RoundedRectangle>(sf::Vector2f(rectangle->Width, rectangle->Height), rectangle->CornerRadius, rectangle->CornerPointCount);
+    }
+
+    shape->SetTexCoords(metadata->TexCoords);
+
+    auto ctx = ResourceContextDecorator::Decorate(context);
+    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+        shape->SetTexture(*texture);
+
+    shape->SetColor(metadata->Color);
+    shape->SetOutlineThickness(metadata->OutlineThickness);
+    shape->SetOutlineColor(metadata->OutlineColor);
+    shape->SetOrigin(metadata->Origin);
+    shape->SetPosition(metadata->Position);
+    shape->SetScale(metadata->Scale);
+    shape->SetRotation(metadata->Rotation);
+
+    auto populator = ObjectPopulator::Decorate(shape.get());
+    if (!metadata->Objects.empty())
+    {
+        for (auto [key, object] : metadata->Objects)
+        {
+            auto name = meta.Name + "/" + key;
+            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+
+            ObjectLoader::Load(name, object, populator, objectCtx);
+        }
+    }
+
+    return shape;
+}

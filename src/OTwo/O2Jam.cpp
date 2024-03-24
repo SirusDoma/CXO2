@@ -7,6 +7,7 @@
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/ShapeLoader.hpp>
 #include <OTwo/IO/Loaders/Audio/SoundLoader.hpp>
 #include <OTwo/IO/Loaders/Audio/MusicLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
@@ -65,6 +66,7 @@ void O2Jam::Boot()
     // Basic Resource
     Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Shape, ShapeLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Sound, SoundLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();

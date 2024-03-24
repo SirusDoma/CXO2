@@ -1,8 +1,10 @@
 #include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
+#include <OTwo/IO/Loaders/MetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <OTwo/Metadata/Avatar/AvatarMetadata.hpp>
-#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <OTwo/IO/Loaders/MetadataLoader.hpp>
+
 
 Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
@@ -33,6 +35,18 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
     avatar->SetPosition(metadata->Position);
     avatar->SetScale(metadata->Scale);
     avatar->SetRotation(metadata->Rotation);
+
+    auto populator = ObjectPopulator::Decorate(avatar.get());
+    if (!metadata->Objects.empty())
+    {
+        for (auto [key, object] : metadata->Objects)
+        {
+            auto name = meta.Name + "/" + key;
+            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+
+            ObjectLoader::Load(name, object, populator, objectCtx);
+        }
+    }
 
     return avatar;
 }

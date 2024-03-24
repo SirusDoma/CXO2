@@ -10,6 +10,7 @@
 #include <Genode/Graphics/Shapes/Circle.hpp>
 #include <Genode/Graphics/Shapes/Polygon.hpp>
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
+#include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 
 #endif

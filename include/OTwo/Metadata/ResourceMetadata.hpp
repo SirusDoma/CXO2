@@ -27,6 +27,7 @@ struct ResourceMetadata
 
         // Graphics
         Sprite,
+        Shape,
         Image,
         Animation,
         Avatar,

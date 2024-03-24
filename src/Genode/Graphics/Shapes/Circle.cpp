@@ -60,11 +60,10 @@ namespace Gx
     {
         static const float pi = 3.141592654f;
 
-        float angle = index * 2 * pi / m_pointCount - pi / 2;
+        float angle = static_cast<float>(index) * 2 * pi / static_cast<float>(m_pointCount) - pi / 2;
         float x = std::cos(angle) * m_radius;
         float y = std::sin(angle) * m_radius;
 
-        return sf::Vector2f(m_radius + x, m_radius + y);
+        return {m_radius + x, m_radius + y};
     }
-
 }
