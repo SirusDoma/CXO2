@@ -107,7 +107,7 @@ void Avatar::Update(double delta)
 {
     UpdatableContainer::Update(delta);
 
-    for (auto [type, part] : RENDER_ORDER)
+    for (auto [type, part] : RENDER_LAYER_ORDER)
     {
         auto iterator = m_items.find(type);
         if (iterator == m_items.end())
@@ -126,7 +126,7 @@ sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates state
 {
     states.transform *= GetTransform();
 
-    for (auto [type, part] : RENDER_ORDER)
+    for (auto [type, part] : RENDER_LAYER_ORDER)
     {
         auto iterator = m_items.find(type);
         if (iterator == m_items.end())
