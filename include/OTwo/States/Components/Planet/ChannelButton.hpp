@@ -41,7 +41,7 @@ public:
 private:
     using StateMap = std::unordered_map<Mode, std::unordered_map<Gx::RadioButton::State, sf::IntRect>>;
 
-    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
     void OnControlStateChanged(Control *sender, State state) override;
     void Invalidate() override;
 

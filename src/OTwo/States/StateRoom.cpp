@@ -201,16 +201,6 @@ void StateRoom::Initialize()
     mixer.Play(bgm, "BGM");
 }
 
-void StateRoom::Update(double delta)
-{
-    Scene::Update(delta);
-}
-
-sf::RenderStates StateRoom::Render(sf::RenderTarget &target, sf::RenderStates states) const
-{
-    return Scene::Render(target, states);
-}
-
 void StateRoom::OnBackClicked()
 {
     auto& director = GetDirector();

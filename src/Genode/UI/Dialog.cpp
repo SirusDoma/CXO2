@@ -172,7 +172,7 @@ namespace Gx
         OnClose();
     }
 
-    sf::RenderStates Dialog::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Dialog::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

@@ -33,20 +33,20 @@
 namespace Gx
 {
     Sprite::Sprite() :
-        m_texture(NULL),
+        m_texture(nullptr),
         m_texcoords()
     {
     }
 
     Sprite::Sprite(const sf::Texture& texture) :
-        m_texture(NULL),
+        m_texture(nullptr),
         m_texcoords()
     {
         SetTexture(texture);
     }
 
     Sprite::Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) :
-        m_texture(NULL),
+        m_texture(nullptr),
         m_texcoords()
     {
         SetTexture(texture);
@@ -57,7 +57,7 @@ namespace Gx
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
         if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))
-            SetTexCoords(sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
+            SetTexCoords(sf::IntRect(0, 0, static_cast<int>(texture.getSize().x), static_cast<int>(texture.getSize().y)));
 
         // Assign the new texture
         m_texture = &texture;
@@ -99,10 +99,10 @@ namespace Gx
 
     sf::FloatRect Sprite::GetLocalBounds() const
     {
-        float width = static_cast<float>(std::abs(m_texcoords.width));
-        float height = static_cast<float>(std::abs(m_texcoords.height));
+        auto width = static_cast<float>(std::abs(m_texcoords.width));
+        auto height = static_cast<float>(std::abs(m_texcoords.height));
 
-        return sf::FloatRect(0.f, 0.f, width, height);
+        return {0.f, 0.f, width, height};
     }
 
     sf::FloatRect Sprite::GetGlobalBounds() const
@@ -119,7 +119,7 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    sf::RenderStates Sprite::Render(sf::RenderTarget& target, sf::RenderStates states) const
+    RenderStates Sprite::Render(sf::RenderTarget& target, RenderStates states) const
     {
         if (m_texture)
         {
@@ -143,10 +143,10 @@ namespace Gx
 
     void Sprite::UpdateTexCoords()
     {
-        float left = static_cast<float>(m_texcoords.left);
-        float right = left + m_texcoords.width;
-        float top = static_cast<float>(m_texcoords.top);
-        float bottom = top + m_texcoords.height;
+        auto left = static_cast<float>(m_texcoords.left);
+        float right = left + static_cast<float>(m_texcoords.width);
+        auto top = static_cast<float>(m_texcoords.top);
+        float bottom = top + static_cast<float>(m_texcoords.height);
 
         m_vertices[0].texCoords = sf::Vector2f(left, top);
         m_vertices[1].texCoords = sf::Vector2f(left, bottom);

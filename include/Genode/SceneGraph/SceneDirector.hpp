@@ -21,7 +21,7 @@ namespace Gx
         SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene);
         ~SceneDirector() override;
 
-        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
+        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(sf::Event ev) override;
 

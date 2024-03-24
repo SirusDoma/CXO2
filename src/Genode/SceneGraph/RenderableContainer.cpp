@@ -10,7 +10,7 @@ namespace Gx
     {
     }
 
-    sf::RenderStates RenderableContainer::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates RenderableContainer::Render(sf::RenderTarget &target, RenderStates states) const
     {
         for (auto node : GetChildren())
         {

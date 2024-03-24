@@ -124,7 +124,7 @@ void StateWaiting7K::Initialize()
 
         avatar->SetPlayer(state.GetPlayer());
 
-        if (index == 0)
+        if (index == 0 || index == 1 || index == 2)
         {
             for (auto [_, item]: items.GetDefaultItems(state.GetPlayer().Gender))
                 avatar->SetDefaultItem(item);

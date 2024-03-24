@@ -122,7 +122,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    sf::RenderStates ProgressBar::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates ProgressBar::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (m_texture)
         {

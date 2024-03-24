@@ -83,7 +83,7 @@ namespace Gx
         return *m_application;
     }
 
-    sf::RenderStates SceneDirector::Render(sf::RenderTarget& target, sf::RenderStates states) const
+    RenderStates SceneDirector::Render(sf::RenderTarget& target, RenderStates states) const
     {
         if (m_currentScene)
             return m_currentScene->Render(target, states);

@@ -14,11 +14,11 @@ class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public G
 {
 public:
     Avatar();
-    Avatar(Player playerInfo);
+    explicit Avatar(const Player& playerInfo);
 
     const Player &GetPlayer() const;
 
-    void SetPlayer(const Player& playerInfo);
+    void SetPlayer(const Player &playerInfo);
     void SetDefaultItem(const Item *item);
 
     bool IsEquiped(const Item* item) const;
@@ -29,7 +29,8 @@ public:
     const Instrument &GetEquipedInstrumentType() const;
 
 private:
-    using ItemMap = std::unordered_map<EquipmentType, const Item*>;
+    using ItemMap            = std::unordered_map<EquipmentType, const Item*>;
+    using RenderableStateMap = std::unordered_map<const Gx::Updatable*, unsigned int>;
 
     constexpr static const std::pair<EquipmentType, RenderPart> RENDER_LAYER_ORDER[] = {
         { EquipmentType::Costume, RenderPart::Cape },
@@ -135,11 +136,14 @@ private:
     };
 
     void Update(double delta) override;
-    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
 
     Player     m_player;
     Instrument m_instrument;
     ItemMap    m_items, m_defaultItems;
+
+    static unsigned int m_lastFrameID;
+    static RenderableStateMap m_renderableStates;
 };
 
 #endif

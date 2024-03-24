@@ -119,7 +119,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    sf::RenderStates Number::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Number::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

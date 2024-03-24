@@ -33,7 +33,7 @@ namespace Gx
         const Sprite GetStateFrame(Button::State state) const;
         Sprite *GetSprite() const;
 
-        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
+        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
         void Invalidate() override;
 
     private:

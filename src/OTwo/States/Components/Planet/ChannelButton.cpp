@@ -22,8 +22,6 @@ void ChannelButton::Initialize()
     if (!parent || m_initialized)
         return;
 
-    // TODO: FIX ALL CHANNEL BUTTON USING SAME CHILDREN POINTERS
-    // MOVE GX::LIST DECLARATION TO CHANNELBOARD.JSON
     m_numberIndicator   = FindChild<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
     m_nameIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NAME");
     m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");;
@@ -70,9 +68,9 @@ void ChannelButton::SetChannelPopulation(unsigned int population)
         return;
 
     float percentage = static_cast<float>(population) / 20.0f;
-    m_populationCounter->SetValue(static_cast<int>(std::ceil(percentage) * 20.0f));
+    m_populationCounter->SetValue(std::ceil(percentage) * 20.0f);
 
-    m_fullIndicator->SetVisible(m_population >= m_populationCounter->GetMaximumValue());
+    m_fullIndicator->SetVisible(static_cast<float>(m_population) >= m_populationCounter->GetMaximumValue());
     m_populationCounter->SetVisible(!m_fullIndicator->IsVislble());
 }
 
@@ -128,7 +126,6 @@ void ChannelButton::SetMusicHall(MusicHall hall)
             return;
     }
 
-    int size = m_states.size();
     if (auto it = m_states.find(mode); it != m_states.end())
     {
         for (auto [state, frame] : it->second)
@@ -136,7 +133,7 @@ void ChannelButton::SetMusicHall(MusicHall hall)
     }
 }
 
-sf::RenderStates ChannelButton::Render(sf::RenderTarget &target, sf::RenderStates states) const
+Gx::RenderStates ChannelButton::Render(sf::RenderTarget &target, Gx::RenderStates states) const
 {
     return CheckBox::Render(target, states);
 }

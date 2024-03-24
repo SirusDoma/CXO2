@@ -37,7 +37,7 @@ public:
     void PushSystemMessage(const std::string &chat);
 
 private:
-    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
     void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
     void Invalidate() override;
 

@@ -54,7 +54,7 @@ private:
     void CaptureCurrentState();
 
     void Update(double delta) override;
-    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
 
     void Invalidate() override;
 

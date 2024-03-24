@@ -110,7 +110,7 @@ namespace Gx
         }
     }
 
-    sf::RenderStates Scene::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Scene::Render(sf::RenderTarget &target, RenderStates states) const
     {
         m_view = target.getView();
         states = RenderableContainer::Render(target, states);

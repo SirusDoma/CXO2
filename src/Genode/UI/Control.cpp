@@ -196,7 +196,7 @@ namespace Gx
             Node::RemoveChild(node);
     }
 
-    sf::RenderStates Control::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Control::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

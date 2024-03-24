@@ -116,7 +116,7 @@ namespace Gx
         void EnsureGeometryUpdate() const;
         virtual void OnGeometryUpdated() const {};
 
-        sf::RenderStates Render(sf::RenderTarget& target, sf::RenderStates states) const override;
+        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
 
     private:
         using ColorMap = std::unordered_map<size_t, sf::Color>;

@@ -181,7 +181,7 @@ namespace Gx
         SetValue(m_value - (m_step == 0 ? 1 : m_step));
     }
 
-    sf::RenderStates ScrollBar::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates ScrollBar::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

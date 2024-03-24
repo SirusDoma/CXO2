@@ -129,7 +129,7 @@ void ChatWindow::PushSystemMessage(const std::string &chat)
     PushMessage(Player{0}, chat);
 }
 
-sf::RenderStates ChatWindow::Render(sf::RenderTarget &target, sf::RenderStates states) const
+Gx::RenderStates ChatWindow::Render(sf::RenderTarget &target, Gx::RenderStates states) const
 {
     states = UiContainer::Render(target, states);
     for (auto& label : m_labels)

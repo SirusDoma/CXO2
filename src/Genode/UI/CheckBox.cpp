@@ -24,7 +24,7 @@ namespace Gx
         m_onCheckStateChanged = std::move(callback);
     }
 
-    sf::RenderStates CheckBox::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates CheckBox::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

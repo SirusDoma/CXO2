@@ -69,7 +69,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetDoubleClickCallback();
 
         void Update(double delta) override;
-        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
         bool Input(sf::Event ev) override;
 
         void OnMouseMove(sf::Event::MouseMoveEvent ev) override;

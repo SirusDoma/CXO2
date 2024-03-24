@@ -2,6 +2,9 @@
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/Equipment.hpp>
 
+Avatar::RenderableStateMap Avatar::m_renderableStates;
+unsigned int Avatar::m_lastFrameID = 0;
+
 Avatar::Avatar() :
     m_player(),
     m_instrument(Instrument::None),
@@ -10,7 +13,7 @@ Avatar::Avatar() :
 {
 }
 
-Avatar::Avatar(Player playerInfo) :
+Avatar::Avatar(const Player &playerInfo) :
     m_player(),
     m_instrument(Instrument::None),
     m_items(),
@@ -105,27 +108,23 @@ const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems()
 
 void Avatar::Update(double delta)
 {
+    // Item instance are shared between multiple instances of Avatar
+    // Therefore, we need to avoid making multiple Update calls on the item animations.
+    // To do that, we need "Frame ID" from the RenderStates. Thus, the animation update need to be done in Render()
     UpdatableContainer::Update(delta);
-
-    for (auto [type, part] : RENDER_LAYER_ORDER)
-    {
-        auto iterator = m_items.find(type);
-        if (iterator == m_items.end())
-            continue;
-
-        auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
-        if (animation)
-            animation->Update(delta);
-
-        if (type == EquipmentType::Costume && part == RenderPart::Body)
-            break;
-    }
 }
 
-sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates states) const
+Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates states) const
 {
     states.transform *= GetTransform();
 
+    // This will prevent static state map from growing non-stop
+    if (m_lastFrameID != states.FrameID)
+    {
+        m_renderableStates.clear();
+        m_lastFrameID = states.FrameID;
+    }
+
     for (auto [type, part] : RENDER_LAYER_ORDER)
     {
         auto iterator = m_items.find(type);
@@ -134,7 +133,15 @@ sf::RenderStates Avatar::Render(sf::RenderTarget &target, sf::RenderStates state
 
         auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
         if (animation)
+        {
+            // Item and its Animation instances are shared across multiple instances of Avatar.
+            // Make sure to update the animation only once, otherwise the animation might be played at speed-up pace
+            if (m_renderableStates[animation] != states.FrameID)
+                animation->Update(states.Delta);
+
             animation->Render(target, states);
+            m_renderableStates[animation] = states.FrameID;
+        }
 
         if (type == EquipmentType::Costume && part == RenderPart::Body)
             break;

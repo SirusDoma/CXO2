@@ -73,7 +73,7 @@ namespace Gx
 {
     Text::Text() :
         m_string             (),
-        m_font               (NULL),
+        m_font               (nullptr),
         m_characterSize      (30),
         m_letterSpacingFactor(1.f),
         m_lineSpacingFactor  (1.f),
@@ -370,7 +370,7 @@ namespace Gx
         return GetTransform().transformRect(GetLocalBounds());
     }
 
-    sf::RenderStates Text::Render(sf::RenderTarget& target, sf::RenderStates states) const
+    RenderStates Text::Render(sf::RenderTarget& target, RenderStates states) const
     {
         if (m_font)
         {

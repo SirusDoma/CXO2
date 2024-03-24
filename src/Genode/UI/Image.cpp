@@ -106,7 +106,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    sf::RenderStates Image::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Image::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

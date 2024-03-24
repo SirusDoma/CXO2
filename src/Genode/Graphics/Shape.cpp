@@ -50,7 +50,7 @@ namespace
 namespace Gx
 {
     Shape::Shape() :
-        m_texture(NULL),
+        m_texture(nullptr),
         m_textureRect(),
         m_fillColor(255, 255, 255),
         m_outlineColor(255, 255, 255),
@@ -194,7 +194,7 @@ namespace Gx
         UpdateOutline();
     }
 
-    sf::RenderStates Shape::Render(sf::RenderTarget& target, sf::RenderStates states) const
+    RenderStates Shape::Render(sf::RenderTarget& target, RenderStates states) const
     {
         states.transform *= GetTransform();
 
@@ -205,7 +205,7 @@ namespace Gx
         // Render the outline
         if (m_outlineThickness != 0)
         {
-            states.texture = NULL;
+            states.texture = nullptr;
             target.draw(m_outlineVertices, states);
         }
 

@@ -49,7 +49,7 @@ namespace Gx
 
     protected:
         void OnKeyDown(sf::Event::KeyEvent ev) override;
-        sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
+        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
 
         virtual void OnShown(Scene &scene);
         virtual void OnClose();

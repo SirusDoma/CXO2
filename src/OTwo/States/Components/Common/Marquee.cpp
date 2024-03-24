@@ -1,11 +1,13 @@
 #include <OTwo/States/Components/Common/Marquee.hpp>
 
 Marquee::Marquee() :
-    m_renderTexture(std::make_unique<sf::RenderTexture>())
+    m_renderTexture(std::make_unique<sf::RenderTexture>()),
+    m_speed()
 {
 }
 
 Marquee::Marquee(const Marquee &copy) :
+    Gx::Label(copy),
     m_renderTexture(std::move(copy.m_renderTexture)),
     m_bounds(copy.m_bounds),
     m_speed(copy.m_speed)
@@ -21,7 +23,7 @@ void Marquee::SetLocalBounds(const sf::FloatRect &bounds)
 {
     m_bounds = bounds;
 
-    m_renderTexture->create(m_bounds.width, m_bounds.height);
+    m_renderTexture->create(static_cast<unsigned int>(m_bounds.width), static_cast<unsigned int>(m_bounds.height));
     m_renderTexture->setSmooth(true);
 
     m_sprite.SetTexture(m_renderTexture->getTexture(), true);
@@ -55,12 +57,12 @@ void Marquee::Update(double delta)
 
     m_renderTexture->clear(sf::Color::Transparent);
     {
-        Text::Render(*m_renderTexture, sf::RenderStates::Default);
+        Text::Render(*m_renderTexture, Gx::RenderStates::Default);
     }
     m_renderTexture->display();
 }
 
-sf::RenderStates Marquee::Render(sf::RenderTarget &target, sf::RenderStates states) const
+Gx::RenderStates Marquee::Render(sf::RenderTarget &target, Gx::RenderStates states) const
 {
     auto transform = GetTransform();
     states.transform *= transform.translate(-GetPosition());

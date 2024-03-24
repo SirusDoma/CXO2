@@ -161,7 +161,7 @@ namespace Gx
         UpdatableContainer::Update(delta);
     }
 
-    sf::RenderStates Animation::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Animation::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!m_visible)
             return states;

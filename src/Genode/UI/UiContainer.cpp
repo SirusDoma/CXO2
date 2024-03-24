@@ -72,7 +72,7 @@ namespace Gx
         }
     }
 
-    sf::RenderStates UiContainer::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates UiContainer::Render(sf::RenderTarget &target, RenderStates states) const
     {
         return Control::Render(target, states);
     }

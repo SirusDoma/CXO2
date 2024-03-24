@@ -25,9 +25,6 @@ public:
     void Initialize() override;
 
 private:
-    void Update(double delta) override;
-    sf::RenderStates Render(sf::RenderTarget &target, sf::RenderStates states) const override;
-
     void OnBackClicked();
 
     OptionDialog m_optionDialog;

@@ -15,7 +15,7 @@ namespace Gx
             Invalidate();
     }
 
-    sf::RenderStates Label::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Label::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;

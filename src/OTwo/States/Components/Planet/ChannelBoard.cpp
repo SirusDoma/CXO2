@@ -407,7 +407,7 @@ void ChannelBoard::Update(double delta)
     TaskContainer::Update(delta);
 }
 
-sf::RenderStates ChannelBoard::Render(sf::RenderTarget &target, sf::RenderStates states) const
+Gx::RenderStates ChannelBoard::Render(sf::RenderTarget &target, Gx::RenderStates states) const
 {
     if (m_animationEnabled)
         target.draw(m_duplicateImage, states);

@@ -18,15 +18,15 @@ namespace Gx
 {
     class Scene;
     class Module;
-    class Application : NonCopyable
+    class Application : NonCopyable, public Gx::Renderable, public Gx::Updatable
     {
     public:
-        const std::string TITLE = "O2-JAM";
         static Application &Instance();
 
-        explicit Application(sf::VideoMode mode, bool fullScreen = false);
-        Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
-        virtual ~Application() = default;
+        explicit Application(const std::string &title, sf::VideoMode mode, bool fullScreen = false);
+        Application(const std::string &title, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
+
+        ~Application() override = default;
 
         int Start();
         int Start(Scene &scene);
@@ -65,6 +65,10 @@ namespace Gx
 
         virtual void Boot();
         virtual void Shutdown();
+
+        void Update(double delta) override;
+        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
         virtual void OnInputReceived(sf::Event ev);
@@ -97,6 +101,8 @@ namespace Gx
         ModuleMap        m_modules;
         ModuleFactoryMap m_factories;
 
+        const std::string m_title;
+        unsigned int m_frameID;
         unsigned int m_frames;
         unsigned int m_renderFreq;
         bool m_fullScreen;

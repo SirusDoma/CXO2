@@ -365,7 +365,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    sf::RenderStates TextBox::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates TextBox::Render(sf::RenderTarget &target, RenderStates states) const
     {
         states.transform *= GetTransform();
         if (m_caret.SelectionLength != 0)
@@ -606,7 +606,7 @@ namespace Gx
         m_highlight.SetColor(color);
     }
 
-    sf::RenderStates TextBox::Caret::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates TextBox::Caret::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!m_visible)
             return states;

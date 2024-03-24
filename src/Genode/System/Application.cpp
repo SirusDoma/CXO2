@@ -6,16 +6,19 @@
 
 namespace Gx
 {
-    Application::Application(sf::VideoMode mode, bool fullScreen)
-        : Application::Application(mode, mode, fullScreen)
+    Application::Application(const std::string &title, sf::VideoMode mode, bool fullScreen)
+        : Application::Application(title, mode, mode, fullScreen)
     {
     }
 
-    Application::Application(sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
-        m_window(mode, Application::TITLE, fullScreen ? sf::Style::Fullscreen : sf::Style::Titlebar | sf::Style::Close),
+    Application::Application(const std::string &title, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
+        m_window(mode, title, fullScreen ? sf::Style::Fullscreen : sf::Style::Titlebar | sf::Style::Close),
+        m_title(title),
         m_timer(),
         m_renderFreq(0),
+        m_frameID(0),
         m_frames(0),
+        m_event(),
         m_cursor(),
         m_resources(),
         m_director(SceneDirector(*this, m_window))
@@ -97,8 +100,8 @@ namespace Gx
             m_window.clear(sf::Color::White);
             {
                 // Game routine (update + render)
-                m_director.Update(delta);
-                m_director.Render(m_window, sf::RenderStates::Default);
+                Update(delta);
+                Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
             }
             m_window.display();
 
@@ -110,7 +113,7 @@ namespace Gx
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
-                m_window.setTitle(TITLE + " [FPS: " + std::to_string(m_renderFreq) + "]");
+                m_window.setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta = 0.0f;
             }
@@ -145,12 +148,23 @@ namespace Gx
         return m_director;
     }
 
+
     void Application::Boot()
     {
     }
 
     void Application::Shutdown()
     {
+    }
+
+    void Application::Update(double delta)
+    {
+        m_director.Update(delta);
+    }
+
+    RenderStates Application::Render(sf::RenderTarget &target, RenderStates states) const
+    {
+        return m_director.Render(m_window, states);
     }
 
     void Application::Close()
@@ -250,4 +264,5 @@ namespace Gx
     {
         return m_window;
     }
+
 }

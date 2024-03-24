@@ -86,7 +86,7 @@ namespace Gx
         OnControlClick(this, sf::Event::MouseButtonEvent{});
     }
 
-    sf::RenderStates Button::Render(sf::RenderTarget &target, sf::RenderStates states) const
+    RenderStates Button::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (!IsVislble())
             return states;
