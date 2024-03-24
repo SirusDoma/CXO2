@@ -19,7 +19,7 @@
 class Item
 {
 public:
-    Item();
+    Item() = default;
 
     unsigned int GetID() const;
     void SetID(unsigned int id);

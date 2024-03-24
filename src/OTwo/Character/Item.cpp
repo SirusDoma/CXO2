@@ -4,18 +4,9 @@
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/Equipment.hpp>
 
-
-Item::Item() :
-    m_prices(),
-    m_smallPreview(),
-    m_largePreview(),
-    m_renderables()
-{
-}
-
 unsigned int Item::GetID() const
 {
-    return 0;
+    return m_id;
 }
 
 void Item::SetID(unsigned int id)
