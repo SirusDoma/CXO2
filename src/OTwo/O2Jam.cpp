@@ -91,8 +91,6 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<RoomContainer, RoomContainerLoader>();
     Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
-//    Gx::ResourceLoaderFactory::Register<OptionDialog, OptionDialogLoader>();
-//    Gx::ResourceLoaderFactory::Register<CreateRoomDialog, CreateRoomDialogLoader>();
     // Avatar
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
@@ -176,7 +174,7 @@ void O2Jam::Boot()
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
 
-    director.Present<StatePlanet>();
+    director.Present<StateAvi>();
 }
 
 void O2Jam::Shutdown()
@@ -202,7 +200,7 @@ void O2Jam::OnFocusChanged(bool focus)
 
     if (focus)
     {
-        mixer.SetVolume(config.MusicVolume);
+        mixer.SetVolume(static_cast<float>(config.MusicVolume));
         if (director.IsPresenting<StateAvi>())
             return;
 
