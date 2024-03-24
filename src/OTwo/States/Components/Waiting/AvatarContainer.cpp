@@ -33,7 +33,7 @@ void AvatarContainer::Invalidate()
     if (!m_player || m_player->ID == 0)
     {
         if (auto avatar = FindChild<Avatar>("IDC_AVATAR"); avatar)
-            avatar->Clear();
+            avatar->ClearEquipments();
 
         if (auto nickname = FindChild<Gx::Label>("IDC_TEXT_NICKNAME"); nickname)
         {

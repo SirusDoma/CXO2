@@ -9,8 +9,8 @@
 class UserState : public Gx::Module
 {
 public:
-    const Player &GetPlayer() const;
-    void SetPlayer(const Player &player);
+    const Player &GetCurrentPlayer() const;
+    void SetCurrentPlayer(const Player &player);
 
     PlanetType GetPlanet() const;
     void SetPlanet(PlanetType planet);

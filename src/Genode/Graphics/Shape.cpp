@@ -133,7 +133,7 @@ namespace Gx
     void Shape::SetColor(const sf::Color& color)
     {
         SetFillColor(color);
-        SetOutlineColor(color);
+        //SetOutlineColor(color);
     }
 
     sf::FloatRect Shape::GetLocalBounds() const

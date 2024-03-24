@@ -11,6 +11,7 @@
 #include <OTwo/States/Components/Room/UserList.hpp>
 #include <OTwo/States/Components/Room/RoomContainer.hpp>
 #include <OTwo/States/Components/Room/RoomButton.hpp>
+#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>
@@ -159,6 +160,11 @@ void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPop
         case ResourceMetadata::ResourceType::RoomButton:
         {
             populator.Populate(name, LoadResource<RoomButton>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::AvatarInfo:
+        {
+            populator.Populate(name, LoadResource<AvatarInfo>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::None:

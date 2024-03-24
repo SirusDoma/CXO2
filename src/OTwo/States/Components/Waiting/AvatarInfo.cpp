@@ -1,0 +1,58 @@
+#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <Genode/UI/Label.hpp>
+
+void AvatarInfo::Initialize()
+{
+    Node::Initialize();
+    Invalidate();
+}
+
+RoomMember *AvatarInfo::GetMember() const
+{
+    return m_member;
+}
+
+const sf::Color &AvatarInfo::GetTeamColor(RoomTeam team)
+{
+    return m_teamColors[team];
+}
+
+void AvatarInfo::SetMember(RoomMember &member)
+{
+    m_member = &member;
+    Invalidate();
+}
+
+void AvatarInfo::RegisterTeamColor(RoomTeam team, const sf::Color &color)
+{
+    m_teamColors[team] = color;
+}
+
+void AvatarInfo::Reset()
+{
+    m_member = nullptr;
+    Invalidate();
+}
+
+void AvatarInfo::Invalidate()
+{
+    UiContainer::Invalidate();
+
+    auto plate = FindChild<Gx::Colorable>("IDC_IMAGE_NAME_PLATE");
+    if (plate)
+    {
+        if (m_member)
+            plate->SetColor(GetTeamColor(m_member->Team));
+        else
+            plate->SetColor(sf::Color::Transparent);
+    }
+
+    auto label = FindChild<Gx::Label>("IDC_TEXT_NICKNAME");
+    if (label)
+    {
+        if (m_member)
+            label->SetString("Lv: " + std::to_string(m_member->Level) + " " + m_member->Name);
+        else
+            label->SetString(std::string());
+    }
+}

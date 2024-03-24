@@ -55,6 +55,7 @@ struct ResourceMetadata
         UserList,
         RoomContainer,
         RoomButton,
+        AvatarInfo,
 
         // Avatar
         ItemData,

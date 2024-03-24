@@ -91,8 +91,15 @@ void RoomButton::Invalidate()
     auto levelRange = FindChild<Gx::Label>("IDC_TEXT_LEVEL_RANGE");
     auto noMusic    = FindChild<Gx::Image>("IDC_IMAGE_NOT_HAVE");
 
+    unsigned int memberCount = 0;
+    for (auto member : m_room.Members)
+    {
+        if (member.ID != 0)
+            memberCount++;
+    }
+
     title->SetString(m_room.Title);
-    capacity->SetString("(" + std::to_string(m_room.PlayerCount) + "/" + std::to_string(m_room.Capacity) + ")");
+    capacity->SetString("(" + std::to_string(memberCount) + "/" + std::to_string(m_room.Capacity) + ")");
 
     number->SetValue(m_room.ID);
     number->SetDigitCount(3);

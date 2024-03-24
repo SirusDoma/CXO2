@@ -34,6 +34,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/RoomContainerLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Room/RoomButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
@@ -93,6 +94,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<RoomContainer, RoomContainerLoader>();
     Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
+    Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
     // Avatar
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
@@ -146,7 +148,7 @@ void O2Jam::Boot()
        player.Level  = -1;
        player.Gender = Gender::Male;
 
-       state->SetPlayer(player);
+        state->SetCurrentPlayer(player);
        return state;
     });
 

@@ -30,32 +30,34 @@ enum class GameMode
     Jam
 };
 
-struct RoomData
-{
-    unsigned int  ID;
-    std::string   Title;
-    ChartMetadata Chart;
-    Difficulty    Difficulty;
-    GameMode      GameMode;
-    SongMode      SongMode;
-    RoomState     State;
-    float         Speed;
-    bool          Locked;
-    unsigned int  PlayerCount   = 1;
-    unsigned int  Capacity      = 8;
-    unsigned int  MinLevelLimit = 0;
-    unsigned int  MaxLevelLimit = 0;
-};
-
 struct Player
 {
     unsigned int ID;
-    int Level;
     std::string Name;
-    bool Administrator;
+    int Level;
     Gender Gender;
     unsigned int Gem;
     unsigned int Cash;
+    bool Administrator;
+    std::vector<unsigned int> EquippedItemIDs;
+};
+
+enum RoomTeam
+{
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H
+};
+
+struct RoomMember : Player
+{
+    RoomMember() = default;
+    RoomTeam Team;
 };
 
 struct ChatData
@@ -66,4 +68,26 @@ struct ChatData
     Player Recipient;
     // MegaphoneInfo Megaphone;
 };
+
+
+struct RoomData
+{
+    using MemberList = RoomMember[];
+
+    unsigned int  ID;
+    unsigned int  RoomMasterID  = 0;
+    std::string   Title;
+    ChartMetadata Chart;
+    Difficulty    Difficulty;
+    GameMode      GameMode;
+    SongMode      SongMode;
+    RoomState     State;
+    float         Speed;
+    bool          Locked;
+    unsigned int  Capacity      = 8;
+    unsigned int  MinLevelLimit = 0;
+    unsigned int  MaxLevelLimit = 0;
+    RoomMember    Members[8]    = {{},{},{},{},{},{},{},{}};
+};
+
 #endif

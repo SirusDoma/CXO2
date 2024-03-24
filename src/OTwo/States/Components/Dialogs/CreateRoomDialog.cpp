@@ -158,7 +158,7 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
     
-    titleTextBox->SetString(state.GetPlayer().Name + "'s Room");
+    titleTextBox->SetString(state.GetCurrentPlayer().Name + "'s Room");
     titleTextBox->SelectAll();
     passwordTextBox->SetString("");
 

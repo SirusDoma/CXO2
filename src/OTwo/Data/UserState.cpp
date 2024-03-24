@@ -1,11 +1,11 @@
 #include <OTwo/Data/UserState.hpp>
 
-const Player &UserState::GetPlayer() const
+const Player &UserState::GetCurrentPlayer() const
 {
     return m_player;
 }
 
-void UserState::SetPlayer(const Player &player)
+void UserState::SetCurrentPlayer(const Player &player)
 {
     m_player = player;
 }

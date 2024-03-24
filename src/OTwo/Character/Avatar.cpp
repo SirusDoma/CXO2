@@ -6,30 +6,28 @@ Avatar::RenderableStateMap Avatar::m_renderableStates;
 unsigned int Avatar::m_lastFrameID = 0;
 
 Avatar::Avatar() :
-    m_player(),
+    m_gender(),
     m_instrument(Instrument::None),
     m_items(),
     m_defaultItems()
 {
+    m_renderableStates.clear();
 }
 
-Avatar::Avatar(const Player &playerInfo) :
-    m_player(),
-    m_instrument(Instrument::None),
-    m_items(),
-    m_defaultItems()
+Avatar::Avatar(Gender gender) :
+    Avatar()
 {
-    SetPlayer(playerInfo);
+    m_gender = gender;
 }
 
-const Player &Avatar::GetPlayer() const
+Gender Avatar::GetGender() const
 {
-    return m_player;
+    return m_gender;
 }
 
-void Avatar::SetPlayer(const Player &playerInfo)
+void Avatar::SetGender(Gender gender)
 {
-    m_player = playerInfo;
+    m_gender = gender;
 }
 
 void Avatar::SetDefaultItem(const Item *item)
@@ -51,8 +49,11 @@ void Avatar::Equip(const Item *item)
 {
     if (item)
     {
-        if (item->GetGender() != Gender::Any && item->GetGender() != m_player.Gender)
+        if (item->GetGender() != Gender::Any && item->GetGender() != m_gender)
             return;
+
+        for (auto renderable : item->GetRenderables())
+            renderable->Reset();
 
         m_items[item->GetType()] = item;
         switch (item->GetType())
@@ -121,7 +122,7 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
     // This will prevent static state map from growing non-stop
     if (m_lastFrameID != states.FrameID)
     {
-        m_renderableStates.clear();
+        //m_renderableStates.clear();
         m_lastFrameID = states.FrameID;
     }
 
@@ -131,7 +132,7 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
         if (iterator == m_items.end())
             continue;
 
-        auto animation = iterator->second->GetRenderableItem(m_player.Gender, part, m_instrument);
+        auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument);
         if (animation)
         {
             // Item and its Animation instances are shared across multiple instances of Avatar.
@@ -150,9 +151,8 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
     return RenderableContainer::Render(target, states);
 }
 
-void Avatar::Clear()
+void Avatar::ClearEquipments()
 {
-    m_player = Player();
     m_items.clear();
     m_instrument = Instrument::None;
 }

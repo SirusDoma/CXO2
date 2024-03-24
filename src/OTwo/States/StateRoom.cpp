@@ -25,14 +25,17 @@ void StateRoom::Initialize()
     auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_07");
     auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_14");
 
-    auto player = state.GetPlayer();
+    auto player = state.GetCurrentPlayer();
     auto nicknameLabel = Load<Gx::Label>("STATE_ROOM/IDC_TEXT_NICKNAME");
     nicknameLabel->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
 
     auto avatar = Load<Avatar>("STATE_ROOM/IDC_AVATAR");
-    avatar->SetPlayer(player);
+    avatar->SetGender(player.Gender);
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
+
+    if (auto item = items.GetItem(221); item)
+        avatar->Equip(item);
 
     auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");
@@ -67,15 +70,16 @@ void StateRoom::Initialize()
     userList->Initialize();
 
     auto users = std::vector<Player>();
-    userList->AddUser(state.GetPlayer());
+    userList->AddUser(state.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
-        userList->AddUser(Player{i + 3, 1, "Dummy " + std::to_string(i)});
+        userList->AddUser(Player{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
 
     auto roomContainer = Load<RoomContainer>("STATE_ROOM/IDC_ROOM_CONTAINER");
     roomContainer->Initialize();
     RoomData rooms[] = {
         RoomData{
+            0,
             0,
             "Let's play together~",
             ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36, true},
@@ -85,10 +89,14 @@ void StateRoom::Initialize()
             RoomState::Playing,
             4.5f,
             false,
-            2
+            8,
+            0,
+            0,
+            { RoomMember{} }
         },
         RoomData{
             5,
+            0,
             "Pimplex's room",
             ChartMetadata{},
             Difficulty::Hard,
@@ -97,9 +105,14 @@ void StateRoom::Initialize()
             RoomState::Waiting,
             3.5f,
             false,
+            8,
+            0,
+            0,
+            { RoomMember{} }
         },
         RoomData{
             3,
+            0,
             "kYo-Abhiem's room",
             ChartMetadata{"R3", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
             Difficulty::Hard,
@@ -108,14 +121,17 @@ void StateRoom::Initialize()
             RoomState::Waiting,
             4.f,
             false,
-            1,
             8,
             20,
-            80
+            80,
+            {
+                RoomMember{},
+                RoomMember{},
+            }
         }
     };
 
-    for (auto room : rooms)
+    for (auto& room : rooms)
         roomContainer->PushRoomData(room);
 
     auto createRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_CREATE_ROOM");
@@ -128,6 +144,7 @@ void StateRoom::Initialize()
             createRoomDialog->SetAcceptCallback([&] () {
                 state.SetRoomData(RoomData{
                     4,
+                    state.GetCurrentPlayer().ID,
                     createRoomDialog->GetRoomName(),
                     ChartMetadata{"V3 (O2 Version)", "BeautifulDay", "NoteFactory", "Classical", 21},
                     Difficulty::Normal,
@@ -136,10 +153,16 @@ void StateRoom::Initialize()
                     RoomState::Waiting,
                     3.5f,
                     !createRoomDialog->GetRoomPassword().empty(),
-                    1,
                     8,
                     createRoomDialog->GetMinLevelLimit(),
-                    createRoomDialog->GetMaxLevelLimit()
+                    createRoomDialog->GetMaxLevelLimit(),
+                    {
+                        RoomMember { state.GetCurrentPlayer(), RoomTeam::A },
+                        {},
+                        {},
+                        RoomMember { Player { 2, "DJZMO",      82, Gender::Male, 0, 0, false, { 221 } }, RoomTeam::F },
+                        RoomMember { Player { 3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, { 482 } }, RoomTeam::G }
+                    }
                 });
                 director.Present<StateWaiting7K>();
             });

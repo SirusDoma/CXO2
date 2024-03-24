@@ -10,6 +10,9 @@
 
 #include <Genode/UI/Button.hpp>
 #include <OTwo/States/Components/Waiting/MapSelector.hpp>
+#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+
+#include <magic_enum.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -78,13 +81,78 @@ void StateWaiting7K::Initialize()
     auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
     level->SetFrame(diffName + speedName);
 
-    auto teamButtons = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
-    auto teamA = teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
-    teamA->SetCheckedState(true);
+    //auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
+    auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
 
-    for (auto node : teamButtons->GetChildren())
+    AvatarInfo *currentAvatarInfo = nullptr;
+    auto currentMember = RoomMember();
+    int memberIndex = 0;
+
+    for (auto child : avatarList->GetChildren())
     {
-        auto teamButton = dynamic_cast<Gx::RadioButton*>(node);
+        if (memberIndex >= sizeof(room.Members) / sizeof(RoomMember))
+            break;
+
+        auto avatar = dynamic_cast<Avatar*>(child);
+        if (!avatar)
+            continue;
+
+        auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
+        auto& member = room.Members[memberIndex];
+        if (member.ID == 0)
+        {
+            avatar->ClearEquipments();
+            avatarInfo->Reset();
+
+            memberIndex++;
+            continue;
+        }
+
+        if (member.ID == state.GetCurrentPlayer().ID)
+        {
+            currentMember = member;
+            currentAvatarInfo = avatarInfo;
+        }
+
+        avatar->SetGender(member.Gender);
+        avatarInfo->SetMember(const_cast<RoomMember&>(member));
+
+        for (auto [_, item]: items.GetDefaultItems(member.Gender))
+            avatar->SetDefaultItem(item);
+
+        for (auto itemID : member.EquippedItemIDs)
+        {
+            if (auto item = items.GetItem(itemID); item)
+                avatar->Equip(item);
+        }
+
+        memberIndex++;
+    }
+
+    auto teamButtons = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
+    auto teamButtonMatcher = [=] (RoomTeam team) -> Gx::RadioButton*
+    {
+        switch (team)
+        {
+            default:
+            case A: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
+            case B: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_B");
+            case C: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_C");
+            case D: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_D");
+            case E: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_E");
+            case F: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_F");
+            case G: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_G");
+            case H: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_H");
+        }
+    };
+
+    if (auto currentTeamButton = teamButtonMatcher(currentMember.Team); currentTeamButton)
+        currentTeamButton->SetCheckedState(true);
+
+
+    for (auto team : {RoomTeam::A, RoomTeam::B, RoomTeam::C, RoomTeam::D, RoomTeam::E, RoomTeam::F, RoomTeam::G, RoomTeam::H })
+    {
+        auto teamButton = teamButtonMatcher(team);
         if (!teamButton)
             continue;
 
@@ -93,7 +161,14 @@ void StateWaiting7K::Initialize()
             if (!sender->IsChecked())
                 return;
 
-            mixer.Play(sfxTeam);
+            if (currentAvatarInfo)
+            {
+                if (auto member = currentAvatarInfo->GetMember(); member)
+                    member->Team = team;
+
+                currentAvatarInfo->Invalidate();
+                mixer.Play(sfxTeam);
+            }
         });
     }
 
@@ -112,44 +187,7 @@ void StateWaiting7K::Initialize()
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    //auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
-    auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
 
-    int index = 0;
-    for (auto child : avatarList->GetChildren())
-    {
-        auto avatar = dynamic_cast<Avatar*>(child);
-        if (!avatar)
-            continue;
-
-        auto player = state.GetPlayer();
-        if (index == 2)
-        {
-            player = Player(player);
-            player.Gender = Gender::Female;
-        }
-        avatar->SetPlayer(player);
-
-        auto namePlate = avatar->FindChild<Gx::Image>("IDC_IMAGE_NAME_PLATE");
-        if (namePlate)
-            namePlate->SetColor(sf::Color::Green);
-
-        if (index == 0 || index == 1 || index == 2)
-        {
-            for (auto [_, item]: items.GetDefaultItems(player.Gender))
-                avatar->SetDefaultItem(item);
-
-            if (auto item = items.GetItem(232); item)
-                avatar->Equip(item);
-        }
-        else
-        {
-            if (auto item = items.GetItem(1534 + index); item)
-                avatar->Equip(item);
-        }
-
-        index++;
-    }
 
     auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto& sender, auto& ev) {

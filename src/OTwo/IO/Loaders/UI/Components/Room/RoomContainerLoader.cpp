@@ -1,5 +1,6 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/RoomContainerLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
@@ -9,6 +10,10 @@ Gx::ResourcePtr<RoomContainer> RoomContainerLoader::LoadFromJson(const Gx::Json 
     UiContainerMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
+
+    auto attributes = json.at("attributes");
+    if (auto transform = attributes.find("transform"); transform != attributes.end())
+        TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
     return LoadFromMetadata(metadata, ctx);
 }
@@ -40,6 +45,11 @@ Gx::ResourcePtr<RoomContainer> RoomContainerLoader::LoadFromMetadata(const Resou
         auto name = meta.Name + "/" + key;
         ObjectLoader::Load(name, object, populator, ctx);
     }
+
+    container->SetOrigin(metadata->Origin);
+    container->SetPosition(metadata->Position);
+    container->SetScale(metadata->Scale);
+    container->SetRotation(metadata->Rotation);
 
     return container;
 }

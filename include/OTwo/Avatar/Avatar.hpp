@@ -14,17 +14,17 @@ class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public G
 {
 public:
     Avatar();
-    explicit Avatar(const Player& playerInfo);
+    explicit Avatar(Gender gender);
 
-    const Player &GetPlayer() const;
+    Gender GetGender() const;
+    void SetGender(Gender gender);
 
-    void SetPlayer(const Player &playerInfo);
     void SetDefaultItem(const Item *item);
 
     bool IsEquiped(const Item* item) const;
     void Equip(const Item* item);
     void Unequip(const Item* item);
-    void Clear();
+    void ClearEquipments();
 
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
     const Instrument &GetEquipedInstrumentType() const;
@@ -139,7 +139,7 @@ private:
     void Update(double delta) override;
     Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
 
-    Player     m_player;
+    Gender     m_gender;
     Instrument m_instrument;
     ItemMap    m_items, m_defaultItems;
 

@@ -27,7 +27,7 @@ void ChatPanel::Initialize()
     chatBox->SetPermanentFocusEnabled(true);
     chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
     {
-        chatWindow->PushMessage(Gx::Application::Instance().Require<UserState>().GetPlayer(), text);
+        chatWindow->PushMessage(Gx::Application::Instance().Require<UserState>().GetCurrentPlayer(), text);
     });
 
     auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON");
