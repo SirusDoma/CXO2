@@ -28,12 +28,14 @@ add_subdirectory(extlibs/headers/clip)
 set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
 add_subdirectory(extlibs/headers/boxer)
 
-# Executable
+# Aliases
 set(EXECUTABLE_NAME "OTwo")
-add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
 # Specific OS Directories and Flags
 if(WIN32)
+    # Executable
+    add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
+
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
@@ -60,6 +62,14 @@ if(WIN32)
     set(VorbisEnc_LIB ${MODULES_DIR}/vorbisenc.lib)
     set(VorbisFile_LIB ${MODULES_DIR}/vorbisfile.lib)
 elseif(APPLE)
+    # App Icon
+    set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
+    set(APP_ICON ${CMAKE_SOURCE_DIR}/assets/${MACOSX_BUNDLE_ICON_FILE})
+    set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    # Executable
+    add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
+
     # Output Directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
@@ -93,6 +103,9 @@ elseif(APPLE)
     target_link_libraries(${EXECUTABLE_NAME} "-framework CoreAudio")
     target_link_libraries(${EXECUTABLE_NAME} "-framework AudioUnit")
 else()
+    # Executable
+    add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
+
     # Compiler Flags
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
         set(CMAKE_C_COMPILER gcc)
