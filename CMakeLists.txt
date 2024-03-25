@@ -33,8 +33,9 @@ set(EXECUTABLE_NAME "OTwo")
 
 # Specific OS Directories and Flags
 if(WIN32)
-    # Executable
-    add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
+    # App Resources (Icon)
+    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/assets/App.o)
+    add_executable(${EXECUTABLE_NAME} ${APP_RESOURCE} ${SRCS} ${HEADERS})
 
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
