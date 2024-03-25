@@ -1,5 +1,5 @@
 # CMake Config
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.27)
 project(O2Jam)
 
 # Compiler
@@ -37,13 +37,14 @@ if(WIN32)
     set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/assets/App.o)
     add_executable(${EXECUTABLE_NAME} ${APP_RESOURCE} ${SRCS} ${HEADERS})
 
+    # Output directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
     # Windows (Visual Studio) Compiler Flags
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-        WIN32_EXECUTABLE FALSE
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG  ${OUTPUT_DIR}
+        WIN32_EXECUTABLE                 TRUE
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
     )
 
@@ -53,30 +54,23 @@ if(WIN32)
     set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET Boxer PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    # Set dependencies libs path
+    # Set dependencies libs
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
-    set(FreeType_LIB ${MODULES_DIR}/freetype.lib)
     set(OpenAL_LIB ${MODULES_DIR}/openal32.lib)
-    set(Ogg_LIB ${MODULES_DIR}/ogg.lib)
-    set(FLAC_LIB ${MODULES_DIR}/flac.lib)
-    set(Vorbis_LIB ${MODULES_DIR}/vorbis.lib)
-    set(VorbisEnc_LIB ${MODULES_DIR}/vorbisenc.lib)
-    set(VorbisFile_LIB ${MODULES_DIR}/vorbisfile.lib)
 elseif(APPLE)
     # App Icon
     set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
     set(APP_ICON ${CMAKE_SOURCE_DIR}/assets/${MACOSX_BUNDLE_ICON_FILE})
     set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    # Executable
-    add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
-
     # Output Directory
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_BUILD_TYPE}")
+    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_OSX_ARCHITECTURES}/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+    # Executable
+    add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
 
     # MacOS Bundle flag
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
@@ -91,18 +85,9 @@ elseif(APPLE)
         MACOSX_BUNDLE_OUTPUT_DIRECTORY ${OUTPUT_DIR}
     )
 
-    # Set dependencies libs path
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-osx")
-    set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
-    set(OpenAL_LIB ${MODULES_DIR}/libopenal.a)
-    set(Ogg_LIB ${MODULES_DIR}/libogg.a)
-    set(FLAC_LIB ${MODULES_DIR}/libFLAC.a)
-    set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
-    set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
-    set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
-
-    target_link_libraries(${EXECUTABLE_NAME} "-framework CoreAudio")
-    target_link_libraries(${EXECUTABLE_NAME} "-framework AudioUnit")
+    # Set dependencies libs
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework CoreAudio")
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework AudioUnit")
 else()
     # Executable
     add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
@@ -125,12 +110,11 @@ else()
         set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     endif()
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
-    # Set dependencies libs path
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-mingw")
+    # Set dependencies libs
+    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-gcc")
     set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
     set(OpenAL_LIB ${MODULES_DIR}/libopenal32.a)
     set(Ogg_LIB ${MODULES_DIR}/libogg.a)
@@ -140,36 +124,36 @@ else()
     set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
 
     # FileSystem library
-    target_link_libraries(${EXECUTABLE_NAME} stdc++fs)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++fs)
 endif()
 
 # Link JSON
 find_package(nlohmann_json CONFIG REQUIRED)
-target_link_libraries(${EXECUTABLE_NAME} nlohmann_json::nlohmann_json)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # Link Clip
-target_link_libraries(${EXECUTABLE_NAME} clip)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
 # Link Boxer
-target_link_libraries(${EXECUTABLE_NAME} Boxer)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
 
 # Link Magic Enum
 find_package(magic_enum CONFIG REQUIRED)
-target_link_libraries(${EXECUTABLE_NAME} magic_enum::magic_enum)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML 2.6.1 COMPONENTS audio graphics system window REQUIRED)
-if (WINDOWS)
-    find_package(SFML 2.6.1 COMPONENTS main REQUIRED)
+find_package(SFML COMPONENTS audio graphics system window REQUIRED)
+if (WIN32)
+    find_package(SFML COMPONENTS main REQUIRED)
 endif()
 
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
-    if (WINDOWS)
-        target_link_libraries(${EXECUTABLE_NAME} sfml-main)
-    endif()
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
 
-    target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)
+    if (WIN32)
+        target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
+    endif()
 else()
     message(FATAL_ERROR "SFML not found")
 endif()

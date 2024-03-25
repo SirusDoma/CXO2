@@ -7,6 +7,7 @@
 #include <OTwo/Data/Character.hpp>
 
 #include <string>
+#include <vector>
 
 enum class RoomState
 {

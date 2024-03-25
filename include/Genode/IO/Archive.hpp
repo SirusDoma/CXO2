@@ -1,12 +1,14 @@
 #ifndef GENODE_IO_ARCHIVE_HPP
 #define GENODE_IO_ARCHIVE_HPP
 
-#include <string>
-#include <vector>
-
 #include <Genode/System/Primitives.hpp>
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/FileSystem/FileSystemController.hpp>
+
+#include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 namespace Gx
 {

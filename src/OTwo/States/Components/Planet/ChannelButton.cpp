@@ -2,6 +2,8 @@
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <cmath>
+
 ChannelButton::ChannelButton() :
     Gx::RadioButton(),
     m_initialized(false),

@@ -1,8 +1,9 @@
 #include <OTwo/States/Components/Room/UserList.hpp>
 
-#include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
+
+#include <cmath>
 
 UserList::UserList() :
     m_users(),

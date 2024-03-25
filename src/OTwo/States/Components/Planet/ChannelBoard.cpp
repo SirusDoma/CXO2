@@ -5,6 +5,8 @@
 #include <Genode/Tasks.hpp>
 #include <Genode/Fx.hpp>
 
+#include <cmath>
+
 ChannelBoard::ChannelBoard() :
     m_tab(ChannelBoard::Tab::Notice),
     m_transitioning(false),

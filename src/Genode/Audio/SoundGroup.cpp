@@ -1,5 +1,7 @@
 ﻿#include <Genode/Audio/SoundGroup.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     SoundGroup::SoundGroup(const std::string &name) :

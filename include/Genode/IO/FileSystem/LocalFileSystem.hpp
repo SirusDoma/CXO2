@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 
-
 namespace Gx
 {
     class LocalFileSystem : public FileSystemController

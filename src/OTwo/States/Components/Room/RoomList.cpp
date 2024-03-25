@@ -1,7 +1,9 @@
 #include <OTwo/States/Components/Room/RoomContainer.hpp>
+#include <OTwo/States/State.hpp>
 
 #include <Genode/UI/List.hpp>
-#include <OTwo/States/StateWaiting7K.hpp>
+
+#include <cmath>
 
 RoomContainer::RoomContainer() :
     m_rooms(),

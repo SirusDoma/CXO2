@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
+#include <cmath>
 
 namespace Gx
 {
@@ -87,7 +88,7 @@ namespace Gx
             case 3: center.x = m_size.x - m_cornerRadius; center.y = m_size.y - m_cornerRadius; break;
         }
 
-        return { m_cornerRadius*cos(deltaAngle * static_cast<float>(index-centerIndex) * pi / 180) + center.x,
-                -m_cornerRadius*sin(deltaAngle * static_cast<float>(index-centerIndex) * pi / 180) + center.y };
+        return { m_cornerRadius * std::cos(deltaAngle * static_cast<float>(index-centerIndex) * pi / 180) + center.x,
+                -m_cornerRadius * std::sin(deltaAngle * static_cast<float>(index-centerIndex) * pi / 180) + center.y };
     }
 }

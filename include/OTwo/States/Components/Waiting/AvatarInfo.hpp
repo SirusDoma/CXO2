@@ -5,6 +5,7 @@
 
 #include <Genode/UI/UiContainer.hpp>
 
+#include <unordered_map>
 
 class AvatarInfo : public Gx::UiContainer
 {

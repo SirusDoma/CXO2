@@ -1,0 +1,192 @@
+name: "Build O2Jam Main Client"
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: Build win32
+        required: true
+        type: boolean
+        default: true
+      osx-arm64:
+        description: Build osx-arm64
+        required: true
+        type: boolean
+        default: true
+      osx-x64_86:
+        description: Build osx-x64_86
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  compile:
+    runs-on: ${{ matrix.os }}
+    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14, macos-13]
+        build_type: ['Release']
+        include:
+          - os: windows-latest
+            enabled: ${{ inputs.windows }}
+            dist_name: win32
+            c_compiler: cl
+            cpp_compiler: cl
+            triplet: x86-windows-static
+            cmake_flags: '-T host=x86 -A Win32'
+            output_dir: /bin/windows/
+          - os: macos-14
+            enabled: ${{ inputs.osx-arm64 }}
+            dist_name: osx-arm64
+            c_compiler: clang
+            cpp_compiler: clang++
+            triplet: arm64-osx-release
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64'
+            output_dir: /bin/osx/arm64/
+          - os: macos-13
+            enabled: ${{ inputs.osx-x64_86 }}
+            dist_name: osx-x86_64
+            c_compiler: clang
+            cpp_compiler: clang++
+            triplet: x64-osx-release
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+            output_dir: /bin/osx/x86_64/
+    steps:
+    - name: Checkout repository
+      if: ${{ matrix.enabled }}
+      uses: actions/checkout@v3
+      with:
+        submodules: 'true'
+    - name: Initialize variables
+      if: ${{ matrix.enabled }}
+      id: strings
+      shell: bash
+      run: |
+        echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+    - name: Setup Dependencies
+      if: ${{ matrix.enabled }}
+      uses: johnwason/vcpkg-action@v6
+      id: vcpkg
+      with:
+        pkgs: sfml nlohmann-json magic-enum
+        triplet: ${{ matrix.triplet }}
+        token: ${{ github.token }}
+        cache-key: ${{ matrix.os }}
+        github-binarycache: true
+    - name: Configure Project
+      if: ${{ matrix.enabled }}
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake 
+        -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} 
+        -DVCPKG_MANIFEST_MODE=OFF
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+        ${{ matrix.cmake_flags }}
+    - name: Compile Project
+      if: ${{ matrix.enabled }}
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+    - name: 'Compress Build'
+      if: ${{ matrix.enabled }}
+      shell: bash
+      working-directory: ${{ steps.strings.outputs.binary-output-dir }}
+      run: tar -cvf OTwo-${{ matrix.dist_name }}.tar .
+    - name: Save Build
+      if: ${{ matrix.enabled }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: OTwo-${{ matrix.dist_name }}
+        path: ${{ steps.strings.outputs.binary-output-dir }}/OTwo-${{ matrix.dist_name }}.tar
+  compile-assets:
+    runs-on: 'ubuntu-latest'
+    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'false'
+      - name: Check Cache
+        id: assets-cache
+        uses: actions/cache/restore@v4
+        with:
+          key: OTwo-Image-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
+          path: ./bin/dist/Image/
+          lookup-only: true
+          restore-keys: |
+            OTwo-Image-
+      - name: Compile Assets
+        if: steps.assets-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          mkdir -p '${{ github.workspace }}/bin/dist/Image'
+          cp -r '${{ github.workspace }}/assets/Avatar' '${{ github.workspace }}/bin/dist/Image'
+          cp -r '${{ github.workspace }}/assets/Interface' '${{ github.workspace }}/bin/dist/Image'
+          cp -r '${{ github.workspace }}/assets/Music' '${{ github.workspace }}/bin/dist/Image'
+      - name: Update Cache
+        id: assets-cache-save
+        if: steps.assets-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: OTwo-Image-${{ hashFiles('./bin/dist/Image/**/*.*') }}
+          path: ./bin/dist/Image/
+  build:
+    needs: [ compile, compile-assets ]
+    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    runs-on: 'ubuntu-latest'
+    strategy:
+      fail-fast: false
+      matrix:
+        dist_name: [ win32, osx-arm64, osx-x86_64 ]
+        include:
+          - dist_name: win32
+            enabled: ${{ inputs.windows }}
+          - dist_name: osx-arm64
+            enabled: ${{ inputs.osx-arm64 }}
+          - dist_name: osx-x86_64
+            enabled: ${{ inputs.osx-x64_86 }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: 'false'
+    - name: Load Build
+      id: build-cache
+      if: ${{ matrix.enabled }}
+      uses: actions/download-artifact@v3
+      with:
+        name: OTwo-${{ matrix.dist_name }}
+        path: ./bin/
+    - name: Decompress Build
+      if: ${{ matrix.enabled }}
+      shell: bash
+      run: |
+        mkdir -p '${{ github.workspace }}/bin/dist'
+        tar -xvf ./bin/OTwo-${{ matrix.dist_name }}.tar -C ./bin/dist/
+    - name: Load Compiled Assets
+      id: assets-cache
+      if: ${{ matrix.enabled }}
+      uses: actions/cache/restore@v4
+      with:
+        key: OTwo-Image-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
+        path: ./bin/dist/Image/
+        restore-keys: |
+          OTwo-Image-
+    - name: Build Distribution Package
+      if: ${{ matrix.enabled }}
+      shell: bash
+      run: |
+        mkdir -p '${{ github.workspace }}/bin/dist'
+        cd '${{ github.workspace }}/bin/dist'
+        zip OTwo-${{ matrix.dist_name }}.zip . -r
+    - name: Upload Artifact
+      if: ${{ matrix.enabled }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: O2Jam-${{ matrix.dist_name }}
+        path: ${{ github.workspace }}/bin/dist/OTwo-${{ matrix.dist_name }}.zip

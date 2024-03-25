@@ -1,5 +1,7 @@
 #include <Genode/UI/ScrollBar.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     ScrollBar::ScrollBar() :

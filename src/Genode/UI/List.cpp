@@ -1,5 +1,7 @@
 ﻿#include <Genode/UI/List.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     List::List() :
