@@ -240,4 +240,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: O2Jam-${{ matrix.dist_name }}
-        path: ${{ github.workspace }}/bin/dist/OTwo-${{ matrix.dist_name }}.zip
+        path: ./bin/dist/**/*
+        compression-level: 0
