@@ -225,7 +225,7 @@ jobs:
           OTwo-Image-
 
     - name: Build Distribution Package
-      if: ${{ matrix.enabled }}
+      if: ${{ matrix.enabled }} && false # Disable nested compression temporarily. Upload artifact will take increased significant amount of time.
       shell: bash
       run: |
         mkdir -p '${{ github.workspace }}/bin/dist'
