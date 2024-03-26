@@ -41,11 +41,15 @@ if(WIN32)
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
 
-    # Windows (Visual Studio) Compiler Flags
+    # Windows (Visual Studio) Compiler Output Directories and Flags
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-        WIN32_EXECUTABLE                 TRUE
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${OUTPUT_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}
+        WIN32_EXECUTABLE                        TRUE
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
     # External Libs Compiler Flags
