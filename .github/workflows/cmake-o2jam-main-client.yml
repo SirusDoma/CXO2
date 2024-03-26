@@ -3,17 +3,27 @@ name: "Build O2Jam Main Client"
 on:
   workflow_dispatch:
     inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
+          - MinSizeRel
+          - RelWithDebInfo
       windows:
         description: Build win32
         required: true
         type: boolean
         default: true
-      osx-arm64:
+      osx_arm64:
         description: Build osx-arm64
         required: true
         type: boolean
         default: true
-      osx-x64_86:
+      osx_x64_86:
         description: Build osx-x64_86
         required: true
         type: boolean
@@ -22,12 +32,12 @@ on:
 jobs:
   compile:
     runs-on: ${{ matrix.os }}
-    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-14, macos-13]
-        build_type: ['Release']
+        build_type: [ '${{ inputs.build_type }}' ]
         include:
           - os: windows-latest
             enabled: ${{ inputs.windows }}
@@ -38,20 +48,20 @@ jobs:
             cmake_flags: '-T host=x86 -A Win32'
             output_dir: /bin/windows/
           - os: macos-14
-            enabled: ${{ inputs.osx-arm64 }}
+            enabled: ${{ inputs.osx_arm64 }}
             dist_name: osx-arm64
             c_compiler: clang
             cpp_compiler: clang++
             triplet: arm64-osx-release
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/arm64/
           - os: macos-13
-            enabled: ${{ inputs.osx-x64_86 }}
+            enabled: ${{ inputs.osx_x64_86 }}
             dist_name: osx-x86_64
             c_compiler: clang
             cpp_compiler: clang++
             triplet: x64-osx-release
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/x86_64/
     steps:
     - name: Checkout repository
@@ -59,14 +69,38 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: 'true'
-    - name: Initialize variables
+
+    - name: Initialize environment
       if: ${{ matrix.enabled }}
       id: strings
       shell: bash
+      env:
+        P12_BUILD_CERTIFICATE_BASE64: ${{ secrets.P12_BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
+        # Setup credentials paths
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+        # Import certificate from secrets
+        echo -n "$P12_BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+        # Create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+        # Import certificate to keychain
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        
+        # Strings variables
         echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+
     - name: Setup Dependencies
       if: ${{ matrix.enabled }}
       uses: johnwason/vcpkg-action@v6
@@ -77,6 +111,7 @@ jobs:
         token: ${{ github.token }}
         cache-key: ${{ matrix.os }}
         github-binarycache: true
+
     - name: Configure Project
       if: ${{ matrix.enabled }}
       run: >
@@ -89,28 +124,33 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
         ${{ matrix.cmake_flags }}
+
     - name: Compile Project
       if: ${{ matrix.enabled }}
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
     - name: 'Compress Build'
       if: ${{ matrix.enabled }}
       shell: bash
       working-directory: ${{ steps.strings.outputs.binary-output-dir }}
       run: tar -cvf OTwo-${{ matrix.dist_name }}.tar .
+
     - name: Save Build
       if: ${{ matrix.enabled }}
       uses: actions/upload-artifact@v3
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ${{ steps.strings.outputs.binary-output-dir }}/OTwo-${{ matrix.dist_name }}.tar
+
   compile-assets:
     runs-on: 'ubuntu-latest'
-    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           submodules: 'false'
+
       - name: Check Cache
         id: assets-cache
         uses: actions/cache/restore@v4
@@ -120,6 +160,7 @@ jobs:
           lookup-only: true
           restore-keys: |
             OTwo-Image-
+
       - name: Compile Assets
         if: steps.assets-cache.outputs.cache-hit != 'true'
         shell: bash
@@ -128,6 +169,7 @@ jobs:
           cp -r '${{ github.workspace }}/assets/Avatar' '${{ github.workspace }}/bin/dist/Image'
           cp -r '${{ github.workspace }}/assets/Interface' '${{ github.workspace }}/bin/dist/Image'
           cp -r '${{ github.workspace }}/assets/Music' '${{ github.workspace }}/bin/dist/Image'
+
       - name: Update Cache
         id: assets-cache-save
         if: steps.assets-cache.outputs.cache-hit != 'true'
@@ -135,9 +177,10 @@ jobs:
         with:
           key: OTwo-Image-${{ hashFiles('./bin/dist/Image/**/*.*') }}
           path: ./bin/dist/Image/
+
   build:
     needs: [ compile, compile-assets ]
-    if: ${{ inputs.windows || inputs.osx-arm64 || inputs.osx-x64_86 }}
+    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
     runs-on: 'ubuntu-latest'
     strategy:
       fail-fast: false
@@ -147,14 +190,15 @@ jobs:
           - dist_name: win32
             enabled: ${{ inputs.windows }}
           - dist_name: osx-arm64
-            enabled: ${{ inputs.osx-arm64 }}
+            enabled: ${{ inputs.osx_arm64 }}
           - dist_name: osx-x86_64
-            enabled: ${{ inputs.osx-x64_86 }}
+            enabled: ${{ inputs.osx_x64_86 }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
         submodules: 'false'
+
     - name: Load Build
       id: build-cache
       if: ${{ matrix.enabled }}
@@ -162,12 +206,14 @@ jobs:
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ./bin/
+
     - name: Decompress Build
       if: ${{ matrix.enabled }}
       shell: bash
       run: |
         mkdir -p '${{ github.workspace }}/bin/dist'
         tar -xvf ./bin/OTwo-${{ matrix.dist_name }}.tar -C ./bin/dist/
+
     - name: Load Compiled Assets
       id: assets-cache
       if: ${{ matrix.enabled }}
@@ -177,6 +223,7 @@ jobs:
         path: ./bin/dist/Image/
         restore-keys: |
           OTwo-Image-
+
     - name: Build Distribution Package
       if: ${{ matrix.enabled }}
       shell: bash
@@ -184,6 +231,7 @@ jobs:
         mkdir -p '${{ github.workspace }}/bin/dist'
         cd '${{ github.workspace }}/bin/dist'
         zip OTwo-${{ matrix.dist_name }}.zip . -r
+
     - name: Upload Artifact
       if: ${{ matrix.enabled }}
       uses: actions/upload-artifact@v3
