@@ -9,9 +9,7 @@ namespace Gx
     {
     public:
         using sf::RenderStates::RenderStates;
-        const static RenderStates Default;
 
-        RenderStates(const RenderStates &copy);
         explicit RenderStates(sf::RenderStates states, unsigned int frameID = 0, double delta = 0);
 
         RenderStates& operator=(const RenderStates& states);
@@ -19,8 +17,7 @@ namespace Gx
         const unsigned int FrameID = 0;
         const double Delta = 0;
 
-    private:
-
+        static const RenderStates Default;
     };
 }
 
