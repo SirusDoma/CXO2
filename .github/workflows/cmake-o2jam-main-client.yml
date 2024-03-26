@@ -66,7 +66,7 @@ jobs:
     steps:
     - name: Checkout repository
       if: ${{ matrix.enabled }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'true'
 
@@ -147,7 +147,7 @@ jobs:
     if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'false'
 
@@ -195,7 +195,7 @@ jobs:
             enabled: ${{ inputs.osx_x64_86 }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'false'
 
