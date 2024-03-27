@@ -11,11 +11,16 @@ file(GLOB_RECURSE SRCS src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
-include_directories(include)
 include_directories(src)
+include_directories(include)
+include_directories(extlibs/headers)
+
+# Executable
+set(EXECUTABLE_NAME "OTwo")
+add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
 # Specific OS Directories and Flags
-if(WIN32)
+if(_WIN32)
     # Windows Compiler Flags
     set(CMAKE_CXX_FLAGS_RELEASE "/MT")
     set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
@@ -56,13 +61,22 @@ elseif(APPLE)
     set(VorbisFile_LIB ${MODULES_DIR}/Framework/vorbisfile.framework)
 else()
     # Compiler Flags
-    set(CMAKE_C_COMPILER gcc-8)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
+        set(CMAKE_C_COMPILER gcc)
+        set(CMAKE_CXX_COMPILER g++)
+    else()
+        set(CMAKE_C_COMPILER gcc-8)
+        set(CMAKE_CXX_COMPILER g++-8)
+    endif()
     set(CMAKE_C_FLAGS "-lstdc++fs -std=c++17")
-    set(CMAKE_CXX_COMPILER g++-8)
     set(CMAKE_CXX_FLAGS "-lstdc++fs -std=c++17")
 
     # Output Directory
-    set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
+    if(UNIX)
+        set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
+    else()
+        set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
+    endif()
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
@@ -77,15 +91,9 @@ else()
     set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
     set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
     set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
-endif()
 
-# Executable
-set(EXECUTABLE_NAME "OTwo")
-add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
-
-# FileSystem library
-if(UNIX)
-    target_link_libraries(${EXECUTABLE_NAME} stdc++fs) 
+    # FileSystem library
+    target_link_libraries(${EXECUTABLE_NAME} stdc++fs)
 endif()
 
 # SFML Flags
@@ -93,7 +101,7 @@ set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
 set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
 
 # Link SFML
-find_package(SFML 2.5 COMPONENTS audio graphics system window REQUIRED)
+find_package(SFML 2.5.1 COMPONENTS audio graphics system window REQUIRED)
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
     target_link_libraries(${EXECUTABLE_NAME} sfml-audio sfml-graphics sfml-system sfml-window)
