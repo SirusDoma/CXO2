@@ -28,7 +28,7 @@ namespace Gx
 		T* Instantiate(const std::string& name, bool cache = true);
 
     private:
-        Cache* m_cache;
+        CacheManager* m_cache;
 		std::unordered_map<std::string, Archive*> m_archives;
         std::unordered_map<std::string, const Archive::FileEntry*> m_entries;
     };

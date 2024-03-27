@@ -1,7 +1,7 @@
 namespace Gx
 {
     template<class T>
-    inline std::shared_ptr<T> Cache::Add(const std::string& name, Uint8* data, Int64 size)
+    inline std::shared_ptr<T> CacheManager::Add(const std::string& name, Uint8* data, Int64 size)
     {
         auto cache = Get<T>(name);
         if (cache)
@@ -19,7 +19,7 @@ namespace Gx
 			};
 
 			auto resource  = std::shared_ptr<T>(new T(deserializer->Deserialize(data, size)), deleter);
-			m_caches[name] = resource;
+			m_cacheMap[name] = resource;
 
 			return resource;
 		}
@@ -28,10 +28,10 @@ namespace Gx
     }
 
     template<class T>
-    inline std::shared_ptr<T> Cache::Get(const std::string& name) const
+    inline std::shared_ptr<T> CacheManager::Get(const std::string& name) const
     {
-        auto iterator = m_caches.find(name);
-        if (iterator != m_caches.end())
+        auto iterator = m_cacheMap.find(name);
+        if (iterator != m_cacheMap.end())
         {
             std::weak_ptr<T> cache = std::get<std::weak_ptr<T>>(iterator->second);
 			

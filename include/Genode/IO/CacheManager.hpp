@@ -23,14 +23,14 @@ namespace Gx
 	typedef std::shared_ptr<sf::Font>            FontPtr;
 	typedef std::variant<
 		std::weak_ptr<sf::Texture>,
-		std::weak_ptr<sf::Font>>                 ResourceCache;
-	typedef std::map<std::string, ResourceCache> CacheMap;
+		std::weak_ptr<sf::Font>>                 CacheEntry;
+	typedef std::map<std::string, CacheEntry> CacheMap;
 
-    class Cache
+    class CacheManager
     {
     public:
 		friend class ResourceManager;
-        static Cache* Instance();
+        static CacheManager* Instance();
 
         template<class T>
         std::shared_ptr<T> Add(const std::string& name, Uint8* data, Int64 size);
@@ -41,10 +41,10 @@ namespace Gx
         bool Remove(const std::string& name);
 
     private:
-        Cache();
-        ~Cache();
+        CacheManager();
+        ~CacheManager();
 
-        CacheMap m_caches;
+        CacheMap m_cacheMap;
     };
 }
 
