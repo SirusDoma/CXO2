@@ -3,7 +3,14 @@
 
 #include <memory>
 #include <algorithm>
+
+#if defined(__cpp_lib_filesystem)
 #include <filesystem>
+using namespace std::filesystem;
+#else
+#include <experimental/filesystem>
+using namespace std::experimental::filesystem;
+#endif
 
 namespace Gx
 {
@@ -21,14 +28,14 @@ namespace Gx
 
     bool FileHelper::Exists(const std::string& fileName)
     {
-        auto path = std::filesystem::path(fileName.c_str());
-        return std::filesystem::exists(path);
+        auto filePath = path(fileName.c_str());
+        return exists(filePath);
     }
 
     std::string FileHelper::GetFileName(const std::string& filename)
     {
-        auto path = std::filesystem::path(filename.c_str());
-        return path.filename().string();
+        auto filePath = path(filename.c_str());
+        return filePath.filename().string();
     }
 
     std::string FileHelper::GetFullName(const std::string& fileName)
@@ -36,9 +43,9 @@ namespace Gx
         if (Exists(fileName))
             return fileName;
 
-        for (auto path : m_directories)
+        for (std::string &filePath : m_directories)
         {
-            std::string fullPath = path + "/" + fileName;
+            std::string fullPath = filePath.append("/").append(fileName);
             if (Exists(fullPath))
                 return fullPath;
         }
