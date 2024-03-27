@@ -62,6 +62,20 @@ if(WIN32)
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
     set(OpenAL_LIB ${MODULES_DIR}/openal32.lib)
 elseif(APPLE)
+    # App Arch
+    if (NOT CMAKE_OSX_ARCHITECTURES)
+        message("[Warning] CMAKE_OSX_ARCHITECTURES is not set. Falling back to CMAKE_HOST_SYSTEM_PROCESSOR")
+        set(CMAKE_OSX_ARCHITECTURES ${CMAKE_HOST_SYSTEM_PROCESSOR})
+    endif()
+
+    if (NOT CMAKE_BUILD_TYPE)
+        message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Debug")
+        set(CMAKE_BUILD_TYPE "Debug")
+    endif()
+
+    message("Build type: " ${CMAKE_BUILD_TYPE})
+    message("Architecture: " ${CMAKE_OSX_ARCHITECTURES})
+
     # App Icon
     set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
     set(APP_ICON ${CMAKE_SOURCE_DIR}/assets/${MACOSX_BUNDLE_ICON_FILE})
@@ -70,27 +84,27 @@ elseif(APPLE)
     # Output Directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_OSX_ARCHITECTURES}/${CMAKE_BUILD_TYPE}")
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY                ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY                ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Executable
+    set(PACKAGE_NAME com.o2jam.game)
     add_executable(${EXECUTABLE_NAME} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
 
     # MacOS Bundle flag
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-        BUNDLE TRUE
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_GUI_IDENTIFIER com.o2jam.${EXECUTABLE_NAME}
-        MACOSX_BUNDLE_BUNDLE_NAME ${EXECUTABLE_NAME}
-        MACOSX_BUNDLE_BUNDLE_VERSION "3.10"
-        MACOSX_BUNDLE_LONG_VERSION_STRING "3.10"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "3.10"
-        MACOSX_BUNDLE_COPYRIGHT "Copyright O2Media"
-        MACOSX_BUNDLE_OUTPUT_DIRECTORY ${OUTPUT_DIR}
+        BUNDLE                                  TRUE
+        MACOSX_BUNDLE                           TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER            ${PACKAGE_NAME}
+        MACOSX_BUNDLE_BUNDLE_NAME               ${EXECUTABLE_NAME}
+        MACOSX_BUNDLE_BUNDLE_VERSION            "3.10"
+        MACOSX_BUNDLE_LONG_VERSION_STRING       "3.10"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING      "3.10"
+        MACOSX_BUNDLE_COPYRIGHT                 "Copyright O2Media"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
     # Set dependencies libs
@@ -138,6 +152,9 @@ else()
     # FileSystem library
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++fs)
 endif()
+
+message("Output Directory: " ${OUTPUT_DIR})
+message("")
 
 # Link JSON
 find_package(nlohmann_json CONFIG REQUIRED)
