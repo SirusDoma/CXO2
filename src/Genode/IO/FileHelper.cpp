@@ -1,7 +1,6 @@
 #include <Genode/IO/FileHelper.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
-#include <memory>
 #include <algorithm>
 
 #if defined(__cpp_lib_filesystem)
