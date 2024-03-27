@@ -228,9 +228,16 @@ jobs:
           OTwo-Image-
 
     - name: Build Distribution Package
-      if: ${{ false }} # Disable nested compression temporarily. Upload artifact will take increased significant amount of time.
+      if: ${{ matrix.enabled }}
       shell: bash
       run: |
+        # Ideally, this generate .msi or .dmg package.
+        # Note that actions/upload-artifact will not preserve executable or any other permissions. 
+        # See https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
+        #
+        # Packaging the game files will avoid this from happening. 
+        # Otherwise, the user might have to run `chmod +x <OTwo executable>` on Linux or macOS.
+        
         mkdir -p '${{ github.workspace }}/bin/dist'
         cd '${{ github.workspace }}/bin/dist'
         zip OTwo-${{ matrix.dist_name }}.zip . -r
