@@ -19,7 +19,7 @@ namespace
 namespace Gx
 {
     template<typename T>
-    inline static void ResourceLoaderFactory::Register(ResourceLoader<T>* deserializer)
+    inline void ResourceLoaderFactory::Register(ResourceLoader<T>* deserializer)
     {
         Remove<T>();
 
@@ -28,7 +28,7 @@ namespace Gx
     }
 
     template<typename T>
-    inline static void ResourceLoaderFactory::Register(DefinitionLoader<T>* deserializer)
+    inline void ResourceLoaderFactory::Register(DefinitionLoader<T>* deserializer)
     {
         Remove<T>();
 
