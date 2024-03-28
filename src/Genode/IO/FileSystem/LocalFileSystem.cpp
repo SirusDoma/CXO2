@@ -30,23 +30,22 @@ namespace Gx
     void LocalFileSystem::SetWorkingDirectory(const std::string &inputPath)
     {
         auto workingDir = path(inputPath);
-        if (workingDir.has_filename() || is_directory(workingDir))
+        if (workingDir.has_filename() || workingDir.has_extension())
             workingDir = workingDir.parent_path();
 
         if (!exists(workingDir))
             return;
-
-#ifdef __APPLE__
-        if (workingDir.string().find(".app/"))
-            workingDir = workingDir.parent_path().parent_path().parent_path();
-#endif
 
         std::filesystem::current_path(workingDir);
     }
 
     std::vector<std::string> LocalFileSystem::GetAssetPaths()
     {
-        return m_paths;
+        auto paths = std::vector<std::string>();
+        for (auto p : m_paths)
+            paths.push_back(weakly_canonical(path(p)).string());
+
+        return paths;
     }
 
     void LocalFileSystem::AddAssetPath(const std::string& path)
