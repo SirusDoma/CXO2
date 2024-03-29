@@ -158,28 +158,30 @@ jobs:
         id: assets-cache
         uses: actions/cache/restore@v4
         with:
-          key: OTwo-Image-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
-          path: ./bin/dist/Image/
+          key: OTwo-Assets-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
+          path: ./bin/dist/
           lookup-only: true
           restore-keys: |
-            OTwo-Image-
+            OTwo-Assets-
 
       - name: Compile Assets
         if: steps.assets-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
+          echo "Latest assets are not found within cache storage. Compiling assets.."
           mkdir -p '${{ github.workspace }}/bin/dist/Image'
+          mkdir -p '${{ github.workspace }}/bin/dist/Music'
           cp -r '${{ github.workspace }}/assets/Avatar' '${{ github.workspace }}/bin/dist/Image'
           cp -r '${{ github.workspace }}/assets/Interface' '${{ github.workspace }}/bin/dist/Image'
-          cp -r '${{ github.workspace }}/assets/Music' '${{ github.workspace }}/bin/dist/Image'
+          cp -r '${{ github.workspace }}/assets/Music' '${{ github.workspace }}/bin/dist'
 
       - name: Update Cache
         id: assets-cache-save
         if: steps.assets-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          key: OTwo-Image-${{ hashFiles('./bin/dist/Image/**/*.*') }}
-          path: ./bin/dist/Image/
+          key: OTwo-Assets-${{ hashFiles('./bin/dist/Image/**/*.*', './bin/dist/Music/**/*.*') }}
+          path: ./bin/dist/
 
   build:
     needs: [ compile, compile-assets ]
@@ -202,7 +204,7 @@ jobs:
       with:
         submodules: 'false'
 
-    - name: Load Build
+    - name: Load Compressed Build
       id: build-cache
       if: ${{ matrix.enabled }}
       uses: actions/download-artifact@v3
@@ -222,10 +224,10 @@ jobs:
       if: ${{ matrix.enabled }}
       uses: actions/cache/restore@v4
       with:
-        key: OTwo-Image-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
-        path: ./bin/dist/Image/
+        key: OTwo-Assets-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
+        path: ./bin/dist/
         restore-keys: |
-          OTwo-Image-
+          OTwo-Assets-
 
     - name: Build Distribution Package
       if: ${{ matrix.enabled }}
