@@ -140,7 +140,7 @@ jobs:
 
     - name: Save Build
       if: ${{ matrix.enabled }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ${{ steps.strings.outputs.binary-output-dir }}/OTwo-${{ matrix.dist_name }}.tar
@@ -207,7 +207,7 @@ jobs:
     - name: Load Compressed Build
       id: build-cache
       if: ${{ matrix.enabled }}
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ./bin/
@@ -246,8 +246,7 @@ jobs:
 
     - name: Upload Artifact
       if: ${{ matrix.enabled }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: O2Jam-${{ matrix.dist_name }}
         path: ./bin/dist/OTwo-${{ matrix.dist_name }}.zip
-        compression-level: 0
