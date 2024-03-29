@@ -16,6 +16,17 @@ using namespace std::experimental::filesystem;
 
 #include <fstream>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#include <dlfcn.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
+typedef OSStatus (*SecTranslocateIsTranslocatedURLFunc)(CFURLRef url, Boolean* isTranslocated);
+typedef CFURLRef __nullable (*SecTranslocateCreateOriginalPathForURLFunc)(CFURLRef translocatedPath, CFErrorRef * __nullable error);
+#endif
+
 namespace Gx
 {
     LocalFileSystem &LocalFileSystem::Instance()
@@ -25,6 +36,110 @@ namespace Gx
             instance = ResourcePtr<LocalFileSystem>(new LocalFileSystem(), [] (auto ptr) { delete ptr; });
 
         return *instance.get();
+    }
+
+    std::string LocalFileSystem::GetApplicationDirectoryPath()
+    {
+        // Windows and Linux doesn't have to be using the actual path of the executable.
+        // This because the operating system allows the user to manually specify working directory on their own.
+        auto workingDir = std::filesystem::current_path().string();
+
+#ifdef __APPLE__
+        // On the other hand, macOS "security" fuckery modify the working directory out of developer / user will.
+        // Context: https://lapcatsoftware.com/articles/app-translocation.html
+
+        // Get the current bundle
+        CFBundleRef mainBundle;
+        if (mainBundle = CFBundleGetMainBundle(); !mainBundle)
+            return workingDir;
+
+        // Get the URL of main bunddle
+        CFURLRef mainBundleURL;
+        if (mainBundleURL = CFBundleCopyBundleURL(mainBundle); !mainBundleURL)
+        {
+            CFRelease(mainBundle);
+            return workingDir;
+        }
+
+        // Extract URL into std::string
+        if (CFStringRef path = CFURLCopyFileSystemPath(mainBundleURL, kCFURLPOSIXPathStyle); path)
+        {
+            char buffer[PATH_MAX];
+            CFStringGetCString(path, buffer, sizeof(buffer), kCFStringEncodingUTF8);
+
+            workingDir = std::string(buffer);
+            CFRelease(path);
+        }
+
+        // Release bundle ref
+        CFRelease(mainBundle);
+
+        // Load security framework
+        auto handle = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY);
+        if (!handle)
+        {
+            CFRelease(mainBundleURL);
+            return workingDir;
+        }
+
+        // Load SecTranslocateIsTranslocatedURL
+        auto SecTranslocateIsTranslocatedURL = reinterpret_cast<SecTranslocateIsTranslocatedURLFunc>(dlsym(handle, "SecTranslocateIsTranslocatedURL"));
+        if (SecTranslocateIsTranslocatedURL == nullptr)
+        {
+            CFRelease(mainBundleURL);
+            dlclose(handle);
+            return workingDir;
+        }
+
+        // Check whether the current working directory is translocated
+        Boolean isTranslocated = false;
+        if (auto status = SecTranslocateIsTranslocatedURL(mainBundleURL, &isTranslocated); !status || !isTranslocated)
+        {
+            CFRelease(mainBundleURL);
+            dlclose(handle);
+            return workingDir;
+        }
+
+        // Load SecTranslocateCreateOriginalPathForURL
+        auto SecTranslocateCreateOriginalPathForURL = reinterpret_cast<SecTranslocateCreateOriginalPathForURLFunc>(dlsym(handle, "SecTranslocateCreateOriginalPathForURL"));
+        if (SecTranslocateCreateOriginalPathForURL == nullptr)
+        {
+            CFRelease(mainBundleURL);
+            dlclose(handle);
+            return workingDir;
+        }
+
+        // Get Untranslocated Current Working Directory
+        auto appURL = SecTranslocateCreateOriginalPathForURL(mainBundleURL, nullptr);
+        if (!appURL)
+        {
+            CFRelease(mainBundleURL);
+            CFRelease(appURL);
+            dlclose(handle);
+            return workingDir;
+        }
+
+        // Convert the URL into string
+        if (auto appPath = CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle); appPath)
+        {
+            char buffer[PATH_MAX];
+            CFStringGetCString(appPath, buffer, sizeof(buffer), kCFStringEncodingUTF8);
+
+            workingDir = std::string(buffer);
+        }
+
+        // Clean up
+        CFRelease(mainBundleURL);
+        CFRelease(appURL);
+        dlclose(handle);
+#endif
+
+        return workingDir;
+    }
+
+    std::string LocalFileSystem::GetWorkingDirectory()
+    {
+        return std::filesystem::current_path().string();
     }
 
     void LocalFileSystem::SetWorkingDirectory(const std::string &inputPath)

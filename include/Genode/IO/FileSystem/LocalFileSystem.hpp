@@ -16,6 +16,9 @@ namespace Gx
     public:
         static LocalFileSystem &Instance();
 
+        static std::string GetApplicationDirectoryPath();
+
+        static std::string GetWorkingDirectory();
         static void SetWorkingDirectory(const std::string &inputPath);
 
         static std::vector<std::string> GetAssetPaths();

@@ -28,6 +28,13 @@ add_subdirectory(extlibs/headers/clip)
 set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
 add_subdirectory(extlibs/headers/boxer)
 
+# Default flags
+if (NOT CMAKE_BUILD_TYPE)
+    message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Debug")
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
 # Aliases
 set(EXECUTABLE_NAME "OTwo")
 
@@ -68,12 +75,6 @@ elseif(APPLE)
         set(CMAKE_OSX_ARCHITECTURES ${CMAKE_HOST_SYSTEM_PROCESSOR})
     endif()
 
-    if (NOT CMAKE_BUILD_TYPE)
-        message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Debug")
-        set(CMAKE_BUILD_TYPE "Debug")
-    endif()
-
-    message("Build type: " ${CMAKE_BUILD_TYPE})
     message("Architecture: " ${CMAKE_OSX_ARCHITECTURES})
 
     # App Icon
@@ -112,6 +113,7 @@ elseif(APPLE)
     # Set dependencies libs
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework CoreAudio")
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework AudioUnit")
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework Security")
 else()
     # Executable
     add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
