@@ -86,7 +86,9 @@ int main(int argc , char** argv)
         {
             std::string path = std::string(argv[0]);
 #ifdef __APPLE__
-            path = GetAppBundlePath();
+            // Handle scenario where app bundle is sandboxed by the OS
+            if (auto bundlePath = GetAppBundlePath(); bundlePath.rfind("/private/var/folders/") != 0)
+                path = bundlePath;
 #endif
             Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
