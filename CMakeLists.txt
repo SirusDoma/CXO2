@@ -34,7 +34,7 @@ set(EXECUTABLE_NAME "OTwo")
 # Specific OS Directories and Flags
 if(WIN32)
     # App Resources (Icon)
-    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/assets/App.o)
+    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/resources/OTwo.o)
     add_executable(${EXECUTABLE_NAME} ${APP_RESOURCE} ${SRCS} ${HEADERS})
 
     # Output directory
@@ -77,8 +77,9 @@ elseif(APPLE)
     message("Architecture: " ${CMAKE_OSX_ARCHITECTURES})
 
     # App Icon
+    set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources/)
     set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
-    set(APP_ICON ${CMAKE_SOURCE_DIR}/assets/${MACOSX_BUNDLE_ICON_FILE})
+    set(APP_ICON ${RESOURCES_DIR}/${MACOSX_BUNDLE_ICON_FILE})
     set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     # Output Directory
@@ -101,6 +102,7 @@ elseif(APPLE)
         MACOSX_BUNDLE_LONG_VERSION_STRING       "3.10"
         MACOSX_BUNDLE_SHORT_VERSION_STRING      "3.10"
         MACOSX_BUNDLE_COPYRIGHT                 "Copyright O2Media"
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS  "${RESOURCES_DIR}/OTwo.entitlements.plist"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
