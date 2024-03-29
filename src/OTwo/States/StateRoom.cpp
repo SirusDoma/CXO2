@@ -89,7 +89,7 @@ void StateRoom::Initialize()
             8,
             0,
             0,
-            { RoomMember{} }
+            { RoomMember{ 1 } }
         },
         RoomData{
             5,
@@ -105,7 +105,7 @@ void StateRoom::Initialize()
             8,
             0,
             0,
-            { RoomMember{} }
+            { RoomMember{ 2 } }
         },
         RoomData{
             3,
@@ -122,8 +122,8 @@ void StateRoom::Initialize()
             20,
             80,
             {
-                RoomMember{},
-                RoomMember{},
+                RoomMember{ 3 },
+                RoomMember{ 4 },
             }
         }
     };
