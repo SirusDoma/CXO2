@@ -3,6 +3,8 @@
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
+#include <Genode/UI/Button.hpp>
+
 #include <memory>
 
 State::State() :
@@ -61,37 +63,83 @@ void State::Initialize()
 
 void State::LoadCommonResources()
 {
-    m_prompted    = false;
-    m_dialog      = Load<Gx::Dialog>("Interface/Metadata/Dialog/Question2.json", ResourceScope::Shared);
-    m_popupSound  = Load<sf::Sound>("Interface/Metadata/Common/ExitSound.json", ResourceScope::Shared);
-    m_cancelSound = Load<sf::Sound>("Interface/Metadata/Common/CancelSound1.json", ResourceScope::Shared);
+    static bool loaded = false;
+    if (loaded)
+        return;
 
-    static bool wired = false;
-    if (!wired)
+    m_prompted    = false;
+    m_dialogInfo  = Load<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
+    m_dialog1     = Load<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
+    m_dialog2     = Load<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+    m_cancelSound = Load<sf::Sound>("Interface/Sound/Effect/03.json", ResourceScope::Shared);
+    m_popupSound  = Load<sf::Sound>("Interface/Sound/Effect/06.json", ResourceScope::Shared);
+
+    if (m_dialog2)
     {
-        m_dialog->SetAcceptCallback([&] {
+        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_exitDialog->SetAcceptCallback([&]
+        {
             m_prompted = true;
             Gx::Application::Instance().Close();
         });
-        m_dialog->SetCancelCallback([&] {
-            auto& mixer = Gx::Application::Instance().Require<Gx::Mixer>();
+
+        m_exitDialog->SetCancelCallback([&]
+        {
+            auto &mixer = Gx::Application::Instance().Require<Gx::Mixer>();
             mixer.Play(m_cancelSound, "SFX");
 
             m_prompted = false;
         });
     }
+    loaded = true;
+}
 
-    wired = true;
+void State::ShowDialog(const std::string &content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback)
+{
+    auto dialog = m_dialogInfo;
+    if (style == DialogStyle::OkCancel)
+        dialog = m_dialog1;
+    else if (style == DialogStyle::YesNo)
+        dialog = m_dialog2;
+
+    dialog->SetAcceptCallback([=] () { callback(true); });
+    dialog->SetCancelCallback([=] () { callback(false); });
+
+    dialog->Show(this, content, backdrop);
+}
+
+void State::ShowDialog(Gx::Node *content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback)
+{
+    auto dialog = m_dialogInfo;
+    if (style == DialogStyle::OkCancel)
+        dialog = m_dialog1;
+    else if (style == DialogStyle::YesNo)
+        dialog = m_dialog2;
+
+    auto label        = dialog->GetLabel();
+    auto acceptButton = dialog->GetAcceptButton();
+    auto cancelButton = dialog->GetCancelButton();
+
+    dialog->ClearChildren();
+    dialog->AddChild(label, acceptButton, cancelButton, content);
+
+    dialog->SetAcceptCallback([=] () { callback(true); });
+    dialog->SetCancelCallback([=] () { callback(false); });
+
+    dialog->Show(this, std::string(), backdrop);
 }
 
 bool State::Close(bool quit)
 {
-    if (quit && !m_prompted && m_dialog)
+    if (quit && !m_prompted)
     {
-        auto& mixer = Require<Gx::Mixer>();
-        mixer.Play(m_popupSound, "SFX");
+        if (m_popupSound)
+        {
+            auto &mixer = Require<Gx::Mixer>();
+            mixer.Play(m_popupSound, "SFX");
+        }
 
-        m_dialog->Show(this, "Do you really want to exit?", true);
+        m_exitDialog->Show(this, "Do you really want to exit?", true);
         return false;
     }
 
@@ -100,5 +148,5 @@ bool State::Close(bool quit)
 
 Gx::ResourceManager &State::GetLocalResources() const
 {
-    return *m_resources.get();
+    return *m_resources;
 }

@@ -93,6 +93,32 @@ R *State::Make(const std::string &id, Args &&... args)
     return child;
 }
 
+template<typename R>
+R *State::Instantiate(const std::string &source, ResourceScope scope)
+{
+    static_assert(
+            std::is_base_of_v<Gx::Node, R> ||
+            std::is_base_of_v<sf::SoundSource, R>,
+            "Parameter must be a Gx::Node or sf::SoundSource"
+    );
+
+    auto resources = m_resources.get();
+    if (scope == ResourceScope::Shared)
+        resources = &Require<Gx::ResourceManager>();
+
+    if (!resources)
+        return nullptr;
+
+    auto name     = Gx::StringHelper::GetTypeName<R>();
+    auto resource = &resources->AddFromFile<R>(GetName() + "/" + name + "_" + std::to_string(resources->Count<R>()), source);
+
+    if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
+        AddChild(resource);
+
+    return resource;
+}
+
+
 template<typename R, typename T>
 R *State::Instantiate(const std::string &id, ResourceScope scope)
 {

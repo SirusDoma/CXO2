@@ -13,6 +13,12 @@ enum ResourceScope
     Shared
 };
 
+enum DialogStyle
+{
+    Information,
+    OkCancel,
+    YesNo
+};
 
 class State : public virtual Gx::Scene
 {
@@ -36,6 +42,9 @@ public:
     template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>
     R* Make(const std::string &id, Args&&... args);
 
+    template<typename R>
+    R *Instantiate(const std::string &id, ResourceScope scope = ResourceScope::Local);
+
     template<typename R, typename T>
     R *Instantiate(const std::string &id, ResourceScope scope = ResourceScope::Local);
 
@@ -50,6 +59,8 @@ public:
 
 protected:
     void Initialize() override;
+    void ShowDialog(const std::string &content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
+    void ShowDialog(Gx::Node *content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
 
 private:
     void LoadCommonResources();
@@ -57,8 +68,8 @@ private:
     std::unique_ptr<Gx::ResourceManager> m_resources;
     std::unique_ptr<Gx::ResourceManager> m_tempResources;
 
-    inline static Gx::Dialog* m_dialog;
-    inline static sf::Sound*  m_popupSound, *m_cancelSound;
+    inline static Gx::Dialog *m_dialogInfo, *m_dialog1, *m_dialog2, *m_exitDialog;
+    inline static sf::Sound  *m_popupSound, *m_cancelSound;
     inline static bool m_prompted = false;
 };
 
