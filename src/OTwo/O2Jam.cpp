@@ -59,6 +59,7 @@ void O2Jam::Boot()
     Gx::Application::Boot();
 
     // Asset Path
+    Gx::LocalFileSystem::AddAssetPath("./");
     Gx::LocalFileSystem::AddAssetPath("./Assets");
     Gx::LocalFileSystem::AddAssetPath("./Image");
     Gx::LocalFileSystem::AddAssetPath("./Music");
