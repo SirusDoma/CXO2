@@ -79,6 +79,8 @@ bool IsDebuggerAttached()
 
 int main(int argc , char** argv)
 {
+    std::string bundlePath;
+
     try
     {
         // Fix weird working directory in macOS
@@ -87,7 +89,7 @@ int main(int argc , char** argv)
             std::string path = std::string(argv[0]);
 #ifdef __APPLE__
             // Handle scenario where app bundle is sandboxed by the OS
-            if (auto bundlePath = GetAppBundlePath(); bundlePath.rfind("/private/var/folders/") != 0)
+            if (bundlePath = GetAppBundlePath(); bundlePath.rfind("/private/var/folders/", 0) != 0)
                 path = bundlePath;
 #endif
             Gx::LocalFileSystem::SetWorkingDirectory(path);
@@ -104,7 +106,17 @@ int main(int argc , char** argv)
         auto details = std::string();
         if (typeid(ex) == typeid(Gx::ResourceAccessException) || typeid(ex) == typeid(Gx::ResourceLoadException))
         {
-            details += "\n\nMounted Paths:\n";
+            if (argc >= 1 || !bundlePath.empty())
+            {
+                details += "\n\nApplication Paths:\n";
+                if (argc >= 1)
+                    details += "- " + std::string(argv[0]) + "\n\n";
+
+                if (!bundlePath.empty())
+                    details += "- " + bundlePath + "\n\n";
+            }
+
+            details += "\nMounted Paths:\n";
             for (auto &path: Gx::LocalFileSystem::GetAssetPaths())
                 details += "- " + path + "\n\n";
         }
