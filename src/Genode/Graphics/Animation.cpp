@@ -22,6 +22,7 @@ namespace Gx
         m_frames(frames),
         m_duration(duration),
         m_elapsed(sf::Time::Zero),
+        m_state(AnimationState::Initial),
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
@@ -43,7 +44,7 @@ namespace Gx
 
     Gx::Sprite &Animation::GetSprite() const
     {
-        return *m_sprite.get();
+        return *m_sprite;
     }
 
     void Animation::SetSprite(Sprite &sprite)
@@ -96,7 +97,7 @@ namespace Gx
         return sf::Color::White;
     }
 
-    const Animation::AnimationState Animation::GetState() const
+    Animation::AnimationState Animation::GetState() const
     {
         return m_state;
     }
@@ -123,7 +124,7 @@ namespace Gx
 
         bool trigger = m_state != AnimationState::Playing;
         m_state      = AnimationState::Playing;
-        m_elapsed   += sf::milliseconds(delta);
+        m_elapsed   += sf::milliseconds(static_cast<int>(delta));
 
         if (trigger)
         {
@@ -131,7 +132,7 @@ namespace Gx
                 m_animationCallback(*this);
         }
 
-        auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / m_frames.size());
+        auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size()));
         if (m_elapsed >= frameTime)
         {
             m_elapsed %= frameTime;
@@ -170,7 +171,7 @@ namespace Gx
         if (!m_sprite)
             return states;
 
-        target.draw(*m_sprite.get(), states);
+        target.draw(*m_sprite, states);
         return RenderableContainer::Render(target, states);
     }
 

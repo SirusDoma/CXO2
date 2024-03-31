@@ -58,7 +58,7 @@ namespace Gx
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color &color) override;
 
-        const AnimationState GetState() const;
+        AnimationState GetState() const;
         void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
 
         bool GetVisible() const;
