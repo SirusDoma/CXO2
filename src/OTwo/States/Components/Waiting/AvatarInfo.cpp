@@ -1,10 +1,17 @@
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <OTwo/Avatar/Avatar.hpp>
+
 #include <Genode/UI/Label.hpp>
 
 void AvatarInfo::Initialize()
 {
     Node::Initialize();
     Invalidate();
+}
+
+Avatar *AvatarInfo::GetAvatar() const
+{
+    return GetParent<Avatar>();
 }
 
 RoomMember *AvatarInfo::GetMember() const

@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 
+class Avatar;
 class AvatarInfo : public Gx::UiContainer
 {
 public:
@@ -14,6 +15,7 @@ public:
 
     void Initialize() override;
 
+    Avatar *GetAvatar() const;
     RoomMember *GetMember() const;
     const sf::Color &GetTeamColor(RoomTeam team);
 

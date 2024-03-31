@@ -18,7 +18,7 @@ enum class EquipmentType
     Glove,
     Pants,
     Shoes,
-    Piano,
+    Keyboard,
     Bass,
     Drum,
     Guitar,
@@ -33,6 +33,7 @@ enum class EquipmentType
     BagExpansion,
     Costume
 };
+
 enum class RenderPart
 {
     SmallPreview,
@@ -47,7 +48,7 @@ enum class Instrument
     None,
     Bass,
     Guitar,
-    Piano,
+    Keyboard,
     Drum
 };
 

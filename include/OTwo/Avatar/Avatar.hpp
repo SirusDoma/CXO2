@@ -22,8 +22,9 @@ public:
     void SetDefaultItem(const Item *item);
 
     bool IsEquiped(const Item* item) const;
-    void Equip(const Item* item);
+    void Equip(const Item* item, bool reset = true);
     void Unequip(const Item* item);
+    void Unequip(EquipmentType type);
     void ClearEquipments();
 
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
@@ -86,30 +87,30 @@ private:
         { EquipmentType::Jacket, RenderPart::RightArm },
         { EquipmentType::Shoes, RenderPart::Cape },
         { EquipmentType::Shoes, RenderPart::Body },
-        { EquipmentType::Shoes, RenderPart::LeftArm },
-        { EquipmentType::Shoes, RenderPart::RightArm },
-        { EquipmentType::Pants, RenderPart::Cape },
-        { EquipmentType::Pants, RenderPart::Body },
-        { EquipmentType::Pants, RenderPart::LeftArm },
-        { EquipmentType::Pants, RenderPart::RightArm },
-        { EquipmentType::Amulet, RenderPart::Cape },
-        { EquipmentType::Amulet, RenderPart::Body },
-        { EquipmentType::Amulet, RenderPart::LeftArm },
-        { EquipmentType::Amulet, RenderPart::RightArm },
-        { EquipmentType::Piano, RenderPart::Cape },
-        { EquipmentType::Piano, RenderPart::Body },
-        { EquipmentType::Piano, RenderPart::LeftArm },
-        { EquipmentType::Piano, RenderPart::RightArm },
-        { EquipmentType::Bass, RenderPart::Cape },
-        { EquipmentType::Bass, RenderPart::Body },
-        { EquipmentType::Bass, RenderPart::LeftArm },
-        { EquipmentType::Bass, RenderPart::RightArm },
-        { EquipmentType::Guitar, RenderPart::Cape },
-        { EquipmentType::Guitar, RenderPart::Body },
-        { EquipmentType::Guitar, RenderPart::LeftArm },
-        { EquipmentType::Guitar, RenderPart::RightArm },
+        { EquipmentType::Shoes,    RenderPart::LeftArm },
+        { EquipmentType::Shoes,    RenderPart::RightArm },
+        { EquipmentType::Pants,    RenderPart::Cape },
+        { EquipmentType::Pants,    RenderPart::Body },
+        { EquipmentType::Pants,    RenderPart::LeftArm },
+        { EquipmentType::Pants,    RenderPart::RightArm },
+        { EquipmentType::Amulet,   RenderPart::Cape },
+        { EquipmentType::Amulet,   RenderPart::Body },
+        { EquipmentType::Amulet,   RenderPart::LeftArm },
+        { EquipmentType::Amulet,   RenderPart::RightArm },
+        { EquipmentType::Keyboard, RenderPart::Cape },
+        { EquipmentType::Keyboard, RenderPart::Body },
+        { EquipmentType::Keyboard, RenderPart::LeftArm },
+        { EquipmentType::Keyboard, RenderPart::RightArm },
+        { EquipmentType::Bass,     RenderPart::Cape },
+        { EquipmentType::Bass,     RenderPart::Body },
+        { EquipmentType::Bass,     RenderPart::LeftArm },
+        { EquipmentType::Bass,     RenderPart::RightArm },
+        { EquipmentType::Guitar,   RenderPart::Cape },
+        { EquipmentType::Guitar,   RenderPart::Body },
+        { EquipmentType::Guitar,   RenderPart::LeftArm },
+        { EquipmentType::Guitar,   RenderPart::RightArm },
         { EquipmentType::RightArm, RenderPart::Body },
-        { EquipmentType::Jacket, RenderPart::LeftArm },
+        { EquipmentType::Jacket,   RenderPart::LeftArm },
         { EquipmentType::Drum, RenderPart::Cape },
         { EquipmentType::Drum, RenderPart::Body },
         { EquipmentType::Drum, RenderPart::LeftArm },
@@ -142,6 +143,8 @@ private:
     Gender     m_gender;
     Instrument m_instrument;
     ItemMap    m_items, m_defaultItems;
+
+    mutable double m_elapsed;
 
     static unsigned int m_lastFrameID;
     static RenderableStateMap m_renderableStates;

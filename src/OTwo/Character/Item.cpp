@@ -145,3 +145,15 @@ void Item::ResetRenderables()
     for (auto& [key, renderable] : m_renderables)
         renderable->Reset();
 }
+
+Instrument Item::GetInstrument() const
+{
+    switch(m_type)
+    {
+        case EquipmentType::Bass:   return Instrument::Bass;
+        case EquipmentType::Guitar: return Instrument::Guitar;
+        case EquipmentType::Keyboard:  return Instrument::Keyboard;
+        case EquipmentType::Drum:   return Instrument::Drum;
+        default:                    return Instrument::None;
+    }
+}

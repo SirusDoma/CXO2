@@ -9,7 +9,8 @@ Avatar::Avatar() :
     m_gender(),
     m_instrument(Instrument::None),
     m_items(),
-    m_defaultItems()
+    m_defaultItems(),
+    m_elapsed()
 {
     m_renderableStates.clear();
 }
@@ -42,27 +43,58 @@ void Avatar::SetDefaultItem(const Item *item)
 
 bool Avatar::IsEquiped(const Item *item) const
 {
-    return m_items.find(item->GetType()) == m_items.end();
+    auto iterator = m_items.find(item->GetType());
+    return iterator != m_items.end() && iterator->second->GetID() == item->GetID();
 }
 
-void Avatar::Equip(const Item *item)
+void Avatar::Equip(const Item *item, bool reset)
 {
     if (item)
     {
         if (item->GetGender() != Gender::Any && item->GetGender() != m_gender)
             return;
 
-        for (auto renderable : item->GetRenderables())
-            renderable->Reset();
+        if (item->GetInstrument() != Instrument::None)
+        {
+            for (auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
+                Unequip(type);
+        }
 
         m_items[item->GetType()] = item;
         switch (item->GetType())
         {
-            case EquipmentType::Piano: m_instrument = Instrument::Piano;  break;
+            case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard;  break;
             case EquipmentType::Bass: m_instrument = Instrument::Bass;   break;
             case EquipmentType::Drum: m_instrument = Instrument::Drum;   break;
             case EquipmentType::Guitar: m_instrument = Instrument::Guitar; break;
             default: break;
+        }
+
+        if (reset)
+        {
+            for (auto renderable: item->GetRenderables())
+            {
+                renderable->Reset();
+                for (auto type : { EquipmentType::Body, EquipmentType::Jacket, EquipmentType::LeftArm, EquipmentType::RightArm, EquipmentType::LeftHand, EquipmentType::RightHand })
+                {
+                    if (auto itemRef = m_items.find(type); itemRef != m_items.end())
+                    {
+                        if (type == EquipmentType::Body)
+                        {
+                            for (auto part: { RenderPart::LeftArm, RenderPart::RightArm })
+                            {
+                                if (auto refRenderable = itemRef->second->GetRenderableItem(GetGender(), part, item->GetInstrument()); refRenderable)
+                                    refRenderable->Reset();
+                            }
+                        }
+                        else
+                        {
+                            for (auto refRenderable : itemRef->second->GetRenderables())
+                                refRenderable->Reset();
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -80,7 +112,7 @@ void Avatar::Unequip(const Item *item)
     {
         switch (item->GetType())
         {
-            case EquipmentType::Piano:
+            case EquipmentType::Keyboard:
             case EquipmentType::Bass:
             case EquipmentType::Drum:
             case EquipmentType::Guitar:
@@ -95,6 +127,29 @@ void Avatar::Unequip(const Item *item)
         if (iterator != m_items.end())
             Equip(iterator->second);
     }
+}
+
+void Avatar::Unequip(EquipmentType type)
+{
+    auto iterator = m_items.find(type);
+    if (iterator == m_items.end())
+        return;
+
+    switch (type)
+    {
+        case EquipmentType::Keyboard:
+        case EquipmentType::Bass:
+        case EquipmentType::Drum:
+        case EquipmentType::Guitar:
+            m_instrument = Instrument::None;
+            break;
+        default: break;
+    }
+
+    m_items.erase(iterator);
+    iterator = m_defaultItems.find(type);
+    if (iterator != m_items.end())
+        Equip(iterator->second);
 }
 
 const Instrument &Avatar::GetEquipedInstrumentType() const
@@ -126,6 +181,7 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
         m_lastFrameID = states.FrameID;
     }
 
+    m_elapsed += states.Delta;
     for (auto [type, part] : RENDER_LAYER_ORDER)
     {
         auto iterator = m_items.find(type);
