@@ -8,9 +8,11 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
-#include <Genode/UI/Button.hpp>
-#include <OTwo/States/Components/Waiting/MapSelector.hpp>
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <OTwo/States/Components/Waiting/MapSelector.hpp>
+#include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
+
+#include <Genode/UI.hpp>
 
 #include <magic_enum.hpp>
 
@@ -28,6 +30,7 @@ void StateWaiting7K::Initialize()
     auto& items    = app.Require<ItemFactory>();
     auto& mixer    = app.Require<Gx::Mixer>();
     auto& state    = app.Require<UserState>();
+    auto& player   = state.GetCurrentPlayer();
     auto& room     = state.GetRoomData();
 
     auto bgm         = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
@@ -81,7 +84,6 @@ void StateWaiting7K::Initialize()
     auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
     level->SetFrame(diffName + speedName);
 
-    //auto avatar = Load<Avatar>("STATE_WAITING/IDC_AVATAR");
     auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
 
     AvatarInfo *currentAvatarInfo = nullptr;
@@ -175,6 +177,42 @@ void StateWaiting7K::Initialize()
     auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
+    auto instrumentSelector = Instantiate<InstrumentSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
+    instrumentSelector->Initialize();
+
+    if (currentAvatarInfo)
+    {
+        instrumentSelector->SetInstrumentSelectCallack([=] (Item *item)
+        {
+            if (auto avatar = currentAvatarInfo->GetAvatar(); avatar)
+            {
+                if (!item || avatar->IsEquiped(item))
+                {
+                    avatar->Unequip(EquipmentType::Bass);
+                    avatar->Unequip(EquipmentType::Guitar);
+                    avatar->Unequip(EquipmentType::Keyboard);
+                    avatar->Unequip(EquipmentType::Drum);
+                }
+                else
+                    avatar->Equip(item);
+            }
+        });
+    }
+
+    instrumentSelector->AddInstrument(items.GetItem(232));
+    instrumentSelector->AddInstrument(items.GetItem(233));
+    instrumentSelector->AddInstrument(items.GetItem(234));
+    instrumentSelector->AddInstrument(items.GetItem(39));
+    instrumentSelector->AddInstrument(items.GetItem(238));
+    instrumentSelector->AddInstrument(items.GetItem(255));
+    instrumentSelector->AddInstrument(items.GetItem(256));
+    instrumentSelector->AddInstrument(items.GetItem(257));
+    instrumentSelector->AddInstrument(items.GetItem(304));
+    instrumentSelector->AddInstrument(items.GetItem(410));
+    instrumentSelector->AddInstrument(items.GetItem(411));
+    instrumentSelector->AddInstrument(items.GetItem(412));
+    instrumentSelector->AddInstrument(items.GetItem(1429));
+
     auto readyButton = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
     readyButton->SetVisible(false);
     readyButton->SetEnabled(false);
@@ -186,6 +224,7 @@ void StateWaiting7K::Initialize()
     auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
+
 
 
 

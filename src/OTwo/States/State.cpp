@@ -14,7 +14,7 @@ State::State() :
 }
 
 State::State(State &state) :
-    Gx::Scene::Scene(state)
+    Gx::Scene(state)
 {
     LoadCommonResources();
 
