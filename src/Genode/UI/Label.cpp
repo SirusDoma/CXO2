@@ -11,8 +11,7 @@ namespace Gx
     {
         Control::Update(delta);
 
-        if (!m_alignmentUpdated)
-            Invalidate();
+        Invalidate();
     }
 
     RenderStates Label::Render(sf::RenderTarget &target, RenderStates states) const
@@ -34,7 +33,8 @@ namespace Gx
             return;
 
         m_alignment = alignment;
-        OnGeometryUpdated();
+        m_alignmentUpdated = false;
+        Invalidate();
     }
 
     void Label::OnGeometryUpdated() const
@@ -45,6 +45,11 @@ namespace Gx
 
     void Label::Invalidate()
     {
+        EnsureGeometryUpdate();
+
+        if (m_alignmentUpdated)
+            return;
+
         auto bounds = GetLocalBounds();
         auto origin = GetOrigin();
 
