@@ -15,6 +15,7 @@
 #include <Genode/UI.hpp>
 
 #include <magic_enum.hpp>
+#include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -33,9 +34,10 @@ void StateWaiting7K::Initialize()
     auto& player   = state.GetCurrentPlayer();
     auto& room     = state.GetRoomData();
 
-    auto bgm         = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
-    auto sfxNavigate = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
-    auto sfxTeam     = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
+    auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
+    auto sfxNavigate    = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
+    auto sfxTeam        = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
+    auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
 
     auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (state.GetMusicHall())
@@ -225,7 +227,18 @@ void StateWaiting7K::Initialize()
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-
+    if (auto dialogSelectMusic = Instantiate<SelectMusicDialog, Gx::Dialog>("STATE_WAITING/IDC_DIALOG_SELECT_MUSIC"); dialogSelectMusic)
+    {
+        dialogSelectMusic->Initialize();
+        if (auto selectMusicButton = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
+        {
+            selectMusicButton->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
+            {
+                mixer.Play(sfxSelectMusic);
+                dialogSelectMusic->Show(this, std::string(), false);
+            });
+        }
+    }
 
 
     auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
