@@ -79,7 +79,15 @@ void StateRoom::Initialize()
             0,
             0,
             "Let's play together~",
-            ChartMetadata{"Earth Quake", "Kaze.o2SE", "Kaze.o2SE", "Rock", 36, true},
+            ChartMetadata
+            {
+                .New          = true,
+                .Title        = "Earth Quake",
+                .Artist       = "Kaze.o2SE",
+                .NoteDesigner = "Kaze.o2SE",
+                .Genre        = "Rock",
+                .LevelHx      = 36,
+            },
             Difficulty::Hard,
             GameMode::Versus,
             SongMode::Normal,
@@ -111,7 +119,14 @@ void StateRoom::Initialize()
             3,
             0,
             "kYo-Abhiem's room",
-            ChartMetadata{"R3", "Kaze.o2SE", "Kaze.o2SE", "Rock", 32},
+            ChartMetadata
+            {
+                .Title        = "R3",
+                .Artist       = "Kaze.o2SE",
+                .NoteDesigner = "Kaze.o2SE",
+                .Genre        = "Rock",
+                .LevelHx      = 32,
+            },
             Difficulty::Hard,
             GameMode::Versus,
             SongMode::Normal,
@@ -143,7 +158,14 @@ void StateRoom::Initialize()
                     4,
                     state.GetCurrentPlayer().ID,
                     createRoomDialog->GetRoomName(),
-                    ChartMetadata{"V3 (O2 Version)", "BeautifulDay", "NoteFactory", "Classical", 21},
+                    ChartMetadata
+                    {
+                        .Title        = "V3 (O2 Version)",
+                        .Artist       = "BeautifulDay",
+                        .NoteDesigner = "NoteFactory",
+                        .Genre        = "Classical",
+                        .LevelHx      = 21
+                    },
                     Difficulty::Normal,
                     createRoomDialog->GetRoomMode(),
                     SongMode::Normal,

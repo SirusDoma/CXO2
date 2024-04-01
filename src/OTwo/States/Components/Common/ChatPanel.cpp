@@ -25,7 +25,7 @@ void ChatPanel::Initialize()
 
     auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
     chatBox->SetPermanentFocusEnabled(true);
-    chatBox->SetTextEnteredCallback([=] (auto& textBox, sf::String text)
+    chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String &text)
     {
         chatWindow->PushMessage(Gx::Application::Instance().Require<UserState>().GetCurrentPlayer(), text);
     });

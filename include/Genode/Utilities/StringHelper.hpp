@@ -3,6 +3,11 @@
 
 #include <SFML/System/String.hpp>
 
+#include <sstream>
+#include <iomanip>
+
+#include <cmath>
+
 namespace Gx
 {
     class StringHelper
@@ -29,7 +34,7 @@ namespace Gx
             return result;
         }
 
-        static const sf::String TrimStart(const sf::String &input)
+        static sf::String TrimStart(const sf::String &input)
         {
             sf::String result = input;
             for (size_t i = 0; i < result.getSize(); i++)
@@ -46,7 +51,7 @@ namespace Gx
             return result;
         }
 
-        static const sf::String TrimEnd(const sf::String &input)
+        static sf::String TrimEnd(const sf::String &input)
         {
             sf::String result = input;
             for (size_t i = result.getSize() - 1; i > 0 && !result.isEmpty(); i--)
@@ -63,12 +68,12 @@ namespace Gx
             return result;
         }
 
-        static const sf::String Trim(const sf::String &input)
+        static sf::String Trim(const sf::String &input)
         {
             return TrimEnd(TrimStart(input));
         }
 
-        static const sf::String RemoveExtension(const std::string& fileName) {
+        static sf::String RemoveExtension(const std::string& fileName) {
             if (fileName == "." || fileName == "..")
                 return fileName;
 
@@ -79,8 +84,34 @@ namespace Gx
             return fileName;
         }
 
+        static sf::String ToString(int value, int totalLength = 0)
+        {
+            int threshold = static_cast<int>(pow(10, totalLength));
+            if (value < threshold)
+            {
+                sf::String result = std::to_string(value);
+                while (result.getSize() < totalLength)
+                    result = "0" + result;
+
+                return result;
+            }
+
+            return std::to_string(value);
+        }
+
+        static sf::String ToString(float value, int precision = 0)
+        {
+            if (precision == 0)
+                return std::to_string(value);
+
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2) << value;
+
+            return oss.str();
+        }
+
         template<typename T>
-        static const sf::String GetTypeName(bool withNamespace = true)
+        static sf::String GetTypeName(bool withNamespace = true)
         {
             auto name = std::string(typeid(T).name());
             if (auto pos = name.find(' '); pos != std::string::npos) {

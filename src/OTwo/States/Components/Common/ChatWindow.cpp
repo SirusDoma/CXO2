@@ -1,4 +1,5 @@
 #include <OTwo/States/Components/Common/ChatWindow.hpp>
+#include <utility>
 
 ChatWindow::ChatWindow() :
     m_font(),
@@ -111,7 +112,7 @@ void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(Player player, const std::string &chat)
+void ChatWindow::PushMessage(Player player, const sf::String &chat)
 {
     auto chatData = ChatData{ player, chat };
     // Do something if player is self
@@ -124,7 +125,7 @@ void ChatWindow::PushMessage(Player player, const std::string &chat)
 }
 
 
-void ChatWindow::PushSystemMessage(const std::string &chat)
+void ChatWindow::PushSystemMessage(const sf::String &chat)
 {
     PushMessage(Player{0}, chat);
 }
@@ -223,7 +224,7 @@ void ChatWindow::Invalidate()
                     nickname = " " + nickname;
             }
 
-            m_labels[index]->SetString("[" + nickname + "] " + chat.Message);
+            m_labels[index]->SetString(sf::String("[" + nickname + "] ") + chat.Message);
         }
         else
             m_labels[index]->SetString(chat.Message);

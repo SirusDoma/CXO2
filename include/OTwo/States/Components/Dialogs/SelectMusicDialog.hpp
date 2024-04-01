@@ -4,12 +4,8 @@
 #include <OTwo/Data/Room.hpp>
 
 #include <Genode/UI/Dialog.hpp>
-#include <Genode/UI/ToolTip.hpp>
-#include <Genode/UI/CheckBox.hpp>
-#include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/TextBox.hpp>
 
-#include <Genode/Graphics/Animation.hpp>
+#include <vector>
 
 class SelectMusicDialog : public Gx::Dialog
 {
@@ -19,8 +15,15 @@ public:
     explicit SelectMusicDialog(const Gx::Dialog &copy);
     void Initialize() override;
 
+protected:
+    void Invalidate() override;
+
 private:
     bool m_initialized;
+    unsigned int m_page;
+    ChartMetadata *m_music = nullptr;
+    std::vector<ChartMetadata> m_musicList;
+    std::vector<ChartMetadata*> m_displayList;
 };
 
 #endif

@@ -33,8 +33,8 @@ public:
     void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int max);
 
-    void PushMessage(Player player, const std::string &chat);
-    void PushSystemMessage(const std::string &chat);
+    void PushMessage(Player player, const sf::String &chat);
+    void PushSystemMessage(const sf::String &chat);
 
 private:
     Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;

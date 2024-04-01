@@ -203,7 +203,7 @@ namespace Gx
         m_maxLength = maxLength;
     }
 
-    void TextBox::SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback)
+    void TextBox::SetTextEnteredCallback(std::function<void(TextBox&, const sf::String&)> callback)
     {
         m_onTextEntered = std::move(callback);
     }
@@ -500,10 +500,11 @@ namespace Gx
                 }
                 else if (ev.code == sf::Keyboard::V)
                 {
-                    auto string = std::string();
-                    clip::get_text(string);
+                    auto input = std::string();
+                    clip::get_text(input);
 
-                    for (size_t index = 0; index < string.size(); index++)
+                    auto string = sf::String::fromUtf8(input.begin(), input.end());
+                    for (size_t index = 0; index < string.getSize(); index++)
                         m_caret.Index = Insert(m_caret.Index, string[index]);
                 }
             }

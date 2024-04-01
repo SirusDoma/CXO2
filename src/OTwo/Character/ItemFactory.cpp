@@ -1,10 +1,7 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/Equipment.hpp>
-
-ItemFactory::ItemFactory()
-{
-}
+#include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
 ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
 {
@@ -75,5 +72,10 @@ Item *ItemFactory::GetItem(unsigned int id)
         return nullptr;
 
     ItemMetadata metadata = iterator->second;
-    return &m_resources->AddFromFile<Item>("Avatar/Items/metadata/" + std::to_string(id) + ".json");
+    auto loader = ItemLoader();
+
+    auto name = "Avatar/Items/" + std::to_string(id);
+    auto ctx  = Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse);
+
+    return &m_resources->AddFromDeserializer<Item>(name, [&] () { return loader.LoadFromMetadata(metadata, ctx); }, ctx.GetCacheMode());
 }

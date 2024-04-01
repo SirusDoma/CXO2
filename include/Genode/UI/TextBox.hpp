@@ -60,7 +60,7 @@ namespace Gx
 
         unsigned int GetMaximumTextLength() const;
         void SetMaximumTextLength(unsigned int maxLength);
-        void SetTextEnteredCallback(std::function<void(TextBox&, sf::String)> callback);
+        void SetTextEnteredCallback(std::function<void(TextBox&, const sf::String&)> callback);
 
         void Select(size_t index, int selectionLength);
         void SelectAll();
@@ -123,7 +123,7 @@ namespace Gx
         bool m_numeric;
         Control::State m_state;
 
-        std::function<void(TextBox&, sf::String)> m_onTextEntered;
+        std::function<void(TextBox&, const sf::String&)> m_onTextEntered;
     };
 }
 

@@ -6,6 +6,8 @@
 #include <OTwo/Data/Game.hpp>
 #include <OTwo/Data/Character.hpp>
 
+#include <SFML/System/String.hpp>
+
 #include <string>
 #include <vector>
 
@@ -64,7 +66,7 @@ struct RoomMember : Player
 struct ChatData
 {
     Player Sender;
-    std::string Message;
+    sf::String Message;
 
     Player Recipient;
     // MegaphoneInfo Megaphone;

@@ -35,7 +35,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetColor(metadata->Color);
     label->SetOutlineThickness(metadata->OutlineThickness);
     label->SetOutlineColor(metadata->OutlineColor);
-    label->SetString(metadata->String);
+    label->SetString(sf::String::fromUtf8(metadata->String.begin(), metadata->String.end()));
     label->SetOrigin(metadata->Origin);
     label->SetPosition(metadata->Position);
     label->SetScale(metadata->Scale);

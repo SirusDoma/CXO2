@@ -49,10 +49,10 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata &meta,
     for (auto [currency, price] : metadata->Prices)
         item->SetPrice(currency, price);
 
-    if (!metadata->SmallPreview.empty())
+    if (!metadata->SmallPreview.isEmpty())
         item->SetSmallPreview(spriteLoader.LoadFromFile(metadata->SmallPreview, ctx));
 
-    if (!metadata->LargePreview.empty())
+    if (!metadata->LargePreview.isEmpty())
         item->SetLargePreview(spriteLoader.LoadFromFile(metadata->LargePreview, ctx));
 
     for (const auto& ref : metadata->References)
@@ -76,10 +76,13 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
     if (attributes != json.end())
     {
         metadata.ID          = attributes->at("id").get<unsigned int>();
-        metadata.Name        = attributes->at("name").get<std::string>();
-        metadata.Description = attributes->at("description").get<std::string>();
         metadata.IsNew       = attributes->at("isNew").get<bool>();
         metadata.Type        = ResourceMetadata::ResourceType::Item;
+
+        auto name            = attributes->at("name").get<std::string>();
+        auto description     = attributes->at("description").get<std::string>();
+        metadata.Name        = sf::String::fromUtf8(name.begin(), name.end());
+        metadata.Description = sf::String::fromUtf8(description.begin(), description.end());
 
         if (auto gender = magic_enum::enum_cast<Gender>(attributes->at("gender").get<std::string>()); gender.has_value())
             metadata.Gender = gender.value();

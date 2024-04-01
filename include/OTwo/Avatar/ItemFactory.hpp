@@ -15,7 +15,7 @@
 class ItemFactory : public Gx::Module
 {
 public:
-    ItemFactory();
+    ItemFactory() = default;
     explicit ItemFactory(Gx::ResourceManager &sharedResources);
 
     std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender &gender);

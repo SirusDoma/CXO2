@@ -10,11 +10,12 @@
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/IO/Resource.hpp>
 
+#include <SFML/System/String.hpp>
+
 #include <tuple>
 #include <unordered_map>
 #include <memory>
 #include <map>
-#include <string>
 
 class Item
 {
@@ -38,11 +39,11 @@ public:
     bool IsNew() const;
     void SetIsNew(bool isNew);
 
-    const std::string &GetName() const;
-    void SetName(const std::string &name);
+    const sf::String &GetName() const;
+    void SetName(const sf::String &name);
 
-    const std::string &GetDescription() const;
-    void SetDescription(const std::string &description);
+    const sf::String &GetDescription() const;
+    void SetDescription(const sf::String &description);
 
     bool IsBuyableWith(const Currency &currency) const;
 
@@ -71,7 +72,7 @@ private:
     Gender           m_gender;
     bool             m_isNew;
     unsigned int     m_price;
-    std::string      m_name, m_description;
+    sf::String       m_name, m_description;
     mutable PriceMap m_prices;
 
     Gx::ResourcePtr<Gx::Sprite> m_smallPreview, m_largePreview;

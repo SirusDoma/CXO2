@@ -152,7 +152,7 @@ void RoomButton::Invalidate()
             newMusic->SetVisible(false);
         }
 
-        music->SetString("Lv." + std::to_string(m_room.Chart.Level) + " - " + m_room.Chart.Title);
+        music->SetString("Lv." + std::to_string(m_room.Chart.LevelHx) + " - " + m_room.Chart.Title);
         speed->SetFrame(diffName + speedStr);
     }
     else if (m_room.SongMode == SongMode::Random)
