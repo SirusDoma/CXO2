@@ -130,10 +130,18 @@ void RoomButton::Invalidate()
         std::string diffName;
         switch (m_room.Difficulty)
         {
-            case Difficulty::Easy:   diffName = "EX"; ohmLevel->SetFrame("Beginner"); break;
-            case Difficulty::Normal: diffName = "NX"; ohmLevel->SetFrame("Intermediate"); break;
-            case Difficulty::Hard:   diffName = "HX"; ohmLevel->SetFrame("High"); break;
-            case Difficulty::Master: diffName = "MX"; ohmLevel->SetFrame("Master"); break;
+            case Difficulty::Easy:   diffName = "EX"; break;
+            case Difficulty::Normal: diffName = "NX"; break;
+            case Difficulty::Hard:   diffName = "HX"; break;
+            case Difficulty::Master: diffName = "MX"; break;
+        }
+
+        switch (m_room.Chart.GetOhmLevel())
+        {
+            case OhmLevel::Level1: ohmLevel->SetFrame("Beginner"); break;
+            case OhmLevel::Level2: ohmLevel->SetFrame("Intermediate"); break;
+            case OhmLevel::Level3: ohmLevel->SetFrame("High"); break;
+            case OhmLevel::Level4: ohmLevel->SetFrame("Master"); break;
         }
 
         auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
@@ -152,7 +160,7 @@ void RoomButton::Invalidate()
             newMusic->SetVisible(false);
         }
 
-        music->SetString("Lv." + std::to_string(m_room.Chart.LevelHx) + " - " + m_room.Chart.Title);
+        music->SetString("Lv." + std::to_string(m_room.Chart.Level) + " - " + m_room.Chart.Title);
         speed->SetFrame(diffName + speedStr);
     }
     else if (m_room.SongMode == SongMode::Random)

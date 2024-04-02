@@ -1,9 +1,12 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
+#include <OTwo/Data/UserState.hpp>
 
 #include <Genode/UI.hpp>
-
-#include <cmath>
 #include <Genode/Utilities/StringHelper.hpp>
+
+#include <magic_enum.hpp>
+#include <cmath>
+#include <unordered_set>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::Dialog(copy),
@@ -11,6 +14,12 @@ SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::Node(copy),
     m_initialized(false),
     m_page(0),
+    m_difficulty(Difficulty::Easy),
+    m_sort(static_cast<MusicSortMode>(-1)),
+    m_order(static_cast<MusicSortOrder>(-1)),
+    m_genre(static_cast<Genre>(0)),
+    m_random(static_cast<OhmLevel>(0)),
+    m_music(),
     m_musicList(),
     m_displayList()
 {
@@ -23,6 +32,8 @@ void SelectMusicDialog::Initialize()
 
     Gx::Dialog::Initialize();
 
+
+
     // Rewire callbacks due to copy constructor
     if (auto acceptButton = GetAcceptButton(); acceptButton)
         SetAcceptButton(*acceptButton);
@@ -30,60 +41,51 @@ void SelectMusicDialog::Initialize()
     if (auto cancelButton = GetCancelButton(); cancelButton)
         SetCancelButton(*cancelButton);
 
+    auto& app   = Gx::Application::Instance();
+    auto& state = app.Require<UserState>();
+
     m_page = 0;
-    m_musicList.push_back(ChartMetadata
-    {
-        .ID           = 495,
-        .Title        = "Earth Quake",
-        .Artist       = "KAZE.o2SE",
-        .NoteDesigner = "KAZE.o2SE",
-        .BPM          = 150.0f,
-        .LevelEx      = 2,
-        .LevelNx      = 15,
-        .LevelHx      = 36,
-        .NoteCountEx  = 431,
-        .NoteCountNx  = 1343,
-        .NoteCountHx  = 2821,
-        .Duration     = sf::seconds(195)
-    });
-
-    m_musicList.push_back(ChartMetadata
-    {
-        .ID           = 394,
-        .Title        = "Red Sign",
-        .Artist       = "Kevin.o2SE",
-        .NoteDesigner = "Kevin.o2SE",
-        .BPM          = 180.0f,
-        .LevelEx      = 2,
-        .LevelNx      = 15,
-        .LevelHx      = 34,
-        .NoteCountEx  = 284,
-        .NoteCountNx  = 898,
-        .NoteCountHx  = 2266,
-        .Duration     = sf::seconds(185)
-    });
-
-    m_musicList.push_back(ChartMetadata
-    {
-        .ID           = 521,
-        .Title        = "Monster Express",
-        .Artist       = "BeautifulDay",
-        .NoteDesigner = "NoteFactory",
-        .BPM          = 140.0f,
-        .LevelEx      = 4,
-        .LevelNx      = 14,
-        .LevelHx      = 19,
-        .NoteCountEx  = 321,
-        .NoteCountNx  = 727,
-        .NoteCountHx  = 969,
-        .Duration     = sf::seconds(108)
-    });
+    m_musicList = state.GetMusicList();
 
     for (auto& metadata : m_musicList)
         m_displayList.push_back(&metadata);
 
     if (!m_displayList.empty())
-        m_music = m_displayList[0];
+        m_music = *m_displayList[0];
+
+    auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
+    if (leftButton)
+    {
+        leftButton->SetClickCallback([this] (auto &sender, auto &ev)
+        {
+            if (m_random != static_cast<OhmLevel>(0) || m_page == 0)
+                return;
+
+            m_page--;
+            m_music = O2ChartMetadata{};
+            Invalidate();
+        });
+    }
+
+    auto rightButton = FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+    if (rightButton)
+    {
+        rightButton->SetClickCallback([this] (auto &sender, auto &ev)
+        {
+            auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+            if (!musicSelector)
+                return;
+
+            unsigned int itemListCount = musicSelector->GetVerticalCount() + musicSelector->GetHorizontalCount();
+            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+            if (m_random != static_cast<OhmLevel>(0) || m_page == maxPage - 1)
+                return;
+
+            m_page++;
+            m_music = O2ChartMetadata{};
+            Invalidate();
+        });
+    }
 
     if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
     {
@@ -94,37 +96,76 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
+            if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                activeHighlighter->SetVisible(false);
+
+            if (auto focusHighlighter = button->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
+                focusHighlighter->SetVisible(false);
+
+            button->SetFocusChangedCallback([] (auto &sender, auto &ev)
+            {
+                if (auto focusHighlighter = sender.template FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
+                    focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
+            });
+
             button->SetCheckStateChangeCallback([this, i] (auto sender)
             {
                 if (!sender->IsChecked())
-                    return;
-
-                m_music = m_displayList[i];
-                if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
                 {
-                    std::vector<std::string> info =
-                    {
-                        "Title: " + m_music->Title,
-                        "Artist: " + m_music->Artist,
-                        "Note Designer: " + m_music->NoteDesigner,
-                        "Total Notes: " + std::to_string(m_music->NoteCountHx),
-                        "BPM: " + Gx::StringHelper::ToString(m_music->BPM, 2)
-                    };
+                    if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                        activeHighlighter->SetVisible(false);
 
-                    auto children = infoList->GetChildren();
-                    for (int x = 0; x < children.size(); x++)
-                    {
-                        auto label = dynamic_cast<Gx::Label*>(children[x]);
-                        if (!label)
-                            continue;
-
-                        if (x < info.size())
-                            label->SetString(info[x]);
-                        else
-                            label->SetString(std::string());
-
-                    }
+                    return;
                 }
+
+                m_music = *m_displayList[i];
+                if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                    activeHighlighter->SetVisible(true);
+
+                Invalidate();
+            });
+        }
+
+        list->SetScrollWheelCallback([=] (auto &sender, auto &ev)
+        {
+            if (leftButton && ev.Delta > 0)
+                leftButton->PerformClick();
+            else if (rightButton && ev.Delta < 0)
+                rightButton->PerformClick();
+        });
+    }
+
+    if (auto sortSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SORT_SELECTOR"); sortSelector)
+    {
+        if (auto newButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_NEW"); newButton)
+        {
+            newButton->SetClickCallback([this] (auto &sender, auto &ev)
+            {
+                Sort(MusicSortMode::ID, m_sort != MusicSortMode::ID || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
+            });
+        }
+
+        if (auto titleButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TITLE"); titleButton)
+        {
+            titleButton->SetClickCallback([this] (auto &sender, auto &ev)
+            {
+                Sort(MusicSortMode::Title, m_sort != MusicSortMode::Title || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
+            });
+        }
+
+        if (auto levelButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_DIFF"); levelButton)
+        {
+            levelButton->SetClickCallback([this] (auto &sender, auto &ev)
+            {
+                Sort(MusicSortMode::Level, m_sort != MusicSortMode::Level || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
+            });
+        }
+
+        if (auto durationButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TIME"); durationButton)
+        {
+            durationButton->SetClickCallback([this] (auto &sender, auto &ev)
+            {
+                Sort(MusicSortMode::Duration, m_sort != MusicSortMode::Duration || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
             });
         }
     }
@@ -133,12 +174,188 @@ void SelectMusicDialog::Initialize()
     {
         if (auto allButton = genreSelector->FindChild<Gx::RadioButton>("IDC_RADIO_GENRE_ALL"); allButton)
             allButton->SetCheckedState(true);
+
+        std::unordered_map<std::string, Genre> genreMap = {
+            { "IDC_RADIO_GENRE_ALL", static_cast<Genre>(0) },
+            { "IDC_RADIO_GENRE_BALLAD", Genre::Ballad },
+            { "IDC_RADIO_GENRE_ROCK", Genre::Rock },
+            { "IDC_RADIO_GENRE_DANCE", Genre::Dance },
+            { "IDC_RADIO_GENRE_TECHNO", Genre::Techno },
+            { "IDC_RADIO_GENRE_HIPHOP", Genre::HipHop },
+            { "IDC_RADIO_GENRE_SOUL", Genre::Soul },
+            { "IDC_RADIO_GENRE_JAZZ", Genre::Jazz },
+            { "IDC_RADIO_GENRE_FUNK", Genre::Funk },
+            { "IDC_RADIO_GENRE_CLASSICAL", Genre::Classical },
+            { "IDC_RADIO_GENRE_TRADITIONAL", Genre::Traditional },
+            { "IDC_RADIO_GENRE_ETC", Genre::Etc },
+        };
+
+        for (auto [key, genre] : genreMap)
+        {
+            auto button = genreSelector->FindChild<Gx::RadioButton>(key);
+            if (!button)
+                continue;
+
+            button->SetCheckStateChangeCallback([this, g = genre] (auto sender)
+            {
+                if (!sender->IsChecked())
+                    return;
+
+                if (m_random != static_cast<OhmLevel>(0))
+                {
+                    sender->SetCheckedState(false);
+                    return;
+                }
+
+                m_genre = g;
+                m_music = O2ChartMetadata{};
+                m_page  = 0;
+                m_displayList.clear();
+                for (auto& metadata : m_musicList)
+                {
+                    if (m_genre == static_cast<Genre>(0) || metadata.Genre == m_genre)
+                        m_displayList.push_back(&metadata);
+                }
+
+                Sort(m_sort, m_order);
+            });
+        }
+    }
+
+    if (auto randomSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_RANDOM_SELECTOR"); randomSelector)
+    {
+        std::unordered_map<std::string, OhmLevel> randomLevelMap = {
+            { "IDC_CHECKBOX_RANDOM_DIFF_1", OhmLevel::Level1 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_2", OhmLevel::Level2 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_3", OhmLevel::Level3 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_4", OhmLevel::Level4 },
+        };
+
+        for (auto [id, level] : randomLevelMap)
+        {
+            auto button = randomSelector->FindChild<Gx::CheckBox>(id);
+            if (!button)
+                continue;
+
+            button->SetCheckStateChangeCallback([this, lv = level] (auto sender)
+            {
+                if (sender->IsChecked())
+                    m_random = static_cast<OhmLevel>(m_random | lv);
+                else
+                    m_random = static_cast<OhmLevel>(m_random & ~lv);
+
+                if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+                {
+                    std::unordered_map<std::string, Genre> genreMap = {
+                        {"IDC_RADIO_GENRE_ALL",         static_cast<Genre>(0)},
+                        {"IDC_RADIO_GENRE_BALLAD",      Genre::Ballad},
+                        {"IDC_RADIO_GENRE_ROCK",        Genre::Rock},
+                        {"IDC_RADIO_GENRE_DANCE",       Genre::Dance},
+                        {"IDC_RADIO_GENRE_TECHNO",      Genre::Techno},
+                        {"IDC_RADIO_GENRE_HIPHOP",      Genre::HipHop},
+                        {"IDC_RADIO_GENRE_SOUL",        Genre::Soul},
+                        {"IDC_RADIO_GENRE_JAZZ",        Genre::Jazz},
+                        {"IDC_RADIO_GENRE_FUNK",        Genre::Funk},
+                        {"IDC_RADIO_GENRE_CLASSICAL",   Genre::Classical},
+                        {"IDC_RADIO_GENRE_TRADITIONAL", Genre::Traditional},
+                        {"IDC_RADIO_GENRE_ETC",         Genre::Etc},
+                    };
+
+                    for (auto [key, genre]: genreMap)
+                    {
+                        if (genre != m_genre)
+                            continue;
+
+                        if (auto button = genreSelector->FindChild<Gx::RadioButton>(key); button)
+                        {
+                            button->SetCheckedState(m_random == static_cast<OhmLevel>(0));
+                            break;
+                        }
+                    }
+                }
+
+                if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+                {
+                    std::unordered_map<std::string, Difficulty> diffMap = {
+                        {"IDC_RADIO_NOTE_EX", Difficulty::Easy},
+                        {"IDC_RADIO_NOTE_NX", Difficulty::Normal},
+                        {"IDC_RADIO_NOTE_HX", Difficulty::Hard},
+                    };
+
+                    for (auto [key, diff]: diffMap)
+                    {
+                        if (diff != m_difficulty)
+                            continue;
+
+                        if (auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
+                        {
+                            button->SetCheckedState(m_random == static_cast<OhmLevel>(0));
+                            break;
+                        }
+                    }
+                }
+
+                Invalidate();
+            });
+        }
     }
 
     if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
     {
         if (auto exButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_EX"); exButton)
+        {
             exButton->SetCheckedState(true);
+            exButton->SetCheckStateChangeCallback([this] (auto sender)
+            {
+                if (!sender->IsChecked())
+                    return;
+
+                if (m_random != static_cast<OhmLevel>(0))
+                {
+                    sender->SetCheckedState(false);
+                    return;
+                }
+
+                m_difficulty = Difficulty::Easy;
+                Invalidate();
+            });
+        }
+
+        if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_NX"); nxButton)
+        {
+            nxButton->SetCheckStateChangeCallback([this] (auto sender)
+            {
+                if (!sender->IsChecked())
+                    return;
+
+                if (m_random != static_cast<OhmLevel>(0))
+                {
+                    sender->SetCheckedState(false);
+                    return;
+                }
+
+                m_difficulty = Difficulty::Normal;
+                Invalidate();
+            });
+        }
+
+        if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_HX"); hxButton)
+        {
+            hxButton->SetCheckStateChangeCallback([this] (auto sender)
+            {
+                if (!sender->IsChecked())
+                    return;
+
+                if (m_random != static_cast<OhmLevel>(0))
+                {
+                    sender->SetCheckedState(false);
+                    return;
+                }
+
+                m_difficulty = Difficulty::Hard;
+                Invalidate();
+            });
+        }
     }
 
     if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
@@ -147,6 +364,106 @@ void SelectMusicDialog::Initialize()
             speedButton->SetCheckedState(true);
     }
 
+    Invalidate();
+}
+
+
+void SelectMusicDialog::OnAccepted()
+{
+    Dialog::OnAccepted();
+
+    auto& app       = Gx::Application::Instance();
+    auto& mixer     = app.Require<Gx::Mixer>();
+    auto& resources = app.Require<Gx::ResourceManager>();
+
+    auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
+    mixer.Play(sfx);
+}
+
+void SelectMusicDialog::OnCancelled()
+{
+    Dialog::OnCancelled();
+
+    auto& app       = Gx::Application::Instance();
+    auto& mixer     = app.Require<Gx::Mixer>();
+    auto& resources = app.Require<Gx::ResourceManager>();
+
+    auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
+    mixer.Play(sfx);
+}
+
+O2ChartMetadata SelectMusicDialog::GetSelectedMusic() const
+{
+    return m_music;
+}
+
+OhmLevel SelectMusicDialog::GetSelectedRandomLevels() const
+{
+    return m_random;
+}
+
+Difficulty SelectMusicDialog::GetDifficulty() const
+{
+    return m_difficulty;
+}
+
+Genre SelectMusicDialog::GetGenre() const
+{
+    return m_genre;
+}
+
+void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
+{
+    m_sort = sort;
+    m_order = order;
+
+    switch (sort)
+    {
+        case ID:
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            {
+                if (m_order == MusicSortOrder::Ascending)
+                    return a->ID > b->ID;
+
+                return a->ID < b->ID;
+            });
+            break;
+        case Title:
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            {
+                if (m_order == MusicSortOrder::Ascending)
+                    return a->Title > b->Title;
+
+                return a->Title < b->Title;
+            });
+            break;
+        case Level:
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            {
+                auto x = a->ToChartMetadata(m_difficulty);
+                auto y = b->ToChartMetadata(m_difficulty);
+
+                if (m_order == MusicSortOrder::Ascending)
+                    return x.Level < y.Level;
+
+                return x.Level > y.Level;
+            });
+            break;
+        case Duration:
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            {
+                auto x = a->ToChartMetadata(m_difficulty);
+                auto y = b->ToChartMetadata(m_difficulty);
+
+                if (m_order == MusicSortOrder::Ascending)
+                    return x.Duration < y.Duration;
+
+                return x.Duration > y.Duration;
+            });
+            break;
+        default:
+            break;
+    }
 
     Invalidate();
 }
@@ -155,48 +472,316 @@ void SelectMusicDialog::Invalidate()
 {
     Dialog::Invalidate();
 
-    auto selectList = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
-    auto selectListChildren = selectList->GetChildren();
+    auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+    if (!musicSelector)
+        return;
 
-    unsigned int itemListCount = selectList->GetVerticalCount() + selectList->GetHorizontalCount();
-    int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+    auto elements = musicSelector->GetChildren();
+    unsigned int itemListCount = musicSelector->GetVerticalCount() + musicSelector->GetHorizontalCount();
+    unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+    m_page = static_cast<unsigned int>(std::min(maxPage - 1, m_page));
 
-    if (auto page = FindChild<Gx::Label>("IDC_TEXT_MUSIC_PAGE"); page)
-        page->SetString("[" + Gx::StringHelper::ToString(static_cast<int>(m_page) + 1, 2) + "/" + Gx::StringHelper::ToString(maxPage, 2) + "]");
-
-    for (int i = static_cast<int>(m_page * itemListCount); i < selectListChildren.size(); i++)
+    auto pager = FindChild<Gx::Label>("IDC_TEXT_MUSIC_PAGE");
+    if (pager)
     {
-        auto button = dynamic_cast<Gx::RadioButton*>(selectListChildren[i]);
+        pager->SetString("[" + Gx::StringHelper::ToString(static_cast<int>(m_page) + 1, 2) + "/" + Gx::StringHelper::ToString(static_cast<int>(maxPage), 2) + "]");
+        pager->SetVisible(true);
+    }
+
+    if (m_random != static_cast<OhmLevel>(0))
+    {
+        m_music = O2ChartMetadata{};
+        if (pager)
+            pager->SetVisible(false);
+
+        std::unordered_set<unsigned int> scanned;
+        unsigned int used = 0;
+        for (int r = 1; r < elements.size(); r++)
+        {
+            if (auto button = dynamic_cast<Gx::RadioButton*>(elements[r]); button)
+            {
+                auto lv = static_cast<OhmLevel>(1 << (r - 1));
+                button->SetCheckedState(false);
+                button->SetEnabled(false);
+
+                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                {
+                    button->SetVisible(m_random & lv);
+                    if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                        activeHighlighter->SetVisible(false);
+
+                    Gx::Label *infoLabel = nullptr;
+                    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildren().size())
+                        infoLabel = dynamic_cast<Gx::Label*>(infoList->GetChildren()[r - 1]);
+
+                    if (m_random & lv)
+                    {
+                        title->SetColor(sf::Color(200, 155, 55));
+                        switch(lv)
+                        {
+                            case Level1:
+                                title->SetString("LEVEL 1 - 5");
+                                if (infoLabel)
+                                    infoLabel->SetString("LEVEL 1 - 5");
+
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                {
+                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level <= 5; });
+
+                                    if (result)
+                                    {
+                                        if (auto [_, inserted] = scanned.insert(m.ID); !inserted)
+                                            return false;
+                                    }
+
+                                    return result;
+                                });
+
+                                break;
+                            case Level2:
+                                title->SetString("LEVEL 5 - 9");
+                                if (infoLabel)
+                                    infoLabel->SetString("LEVEL 5 - 9");
+
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                {
+                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    {
+                                        int level = m.ToChartMetadata(diff).Level;
+                                        return level > 5 && level <= 9;
+                                    });
+
+                                    if (result)
+                                    {
+                                        if (auto [_, inserted] = scanned.insert(m.ID); !inserted)
+                                            return false;
+                                    }
+
+                                    return result;
+                                });
+
+                                break;
+                            case Level3:
+                                title->SetString("LEVEL 9 - 13");
+                                if (infoLabel)
+                                    infoLabel->SetString("LEVEL 9 - 13");
+
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                {
+                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    {
+                                        int level = m.ToChartMetadata(diff).Level;
+                                        return level > 9 && level <= 13;
+                                    });
+
+                                    if (result)
+                                    {
+                                        if (auto [_, inserted] = scanned.insert(m.ID); !inserted)
+                                            return false;
+                                    }
+
+                                    return result;
+                                });
+
+                                break;
+                            case Level4:
+                                title->SetString("LEVEL 13 higher");
+                                if (infoLabel)
+                                    infoLabel->SetString("LEVEL 13 higher");
+
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                {
+                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level > 13; });
+
+                                    if (result)
+                                    {
+                                        if (auto [_, inserted] = scanned.insert(m.ID); !inserted)
+                                            return false;
+                                    }
+
+                                    return result;
+                                });
+
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        title->SetString(std::string());
+                        if (infoLabel)
+                            infoLabel->SetString(std::string());
+                    }
+                }
+
+                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                    level->SetString(std::string());
+
+                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                    duration->SetString(std::string());
+            }
+        }
+
+        if (!elements.empty())
+        {
+            if (auto button = dynamic_cast<Gx::RadioButton*>(elements[0]); button)
+            {
+                if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                    activeHighlighter->SetVisible(false);
+
+                button->SetCheckedState(false);
+                button->SetEnabled(false);
+                button->SetVisible(true);
+                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                {
+                    title->SetColor(sf::Color(200, 155, 55));
+                    title->SetString("'Random' is selected (Total: " +
+                        Gx::StringHelper::ToString(static_cast<int>(used), 2) + "/" +
+                        Gx::StringHelper::ToString(static_cast<int>(m_musicList.size()), 2) + ")"
+                    );
+                }
+
+                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                    level->SetString(std::string());
+
+                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                    duration->SetString(std::string());
+            }
+        }
+
+        if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+        {
+            for (auto child : genreSelector->GetChildren())
+            {
+                if (auto button = dynamic_cast<Gx::RadioButton*>(child); button)
+                    button->SetCheckedState(false);
+            }
+        }
+
+        if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+        {
+            for (auto child : levelSelector->GetChildren())
+            {
+                if (auto button = dynamic_cast<Gx::RadioButton*>(child); button)
+                    button->SetCheckedState(false);
+            }
+        }
+
+        return;
+    }
+
+    Gx::Label *lastTitle = nullptr;
+    for (int i = static_cast<int>(elements.size()) - 1; i >= 0; i--)
+    {
+        auto button = dynamic_cast<Gx::RadioButton*>(elements[i]);
         if (!button)
             continue;
 
-        if (i >= m_displayList.size())
+        int index = i + static_cast<int>(m_page * itemListCount);
+        if (index >= m_displayList.size())
         {
+            button->SetCheckedState(false);
             button->SetEnabled(false);
             button->SetVisible(false);
+
+            if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+            {
+                if (!lastTitle)
+                    lastTitle = title;
+            }
+
+            if (i == 0 && m_displayList.empty())
+            {
+                m_music = O2ChartMetadata{};
+                if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
+                {
+                    for (auto child : infoList->GetChildren())
+                    {
+                        if (auto label = dynamic_cast<Gx::Label*>(child); label)
+                            label->SetString(std::string());
+                    }
+                }
+
+                if (pager)
+                    pager->SetVisible(false);
+
+                button->SetVisible(true);
+                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                {
+                    if (!lastTitle)
+                        lastTitle = title;
+
+                    title->SetString(std::string(magic_enum::enum_name(m_genre)) + " is not available yet.");
+                    title->SetColor(sf::Color(135, 200, 60));
+                }
+
+                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                    level->SetString(std::string());
+
+                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                    duration->SetString(std::string());
+            }
 
             continue;
         }
 
-        auto metadata = m_displayList[i];
+        auto metadata = m_displayList[index]->ToChartMetadata(m_difficulty);
+        if (i == 0 && m_music.ID == 0)
+            m_music = *m_displayList[index];
+
         if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
-            title->SetString(metadata->Title);
+        {
+            if (!lastTitle)
+                lastTitle = title;
+            else
+                title->SetColor(lastTitle->GetColor());
+
+            title->SetString(metadata.Title);
+        }
 
         if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
-            level->SetString(std::to_string(metadata->LevelHx));
+            level->SetString(std::to_string(metadata.Level));
 
         if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
         {
-            float seconds = metadata->Duration.asSeconds();
+            float seconds = metadata.Duration.asSeconds();
             int minute    = floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
             duration->SetString("[" + std::to_string(minute) + ":" + Gx::StringHelper::ToString(remainder, 2) + "]");
         }
 
-        button->SetCheckedState(m_music && m_music->ID == metadata->ID);
+        button->SetCheckedState(m_music.ID == m_displayList[index]->ID);
         button->SetEnabled(true);
         button->SetVisible(true);
     }
-}
 
+    auto currentMetadata = m_music.ToChartMetadata(m_difficulty);
+    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
+    {
+        std::vector<std::string> info =
+        {
+            "Title: " + currentMetadata.Title,
+            "Artist: " + currentMetadata.Artist,
+            "Note Designer: " + currentMetadata.NoteDesigner,
+            "Total Notes: " + std::to_string(currentMetadata.NoteCount),
+            "BPM: " + Gx::StringHelper::ToString(m_music.BPM, 2)
+        };
+
+        auto children = infoList->GetChildren();
+        for (int x = 0; x < children.size(); x++)
+        {
+            auto label = dynamic_cast<Gx::Label*>(children[x]);
+            if (!label)
+                continue;
+
+            if (m_music.ID != 0 && x < info.size())
+                label->SetString(info[x]);
+            else
+                label->SetString(std::string());
+        }
+    }
+}

@@ -2,9 +2,10 @@
 #define O2JAM_USER_STATE_HPP
 
 #include <OTwo/Data/Planet.hpp>
+#include <OTwo/Data/Room.hpp>
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
 
 #include <Genode/System/Module.hpp>
-#include "Room.hpp"
 
 class UserState : public Gx::Module
 {
@@ -24,12 +25,16 @@ public:
     const RoomData &GetRoomData() const;
     void SetRoomData(const RoomData &room);
 
+    const std::vector<O2ChartMetadata> &GetMusicList() const;
+    void SetMusicList(const std::vector<O2ChartMetadata> &musicList);
+
 private:
     Player m_player;
     PlanetType m_planet = PlanetType::O2Planet;
     MusicHall m_hall;
     unsigned int m_channelID;
     RoomData m_room;
+    std::vector<O2ChartMetadata> m_musicList;
 };
 
-#endif //O2JAM_USERSTATE_HPP
+#endif

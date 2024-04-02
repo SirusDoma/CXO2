@@ -20,6 +20,7 @@ namespace Gx
         {
             bool Handled;
             const State State;
+            double Delta;
         };
 
         ~Control() override = default;
@@ -36,6 +37,7 @@ namespace Gx
         void SetClickCallback(std::function<void(Control&, Event&)> callback);
         void SetHoldClickCallback(std::function<void(Control&, Event&)> callback);
         void SetDoubleClickCallback(std::function<void(Control&, Event&)> callback);
+        void SetScrollWheelCallback(std::function<void(Control&, Event&)> callback);
 
         void SetEnabled(bool enabled);
         bool IsEnabled() const;
@@ -67,6 +69,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetClickCallback();
         const std::function<void(Control&, Event&)>& GetHoldClickCallback();
         const std::function<void(Control&, Event&)>& GetDoubleClickCallback();
+        const std::function<void(Control&, Event&)>& GetScrollWheelCallback();
 
         void Update(double delta) override;
         RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
@@ -95,7 +98,7 @@ namespace Gx
         bool   m_enabled, m_visible, m_focused, m_clicked;
         double m_deltaClickDuration, m_deltaHoldDuration;
 
-        std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
+        std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onScrollWheel, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }
 

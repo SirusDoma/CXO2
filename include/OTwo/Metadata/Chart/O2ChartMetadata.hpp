@@ -1,10 +1,15 @@
 #ifndef O2JAM_O2CHART_METADATA_HPP
 #define O2JAM_O2CHART_METADATA_HPP
 
-#include <SFML/System/String.hpp>
+
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
-enum O2ChartGenre
+#include <Genode/System/Primitives.hpp>
+#include <Genode/Utilities/StringHelper.hpp>
+
+#include <SFML/System/String.hpp>
+
+enum Genre
 {
     Ballad      = 0,
     Rock        = 1,
@@ -21,77 +26,98 @@ enum O2ChartGenre
 
 struct O2ChartMetadata
 {
-public:
-    int Id;
+    Gx::Uint32 ID;
     sf::String Signature;
     float EncodingVersion;
-    O2ChartGenre Genre;
+    Genre Genre;
     float BPM;
-    short LevelEx;
-    short LevelNx;
-    short LevelHx;
-    short Padding;
-    int EventCountEx;
-    int EventCountNx;
-    int EventCountHx;
-    int NoteCountEx;
-    int NoteCountNx;
-    int NoteCountHx;
-    int MeasureCountEx;
-    int MeasureCountNx;
-    int MeasureCountHx;
-    int BlockCountEx;
-    int BlockCountNx;
-    int BlockCountHx;
-    short OldEncodingVersion;
-    short OldSongId;
-    sf::String OldGenre;
-    int ThumbnailSize;
-    int FileVersion;
-    sf::String Title;
-    sf::String Artist;
-    sf::String NoteArranger;
-    sf::String OJM;
-    int CoverSize;
-    int DurationEx;
-    int DurationNx;
-    int DurationHx;
-    int BlockOffsetEx;
-    int BlockOffsetNx;
-    int BlockOffsetHx;
-    int CoverOffset;
+    Gx::Uint16 LevelEx;
+    Gx::Uint16 LevelNx;
+    Gx::Uint16 LevelHx;
+    Gx::Int16 Unk1;
+    Gx::Uint32 EventCountEx;
+    Gx::Uint32 EventCountNx;
+    Gx::Uint32 EventCountHx;
+    Gx::Uint32 NoteCountEx;
+    Gx::Uint32 NoteCountNx;
+    Gx::Uint32 NoteCountHx;
+    Gx::Uint32 MeasureCountEx;
+    Gx::Uint32 MeasureCountNx;
+    Gx::Uint32 MeasureCountHx;
+    Gx::Uint32 BlockCountEx;
+    Gx::Uint32 BlockCountNx;
+    Gx::Uint32 BlockCountHx;
+    Gx::Int16 OldEncodingVersion;
+    Gx::Int16 OldSongID;
+    char OldGenre[20];
+    Gx::Uint32 ThumbnailSize;
+    Gx::Uint32 FileVersion;
+    char Title[64];
+    char Artist[32];
+    char NoteArranger[32];
+    char OJM[32];
+    Gx::Uint32 CoverSize;
+    Gx::Uint32 DurationEx;
+    Gx::Uint32 DurationNx;
+    Gx::Uint32 DurationHx;
+    Gx::Uint32 BlockOffsetEx;
+    Gx::Uint32 BlockOffsetNx;
+    Gx::Uint32 BlockOffsetHx;
+    Gx::Uint32 CoverOffset;
 
-    ChartMetadata ToChartMetadata(Difficulty difficulty)
+    ChartMetadata ToChartMetadata(Difficulty difficulty) const
     {
         sf::String genre;
         switch (Genre)
         {
-            case O2ChartGenre::Ballad:      genre = "Ballad";      break;
-            case O2ChartGenre::Rock:        genre = "Rock";        break;
-            case O2ChartGenre::Dance:       genre = "Dance";       break;
-            case O2ChartGenre::Techno:      genre = "Techno";      break;
-            case O2ChartGenre::HipHop:      genre = "HipHop";      break;
-            case O2ChartGenre::Soul:        genre = "Soul";        break;
-            case O2ChartGenre::Jazz:        genre = "Jazz";        break;
-            case O2ChartGenre::Funk:        genre = "Funk";        break;
-            case O2ChartGenre::Classical:   genre = "Classical";   break;
-            case O2ChartGenre::Traditional: genre = "Traditional"; break;
-            default:                        genre = "Etc.";        break;
+            case Genre::Ballad:      genre = "Ballad";      break;
+            case Genre::Rock:        genre = "Rock";        break;
+            case Genre::Dance:       genre = "Dance";       break;
+            case Genre::Techno:      genre = "Techno";      break;
+            case Genre::HipHop:      genre = "HipHop";      break;
+            case Genre::Soul:        genre = "Soul";        break;
+            case Genre::Jazz:        genre = "Jazz";        break;
+            case Genre::Funk:        genre = "Funk";        break;
+            case Genre::Classical:   genre = "Classical";   break;
+            case Genre::Traditional: genre = "Traditional"; break;
+            default:                 genre = "Etc.";        break;
         }
 
         unsigned int level = 0;
+        unsigned int duration = 0;
+        unsigned int noteCount = 0;
         switch (difficulty)
         {
-            case Difficulty::Easy:   level = LevelEx; break;
-            case Difficulty::Normal: level = LevelNx; break;
+            case Difficulty::Easy:
+                level = LevelEx;
+                duration = DurationEx;
+                noteCount = NoteCountEx;
+                break;
+            case Difficulty::Normal:
+                level = LevelNx;
+                duration = DurationNx;
+                noteCount = NoteCountNx;
+                break;
             case Difficulty::Hard:
             case Difficulty::Master:
                 level = LevelHx;
+                duration = DurationHx;
+                noteCount = NoteCountHx;
                 break;
         }
 
-        return ChartMetadata{Title, Artist, NoteArranger, LevelEx, genre, level};
+        return ChartMetadata{
+            .ID           = std::to_string(ID),
+            .Title        = Gx::StringHelper::Trim(Title),
+            .Artist       = Gx::StringHelper::Trim(Artist),
+            .NoteDesigner = Gx::StringHelper::Trim(NoteArranger),
+            .BPM          = BPM,
+            .Genre        = genre,
+            .Level        = level,
+            .NoteCount    = noteCount,
+            .Duration     = sf::seconds(static_cast<float>(duration)),
+        };
     }
-}
+};
 
 #endif

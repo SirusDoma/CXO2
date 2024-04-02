@@ -38,7 +38,7 @@ namespace Gx
     class Shape : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
-        virtual ~Shape();
+        virtual ~Shape() = default;
 
         void SetTexture(const sf::Texture &texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rect);
@@ -56,6 +56,9 @@ namespace Gx
         
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color& color) override;
+
+        bool IsVisible() const;
+        void SetVisible(bool visible);
 
         virtual std::size_t GetPointCount() const = 0;
         virtual sf::Vector2f GetPoint(std::size_t index) const = 0;
@@ -75,7 +78,6 @@ namespace Gx
         void UpdateOutline();
         void UpdateOutlineColors();
 
-    private:
         const sf::Texture* m_texture;          
         sf::IntRect        m_textureRect;      
         sf::Color          m_fillColor;        
@@ -84,7 +86,8 @@ namespace Gx
         sf::VertexArray    m_vertices;         
         sf::VertexArray    m_outlineVertices;  
         sf::FloatRect      m_insideBounds;     
-        sf::FloatRect      m_bounds;           
+        sf::FloatRect      m_bounds;
+        bool               m_visible;
     };
 
 }

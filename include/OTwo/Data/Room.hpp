@@ -72,7 +72,6 @@ struct ChatData
     // MegaphoneInfo Megaphone;
 };
 
-
 struct RoomData
 {
     using MemberList = RoomMember[];

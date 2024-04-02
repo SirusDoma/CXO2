@@ -86,7 +86,7 @@ void StateRoom::Initialize()
                 .Artist       = "Kaze.o2SE",
                 .NoteDesigner = "Kaze.o2SE",
                 .Genre        = "Rock",
-                .LevelHx      = 36,
+                .Level        = 36,
             },
             Difficulty::Hard,
             GameMode::Versus,
@@ -125,7 +125,7 @@ void StateRoom::Initialize()
                 .Artist       = "Kaze.o2SE",
                 .NoteDesigner = "Kaze.o2SE",
                 .Genre        = "Rock",
-                .LevelHx      = 32,
+                .Level      = 32,
             },
             Difficulty::Hard,
             GameMode::Versus,
@@ -154,19 +154,13 @@ void StateRoom::Initialize()
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
+                auto musicList = state.GetMusicList();
                 state.SetRoomData(RoomData{
                     4,
                     state.GetCurrentPlayer().ID,
                     createRoomDialog->GetRoomName(),
-                    ChartMetadata
-                    {
-                        .Title        = "V3 (O2 Version)",
-                        .Artist       = "BeautifulDay",
-                        .NoteDesigner = "NoteFactory",
-                        .Genre        = "Classical",
-                        .LevelHx      = 21
-                    },
-                    Difficulty::Normal,
+                    musicList[0].ToChartMetadata(Difficulty::Easy),
+                    Difficulty::Easy,
                     createRoomDialog->GetRoomMode(),
                     SongMode::Normal,
                     RoomState::Waiting,

@@ -4,17 +4,18 @@
 namespace Gx
 {
     Control::Control() :
-        m_enabled(true),
-        m_visible(true),
-        m_focused(false),
-        m_clicked(false),
-        m_deltaClickDuration(),
-        m_state(State::Normal),
-        m_onClick(),
-        m_onHoldClick(),
-        m_onDoubleClick(),
-        m_onGainFocus(),
-        m_onLostFocus()
+            m_enabled(true),
+            m_visible(true),
+            m_focused(false),
+            m_clicked(false),
+            m_deltaClickDuration(),
+            m_state(State::Normal),
+            m_onClick(),
+            m_onHoldClick(),
+            m_onDoubleClick(),
+            m_onScrollWheel(),
+            m_onGainFocus(),
+            m_onLostFocus()
     {
     }
 
@@ -129,6 +130,11 @@ namespace Gx
         m_onDoubleClick = std::move(callback);
     }
 
+    void Control::SetScrollWheelCallback(std::function<void(Control &, Event &)> callback)
+    {
+        m_onScrollWheel = std::move(callback);
+    }
+
     const std::function<void(Control&, Control::Event&)> &Control::GetFocusChangedCallback()
     {
         return m_onFocusChanged;
@@ -157,6 +163,11 @@ namespace Gx
     const std::function<void(Control&, Control::Event&)> &Control::GetDoubleClickCallback()
     {
         return m_onDoubleClick;
+    }
+
+    const std::function<void(Control &, Control::Event&)> &Control::GetScrollWheelCallback()
+    {
+        return m_onScrollWheel;
     }
 
     void Control::AddChild(Control *node)
@@ -384,6 +395,20 @@ namespace Gx
 
     void Control::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
     {
+        if (!IsEnabled())
+            return;
+
+        auto state = GetControlState();
+        if (state == Control::State::Hover || state == Control::State::Active)
+        {
+            auto uiEvent = Event{false, state, ev.delta};
+            if (m_onScrollWheel)
+                m_onScrollWheel(*this, uiEvent);
+
+            if (uiEvent.Handled)
+                return;
+        }
+
         Inputable::OnMouseWheelScrolled(ev);
     }
 }

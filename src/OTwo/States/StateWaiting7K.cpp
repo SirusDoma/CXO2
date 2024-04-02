@@ -61,7 +61,7 @@ void StateWaiting7K::Initialize()
     roomName->SetString(room.Title);
 
     auto musicName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
-    musicName->SetString(room.Chart.Title);
+    musicName->SetString(room.Chart.Title + " [BPM: " + Gx::StringHelper::ToString(room.Chart.BPM, 2) + "]");
 
     std::string speedName(4, '\0');
     if (room.Speed > 0)

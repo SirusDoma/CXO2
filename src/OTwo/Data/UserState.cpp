@@ -49,3 +49,13 @@ void UserState::SetRoomData(const RoomData &room)
 {
     m_room = room;
 }
+
+const std::vector<O2ChartMetadata> &UserState::GetMusicList() const
+{
+    return m_musicList;
+}
+
+void UserState::SetMusicList(const std::vector<O2ChartMetadata> &musicList)
+{
+    m_musicList = musicList;
+}

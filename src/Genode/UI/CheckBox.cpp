@@ -49,6 +49,9 @@ namespace Gx
 
     void CheckBox::Invalidate()
     {
+        if (!IsEnabled())
+            return;
+
         Sprite frame;
         if (IsChecked())
             frame = GetStateFrame(CheckBox::State::Active);

@@ -1,8 +1,7 @@
 #ifndef O2JAM_CHART_METADATA_HPP
 #define O2JAM_CHART_METADATA_HPP
 
-#include <string>
-
+#include <SFML/System/String.hpp>
 #include <SFML/System/Time.hpp>
 
 enum Difficulty
@@ -13,22 +12,38 @@ enum Difficulty
     Master
 };
 
+enum OhmLevel
+{
+    Level1 = 1 << 0,
+    Level2 = 1 << 1,
+    Level3 = 1 << 2,
+    Level4 = 1 << 3
+};
+
 struct ChartMetadata
 {
-    unsigned int ID;
+    sf::String   ID;
     bool         New;
-    std::string  Title;
-    std::string  Artist;
-    std::string  NoteDesigner;
-    std::string  Genre;
+    sf::String   Title;
+    sf::String   Artist;
+    sf::String   NoteDesigner;
     float        BPM;
-    unsigned int LevelEx;
-    unsigned int LevelNx;
-    unsigned int LevelHx;
-    unsigned int NoteCountEx;
-    unsigned int NoteCountNx;
-    unsigned int NoteCountHx;
+    sf::String   Genre;
+    unsigned int Level;
+    unsigned int NoteCount;
     sf::Time     Duration;
+
+    OhmLevel GetOhmLevel() const
+    {
+        if (Level <= 5)
+            return OhmLevel::Level1;
+        else if (Level <= 9)
+            return OhmLevel::Level2;
+        else if (Level <= 13)
+            return OhmLevel::Level3;
+
+        return OhmLevel::Level4;
+    }
 };
 
 #endif

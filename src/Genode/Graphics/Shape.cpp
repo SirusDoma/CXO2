@@ -58,11 +58,8 @@ namespace Gx
         m_vertices(sf::TriangleFan),
         m_outlineVertices(sf::TriangleStrip),
         m_insideBounds(),
-        m_bounds()
-    {
-    }
-
-    Shape::~Shape()
+        m_bounds(),
+        m_visible(true)
     {
     }
 
@@ -193,6 +190,9 @@ namespace Gx
 
     RenderStates Shape::Render(sf::RenderTarget& target, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         states.transform *= GetTransform();
 
         // Render the inside
@@ -285,6 +285,16 @@ namespace Gx
     {
         for (std::size_t i = 0; i < m_outlineVertices.getVertexCount(); ++i)
             m_outlineVertices[i].color = m_outlineColor;
+    }
+
+    bool Shape::IsVisible() const
+    {
+        return m_visible;
+    }
+
+    void Shape::SetVisible(bool visible)
+    {
+        m_visible = visible;
     }
 
 }
