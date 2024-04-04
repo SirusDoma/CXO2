@@ -119,41 +119,33 @@ else()
     add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
     # Compiler Flags
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
-        set(CMAKE_C_COMPILER gcc)
-        set(CMAKE_CXX_COMPILER g++)
-    else()
-        set(CMAKE_C_COMPILER gcc-8)
-        set(CMAKE_CXX_COMPILER g++-8)
+    # TODO: Not to assume the compiler to be GCC/G++
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8)
+        message("FileSystem is not supported with your compiler version.")
+        message("Compiler Version: " ${CMAKE_CXX_COMPILER_VERSION})
     endif()
-    set(CMAKE_C_FLAGS "-lstdc++fs -std=c++17")
-    set(CMAKE_CXX_FLAGS "-lstdc++fs -std=c++17")
 
     # Output Directory
-    if(UNIX)
+    if(UNIX OR __linux__)
         set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
     else()
         set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
     endif()
+
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY                ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY                ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
+    )
 
     # Set dependencies libs
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-gcc")
-    set(FreeType_LIB ${MODULES_DIR}/libfreetype.a)
-    set(OpenAL_LIB ${MODULES_DIR}/libopenal32.a)
-    set(Ogg_LIB ${MODULES_DIR}/libogg.a)
-    set(FLAC_LIB ${MODULES_DIR}/libFLAC.a)
-    set(Vorbis_LIB ${MODULES_DIR}/libvorbis.a)
-    set(VorbisEnc_LIB ${MODULES_DIR}/libvorbisenc.a)
-    set(VorbisFile_LIB ${MODULES_DIR}/libvorbisfile.a)
 
-    # FileSystem library
+    # Libraries
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++fs)
 endif()
 
@@ -168,14 +160,17 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
 # Link Boxer
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
+# TODO: Fork Boxer and migrate Gtk to X11
+if(!UNIX)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
+endif()
 
 # Link Magic Enum
 find_package(magic_enum CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML COMPONENTS audio graphics system window REQUIRED)
+find_package(SFML COMPONENTS audio graphics system window CONFIG REQUIRED)
 if (WIN32)
     find_package(SFML COMPONENTS main REQUIRED)
 endif()

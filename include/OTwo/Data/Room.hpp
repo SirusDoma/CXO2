@@ -38,7 +38,7 @@ struct Player
     unsigned int ID;
     std::string Name;
     int Level;
-    Gender Gender;
+    ::Gender Gender;
     unsigned int Gem;
     unsigned int Cash;
     bool Administrator;
@@ -80,9 +80,9 @@ struct RoomData
     unsigned int  RoomMasterID  = 0;
     std::string   Title;
     ChartMetadata Chart;
-    Difficulty    Difficulty;
-    GameMode      GameMode;
-    SongMode      SongMode;
+    ::Difficulty  Difficulty;
+    ::GameMode    GameMode;
+    ::SongMode    SongMode;
     RoomState     State;
     float         Speed;
     bool          Locked;

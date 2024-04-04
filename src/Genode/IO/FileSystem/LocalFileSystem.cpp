@@ -6,13 +6,8 @@
 
 #include <algorithm>
 
-#if defined(__cpp_lib_filesystem)
 #include <filesystem>
 using namespace std::filesystem;
-#else
-#include <experimental/filesystem>
-using namespace std::experimental::filesystem;
-#endif
 
 #include <fstream>
 

@@ -13,16 +13,16 @@ struct ItemMetadata : ResourceMetadata
 {
     struct ItemSpriteMetadata
     {
-        Gender      Gender;
-        RenderPart  RenderPart;
-        Instrument  Instrument;
-        std::string Reference;
+        ::Gender      Gender;
+        ::RenderPart  RenderPart;
+        ::Instrument  Instrument;
+        std::string   Reference;
     };
 
     unsigned int                     ID;
-    EquipmentType                    EquipmentType;
+    ::EquipmentType                  EquipmentType;
     PlanetType                       Origin;
-    Gender                           Gender;
+    ::Gender                         Gender;
     bool                             IsNew;
     sf::String                       Name, Description, SmallPreview, LargePreview;
     std::map<Currency, unsigned int> Prices;

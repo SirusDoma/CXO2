@@ -41,21 +41,21 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
     if (gender == Gender::Male)
     {
         apply({
-            "Avatar/default/Male/Face.json",
-            "Avatar/default/Male/Hair.json",
-            "Avatar/default/Male/Jacket.json",
-            "Avatar/default/Male/Pants.json",
-            "Avatar/default/Male/Shoes.json"
+            "Avatar/default/male/Face.json",
+            "Avatar/default/male/Hair.json",
+            "Avatar/default/male/Jacket.json",
+            "Avatar/default/male/Pants.json",
+            "Avatar/default/male/Shoes.json"
         });
     }
     else if (gender == Gender::Female)
     {
         apply({
-            "Avatar/default/Female/Face.json",
-            "Avatar/default/Female/Hair.json",
-            "Avatar/default/Female/Jacket.json",
-            "Avatar/default/Female/Pants.json",
-            "Avatar/default/Female/Shoes.json"
+            "Avatar/default/female/Face.json",
+            "Avatar/default/female/Hair.json",
+            "Avatar/default/female/Jacket.json",
+            "Avatar/default/female/Pants.json",
+            "Avatar/default/female/Shoes.json"
         });
     }
 

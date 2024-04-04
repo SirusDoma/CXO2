@@ -29,7 +29,7 @@ struct O2ChartMetadata
     Gx::Uint32 ID;
     sf::String Signature;
     float EncodingVersion;
-    Genre Genre;
+    ::Genre Genre;
     float BPM;
     Gx::Uint16 LevelEx;
     Gx::Uint16 LevelNx;

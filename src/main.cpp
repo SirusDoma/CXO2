@@ -3,8 +3,11 @@
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/System/Exception.hpp>
 #include <Genode/Utilities/Debugger.hpp>
+#include <iostream>
 
+#ifndef __linux__
 #include <boxer/boxer.h>
+#endif
 
 int main(int argc , char** argv)
 {
@@ -23,7 +26,10 @@ int main(int argc , char** argv)
     catch (std::exception &ex)
     {
         if (Gx::Debugger::IsDebuggerAttached())
+        {
+            std::cerr << ex.what() << std::endl;
             throw ex;
+        }
 
         auto details = std::string();
         if (typeid(ex) == typeid(Gx::ResourceAccessException) || typeid(ex) == typeid(Gx::ResourceLoadException))
@@ -36,7 +42,10 @@ int main(int argc , char** argv)
                 details += "- " + path + "\n\n";
         }
 
+#ifndef __linux__
         boxer::show(std::string(std::string(ex.what()) + details).c_str(), "Fatal Error", boxer::Style::Error);
+#endif
+
         throw ex;
     }
 }

@@ -19,7 +19,7 @@ namespace Gx
         struct Event
         {
             bool Handled;
-            const State State;
+            const Control::State State;
             double Delta;
         };
 
