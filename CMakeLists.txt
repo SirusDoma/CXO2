@@ -161,7 +161,7 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
 # Link Boxer
 # TODO: Fork Boxer and migrate Gtk to X11
-if(!UNIX)
+if ((UNIX AND NOT APPLE) OR __linux__)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
 endif()
 
