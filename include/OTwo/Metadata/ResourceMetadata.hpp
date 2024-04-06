@@ -14,7 +14,7 @@ struct ObjectMetadata
 
 struct ResourceMetadata
 {
-    enum ResourceType
+    enum class ResourceType
     {
         None,
 

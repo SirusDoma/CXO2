@@ -8,7 +8,7 @@
 
 #include <vector>
 
-enum MusicSortMode
+enum class MusicSortMode
 {
     ID,
     Title,
@@ -16,7 +16,7 @@ enum MusicSortMode
     Duration
 };
 
-enum MusicSortOrder
+enum class MusicSortOrder
 {
     None,
     Ascending,
@@ -32,7 +32,7 @@ public:
     void Initialize() override;
 
     O2ChartMetadata GetSelectedMusic() const;
-    OhmLevel GetSelectedRandomLevels() const;
+    LevelCategory GetSelectedRandomLevels() const;
     Difficulty GetDifficulty() const;
     Genre GetGenre() const;
 
@@ -51,7 +51,7 @@ private:
     MusicSortMode m_sort;
     MusicSortOrder m_order;
     Genre m_genre;
-    OhmLevel m_random;
+    LevelCategory m_random;
     O2ChartMetadata m_music;
     std::vector<O2ChartMetadata> m_musicList;
     std::vector<O2ChartMetadata*> m_displayList;

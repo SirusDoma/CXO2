@@ -9,7 +9,7 @@ namespace Gx
         Reset();
     }
 
-    const Task::TaskState Task::GetState() const
+    TaskState Task::GetState() const
     {
         return m_state;
     }
@@ -19,7 +19,7 @@ namespace Gx
         m_state = state;
     }
 
-    const sf::Time Task::GetElapsed() const
+    const sf::Time &Task::GetElapsed() const
     {
         return m_elapsed;
     }

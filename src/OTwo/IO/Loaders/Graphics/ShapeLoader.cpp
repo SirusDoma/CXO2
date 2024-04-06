@@ -167,23 +167,23 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     std::unique_ptr<Gx::Shape> shape;
-    if (metadata->ShapeType == ShapeMetadata::Circle)
+    if (metadata->ShapeType == ShapeMetadata::Type::Circle)
     {
         auto circle = dynamic_cast<const CircleMetadata*>(&meta);
         shape = std::make_unique<Gx::Circle>(circle->Radius, circle->PointCount);
 
     }
-    else if (metadata->ShapeType == ShapeMetadata::Polygon)
+    else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
     {
         auto polygon = dynamic_cast<const PolygonMetadata*>(&meta);
         shape = std::make_unique<Gx::Polygon>(polygon->PointCount);
     }
-    else if (metadata->ShapeType == ShapeMetadata::Rectangle)
+    else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
     {
         auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta);
         shape = std::make_unique<Gx::Rectangle>(sf::Vector2f(rectangle->Width, rectangle->Height));
     }
-    else if (metadata->ShapeType == ShapeMetadata::RoundedRectangle)
+    else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
     {
         auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta);
         shape = std::make_unique<Gx::RoundedRectangle>(sf::Vector2f(rectangle->Width, rectangle->Height), rectangle->CornerRadius, rectangle->CornerPointCount);

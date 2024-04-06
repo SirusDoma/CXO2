@@ -13,7 +13,7 @@
 
 namespace Gx
 {
-    enum CacheMode
+    enum class CacheMode
     {
         None,
         Update,

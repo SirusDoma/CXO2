@@ -9,7 +9,7 @@ namespace Gx
     class List : public virtual UiContainer
     {
     public:
-        enum Order
+        enum class Order
         {
             Vertical,
             Horizontal

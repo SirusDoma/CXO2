@@ -2,6 +2,8 @@
 
 #include <OTwo/States/StateRoom.hpp>
 
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+
 #include <OTwo/Data/Room.hpp>
 #include <OTwo/Data/UserState.hpp>
 
@@ -11,11 +13,11 @@
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
 #include <OTwo/States/Components/Waiting/MapSelector.hpp>
 #include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
+#include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 
 #include <Genode/UI.hpp>
 
 #include <magic_enum.hpp>
-#include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -77,10 +79,10 @@ void StateWaiting7K::Initialize()
     std::string diffName;
     switch (room.Difficulty)
     {
-        case Difficulty::Easy:   diffName = "EX"; break;
-        case Difficulty::Normal: diffName = "NX"; break;
-        case Difficulty::Hard:   diffName = "HX"; break;
-        case Difficulty::Master: diffName = "MX"; break;
+        case Difficulty::EX: diffName = "EX"; break;
+        case Difficulty::NX: diffName = "NX"; break;
+        case Difficulty::HX: diffName = "HX"; break;
+        case Difficulty::MX: diffName = "MX"; break;
     }
 
     auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
@@ -139,14 +141,14 @@ void StateWaiting7K::Initialize()
         switch (team)
         {
             default:
-            case A: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
-            case B: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_B");
-            case C: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_C");
-            case D: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_D");
-            case E: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_E");
-            case F: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_F");
-            case G: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_G");
-            case H: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_H");
+            case RoomTeam::A: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
+            case RoomTeam::B: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_B");
+            case RoomTeam::C: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_C");
+            case RoomTeam::D: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_D");
+            case RoomTeam::E: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_E");
+            case RoomTeam::F: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_F");
+            case RoomTeam::G: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_G");
+            case RoomTeam::H: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_H");
         }
     };
 

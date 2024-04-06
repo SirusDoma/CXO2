@@ -11,7 +11,7 @@ namespace Gx
     {
         Task::Update(delta);
 
-        if (GetState() == Task::Running)
+        if (GetState() == TaskState::Running)
         {
             if (m_callback)
                 m_callback();

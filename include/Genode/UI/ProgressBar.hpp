@@ -11,7 +11,7 @@ namespace Gx
     class ProgressBar : public virtual Control, public virtual Colorable
     {
     public:
-        enum Orientation { Horizontal, Vertical };
+        enum class Orientation { Horizontal, Vertical };
 
         ProgressBar();
         explicit ProgressBar(const sf::Texture& texture);

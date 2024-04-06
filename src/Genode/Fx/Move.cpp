@@ -74,7 +74,7 @@ namespace Gx
     {
         Task::Reset();
 
-        if (GetState() != Move::Initial)
+        if (GetState() != TaskState::Initial)
             m_target->SetPosition(m_start);
     }
 }

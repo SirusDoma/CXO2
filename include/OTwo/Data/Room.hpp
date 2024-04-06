@@ -1,7 +1,7 @@
 #ifndef O2JAM_ROOM_DATA_HPP
 #define O2JAM_ROOM_DATA_HPP
 
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
 
 #include <OTwo/Data/Game.hpp>
 #include <OTwo/Data/Character.hpp>
@@ -45,7 +45,7 @@ struct Player
     std::vector<unsigned int> EquippedItemIDs;
 };
 
-enum RoomTeam
+enum class RoomTeam
 {
     A,
     B,

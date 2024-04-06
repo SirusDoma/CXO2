@@ -4,15 +4,7 @@
 #include <SFML/System/String.hpp>
 #include <SFML/System/Time.hpp>
 
-enum Difficulty
-{
-    Easy,
-    Normal,
-    Hard,
-    Master
-};
-
-enum OhmLevel
+enum class LevelCategory
 {
     Level1 = 1 << 0,
     Level2 = 1 << 1,
@@ -33,16 +25,16 @@ struct ChartMetadata
     unsigned int NoteCount;
     sf::Time     Duration;
 
-    OhmLevel GetOhmLevel() const
+    LevelCategory GetLevelCategory() const
     {
         if (Level <= 5)
-            return OhmLevel::Level1;
+            return LevelCategory::Level1;
         else if (Level <= 9)
-            return OhmLevel::Level2;
+            return LevelCategory::Level2;
         else if (Level <= 13)
-            return OhmLevel::Level3;
+            return LevelCategory::Level3;
 
-        return OhmLevel::Level4;
+        return LevelCategory::Level4;
     }
 };
 

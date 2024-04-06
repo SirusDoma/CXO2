@@ -210,13 +210,13 @@ namespace Gx
             m_height = m_height < texCoords.height ? texCoords.height : m_height;
         }
 
-        if (m_alignment != None)
+        if (m_alignment != Alignment::None)
         {
-            if (m_alignment == Left)
+            if (m_alignment == Alignment::Left)
                 SetOrigin(m_width / 2.f, 0);
-            else if (m_alignment == Center)
+            else if (m_alignment == Alignment::Center)
                 SetOrigin(m_width / 2.f, m_height / 2.f);
-            else if (m_alignment == Right)
+            else if (m_alignment == Alignment::Right)
                 SetOrigin(m_width, 0);
         }
 

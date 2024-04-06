@@ -77,7 +77,7 @@ namespace Gx
         m_characterSize      (30),
         m_letterSpacingFactor(1.f),
         m_lineSpacingFactor  (1.f),
-        m_style              (Regular),
+        m_style              (static_cast<Gx::Uint32>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_outlineThickness   (0),
@@ -98,7 +98,7 @@ namespace Gx
         m_characterSize      (characterSize),
         m_letterSpacingFactor(1.f),
         m_lineSpacingFactor  (1.f),
-        m_style              (Regular),
+        m_style              (static_cast<Gx::Uint32>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_outlineThickness   (0),
@@ -321,7 +321,7 @@ namespace Gx
             index = m_string.getSize();
 
         // Precompute the variables needed by the algorithm
-        bool  isBold          = m_style & Bold;
+        bool  isBold          = m_style & static_cast<Gx::Uint32>(Style::Bold);
         float whitespaceWidth = m_font->getGlyph(L' ', m_characterSize, isBold).advance;
         float letterSpacing   = ( whitespaceWidth / 3.f ) * ( m_letterSpacingFactor - 1.f );
         whitespaceWidth      += letterSpacing;
@@ -415,10 +415,10 @@ namespace Gx
             return;
 
         // Compute values related to the text style
-        bool  isBold             = m_style & Bold;
-        bool  isUnderlined       = m_style & Underlined;
-        bool  isStrikeThrough    = m_style & StrikeThrough;
-        float italicShear        = (m_style & Italic) ? 0.209f : 0.f; // 12 degrees in radians
+        bool  isBold             = m_style & static_cast<Gx::Uint32>(Style::Bold);
+        bool  isUnderlined       = m_style & static_cast<Gx::Uint32>(Style::Underlined);
+        bool  isStrikeThrough    = m_style & static_cast<Gx::Uint32>(Style::StrikeThrough);
+        float italicShear        = (m_style & static_cast<Gx::Uint32>(Style::Italic)) ? 0.209f : 0.f; // 12 degrees in radians
         float underlineOffset    = m_font->getUnderlinePosition(m_characterSize);
         float underlineThickness = m_font->getUnderlineThickness(m_characterSize);
 

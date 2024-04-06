@@ -15,7 +15,7 @@
 class ChannelButton : public Gx::RadioButton
 {
 public:
-    enum Mode
+    enum class Mode
     {
         Beginner,
         Intermediate,

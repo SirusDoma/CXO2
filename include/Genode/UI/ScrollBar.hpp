@@ -9,7 +9,7 @@ namespace Gx
     class ScrollBar : public Control, public virtual Colorable
     {
     public:
-        enum ScrollOrientation { Horizontal, Vertical };
+        enum class ScrollOrientation { Horizontal, Vertical };
         
         ScrollBar();
         ~ScrollBar() override = default;

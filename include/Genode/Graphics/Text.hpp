@@ -67,7 +67,7 @@ namespace Gx
     class Text : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
-        enum Style
+        enum class Style
         {
             Regular       = 0,
             Bold          = 1 << 0,

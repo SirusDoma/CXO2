@@ -5,6 +5,7 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
 
 StateRoom::StateRoom(State &state) :
     State(state)
@@ -88,7 +89,7 @@ void StateRoom::Initialize()
                 .Genre        = "Rock",
                 .Level        = 36,
             },
-            Difficulty::Hard,
+            Difficulty::HX,
             GameMode::Versus,
             SongMode::Normal,
             RoomState::Playing,
@@ -104,7 +105,7 @@ void StateRoom::Initialize()
             0,
             "Pimplex's room",
             ChartMetadata{},
-            Difficulty::Hard,
+            Difficulty::HX,
             GameMode::Single,
             SongMode::Random,
             RoomState::Waiting,
@@ -127,7 +128,7 @@ void StateRoom::Initialize()
                 .Genre        = "Rock",
                 .Level      = 32,
             },
-            Difficulty::Hard,
+            Difficulty::HX,
             GameMode::Versus,
             SongMode::Normal,
             RoomState::Waiting,
@@ -159,8 +160,8 @@ void StateRoom::Initialize()
                     4,
                     state.GetCurrentPlayer().ID,
                     createRoomDialog->GetRoomName(),
-                    musicList[0].ToChartMetadata(Difficulty::Easy),
-                    Difficulty::Easy,
+                    musicList[0].ToChartMetadata(Difficulty::EX),
+                    Difficulty::EX,
                     createRoomDialog->GetRoomMode(),
                     SongMode::Normal,
                     RoomState::Waiting,

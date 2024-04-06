@@ -1,4 +1,5 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
 #include <OTwo/Data/UserState.hpp>
 
 #include <Genode/UI.hpp>
@@ -14,11 +15,11 @@ SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::Node(copy),
     m_initialized(false),
     m_page(0),
-    m_difficulty(Difficulty::Easy),
+    m_difficulty(Difficulty::EX),
     m_sort(static_cast<MusicSortMode>(-1)),
     m_order(static_cast<MusicSortOrder>(-1)),
     m_genre(static_cast<Genre>(0)),
-    m_random(static_cast<OhmLevel>(0)),
+    m_random(static_cast<LevelCategory>(0)),
     m_music(),
     m_musicList(),
     m_displayList()
@@ -58,7 +59,7 @@ void SelectMusicDialog::Initialize()
     {
         leftButton->SetClickCallback([this] (auto &sender, auto &ev)
         {
-            if (m_random != static_cast<OhmLevel>(0) || m_page == 0)
+            if (m_random != static_cast<LevelCategory>(0) || m_page == 0)
                 return;
 
             m_page--;
@@ -78,7 +79,7 @@ void SelectMusicDialog::Initialize()
 
             unsigned int itemListCount = musicSelector->GetVerticalCount() + musicSelector->GetHorizontalCount();
             unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
-            if (m_random != static_cast<OhmLevel>(0) || m_page == maxPage - 1)
+            if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
                 return;
 
             m_page++;
@@ -201,7 +202,7 @@ void SelectMusicDialog::Initialize()
                 if (!sender->IsChecked())
                     return;
 
-                if (m_random != static_cast<OhmLevel>(0))
+                if (m_random != static_cast<LevelCategory>(0))
                 {
                     sender->SetCheckedState(false);
                     return;
@@ -224,11 +225,11 @@ void SelectMusicDialog::Initialize()
 
     if (auto randomSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_RANDOM_SELECTOR"); randomSelector)
     {
-        std::unordered_map<std::string, OhmLevel> randomLevelMap = {
-            { "IDC_CHECKBOX_RANDOM_DIFF_1", OhmLevel::Level1 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_2", OhmLevel::Level2 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_3", OhmLevel::Level3 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_4", OhmLevel::Level4 },
+        std::unordered_map<std::string, LevelCategory> randomLevelMap = {
+            { "IDC_CHECKBOX_RANDOM_DIFF_1", LevelCategory::Level1 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_2", LevelCategory::Level2 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_3", LevelCategory::Level3 },
+            { "IDC_CHECKBOX_RANDOM_DIFF_4", LevelCategory::Level4 },
         };
 
         for (auto [id, level] : randomLevelMap)
@@ -240,9 +241,9 @@ void SelectMusicDialog::Initialize()
             button->SetCheckStateChangeCallback([this, lv = level] (auto sender)
             {
                 if (sender->IsChecked())
-                    m_random = static_cast<OhmLevel>(m_random | lv);
+                    m_random = static_cast<LevelCategory>(static_cast<int>(m_random) | static_cast<int>(lv));
                 else
-                    m_random = static_cast<OhmLevel>(m_random & ~lv);
+                    m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
 
                 if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
                 {
@@ -268,7 +269,7 @@ void SelectMusicDialog::Initialize()
 
                         if (auto button = genreSelector->FindChild<Gx::RadioButton>(key); button)
                         {
-                            button->SetCheckedState(m_random == static_cast<OhmLevel>(0));
+                            button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
                         }
                     }
@@ -277,9 +278,9 @@ void SelectMusicDialog::Initialize()
                 if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
                 {
                     std::unordered_map<std::string, Difficulty> diffMap = {
-                        {"IDC_RADIO_NOTE_EX", Difficulty::Easy},
-                        {"IDC_RADIO_NOTE_NX", Difficulty::Normal},
-                        {"IDC_RADIO_NOTE_HX", Difficulty::Hard},
+                        {"IDC_RADIO_NOTE_EX", Difficulty::EX},
+                        {"IDC_RADIO_NOTE_NX", Difficulty::NX},
+                        {"IDC_RADIO_NOTE_HX", Difficulty::HX},
                     };
 
                     for (auto [key, diff]: diffMap)
@@ -289,7 +290,7 @@ void SelectMusicDialog::Initialize()
 
                         if (auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
                         {
-                            button->SetCheckedState(m_random == static_cast<OhmLevel>(0));
+                            button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
                         }
                     }
@@ -310,13 +311,13 @@ void SelectMusicDialog::Initialize()
                 if (!sender->IsChecked())
                     return;
 
-                if (m_random != static_cast<OhmLevel>(0))
+                if (m_random != static_cast<LevelCategory>(0))
                 {
                     sender->SetCheckedState(false);
                     return;
                 }
 
-                m_difficulty = Difficulty::Easy;
+                m_difficulty = Difficulty::EX;
                 Invalidate();
             });
         }
@@ -328,13 +329,13 @@ void SelectMusicDialog::Initialize()
                 if (!sender->IsChecked())
                     return;
 
-                if (m_random != static_cast<OhmLevel>(0))
+                if (m_random != static_cast<LevelCategory>(0))
                 {
                     sender->SetCheckedState(false);
                     return;
                 }
 
-                m_difficulty = Difficulty::Normal;
+                m_difficulty = Difficulty::NX;
                 Invalidate();
             });
         }
@@ -346,13 +347,13 @@ void SelectMusicDialog::Initialize()
                 if (!sender->IsChecked())
                     return;
 
-                if (m_random != static_cast<OhmLevel>(0))
+                if (m_random != static_cast<LevelCategory>(0))
                 {
                     sender->SetCheckedState(false);
                     return;
                 }
 
-                m_difficulty = Difficulty::Hard;
+                m_difficulty = Difficulty::HX;
                 Invalidate();
             });
         }
@@ -397,7 +398,7 @@ O2ChartMetadata SelectMusicDialog::GetSelectedMusic() const
     return m_music;
 }
 
-OhmLevel SelectMusicDialog::GetSelectedRandomLevels() const
+LevelCategory SelectMusicDialog::GetSelectedRandomLevels() const
 {
     return m_random;
 }
@@ -419,7 +420,7 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
 
     switch (sort)
     {
-        case ID:
+        case MusicSortMode::ID:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
@@ -428,7 +429,7 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
                 return a->ID < b->ID;
             });
             break;
-        case Title:
+        case MusicSortMode::Title:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
@@ -437,7 +438,7 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
                 return a->Title < b->Title;
             });
             break;
-        case Level:
+        case MusicSortMode::Level:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 auto x = a->ToChartMetadata(m_difficulty);
@@ -449,7 +450,7 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
                 return x.Level > y.Level;
             });
             break;
-        case Duration:
+        case MusicSortMode::Duration:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 auto x = a->ToChartMetadata(m_difficulty);
@@ -488,7 +489,7 @@ void SelectMusicDialog::Invalidate()
         pager->SetVisible(true);
     }
 
-    if (m_random != static_cast<OhmLevel>(0))
+    if (m_random != static_cast<LevelCategory>(0))
     {
         m_music = O2ChartMetadata{};
         if (pager)
@@ -500,13 +501,14 @@ void SelectMusicDialog::Invalidate()
         {
             if (auto button = dynamic_cast<Gx::RadioButton*>(elements[r]); button)
             {
-                auto lv = static_cast<OhmLevel>(1 << (r - 1));
+                auto lv = static_cast<LevelCategory>(1 << (r - 1));
+                bool isRandomActivated = static_cast<int>(m_random) & static_cast<int>(lv);
                 button->SetCheckedState(false);
                 button->SetEnabled(false);
 
                 if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
                 {
-                    button->SetVisible(m_random & lv);
+                    button->SetVisible(isRandomActivated);
                     if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                         activeHighlighter->SetVisible(false);
 
@@ -514,19 +516,19 @@ void SelectMusicDialog::Invalidate()
                     if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildren().size())
                         infoLabel = dynamic_cast<Gx::Label*>(infoList->GetChildren()[r - 1]);
 
-                    if (m_random & lv)
+                    if (isRandomActivated)
                     {
                         title->SetColor(sf::Color(200, 155, 55));
                         switch(lv)
                         {
-                            case Level1:
+                            case LevelCategory::Level1:
                                 title->SetString("LEVEL 1 - 5");
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 1 - 5");
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level <= 5; });
 
                                     if (result)
@@ -539,14 +541,14 @@ void SelectMusicDialog::Invalidate()
                                 });
 
                                 break;
-                            case Level2:
+                            case LevelCategory::Level2:
                                 title->SetString("LEVEL 5 - 9");
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 5 - 9");
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
                                         int level = m.ToChartMetadata(diff).Level;
@@ -563,14 +565,14 @@ void SelectMusicDialog::Invalidate()
                                 });
 
                                 break;
-                            case Level3:
+                            case LevelCategory::Level3:
                                 title->SetString("LEVEL 9 - 13");
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 9 - 13");
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
                                         int level = m.ToChartMetadata(diff).Level;
@@ -587,14 +589,14 @@ void SelectMusicDialog::Invalidate()
                                 });
 
                                 break;
-                            case Level4:
+                            case LevelCategory::Level4:
                                 title->SetString("LEVEL 13 higher");
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 13 higher");
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::Easy, Difficulty::Normal, Difficulty::Hard};
+                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level > 13; });
 
                                     if (result)

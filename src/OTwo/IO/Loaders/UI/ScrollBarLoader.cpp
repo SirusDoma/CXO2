@@ -19,9 +19,9 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &jso
     if (orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
-            metadata.Orientation = Gx::ScrollBar::Vertical;
+            metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Vertical;
         else
-            metadata.Orientation = Gx::ScrollBar::Horizontal;
+            metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Horizontal;
     }
 
     auto maximum = attributes.find("maximum");

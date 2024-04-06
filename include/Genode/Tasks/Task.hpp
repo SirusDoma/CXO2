@@ -9,23 +9,22 @@
 
 namespace Gx
 {
+    enum class TaskState
+    {
+        Initial,
+        Running,
+        Stopped,
+        Completed
+    };
+
     class Task : public Updatable
     {
     public:
         friend class TaskContainer;
-
-        enum TaskState
-        {
-            Initial,
-            Running,
-            Stopped,
-            Completed
-        };
-
         ~Task() override = default;
 
-        const TaskState GetState() const;
-        virtual const sf::Time GetElapsed() const;
+        TaskState GetState() const;
+        virtual const sf::Time &GetElapsed() const;
 
         void OnStart(std::function<void()> callback);
         void OnStopped(std::function<void()> callback);

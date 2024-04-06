@@ -6,14 +6,14 @@
 
 #include <memory>
 
-enum ResourceScope
+enum class ResourceScope
 {
     Immediate,
     Local,
     Shared
 };
 
-enum DialogStyle
+enum class DialogStyle
 {
     Information,
     OkCancel,

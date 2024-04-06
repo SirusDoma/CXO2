@@ -1,4 +1,5 @@
 ﻿#include <OTwo/States/Components/Room/RoomButton.hpp>
+#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
@@ -130,18 +131,18 @@ void RoomButton::Invalidate()
         std::string diffName;
         switch (m_room.Difficulty)
         {
-            case Difficulty::Easy:   diffName = "EX"; break;
-            case Difficulty::Normal: diffName = "NX"; break;
-            case Difficulty::Hard:   diffName = "HX"; break;
-            case Difficulty::Master: diffName = "MX"; break;
+            case Difficulty::EX: diffName = "EX"; break;
+            case Difficulty::NX: diffName = "NX"; break;
+            case Difficulty::HX: diffName = "HX"; break;
+            case Difficulty::MX: diffName = "MX"; break;
         }
 
-        switch (m_room.Chart.GetOhmLevel())
+        switch (m_room.Chart.GetLevelCategory())
         {
-            case OhmLevel::Level1: ohmLevel->SetFrame("Beginner"); break;
-            case OhmLevel::Level2: ohmLevel->SetFrame("Intermediate"); break;
-            case OhmLevel::Level3: ohmLevel->SetFrame("High"); break;
-            case OhmLevel::Level4: ohmLevel->SetFrame("Master"); break;
+            case LevelCategory::Level1: ohmLevel->SetFrame("Beginner"); break;
+            case LevelCategory::Level2: ohmLevel->SetFrame("Intermediate"); break;
+            case LevelCategory::Level3: ohmLevel->SetFrame("High"); break;
+            case LevelCategory::Level4: ohmLevel->SetFrame("Master"); break;
         }
 
         auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");

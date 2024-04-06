@@ -6,7 +6,7 @@
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/ProgressBar.hpp>
 
-#include <OTwo/Chart/EventChannel.hpp>
+#include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <Genode/UI/ToolTip.hpp>
 #include <OTwo/States/State.hpp>
@@ -35,10 +35,10 @@ private:
     void Invalidate() override;
 
     ::State *m_parent;
-    std::map<EventChannel, Gx::Image*> m_keyTexts, m_keyDowns;
+    std::map<O2Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    GameConfig   m_config;
-    EventChannel m_keyChannel;
+    GameConfig       m_config;
+    O2Chart::Channel m_keyChannel;
 
     bool m_keyTestEnabled;
     bool m_initialized;

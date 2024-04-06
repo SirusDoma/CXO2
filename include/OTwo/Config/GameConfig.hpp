@@ -1,9 +1,10 @@
 #ifndef O2JAM_CONFIG_GAME_CONFIG_HPP
 #define O2JAM_CONFIG_GAME_CONFIG_HPP
 
+#include <OTwo/Chart/Chart.hpp>
+
 #include <Genode/System/Config.hpp>
 
-#include <OTwo/Chart/EventChannel.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 struct GameConfig : public Gx::Config
@@ -21,18 +22,18 @@ struct GameConfig : public Gx::Config
         MusicVolume     = 100;
         EffectVolume    = 100;
         SevenKeyBinding = {
-            {EventChannel::Note1, sf::Keyboard::Key::S},
-            {EventChannel::Note2, sf::Keyboard::Key::D},
-            {EventChannel::Note3, sf::Keyboard::Key::F},
-            {EventChannel::Note4, sf::Keyboard::Key::Space},
-            {EventChannel::Note5, sf::Keyboard::Key::J},
-            {EventChannel::Note6, sf::Keyboard::Key::K},
-            {EventChannel::Note7, sf::Keyboard::Key::L}
+            {O2Chart::Channel::Note1, sf::Keyboard::Key::S},
+            {O2Chart::Channel::Note2, sf::Keyboard::Key::D},
+            {O2Chart::Channel::Note3, sf::Keyboard::Key::F},
+            {O2Chart::Channel::Note4, sf::Keyboard::Key::Space},
+            {O2Chart::Channel::Note5, sf::Keyboard::Key::J},
+            {O2Chart::Channel::Note6, sf::Keyboard::Key::K},
+            {O2Chart::Channel::Note7, sf::Keyboard::Key::L}
         };
         ThreeKeyBinding = {
-            {EventChannel::Note1, sf::Keyboard::Key::LShift},
-            {EventChannel::Note2, sf::Keyboard::Key::RShift},
-            {EventChannel::Note3, sf::Keyboard::Key::Enter}
+            {O2Chart::Channel::Note1, sf::Keyboard::Key::LShift},
+            {O2Chart::Channel::Note2, sf::Keyboard::Key::RShift},
+            {O2Chart::Channel::Note3, sf::Keyboard::Key::Enter}
         };
     }
 
@@ -43,8 +44,8 @@ struct GameConfig : public Gx::Config
     unsigned int MusicVolume;
     unsigned int EffectVolume;
 
-    std::map<EventChannel, sf::Keyboard::Key> SevenKeyBinding;
-    std::map<EventChannel, sf::Keyboard::Key> ThreeKeyBinding;
+    std::map<O2Chart::Channel, sf::Keyboard::Key> SevenKeyBinding;
+    std::map<O2Chart::Channel, sf::Keyboard::Key> ThreeKeyBinding;
 };
 
 #endif

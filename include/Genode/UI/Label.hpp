@@ -9,7 +9,7 @@ namespace Gx
     class Label : public virtual Control, public virtual Text
     {
     public:
-        enum Alignment
+        enum class Alignment
         {
             None,
             Left,

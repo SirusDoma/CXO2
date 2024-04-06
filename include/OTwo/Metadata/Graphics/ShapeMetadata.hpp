@@ -8,7 +8,7 @@
 
 struct ShapeMetadata : TransformMetadata
 {
-    enum Type
+    enum class Type
     {
         Circle,
         Polygon,

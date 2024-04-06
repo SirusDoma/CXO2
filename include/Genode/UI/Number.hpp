@@ -14,7 +14,7 @@ namespace Gx
     class Number : public virtual Control, public Colorable
     {
     public:
-        enum Alignment { None, Left, Center, Right };
+        enum class Alignment { None, Left, Center, Right };
 
         Number();
         explicit Number(const sf::Texture& texture);

@@ -1,4 +1,5 @@
-﻿#include <Genode/Tasks/TaskContainer.hpp>
+﻿#include <Genode/Tasks/Task.hpp>
+#include <Genode/Tasks/TaskContainer.hpp>
 
 namespace Gx
 {
@@ -20,7 +21,7 @@ namespace Gx
         {
             // Run update before deleting
             auto item = *iterator;
-            if (item->GetState() != Task::Completed)
+            if (item->GetState() != TaskState::Completed)
             {
                 item->Stop();
                 item->Update(0);
@@ -36,7 +37,7 @@ namespace Gx
         {
             // Run update before deleting
             auto item = m_tasks[i];
-            if (item->GetState() != Task::Completed)
+            if (item->GetState() != TaskState::Completed)
             {
                 item->Stop();
                 item->Update(0);

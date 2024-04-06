@@ -21,9 +21,9 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
     if (orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
-            metadata.Orientation = Gx::ProgressBar::Vertical;
+            metadata.Orientation = Gx::ProgressBar::Orientation::Vertical;
         else
-            metadata.Orientation = Gx::ProgressBar::Horizontal;
+            metadata.Orientation = Gx::ProgressBar::Orientation::Horizontal;
     }
 
     auto maximum = attributes.find("maximum");

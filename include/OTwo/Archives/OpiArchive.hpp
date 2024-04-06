@@ -11,7 +11,7 @@
 class OpiArchive final : public Gx::Archive
 {
 public:
-    enum Signature : Gx::Uint32
+    enum class Signature : Gx::Uint32
     {
         Unknown,
         OPA = 01,

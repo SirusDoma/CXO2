@@ -15,7 +15,13 @@ OptionDialog::OptionDialog(const Gx::Dialog &copy) :
     Gx::Dialog(copy),
     Gx::UiContainer(copy),
     Gx::Node(copy),
-    m_initialized(false)
+    m_initialized(false),
+    m_parent(),
+    m_keyTexts(),
+    m_keyDowns(),
+    m_config(),
+    m_keyChannel(),
+    m_keyTestEnabled(false)
 {
 }
 
@@ -60,15 +66,15 @@ void OptionDialog::Initialize()
     keyTestCheckBox->SetCheckStateChangeCallback([=] (auto sender)
     {
         m_keyTestEnabled = sender->IsChecked();
-        m_keyChannel     = EventChannel::Note1;
+        m_keyChannel     = O2Chart::Channel::Note1;
         keySelect->SetFrame(0);
         keySelect->SetVisible(!m_keyTestEnabled);
     });
 
-    m_keyChannel = EventChannel::Note1;
+    m_keyChannel = O2Chart::Channel::Note1;
     for (unsigned int i = 1; i <= 7; i++)
     {
-        auto channel = static_cast<EventChannel>(i + 1);
+        auto channel = static_cast<O2Chart::Channel>(i + 1);
         auto keytext = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_TEXT_" + std::to_string(i));
         keytext->SetClickCallback([=] (auto &sender, auto &ev)
         {
@@ -82,7 +88,7 @@ void OptionDialog::Initialize()
     for (unsigned int i = 1; i <= 7; i++)
     {
         auto keyDown = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN_" + std::to_string(i));
-        auto channel = static_cast<EventChannel>(i + 1);
+        auto channel = static_cast<O2Chart::Channel>(i + 1);
 
         keyDown->SetFrame("Note" + std::to_string(i));
         m_keyDowns[channel] = keyDown;
@@ -224,7 +230,7 @@ void OptionDialog::Initialize()
         auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
         keyTestCheckBox->SetCheckedState(false);
 
-        m_keyChannel = EventChannel::Note1;
+        m_keyChannel = O2Chart::Channel::Note1;
         keySelect->SetFrame(0);
 
         if (auto bgGroup = mixer.GetSoundGroup("BGM"); bgGroup)
@@ -346,7 +352,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     toolTip->Hide();
 
     m_keyTestEnabled = false;
-    m_keyChannel = EventChannel::Note1;
+    m_keyChannel = O2Chart::Channel::Note1;
     keySelect->SetFrame(0);
 }
 
@@ -394,13 +400,13 @@ void OptionDialog::OnKeyDown(sf::Event::KeyEvent ev)
             keytext->SetFrame(keyStr);
 
             int index = static_cast<int>(m_keyChannel);
-            if (index >= static_cast<int>(EventChannel::Note7))
-                index = static_cast<int>(EventChannel::Note1);
+            if (index >= static_cast<int>(O2Chart::Channel::Note7))
+                index = static_cast<int>(O2Chart::Channel::Note1);
             else
                 index++;
 
-            m_keyChannel = static_cast<EventChannel>(index);
-            keySelect->SetFrame(index - static_cast<int>(EventChannel::Note1));
+            m_keyChannel = static_cast<O2Chart::Channel>(index);
+            keySelect->SetFrame(index - static_cast<int>(O2Chart::Channel::Note1));
             keySelect->SetVisible(true);
         }
         else

@@ -1,15 +1,23 @@
 #ifndef O2JAM_O2CHART_METADATA_HPP
 #define O2JAM_O2CHART_METADATA_HPP
 
-
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/System/Primitives.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <SFML/System/String.hpp>
+#include <SFML/System/Time.hpp>
 
-enum Genre
+enum class  Difficulty
+{
+    EX = 0,
+    NX = 1,
+    HX = 2,
+    MX = 3
+};
+
+enum class Genre
 {
     Ballad      = 0,
     Rock        = 1,
@@ -88,18 +96,18 @@ struct O2ChartMetadata
         unsigned int noteCount = 0;
         switch (difficulty)
         {
-            case Difficulty::Easy:
+            case Difficulty::EX:
                 level = LevelEx;
                 duration = DurationEx;
                 noteCount = NoteCountEx;
                 break;
-            case Difficulty::Normal:
+            case Difficulty::NX:
                 level = LevelNx;
                 duration = DurationNx;
                 noteCount = NoteCountNx;
                 break;
-            case Difficulty::Hard:
-            case Difficulty::Master:
+            case Difficulty::HX:
+            case Difficulty::MX:
                 level = LevelHx;
                 duration = DurationHx;
                 noteCount = NoteCountHx;
