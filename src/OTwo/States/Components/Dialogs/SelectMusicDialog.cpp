@@ -8,6 +8,7 @@
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
+#include <OTwo/IO/Loaders/Chart/O2ChartLoader.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::Dialog(copy),
@@ -18,7 +19,7 @@ SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     m_difficulty(Difficulty::EX),
     m_sort(static_cast<MusicSortMode>(-1)),
     m_order(static_cast<MusicSortOrder>(-1)),
-    m_genre(static_cast<Genre>(0)),
+    m_genre(static_cast<Genre>(-1)),
     m_random(static_cast<LevelCategory>(0)),
     m_music(),
     m_musicList(),
@@ -32,8 +33,6 @@ void SelectMusicDialog::Initialize()
         return;
 
     Gx::Dialog::Initialize();
-
-
 
     // Rewire callbacks due to copy constructor
     if (auto acceptButton = GetAcceptButton(); acceptButton)
@@ -52,7 +51,7 @@ void SelectMusicDialog::Initialize()
         m_displayList.push_back(&metadata);
 
     if (!m_displayList.empty())
-        m_music = *m_displayList[0];
+        m_music = *m_displayList[m_displayList.size() / 2];
 
     auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
     if (leftButton)
@@ -77,7 +76,7 @@ void SelectMusicDialog::Initialize()
             if (!musicSelector)
                 return;
 
-            unsigned int itemListCount = musicSelector->GetVerticalCount() + musicSelector->GetHorizontalCount();
+            unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
             unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
             if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
                 return;
@@ -111,6 +110,7 @@ void SelectMusicDialog::Initialize()
 
             button->SetCheckStateChangeCallback([this, i] (auto sender)
             {
+                auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
                 if (!sender->IsChecked())
                 {
                     if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
@@ -119,9 +119,15 @@ void SelectMusicDialog::Initialize()
                     return;
                 }
 
-                m_music = *m_displayList[i];
                 if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                     activeHighlighter->SetVisible(true);
+
+                unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
+                auto music = *m_displayList[i + static_cast<int>(m_page * itemListCount)];
+                if (m_music.ID == music.ID)
+                    return;
+
+                m_music = music;
 
                 Invalidate();
             });
@@ -177,7 +183,7 @@ void SelectMusicDialog::Initialize()
             allButton->SetCheckedState(true);
 
         std::unordered_map<std::string, Genre> genreMap = {
-            { "IDC_RADIO_GENRE_ALL", static_cast<Genre>(0) },
+            { "IDC_RADIO_GENRE_ALL", static_cast<Genre>(-1) },
             { "IDC_RADIO_GENRE_BALLAD", Genre::Ballad },
             { "IDC_RADIO_GENRE_ROCK", Genre::Rock },
             { "IDC_RADIO_GENRE_DANCE", Genre::Dance },
@@ -214,7 +220,7 @@ void SelectMusicDialog::Initialize()
                 m_displayList.clear();
                 for (auto& metadata : m_musicList)
                 {
-                    if (m_genre == static_cast<Genre>(0) || metadata.Genre == m_genre)
+                    if (m_genre == static_cast<Genre>(-1) || metadata.Genre == m_genre)
                         m_displayList.push_back(&metadata);
                 }
 
@@ -248,7 +254,7 @@ void SelectMusicDialog::Initialize()
                 if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
                 {
                     std::unordered_map<std::string, Genre> genreMap = {
-                        {"IDC_RADIO_GENRE_ALL",         static_cast<Genre>(0)},
+                        {"IDC_RADIO_GENRE_ALL",         static_cast<Genre>(-1)},
                         {"IDC_RADIO_GENRE_BALLAD",      Genre::Ballad},
                         {"IDC_RADIO_GENRE_ROCK",        Genre::Rock},
                         {"IDC_RADIO_GENRE_DANCE",       Genre::Dance},
@@ -318,7 +324,7 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::EX;
-                Invalidate();
+                Sort(m_sort, m_order);
             });
         }
 
@@ -336,7 +342,7 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::NX;
-                Invalidate();
+                Sort(m_sort, m_order);
             });
         }
 
@@ -354,7 +360,7 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::HX;
-                Invalidate();
+                Sort(m_sort, m_order);
             });
         }
     }
@@ -362,12 +368,166 @@ void SelectMusicDialog::Initialize()
     if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
     {
         if (auto speedButton = speedSelector->FindChild<Gx::RadioButton>("IDC_RADIO_SPEED_10"); speedButton)
+        {
             speedButton->SetCheckedState(true);
+            m_speed = 1.f;
+        }
+
+        for (auto child : speedSelector->GetChildren())
+        {
+            auto button = dynamic_cast<Gx::RadioButton*>(child);
+            if (!button)
+                continue;
+
+            auto name = button->GetName();
+            if (auto index = name.find_last_of('/'); index != -1)
+                name = name.substr(index + 1);
+
+            auto prefix = std::string("IDC_RADIO_SPEED_");
+            if (name.compare(0, prefix.size(), prefix) != 0)
+                continue;
+
+            auto speedName = name.substr(prefix.size());
+            float speed = 0.f;
+
+            if (speedName == "XR")
+                speed = XrSpeed;
+            else if (speedName == "3D")
+                speed = TdSpeed;
+            else if (speedName.size() == 2)
+                speed = std::stof(std::string(1, speedName[0]) + "." + std::string(1, speedName[1]));
+
+            if (speed != XrSpeed && speed != TdSpeed)
+            {
+                bool supported = false;
+                for (float s : SupportedHiSpeeds)
+                {
+                    if (speed == s)
+                    {
+                        supported = true;
+                        break;
+                    }
+                }
+
+                if (!supported)
+                    continue;
+            }
+
+            button->SetCheckStateChangeCallback([this, speed] (auto sender)
+            {
+                if (!sender->IsChecked())
+                    return;
+
+                m_speed = speed;
+            });
+        }
     }
 
-    Invalidate();
+    Sort(MusicSortMode::Level, MusicSortOrder::Ascending);
 }
 
+void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
+{
+    Dialog::OnKeyDown(ev);
+
+    if (ev.code == sf::Keyboard::Up)
+    {
+        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        {
+            auto children = list->GetChildren();
+            Gx::RadioButton *previous = nullptr;
+            for (int i = 0; i < children.size(); i++)
+            {
+                auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
+                if (!button)
+                    continue;
+
+                if (button->IsChecked())
+                {
+                    if (!previous && m_page != 0)
+                    {
+                        m_page--;
+                        m_music = O2ChartMetadata{};
+                        Invalidate();
+                        return;
+                    }
+                    else if (i > 0)
+                    {
+                        if (previous)
+                            previous->SetCheckedState(true);
+
+                        return;
+                    }
+                }
+
+                previous = button;
+            }
+        }
+    }
+    else if (ev.code == sf::Keyboard::Down)
+    {
+        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        {
+            auto children = list->GetChildren();
+            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+            for (int i = 0; i < children.size(); i++)
+            {
+                auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
+                if (!button)
+                    continue;
+
+                if (button->IsChecked())
+                {
+                    if (i == children.size() - 1 && m_page < maxPage - 1)
+                    {
+                        m_page++;
+                        m_music = O2ChartMetadata{};
+                        Invalidate();
+                        return;
+                    }
+                    else if (i < children.size())
+                    {
+                        for (int j = i + 1; j < children.size(); j++)
+                        {
+                            if (auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
+                            {
+                                next->SetCheckedState(true);
+                                break;
+                            }
+                        }
+
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    else if (ev.code == sf::Keyboard::Left)
+    {
+        if (m_page == 0)
+            return;
+
+        m_page--;
+        m_music = O2ChartMetadata{};
+        Invalidate();
+    }
+    else if (ev.code == sf::Keyboard::Right)
+    {
+        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        {
+            auto children = list->GetChildren();
+            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+
+            if (m_page == maxPage - 1)
+                return;
+        }
+
+
+        m_page++;
+        m_music = O2ChartMetadata{};
+        Invalidate();
+    }
+}
 
 void SelectMusicDialog::OnAccepted()
 {
@@ -403,14 +563,19 @@ LevelCategory SelectMusicDialog::GetSelectedRandomLevels() const
     return m_random;
 }
 
-Difficulty SelectMusicDialog::GetDifficulty() const
+Difficulty SelectMusicDialog::GetSelectedDifficulty() const
 {
     return m_difficulty;
 }
 
-Genre SelectMusicDialog::GetGenre() const
+Genre SelectMusicDialog::GetSelectedGenre() const
 {
     return m_genre;
+}
+
+float SelectMusicDialog::GetSelectedSpeed() const
+{
+    return m_speed;
 }
 
 void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
@@ -424,18 +589,18 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
-                    return a->ID > b->ID;
+                    return a->ID < b->ID;
 
-                return a->ID < b->ID;
+                return a->ID > b->ID;
             });
             break;
         case MusicSortMode::Title:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
-                    return a->Title > b->Title;
+                    return std::string(a->Title) < std::string(b->Title);
 
-                return a->Title < b->Title;
+                return std::string(a->Title) > std::string(b->Title);
             });
             break;
         case MusicSortMode::Level:
@@ -478,10 +643,24 @@ void SelectMusicDialog::Invalidate()
         return;
 
     auto elements = musicSelector->GetChildren();
-    unsigned int itemListCount = musicSelector->GetVerticalCount() + musicSelector->GetHorizontalCount();
+    unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
     unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
-    m_page = static_cast<unsigned int>(std::min(maxPage - 1, m_page));
 
+    if (m_music.ID != 0)
+    {
+        unsigned int i = 0;
+        for (auto m : m_displayList)
+        {
+            if (m->ID == m_music.ID)
+                break;
+
+            i++;
+        }
+
+        m_page = std::floor(static_cast<float>(i) / static_cast<float>(itemListCount));
+    }
+
+    m_page = static_cast<unsigned int>(std::min(maxPage - 1, m_page));
     auto pager = FindChild<Gx::Label>("IDC_TEXT_MUSIC_PAGE");
     if (pager)
     {
@@ -761,6 +940,9 @@ void SelectMusicDialog::Invalidate()
         button->SetVisible(true);
     }
 
+    if (m_music.ID == 0)
+        return;
+
     auto currentMetadata = m_music.ToChartMetadata(m_difficulty);
     if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
     {
@@ -785,5 +967,19 @@ void SelectMusicDialog::Invalidate()
             else
                 label->SetString(std::string());
         }
+    }
+
+    if (auto thumbnail = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_THUMBNAIL"); thumbnail && m_coverID != m_music.ID)
+    {
+        m_coverID   = m_music.ID;
+        m_thumbnail = O2ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default);
+
+        if (m_thumbnail)
+        {
+            thumbnail->SetVisible(true);
+            thumbnail->SetTexture(*m_thumbnail);
+        }
+        else
+            thumbnail->SetVisible(false);
     }
 }

@@ -33,12 +33,15 @@ public:
 
     O2ChartMetadata GetSelectedMusic() const;
     LevelCategory GetSelectedRandomLevels() const;
-    Difficulty GetDifficulty() const;
-    Genre GetGenre() const;
+    Difficulty GetSelectedDifficulty() const;
+    Genre GetSelectedGenre() const;
+    float GetSelectedSpeed() const;
 
     void Sort(MusicSortMode mode, MusicSortOrder order = static_cast<MusicSortOrder>(0));
 
 protected:
+    void OnKeyDown(sf::Event::KeyEvent ev) override;
+
     void OnAccepted() override;
     void OnCancelled() override;
 
@@ -47,6 +50,9 @@ protected:
 private:
     bool m_initialized;
     unsigned int m_page;
+    unsigned int m_coverID;
+    float m_speed;
+    Gx::ResourcePtr<sf::Texture> m_thumbnail;
     Difficulty m_difficulty;
     MusicSortMode m_sort;
     MusicSortOrder m_order;
