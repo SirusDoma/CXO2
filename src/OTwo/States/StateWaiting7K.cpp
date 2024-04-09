@@ -83,6 +83,7 @@ void StateWaiting7K::Initialize()
         case Difficulty::NX: diffName = "NX"; break;
         case Difficulty::HX: diffName = "HX"; break;
         case Difficulty::MX: diffName = "MX"; break;
+        default:             diffName = "RX"; break;
     }
 
     auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
@@ -240,6 +241,42 @@ void StateWaiting7K::Initialize()
                 dialogSelectMusic->Show(this, std::string(), false);
             });
         }
+
+        dialogSelectMusic->SetAcceptCallback([=, s = &state, r = &room] ()
+        {
+            auto music = dialogSelectMusic->GetSelectedMusic();
+            auto meta = music.ToChartMetadata(dialogSelectMusic->GetSelectedDifficulty());
+            auto data = RoomData(*r);
+
+            data.Chart      = meta;
+            data.Difficulty = dialogSelectMusic->GetSelectedDifficulty();
+            data.Speed      = dialogSelectMusic->GetSelectedSpeed();
+            s->SetRoomData(data);
+
+            std::string speedName(4, '\0');
+            if (data.Speed > 0)
+            {
+                if (std::fmod(data.Speed, 1.0f) != 0)
+                    speedName.resize(std::snprintf(&speedName[0], speedName.size(), "%.1f", data.Speed));
+                else
+                    speedName = std::to_string(static_cast<int>(data.Speed));
+            }
+            else
+                speedName = "R";
+
+            std::string diffName;
+            switch (data.Difficulty)
+            {
+                case Difficulty::EX: diffName = "EX"; break;
+                case Difficulty::NX: diffName = "NX"; break;
+                case Difficulty::HX: diffName = "HX"; break;
+                case Difficulty::MX: diffName = "MX"; break;
+                default:             diffName = "RX"; break;
+            }
+
+            musicName->SetString(meta.Title + " [BPM: " + Gx::StringHelper::ToString(meta.BPM, 2) + "]");
+            level->SetFrame(diffName + speedName);
+        });
     }
 
 

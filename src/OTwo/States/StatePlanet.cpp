@@ -18,7 +18,7 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    auto state    = Require<UserState>();
+    auto& state   = Require<UserState>();
     auto& mixer   = Require<Gx::Mixer>();
 
     auto bgm      = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
@@ -137,65 +137,9 @@ void StatePlanet::OnChannelEnter(MusicHall hall, Channel channel)
         return;
     }
 
-    auto musicList = std::vector<O2ChartMetadata>();
-    musicList.push_back(O2ChartMetadata
-    {
-        .ID           = 495,
-        .BPM          = 150.0f,
-        .LevelEx      = 2,
-        .LevelNx      = 15,
-        .LevelHx      = 36,
-        .NoteCountEx  = 431,
-        .NoteCountNx  = 1343,
-        .NoteCountHx  = 2821,
-        .Title        = "Earth Quake",
-        .Artist       = "KAZE.o2SE",
-        .NoteArranger = "KAZE.o2SE",
-        .DurationEx   = 195,
-        .DurationNx   = 195,
-        .DurationHx   = 195
-    });
-
-    musicList.push_back(O2ChartMetadata
-    {
-        .ID           = 394,
-        .BPM          = 180.0f,
-        .LevelEx      = 2,
-        .LevelNx      = 15,
-        .LevelHx      = 34,
-        .NoteCountEx  = 284,
-        .NoteCountNx  = 898,
-        .NoteCountHx  = 2266,
-        .Title        = "Red Sign",
-        .Artist       = "Kevin.o2SE",
-        .NoteArranger = "Kevin.o2SE",
-        .DurationEx   = 185,
-        .DurationNx   = 185,
-        .DurationHx   = 185
-    });
-
-    musicList.push_back(O2ChartMetadata
-    {
-        .ID           = 521,
-        .BPM          = 140.0f,
-        .LevelEx      = 4,
-        .LevelNx      = 14,
-        .LevelHx      = 19,
-        .NoteCountEx  = 321,
-        .NoteCountNx  = 727,
-        .NoteCountHx  = 969,
-        .Title        = "Monster Express",
-        .Artist       = "BeautifulDay",
-        .NoteArranger = "NoteFactory",
-        .DurationEx   = 108,
-        .DurationNx   = 108,
-        .DurationHx   = 108
-    });
-
     auto& state = Require<UserState>();
     state.SetMusicHall(hall);
     state.SetChannelID(channel.ID);
-    state.SetMusicList(musicList);
 
     m_connecting = true;
     auto sequence = Create<Gx::Sequence>([&] ()
