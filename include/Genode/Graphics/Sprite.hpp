@@ -30,6 +30,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include <Genode/Entities/Colorable.hpp>
+#include <Genode/Graphics/BlendMode.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
@@ -38,8 +39,6 @@
 
 namespace Gx
 {
-    typedef std::shared_ptr<const sf::Texture> TextureHandle;
-
     class Sprite : virtual public Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual Colorable
     {
     public:
@@ -55,6 +54,9 @@ namespace Gx
         const sf::IntRect& GetTexCoords() const;
         const sf::Color& GetColor() const override;
 
+        Gx::BlendMode GetBlendMode() const;
+        void SetBlendMode(Gx::BlendMode blendMode);
+
         sf::FloatRect GetLocalBounds() const;
         sf::FloatRect GetGlobalBounds() const;
 
@@ -68,6 +70,7 @@ namespace Gx
         sf::Vertex  m_vertices[4];
         const sf::Texture* m_texture;
         sf::IntRect m_texcoords;
+        Gx::BlendMode m_blendMode;
     };
 
 }

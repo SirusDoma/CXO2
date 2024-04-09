@@ -6,6 +6,8 @@
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
 
+#include <magic_enum.hpp>
+
 Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
     SpriteMetadata metadata;
@@ -30,6 +32,7 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadat
         sprite->SetTexture(*texture);
 
     sprite->SetName(metadata->Name);
+    sprite->SetBlendMode(metadata->BlendMode);
     sprite->SetTexCoords(metadata->TexCoords);
     sprite->SetColor(metadata->Color);
     sprite->SetOrigin(metadata->Origin);
@@ -47,6 +50,13 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
 
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+
+    metadata.BlendMode = Gx::BlendMode::Auto;
+    if (auto mode = attributes.find("blend"); mode != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gx::BlendMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.BlendMode = parsed.value();
+    }
 
     auto color = attributes.find("color");
     if (color != attributes.end())

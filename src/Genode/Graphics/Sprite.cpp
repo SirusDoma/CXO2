@@ -34,20 +34,23 @@ namespace Gx
 {
     Sprite::Sprite() :
         m_texture(nullptr),
-        m_texcoords()
+        m_texcoords(),
+        m_blendMode(Gx::BlendMode::Auto)
     {
     }
 
     Sprite::Sprite(const sf::Texture& texture) :
         m_texture(nullptr),
-        m_texcoords()
+        m_texcoords(),
+        m_blendMode(Gx::BlendMode::Auto)
     {
         SetTexture(texture);
     }
 
     Sprite::Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) :
         m_texture(nullptr),
-        m_texcoords()
+        m_texcoords(),
+        m_blendMode(Gx::BlendMode::Auto)
     {
         SetTexture(texture);
         SetTexCoords(rectangle);
@@ -97,6 +100,16 @@ namespace Gx
         return m_vertices[0].color;
     }
 
+    Gx::BlendMode Sprite::GetBlendMode() const
+    {
+        return m_blendMode;
+    }
+
+    void Sprite::SetBlendMode(Gx::BlendMode blendMode)
+    {
+        m_blendMode = blendMode;
+    }
+
     sf::FloatRect Sprite::GetLocalBounds() const
     {
         auto width = static_cast<float>(std::abs(m_texcoords.width));
@@ -123,8 +136,19 @@ namespace Gx
     {
         if (m_texture)
         {
-            states.transform *= GetTransform();
             states.texture = m_texture;
+            states.transform *= GetTransform();
+            switch (m_blendMode)
+            {
+                case BlendMode::Alpha:          states.blendMode = sf::BlendAlpha;    break;
+                case BlendMode::Additive:       states.blendMode = sf::BlendAdd;      break;
+                case BlendMode::Multiplicative: states.blendMode = sf::BlendMultiply; break;
+                case BlendMode::Min:            states.blendMode = sf::BlendMin;      break;
+                case BlendMode::Max:            states.blendMode = sf::BlendMax;      break;
+                case BlendMode::None:           states.blendMode = sf::BlendNone;     break;
+                case BlendMode::Auto:                                                 break;
+            }
+
             target.draw(m_vertices, 4, sf::TriangleStrip, states);
         }
 

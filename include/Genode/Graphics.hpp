@@ -1,6 +1,7 @@
 #ifndef GENODE_GRAPHICS_HPP
 #define GENODE_GRAPHICS_HPP
 
+#include <Genode/Graphics/BlendMode.hpp>
 #include <Genode/Graphics/RenderStates.hpp>
 #include <Genode/Graphics/Transformable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
