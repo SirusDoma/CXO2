@@ -1,29 +1,27 @@
-#ifndef O2JAM_OPI_ARCHIVE_HPP
-#define O2JAM_OPI_ARCHIVE_HPP
+#ifndef O2JAM_OJM_ARCHIVE_HPP
+#define O2JAM_OJM_ARCHIVE_HPP
 
-#include <Genode/IO.hpp>
-#include <SFML/System/FileInputStream.hpp>
 
 #include <OTwo/Archives/FileInfo.hpp>
+#include <OTwo/Archives/M30Archive.hpp>
+#include <OTwo/Archives/OmcArchive.hpp>
+
+#include <Genode/IO/Archive.hpp>
+
+#include <SFML/System/FileInputStream.hpp>
 
 #include <unordered_map>
+#include <Genode/System/Exception.hpp>
 
-class OpiArchive final : public virtual Gx::Archive
+class OjmArchive final : public virtual Gx::Archive, M30Archive, OmcArchive
 {
 public:
-    enum class Signature : Gx::Uint32
-    {
-        Unknown,
-        OPA = 01,
-        OPI = 02,
-    };
+    OjmArchive() = default;
+    ~OjmArchive() override = default;
 
-    OpiArchive() = default;
-    ~OpiArchive() override = default;
-
-    Signature GetSignature() const;
     bool LoadFromFile(const std::string& fileName) override;
 
+    Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const override;
     Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
     bool Contains(const std::string& name) const override;
@@ -36,15 +34,14 @@ public:
     Gx::Int64 GetFileSize(const std::string &fileName) const override;
 
 private:
-    const unsigned int ITEM_HEADER_SIZE = 152;
+    enum class ArchiveType
+    {
+        Unknown,
+        M30,
+        OMC
+    };
 
-    bool ReadStream(void* data, Gx::Uint64 size) const;
- 
-    Signature m_signature;
-    Gx::Uint32 m_count;
-
-    mutable std::unordered_map<std::string, FileInfo> m_entries;
-    mutable sf::FileInputStream m_fileStream;
+    ArchiveType m_type = ArchiveType::Unknown;
 };
 
 #endif

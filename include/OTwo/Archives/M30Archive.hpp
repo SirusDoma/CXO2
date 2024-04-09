@@ -33,7 +33,7 @@ struct M30SampleHeader
     int   PcmSamples;
 };
 
-class M30Archive final : public Gx::Archive
+class M30Archive : public virtual Gx::Archive
 {
 public:
     M30Archive() = default;
@@ -41,7 +41,7 @@ public:
 
     bool LoadFromFile(const std::string& fileName) override;
 
-    Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
+    virtual Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
     Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
     bool Contains(const std::string& name) const override;
@@ -60,7 +60,7 @@ private:
 
     static Gx::Uint8* DecodeSample(const Gx::Uint8* encoded, int length, int encodingCode);
 
-    M30Header m_header;
+    M30Header m_header = M30Header();
     mutable std::unordered_map<unsigned int, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };

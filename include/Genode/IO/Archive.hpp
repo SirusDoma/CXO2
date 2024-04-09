@@ -12,7 +12,7 @@
 
 namespace Gx
 {
-    class Archive : public FileSystemController
+    class Archive : public virtual FileSystemController
     {
     public:
 

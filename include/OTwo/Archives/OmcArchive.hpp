@@ -39,7 +39,7 @@ struct OmcOggHeader
     int  Size;
 };
 
-class OmcArchive final : public Gx::Archive
+class OmcArchive : public virtual Gx::Archive
 {
 public:
     OmcArchive() = default;
@@ -47,7 +47,7 @@ public:
 
     bool LoadFromFile(const std::string& fileName) override;
 
-    Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
+    virtual Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
     Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
     bool Contains(const std::string& name) const override;
@@ -66,7 +66,7 @@ private:
 
     bool ReadStream(void* data, Gx::Uint64 size) const;
 
-    OmcHeader m_header;
+    OmcHeader m_header = OmcHeader();
     mutable std::unordered_map<unsigned int, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
