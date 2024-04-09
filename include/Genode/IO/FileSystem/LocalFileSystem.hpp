@@ -39,6 +39,8 @@ namespace Gx
 
         Int64 GetFileSize(const std::string &fileName) const override;
 
+        std::vector<FileInfo> Scan(const std::string &pattern, bool recursive) const override;
+
     private:
         LocalFileSystem() = default;
 

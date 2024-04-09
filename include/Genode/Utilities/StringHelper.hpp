@@ -5,8 +5,8 @@
 
 #include <sstream>
 #include <iomanip>
-
 #include <cmath>
+#include <regex>
 
 namespace Gx
 {
@@ -39,13 +39,11 @@ namespace Gx
             sf::String result = input;
             for (size_t i = 0; i < result.getSize(); i++)
             {
-                if (result[i] == L' ' || result[i] == L'\t' || result[i] == L'\n')
+                if (result[i] != L'\0' && result[i] != L' ' && result[i] != L'\t' && result[i] != L'\n')
                 {
-                    result.erase(i, 1);
-                    i--;
-                }
-                else
+                    result = input.substring(i);
                     break;
+                }
             }
 
             return result;
@@ -54,15 +52,13 @@ namespace Gx
         static sf::String TrimEnd(const sf::String &input)
         {
             sf::String result = input;
-            for (size_t i = result.getSize() - 1; i > 0 && !result.isEmpty(); i--)
+            for (size_t i = result.getSize() - 1; i > 0; i--)
             {
-                if (result[i] == L' ' || result[i] == L'\t' || result[i] == L'\n')
+                if (result[i] != L'\0' && result[i] != L' ' && result[i] != L'\t' && result[i] != L'\n')
                 {
-                    result.erase(i, 1);
-                    i++;
-                }
-                else
+                    result = input.substring(0, i + 1);
                     break;
+                }
             }
 
             return result;
@@ -73,7 +69,31 @@ namespace Gx
             return TrimEnd(TrimStart(input));
         }
 
-        static sf::String RemoveExtension(const std::string& fileName) {
+        static bool IsGlobMatch(const std::string &input, const sf::String &pattern)
+        {
+            std::string regexPattern;
+            for (char c : pattern)
+            {
+                if (c == '*')
+                    regexPattern += ".*";
+                else if (c == '?')
+                    regexPattern += ".";
+                else if (std::ispunct(c))
+                {
+                    regexPattern += "\\";
+                    regexPattern += c;
+                }
+                else
+                    regexPattern += c;
+            }
+
+
+            auto regex = std::regex(regexPattern);
+            return std::regex_match(input, regex);
+        }
+
+        static sf::String RemoveExtension(const std::string& fileName)
+        {
             if (fileName == "." || fileName == "..")
                 return fileName;
 

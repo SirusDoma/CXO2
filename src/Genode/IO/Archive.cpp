@@ -25,4 +25,17 @@ namespace Gx
     {
         return m_filename;
     }
+
+    std::vector<Gx::FileInfo> Archive::Scan(const std::string &pattern, bool recrusive) const
+    {
+        std::vector<FileInfo> files;
+        for (const auto &entry : GetFileEntries())
+        {
+            auto fileName = entry.GetName();
+            if (StringHelper::IsGlobMatch(fileName, pattern))
+                files.push_back(std::move(FileInfo(*this, fileName, GetFileSize(fileName))));
+        }
+
+        return files;
+    }
 }

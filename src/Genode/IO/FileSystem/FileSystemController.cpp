@@ -1,0 +1,19 @@
+#include <Genode/IO/FileSystem/FileSystemController.hpp>
+
+namespace Gx
+{
+    std::vector<FileInfo> FileSystemController::Scan(const std::string &pattern, bool recrusive) const
+    {
+        return {};
+    }
+
+    const std::string &FileSystemController::GetPrefix() const
+    {
+        return m_prefix;
+    }
+
+    void FileSystemController::SetPathPrefix(const std::string &prefix)
+    {
+        m_prefix = prefix;
+    }
+}

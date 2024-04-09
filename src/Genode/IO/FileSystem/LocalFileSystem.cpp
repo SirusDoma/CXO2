@@ -3,13 +3,13 @@
 #include <SFML/System/FileInputStream.hpp>
 
 #include <Genode/IO/FileSystem/FileInfo.hpp>
+#include <Genode/Utilities/StringHelper.hpp>
 
+#include <unordered_set>
 #include <algorithm>
-
+#include <fstream>
 #include <filesystem>
 using namespace std::filesystem;
-
-#include <fstream>
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -219,6 +219,14 @@ namespace Gx
 
     std::string LocalFileSystem::GetFullName(const std::string& fileName, const bool withExtension) const
     {
+        if (exists(fileName))
+        {
+            if (withExtension)
+                return fileName;
+
+            return path(fileName).replace_extension().string();
+        }
+
         for (std::string &dir : m_paths)
         {
             if (std::string fullPath = std::string(dir).append("/").append(fileName); exists(fullPath))
@@ -256,5 +264,39 @@ namespace Gx
         fs.write(reinterpret_cast<const char*>(data), size);
 
         fs.close();
+    }
+
+    std::vector<FileInfo> LocalFileSystem::Scan(const std::string &pattern, bool recursive) const
+    {
+        std::vector<FileInfo> files;
+        std::unordered_set<std::string> scanned;
+
+        auto paths = m_paths;
+        for (const auto& dir : paths)
+        {
+            if (!exists(dir))
+                continue;
+
+            for (const auto &entry : directory_iterator(dir))
+            {
+                if (is_directory(entry) && recursive)
+                {
+                    paths.push_back(entry.path());
+                    continue;
+                }
+
+                if (!is_regular_file(entry))
+                    continue;
+
+                auto fileName = weakly_canonical(entry.path()).string();
+                if (auto [_, inserted] = scanned.insert(fileName); !inserted)
+                    continue;
+
+                if (StringHelper::IsGlobMatch(entry.path().filename().string(), pattern))
+                    files.push_back(std::move(FileInfo(*this, fileName, GetFileSize(fileName))));
+            }
+        }
+
+        return files;
     }
 }

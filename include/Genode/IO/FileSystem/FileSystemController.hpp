@@ -21,6 +21,7 @@ namespace Gx
 
         virtual ResourcePtr<sf::InputStream> Open(const std::string &fileName) const = 0;
 
+        virtual std::vector<FileInfo> Scan(const std::string &pattern, bool recursive) const;
         virtual bool Contains(const std::string &fileName) const = 0;
 
         virtual std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const = 0;
@@ -31,8 +32,8 @@ namespace Gx
 
         virtual Int64 GetFileSize(const std::string &fileName) const = 0;
 
-        const std::string &GetPrefix() const { return m_prefix; }
-        void SetPathPrefix(const std::string &prefix) { m_prefix = prefix; }
+        const std::string &GetPrefix() const;
+        void SetPathPrefix(const std::string &prefix);
 
     private:
         std::string m_prefix;
