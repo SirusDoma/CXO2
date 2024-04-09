@@ -134,7 +134,7 @@ bool ImageLoader::ParseMetadata(const Gx::Json &attributes, ImageMetadata &metad
             t->at("width").get_to(w);
             t->at("height").get_to(h);
 
-            texCoords = sf::IntRect(x, y, w, h);
+            texCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
         }
         frame.TexCoords = texCoords;
         metadata.Frames.push_back({frameName, frame});

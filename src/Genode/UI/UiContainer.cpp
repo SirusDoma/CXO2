@@ -39,7 +39,7 @@ namespace Gx
     {
         Inputable::OnKeyDown(ev);
 
-        if (!IsEnabled() || ev.code != sf::Keyboard::Tab)
+        if (!IsEnabled() || ev.code != sf::Keyboard::Key::Tab)
             return;
 
         TextBox *first   = nullptr;
@@ -138,6 +138,6 @@ namespace Gx
                 result.height = bounds.top  + bounds.height;
         }
 
-        m_localBounds = sf::FloatRect (0, 0, result.width - result.left, result.height - result.top);
+        m_localBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.width - result.left, result.height - result.top));
     }
 }

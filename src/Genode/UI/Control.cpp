@@ -268,7 +268,7 @@ namespace Gx
     {
         if (GetControlState() != Control::State::Active)
         {
-            bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
+            bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y));
             if (intersect && GetControlState() == Control::State::Normal)
                 SetControlState(Control::State::Hover);
             else if (!intersect && GetControlState() == Control::State::Hover)
@@ -283,7 +283,7 @@ namespace Gx
 
     void Control::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
     {
-        bool intersect = GetGlobalBounds().contains(ev.x, ev.y);
+        bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y));
         if (intersect)
         {
             if (GetControlState() == Control::State::Hover)
@@ -323,7 +323,7 @@ namespace Gx
 
     void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
     {
-        if (GetGlobalBounds().contains(ev.x, ev.y))
+        if (GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
         {
             if (GetControlState() == Control::State::Active)
             {

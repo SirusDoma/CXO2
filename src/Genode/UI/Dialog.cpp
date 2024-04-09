@@ -151,10 +151,10 @@ namespace Gx
             auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(static_cast<sf::RenderWindow&>(target)));
 
             if (m_acceptButton)
-                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
 
             if (m_cancelButton)
-                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
 
             OnShown(*scene);
             Invalidate();
@@ -190,9 +190,9 @@ namespace Gx
     {
         UiContainer::OnKeyDown(ev);
 
-        if (ev.code == sf::Keyboard::Enter)
+        if (ev.code == sf::Keyboard::Key::Enter)
             OnAccepted();
-        else if (ev.code == sf::Keyboard::Escape)
+        else if (ev.code == sf::Keyboard::Key::Escape)
             OnCancelled();
     }
 

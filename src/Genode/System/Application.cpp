@@ -12,7 +12,7 @@ namespace Gx
     }
 
     Application::Application(const std::string &title, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
-        m_window(mode, title, fullScreen ? sf::Style::Fullscreen : sf::Style::Titlebar | sf::Style::Close),
+        m_window(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
         m_title(title),
         m_timer(),
         m_renderFreq(0),
@@ -48,8 +48,8 @@ namespace Gx
 
         // Setup view
         auto view = m_window.getDefaultView();
-        view.setSize(static_cast<float>(m_virtualMode.width), static_cast<float>(m_virtualMode.height));
-        view.setCenter(m_virtualMode.width / 2.0f, m_virtualMode.height / 2.0f);
+        view.setSize(sf::Vector2f(static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)));
+        view.setCenter(sf::Vector2f(m_virtualMode.size.x / 2.0f, m_virtualMode.size.y / 2.0f));
         m_window.setView(view);
 
         // Bootstrap the game

@@ -1,6 +1,6 @@
 # CMake Config
 cmake_minimum_required(VERSION 3.27)
-project(O2Jam)
+project(O2Jam LANGUAGES C CXX OBJCXX)
 
 # Compiler
 set(CMAKE_CXX_STANDARD 17)
@@ -17,16 +17,32 @@ include_directories(include)
 include_directories(extlibs/headers)
 
 # External Libs Sources and Flags
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
+include(FetchContent)
 # -- SFML
-set(SFML_DIR "${SFML_ROOT}/cmake/SFML")
-set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
+fetchcontent_declare(
+    SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG feature/miniaudio
+)
+fetchcontent_makeavailable(SFML)
 # -- Clip Flags
 set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
 set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
-add_subdirectory(extlibs/headers/clip)
+fetchcontent_declare(
+    clip
+    GIT_REPOSITORY https://github.com/dacap/clip.git
+    GIT_TAG main
+)
+fetchcontent_makeavailable(clip)
 # -- Boxer Flags
 set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
-add_subdirectory(extlibs/headers/boxer)
+fetchcontent_declare(
+    Boxer
+    GIT_REPOSITORY https://github.com/aaronmjacobs/Boxer.git
+    GIT_TAG master
+)
+fetchcontent_makeavailable(Boxer)
 
 # Default flags
 if (NOT CMAKE_BUILD_TYPE)
@@ -157,31 +173,19 @@ find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # Link Clip
+include_directories(${FETCHCONTENT_BASE_DIR}/clip-src)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
 # Link Boxer
 # TODO: Fork Boxer and migrate Gtk to X11
-if (APPLE OR WIN32)
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
-endif()
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
 
 # Link Magic Enum
 find_package(magic_enum CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link SFML
-find_package(SFML COMPONENTS audio graphics system window CONFIG REQUIRED)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
 if (WIN32)
-    find_package(SFML COMPONENTS main REQUIRED)
-endif()
-
-if(SFML_FOUND)
-    include_directories(${SFML_INCLUDE_DIR})
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
-
-    if (WIN32)
-        target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
-    endif()
-else()
-    message(FATAL_ERROR "SFML not found")
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
 endif()

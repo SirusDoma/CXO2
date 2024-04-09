@@ -6,24 +6,24 @@
 namespace Gx
 {
     // 8 bits integer types
-    typedef int8_t  Int8;
-    typedef uint8_t Uint8;
+    typedef std::int8_t  Int8;
+    typedef std::uint8_t Uint8;
 
     // 16 bits integer types
-    typedef int16_t  Int16;
-    typedef uint16_t Uint16;
+    typedef std::int16_t  Int16;
+    typedef std::uint16_t Uint16;
 
     // 32 bits integer types
-    typedef int32_t  Int32;
-    typedef uint32_t Uint32;
+    typedef std::int32_t  Int32;
+    typedef std::uint32_t Uint32;
 
     // 64 bits integer types
 #if defined(_MSC_VER)
     typedef signed   __int64 Int64;
     typedef unsigned __int64 Uint64;
 #else
-    typedef int64_t  Int64;
-    typedef uint64_t Uint64;
+    typedef std::int64_t  Int64;
+    typedef std::uint64_t Uint64;
 #endif
 
 }

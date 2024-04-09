@@ -3,7 +3,7 @@
 namespace Gx
 {
     ProgressBar::ProgressBar() :
-        m_vertices(sf::TriangleStrip, 4),
+        m_vertices(sf::PrimitiveType::TriangleStrip, 4),
         m_texture(),
         m_texCoords(),
         m_orientation(Orientation::Horizontal),
@@ -14,9 +14,8 @@ namespace Gx
     }
 
     ProgressBar::ProgressBar(const sf::Texture &texture) :
-        ProgressBar(texture, sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y))
+        ProgressBar(texture, sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)))
     {
-
     }
 
     ProgressBar::ProgressBar(const sf::Texture &texture, const sf::IntRect &texCoords) :
@@ -28,7 +27,7 @@ namespace Gx
 
     sf::FloatRect ProgressBar::GetLocalBounds() const
     {
-        return sf::FloatRect(0, 0, m_texCoords.width, m_texCoords.height);
+        return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.width, m_texCoords.height));
     }
 
     const sf::Texture *ProgressBar::GetTexture() const
@@ -164,9 +163,9 @@ namespace Gx
             }
         }
 
-        m_vertices[0] = sf::Vertex(sf::Vector2f(x, y), color, sf::Vector2f(left, top));
-        m_vertices[1] = sf::Vertex(sf::Vector2f(x, h), color, sf::Vector2f(left, bottom));
-        m_vertices[2] = sf::Vertex(sf::Vector2f(w, y), color, sf::Vector2f(right, top));
-        m_vertices[3] = sf::Vertex(sf::Vector2f(w, h), color, sf::Vector2f(right, bottom));
+        m_vertices[0] = {sf::Vector2f(x, y), color, sf::Vector2f(left, top)};
+        m_vertices[1] = {sf::Vector2f(x, h), color, sf::Vector2f(left, bottom)};
+        m_vertices[2] = {sf::Vector2f(w, y), color, sf::Vector2f(right, top)};
+        m_vertices[3] = {sf::Vector2f(w, h), color, sf::Vector2f(right, bottom)};
     }
 }

@@ -430,7 +430,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
 {
     Dialog::OnKeyDown(ev);
 
-    if (ev.code == sf::Keyboard::Up)
+    if (ev.code == sf::Keyboard::Key::Up)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
@@ -464,7 +464,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
             }
         }
     }
-    else if (ev.code == sf::Keyboard::Down)
+    else if (ev.code == sf::Keyboard::Key::Down)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
@@ -502,7 +502,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
             }
         }
     }
-    else if (ev.code == sf::Keyboard::Left)
+    else if (ev.code == sf::Keyboard::Key::Left)
     {
         if (m_page == 0)
             return;
@@ -511,7 +511,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
         m_music = O2ChartMetadata{};
         Invalidate();
     }
-    else if (ev.code == sf::Keyboard::Right)
+    else if (ev.code == sf::Keyboard::Key::Right)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {

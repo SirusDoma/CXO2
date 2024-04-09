@@ -24,7 +24,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromJson(const Gx::Json &json, c
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
         
-        metadata.Bounds = sf::FloatRect(x, y, w, h);
+        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
     }
 
     auto maxLength = attributes.find("maximumLength");

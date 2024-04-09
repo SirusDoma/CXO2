@@ -79,7 +79,7 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
         texCoords->at("y").get_to(y);
         texCoords->at("width").get_to(w);
         texCoords->at("height").get_to(h);
-        metadata.TexCoords = sf::IntRect(x, y, w, h);
+        metadata.TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
     }
 
     return true;

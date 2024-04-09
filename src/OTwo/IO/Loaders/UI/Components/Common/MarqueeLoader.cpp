@@ -26,7 +26,7 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromJson(const Gx::Json &json, const
         bounds->at("y").get_to(y);
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
-        metadata.Bounds = sf::FloatRect(x, y, w, h);
+        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
     }
 
     return LoadFromMetadata(metadata, context);

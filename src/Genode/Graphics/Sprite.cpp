@@ -60,7 +60,7 @@ namespace Gx
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
         if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))
-            SetTexCoords(sf::IntRect(0, 0, static_cast<int>(texture.getSize().x), static_cast<int>(texture.getSize().y)));
+            SetTexCoords(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(static_cast<int>(texture.getSize().x), static_cast<int>(texture.getSize().y))));
 
         // Assign the new texture
         m_texture = &texture;
@@ -115,7 +115,7 @@ namespace Gx
         auto width = static_cast<float>(std::abs(m_texcoords.width));
         auto height = static_cast<float>(std::abs(m_texcoords.height));
 
-        return {0.f, 0.f, width, height};
+        return {sf::Vector2f(0.f, 0.f), sf::Vector2f(width, height)};
     }
 
     sf::FloatRect Sprite::GetGlobalBounds() const
@@ -149,7 +149,7 @@ namespace Gx
                 case BlendMode::Auto:                                                 break;
             }
 
-            target.draw(m_vertices, 4, sf::TriangleStrip, states);
+            target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, states);
         }
 
         return RenderableContainer::Render(target, states);

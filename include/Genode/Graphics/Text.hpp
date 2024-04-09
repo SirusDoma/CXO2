@@ -46,7 +46,7 @@
 namespace
 {
     struct CacheStorage {
-        typedef sf::Uint64 sf::Texture::* type;
+        typedef Gx::Uint64 sf::Texture::* type;
         friend type Get(CacheStorage);
     };
 

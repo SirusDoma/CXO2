@@ -41,7 +41,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
             frame.at("y").get_to(y);
             frame.at("width").get_to(w);
             frame.at("height").get_to(h);
-            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(x, y, w, h);
+            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
         }
     }
 

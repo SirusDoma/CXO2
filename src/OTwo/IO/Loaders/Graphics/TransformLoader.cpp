@@ -24,7 +24,7 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceM
     auto transform = sf::Transform();
     transform.translate(metadata->Position);
     transform.scale(metadata->Scale);
-    transform.rotate(metadata->Rotation);
+    transform.rotate(sf::degrees(metadata->Rotation));
 
     return std::make_unique<sf::Transform>(transform);
 }

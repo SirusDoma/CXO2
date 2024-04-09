@@ -259,7 +259,7 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(ev.x, ev.y))
+        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
         {
             auto bounds   = GetScrollBarGlobalBounds();
             m_dragging    = true;

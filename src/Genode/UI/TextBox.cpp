@@ -1,7 +1,7 @@
 #include <Genode/UI/TextBox.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-#include <clip/clip.h>
+#include <clip.h>
 
 namespace Gx
 {
@@ -271,7 +271,7 @@ namespace Gx
                 index = Erase(index - 1, selectionLength);
 
             auto string = m_text.GetString();
-            string.insert(index, unicode);
+            string.insert(index, sf::String(static_cast<char32_t>(unicode)));
             m_text.SetString(string);
 
             return ++index;
@@ -435,7 +435,7 @@ namespace Gx
         control = ev.system;
 #endif
 
-        if (ev.code == sf::Keyboard::Backspace || (ev.code == sf::Keyboard::Delete && m_caret.SelectionLength != 0))
+        if (ev.code == sf::Keyboard::Key::Backspace || (ev.code == sf::Keyboard::Key::Delete && m_caret.SelectionLength != 0))
         {
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
@@ -444,7 +444,7 @@ namespace Gx
             m_caret.Index = Erase(m_caret.Index - 1, length == 0 ? -1 : length);
             m_caret.SelectionLength = 0;
         }
-        else if (ev.code == sf::Keyboard::Delete)
+        else if (ev.code == sf::Keyboard::Key::Delete)
         {
             if (m_caret.Index >= m_text.GetString().getSize())
                 return;
@@ -455,7 +455,7 @@ namespace Gx
             m_text.SetString(str);
             m_caret.SelectionLength = 0;
         }
-        else if (ev.code == sf::Keyboard::Enter)
+        else if (ev.code == sf::Keyboard::Key::Enter)
         {
             // Trim front and back string from whitespaces
             sf::String string = StringHelper::Trim(m_text.GetString());
@@ -469,7 +469,7 @@ namespace Gx
         {
             if (ev.shift)
             {
-                if (ev.code == sf::Keyboard::Left)
+                if (ev.code == sf::Keyboard::Key::Left)
                 {
                     if (m_caret.Index <= 0)
                         return;
@@ -477,7 +477,7 @@ namespace Gx
                     m_caret.Index--;
                     m_caret.SelectionLength++;
                 }
-                else if (ev.code == sf::Keyboard::Right)
+                else if (ev.code == sf::Keyboard::Key::Right)
                 {
                     if (m_caret.Index >= m_text.GetString().getSize())
                         return;
@@ -489,16 +489,16 @@ namespace Gx
 
             if (control)
             {
-                if (ev.code == sf::Keyboard::C || ev.code == sf::Keyboard::X)
+                if (ev.code == sf::Keyboard::Key::C || ev.code == sf::Keyboard::Key::X)
                 {
                     clip::set_text(GetSelectedText());
-                    if (ev.code == sf::Keyboard::X)
+                    if (ev.code == sf::Keyboard::Key::X)
                     {
                         m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
                         m_caret.SelectionLength = 0;
                     }
                 }
-                else if (ev.code == sf::Keyboard::V)
+                else if (ev.code == sf::Keyboard::Key::V)
                 {
                     auto input = std::string();
                     clip::get_text(input);
@@ -511,13 +511,13 @@ namespace Gx
         }
         else if (!ev.shift)
         {
-            if (ev.code == sf::Keyboard::Left)
+            if (ev.code == sf::Keyboard::Key::Left)
             {
                 m_caret.Index--;
                 m_caret.SelectionLength = 0;
                 m_text.SetFillColor(m_text.GetFillColor());
             }
-            else if (ev.code == sf::Keyboard::Right)
+            else if (ev.code == sf::Keyboard::Key::Right)
             {
                 m_caret.Index++;
                 m_caret.SelectionLength = 0;

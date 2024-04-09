@@ -9,6 +9,8 @@
 #include <Genode/SceneGraph/InputableContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
+#include <SFML/System/Time.hpp>
+
 #include <initializer_list>
 #include <functional>
 

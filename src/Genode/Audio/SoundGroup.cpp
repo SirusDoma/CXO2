@@ -128,7 +128,7 @@ namespace Gx
         {
             m_pan = pan;
             for (auto source : m_sources)
-                source->setPosition(m_pan, 0.f, 0.f);
+                source->setPosition(sf::Vector3f(m_pan, 0.f, 0.f));
         }
     }
 
@@ -153,8 +153,9 @@ namespace Gx
             if (iterator == m_sources.end())
                 m_sources.push_back(source);
 
+            source->stop();
             source->setVolume(m_volume);
-            source->setPosition(m_pan, 0.f, 0.f);
+            source->setPosition(sf::Vector3f(m_pan, 0.f, 0.f));
             source->play();
 
             return source;

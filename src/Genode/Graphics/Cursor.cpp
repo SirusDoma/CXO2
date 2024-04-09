@@ -1,5 +1,7 @@
 ﻿#include <Genode/Graphics/Cursor.hpp>
 
+#include <SFML/Graphics/Image.hpp>
+
 namespace Gx
 {
     Cursor::Cursor() :

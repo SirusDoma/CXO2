@@ -55,8 +55,8 @@ namespace Gx
         m_fillColor(255, 255, 255),
         m_outlineColor(255, 255, 255),
         m_outlineThickness(0),
-        m_vertices(sf::TriangleFan),
-        m_outlineVertices(sf::TriangleStrip),
+        m_vertices(sf::PrimitiveType::TriangleFan),
+        m_outlineVertices(sf::PrimitiveType::TriangleStrip),
         m_insideBounds(),
         m_bounds(),
         m_visible(true)
@@ -67,7 +67,7 @@ namespace Gx
     {
         // Recompute the texture area if requested, or if there was no texture & rect before
         if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
-            SetTexCoords(sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
+            SetTexCoords(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)));
 
         // Assign the new texture
         m_texture = &texture;

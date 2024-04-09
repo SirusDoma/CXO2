@@ -35,13 +35,14 @@ namespace
     {
         float top = std::floor(lineTop + offset - (thickness / 2) + 0.5f);
         float bottom = top + std::floor(thickness + 0.5f);
+        auto v = sf::Vertex();
 
-        vertices.append(sf::Vertex(sf::Vector2f(-outlineThickness,             top    - outlineThickness), color, sf::Vector2f(1, 1)));
-        vertices.append(sf::Vertex(sf::Vector2f(lineLength + outlineThickness, top    - outlineThickness), color, sf::Vector2f(1, 1)));
-        vertices.append(sf::Vertex(sf::Vector2f(-outlineThickness,             bottom + outlineThickness), color, sf::Vector2f(1, 1)));
-        vertices.append(sf::Vertex(sf::Vector2f(-outlineThickness,             bottom + outlineThickness), color, sf::Vector2f(1, 1)));
-        vertices.append(sf::Vertex(sf::Vector2f(lineLength + outlineThickness, top    - outlineThickness), color, sf::Vector2f(1, 1)));
-        vertices.append(sf::Vertex(sf::Vector2f(lineLength + outlineThickness, bottom + outlineThickness), color, sf::Vector2f(1, 1)));
+        vertices.append({sf::Vector2f(-outlineThickness,             top    - outlineThickness), color, sf::Vector2f(1, 1)});
+        vertices.append({sf::Vector2f(lineLength + outlineThickness, top    - outlineThickness), color, sf::Vector2f(1, 1)});
+        vertices.append({sf::Vector2f(-outlineThickness,             bottom + outlineThickness), color, sf::Vector2f(1, 1)});
+        vertices.append({sf::Vector2f(-outlineThickness,             bottom + outlineThickness), color, sf::Vector2f(1, 1)});
+        vertices.append({sf::Vector2f(lineLength + outlineThickness, top    - outlineThickness), color, sf::Vector2f(1, 1)});
+        vertices.append({sf::Vector2f(lineLength + outlineThickness, bottom + outlineThickness), color, sf::Vector2f(1, 1)});
     }
 
     // Add a glyph quad to the vertex array
@@ -59,12 +60,12 @@ namespace
         float u2 = static_cast<float>(glyph.textureRect.left + glyph.textureRect.width) + padding;
         float v2 = static_cast<float>(glyph.textureRect.top  + glyph.textureRect.height) + padding;
 
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + left  - italicShear * top   , position.y + top),    color, sf::Vector2f(u1, v1)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * top   , position.y + top),    color, sf::Vector2f(u2, v1)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + left  - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u1, v2)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + left  - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u1, v2)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * top   , position.y + top),    color, sf::Vector2f(u2, v1)));
-        vertices.append(sf::Vertex(sf::Vector2f(position.x + right - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u2, v2)));
+        vertices.append({sf::Vector2f(position.x + left  - italicShear * top   , position.y + top),    color, sf::Vector2f(u1, v1)});
+        vertices.append({sf::Vector2f(position.x + right - italicShear * top   , position.y + top),    color, sf::Vector2f(u2, v1)});
+        vertices.append({sf::Vector2f(position.x + left  - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u1, v2)});
+        vertices.append({sf::Vector2f(position.x + left  - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u1, v2)});
+        vertices.append({sf::Vector2f(position.x + right - italicShear * top   , position.y + top),    color, sf::Vector2f(u2, v1)});
+        vertices.append({sf::Vector2f(position.x + right - italicShear * bottom, position.y + bottom), color, sf::Vector2f(u2, v2)});
     }
 }
 
@@ -81,8 +82,8 @@ namespace Gx
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_outlineThickness   (0),
-        m_vertices           (sf::Triangles),
-        m_outlineVertices    (sf::Triangles),
+        m_vertices           (sf::PrimitiveType::Triangles),
+        m_outlineVertices    (sf::PrimitiveType::Triangles),
         m_bounds             (),
         m_geometryNeedUpdate (false),
         m_fontTextureId      (0),
@@ -102,8 +103,8 @@ namespace Gx
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_outlineThickness   (0),
-        m_vertices           (sf::Triangles),
-        m_outlineVertices    (sf::Triangles),
+        m_vertices           (sf::PrimitiveType::Triangles),
+        m_outlineVertices    (sf::PrimitiveType::Triangles),
         m_bounds             (),
         m_geometryNeedUpdate (true),
         m_fontTextureId      (0),
