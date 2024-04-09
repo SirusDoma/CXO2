@@ -3,9 +3,14 @@
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
+#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/IO/ResourceLoader.hpp>
 #include <Genode/System/Primitives.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
+
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/String.hpp>
 #include <SFML/System/Time.hpp>
 
@@ -35,7 +40,7 @@ enum class Genre
 struct O2ChartMetadata
 {
     Gx::Uint32 ID;
-    sf::String Signature;
+    char Signature[4];
     float EncodingVersion;
     ::Genre Genre;
     float BPM;
@@ -72,6 +77,8 @@ struct O2ChartMetadata
     Gx::Uint32 BlockOffsetNx;
     Gx::Uint32 BlockOffsetHx;
     Gx::Uint32 CoverOffset;
+
+    std::string Source;
 
     ChartMetadata ToChartMetadata(Difficulty difficulty) const
     {

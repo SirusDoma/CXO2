@@ -1,6 +1,7 @@
 ﻿#include <OTwo/O2Jam.hpp>
 #include <Genode.hpp>
 
+#include <OTwo/Archives/OjmArchive.hpp>
 #include <OTwo/Archives/M30Archive.hpp>
 #include <OTwo/Archives/OmcArchive.hpp>
 
@@ -26,6 +27,10 @@
 #include <OTwo/IO/Loaders/UI/ScrollBarLoader.hpp>
 #include <OTwo/IO/Loaders/UI/UiContainerLoader.hpp>
 
+#include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
+#include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
+#include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
+
 #include <OTwo/IO/Loaders/UI/Components/Common/MarqueeLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Common/ChatPanelLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Common/ChatWindowLoader.hpp>
@@ -36,10 +41,8 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 
-#include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
-#include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
-#include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
-
+#include <OTwo/IO/Loaders/Chart/O2ChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 
 #include <OTwo/Data/Character.hpp>
@@ -59,8 +62,8 @@ void O2Jam::Boot()
     Gx::Application::Boot();
 
     // Asset Path
-    Gx::LocalFileSystem::AddAssetPath("./");
     Gx::LocalFileSystem::AddAssetPath("./assets");
+    Gx::LocalFileSystem::AddAssetPath("./assets/Music");
     Gx::LocalFileSystem::AddAssetPath("./Image");
     Gx::LocalFileSystem::AddAssetPath("./Music");
 
@@ -86,6 +89,10 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
+    // Avatar
+    Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
+    Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
+    Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
     // O2Jam Components
     Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
     Gx::ResourceLoaderFactory::Register<ChatPanel, ChatPanelLoader>();
@@ -96,12 +103,12 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
     Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
-    // Avatar
-    Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
-    Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
-    Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
+    // O2Jam Core Resources
+    Gx::ResourceLoaderFactory::Register<O2ChartMetadata, O2ChartMetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<O2Chart, O2ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
+
 
     auto config = GameConfig();
 
@@ -141,35 +148,52 @@ void O2Jam::Boot()
         return factory;
     });
 
-    Provide<UserState>([&](auto &app) {
-       auto state = std::make_unique<UserState>();
-       auto player   = Player();
-       player.ID     = 1;
-       player.Name   = "CXO2";
-       player.Level  = -1;
-       player.Gender = Gender::Male;
+    Provide<UserState>([&](auto &app)
+    {
+        auto state = std::make_unique<UserState>();
+        auto player   = Player();
+        player.ID     = 1;
+        player.Name   = "CXO2";
+        player.Level  = -1;
+        player.Gender = Gender::Male;
 
         state->SetCurrentPlayer(player);
-       return state;
+
+        auto metaLoader = O2ChartMetadataLoader();
+        auto musicList = std::vector<O2ChartMetadata>();
+        for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
+        {
+            auto name = file.GetName();
+            auto meta = metaLoader.LoadFromFile(file.GetName(), Gx::ResourceContext::Default);
+            musicList.push_back(*meta);
+        }
+
+        state->SetMusicList(musicList);
+        return state;
     });
 
-    // Force to load item metadata at startup
+    // Force to heavy providers during start-up
+    Require<UserState>();
     for (auto gender : {Gender::Male, Gender::Female})
         Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
     auto& resources = Require<Gx::ResourceManager>();
-    auto& bgm       = resources.Create<OmcArchive>("BGM");
-    auto& bgEffect  = resources.Create<OmcArchive>("BgEffect");
-    auto& bgPlanet  = resources.Create<OmcArchive>("BgPlanet");
+    auto& bgm       = resources.Create<OjmArchive>("BGM");
+    auto& bgEvent   = resources.Create<OjmArchive>("Event");
+    auto& bgEffect  = resources.Create<OjmArchive>("BgEffect");
+    auto& bgPlanet  = resources.Create<OjmArchive>("BgPlanet");
 
-    if (bgm.LoadFromFile("Music/BGM.ojm"))
+    if (bgm.LoadFromFile("BGM.ojm"))
         Gx::FileSystem::Mount(bgm);
 
-    if (bgEffect.LoadFromFile("Music/bgEffect.ojm"))
+    if (bgEvent.LoadFromFile("Event.ojm"))
+        Gx::FileSystem::Mount(bgEvent);
+
+    if (bgEffect.LoadFromFile("bgEffect.ojm"))
         Gx::FileSystem::Mount(bgEffect);
 
-    if (bgPlanet.LoadFromFile("Music/Planet.ojm"))
+    if (bgPlanet.LoadFromFile("Planet.ojm"))
         Gx::FileSystem::Mount(bgPlanet);
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
