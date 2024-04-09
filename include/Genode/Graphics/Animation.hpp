@@ -14,7 +14,7 @@
 
 namespace Gx
 {
-    class Animation : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
+    class Animation : public Gx::Sprite
     {
     public:
         enum class AnimationState
@@ -35,16 +35,13 @@ namespace Gx
         };
 
         Animation();
-        Animation(Sprite &sprite, const sf::Time& duration, std::initializer_list<Frame> frames);
+        Animation(const sf::Texture& texture, const sf::Time& duration, std::initializer_list<Frame> frames);
         ~Animation() override = default;
 
         template<typename... Args>
         void AddFrame(const Frame &first, Args... args);
         void AddFrame(const Frame &frame);
         unsigned int GetFrameCount() const;
-
-        Gx::Sprite &GetSprite() const;
-        void SetSprite(Gx::Sprite &sprite);
 
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);
@@ -54,9 +51,6 @@ namespace Gx
 
         bool IsLoop() const;
         void SetLoop(bool loop);
-
-        const sf::Color& GetColor() const override;
-        void SetColor(const sf::Color &color) override;
 
         AnimationState GetState() const;
         void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
@@ -73,7 +67,6 @@ namespace Gx
     private:
         void SetFrame(unsigned int index);
 
-        std::unique_ptr<Sprite> m_sprite;
         AnimationState m_state;
         bool m_visible;
 

@@ -3,7 +3,7 @@
 namespace Gx
 {
     Animation::Animation() :
-        m_sprite(std::make_unique<Gx::Sprite>()),
+        Gx::Sprite(),
         m_frames(),
         m_duration(sf::Time::Zero),
         m_elapsed(sf::Time::Zero),
@@ -17,8 +17,8 @@ namespace Gx
     {
     }
 
-    Animation::Animation(Gx::Sprite &sprite, const sf::Time &duration, std::initializer_list<Frame> frames) :
-        m_sprite(&sprite),
+    Animation::Animation(const sf::Texture& texture, const sf::Time &duration, std::initializer_list<Frame> frames) :
+        Gx::Sprite(texture),
         m_frames(frames),
         m_duration(duration),
         m_elapsed(sf::Time::Zero),
@@ -40,16 +40,6 @@ namespace Gx
             m_currentFrame = 0;
             SetFrame(m_currentFrame);
         }
-    }
-
-    Gx::Sprite &Animation::GetSprite() const
-    {
-        return *m_sprite;
-    }
-
-    void Animation::SetSprite(Sprite &sprite)
-    {
-        m_sprite = std::make_unique<Sprite>(sprite);
     }
 
     void Animation::SetDuration(const sf::Time &duration)
@@ -81,20 +71,6 @@ namespace Gx
     bool Animation::IsLoop() const
     {
         return m_loop;
-    }
-
-    void Animation::SetColor(const sf::Color &color)
-    {
-        if (m_sprite)
-            m_sprite->SetColor(color);
-    }
-
-    const sf::Color &Animation::GetColor() const
-    {
-        if (m_sprite)
-            return m_sprite->GetColor();
-
-        return sf::Color::White;
     }
 
     Animation::AnimationState Animation::GetState() const
@@ -167,12 +143,7 @@ namespace Gx
         if (!m_visible)
             return states;
 
-        states.transform *= GetTransform();
-        if (!m_sprite)
-            return states;
-
-        target.draw(*m_sprite, states);
-        return RenderableContainer::Render(target, states);
+        return Gx::Sprite::Render(target, states);
     }
 
     void Animation::Stop()
@@ -201,12 +172,12 @@ namespace Gx
     {
         if (frame < m_frames.size())
         {
-            m_sprite->SetTexCoords(m_frames[frame].TexCoords);
+            SetTexCoords(m_frames[frame].TexCoords);
 
-            m_sprite->SetOrigin(m_frames[frame].Origin);
-            m_sprite->SetPosition(m_frames[frame].Position);
-            m_sprite->SetRotation(m_frames[frame].Rotation);
-            m_sprite->SetScale(m_frames[frame].Scale);
+            SetOrigin(m_frames[frame].Origin);
+            SetPosition(m_frames[frame].Position);
+            SetRotation(m_frames[frame].Rotation);
+            SetScale(m_frames[frame].Scale);
         }
     }
 

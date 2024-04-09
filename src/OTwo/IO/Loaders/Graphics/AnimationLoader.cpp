@@ -61,17 +61,23 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto animation = std::make_unique<Gx::Animation>();
-    animation->SetName(metadata->Name);
+    auto ctx = ResourceContextDecorator::Decorate(context);
+    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+        animation->SetTexture(*texture);
 
     for (const auto& frame : metadata->Frames)
         animation->AddFrame(frame);
 
+    animation->SetName(metadata->Name);
     animation->SetLoop(metadata->IsLoop);
     animation->SetDuration(metadata->Duration);
-
-    auto spriteLoader = SpriteLoader();
-    if (auto sprite = spriteLoader.LoadFromMetadata(*metadata, context); sprite)
-        animation->SetSprite(*sprite.release());
+    animation->SetBlendMode(metadata->BlendMode);
+    animation->SetTexCoords(metadata->TexCoords);
+    animation->SetColor(metadata->Color);
+    animation->SetOrigin(metadata->Origin);
+    animation->SetPosition(metadata->Position);
+    animation->SetScale(metadata->Scale);
+    animation->SetRotation(metadata->Rotation);
 
     return animation;
 }
