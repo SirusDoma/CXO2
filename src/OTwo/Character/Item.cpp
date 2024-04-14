@@ -24,12 +24,12 @@ void Item::SetType(EquipmentType type)
     m_type = type;
 }
 
-PlanetType Item::GetOrigin() const
+Planet Item::GetOrigin() const
 {
     return m_origin;
 }
 
-void Item::SetOrigin(PlanetType planet)
+void Item::SetOrigin(Planet planet)
 {
     m_origin = planet;
 }

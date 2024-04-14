@@ -1,21 +1,22 @@
 #include <OTwo/Data/UserState.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
-const Player &UserState::GetCurrentPlayer() const
+const PlayerData &UserState::GetCurrentPlayer() const
 {
     return m_player;
 }
 
-void UserState::SetCurrentPlayer(const Player &player)
+void UserState::SetCurrentPlayer(const PlayerData &player)
 {
     m_player = player;
 }
 
-PlanetType UserState::GetPlanet() const
+Planet UserState::GetPlanet() const
 {
     return m_planet;
 }
 
-void UserState::SetPlanet(PlanetType planet)
+void UserState::SetPlanet(Planet planet)
 {
     m_planet = planet;
 }
@@ -40,22 +41,28 @@ void UserState::SetChannelID(unsigned int channelId)
     m_channelID = channelId;
 }
 
-const RoomData &UserState::GetRoomData() const
+const RoomData &UserState::GetCurrentRoom() const
 {
     return m_room;
 }
 
-void UserState::SetRoomData(const RoomData &room)
+void UserState::SetCurrentRoom(const RoomData &room)
 {
     m_room = room;
 }
 
-const std::vector<O2ChartMetadata> &UserState::GetMusicList() const
+const std::vector<ChartMetadata> &UserState::GetInstalledMusic() const
 {
-    return m_musicList;
-}
+    if (m_installedMusicList.empty())
+    {
+        auto metaLoader = ChartMetadataLoader();
+        for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
+        {
+            auto name = file.GetName();
+            auto meta = metaLoader.LoadFromFile(file.GetName(), Gx::ResourceContext::Default);
+            m_installedMusicList.push_back(*meta);
+        }
+    }
 
-void UserState::SetMusicList(const std::vector<O2ChartMetadata> &musicList)
-{
-    m_musicList = musicList;
+    return m_installedMusicList;
 }

@@ -12,13 +12,13 @@ public:
 
     void Initialize() override;
 
-    const Player *GetPlayer() const;
-    void SetPlayer(const Player &player);
+    const PlayerData *GetPlayer() const;
+    void SetPlayer(const PlayerData &player);
 
     void Invalidate() override;
 
 private:
-    const Player *m_player;
+    const PlayerData *m_player;
 };
 
 #endif

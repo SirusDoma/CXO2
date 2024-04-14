@@ -56,7 +56,7 @@ public:
 
     Gx::Int64 ReadFile(unsigned int index, void *data, Gx::Int64 size) const;
     Gx::Int64 ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const override;
-    void WriteFile(const std::string &fileName, void *data, Gx::Int64 size) const override { throw Gx::NotSupportedException(); }
+    void WriteFile(const std::string &fileName, void *data, Gx::Int64 size) override { throw Gx::NotSupportedException(); }
 
     Gx::Int64 GetFileSize(const std::string &fileName) const override;
     std::string GetExtension(const std::string& name) const;

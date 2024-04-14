@@ -65,7 +65,7 @@ namespace Gx
         return files;
     }
 
-    std::unique_ptr<FileInfo> FileSystem::GetFileInfo(const std::string &fileName)
+    std::unique_ptr<Gx::FileInfo> FileSystem::GetFileInfo(const std::string &fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 

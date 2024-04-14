@@ -22,18 +22,18 @@ struct GameConfig : public Gx::Config
         MusicVolume     = 100;
         EffectVolume    = 100;
         SevenKeyBinding = {
-            {O2Chart::Channel::Note1, sf::Keyboard::Key::S},
-            {O2Chart::Channel::Note2, sf::Keyboard::Key::D},
-            {O2Chart::Channel::Note3, sf::Keyboard::Key::F},
-            {O2Chart::Channel::Note4, sf::Keyboard::Key::Space},
-            {O2Chart::Channel::Note5, sf::Keyboard::Key::J},
-            {O2Chart::Channel::Note6, sf::Keyboard::Key::K},
-            {O2Chart::Channel::Note7, sf::Keyboard::Key::L}
+            {Chart::Channel::Note1, sf::Keyboard::Key::S},
+            {Chart::Channel::Note2, sf::Keyboard::Key::D},
+            {Chart::Channel::Note3, sf::Keyboard::Key::F},
+            {Chart::Channel::Note4, sf::Keyboard::Key::Space},
+            {Chart::Channel::Note5, sf::Keyboard::Key::J},
+            {Chart::Channel::Note6, sf::Keyboard::Key::K},
+            {Chart::Channel::Note7, sf::Keyboard::Key::L}
         };
         ThreeKeyBinding = {
-            {O2Chart::Channel::Note1, sf::Keyboard::Key::LShift},
-            {O2Chart::Channel::Note2, sf::Keyboard::Key::RShift},
-            {O2Chart::Channel::Note3, sf::Keyboard::Key::Enter}
+            {Chart::Channel::Note1, sf::Keyboard::Key::LShift},
+            {Chart::Channel::Note2, sf::Keyboard::Key::RShift},
+            {Chart::Channel::Note3, sf::Keyboard::Key::Enter}
         };
     }
 
@@ -44,8 +44,8 @@ struct GameConfig : public Gx::Config
     unsigned int MusicVolume;
     unsigned int EffectVolume;
 
-    std::map<O2Chart::Channel, sf::Keyboard::Key> SevenKeyBinding;
-    std::map<O2Chart::Channel, sf::Keyboard::Key> ThreeKeyBinding;
+    std::map<Chart::Channel, sf::Keyboard::Key> SevenKeyBinding;
+    std::map<Chart::Channel, sf::Keyboard::Key> ThreeKeyBinding;
 };
 
 #endif

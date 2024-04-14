@@ -110,7 +110,7 @@ void StatePlanet::OnMusicHallSelected(MusicHall hall)
     m_connecting = true;
     auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
 
-    auto planetInfo = Planet();
+    auto planetInfo = PlanetData();
     planetInfo.Hall = hall;
 
     for (int x = 0; x < 2; x++)

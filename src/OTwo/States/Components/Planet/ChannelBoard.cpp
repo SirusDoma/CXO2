@@ -327,7 +327,7 @@ void ChannelBoard::Show(MusicHall hall, std::function<void()> callback)
     }
 }
 
-void ChannelBoard::UpdateChannelList(Planet planet)
+void ChannelBoard::UpdateChannelList(PlanetData planet)
 {
     m_planet = planet;
     m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / CHANNEL_LIST_PER_PAGE));

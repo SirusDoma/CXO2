@@ -41,8 +41,8 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 
-#include <OTwo/IO/Loaders/Chart/O2ChartMetadataLoader.hpp>
-#include <OTwo/IO/Loaders/Chart/O2ChartLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 
 #include <OTwo/Data/Character.hpp>
@@ -54,6 +54,7 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
+#include <OTwo/States/StateLoading.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 
@@ -104,8 +105,8 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
     Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
     // O2Jam Core Resources
-    Gx::ResourceLoaderFactory::Register<O2ChartMetadata, O2ChartMetadataLoader>();
-    Gx::ResourceLoaderFactory::Register<O2Chart, O2ChartLoader>();
+    Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
 
@@ -151,29 +152,18 @@ void O2Jam::Boot()
     Provide<UserState>([&](auto &app)
     {
         auto state = std::make_unique<UserState>();
-        auto player   = Player();
+        auto player   = PlayerData();
         player.ID     = 1;
         player.Name   = "CXO2";
         player.Level  = -1;
         player.Gender = Gender::Male;
 
         state->SetCurrentPlayer(player);
-
-        auto metaLoader = O2ChartMetadataLoader();
-        auto musicList = std::vector<O2ChartMetadata>();
-        for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
-        {
-            auto name = file.GetName();
-            auto meta = metaLoader.LoadFromFile(file.GetName(), Gx::ResourceContext::Default);
-            musicList.push_back(*meta);
-        }
-
-        state->SetMusicList(musicList);
         return state;
     });
 
-    // Force to heavy providers during start-up
-    Require<UserState>();
+    // Force to load heavy providers during start-up
+    Require<UserState>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
         Require<ItemFactory>().GetDefaultItems(gender);
 
@@ -202,6 +192,7 @@ void O2Jam::Boot()
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
+    director.Register<StateLoading>("Interface/State/Loading.json");
 
     director.Present<StateAvi>();
 }

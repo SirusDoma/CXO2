@@ -87,7 +87,7 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
         if (auto gender = magic_enum::enum_cast<Gender>(attributes->at("gender").get<std::string>()); gender.has_value())
             metadata.Gender = gender.value();
 
-        if (auto origin = magic_enum::enum_cast<PlanetType>(attributes->at("origin").get<std::string>()); origin.has_value())
+        if (auto origin = magic_enum::enum_cast<Planet>(attributes->at("origin").get<std::string>()); origin.has_value())
             metadata.Origin = origin.value();
 
         if (auto equipType = magic_enum::enum_cast<EquipmentType>(attributes->at("type").get<std::string>()); equipType.has_value())

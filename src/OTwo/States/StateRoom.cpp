@@ -5,7 +5,8 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Data/Game.hpp>
 
 StateRoom::StateRoom(State &state) :
     State(state)
@@ -67,20 +68,20 @@ void StateRoom::Initialize()
     auto userList = Load<UserList>("STATE_ROOM/IDC_USER_LIST");
     userList->Initialize();
 
-    auto users = std::vector<Player>();
+    auto users = std::vector<PlayerData>();
     userList->AddUser(state.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
-        userList->AddUser(Player{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
+        userList->AddUser(PlayerData{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
 
     auto roomContainer = Load<RoomContainer>("STATE_ROOM/IDC_ROOM_CONTAINER");
     roomContainer->Initialize();
     RoomData rooms[] = {
         RoomData{
-            0,
-            0,
-            "Let's play together~",
-            ChartMetadata
+            .ID           = 0,
+            .RoomMasterID = 0,
+            .Title        = "Let's play together~",
+            .Chart        = ChartMetadataView
             {
                 .New          = true,
                 .Title        = "Earth Quake",
@@ -89,38 +90,38 @@ void StateRoom::Initialize()
                 .Genre        = "Rock",
                 .Level        = 36,
             },
-            Difficulty::HX,
-            GameMode::Versus,
-            SongMode::Normal,
-            RoomState::Playing,
-            4.5f,
-            false,
-            8,
-            0,
-            0,
-            { RoomMember{ 1 } }
+            .Difficulty    = Difficulty::HX,
+            .GameMode      = GameMode::Versus,
+            .SongMode      = SongMode::Normal,
+            .State         = RoomState::Playing,
+            .Speed         = 4.5f,
+            .Locked        = false,
+            .Capacity      = 8,
+            .MinLevelLimit = 0,
+            .MaxLevelLimit = 0,
+            .Members       = { RoomMember{ 1 } }
         },
         RoomData{
-            5,
-            0,
-            "Pimplex's room",
-            ChartMetadata{},
-            Difficulty::HX,
-            GameMode::Single,
-            SongMode::Random,
-            RoomState::Waiting,
-            3.5f,
-            false,
-            8,
-            0,
-            0,
-            { RoomMember{ 2 } }
+            .ID            = 5,
+            .RoomMasterID  = 0,
+            .Title         = "Pimplex's room",
+            .Chart         = ChartMetadataView{},
+            .Difficulty    = Difficulty::HX,
+            .GameMode      = GameMode::Single,
+            .SongMode      = SongMode::Random,
+            .State         = RoomState::Waiting,
+            .Speed         = 3.5f,
+            .Locked        = false,
+            .Capacity      = 8,
+            .MinLevelLimit = 0,
+            .MaxLevelLimit = 0,
+            .Members       = { RoomMember{ 2 } }
         },
         RoomData{
-            3,
-            0,
-            "kYo-Abhiem's room",
-            ChartMetadata
+            .ID           = 3,
+            .RoomMasterID = 0,
+            .Title        = "kYo-Abhiem's room",
+            .Chart        = ChartMetadataView
             {
                 .Title        = "R3",
                 .Artist       = "Kaze.o2SE",
@@ -128,19 +129,16 @@ void StateRoom::Initialize()
                 .Genre        = "Rock",
                 .Level      = 32,
             },
-            Difficulty::HX,
-            GameMode::Versus,
-            SongMode::Normal,
-            RoomState::Waiting,
-            4.f,
-            false,
-            8,
-            20,
-            80,
-            {
-                RoomMember{ 3 },
-                RoomMember{ 4 },
-            }
+            .Difficulty    = Difficulty::HX,
+            .GameMode      = GameMode::Versus,
+            .SongMode      = SongMode::Normal,
+            .State         = RoomState::Waiting,
+            .Speed         = 4.f,
+            .Locked        = false,
+            .Capacity      = 8,
+            .MinLevelLimit = 20,
+            .MaxLevelLimit = 80,
+            .Members       = { RoomMember{ 3 }, RoomMember{ 4 } }
         }
     };
 
@@ -155,28 +153,28 @@ void StateRoom::Initialize()
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
-                auto musicList = state.GetMusicList();
-                state.SetRoomData(RoomData{
-                    4,
-                    state.GetCurrentPlayer().ID,
-                    createRoomDialog->GetRoomName(),
-                    musicList[musicList.size() / 2].ToChartMetadata(Difficulty::EX),
-                    Difficulty::EX,
-                    createRoomDialog->GetRoomMode(),
-                    SongMode::Normal,
-                    RoomState::Waiting,
-                    1.0f,
-                    !createRoomDialog->GetRoomPassword().empty(),
-                    8,
-                    createRoomDialog->GetMinLevelLimit(),
-                    createRoomDialog->GetMaxLevelLimit(),
-                    {
-                        RoomMember { state.GetCurrentPlayer(), RoomTeam::A },
-                        {},
-                        {},
-                        RoomMember { Player { 2, "DJZMO",      82, Gender::Male, 0, 0, false, { 221 } }, RoomTeam::F },
-                        RoomMember { Player { 3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, { 482 } }, RoomTeam::G }
-                    }
+                auto musicList = state.GetInstalledMusic();
+                state.SetCurrentRoom(RoomData{
+                        4,
+                        state.GetCurrentPlayer().ID,
+                        createRoomDialog->GetRoomName(),
+                        musicList[musicList.size() / 2].ToChartMetadataView(Difficulty::EX),
+                        Difficulty::EX,
+                        createRoomDialog->GetRoomMode(),
+                        SongMode::Normal,
+                        RoomState::Waiting,
+                        1.0f,
+                        !createRoomDialog->GetRoomPassword().empty(),
+                        8,
+                        createRoomDialog->GetMinLevelLimit(),
+                        createRoomDialog->GetMaxLevelLimit(),
+                        {
+                            RoomMember{state.GetCurrentPlayer(), RoomTeam::A},
+                            {},
+                            {},
+                            RoomMember{PlayerData{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221}}, RoomTeam::F},
+                            RoomMember{PlayerData{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {482}}, RoomTeam::G}
+                        }
                 });
                 director.Present<StateWaiting7K>();
             });

@@ -1,8 +1,9 @@
 ﻿#include <OTwo/States/Components/Room/RoomButton.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Data/Game.hpp>
 
 RoomButton::RoomButton() :
     m_room(),

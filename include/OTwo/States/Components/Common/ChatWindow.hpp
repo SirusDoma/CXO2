@@ -33,7 +33,7 @@ public:
     void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int max);
 
-    void PushMessage(Player player, const sf::String &chat);
+    void PushMessage(PlayerData player, const sf::String &chat);
     void PushSystemMessage(const sf::String &chat);
 
 private:

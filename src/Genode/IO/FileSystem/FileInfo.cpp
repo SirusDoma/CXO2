@@ -26,8 +26,8 @@ namespace Gx
         return m_size;
     }
 
-    Int64 FileInfo::Read(const std::string &fileName, void *data, const Int64 size) const
+    Int64 FileInfo::Read(void *data) const
     {
-        return m_parent->ReadFile(fileName, data, size);
+        return m_parent->ReadFile(m_name, data, m_size);
     }
 }

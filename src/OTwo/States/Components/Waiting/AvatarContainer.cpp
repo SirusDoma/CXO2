@@ -16,12 +16,12 @@ void AvatarContainer::Initialize()
     Invalidate();
 }
 
-const Player *AvatarContainer::GetPlayer() const
+const PlayerData *AvatarContainer::GetPlayer() const
 {
     return m_player;
 }
 
-void AvatarContainer::SetPlayer(const Player &player)
+void AvatarContainer::SetPlayer(const PlayerData &player)
 {
     m_player = &player;
 }

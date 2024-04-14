@@ -214,7 +214,7 @@ namespace Gx
         auto index  = m_caret.Index;
 
         if (m_caret.SelectionLength != 0)
-            index = Erase(index - 1, m_caret.SelectionLength);
+            index = static_cast<int>(Erase(index - 1, m_caret.SelectionLength));
 
         auto newString = m_text.GetString();
         newString.insert(index, " ");
@@ -225,9 +225,9 @@ namespace Gx
         return fit;
     }
 
-    void TextBox::Select(size_t index, int selectionLength)
+    void TextBox::Select(std::size_t index, int selectionLength)
     {
-        m_caret.Index = index;
+        m_caret.Index = static_cast<int>(index);
         m_caret.SelectionLength = selectionLength;
         SetFocus(true);
 
@@ -236,7 +236,7 @@ namespace Gx
 
     void TextBox::SelectAll()
     {
-        int length = GetString().getSize();
+        int length = static_cast<int>(GetString().getSize());
         Select(length, -length);
     }
 
@@ -249,7 +249,7 @@ namespace Gx
         else if (length > 0)
             index++;
         else
-            return sf::String();
+            return {};
 
         return m_text.GetString().substring(index, std::abs(length));
     }
@@ -280,7 +280,7 @@ namespace Gx
         return index;
     }
 
-    size_t TextBox::Erase(size_t index, int length)
+    std::size_t TextBox::Erase(std::size_t index, int length)
     {
         if (length < 0)
             index += length + 1;
@@ -290,7 +290,7 @@ namespace Gx
             return index;
 
         auto str = m_text.GetString();
-        str.erase(index, length == 0 ? 1 : std::abs(length));
+        str.erase(index, std::abs(length));
         m_text.SetString(str);
 
         return index;
@@ -390,7 +390,7 @@ namespace Gx
         auto bounds = GetGlobalBounds();
         for (size_t index = 0; index <= m_text.GetString().getSize(); index++)
         {
-            float distance = std::abs((FindCharacterPosition(index).x + bounds.left) - ev.x);
+            float distance = std::abs((FindCharacterPosition(index).x + bounds.left) - static_cast<float>(ev.x));
             if (minDistance == -1 || distance < minDistance)
             {
                 selectIndex = index;
@@ -441,7 +441,7 @@ namespace Gx
                 return;
 
             int length    = m_caret.SelectionLength;
-            m_caret.Index = Erase(m_caret.Index - 1, length == 0 ? -1 : length);
+            m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, length == 0 ? -1 : length));
             m_caret.SelectionLength = 0;
         }
         else if (ev.code == sf::Keyboard::Key::Delete)
@@ -494,7 +494,7 @@ namespace Gx
                     clip::set_text(GetSelectedText());
                     if (ev.code == sf::Keyboard::Key::X)
                     {
-                        m_caret.Index = Erase(m_caret.Index - 1, m_caret.SelectionLength);
+                        m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, m_caret.SelectionLength));
                         m_caret.SelectionLength = 0;
                     }
                 }
@@ -505,27 +505,24 @@ namespace Gx
 
                     auto string = sf::String::fromUtf8(input.begin(), input.end());
                     for (size_t index = 0; index < string.getSize(); index++)
-                        m_caret.Index = Insert(m_caret.Index, string[index]);
+                        m_caret.Index = static_cast<int>(Insert(m_caret.Index, string[index]));
                 }
             }
         }
-        else if (!ev.shift)
+        else if (ev.code == sf::Keyboard::Key::Left)
         {
-            if (ev.code == sf::Keyboard::Key::Left)
-            {
-                m_caret.Index--;
-                m_caret.SelectionLength = 0;
-                m_text.SetFillColor(m_text.GetFillColor());
-            }
-            else if (ev.code == sf::Keyboard::Key::Right)
-            {
-                m_caret.Index++;
-                m_caret.SelectionLength = 0;
-                m_text.SetFillColor(m_text.GetFillColor());
-            }
-            else
-                return;
+            m_caret.Index--;
+            m_caret.SelectionLength = 0;
+            m_text.SetFillColor(m_text.GetFillColor());
         }
+        else if (ev.code == sf::Keyboard::Key::Right)
+        {
+            m_caret.Index++;
+            m_caret.SelectionLength = 0;
+            m_text.SetFillColor(m_text.GetFillColor());
+        }
+        else
+            return;
 
         Invalidate();
     }
@@ -549,7 +546,7 @@ namespace Gx
         if (m_numeric && (ev.unicode < 48 || ev.unicode > 57))
             return;
 
-        m_caret.Index = Insert(m_caret.Index, ev.unicode, m_caret.SelectionLength);
+        m_caret.Index = static_cast<int>(Insert(m_caret.Index, ev.unicode, m_caret.SelectionLength));
         m_caret.SelectionLength = 0;
 
         Invalidate();
@@ -632,12 +629,12 @@ namespace Gx
             Index = 0;
 
         if (Index > Instance.GetString().getSize())
-            Index = Instance.GetString().getSize();
+            Index = static_cast<int>(Instance.GetString().getSize());
 
         if (Instance.GetFont())
         {
             auto glyph = Instance.GetFont()->getGlyph('|', Instance.GetCharacterSize(), false);
-            m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, Instance.GetCharacterSize()));
+            m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
         }
 
         m_cursor.SetPosition(Instance.FindCharacterPosition(Index) + sf::Vector2f(0.f, 1.5f));
@@ -655,7 +652,7 @@ namespace Gx
             auto charPos = Instance.FindCharacterPosition(index);
             auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
             m_highlight.SetPosition(sf::Vector2f(charPos.x, m_cursor.GetPosition().y));
-            m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), Instance.GetCharacterSize()));
+            m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), static_cast<float>(Instance.GetCharacterSize())));
         }
         else
             m_highlight.SetSize(sf::Vector2f());

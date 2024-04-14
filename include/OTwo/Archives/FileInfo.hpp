@@ -6,21 +6,20 @@
 class FileInfo final : public Gx::FileInfo
 {
 public:
-    FileInfo() :
-        Gx::FileInfo()
-    {
+    FileInfo() = default;
 
-    }
-
-    FileInfo(const Gx::FileSystemController &parent, const std::string &name, const Gx::Int64 size, const Gx::Uint64 offset) :
+    FileInfo(const Gx::FileSystemController &parent, const std::string &name, const Gx::Int64 size, const Gx::Uint16 index, const Gx::Uint64 offset) :
         Gx::FileInfo(parent, name, size),
+        m_index(index),
         m_offset(offset)
     {
     }
 
+    Gx::Uint16 GetIndex() const { return m_index; }
     Gx::Uint64 GetOffset() const { return m_offset; }
 
 private:
+    Gx::Uint16 m_index  = 0;
     Gx::Uint64 m_offset = 0;
 };
 

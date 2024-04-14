@@ -1,8 +1,8 @@
 #ifndef O2JAM_MUSIC_LIST_STATE_HPP
 #define O2JAM_MUSIC_LIST_STATE_HPP
 
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
-#include <OTwo/IO/Loaders/Chart/O2ChartMetadataLoader.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 

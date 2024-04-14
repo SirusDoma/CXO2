@@ -19,7 +19,7 @@ namespace Gx
         std::string GetName() const;
         Uint32 GetSize() const;
 
-        virtual Int64 Read(const std::string &fileName, void *data, Int64 size) const;
+        virtual Int64 Read(void *data) const;
 
     private:
         const FileSystemController* m_parent = nullptr;

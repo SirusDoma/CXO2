@@ -33,7 +33,7 @@ public:
     sf::FloatRect GetLocalBounds() const override;
 
     void Show(MusicHall hall, std::function<void()> callback);
-    void UpdateChannelList(Planet planet);
+    void UpdateChannelList(PlanetData planet);
     void ShowChannelList(unsigned int page);
     void ShowNotice(unsigned int page);
     void SwitchTab(Tab tab);
@@ -62,7 +62,7 @@ private:
     Gx::Image m_duplicateImage;
     sf::RenderTexture m_renderTexture;
 
-    Planet m_planet;
+    PlanetData m_planet;
     ChannelBoard::Tab m_tab;
     std::function<void(MusicHall, Channel)> m_callback;
 

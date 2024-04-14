@@ -1,7 +1,7 @@
 #ifndef O2JAM_ROOM_DATA_HPP
 #define O2JAM_ROOM_DATA_HPP
 
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Chart/Chart.hpp>
 
 #include <OTwo/Data/Game.hpp>
 #include <OTwo/Data/Character.hpp>
@@ -23,26 +23,28 @@ enum class SongMode
     Random
 };
 
-enum class GameMode
+struct PlayerData
 {
-    Single,
-    Versus,
-    Album,
-    Couple,
-    Live,
-    Jam
+    using ItemList = std::vector<Gx::Uint32>;
+
+    Gx::Uint32   ID;
+    std::string  Name;
+    Gx::Int32    Level;
+    ::Gender     Gender;
+    Gx::Uint32   Gem;
+    Gx::Uint32   Cash;
+    Gx::Int8     Administrator;
+    ItemList     EquippedItemIDs;
+    ItemList     Inventory;
 };
 
-struct Player
+struct ChatData
 {
-    unsigned int ID;
-    std::string Name;
-    int Level;
-    ::Gender Gender;
-    unsigned int Gem;
-    unsigned int Cash;
-    bool Administrator;
-    std::vector<unsigned int> EquippedItemIDs;
+    PlayerData Sender;
+    sf::String Message;
+
+    PlayerData Recipient;
+    // MegaphoneInfo Megaphone;
 };
 
 enum class RoomTeam
@@ -57,39 +59,32 @@ enum class RoomTeam
     H
 };
 
-struct RoomMember : Player
+struct RoomMember : PlayerData
 {
     RoomMember() = default;
-    RoomTeam Team;
-};
-
-struct ChatData
-{
-    Player Sender;
-    sf::String Message;
-
-    Player Recipient;
-    // MegaphoneInfo Megaphone;
+    
+    RoomTeam   Team  = static_cast<RoomTeam>(-1);
+    Gx::Uint32 Index = 0;
 };
 
 struct RoomData
 {
     using MemberList = RoomMember[];
 
-    unsigned int  ID;
-    unsigned int  RoomMasterID  = 0;
-    std::string   Title;
-    ChartMetadata Chart;
-    ::Difficulty  Difficulty;
-    ::GameMode    GameMode;
-    ::SongMode    SongMode;
-    RoomState     State;
-    float         Speed;
-    bool          Locked;
-    unsigned int  Capacity      = 8;
-    unsigned int  MinLevelLimit = 0;
-    unsigned int  MaxLevelLimit = 0;
-    RoomMember    Members[8]    = {{},{},{},{},{},{},{},{}};
+    Gx::Uint32        ID;
+    Gx::Uint32        RoomMasterID  = 0;
+    std::string       Title;
+    ChartMetadataView Chart;
+    ::Difficulty      Difficulty;
+    ::GameMode        GameMode;
+    ::SongMode        SongMode;
+    RoomState         State;
+    float             Speed;
+    Gx::Int8          Locked;
+    Gx::Uint32        Capacity      = 8;
+    Gx::Uint32        MinLevelLimit = 0;
+    Gx::Uint32        MaxLevelLimit = 0;
+    RoomMember        Members[8]    = {{},{},{},{},{},{},{},{}};
 };
 
 #endif

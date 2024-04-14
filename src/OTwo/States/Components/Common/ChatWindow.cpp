@@ -112,7 +112,7 @@ void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(Player player, const sf::String &chat)
+void ChatWindow::PushMessage(PlayerData player, const sf::String &chat)
 {
     auto chatData = ChatData{ player, chat };
     // Do something if player is self
@@ -127,7 +127,7 @@ void ChatWindow::PushMessage(Player player, const sf::String &chat)
 
 void ChatWindow::PushSystemMessage(const sf::String &chat)
 {
-    PushMessage(Player{0}, chat);
+    PushMessage(PlayerData{0}, chat);
 }
 
 Gx::RenderStates ChatWindow::Render(sf::RenderTarget &target, Gx::RenderStates states) const
