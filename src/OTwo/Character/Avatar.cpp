@@ -148,7 +148,7 @@ void Avatar::Unequip(EquipmentType type)
 
     m_items.erase(iterator);
     iterator = m_defaultItems.find(type);
-    if (iterator != m_items.end())
+    if (iterator != m_defaultItems.end())
         Equip(iterator->second);
 }
 

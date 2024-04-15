@@ -282,7 +282,7 @@ namespace Gx
             {
                 if (is_directory(entry) && recursive)
                 {
-                    paths.push_back(entry.path());
+                    paths.push_back(entry.path().string());
                     continue;
                 }
 
