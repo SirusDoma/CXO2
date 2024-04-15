@@ -1,6 +1,6 @@
 # CMake Config
 cmake_minimum_required(VERSION 3.27)
-project(O2Jam LANGUAGES C CXX OBJCXX)
+project(O2Jam LANGUAGES C CXX)
 
 # Compiler
 set(CMAKE_CXX_STANDARD 17)
@@ -20,6 +20,7 @@ include_directories(extlibs/headers)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 include(FetchContent)
 # -- SFML
+set(SFML_STATIC_LIBRARIES TRUE)
 fetchcontent_declare(
     SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -76,8 +77,12 @@ if(WIN32)
     )
 
     # External Libs Compiler Flags
-    set(SFML_STATIC_LIBRARIES TRUE)
     set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET sfml-system PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET sfml-graphics PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET sfml-audio PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET sfml-window PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET sfml-main PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET Boxer PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
