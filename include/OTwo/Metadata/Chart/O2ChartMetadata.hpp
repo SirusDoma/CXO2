@@ -122,15 +122,16 @@ struct O2ChartMetadata
         }
 
         return ChartMetadata{
-            .ID           = std::to_string(ID),
-            .Title        = Gx::StringHelper::Trim(Title),
-            .Artist       = Gx::StringHelper::Trim(Artist),
-            .NoteDesigner = Gx::StringHelper::Trim(NoteArranger),
-            .BPM          = BPM,
-            .Genre        = genre,
-            .Level        = level,
-            .NoteCount    = noteCount,
-            .Duration     = sf::seconds(static_cast<float>(duration)),
+            /* .ID           = */ std::to_string(ID),
+            /* .New          = */ false,
+            /* .Title        = */ Gx::StringHelper::Trim(Title),
+            /* .Artist       = */ Gx::StringHelper::Trim(Artist),
+            /* .NoteDesigner = */ Gx::StringHelper::Trim(NoteArranger),
+            /* .BPM          = */ BPM,
+            /* .Genre        = */ genre,
+            /* .Level        = */ level,
+            /* .NoteCount    = */ noteCount,
+            /* .Duration     = */ sf::seconds(static_cast<float>(duration)),
         };
     }
 };

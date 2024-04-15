@@ -38,7 +38,7 @@ struct Channel
 
 struct Planet
 {
-    PlanetType Planet = PlanetType::O2Planet;
+    PlanetType PlanetType = PlanetType::O2Planet;
     MusicHall Hall = MusicHall::None;
     std::vector<Channel> Channels;
 };
