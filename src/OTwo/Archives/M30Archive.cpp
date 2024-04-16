@@ -16,10 +16,10 @@ bool M30Archive::LoadFromFile(const std::string& fileName)
     if (!ReadStream(&m_header, sizeof(m_header)))
         return false;
 
-    if (auto signature = std::string(m_header.Signature, 3); signature != "M30")
+    if (const auto signature = std::string(m_header.Signature, 3); signature != "M30")
         return false;
 
-    auto entries = GetFileEntries();
+    const auto entries = GetFileEntries();
     return !entries.empty();
 }
 
@@ -30,7 +30,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string &fileName) c
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
 
     const auto data = new Gx::Uint8[header->GetSize()];
-    if (auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
+    if (const auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
@@ -54,7 +54,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(unsigned int index) const
     const auto header = &iterator->second;
     const auto data = new Gx::Uint8[header->GetSize()];
 
-    if (auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
+    if (const auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();

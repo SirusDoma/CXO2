@@ -18,7 +18,7 @@
 
 void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPopulator &populator, Gx::ResourceContext &ctx)
 {
-    auto metaLoader = MetadataLoader();
+    const auto metaLoader = MetadataLoader();
     Gx::ResourcePtr<ResourceMetadata> metadata;
     if (json.type() == Gx::Json::value_t::string)
         metadata = metaLoader.LoadFromFile(json.get<std::string>(), ctx);

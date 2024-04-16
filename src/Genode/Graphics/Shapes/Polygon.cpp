@@ -26,12 +26,12 @@
 
 namespace Gx
 {
-    Polygon::Polygon(std::size_t pointCount)
+    Polygon::Polygon(const std::size_t pointCount)
     {
         SetPointCount(pointCount);
     }
 
-    void Polygon::SetPointCount(std::size_t count)
+    void Polygon::SetPointCount(const std::size_t count)
     {
         m_points.resize(count);
         Update();
@@ -42,13 +42,13 @@ namespace Gx
         return m_points.size();
     }
 
-    void Polygon::SetPoint(std::size_t index, const sf::Vector2f& point)
+    void Polygon::SetPoint(const std::size_t index, const sf::Vector2f& point)
     {
         m_points[index] = point;
         Update();
     }
 
-    sf::Vector2f Polygon::GetPoint(std::size_t index) const
+    sf::Vector2f Polygon::GetPoint(const std::size_t index) const
     {
         return m_points[index];
     }

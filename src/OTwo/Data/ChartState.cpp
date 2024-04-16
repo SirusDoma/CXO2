@@ -16,7 +16,7 @@ Difficulty ChartState::GetDifficulty() const
     return m_difficulty;
 }
 
-void ChartState::SetDifficulty(Difficulty difficulty)
+void ChartState::SetDifficulty(const Difficulty difficulty)
 {
     m_difficulty = difficulty;
 }
@@ -26,7 +26,7 @@ GameMode ChartState::GetMode() const
     return m_mode;
 }
 
-void ChartState::SetMode(GameMode mode)
+void ChartState::SetMode(const GameMode mode)
 {
     m_mode = mode;
 }

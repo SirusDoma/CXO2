@@ -54,10 +54,10 @@ namespace Gx
         const sf::IntRect& GetTexCoords() const;
         const sf::Color& GetColor() const override;
 
-        Gx::BlendMode GetBlendMode() const;
+        BlendMode GetBlendMode() const;
         void SetBlendMode(Gx::BlendMode blendMode);
 
-        sf::FloatRect GetLocalBounds() const;
+        virtual sf::FloatRect GetLocalBounds() const;
         sf::FloatRect GetGlobalBounds() const;
 
     protected:
@@ -70,7 +70,7 @@ namespace Gx
         sf::Vertex  m_vertices[4];
         const sf::Texture* m_texture;
         sf::IntRect m_texcoords;
-        Gx::BlendMode m_blendMode;
+        BlendMode m_blendMode;
     };
 
 }

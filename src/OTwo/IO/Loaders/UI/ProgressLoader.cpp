@@ -17,8 +17,7 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    auto orientation = attributes.find("orientation");
-    if (orientation != attributes.end())
+    if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
             metadata.Orientation = Gx::ProgressBar::Orientation::Vertical;
@@ -26,8 +25,7 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
             metadata.Orientation = Gx::ProgressBar::Orientation::Horizontal;
     }
 
-    auto maximum = attributes.find("maximum");
-    if (maximum != attributes.end())
+    if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
         metadata.Maximum = maximum->get<float>();
     else
         metadata.Maximum = 100.0f;
@@ -37,13 +35,13 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
 
 Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ProgressBarMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ProgressBarMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto progressBar = std::make_unique<Gx::ProgressBar>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         progressBar->SetTexture(*texture);
     
     progressBar->SetName(metadata->Name);

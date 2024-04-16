@@ -21,7 +21,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json &j
     if (!ImageLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    if (auto count = attributes.find("channelCount"); count != attributes.end())
+    if (const auto count = attributes.find("channelCount"); count != attributes.end())
         metadata.ChannelCount = count->get<unsigned int>();
 
     return LoadFromMetadata(metadata, context);

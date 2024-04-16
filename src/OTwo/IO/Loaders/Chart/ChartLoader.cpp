@@ -11,7 +11,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata &meta, 
 
 Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &context) const
 {
-    auto stream = Gx::FileSystem::Open(fileName);
+    const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
         throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
 
@@ -63,7 +63,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
         for (const auto &e : archive->GetFileEntries())
         {
-            auto entry = dynamic_cast<const FileInfo*>(&e);
+            const auto entry = dynamic_cast<const FileInfo*>(&e);
             if (!entry)
                 continue;
 
@@ -71,7 +71,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (entry->Read(&payload[0]) <= 0)
                 continue;
 
-            auto loader = Gx::ResourceLoaderFactory::GetLoader<sf::SoundBuffer>();
+            const auto loader = Gx::ResourceLoaderFactory::GetLoader<sf::SoundBuffer>();
             if (auto buffer = loader->LoadFromMemory(&payload, entry->GetSize(), Gx::ResourceContext::Default); buffer)
                 chart->AddSample(entry->GetIndex(), std::move(buffer));
         }
@@ -79,7 +79,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
     if (ctx.Available())
     {
-        if (auto archive = ctx.Find<OjmArchive>(metadata.OJM); archive)
+        if (const auto archive = ctx.Find<OjmArchive>(metadata.OJM); archive)
         {
             loadSamples(archive);
             samplesLoaded = true;
@@ -98,7 +98,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
     for (int d = 0; d < 3; d++)
     {
-        auto difficulty = static_cast<Difficulty>(d);
+        const auto difficulty = static_cast<Difficulty>(d);
 
         Gx::Uint32 offset = 0;
         Gx::Uint32 blockCount = 0;
@@ -148,7 +148,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
             for (int i = 0; i < count; i++)
             {
-                float position = static_cast<float>(measure) + (static_cast<float>(i) / static_cast<float>(count));
+                const float position = static_cast<float>(measure) + (static_cast<float>(i) / static_cast<float>(count));
                 if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
                 {
                     std::float_t value;
@@ -206,13 +206,13 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
 Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(ChartMetadata &metadata, const Gx::ResourceContext &ctx)
 {
-    auto fs = Gx::FileSystem::Open(metadata.Source);
+    const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadThumbnail(*fs, metadata, ctx);
 }
 
 Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(ChartMetadata &metadata, const Gx::ResourceContext &ctx)
 {
-    auto fs = Gx::FileSystem::Open(metadata.Source);
+    const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadCoverArt(*fs, metadata, ctx);
 }
 

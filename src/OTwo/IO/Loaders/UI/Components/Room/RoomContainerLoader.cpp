@@ -12,7 +12,7 @@ Gx::ResourcePtr<RoomContainer> RoomContainerLoader::LoadFromJson(const Gx::Json 
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
     return LoadFromMetadata(metadata, ctx);

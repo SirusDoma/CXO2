@@ -38,7 +38,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported.\n" + fileName);
     }
 
-    bool FileSystem::Contains(std::string &fileName)
+    bool FileSystem::Contains(const std::string &fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -56,7 +56,7 @@ namespace Gx
         EnsureDefaultFileSystemsRegistered();
 
         std::vector<FileInfo> files;
-        for (auto controller : m_controllers)
+        for (const auto controller : m_controllers)
         {
             if (auto f = controller->Scan(pattern, false); !f.empty())
                 files.insert(files.end(), f.begin(), f.end());

@@ -16,8 +16,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
-    auto vertical = attributes.find("vertical");
-    if (vertical != attributes.end())
+    if (auto vertical = attributes.find("vertical"); vertical != attributes.end())
     {
         metadata.VerticalCount   = vertical->at("count").get<unsigned int>();
         metadata.VerticalSpacing = vertical->at("spacing").get<float>();
@@ -28,8 +27,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
         metadata.VerticalSpacing = 0.f;
     }
 
-    auto horizontal = attributes.find("horizontal");
-    if (horizontal != attributes.end())
+    if (auto horizontal = attributes.find("horizontal"); horizontal != attributes.end())
     {
         metadata.HorizontalCount   = horizontal->at("count").get<unsigned int>();
         metadata.HorizontalSpacing = horizontal->at("spacing").get<float>();
@@ -40,8 +38,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
         metadata.HorizontalSpacing = 0.f;
     }
 
-    auto order = attributes.find("order");
-    if (order != attributes.end())
+    if (auto order = attributes.find("order"); order != attributes.end())
     {
         if (auto parsed = magic_enum::enum_cast<Gx::List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
             metadata.Order = parsed.value();
@@ -66,7 +63,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
 
 Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ListMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     

@@ -25,13 +25,13 @@ namespace Gx
         Mixer &operator=(Mixer&& right) noexcept;
 
         SoundGroup *GetMasterSoundGroup() const;
-        SoundGroup *GetSoundGroup(const std::string &name);
+        SoundGroup *GetSoundGroup(const std::string &groupName);
 
         sf::SoundSource *Play(sf::SoundSource *source);
         sf::SoundSource *Play(sf::SoundSource *source, const std::string &group);
         sf::SoundSource *Play(sf::SoundSource *source, SoundGroup *group);
 
-        void Play(const std::string &group);
+        void Play(const std::string &groupName);
         void Play(SoundGroup *group);
 
         void Pause(sf::SoundSource *source);

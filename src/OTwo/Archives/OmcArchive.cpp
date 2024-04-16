@@ -33,7 +33,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
-    if (auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+    if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
@@ -56,7 +56,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
             continue;
 
         const auto data = new Gx::Uint8[header.GetSize()];
-        if (auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+        if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         {
             delete[] data;
             throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file.");

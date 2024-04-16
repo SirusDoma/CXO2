@@ -27,14 +27,14 @@
 
 namespace Gx
 {
-    Circle::Circle(float radius, std::size_t pointCount) :
+    Circle::Circle(const float radius, const std::size_t pointCount) :
         m_radius(radius),
         m_pointCount(pointCount)
     {
         Update();
     }
 
-    void Circle::SetRadius(float radius)
+    void Circle::SetRadius(const float radius)
     {
         m_radius = radius;
         Update();
@@ -45,7 +45,7 @@ namespace Gx
         return m_radius;
     }
 
-    void Circle::SetPointCount(std::size_t count)
+    void Circle::SetPointCount(const std::size_t count)
     {
         m_pointCount = count;
         Update();
@@ -56,13 +56,13 @@ namespace Gx
         return m_pointCount;
     }
 
-    sf::Vector2f Circle::GetPoint(std::size_t index) const
+    sf::Vector2f Circle::GetPoint(const std::size_t index) const
     {
-        static const float pi = 3.141592654f;
+        static constexpr float pi = 3.141592654f;
 
-        float angle = static_cast<float>(index) * 2 * pi / static_cast<float>(m_pointCount) - pi / 2;
-        float x = std::cos(angle) * m_radius;
-        float y = std::sin(angle) * m_radius;
+        const float angle = static_cast<float>(index) * 2 * pi / static_cast<float>(m_pointCount) - pi / 2;
+        const float x = std::cos(angle) * m_radius;
+        const float y = std::sin(angle) * m_radius;
 
         return {m_radius + x, m_radius + y};
     }

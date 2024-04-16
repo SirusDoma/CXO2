@@ -2,20 +2,20 @@
 
 namespace Gx
 {
-    Scale::Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration) :
+    Scale::Scale(Transformable* target, const sf::Vector2f scale, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetScale()),
-        m_diff(),
         m_end(scale),
+        m_diff(),
         m_duration(duration)
     {
     }
 
-    void Scale::Update(double delta)
+    void Scale::Update(const double delta)
     {
         Task::Update(delta);
 
-        auto state = GetState();
+        const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
@@ -29,7 +29,7 @@ namespace Gx
 
         float scale  = 0.0f;
         auto current = m_target->GetScale();
-        auto elapsed = GetElapsed();
+        const auto elapsed = GetElapsed();
 
         if (m_end.x < current.x)
         {

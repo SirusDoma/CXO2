@@ -25,8 +25,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
         metadata.FontSize = 13;
 
     metadata.MaximumChatsLength = attributes.at("maximumChatLength").get<unsigned int>();
-    auto bounds = attributes.find("bounds");
-    if (bounds != attributes.end())
+    if (auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
         unsigned int x, y, w, h;
         bounds->at("x").get_to(x);
@@ -41,7 +40,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
 
 Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ChatWindowMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ChatWindowMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
@@ -51,8 +50,8 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
     window->SetMaximumChatLength(metadata->MaximumChatsLength);
     window->SetLocalBounds(metadata->Bounds);
 
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto font = ctx.Find<sf::Font>(*metadata); font)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         window->SetFont(*font);
     else
         return nullptr;

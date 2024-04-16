@@ -13,7 +13,7 @@ bool OjmArchive::LoadFromFile(const std::string &fileName)
 
     delete fs.release(); // Force releasing file handle
 
-    auto signature = std::string(sign, 3);
+    const auto signature = std::string(sign, 3);
     if (signature == "M30")
     {
         m_type = ArchiveType::M30;

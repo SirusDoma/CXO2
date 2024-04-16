@@ -21,27 +21,25 @@ bool MetadataLoader::Parse(const Gx::Json &json, ResourceMetadata &metadata, con
         return false;
 
     metadata.Name = ctx.GetID();
-    if (auto name = json.find("name"); name != json.end())
+    if (const auto name = json.find("name"); name != json.end())
         metadata.Name = name->get<std::string>();
 
     metadata.Type = ResourceMetadata::ResourceType::None;
-    if (auto type = json.find("type"); type != json.end())
+    if (const auto type = json.find("type"); type != json.end())
     {
-        auto parse = magic_enum::enum_cast<ResourceMetadata::ResourceType>(type->get<std::string>());
-        if (parse.has_value())
+        if (const auto parse = magic_enum::enum_cast<ResourceMetadata::ResourceType>(type->get<std::string>()); parse.has_value())
             metadata.Type = parse.value();
     }
 
-    auto require = json.find("require");
-    if (require != json.end() && !require->empty())
+    if (const auto require = json.find("require"); require != json.end() && !require->empty())
     {
         for (auto [key, resource]: require->items())
             metadata.Require[key] = resource;
     }
 
-    if (auto attributes = json.find("attributes"); attributes != json.end())
+    if (const auto attributes = json.find("attributes"); attributes != json.end())
     {
-        if (auto objects = attributes->find("objects"); objects != attributes->end())
+        if (const auto objects = attributes->find("objects"); objects != attributes->end())
         {
             for (auto [key, object]: objects->items())
                 metadata.Objects.push_back(ObjectMetadata{key, object});

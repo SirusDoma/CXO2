@@ -10,7 +10,7 @@ namespace Gx
     public:
         using sf::RenderStates::RenderStates;
 
-        explicit RenderStates(sf::RenderStates states, unsigned int frameID = 0, double delta = 0);
+        explicit RenderStates(const sf::RenderStates &states, unsigned int frameID = 0, double delta = 0);
 
         RenderStates& operator=(const RenderStates& states);
 

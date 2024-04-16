@@ -13,13 +13,12 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromJson(const Gx::Json &json, const
     if (!LabelLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
     
-    if (auto speed = attributes.find("speed"); speed != attributes.end())
+    if (const auto speed = attributes.find("speed"); speed != attributes.end())
         metadata.Speed = speed->get<double>();
     else
         metadata.Speed = 30.f;
 
-    auto bounds = attributes.find("bounds");
-    if (bounds != attributes.end())
+    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
         unsigned int x, y, w, h;
         bounds->at("x").get_to(x);
@@ -34,13 +33,13 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const MarqueeMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const MarqueeMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto marquee = std::make_unique<Marquee>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto font = ctx.Find<sf::Font>(*metadata); font)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         marquee->SetFont(*font);
     else
         return nullptr;

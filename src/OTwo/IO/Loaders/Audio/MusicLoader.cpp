@@ -11,10 +11,9 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json &json, const
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto it = metadata.Require.find("music");;
-    if (it != metadata.Require.end())
+    if (const auto it = metadata.Require.find("music"); it != metadata.Require.end())
     {
-        auto source = std::any_cast<Gx::Json>(it->second);
+        const auto source = std::any_cast<Gx::Json>(it->second);
         metadata.Source = source.get<std::string>();
     }
 
@@ -26,13 +25,13 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const MusicMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const MusicMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
-    
-    auto size = Gx::FileSystem::GetFileSize(metadata->Source);
-    auto data = new Gx::Uint8[size];
-    if (Gx::FileSystem::ReadFile(metadata->Source, data, size))
+
+    // "data" must be a pointer (or reference to somewhere else) because it need to be alive outside this method
+    const auto size = Gx::FileSystem::GetFileSize(metadata->Source);
+    if (auto data = new Gx::Uint8[size]; Gx::FileSystem::ReadFile(metadata->Source, data, size))
     {
         auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto music) {
             delete music;

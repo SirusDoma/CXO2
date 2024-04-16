@@ -15,7 +15,7 @@ void Chart::SetMetadata(const ChartMetadata &metadata)
 std::vector<Chart::Event*> Chart::GetEvents(Difficulty diff) const
 {
     auto events = std::vector<Event*>();
-    auto source = m_events.find(diff);
+    const auto source = m_events.find(diff);
     if (source == m_events.end())
         return events;
 
@@ -32,7 +32,7 @@ void Chart::AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample)
 
 sf::SoundBuffer *Chart::GetSample(Gx::Uint16 id) const
 {
-    if (auto it = m_samples.find(id); it != m_samples.end())
+    if (const auto it = m_samples.find(id); it != m_samples.end())
         return it->second.get();
 
     return nullptr;

@@ -10,7 +10,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json &json, con
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
 
-    auto attributes = json.at("attributes");
+    const auto attributes = json.at("attributes");
     if (!SpriteLoader::ParseMetadata(attributes, metadata, ctx))
         return nullptr;
 

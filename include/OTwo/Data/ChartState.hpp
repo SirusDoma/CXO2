@@ -12,6 +12,8 @@ class Chart;
 class ChartState : public Gx::Module
 {
 public:
+    ChartState() = default;
+
     const Chart *GetChart() const;
     void SetChart(Gx::ResourcePtr<Chart> chart);
 

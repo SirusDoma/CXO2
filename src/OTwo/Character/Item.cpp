@@ -9,7 +9,7 @@ unsigned int Item::GetID() const
     return m_id;
 }
 
-void Item::SetID(unsigned int id)
+void Item::SetID(const unsigned int id)
 {
     m_id = id;
 }
@@ -19,7 +19,7 @@ EquipmentType Item::GetType() const
     return m_type;
 }
 
-void Item::SetType(EquipmentType type)
+void Item::SetType(const EquipmentType type)
 {
     m_type = type;
 }
@@ -29,7 +29,7 @@ Planet Item::GetOrigin() const
     return m_origin;
 }
 
-void Item::SetOrigin(Planet planet)
+void Item::SetOrigin(const Planet planet)
 {
     m_origin = planet;
 }
@@ -39,7 +39,7 @@ Gender Item::GetGender() const
     return m_gender;
 }
 
-void Item::SetGender(Gender gender)
+void Item::SetGender(const Gender gender)
 {
     m_gender = gender;
 }
@@ -49,7 +49,7 @@ bool Item::IsNew() const
     return m_isNew;
 }
 
-void Item::SetIsNew(bool isNew)
+void Item::SetIsNew(const bool isNew)
 {
     m_isNew = isNew;
 }
@@ -81,14 +81,14 @@ bool Item::IsBuyableWith(const Currency &currency) const
 
 unsigned int Item::GetPrice(const Currency &currency) const
 {
-    auto iterator = m_prices.find(currency);
+    const auto iterator = m_prices.find(currency);
     if (iterator != m_prices.end())
         return iterator->second;
 
     return 0;
 }
 
-void Item::SetPrice(const Currency &currency, unsigned int price)
+void Item::SetPrice(const Currency &currency, const unsigned int price)
 {
     m_prices[currency] = price;
 }
@@ -123,7 +123,7 @@ void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument in
 
 Gx::Animation *Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const
 {
-    auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
+    const auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
     if (find != m_renderables.end())
         return find->second.get();
 

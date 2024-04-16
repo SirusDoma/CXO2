@@ -16,7 +16,7 @@ Planet UserState::GetPlanet() const
     return m_planet;
 }
 
-void UserState::SetPlanet(Planet planet)
+void UserState::SetPlanet(const Planet planet)
 {
     m_planet = planet;
 }
@@ -26,7 +26,7 @@ MusicHall UserState::GetMusicHall() const
     return m_hall;
 }
 
-void UserState::SetMusicHall(MusicHall hall)
+void UserState::SetMusicHall(const MusicHall hall)
 {
     m_hall = hall;
 }
@@ -36,7 +36,7 @@ unsigned int UserState::GetChannelID() const
     return m_channelID;
 }
 
-void UserState::SetChannelID(unsigned int channelId)
+void UserState::SetChannelID(const unsigned int channelId)
 {
     m_channelID = channelId;
 }

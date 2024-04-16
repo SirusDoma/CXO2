@@ -2,7 +2,7 @@
 
 Gx::ResourcePtr <ChartMetadata> ChartMetadataLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
 {
-    auto stream = Gx::FileSystem::Open(fileName);
+    const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
         throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
 

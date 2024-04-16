@@ -15,7 +15,7 @@ Gx::ResourcePtr<UserList> UserListLoader::LoadFromJson(const Gx::Json &json, con
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
     return LoadFromMetadata(metadata, ctx);
@@ -23,7 +23,7 @@ Gx::ResourcePtr<UserList> UserListLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<UserList> UserListLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const UserListMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const UserListMetadata*>(&meta);
     if (metadata == nullptr)
         return nullptr;
 

@@ -31,7 +31,7 @@ namespace Gx
     sf::SoundSource::Status SoundGroup::GetStatus() const
     {
         bool paused = false;
-        for (auto source : m_sources)
+        for (const auto source : m_sources)
         {
             if (source->getStatus() == sf::SoundSource::Playing)
                 return sf::SoundSource::Playing;
@@ -50,12 +50,12 @@ namespace Gx
         if (!m_enabled)
             return;
 
-        for (auto source : m_sources)
+        for (const auto source : m_sources)
         {
             // TODO: expose playing offset?
-            if (auto sound = dynamic_cast<sf::Sound*>(source); sound)
+            if (const auto sound = dynamic_cast<sf::Sound*>(source); sound)
                 sound->setPlayingOffset(sf::Time::Zero);
-            else if (auto music = dynamic_cast<sf::Music*>(source); music)
+            else if (const auto music = dynamic_cast<sf::Music*>(source); music)
                 music->setPlayingOffset(sf::Time::Zero);
             else
                 source->stop(); // isn't thread-safe
@@ -69,7 +69,7 @@ namespace Gx
         if (!m_enabled)
             return;
 
-        for (auto source : m_sources)
+        for (const auto source : m_sources)
         {
             if (source->getStatus() == sf::SoundSource::Paused)
                 source->play();
@@ -81,7 +81,7 @@ namespace Gx
         if (!m_enabled)
             return;
 
-        for (auto source : m_sources)
+        for (const auto source : m_sources)
             source->pause();
     }
 
@@ -90,7 +90,7 @@ namespace Gx
         if (!m_enabled)
             return;
 
-        for (auto source : m_sources)
+        for (const auto source : m_sources)
             source->stop();
 
         m_sources.clear();
@@ -112,7 +112,7 @@ namespace Gx
         if (m_volume != volume)
         {
             m_volume = volume;
-            for (auto source : m_sources)
+            for (const auto source : m_sources)
                 source->setVolume(volume);
         }
     }
@@ -122,12 +122,12 @@ namespace Gx
         return m_pan;
     }
 
-    void SoundGroup::SetPan(float pan)
+    void SoundGroup::SetPan(const float pan)
     {
         if (m_pan != pan && m_enabled)
         {
             m_pan = pan;
-            for (auto source : m_sources)
+            for (const auto source : m_sources)
                 source->setPosition(sf::Vector3f(m_pan, 0.f, 0.f));
         }
     }
@@ -137,7 +137,7 @@ namespace Gx
         return m_enabled;
     }
 
-    void SoundGroup::SetEnabled(bool enable)
+    void SoundGroup::SetEnabled(const bool enable)
     {
         if (!enable)
             Pause();
@@ -149,7 +149,7 @@ namespace Gx
     {
         if (source && m_enabled)
         {
-            auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
+            const auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
             if (iterator == m_sources.end())
                 m_sources.push_back(source);
 
@@ -168,7 +168,7 @@ namespace Gx
     {
         if (source && m_enabled)
         {
-            auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
+            const auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
             if (iterator != m_sources.end())
                 return m_sources.erase(iterator) == m_sources.end();
         }

@@ -29,15 +29,15 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json &json, const Gx::R
 
 Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ItemMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ItemMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto item = std::make_unique<Item>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    
-    auto spriteLoader = SpriteLoader();
-    auto animationLoader = AnimationLoader();
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+
+    const auto spriteLoader = SpriteLoader();
+    const auto animationLoader = AnimationLoader();
     item->SetID(metadata->ID);
     item->SetName(metadata->Name);
     item->SetDescription(metadata->Description);
@@ -72,8 +72,7 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
         return false;
 
     MetadataLoader::Parse(json, metadata, context);
-    auto attributes = json.find("attributes");
-    if (attributes != json.end())
+    if (auto attributes = json.find("attributes"); attributes != json.end())
     {
         metadata.ID          = attributes->at("id").get<unsigned int>();
         metadata.IsNew       = attributes->at("isNew").get<bool>();
@@ -93,8 +92,7 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
         if (auto equipType = magic_enum::enum_cast<EquipmentType>(attributes->at("type").get<std::string>()); equipType.has_value())
             metadata.EquipmentType = equipType.value();
 
-        auto price = attributes->find("price");
-        if (price != attributes->end())
+        if (auto price = attributes->find("price"); price != attributes->end())
         {
             for (auto [priceKey, priceValue] : price->items())
             {
@@ -107,11 +105,9 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
 
     if (!metadata.Require.empty())
     {
-        auto it = metadata.Require.find("preview");
-        if (it != metadata.Require.end())
+        if (auto it = metadata.Require.find("preview"); it != metadata.Require.end())
         {
-            auto preview = std::any_cast<Gx::Json>(it->second);
-            if (!preview.empty())
+            if (auto preview = std::any_cast<Gx::Json>(it->second); !preview.empty())
             {
                 metadata.SmallPreview = preview.at("small").get<std::string>();
                 metadata.LargePreview = preview.at("large").get<std::string>();

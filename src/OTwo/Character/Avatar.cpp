@@ -15,7 +15,7 @@ Avatar::Avatar() :
     m_renderableStates.clear();
 }
 
-Avatar::Avatar(Gender gender) :
+Avatar::Avatar(const Gender gender) :
     Avatar()
 {
     m_gender = gender;
@@ -26,7 +26,7 @@ Gender Avatar::GetGender() const
     return m_gender;
 }
 
-void Avatar::SetGender(Gender gender)
+void Avatar::SetGender(const Gender gender)
 {
     m_gender = gender;
 }
@@ -36,18 +36,18 @@ void Avatar::SetDefaultItem(const Item *item)
     if (item)
     {
         m_defaultItems[item->GetType()] = item;
-        if (auto it = m_items.find(item->GetType()); it == m_items.end())
+        if (const auto it = m_items.find(item->GetType()); it == m_items.end())
             Equip(item);
     }
 }
 
 bool Avatar::IsEquiped(const Item *item) const
 {
-    auto iterator = m_items.find(item->GetType());
+    const auto iterator = m_items.find(item->GetType());
     return iterator != m_items.end() && iterator->second->GetID() == item->GetID();
 }
 
-void Avatar::Equip(const Item *item, bool reset)
+void Avatar::Equip(const Item *item, const bool reset)
 {
     if (item)
     {
@@ -56,7 +56,7 @@ void Avatar::Equip(const Item *item, bool reset)
 
         if (item->GetInstrument() != Instrument::None)
         {
-            for (auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
+            for (const auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
                 Unequip(type);
         }
 
@@ -72,7 +72,7 @@ void Avatar::Equip(const Item *item, bool reset)
 
         if (reset)
         {
-            for (auto renderable: item->GetRenderables())
+            for (const auto renderable: item->GetRenderables())
             {
                 renderable->Reset();
                 for (auto type : { EquipmentType::Body, EquipmentType::Jacket, EquipmentType::LeftArm, EquipmentType::RightArm, EquipmentType::LeftHand, EquipmentType::RightHand })
@@ -81,15 +81,15 @@ void Avatar::Equip(const Item *item, bool reset)
                     {
                         if (type == EquipmentType::Body)
                         {
-                            for (auto part: { RenderPart::LeftArm, RenderPart::RightArm })
+                            for (const auto part: { RenderPart::LeftArm, RenderPart::RightArm })
                             {
-                                if (auto refRenderable = itemRef->second->GetRenderableItem(GetGender(), part, item->GetInstrument()); refRenderable)
+                                if (const auto refRenderable = itemRef->second->GetRenderableItem(GetGender(), part, item->GetInstrument()); refRenderable)
                                     refRenderable->Reset();
                             }
                         }
                         else
                         {
-                            for (auto refRenderable : itemRef->second->GetRenderables())
+                            for (const auto refRenderable : itemRef->second->GetRenderables())
                                 refRenderable->Reset();
                         }
                     }
@@ -129,7 +129,7 @@ void Avatar::Unequip(const Item *item)
     }
 }
 
-void Avatar::Unequip(EquipmentType type)
+void Avatar::Unequip(const EquipmentType type)
 {
     auto iterator = m_items.find(type);
     if (iterator == m_items.end())
@@ -162,7 +162,7 @@ const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems()
     return m_items;
 }
 
-void Avatar::Update(double delta)
+void Avatar::Update(const double delta)
 {
     // Item instance are shared between multiple instances of Avatar
     // Therefore, we need to avoid making multiple Update calls on the item animations.
@@ -188,7 +188,7 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
         if (iterator == m_items.end())
             continue;
 
-        auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument);
+        const auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument);
         if (animation)
         {
             // Item and its Animation instances are shared across multiple instances of Avatar.

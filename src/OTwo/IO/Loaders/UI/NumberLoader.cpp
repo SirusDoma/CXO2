@@ -15,9 +15,8 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     if (!TransformLoader::ParseMetadata(attributes["transform"], metadata, context))
         return nullptr;
 
-    
-    auto digitSize = attributes.find("digitSize");
-    if (digitSize != attributes.end())
+
+    if (auto digitSize = attributes.find("digitSize"); digitSize != attributes.end())
     {
         unsigned int w, h;
         digitSize->at("width").get_to(w);
@@ -25,14 +24,12 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
         metadata.DigitSize = sf::Vector2u(w, h);
     }
 
-    auto digitCount = attributes.find("digitCount");
-    if (digitCount != attributes.end())
+    if (auto digitCount = attributes.find("digitCount"); digitCount != attributes.end())
         metadata.DigitCount = digitCount->get<unsigned int>();
     else
         metadata.DigitCount = 1;
 
-    auto frames = attributes.find("digits");
-    if (frames != attributes.end())
+    if (auto frames = attributes.find("digits"); frames != attributes.end())
     {
         for (auto [digit, frame] : frames->items())
         {
@@ -45,8 +42,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
         }
     }
 
-    auto color = attributes.find("color");
-    if (color != attributes.end())
+    if (auto color = attributes.find("color"); color != attributes.end())
     {
         unsigned int a, r, g, b;
         color->at("a").get_to(a);
@@ -58,14 +54,12 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.Color = sf::Color::White;
 
-    auto spacing = attributes.find("letterSpacing");
-    if (spacing != attributes.end())
+    if (auto spacing = attributes.find("letterSpacing"); spacing != attributes.end())
         metadata.LetterSpacing = spacing->get<float>();
     else
         metadata.LetterSpacing = 0.f;
 
-    auto value = attributes.find("value");
-    if (value != attributes.end())
+    if (auto value = attributes.find("value"); value != attributes.end())
         metadata.Value = value->get<unsigned int>();
     else
         metadata.Value = 0;
@@ -75,13 +69,13 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto number = std::make_unique<Gx::Number>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         number->SetTexture(*texture);
 
     number->SetDigitsSize(metadata->DigitSize);

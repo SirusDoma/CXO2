@@ -16,13 +16,13 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json &json, con
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    if (auto label = attributes.find("label"); label != attributes.end())
+    if (const auto label = attributes.find("label"); label != attributes.end())
     {
         MetadataLoader::Parse(label.value(), metadata.PromptLabelMetadata, context);
         LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_TEXT_PROMPT", context));
     }
 
-    if (auto buttons = attributes.find("buttons"); buttons != attributes.end())
+    if (const auto buttons = attributes.find("buttons"); buttons != attributes.end())
     {
         for (std::string type : {"accept", "cancel"})
         {
@@ -53,13 +53,13 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto dialog = std::make_unique<Gx::Dialog>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         dialog->SetTexture(*texture);
 
     auto populator = ObjectPopulator::Decorate(dialog.get());
@@ -74,8 +74,8 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
         }
     }
 
-    auto labelLoader = LabelLoader();
-    auto buttonLoader = ButtonLoader();
+    const auto labelLoader = LabelLoader();
+    const auto buttonLoader = ButtonLoader();
 
     if (auto label = labelLoader.LoadFromMetadata(metadata->PromptLabelMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_TEXT_PROMPT", context)); label)
         dialog->SetLabel(context.Store(context.GetID() + "/IDC_TEXT_PROMPT", std::move(label)));

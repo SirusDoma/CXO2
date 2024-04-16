@@ -56,7 +56,7 @@ namespace Gx
         SetTexCoords(rectangle);
     }
 
-    void Sprite::SetTexture(const sf::Texture& texture, bool resetRect)
+    void Sprite::SetTexture(const sf::Texture& texture, const bool resetRect)
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
         if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))
@@ -100,20 +100,20 @@ namespace Gx
         return m_vertices[0].color;
     }
 
-    Gx::BlendMode Sprite::GetBlendMode() const
+    BlendMode Sprite::GetBlendMode() const
     {
         return m_blendMode;
     }
 
-    void Sprite::SetBlendMode(Gx::BlendMode blendMode)
+    void Sprite::SetBlendMode(const Gx::BlendMode blendMode)
     {
         m_blendMode = blendMode;
     }
 
     sf::FloatRect Sprite::GetLocalBounds() const
     {
-        auto width = static_cast<float>(std::abs(m_texcoords.width));
-        auto height = static_cast<float>(std::abs(m_texcoords.height));
+        const auto width = static_cast<float>(std::abs(m_texcoords.width));
+        const auto height = static_cast<float>(std::abs(m_texcoords.height));
 
         return {sf::Vector2f(0.f, 0.f), sf::Vector2f(width, height)};
     }
@@ -157,7 +157,7 @@ namespace Gx
 
     void Sprite::UpdatePositions()
     {
-        sf::FloatRect bounds = GetLocalBounds();
+        const sf::FloatRect bounds = GetLocalBounds();
 
         m_vertices[0].position = sf::Vector2f(0, 0);
         m_vertices[1].position = sf::Vector2f(0, bounds.height);
@@ -167,10 +167,10 @@ namespace Gx
 
     void Sprite::UpdateTexCoords()
     {
-        auto left = static_cast<float>(m_texcoords.left);
-        float right = left + static_cast<float>(m_texcoords.width);
-        auto top = static_cast<float>(m_texcoords.top);
-        float bottom = top + static_cast<float>(m_texcoords.height);
+        const auto left = static_cast<float>(m_texcoords.left);
+        const float right = left + static_cast<float>(m_texcoords.width);
+        const auto top = static_cast<float>(m_texcoords.top);
+        const float bottom = top + static_cast<float>(m_texcoords.height);
 
         m_vertices[0].texCoords = sf::Vector2f(left, top);
         m_vertices[1].texCoords = sf::Vector2f(left, bottom);

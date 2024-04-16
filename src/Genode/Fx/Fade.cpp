@@ -2,20 +2,20 @@
 
 namespace Gx
 {
-    Fade::Fade(Colorable* target, Uint8 opacity, const sf::Time& duration) :
+    Fade::Fade(Colorable* target, const Uint8 opacity, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetColor().a),
-        m_diff(0),
         m_end(opacity),
+        m_diff(0),
         m_duration(duration)
     {
     }
 
-    void Fade::Update(double delta)
+    void Fade::Update(const double delta)
     {
         Task::Update(delta);
 
-        auto state = GetState();
+        const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
@@ -27,7 +27,7 @@ namespace Gx
 
         short alpha  = 0;
         auto current = m_target->GetColor();
-        auto elapsed = GetElapsed();
+        const auto elapsed = GetElapsed();
 
         if (m_end < current.a)
         {

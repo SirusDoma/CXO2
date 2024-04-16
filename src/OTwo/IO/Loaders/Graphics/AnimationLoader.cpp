@@ -13,8 +13,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    auto frames = attributes.find("frames");
-    if (frames != attributes.end())
+    if (auto frames = attributes.find("frames"); frames != attributes.end())
     {
         for (const auto& frame : frames->items())
         {
@@ -56,13 +55,13 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
 
 Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto animation = std::make_unique<Gx::Animation>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         animation->SetTexture(*texture);
 
     for (const auto& frame : metadata->Frames)

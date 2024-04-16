@@ -14,7 +14,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const G
     
     auto attributes = json.at("attributes");
 
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
     {
         if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
             return nullptr;
@@ -26,7 +26,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const G
 Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
     auto avatar = std::make_unique<Avatar>();
-    auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     

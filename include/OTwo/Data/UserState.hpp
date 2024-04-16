@@ -10,6 +10,8 @@
 class UserState : public Gx::Module
 {
 public:
+    UserState() = default;
+
     const PlayerData &GetCurrentPlayer() const;
     void SetCurrentPlayer(const PlayerData &player);
 

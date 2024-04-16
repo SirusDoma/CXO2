@@ -27,7 +27,7 @@
 
 namespace Gx
 {
-    RoundedRectangle::RoundedRectangle(const sf::Vector2f &size, float cornerRadius, unsigned int cornerPointCount) :
+    RoundedRectangle::RoundedRectangle(const sf::Vector2f &size, const float cornerRadius, const unsigned int cornerPointCount) :
         m_size(size),
         m_cornerRadius(cornerRadius),
         m_cornerPointCount(cornerPointCount)
@@ -44,7 +44,7 @@ namespace Gx
         return m_size;
     }
 
-    void RoundedRectangle::SetCornerRadius(float radius)
+    void RoundedRectangle::SetCornerRadius(const float radius)
     {
         m_cornerRadius = radius;
     }
@@ -54,7 +54,7 @@ namespace Gx
         return m_cornerRadius;
     }
 
-    void RoundedRectangle::SetCornerPointCount(unsigned int cornerPointCount)
+    void RoundedRectangle::SetCornerPointCount(const unsigned int cornerPointCount)
     {
         m_cornerPointCount = cornerPointCount;
     }
@@ -69,14 +69,14 @@ namespace Gx
         return m_cornerPointCount * 4;
     }
 
-    sf::Vector2f RoundedRectangle::GetPoint(std::size_t index) const
+    sf::Vector2f RoundedRectangle::GetPoint(const std::size_t index) const
     {
         if(index >= m_cornerPointCount * 4)
             return {0,0};
 
-        float deltaAngle = 90.0f / static_cast<float>(m_cornerPointCount - 1);
+        const float deltaAngle = 90.0f / static_cast<float>(m_cornerPointCount - 1);
         sf::Vector2f center;
-        unsigned int centerIndex = index / m_cornerPointCount;
+        const unsigned int centerIndex = index / m_cornerPointCount;
         static const float pi = 3.141592654f;
 
         switch(centerIndex)

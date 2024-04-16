@@ -4,7 +4,7 @@
 
 namespace Gx
 {
-    FileInfo::FileInfo(const FileSystemController &parent, const std::string &name, Int64 size) :
+    FileInfo::FileInfo(const FileSystemController &parent, const std::string &name, const Int64 size) :
         m_parent(&parent),
         m_name(name),
         m_size(size)

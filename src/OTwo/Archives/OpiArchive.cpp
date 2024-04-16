@@ -37,7 +37,7 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) c
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
-    if (auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
+    if (const auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();

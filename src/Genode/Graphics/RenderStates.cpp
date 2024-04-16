@@ -10,7 +10,7 @@ namespace Gx
             sf::BlendMode::Factor::OneMinusSrcAlpha,
             sf::BlendMode::Equation::Add)));
 
-    RenderStates::RenderStates(sf::RenderStates states, unsigned int frameID, double delta):
+    RenderStates::RenderStates(const sf::RenderStates &states, const unsigned int frameID, const double delta) :
         sf::RenderStates(states),
         FrameID(frameID),
         Delta(delta)

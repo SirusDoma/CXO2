@@ -14,7 +14,7 @@ Gx::ResourcePtr<ChatPanel> ChatPanelLoader::LoadFromJson(const Gx::Json &json, c
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
     return LoadFromMetadata(metadata, ctx);
@@ -22,7 +22,7 @@ Gx::ResourcePtr<ChatPanel> ChatPanelLoader::LoadFromJson(const Gx::Json &json, c
 
 Gx::ResourcePtr<ChatPanel> ChatPanelLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ChatPanelMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ChatPanelMetadata*>(&meta);
     if (metadata == nullptr)
         return nullptr;
 

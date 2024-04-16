@@ -54,13 +54,13 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json 
 
 Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ChannelButtonMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ChannelButtonMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto channelButton = std::make_unique<ChannelButton>();
-    auto acquirer = ResourceContextDecorator::Decorate(context);
-    if (auto texture = acquirer.Find<sf::Texture>(*metadata); texture)
+    const auto acquirer = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = acquirer.Find<sf::Texture>(*metadata); texture)
         channelButton->SetTexture(*texture);
 
     auto spriteLoader = SpriteLoader();

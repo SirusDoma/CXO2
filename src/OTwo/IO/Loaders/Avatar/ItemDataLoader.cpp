@@ -13,8 +13,7 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, con
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto attributes = json.find("attributes");
-    if (attributes != json.end())
+    if (auto attributes = json.find("attributes"); attributes != json.end())
     {
         if (auto version = attributes->find("version"); version != attributes->end())
             metadata.Version = version->get<std::string>();
@@ -26,8 +25,7 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, con
     {
         unsigned int id = std::stoi(key);
         auto data = std::any_cast<Gx::Json>(resource);
-        auto itemMetadata = ItemMetadata();
-        if (ItemLoader::ParseMetadata(data, itemMetadata, context))
+        if (auto itemMetadata = ItemMetadata(); ItemLoader::ParseMetadata(data, itemMetadata, context))
             metadata.Items[id] = itemMetadata;
     }
 
@@ -36,7 +34,7 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ItemData*>(&meta);
+    const auto metadata = dynamic_cast<const ItemData*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 

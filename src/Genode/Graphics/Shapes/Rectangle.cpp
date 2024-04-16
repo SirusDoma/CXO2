@@ -48,7 +48,7 @@ namespace Gx
         return 4;
     }
 
-    sf::Vector2f Rectangle::GetPoint(std::size_t index) const
+    sf::Vector2f Rectangle::GetPoint(const std::size_t index) const
     {
         switch (index)
         {
