@@ -16,7 +16,7 @@ int main(int argc , char** argv)
         if (!Gx::Debugger::IsDebuggerAttached())
         {
             // "Fix" macOS translocation
-            if (auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
+            if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
                 Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
 
