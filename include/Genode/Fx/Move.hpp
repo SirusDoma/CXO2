@@ -13,7 +13,7 @@ namespace Gx
         Move(Transformable* target, sf::Vector2f position, const sf::Time& duration);
 
     protected:
-        void Update(double delta) override;
+        void Update(const double delta) override;
         void Reset() override;
 
     private:

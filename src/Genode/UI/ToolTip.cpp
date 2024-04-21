@@ -156,7 +156,7 @@ namespace Gx
         return Label::Render(target, states);
     }
 
-    void ToolTip::Update(double delta)
+    void ToolTip::Update(const double delta)
     {
         Label::Update(delta);
 

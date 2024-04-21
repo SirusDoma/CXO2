@@ -4,7 +4,7 @@
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/CheckBox.hpp>
-#include <Genode/UI/ProgressBar.hpp>
+#include <Genode/UI/Gauge.hpp>
 
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>

@@ -27,8 +27,8 @@ namespace Gx
         const sf::Color & GetColor() const override;
         void SetColor(const sf::Color &color) override;
 
-        float GetLetterSpacing() const;
-        void SetLetterSpacing(float spacing);
+        float GetKerning() const;
+        void SetKerning(const float value);
 
         int GetDigitCount() const;
         void SetDigitCount(int count);
@@ -52,7 +52,7 @@ namespace Gx
         Alignment         m_alignment;
 
         unsigned int m_value, m_digitCount;
-        float m_width, m_height, m_spacing;
+        float m_width, m_height, m_kerning;
         bool m_needUpdate;
 
         std::unordered_map<unsigned int, sf::IntRect> m_texCoords;

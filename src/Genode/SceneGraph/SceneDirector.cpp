@@ -91,7 +91,7 @@ namespace Gx
         return states;
     }
 
-    void SceneDirector::Update(double delta)
+    void SceneDirector::Update(const double delta)
     {
         Stage();
 

@@ -157,7 +157,7 @@ namespace Gx
     {
     }
 
-    void Application::Update(double delta)
+    void Application::Update(const double delta)
     {
         m_director.Update(delta);
     }

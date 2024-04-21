@@ -20,7 +20,7 @@
 #include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
 #include <OTwo/IO/Loaders/UI/RadioButtonLoader.hpp>
-#include <OTwo/IO/Loaders/UI/ProgressBarLoader.hpp>
+#include <OTwo/IO/Loaders/UI/GaugeLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/DialogLoader.hpp>
 #include <OTwo/IO/Loaders/UI/TextBoxLoader.hpp>
@@ -84,7 +84,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::CheckBox, CheckBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::ProgressBar, ProgressBarLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
@@ -194,7 +194,7 @@ void O2Jam::Boot()
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
 
-    director.Present<StateAvi>();
+    director.Present<StateTest>();
 }
 
 void O2Jam::Shutdown()

@@ -405,7 +405,7 @@ void ChannelBoard::ShowNotice(unsigned int page)
     notice->SetFrame(m_noticePageIndex - 1);
 }
 
-void ChannelBoard::Update(double delta)
+void ChannelBoard::Update(const double delta)
 {
     Control::Update(delta);
     TaskContainer::Update(delta);

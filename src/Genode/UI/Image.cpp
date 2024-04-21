@@ -101,7 +101,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Image::Update(double delta)
+    void Image::Update(const double delta)
     {
         Control::Update(delta);
     }

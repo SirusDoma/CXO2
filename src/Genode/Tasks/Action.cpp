@@ -7,7 +7,7 @@ namespace Gx
     {
     }
 
-    void Action::Update(double delta)
+    void Action::Update(const double delta)
     {
         Task::Update(delta);
 

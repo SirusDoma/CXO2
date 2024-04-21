@@ -427,7 +427,7 @@ void SelectMusicDialog::Initialize()
     Sort(MusicSortMode::Level, MusicSortOrder::Ascending);
 }
 
-void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
+void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Dialog::OnKeyDown(ev);
 

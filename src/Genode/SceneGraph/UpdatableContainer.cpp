@@ -10,7 +10,7 @@ namespace Gx
     {
     }
 
-    void UpdatableContainer::Update(double delta)
+    void UpdatableContainer::Update(const double delta)
     {
         for (auto node : GetChildren())
         {

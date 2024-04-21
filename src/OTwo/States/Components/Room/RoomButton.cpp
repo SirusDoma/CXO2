@@ -60,7 +60,7 @@ bool RoomButton::IsActive() const
     return m_active;
 }
 
-void RoomButton::OnMouseMove(sf::Event::MouseMoveEvent ev)
+void RoomButton::OnMouseMove(const sf::Event::MouseMoveEvent ev)
 {
     Control::OnMouseMove(ev);
     m_hover->SetVisible(IsFocused());

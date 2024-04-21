@@ -60,7 +60,7 @@ void StateLoading::Initialize()
     thread.detach();
 }
 
-void StateLoading::Update(double delta)
+void StateLoading::Update(const double delta)
 {
     State::Update(delta);
 

@@ -10,7 +10,7 @@ namespace Gx
         m_digitCount(),
         m_width(),
         m_height(),
-        m_spacing(),
+        m_kerning(),
         m_value(),
         m_needUpdate(true)
     {
@@ -50,14 +50,14 @@ namespace Gx
             m_vertices[i].color = color;
     }
 
-    float Number::GetLetterSpacing() const
+    float Number::GetKerning() const
     {
-        return m_spacing;
+        return m_kerning;
     }
 
-    void Number::SetLetterSpacing(float spacing)
+    void Number::SetKerning(const float value)
     {
-        m_spacing = spacing;
+        m_kerning = value;
         m_needUpdate = true;
     }
 
@@ -111,7 +111,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Number::Update(double delta)
+    void Number::Update(const double delta)
     {
         if (m_needUpdate)
             Invalidate();
@@ -160,7 +160,7 @@ namespace Gx
         for (int d = 0; d < digitCount; d++)
         {
             if (d > 0)
-                m_width += m_spacing;
+                m_width += m_kerning;
 
             bool isLeading = leadingCount > 0 && d > digitCount - leadingCount;
             if (isLeading)
@@ -186,7 +186,7 @@ namespace Gx
             digits.pop();
 
             if (i > 0)
-                position += sf::Vector2f(texCoords.width + m_spacing, 0);
+                position += sf::Vector2f(texCoords.width + m_kerning, 0);
 
             texCoords = m_texCoords[digit];
             float x = position.x;

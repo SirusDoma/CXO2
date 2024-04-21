@@ -359,7 +359,7 @@ namespace Gx
         }
     }
 
-    void TextBox::Update(double delta)
+    void TextBox::Update(const double delta)
     {
         m_caret.Update(delta);
         Control::Update(delta);
@@ -404,17 +404,17 @@ namespace Gx
         Control::OnControlClick(sender, ev);
     }
 
-    void TextBox::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void TextBox::OnMouseMove(const sf::Event::MouseMoveEvent ev)
     {
         Control::OnMouseMove(ev);
     }
 
-    void TextBox::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
+    void TextBox::OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonDown(ev);
     }
 
-    void TextBox::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    void TextBox::OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonUp(ev);
 
@@ -425,7 +425,7 @@ namespace Gx
         }
     }
 
-    void TextBox::OnKeyDown(sf::Event::KeyEvent ev)
+    void TextBox::OnKeyDown(const sf::Event::KeyEvent ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -527,7 +527,7 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::OnKeyType(sf::Event::TextEvent ev)
+    void TextBox::OnKeyType(const sf::Event::TextEvent ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -613,7 +613,7 @@ namespace Gx
         return states;
     }
 
-    void TextBox::Caret::Update(double delta)
+    void TextBox::Caret::Update(const double delta)
     {
         m_elapsed += delta;
         if (m_elapsed >= BLINK_THRESHOLD)

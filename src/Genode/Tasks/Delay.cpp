@@ -22,7 +22,7 @@ namespace Gx
         m_duration = duration;
     }
 
-    void Delay::Update(double delta)
+    void Delay::Update(const double delta)
     {
         Task::Update(delta);
 

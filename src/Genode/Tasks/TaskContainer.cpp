@@ -49,7 +49,7 @@ namespace Gx
         m_tasks.clear();
     }
 
-    void TaskContainer::Update(double delta)
+    void TaskContainer::Update(const double delta)
     {
         for (auto task : m_tasks)
             task->Update(delta);

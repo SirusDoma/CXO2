@@ -9,7 +9,7 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/ProgressBar.hpp>
+#include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Dialog.hpp>

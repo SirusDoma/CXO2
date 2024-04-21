@@ -7,7 +7,7 @@ namespace Gx
         return Text::GetLocalBounds();
     }
 
-    void Label::Update(double delta)
+    void Label::Update(const double delta)
     {
         Control::Update(delta);
 

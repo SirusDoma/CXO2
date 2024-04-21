@@ -97,9 +97,9 @@ void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPop
             populator.Populate(name, LoadResource<Gx::RadioButton>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::ProgressBar:
+        case ResourceMetadata::ResourceType::Gauge:
         {
-            populator.Populate(name, LoadResource<Gx::ProgressBar>(name, json, ctx), ctx);
+            populator.Populate(name, LoadResource<Gx::Gauge>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::ScrollBar:

@@ -35,7 +35,7 @@ namespace Gx
         m_activeRadio = radio;
     }
 
-    void UiContainer::OnKeyDown(sf::Event::KeyEvent ev)
+    void UiContainer::OnKeyDown(const sf::Event::KeyEvent ev)
     {
         Inputable::OnKeyDown(ev);
 
@@ -77,7 +77,7 @@ namespace Gx
         return Control::Render(target, states);
     }
 
-    void UiContainer::Update(double delta)
+    void UiContainer::Update(const double delta)
     {
         Control::Update(delta);
     }

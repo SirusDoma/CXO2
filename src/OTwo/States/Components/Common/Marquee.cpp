@@ -44,7 +44,7 @@ void Marquee::SetSpeed(double speed)
     m_speed = speed;
 }
 
-void Marquee::Update(double delta)
+void Marquee::Update(const double delta)
 {
     Label::Update(delta);
 

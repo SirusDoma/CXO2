@@ -31,6 +31,17 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         label->SetFont(*font);
 
+    Gx::Uint32 style = 0;
+    if (metadata->Bold)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Bold);
+
+    if (metadata->Italic)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Italic);
+
+    if (metadata->Underlined)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Underlined);
+
+    label->SetStyle(style);
     label->SetCharacterSize(metadata->FontSize);
     label->SetColor(metadata->Color);
     label->SetOutlineThickness(metadata->OutlineThickness);
@@ -41,6 +52,8 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetScale(metadata->Scale);
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
+
+
 
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
@@ -85,6 +98,18 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     }
     else
         metadata.Color = sf::Color::White;
+
+    metadata.Bold = false;
+    if (auto bold = attributes.find("bold"); bold != attributes.end())
+        metadata.Bold = bold->get<bool>();
+
+    metadata.Italic = false;
+    if (auto italic = attributes.find("italic"); italic != attributes.end())
+        metadata.Italic = italic->get<bool>();
+
+    metadata.Underlined = false;
+    if (auto underlined = attributes.find("underlined"); underlined != attributes.end())
+        metadata.Underlined = underlined->get<bool>();
 
     if (auto outline = attributes.find("outline"); outline != attributes.end())
     {

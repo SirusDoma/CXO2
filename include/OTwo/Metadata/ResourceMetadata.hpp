@@ -40,7 +40,7 @@ struct ResourceMetadata
         Button,
         CheckBox,
         RadioButton,
-        ProgressBar,
+        Gauge,
         ScrollBar,
         ToolTip,
         Dialog,

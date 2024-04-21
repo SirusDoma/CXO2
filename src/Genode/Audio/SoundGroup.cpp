@@ -176,7 +176,7 @@ namespace Gx
         return false;
     }
 
-    void SoundGroup::Update(double delta)
+    void SoundGroup::Update(const double delta)
     {
         m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource *src)
         {

@@ -8,7 +8,7 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
-#include <Genode/UI/ProgressBar.hpp>
+#include <Genode/UI/Gauge.hpp>
 
 #include <OTwo/Data/Planet.hpp>
 
@@ -47,7 +47,7 @@ private:
 
     Gx::Image       *m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
     Gx::Number      *m_numberIndicator;
-    Gx::ProgressBar *m_populationCounter;
+    Gx::Gauge *m_populationCounter;
 
     StateMap m_states;
     MusicHall m_hall;

@@ -186,7 +186,7 @@ namespace Gx
         return RenderableContainer::Render(target, states);
     }
 
-    void Dialog::OnKeyDown(sf::Event::KeyEvent ev)
+    void Dialog::OnKeyDown(const sf::Event::KeyEvent ev)
     {
         UiContainer::OnKeyDown(ev);
 

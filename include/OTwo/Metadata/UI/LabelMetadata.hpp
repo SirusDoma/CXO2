@@ -8,6 +8,9 @@ struct LabelMetadata : public TransformMetadata
 {
     std::string          String;
     unsigned int         FontSize;
+    bool                 Bold;
+    bool                 Italic;
+    bool                 Underlined;
     float                OutlineThickness;
     sf::Color            Color;
     sf::Color            OutlineColor;

@@ -1,8 +1,8 @@
-﻿#include <Genode/UI/ProgressBar.hpp>
+﻿#include <Genode/UI/Gauge.hpp>
 
 namespace Gx
 {
-    ProgressBar::ProgressBar() :
+    Gauge::Gauge() :
         m_vertices(sf::PrimitiveType::TriangleStrip, 4),
         m_texture(),
         m_texCoords(),
@@ -13,39 +13,39 @@ namespace Gx
 
     }
 
-    ProgressBar::ProgressBar(const sf::Texture &texture) :
-        ProgressBar(texture, sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)))
+    Gauge::Gauge(const sf::Texture &texture) :
+        Gauge(texture, sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)))
     {
     }
 
-    ProgressBar::ProgressBar(const sf::Texture &texture, const sf::IntRect &texCoords) :
-        ProgressBar()
+    Gauge::Gauge(const sf::Texture &texture, const sf::IntRect &texCoords) :
+        Gauge()
     {
         SetTexture(texture);
         SetTexCoords(texCoords);
     }
 
-    sf::FloatRect ProgressBar::GetLocalBounds() const
+    sf::FloatRect Gauge::GetLocalBounds() const
     {
         return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.width, m_texCoords.height));
     }
 
-    const sf::Texture *ProgressBar::GetTexture() const
+    const sf::Texture *Gauge::GetTexture() const
     {
         return m_texture;
     }
 
-    void ProgressBar::SetTexture(const sf::Texture &texture)
+    void Gauge::SetTexture(const sf::Texture &texture)
     {
         m_texture = &texture;
     }
 
-    const sf::IntRect& ProgressBar::GetTexCoords() const
+    const sf::IntRect& Gauge::GetTexCoords() const
     {
         return m_texCoords;
     }
 
-    void ProgressBar::SetTexCoords(const sf::IntRect &texCoords)
+    void Gauge::SetTexCoords(const sf::IntRect &texCoords)
     {
         if (texCoords != m_texCoords)
         {
@@ -54,12 +54,12 @@ namespace Gx
         }
     }
 
-    const sf::Color &ProgressBar::GetColor() const
+    const sf::Color &Gauge::GetColor() const
     {
         return m_vertices[0].color;
     }
 
-    void ProgressBar::SetColor(const sf::Color &color)
+    void Gauge::SetColor(const sf::Color &color)
     {
         // Update the vertices' color
         m_vertices[0].color = color;
@@ -68,12 +68,12 @@ namespace Gx
         m_vertices[3].color = color;
     }
 
-    const ProgressBar::Orientation ProgressBar::GetOrientation() const
+    const Gauge::Orientation Gauge::GetOrientation() const
     {
         return m_orientation;
     }
 
-    void ProgressBar::SetOrientation(const Orientation &orientation)
+    void Gauge::SetOrientation(const Orientation &orientation)
     {
         if (m_orientation != orientation)
         {
@@ -82,12 +82,12 @@ namespace Gx
         }
     }
 
-    float ProgressBar::GetMaximumValue() const
+    float Gauge::GetMaximumValue() const
     {
         return m_maximum;
     }
 
-    void ProgressBar::SetMaximumValue(float max)
+    void Gauge::SetMaximumValue(const float max)
     {
         if (m_maximum != max)
         {
@@ -96,12 +96,12 @@ namespace Gx
         }
     }
 
-    float ProgressBar::GetValue() const
+    float Gauge::GetValue() const
     {
         return m_value;
     }
 
-    void ProgressBar::SetValue(float value)
+    void Gauge::SetValue(float value)
     {
         if (value > m_maximum)
             value = m_maximum;
@@ -116,12 +116,12 @@ namespace Gx
         }
     }
 
-    void ProgressBar::Update(double delta)
+    void Gauge::Update(const double delta)
     {
         Control::Update(delta);
     }
 
-    RenderStates ProgressBar::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Gauge::Render(sf::RenderTarget &target, RenderStates states) const
     {
         if (m_texture)
         {
@@ -133,7 +133,7 @@ namespace Gx
         return Control::Render(target, states);
     }
 
-    void ProgressBar::Invalidate()
+    void Gauge::Invalidate()
     {
         auto color  = GetColor();
         auto bounds = GetLocalBounds();

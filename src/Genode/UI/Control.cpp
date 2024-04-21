@@ -216,7 +216,7 @@ namespace Gx
         return RenderableContainer::Render(target, states);
     }
 
-    void Control::Update(double delta)
+    void Control::Update(const double delta)
     {
         if (!IsEnabled())
             return;
@@ -264,7 +264,7 @@ namespace Gx
         return InputableContainer::Input(ev);
     }
 
-    void Control::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void Control::OnMouseMove(const sf::Event::MouseMoveEvent ev)
     {
         if (GetControlState() != Control::State::Active)
         {
@@ -281,7 +281,7 @@ namespace Gx
         InputableContainer::OnMouseMove(ev);
     }
 
-    void Control::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
+    void Control::OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)
     {
         bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y));
         if (intersect)
@@ -321,7 +321,7 @@ namespace Gx
         InputableContainer::OnMouseButtonDown(ev);
     }
 
-    void Control::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    void Control::OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)
     {
         if (GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
         {
@@ -393,7 +393,7 @@ namespace Gx
             parent->OnControlDoubleClick(sender, ev);
     }
 
-    void Control::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
+    void Control::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev)
     {
         if (!IsEnabled())
             return;

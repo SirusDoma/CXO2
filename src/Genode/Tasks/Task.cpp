@@ -39,7 +39,7 @@ namespace Gx
         m_onComplete = std::move(callback);
     }
 
-    void Task::Update(double delta)
+    void Task::Update(const double delta)
     {
         if (m_state == TaskState::Completed || m_state == TaskState::Stopped)
             return;

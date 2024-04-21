@@ -13,14 +13,14 @@ namespace Gx
 
         virtual ~Inputable() = default;
 
-        virtual void OnMouseMove(sf::Event::MouseMoveEvent ev)                 {}
-        virtual void OnMouseButtonDown(sf::Event::MouseButtonEvent ev)         {}
-        virtual void OnMouseButtonUp(sf::Event::MouseButtonEvent ev)           {}
-        virtual void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) {}
+        virtual void OnMouseMove(const sf::Event::MouseMoveEvent ev)                 {}
+        virtual void OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)         {}
+        virtual void OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)           {}
+        virtual void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev) {}
 
-        virtual void OnKeyDown(sf::Event::KeyEvent ev)  {}
-        virtual void OnKeyUp(sf::Event::KeyEvent ev)    {}
-        virtual void OnKeyType(sf::Event::TextEvent ev) {}
+        virtual void OnKeyDown(const sf::Event::KeyEvent ev)  {}
+        virtual void OnKeyUp(const sf::Event::KeyEvent ev)    {}
+        virtual void OnKeyType(const sf::Event::TextEvent ev) {}
 
         virtual bool Input(const sf::Event ev)
         {

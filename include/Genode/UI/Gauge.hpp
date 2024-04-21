@@ -1,5 +1,5 @@
-#ifndef GENODE_UI_PROGRESS_BAR_HPP
-#define GENODE_UI_PROGRESS_BAR_HPP
+#ifndef GENODE_UI_GAUGE_HPP
+#define GENODE_UI_GAUGE_HPP
 
 #include <SFML/Graphics.hpp>
 
@@ -8,14 +8,14 @@
 
 namespace Gx
 {
-    class ProgressBar : public virtual Control, public virtual Colorable
+    class Gauge : public virtual Control, public virtual Colorable
     {
     public:
         enum class Orientation { Horizontal, Vertical };
 
-        ProgressBar();
-        explicit ProgressBar(const sf::Texture& texture);
-        ProgressBar(const sf::Texture& texture, const sf::IntRect &texCoords);
+        Gauge();
+        explicit Gauge(const sf::Texture& texture);
+        Gauge(const sf::Texture& texture, const sf::IntRect &texCoords);
 
         sf::FloatRect GetLocalBounds() const override;
 
@@ -38,7 +38,7 @@ namespace Gx
         void SetValue(float value);
 
     protected:
-        void Update(double delta) override;
+        void Update(const double delta) override;
         RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
 
         void Invalidate() override;

@@ -54,10 +54,10 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.Color = sf::Color::White;
 
-    if (auto spacing = attributes.find("letterSpacing"); spacing != attributes.end())
-        metadata.LetterSpacing = spacing->get<float>();
+    if (auto kerning = attributes.find("kerning"); kerning != attributes.end())
+        metadata.Kerning = kerning->get<float>();
     else
-        metadata.LetterSpacing = 0.f;
+        metadata.Kerning = 0.f;
 
     if (auto value = attributes.find("value"); value != attributes.end())
         metadata.Value = value->get<unsigned int>();
@@ -84,7 +84,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
         number->SetDigitFrame(digit, frame);
 
     number->SetColor(metadata->Color);
-    number->SetLetterSpacing(metadata->LetterSpacing);
+    number->SetKerning(metadata->Kerning);
     number->SetValue(metadata->Value);
 
     number->SetName(metadata->Name);

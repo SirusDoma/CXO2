@@ -1,15 +1,15 @@
-﻿#include <OTwo/IO/Loaders/UI/ProgressBarLoader.hpp>
+﻿#include <OTwo/IO/Loaders/UI/GaugeLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-#include <OTwo/Metadata/UI/ProgressBarMetadata.hpp>
+#include <OTwo/Metadata/UI/GaugeMetadata.hpp>
 
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 
-Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
-    ProgressBarMetadata metadata;
+    GaugeMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
@@ -20,9 +20,9 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
     if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
-            metadata.Orientation = Gx::ProgressBar::Orientation::Vertical;
+            metadata.Orientation = Gx::Gauge::Orientation::Vertical;
         else
-            metadata.Orientation = Gx::ProgressBar::Orientation::Horizontal;
+            metadata.Orientation = Gx::Gauge::Orientation::Horizontal;
     }
 
     if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
@@ -33,28 +33,28 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromJson(const Gx::Json 
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    const auto metadata = dynamic_cast<const ProgressBarMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const GaugeMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
-    auto progressBar = std::make_unique<Gx::ProgressBar>();
+    auto gauge = std::make_unique<Gx::Gauge>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
-        progressBar->SetTexture(*texture);
+        gauge->SetTexture(*texture);
     
-    progressBar->SetName(metadata->Name);
-    progressBar->SetOrientation(metadata->Orientation);
-    progressBar->SetMaximumValue(metadata->Maximum);
-    progressBar->SetTexCoords(metadata->TexCoords);
-    progressBar->SetColor(metadata->Color);
-    progressBar->SetOrigin(metadata->Origin);
-    progressBar->SetPosition(metadata->Position);
-    progressBar->SetScale(metadata->Scale);
-    progressBar->SetRotation(metadata->Rotation);
+    gauge->SetName(metadata->Name);
+    gauge->SetOrientation(metadata->Orientation);
+    gauge->SetMaximumValue(metadata->Maximum);
+    gauge->SetTexCoords(metadata->TexCoords);
+    gauge->SetColor(metadata->Color);
+    gauge->SetOrigin(metadata->Origin);
+    gauge->SetPosition(metadata->Position);
+    gauge->SetScale(metadata->Scale);
+    gauge->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(progressBar.get());
+    auto populator = ObjectPopulator::Decorate(gauge.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -66,5 +66,5 @@ Gx::ResourcePtr<Gx::ProgressBar> ProgressBarLoader::LoadFromMetadata(const Resou
         }
     }
 
-    return progressBar;
+    return gauge;
 }

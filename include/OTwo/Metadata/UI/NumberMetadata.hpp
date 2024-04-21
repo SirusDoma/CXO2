@@ -12,7 +12,7 @@ struct NumberMetadata : public TransformMetadata
 
     sf::Color    Color;
     sf::Vector2u DigitSize;
-    float        LetterSpacing;
+    float        Kerning;
     unsigned int Value;
     unsigned int DigitCount;
     std::unordered_map<unsigned int, sf::IntRect>  DigitFrames;
