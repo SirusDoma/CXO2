@@ -39,7 +39,8 @@ namespace Gx
         unsigned int GetValue() const;
         void SetValue(unsigned int value);
 
-        void Align(Alignment alignment);
+        void SetAlignment(const Alignment alignment);
+        Alignment GetAlignment() const;
 
     protected:
         void Update(double delta) override;

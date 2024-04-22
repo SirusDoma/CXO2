@@ -105,10 +105,15 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    void Number::Align(Number::Alignment alignment)
+    Number::Alignment Number::GetAlignment() const
+    {
+        return m_alignment;
+    }
+
+    void Number::SetAlignment(const Alignment alignment)
     {
         m_alignment = alignment;
-        Invalidate();
+        m_needUpdate = true;
     }
 
     void Number::Update(const double delta)

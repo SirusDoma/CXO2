@@ -8,14 +8,13 @@
 
 struct NumberMetadata : public TransformMetadata
 {
-    NumberMetadata() : DigitFrames() {}
-
     sf::Color    Color;
     sf::Vector2u DigitSize;
     float        Kerning;
     unsigned int Value;
     unsigned int DigitCount;
-    std::unordered_map<unsigned int, sf::IntRect>  DigitFrames;
+    Gx::Number::Alignment Alignment;
+    std::unordered_map<unsigned int, sf::IntRect> DigitFrames = {};
 };
 
 #endif

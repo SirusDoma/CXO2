@@ -9,13 +9,7 @@ namespace Gx
     class Label : public virtual Control, public virtual Text
     {
     public:
-        enum class Alignment
-        {
-            None,
-            Left,
-            Center,
-            Right
-        };
+        enum class Alignment { None, Left, Center, Right };
 
         using Text::Text;
         ~Label() override = default;

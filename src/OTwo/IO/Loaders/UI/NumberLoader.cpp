@@ -5,6 +5,8 @@
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
+#include <magic_enum.hpp>
+
 Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
     auto metadata = NumberMetadata();
@@ -59,6 +61,16 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.Kerning = 0.f;
 
+    if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gx::Number::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.Alignment = parsed.value();
+        else
+            metadata.Alignment = Gx::Number::Alignment::None;
+    }
+    else
+        metadata.Alignment = Gx::Number::Alignment::None;
+
     if (auto value = attributes.find("value"); value != attributes.end())
         metadata.Value = value->get<unsigned int>();
     else
@@ -86,6 +98,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
     number->SetColor(metadata->Color);
     number->SetKerning(metadata->Kerning);
     number->SetValue(metadata->Value);
+    number->SetAlignment(metadata->Alignment);
 
     number->SetName(metadata->Name);
     number->SetOrigin(metadata->Origin);
