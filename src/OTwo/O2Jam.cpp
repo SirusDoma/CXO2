@@ -163,9 +163,9 @@ void O2Jam::Boot()
     });
 
     // Force to load heavy providers during start-up
-    Require<UserState>().GetInstalledMusic();
+    auto _ = Require<UserState>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
-        Require<ItemFactory>().GetDefaultItems(gender);
+        auto _ = Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
     auto& resources = Require<Gx::ResourceManager>();
@@ -194,7 +194,7 @@ void O2Jam::Boot()
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
 
-    director.Present<StateTest>();
+    director.Present<StateAvi>();
 }
 
 void O2Jam::Shutdown()
