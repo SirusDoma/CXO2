@@ -2,8 +2,6 @@
 #include <Genode.hpp>
 
 #include <OTwo/Archives/OjmArchive.hpp>
-#include <OTwo/Archives/M30Archive.hpp>
-#include <OTwo/Archives/OmcArchive.hpp>
 
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
@@ -109,9 +107,6 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
-
-
-    auto config = GameConfig();
 
     // Render settings
     auto& window = GetRenderWindow();
