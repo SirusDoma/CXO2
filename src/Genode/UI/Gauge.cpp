@@ -231,7 +231,7 @@ namespace Gx
                 w     = progress;
                 right = left + w;
 
-                if (m_flickerActivate && m_value != m_maximum && progress > 0)
+                if (m_flickerActivate && m_value != m_maximum && m_value != 0 && progress > 0)
                 {
                     w -= 5;
                     right -= 5;
@@ -243,7 +243,7 @@ namespace Gx
                 y   = progress;
                 top = progress;
 
-                if (m_flickerActivate && m_value != m_maximum && progress > 0)
+                if (m_flickerActivate && m_value != m_maximum && m_value != 0 && progress > 0)
                 {
                     y -= 5;
                     top -= 5;

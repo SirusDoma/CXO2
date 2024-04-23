@@ -15,11 +15,14 @@ void StateTest::Initialize()
 {
     State::Initialize();
 
-    auto wave = Load<Gx::Gauge>("STATE_TEST/IDC_GAUGE_WAVE");
+    auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
     wave->SetValue(50);
 
     auto jam = Load<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(50);
+
+    auto lifeBar = Load<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    lifeBar->SetValue(75);
 
     //
     // auto& director  = GetDirector();
