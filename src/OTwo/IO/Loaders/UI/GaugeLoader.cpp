@@ -30,6 +30,49 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json &json, const
     else
         metadata.Maximum = 100.0f;
 
+    if (auto frames = attributes.find("frames"); frames != attributes.end())
+    {
+        for (const auto& frame : frames->items())
+        {
+            SpriteMetadata frameMetadata;
+            if (!SpriteLoader::ParseMetadata(frame.value(), frameMetadata, context))
+                continue;
+
+            auto transform = frame.value().find("transform");
+            if (transform == frame.value().end() || transform.value().find("position") == transform->end())
+                frameMetadata.Position = metadata.Position;
+
+            if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
+                frameMetadata.Scale    = metadata.Scale;
+
+            if (transform == frame.value().end() || transform.value().find("rotation") == transform->end())
+                frameMetadata.Rotation = metadata.Rotation;
+
+            if (transform == frame.value().end() || transform.value().find("origin") == transform->end())
+                frameMetadata.Origin   = metadata.Origin;
+
+            metadata.AnimationFrames.push_back(Gx::Animation::Frame
+            {
+                frameMetadata.TexCoords,
+                frameMetadata.Origin,
+                frameMetadata.Position,
+                frameMetadata.Rotation,
+                frameMetadata.Scale
+            });
+        }
+    }
+
+    if (auto duration = attributes.find("duration"); duration != attributes.end())
+        metadata.AnimationDuration = sf::milliseconds(duration->get<unsigned int>());
+    else
+        metadata.AnimationDuration = sf::milliseconds(metadata.AnimationFrames.size() * 60);
+
+    if (auto flicker = attributes.find("flicker"); flicker != attributes.end())
+        metadata.Flicker = flicker->get<bool>();
+    else
+        metadata.Flicker = false;
+
+
     return LoadFromMetadata(metadata, context);
 }
 
@@ -43,11 +86,16 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata 
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         gauge->SetTexture(*texture);
+
+    gauge->SetFlickering(metadata->Flicker);
+    gauge->SetAnimationDuration(metadata->AnimationDuration);
+    for (const auto& frame : metadata->AnimationFrames)
+        gauge->AddAnimationFrame(frame);
     
     gauge->SetName(metadata->Name);
     gauge->SetOrientation(metadata->Orientation);
-    gauge->SetMaximumValue(metadata->Maximum);
     gauge->SetTexCoords(metadata->TexCoords);
+    gauge->SetMaximumValue(metadata->Maximum);
     gauge->SetColor(metadata->Color);
     gauge->SetOrigin(metadata->Origin);
     gauge->SetPosition(metadata->Position);

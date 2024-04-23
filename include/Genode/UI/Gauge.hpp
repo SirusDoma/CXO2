@@ -1,10 +1,10 @@
 #ifndef GENODE_UI_GAUGE_HPP
 #define GENODE_UI_GAUGE_HPP
 
-#include <SFML/Graphics.hpp>
-
-#include <Genode/Graphics/Sprite.hpp>
+#include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Control.hpp>
+
+#include <SFML/Graphics.hpp>
 
 namespace Gx
 {
@@ -19,6 +19,20 @@ namespace Gx
 
         sf::FloatRect GetLocalBounds() const override;
 
+
+        bool IsFlickering() const;
+        void SetFlickering(const bool flicker);
+
+        Animation::AnimationState GetAnimationState() const;
+
+        template<typename... Args>
+        void AddAnimationFrame(const Animation::Frame &first, Args... args);
+        void AddAnimationFrame(const Animation::Frame &frame);
+        unsigned int GetAnimationFrameCount() const;
+
+        const sf::Time& GetAnimationDuration() const;
+        void SetAnimationDuration(const sf::Time& duration);
+
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
 
@@ -28,7 +42,7 @@ namespace Gx
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color &color) override;
 
-        const Orientation GetOrientation() const;
+        Orientation GetOrientation() const;
         void SetOrientation(const Orientation &orientation);
 
         float GetMaximumValue() const;
@@ -42,15 +56,24 @@ namespace Gx
         RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
 
         void Invalidate() override;
+
     private:
         sf::VertexArray    m_vertices;
         const sf::Texture* m_texture;
         sf::IntRect        m_texCoords;
         Orientation        m_orientation;
+        float              m_value, m_maximum;
+        bool               m_flicker, m_flickerActivate;
 
-    private:
-        float m_value, m_maximum;
+        Animation::AnimationState m_animationState;
+        unsigned int m_currentFrame;
+        bool m_visible;
+        sf::Time m_animationDuration;
+        sf::Time m_animationElapsed;
+        std::vector<Animation::Frame> m_frames;
     };
+
 }
 
+#include <Genode/UI/Gauge.inl>
 #endif

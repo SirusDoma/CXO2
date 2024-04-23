@@ -8,9 +8,13 @@ namespace Gx
         m_texCoords(),
         m_orientation(Orientation::Horizontal),
         m_value(0),
-        m_maximum(100.0f)
+        m_maximum(100.0f),
+        m_flicker(false),
+        m_flickerActivate(false),
+        m_animationState(Animation::AnimationState::Initial),
+        m_currentFrame(0),
+        m_visible(false)
     {
-
     }
 
     Gauge::Gauge(const sf::Texture &texture) :
@@ -28,6 +32,51 @@ namespace Gx
     sf::FloatRect Gauge::GetLocalBounds() const
     {
         return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.width, m_texCoords.height));
+    }
+
+
+    bool Gauge::IsFlickering() const
+    {
+        return m_flicker;
+    }
+
+    void Gauge::SetFlickering(const bool flicker)
+    {
+        if (m_flicker != flicker)
+        {
+            m_flicker = flicker;
+            Invalidate();
+        }
+    }
+
+    Animation::AnimationState Gauge::GetAnimationState() const
+    {
+        return m_animationState;
+    }
+
+    void Gauge::AddAnimationFrame(const Animation::Frame &frame)
+    {
+        m_frames.push_back(frame);
+        if (m_frames.size() == 1)
+        {
+            m_currentFrame = 0;
+            Invalidate();
+        }
+    }
+
+    unsigned int Gauge::GetAnimationFrameCount() const
+    {
+        return m_frames.size();
+    }
+
+    const sf::Time & Gauge::GetAnimationDuration() const
+    {
+        return m_animationDuration;
+    }
+
+    void Gauge::SetAnimationDuration(const sf::Time &duration)
+    {
+        m_animationDuration = duration;
     }
 
     const sf::Texture *Gauge::GetTexture() const
@@ -68,7 +117,7 @@ namespace Gx
         m_vertices[3].color = color;
     }
 
-    const Gauge::Orientation Gauge::GetOrientation() const
+    Gauge::Orientation Gauge::GetOrientation() const
     {
         return m_orientation;
     }
@@ -119,6 +168,23 @@ namespace Gx
     void Gauge::Update(const double delta)
     {
         Control::Update(delta);
+
+        if (!IsEnabled() || m_frames.empty())
+            return;
+
+        m_animationState    = Animation::AnimationState::Playing;
+        m_animationElapsed += sf::milliseconds(static_cast<int>(delta));
+        if (const auto frameTime = sf::milliseconds(m_animationDuration.asMilliseconds() / static_cast<int>(m_frames.size())); m_animationElapsed >= frameTime)
+        {
+            m_animationElapsed %= frameTime;
+            m_currentFrame++;
+            if (m_currentFrame >= m_frames.size())
+                m_currentFrame = 0;
+
+            m_flickerActivate = m_flicker && !m_flickerActivate;
+            Invalidate();
+        }
+
     }
 
     RenderStates Gauge::Render(sf::RenderTarget &target, RenderStates states) const
@@ -135,12 +201,22 @@ namespace Gx
 
     void Gauge::Invalidate()
     {
+        if (m_currentFrame < m_frames.size())
+        {
+            const auto &frame = m_frames[m_currentFrame];
+            m_texCoords = frame.TexCoords;
+            SetOrigin(frame.Origin);
+            SetPosition(frame.Position);
+            SetRotation(frame.Rotation);
+            SetScale(frame.Scale);
+        }
+
         auto color  = GetColor();
         auto bounds = GetLocalBounds();
         int x = bounds.left;
         int y = bounds.top;
-        float w = static_cast<float>(bounds.width);
-        float h = static_cast<float>(bounds.height);
+        float w = bounds.width;
+        float h = bounds.height;
 
         float left   = static_cast<float>(m_texCoords.left);
         float right  = left + w;
@@ -151,15 +227,27 @@ namespace Gx
         {
             if (m_orientation == Orientation::Horizontal)
             {
-                float progress = static_cast<float>(bounds.width) * (m_value / 100.f);
+                const float progress = bounds.width * (m_value / m_maximum);
                 w     = progress;
                 right = left + w;
+
+                if (m_flickerActivate && m_value != m_maximum && progress > 0)
+                {
+                    w -= 5;
+                    right -= 5;
+                }
             }
             else
             {
-                float progress = static_cast<float>(bounds.height) * (m_value / 100.f);
+                const float progress = bounds.height * (1.f - (m_value / m_maximum));
                 y   = progress;
                 top = progress;
+
+                if (m_flickerActivate && m_value != m_maximum && progress > 0)
+                {
+                    y -= 5;
+                    top -= 5;
+                }
             }
         }
 

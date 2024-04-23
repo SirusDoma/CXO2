@@ -7,13 +7,14 @@
 #include <Genode/IO/Json.hpp>
 #include <Genode/UI/Gauge.hpp>
 
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Rect.hpp>
-
 struct GaugeMetadata : public SpriteMetadata
 {
     float Maximum;
     Gx::Gauge::Orientation Orientation;
+
+    bool Flicker;
+    sf::Time AnimationDuration;
+    std::vector<Gx::Animation::Frame> AnimationFrames;
 };
 
 #endif
