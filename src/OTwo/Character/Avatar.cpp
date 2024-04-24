@@ -182,7 +182,7 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
     }
 
     m_elapsed += states.Delta;
-    for (auto [type, part] : RENDER_LAYER_ORDER)
+    for (auto [type, part] : RenderLayerOrder)
     {
         auto iterator = m_items.find(type);
         if (iterator == m_items.end())
