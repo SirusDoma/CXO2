@@ -17,7 +17,7 @@ namespace Gx
         virtual RenderStates Render(sf::RenderTarget& target, RenderStates states) const = 0;
 
     protected:
-        void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override { Render(target, RenderStates(states)); }
+        void draw(sf::RenderTarget& target, const sf::RenderStates states) const override { Render(target, RenderStates(states)); }
     };
 }
 
