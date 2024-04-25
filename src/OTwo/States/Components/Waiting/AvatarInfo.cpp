@@ -45,21 +45,42 @@ void AvatarInfo::Invalidate()
 {
     UiContainer::Invalidate();
 
-    auto plate = FindChild<Gx::Colorable>("IDC_IMAGE_NAME_PLATE");
-    if (plate)
+    if (const auto plate = FindChild<Gx::Colorable>("IDC_IMAGE_AVATAR_INFO_PLATE"); plate)
     {
         if (m_member)
             plate->SetColor(GetTeamColor(m_member->Team));
         else
             plate->SetColor(sf::Color::Transparent);
+
+        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+        {
+            if (m_member)
+                label->SetString("Lv: " + std::to_string(m_member->Level) + " " + m_member->Name);
+            else
+                label->SetString(std::string());
+        }
+    }
+    else
+    {
+        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+        {
+            if (m_member)
+                label->SetString("Lv." + std::to_string(m_member->Level));
+            else
+                label->SetString(std::string());
+        }
+
+        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+        {
+            if (m_member)
+            {
+                label->SetString(m_member->Name);
+                label->SetColor(GetTeamColor(m_member->Team));
+            }
+            else
+                label->SetString(std::string());
+        }
     }
 
-    auto label = FindChild<Gx::Label>("IDC_TEXT_NICKNAME");
-    if (label)
-    {
-        if (m_member)
-            label->SetString("Lv: " + std::to_string(m_member->Level) + " " + m_member->Name);
-        else
-            label->SetString(std::string());
-    }
+
 }
