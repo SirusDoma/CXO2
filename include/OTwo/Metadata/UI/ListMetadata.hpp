@@ -10,6 +10,7 @@ struct ListMetadata : public TransformMetadata
     float VerticalSpacing;
     float HorizontalSpacing;
     Gx::List::Order Order;
+    std::vector<TransformMetadata> Layouts = {};
 
     ResourceType ItemType = ResourceType::None;
     std::string ItemName = std::string();

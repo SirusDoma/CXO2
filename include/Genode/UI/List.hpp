@@ -15,6 +15,14 @@ namespace Gx
             Horizontal
         };
 
+        struct LayoutItem
+        {
+            sf::Vector2f Origin;
+            sf::Vector2f Position;
+            float        Rotation;
+            sf::Vector2f Scale;
+        };
+
         List();
         List(int verticalCount, float verticalSpacing);
         List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
@@ -34,6 +42,9 @@ namespace Gx
         float GetVerticalSpacing() const;
         float GetHorizontalSpacing() const;
 
+        void AddLayout(const LayoutItem &layout);
+        void ClearLayouts();
+
         void AddChild(Gx::Node *node) override;
         void RemoveChild(Gx::Node *node) override;
 
@@ -45,7 +56,7 @@ namespace Gx
 
         void ClearChildren() override;
 
-        void Apply(const std::function<void(Control*)>& fun);
+        void Apply(const std::function<void(Control*)>& fun) const;
 
     protected:
         bool IsAvailable() const;
@@ -60,6 +71,7 @@ namespace Gx
         float m_verticalSpacing, m_horizontalSpacing;
 
         int m_verticalCounter, m_horizontalCounter;
+        std::vector<LayoutItem> m_layouts;
     };
 }
 

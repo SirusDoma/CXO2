@@ -16,35 +16,46 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
-    if (auto vertical = attributes.find("vertical"); vertical != attributes.end())
+    if (auto layouts = attributes.find("layouts"); layouts != attributes.end())
     {
-        metadata.VerticalCount   = vertical->at("count").get<unsigned int>();
-        metadata.VerticalSpacing = vertical->at("spacing").get<float>();
+        for (auto &transform : layouts->items())
+        {
+            if (auto layout = TransformMetadata(); TransformLoader::ParseMetadata(transform.value(), layout, ctx))
+                metadata.Layouts.push_back(layout);
+        }
     }
     else
     {
-        metadata.VerticalCount   = 1;
-        metadata.VerticalSpacing = 0.f;
-    }
+        if (auto vertical = attributes.find("vertical"); vertical != attributes.end())
+        {
+            metadata.VerticalCount   = vertical->at("count").get<unsigned int>();
+            metadata.VerticalSpacing = vertical->at("spacing").get<float>();
+        }
+        else
+        {
+            metadata.VerticalCount   = 1;
+            metadata.VerticalSpacing = 0.f;
+        }
 
-    if (auto horizontal = attributes.find("horizontal"); horizontal != attributes.end())
-    {
-        metadata.HorizontalCount   = horizontal->at("count").get<unsigned int>();
-        metadata.HorizontalSpacing = horizontal->at("spacing").get<float>();
-    }
-    else
-    {
-        metadata.HorizontalCount   = 1;
-        metadata.HorizontalSpacing = 0.f;
-    }
+        if (auto horizontal = attributes.find("horizontal"); horizontal != attributes.end())
+        {
+            metadata.HorizontalCount   = horizontal->at("count").get<unsigned int>();
+            metadata.HorizontalSpacing = horizontal->at("spacing").get<float>();
+        }
+        else
+        {
+            metadata.HorizontalCount   = 1;
+            metadata.HorizontalSpacing = 0.f;
+        }
 
-    if (auto order = attributes.find("order"); order != attributes.end())
-    {
-        if (auto parsed = magic_enum::enum_cast<Gx::List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
-            metadata.Order = parsed.value();
+        if (auto order = attributes.find("order"); order != attributes.end())
+        {
+            if (auto parsed = magic_enum::enum_cast<Gx::List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+                metadata.Order = parsed.value();
+        }
+        else
+            metadata.Order = Gx::List::Order::Vertical;
     }
-    else
-        metadata.Order = Gx::List::Order::Vertical;
 
     if (auto prefab = attributes.find("prefab"); prefab != attributes.end())
     {
@@ -78,6 +89,12 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
     list->SetScale(metadata->Scale);
     list->SetRotation(metadata->Rotation);
     list->SetOrder(metadata->Order);
+
+    if (!metadata->Layouts.empty())
+    {
+        for (const auto &layout : metadata->Layouts)
+            list->AddLayout({ layout.Origin, layout.Position, layout.Rotation, layout.Scale });
+    }
 
     if (context.Available())
     {
