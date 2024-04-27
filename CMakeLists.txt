@@ -1,6 +1,11 @@
 # CMake Config
 cmake_minimum_required(VERSION 3.27)
+include(CheckIncludeFiles)
 project(O2Jam LANGUAGES C CXX)
+
+# CMake private flags
+set(GTK_AVAILABLE FALSE)
+check_include_files("gtk/gtk.h" GTK_AVAILABLE)
 
 # Compiler
 set(CMAKE_CXX_STANDARD 17)
@@ -16,6 +21,13 @@ include_directories(src)
 include_directories(include)
 include_directories(extlibs/headers)
 
+# Default flags
+if (NOT CMAKE_BUILD_TYPE)
+    message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Release")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
 # External Libs Sources and Flags
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 include(FetchContent)
@@ -24,9 +36,10 @@ set(SFML_STATIC_LIBRARIES TRUE)
 fetchcontent_declare(
     SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG feature/miniaudio
+    GIT_TAG 5da286487ae79703c4b918c00f9542be67d8e660
 )
 fetchcontent_makeavailable(SFML)
+
 # -- Clip Flags
 set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
 set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
@@ -36,21 +49,30 @@ fetchcontent_declare(
     GIT_TAG main
 )
 fetchcontent_makeavailable(clip)
-# -- Boxer Flags
-set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
-fetchcontent_declare(
-    Boxer
-    GIT_REPOSITORY https://github.com/aaronmjacobs/Boxer.git
-    GIT_TAG master
-)
-fetchcontent_makeavailable(Boxer)
 
-# Default flags
-if (NOT CMAKE_BUILD_TYPE)
-    message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Debug")
-    set(CMAKE_BUILD_TYPE "Debug")
+# -- MessageBox
+set(USE_BOXER WIN32 OR APPLE OR GTK_AVAILABLE)
+if(USE_BOXER)
+    # -- Boxer Flags
+    message("System message box: Boxer")
+    add_compile_definitions(USE_BOXER)
+    set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
+    fetchcontent_declare(
+        Boxer
+        GIT_REPOSITORY https://github.com/aaronmjacobs/Boxer.git
+        GIT_TAG master
+    )
+    fetchcontent_makeavailable(Boxer)
+else()
+    # -- MessageBox-X11 Flags
+    message("System message box: MessageBox-X11")
+    fetchcontent_declare(
+        MessageBoxX11
+        GIT_REPOSITORY https://github.com/Eleobert/MessageBox-X11.git
+        GIT_TAG master
+    )
+    fetchcontent_makeavailable(MessageBoxX11)
 endif()
-message("Build type: " ${CMAKE_BUILD_TYPE})
 
 # Aliases
 set(EXECUTABLE_NAME "OTwo")
@@ -140,8 +162,7 @@ else()
     add_executable(${EXECUTABLE_NAME} ${SRCS} ${HEADERS})
 
     # Compiler Flags
-    # TODO: Not to assume the compiler to be GCC/G++
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8)
+    if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8)
         message("FileSystem is not supported with your compiler version.")
         message("Compiler Version: " ${CMAKE_CXX_COMPILER_VERSION})
     endif()
@@ -181,9 +202,13 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 include_directories(${FETCHCONTENT_BASE_DIR}/clip-src)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
-# Link Boxer
-# TODO: Fork Boxer and migrate Gtk to X11
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
+# Link Boxer / MessageBox-X11
+if(USE_BOXER)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
+else()
+    include_directories(${FETCHCONTENT_BASE_DIR}/MessageBox-X11-src)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE MessageBoxX11)
+endif()
 
 # Link Magic Enum
 find_package(magic_enum CONFIG REQUIRED)
@@ -191,6 +216,6 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link SFML
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
-if (WIN32)
+if(WIN32)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
 endif()
