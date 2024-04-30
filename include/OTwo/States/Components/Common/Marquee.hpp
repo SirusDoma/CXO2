@@ -21,7 +21,7 @@ public:
 
 private:
     void Update(double delta) override;
-    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
     void Invalidate() override;
 

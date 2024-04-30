@@ -183,17 +183,17 @@ namespace Gx
         SetValue(m_value - (m_step == 0 ? 1 : m_step));
     }
 
-    RenderStates ScrollBar::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates ScrollBar::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
-        states = Control::Render(target, states);
+        states = Control::Render(surface, states);
         // TODO: Cache global bounds (or transform) to avoid recalculating bounds on mouse events
         // m_globalBounds = states.transform.transformRect(GetLocalBounds);
         // m_scrollGlobalBounds = (m_sprite.GetTransform() * states.transform).transformRect(GetLocalBounds);
 
-        target.draw(m_sprite, states);
+        surface.Render(m_sprite, states);
         return states;
     }
 

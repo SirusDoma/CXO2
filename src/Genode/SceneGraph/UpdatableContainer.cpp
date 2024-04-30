@@ -12,10 +12,9 @@ namespace Gx
 
     void UpdatableContainer::Update(const double delta)
     {
-        for (auto node : GetChildren())
+        for (const auto node : GetChildren())
         {
-            auto updatable = dynamic_cast<Updatable*>(node);
-            if (updatable)
+            if (const auto updatable = dynamic_cast<Updatable*>(node))
                 updatable->Update(delta);
         }
     }

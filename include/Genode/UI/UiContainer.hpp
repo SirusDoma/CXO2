@@ -24,7 +24,7 @@ namespace Gx
         void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
     protected:
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(sf::Event ev) override;
 

@@ -35,7 +35,10 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadat
 
     auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-        button->SetStateFrame(state, Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx)));
+    {
+        auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
+        button->SetStateFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
+    }
 
     button->SetName(metadata->Name);
     button->SetOrigin(metadata->Origin);

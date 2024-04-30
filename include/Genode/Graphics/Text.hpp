@@ -109,14 +109,14 @@ namespace Gx
         float GetOutlineThickness() const;
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;
-        sf::FloatRect GetLocalBounds() const;
+        virtual sf::FloatRect GetLocalBounds() const;
         sf::FloatRect GetGlobalBounds() const;
 
     protected:
         void EnsureGeometryUpdate() const;
         virtual void OnGeometryUpdated() const {};
 
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
     private:
         using ColorMap = std::unordered_map<size_t, sf::Color>;

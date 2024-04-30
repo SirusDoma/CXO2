@@ -11,7 +11,8 @@ namespace Gx
     class CheckBox : public Button
     {
     public:
-        using Button::Button;
+        CheckBox() = default;
+        ~CheckBox() override = default;
 
         virtual bool IsChecked() const;
         virtual void SetCheckedState(bool checked);
@@ -19,7 +20,6 @@ namespace Gx
         virtual void SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback);
 
     protected:
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
         void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
 
         void Invalidate() override;

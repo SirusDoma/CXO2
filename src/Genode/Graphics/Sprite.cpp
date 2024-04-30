@@ -33,6 +33,7 @@
 namespace Gx
 {
     Sprite::Sprite() :
+        m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
         m_blendMode(Gx::BlendMode::Auto)
@@ -40,6 +41,7 @@ namespace Gx
     }
 
     Sprite::Sprite(const sf::Texture& texture) :
+        m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
         m_blendMode(Gx::BlendMode::Auto)
@@ -48,6 +50,7 @@ namespace Gx
     }
 
     Sprite::Sprite(const sf::Texture& texture, const sf::IntRect& rectangle) :
+        m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
         m_blendMode(Gx::BlendMode::Auto)
@@ -60,7 +63,7 @@ namespace Gx
     {
         // Recompute the texture area if requested, or if there was no valid texture & rect before
         if (resetRect || (!m_texture && (m_texcoords == sf::IntRect())))
-            SetTexCoords(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(static_cast<int>(texture.getSize().x), static_cast<int>(texture.getSize().y))));
+            SetTexCoords(sf::IntRect({0, 0}, sf::Vector2i(texture.getSize())));
 
         // Assign the new texture
         m_texture = &texture;
@@ -79,10 +82,8 @@ namespace Gx
     void Sprite::SetColor(const sf::Color& color)
     {
         // Update the vertices' color
-        m_vertices[0].color = color;
-        m_vertices[1].color = color;
-        m_vertices[2].color = color;
-        m_vertices[3].color = color;
+        for (auto &vertex : m_vertices)
+            vertex.color = color;
     }
 
     const sf::Texture* Sprite::GetTexture() const
@@ -115,7 +116,7 @@ namespace Gx
         const auto width = static_cast<float>(std::abs(m_texcoords.width));
         const auto height = static_cast<float>(std::abs(m_texcoords.height));
 
-        return {sf::Vector2f(0.f, 0.f), sf::Vector2f(width, height)};
+        return {{0.f, 0.f}, {width, height}};
     }
 
     sf::FloatRect Sprite::GetGlobalBounds() const
@@ -132,32 +133,33 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    RenderStates Sprite::Render(sf::RenderTarget& target, RenderStates states) const
+    RenderStates Sprite::Render(RenderSurface &surface, RenderStates states) const
     {
+        states.transform     *= GetTransform();
+        states.coordinateType = sf::CoordinateType::Pixels;
+        switch (m_blendMode)
+        {
+            case BlendMode::Alpha:          states.blendMode = sf::BlendAlpha;    break;
+            case BlendMode::Additive:       states.blendMode = sf::BlendAdd;      break;
+            case BlendMode::Multiplicative: states.blendMode = sf::BlendMultiply; break;
+            case BlendMode::Min:            states.blendMode = sf::BlendMin;      break;
+            case BlendMode::Max:            states.blendMode = sf::BlendMax;      break;
+            case BlendMode::None:           states.blendMode = sf::BlendNone;     break;
+            case BlendMode::Auto:                                                 break;
+        }
+
         if (m_texture)
         {
             states.texture = m_texture;
-            states.transform *= GetTransform();
-            switch (m_blendMode)
-            {
-                case BlendMode::Alpha:          states.blendMode = sf::BlendAlpha;    break;
-                case BlendMode::Additive:       states.blendMode = sf::BlendAdd;      break;
-                case BlendMode::Multiplicative: states.blendMode = sf::BlendMultiply; break;
-                case BlendMode::Min:            states.blendMode = sf::BlendMin;      break;
-                case BlendMode::Max:            states.blendMode = sf::BlendMax;      break;
-                case BlendMode::None:           states.blendMode = sf::BlendNone;     break;
-                case BlendMode::Auto:                                                 break;
-            }
-
-            target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, states);
+            surface.Render(m_vertices.data(), m_vertices.size(), sf::PrimitiveType::TriangleStrip, states);
         }
 
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
     void Sprite::UpdatePositions()
     {
-        const sf::FloatRect bounds = GetLocalBounds();
+        const sf::FloatRect bounds = Sprite::GetLocalBounds();
 
         m_vertices[0].position = sf::Vector2f(0, 0);
         m_vertices[1].position = sf::Vector2f(0, bounds.height);

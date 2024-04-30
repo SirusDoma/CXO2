@@ -15,8 +15,8 @@ class ChatWindow : public Gx::List
 {
 public:
     ChatWindow();
-    ChatWindow(ChatWindow &&copy);
-    ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned int characterSize = 13);
+    ChatWindow(ChatWindow &&other) noexcept;
+    ChatWindow(const sf::Font &font, const sf::FloatRect &localBounds, unsigned int characterSize = 13);
 
     sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect &bounds);
@@ -31,13 +31,13 @@ public:
 
     void SetScrollBar(Gx::ScrollBar &scrollBar);
     void SetScrollOffset(unsigned int offset);
-    void SetMaximumChatLength(unsigned int max);
+    void SetMaximumChatLength(unsigned int maxLength);
 
-    void PushMessage(PlayerData player, const sf::String &chat);
+    void PushMessage(const PlayerData &player, const sf::String &chat);
     void PushSystemMessage(const sf::String &chat);
 
 private:
-    Gx::RenderStates Render(sf::RenderTarget &target, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
     void Invalidate() override;
 

@@ -188,7 +188,7 @@ namespace Gx
         UpdateOutline();
     }
 
-    RenderStates Shape::Render(sf::RenderTarget& target, RenderStates states) const
+    RenderStates Shape::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -197,16 +197,16 @@ namespace Gx
 
         // Render the inside
         states.texture = m_texture;
-        target.draw(m_vertices, states);
+        surface.Render(m_vertices, states);
 
         // Render the outline
         if (m_outlineThickness != 0)
         {
             states.texture = nullptr;
-            target.draw(m_outlineVertices, states);
+            surface.Render(m_outlineVertices, states);
         }
 
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
     void Shape::UpdateFillColors()

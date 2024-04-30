@@ -371,23 +371,23 @@ namespace Gx
         return GetTransform().transformRect(GetLocalBounds());
     }
 
-    RenderStates Text::Render(sf::RenderTarget& target, RenderStates states) const
+    RenderStates Text::Render(RenderSurface &surface, RenderStates states) const
     {
         if (m_font)
         {
             EnsureGeometryUpdate();
 
             states.transform *= GetTransform();
-            states.texture = &m_font->getTexture(m_characterSize);
+            states.texture    = &m_font->getTexture(m_characterSize);
 
             // Only draw the outline if there is something to draw
             if (m_outlineThickness != 0)
-                target.draw(m_outlineVertices, states);
+                surface.Render(m_outlineVertices, states);
 
-            target.draw(m_vertices, states);
+            surface.Render(m_vertices, states);
         }
 
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
     void Text::EnsureGeometryUpdate() const

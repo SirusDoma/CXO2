@@ -3,6 +3,7 @@
 namespace Gx
 {
     Gauge::Gauge() :
+        Control(),
         m_vertices(sf::PrimitiveType::TriangleStrip, 4),
         m_texture(),
         m_texCoords(),
@@ -12,8 +13,7 @@ namespace Gx
         m_flicker(false),
         m_flickerActivate(false),
         m_animationState(Animation::AnimationState::Initial),
-        m_currentFrame(0),
-        m_visible(false)
+        m_currentFrame(0)
     {
     }
 
@@ -33,7 +33,6 @@ namespace Gx
     {
         return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.width, m_texCoords.height));
     }
-
 
     bool Gauge::IsFlickering() const
     {
@@ -187,16 +186,19 @@ namespace Gx
 
     }
 
-    RenderStates Gauge::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Gauge::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVislble())
+            return states;
+
         if (m_texture)
         {
             states.transform *= GetTransform();
             states.texture    = m_texture;
-            target.draw(m_vertices, states);
+            surface.Render(m_vertices, states);
         }
 
-        return Control::Render(target, states);
+        return Control::Render(surface, states);
     }
 
     void Gauge::Invalidate()
@@ -211,17 +213,17 @@ namespace Gx
             SetScale(frame.Scale);
         }
 
-        auto color  = GetColor();
-        auto bounds = GetLocalBounds();
-        int x = bounds.left;
-        int y = bounds.top;
-        float w = bounds.width;
-        float h = bounds.height;
+        const auto color  = GetColor();
+        const auto bounds = GetLocalBounds();
+        const int x   = bounds.left;
+        int y         = bounds.top;
+        float w       = bounds.width;
+        const float h = bounds.height;
 
-        float left   = static_cast<float>(m_texCoords.left);
-        float right  = left + w;
-        float top    = static_cast<float>(m_texCoords.top);
-        float bottom = top + h;
+        const float left   = static_cast<float>(m_texCoords.left);
+        float right        = left + w;
+        float top          = static_cast<float>(m_texCoords.top);
+        const float bottom = top + h;
 
         if (m_value < 100)
         {

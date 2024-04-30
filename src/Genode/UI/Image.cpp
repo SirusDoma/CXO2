@@ -106,12 +106,12 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Image::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Image::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
-        return Sprite::Render(target, states);
+        return Sprite::Render(surface, states);
     }
 
     void Image::Invalidate()

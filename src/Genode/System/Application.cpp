@@ -6,22 +6,23 @@
 
 namespace Gx
 {
-    Application::Application(const std::string &title, sf::VideoMode mode, bool fullScreen)
-        : Application::Application(title, mode, mode, fullScreen)
+    Application::Application(const std::string &title, const sf::VideoMode &mode, const bool fullScreen)
+        : Application(title, mode, mode, fullScreen)
     {
     }
 
-    Application::Application(const std::string &title, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen) :
+    Application::Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, const bool fullScreen) :
         m_window(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
-        m_title(title),
+        m_targetAdapter(m_window),
+        m_director(SceneDirector(*this, m_window)),
+        m_event(),
+        m_resources(),
         m_timer(),
-        m_renderFreq(0),
+        m_cursor(),
+        m_title(title),
         m_frameID(0),
         m_frames(0),
-        m_event(),
-        m_cursor(),
-        m_resources(),
-        m_director(SceneDirector(*this, m_window))
+        m_renderFreq(0)
     {
         m_mode           = mode;
         m_virtualMode    = virtualMode;
@@ -57,7 +58,7 @@ namespace Gx
 
         // Setup timer
         m_timer = sf::Clock();
-        double start = m_timer.getElapsedTime().asMilliseconds(), end, delta, fpsDelta = 0;
+        double start = m_timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
 
         // Main game loop
         while (m_window.isOpen())
@@ -85,26 +86,28 @@ namespace Gx
             }
 
             // Calculate delta
-            end   = m_timer.getElapsedTime().asMilliseconds();
-            delta = end - start;
+            const double end = m_timer.getElapsedTime().asMilliseconds();
+            const double delta = end - start;
 
             // Update installed modules
             for (auto& [_, module] : m_modules)
             {
-                auto updatable = dynamic_cast<Updatable*>(module.get());
-                if (updatable)
+                if (const auto updatable = dynamic_cast<Updatable*>(module.get()))
                     updatable->Update(delta);
             }
+
+            // Perform update before rendering objects
+            Update(delta);
 
             // Render the window
             m_window.clear(sf::Color::White);
             {
-                // Game routine (update + render)
-                Update(delta);
+                // Render objects
                 Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
             }
             m_window.display();
 
+            // Execute post-processing events
             m_director.ProcessEvents();
 
             // Track the number of frames rendered in a second
@@ -148,7 +151,6 @@ namespace Gx
         return m_director;
     }
 
-
     void Application::Boot()
     {
     }
@@ -162,9 +164,9 @@ namespace Gx
         m_director.Update(delta);
     }
 
-    RenderStates Application::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Application::Render(RenderSurface &surface, RenderStates states) const
     {
-        return m_director.Render(m_window, states);
+        return m_director.Render(surface, states);
     }
 
     void Application::Close()
@@ -265,4 +267,8 @@ namespace Gx
         return m_window;
     }
 
+    Application::operator RenderSurface&() const
+    {
+        return m_targetAdapter;
+    }
 }

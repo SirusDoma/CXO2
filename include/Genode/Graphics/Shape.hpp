@@ -38,7 +38,7 @@ namespace Gx
     class Shape : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
-        virtual ~Shape() = default;
+        ~Shape() override = default;
 
         void SetTexture(const sf::Texture &texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rect);
@@ -71,7 +71,7 @@ namespace Gx
         void Update();
 
     private:
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void UpdateFillColors();
         void UpdateTexCoords();

@@ -48,27 +48,27 @@ void Marquee::Update(const double delta)
 {
     Label::Update(delta);
 
-    auto velocity = sf::Vector2f(m_speed, 0.f) * static_cast<float>(delta / 1000.f);
-    auto position = GetPosition() - velocity;
+    const auto velocity = sf::Vector2f(m_speed, 0.f) * static_cast<float>(delta / 1000.f);
+    const auto position = GetPosition() - velocity;
     SetPosition(position);
 
-    auto textBounds = Label::GetLocalBounds();
-    float x = GetPosition().x + textBounds.width;
-    if (x <= 0)
+    const auto textBounds = Label::GetLocalBounds();
+    if (const float x = GetPosition().x + textBounds.width; x <= 0)
         SetPosition(sf::Vector2f(m_bounds.width, GetPosition().y));
 
     m_renderTexture->clear(sf::Color::Transparent);
     {
-        Text::Render(*m_renderTexture, Gx::RenderStates::Default);
+        auto adapter = Gx::RenderTargetAdapter(*m_renderTexture);
+        Text::Render(adapter, Gx::RenderStates::Default);
     }
     m_renderTexture->display();
 }
 
-Gx::RenderStates Marquee::Render(sf::RenderTarget &target, Gx::RenderStates states) const
+Gx::RenderStates Marquee::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     auto transform = GetTransform();
     states.transform *= transform.translate(-GetPosition());
-    target.draw(m_sprite, states);
+    surface.Render(m_sprite, states);
 
     return states;
 }

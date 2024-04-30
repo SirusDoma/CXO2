@@ -4,14 +4,14 @@
 
 namespace Gx
 {
-    void RadioButton::SetCheckedState(bool checked)
+    void RadioButton::SetCheckedState(const bool checked)
     {
         if (IsChecked() != checked)
         {
             CheckBox::SetCheckedState(checked);
             if (IsChecked())
             {
-                for (auto pair : m_pairs)
+                for (const auto pair : m_pairs)
                 {
                     if (pair && pair != this)
                         pair->SetCheckedState(false);
@@ -34,7 +34,7 @@ namespace Gx
 
     void RadioButton::Unpair(RadioButton *radio)
     {
-        for (auto pair : m_pairs)
+        for (const auto pair : m_pairs)
         {
             pair->m_pairs.erase(
                 std::remove_if(pair->m_pairs.begin(), pair->m_pairs.end(), [radio](auto r) { return radio == r; }),
@@ -50,7 +50,7 @@ namespace Gx
 
     void RadioButton::UnpairAll()
     {
-        for (auto pair : m_pairs)
+        for (const auto pair : m_pairs)
             pair->m_pairs.clear();
 
         m_pairs.clear();

@@ -124,16 +124,16 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Number::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Number::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
         states.transform *= GetTransform();
         states.texture    = m_texture;
-        target.draw(m_vertices, states);
+        surface.Render(m_vertices, states);
 
-        return Control::Render(target, states);
+        return Control::Render(surface, states);
     }
 
     void Number::Invalidate()

@@ -16,7 +16,7 @@ namespace Gx
 
     protected:
         RenderableContainer();
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const  override;;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const  override;;
     };
 }
 

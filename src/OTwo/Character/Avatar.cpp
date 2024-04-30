@@ -170,7 +170,7 @@ void Avatar::Update(const double delta)
     UpdatableContainer::Update(delta);
 }
 
-Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates states) const
+Gx::RenderStates Avatar::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     states.transform *= GetTransform();
 
@@ -188,23 +188,23 @@ Gx::RenderStates Avatar::Render(sf::RenderTarget &target, Gx::RenderStates state
         if (iterator == m_items.end())
             continue;
 
-        const auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument);
-        if (animation)
+        if (const auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument))
         {
             // Item and its Animation instances are shared across multiple instances of Avatar.
             // Make sure to update the animation only once, otherwise the animation might be played at speed-up pace
             if (m_renderableStates[animation] != states.FrameID)
                 animation->Update(states.Delta);
 
-            animation->Render(target, states);
+            animation->Render(surface, states);
             m_renderableStates[animation] = states.FrameID;
         }
 
+        states.BatchLevel += 1.f;
         if (type == EquipmentType::Costume && part == RenderPart::Body)
             break;
     }
 
-    return RenderableContainer::Render(target, states);
+    return RenderableContainer::Render(surface, states);
 }
 
 void Avatar::ClearEquipments()

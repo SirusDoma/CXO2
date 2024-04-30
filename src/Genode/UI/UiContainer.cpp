@@ -72,9 +72,9 @@ namespace Gx
         }
     }
 
-    RenderStates UiContainer::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates UiContainer::Render(RenderSurface &surface, RenderStates states) const
     {
-        return Control::Render(target, states);
+        return Control::Render(surface, states);
     }
 
     void UiContainer::Update(const double delta)

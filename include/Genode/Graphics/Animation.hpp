@@ -64,7 +64,7 @@ namespace Gx
         virtual void Reset();
 
         void Update(double delta) override;
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
     private:
         void SetFrame(unsigned int index);

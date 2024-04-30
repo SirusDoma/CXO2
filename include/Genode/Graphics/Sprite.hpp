@@ -61,13 +61,13 @@ namespace Gx
         sf::FloatRect GetGlobalBounds() const;
 
     protected:
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
     private:
         void UpdatePositions();
         void UpdateTexCoords();
 
-        sf::Vertex  m_vertices[4];
+        std::array<sf::Vertex, 4> m_vertices;
         const sf::Texture* m_texture;
         sf::IntRect m_texcoords;
         BlendMode m_blendMode;

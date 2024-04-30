@@ -48,7 +48,7 @@ namespace Gx
     private:
         sf::FloatRect GetScrollBarGlobalBounds() const;
 
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
         void OnMouseButtonDown(sf::Event::MouseButtonEvent ev) override;

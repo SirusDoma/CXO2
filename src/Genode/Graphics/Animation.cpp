@@ -108,8 +108,7 @@ namespace Gx
                 m_animationCallback(*this);
         }
 
-        const auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size()));
-        if (m_elapsed >= frameTime)
+        if (const auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size())); m_elapsed >= frameTime)
         {
             m_elapsed %= frameTime;
             m_currentFrame++;
@@ -138,12 +137,12 @@ namespace Gx
         UpdatableContainer::Update(delta);
     }
 
-    RenderStates Animation::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Animation::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!m_visible)
             return states;
 
-        return Gx::Sprite::Render(target, states);
+        return Sprite::Render(surface, states);
     }
 
     void Animation::Stop()

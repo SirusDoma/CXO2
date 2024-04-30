@@ -22,8 +22,19 @@ namespace Gx
         m_horizontalSpacing(horizontalSpacing),
         m_verticalCounter(),
         m_horizontalCounter(),
-        m_layouts()
+        m_layouts(),
+        m_batcher(SpriteBatch::BatchMode::LayerSort)
     {
+    }
+
+    void List::UseBatching(const bool batching)
+    {
+        m_useBatching = batching;
+    }
+
+    void List::SetBatchMode(const SpriteBatch::BatchMode batchMode) const
+    {
+        m_batcher.SetBatchMode(batchMode);
     }
 
     List::Order List::GetOrder() const
@@ -131,6 +142,28 @@ namespace Gx
                 m_verticalCounter++;
             }
         }
+    }
+
+    void List::Update(const double delta)
+    {
+        UiContainer::Update(delta);
+    }
+
+    RenderStates List::Render(RenderSurface &surface, RenderStates states) const
+    {
+        if (m_useBatching)
+        {
+            const auto transform = states.transform;
+            states.transform     = sf::Transform();
+            UiContainer::Render(m_batcher, states);
+
+            states.transform = transform;
+            m_batcher.Render(surface, states);
+
+            return states;
+        }
+
+        return UiContainer::Render(surface, states);
     }
 
     void List::AddChild(Node *node)

@@ -73,7 +73,7 @@ void SelectMusicDialog::Initialize()
     {
         rightButton->SetClickCallback([this] (auto &sender, auto &ev)
         {
-            auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+            const auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
             if (!musicSelector)
                 return;
 

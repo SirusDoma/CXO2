@@ -52,7 +52,10 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
 
     auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-        checkBox->SetStateFrame(state, Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx)));
+    {
+        auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
+        checkBox->SetStateFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
+    }
 
     checkBox->SetName(metadata->Name);
     checkBox->SetOrigin(metadata->Origin);

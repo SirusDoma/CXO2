@@ -365,17 +365,17 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates TextBox::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates TextBox::Render(RenderSurface &surface, RenderStates states) const
     {
         states.transform *= GetTransform();
         if (m_caret.SelectionLength != 0)
-            target.draw(m_caret.GetHighlight(), states);
+            surface.Render(m_caret.GetHighlight(), states);
 
-        target.draw(m_text, states);
+        surface.Render(m_text, states);
         if (IsFocused() && IsEnabled())
-            target.draw(m_caret, states);
+            surface.Render(m_caret, states);
 
-        return Control::Render(target, states);
+        return Control::Render(surface, states);
     }
 
     void TextBox::OnControlStateChanged(Control *sender, Control::State state)
@@ -604,12 +604,12 @@ namespace Gx
         m_highlight.SetColor(color);
     }
 
-    RenderStates TextBox::Caret::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates TextBox::Caret::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!m_visible)
             return states;
 
-        target.draw(m_cursor, states);
+        surface.Render(m_cursor, states);
         return states;
     }
 

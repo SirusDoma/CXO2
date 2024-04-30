@@ -1,0 +1,42 @@
+#ifndef GENODE_GRAPHICS_RENDER_SURFACE_HPP
+#define GENODE_GRAPHICS_RENDER_SURFACE_HPP
+
+#include <Genode/Graphics/RenderStates.hpp>
+
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/PrimitiveType.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/VertexBuffer.hpp>
+
+namespace Gx
+{
+    class Renderable;
+    class RenderSurface
+    {
+    public:
+        virtual ~RenderSurface() = default;
+
+        virtual void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) = 0;
+
+        void Render(const sf::VertexArray& vertices, const RenderStates& states = RenderStates::Default)
+        {
+            if (vertices.getVertexCount() > 0)
+                Render(&vertices[0], vertices.getVertexCount(), vertices.getPrimitiveType(), states);
+        }
+
+        virtual void Render(const sf::Vertex*       vertices,
+                            const std::size_t       vertexCount,
+                            const sf::PrimitiveType type,
+                            const RenderStates&     states = RenderStates::Default
+        ) = 0;
+
+        virtual void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states = RenderStates::Default) = 0;
+        virtual void Render(const sf::VertexBuffer& vertexBuffer,
+                            const std::size_t       firstVertex,
+                            const std::size_t       vertexCount,
+                            const RenderStates&     states = RenderStates::Default
+        ) = 0;
+    };
+}
+
+#endif

@@ -7,7 +7,7 @@ namespace Gx
         return m_isChecked;
     }
 
-    void CheckBox::SetCheckedState(bool checked)
+    void CheckBox::SetCheckedState(const bool checked)
     {
         if (IsChecked() != checked)
         {
@@ -22,19 +22,6 @@ namespace Gx
     void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback)
     {
         m_onCheckStateChanged = std::move(callback);
-    }
-
-    RenderStates CheckBox::Render(sf::RenderTarget &target, RenderStates states) const
-    {
-        if (!IsVislble())
-            return states;
-
-        auto frame = GetStateFrame(GetControlState());
-        states.transform *= GetTransform();
-        states.transform *= frame.GetTransform();
-        target.draw(*GetSprite(), states);
-
-        return RenderableContainer::Render(target, states);
     }
 
     void CheckBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
@@ -52,7 +39,7 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        Sprite frame;
+        Frame frame;
         if (IsChecked())
             frame = GetStateFrame(CheckBox::State::Active);
         else if (GetControlState() == CheckBox::State::Active)
@@ -60,8 +47,6 @@ namespace Gx
         else
             frame = GetStateFrame(GetControlState());
 
-        auto sprite = GetSprite();
-        sprite->SetColor(frame.GetColor());
-        sprite->SetTexCoords(frame.GetTexCoords());
+        ApplyFrame(frame);
     }
 }

@@ -144,16 +144,16 @@ namespace Gx
         }
     }
 
-    RenderStates ToolTip::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates ToolTip::Render(RenderSurface &surface, RenderStates states) const
     {
         if (IsVislble() && !GetString().isEmpty())
         {
             auto tempStates = states;
             tempStates.transform *= GetTransform();
-            target.draw(m_rectangle, tempStates);
+            surface.Render(m_rectangle, tempStates);
         }
 
-        return Label::Render(target, states);
+        return Label::Render(surface, states);
     }
 
     void ToolTip::Update(const double delta)

@@ -14,12 +14,12 @@ namespace Gx
         Invalidate();
     }
 
-    RenderStates Label::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Label::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
-        return Text::Render(target, states);
+        return Text::Render(surface, states);
     }
 
     Label::Alignment Label::GetAlignment() const

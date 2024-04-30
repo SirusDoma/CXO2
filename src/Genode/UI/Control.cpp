@@ -4,18 +4,19 @@
 namespace Gx
 {
     Control::Control() :
-            m_enabled(true),
-            m_visible(true),
-            m_focused(false),
-            m_clicked(false),
-            m_deltaClickDuration(),
-            m_state(State::Normal),
-            m_onClick(),
-            m_onHoldClick(),
-            m_onDoubleClick(),
-            m_onScrollWheel(),
-            m_onGainFocus(),
-            m_onLostFocus()
+        m_state(State::Normal),
+        m_enabled(true),
+        m_visible(true),
+        m_focused(false),
+        m_clicked(false),
+        m_deltaClickDuration(),
+        m_deltaHoldDuration(),
+        m_onClick(),
+        m_onHoldClick(),
+        m_onDoubleClick(),
+        m_onScrollWheel(),
+        m_onGainFocus(),
+        m_onLostFocus()
     {
     }
 
@@ -207,13 +208,13 @@ namespace Gx
             Node::RemoveChild(node);
     }
 
-    RenderStates Control::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Control::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
         states.transform *= GetTransform();
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
     void Control::Update(const double delta)

@@ -19,7 +19,6 @@ namespace Gx
 
         sf::FloatRect GetLocalBounds() const override;
 
-
         bool IsFlickering() const;
         void SetFlickering(const bool flicker);
 
@@ -53,7 +52,7 @@ namespace Gx
 
     protected:
         void Update(const double delta) override;
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void Invalidate() override;
 
@@ -67,7 +66,6 @@ namespace Gx
 
         Animation::AnimationState m_animationState;
         unsigned int m_currentFrame;
-        bool m_visible;
         sf::Time m_animationDuration;
         sf::Time m_animationElapsed;
         std::vector<Animation::Frame> m_frames;

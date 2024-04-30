@@ -1,4 +1,5 @@
 #include <Genode/Graphics/RenderStates.hpp>
+#include <Genode/Graphics/SpriteBatch.hpp>
 
 namespace Gx
 {

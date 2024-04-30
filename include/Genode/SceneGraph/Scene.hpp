@@ -37,13 +37,13 @@ namespace Gx
         void PushOverlay(Node *overlay);
         void CloseOverlay();
 
-        void PushEvent(std::function<void()> evt);
+        void PushEvent(const std::function<void()> &evt);
 
     protected:
         void Initialize() override;
         virtual bool Close(bool quit);
 
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(sf::Event ev) override;
 
