@@ -16,6 +16,8 @@ namespace Gx
     class SceneDirector : public Renderable, public Updatable, public Inputable
     {
     public:
+        using SceneFactory = std::function<std::unique_ptr<Scene>(const ResourceContext&)>;
+
         SceneDirector(SceneDirector &&director) noexcept;
         SceneDirector(Application &app, sf::RenderTarget &target);
         SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene);
@@ -37,7 +39,7 @@ namespace Gx
         void Present(T &scene);
 
         template<typename T>
-        void Present();
+        void Present(const ResourceContext &context = Gx::ResourceContext(typeid(T).name()));
 
         void Unload();
 
@@ -47,11 +49,11 @@ namespace Gx
         Application &GetApplication() const;
 
         template<typename T>
-        void Register(std::function<std::unique_ptr<Gx::Scene>()> factory);
+        void Register(const SceneFactory &factory);
 
     private:
-        using SceneCacheMap   = std::unordered_map<std::type_index, std::unique_ptr<Gx::Scene>>;
-        using SceneFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Gx::Scene>()>>;
+        using SceneCacheMap   = std::unordered_map<std::type_index, std::unique_ptr<Scene>>;
+        using SceneFactoryMap = std::unordered_map<std::type_index, SceneFactory>;
 
         void Stage();
         void Unstage();

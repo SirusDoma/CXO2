@@ -42,6 +42,7 @@
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/StatePlayingLoader.hpp>
 
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/UserState.hpp>
@@ -107,6 +108,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
+    Gx::ResourceLoaderFactory::Register<StatePlaying, StatePlayingLoader>();
 
     // Render settings
     auto& window = GetRenderWindow();
@@ -188,6 +190,7 @@ void O2Jam::Boot()
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
+    director.Register<StatePlaying>("Interface/State/Playing.json");
 
     director.Present<StateAvi>();
 }

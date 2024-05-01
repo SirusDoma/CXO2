@@ -3,9 +3,9 @@
 namespace Gx
 {
     template<typename T>
-    void SceneDirector::Register(std::function<std::unique_ptr<Gx::Scene>()> factory)
+    void SceneDirector::Register(const SceneFactory &factory)
     {
-        static_assert(std::is_base_of_v<Gx::Scene, T>, "Parameter must be a Gx::Scene.");
+        static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene.");
 
         m_factories[typeid(T)] = factory;
     }
@@ -13,7 +13,7 @@ namespace Gx
     template<typename T>
     void SceneDirector::Present(T &scene)
     {
-        static_assert(std::is_base_of_v<Gx::Scene, T>, "Parameter must be a Gx::Scene.");
+        static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene.");
 
         Unstage();
 
@@ -22,20 +22,20 @@ namespace Gx
     }
 
     template<typename T>
-    void SceneDirector::Present()
+    void SceneDirector::Present(const ResourceContext &context)
     {
         static_assert(std::is_base_of_v<Gx::Scene, T>, "Parameter must be a Gx::Scene.");
 
         Unstage();
 
-        auto it = m_factories.find(typeid(T));
+        const auto it = m_factories.find(typeid(T));
         if (it == m_factories.end())
             throw Exception("Scene is not registered");
 
         // TODO: use cache if enabled
         //       probably need to change the pointer to shared_ptr
 
-        m_nextScene = std::move(it->second());
+        m_nextScene = std::move(it->second(context));
         m_staged = false;
     }
 

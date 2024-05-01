@@ -2,6 +2,7 @@
 #define O2JAM_STATE_LOADING_HPP
 
 #include <OTwo/States/State.hpp>
+#include <OTwo/IO/PlayingResourceContext.hpp>
 
 class StateLoading : public State
 {
