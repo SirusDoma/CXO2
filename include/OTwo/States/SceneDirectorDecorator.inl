@@ -41,7 +41,7 @@ void SceneDirectorDecorator::Register(State &state)
 }
 
 template<typename T>
-void SceneDirectorDecorator::Present() const
+void SceneDirectorDecorator::Present(const Gx::ResourceContext &context) const
 {
-    m_director->Present<T>();
+    m_director->Present<T>(context);
 }

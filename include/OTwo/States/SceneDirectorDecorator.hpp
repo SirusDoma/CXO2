@@ -18,7 +18,7 @@ public:
     void Register(State &state);
 
     template<typename T>
-    void Present() const;
+    void Present(const Gx::ResourceContext &context = Gx::ResourceContext(typeid(T).name())) const;
 
 private:
     explicit SceneDirectorDecorator(Gx::SceneDirector &director);

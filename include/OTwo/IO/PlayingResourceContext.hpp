@@ -6,6 +6,7 @@
 class PlayingResourceContext : public Gx::ResourceContext
 {
 public:
+    using Gx::ResourceContext::ResourceContext;
     // TODO: Read `requires` and only pick Playng_BG and Note_Click based on these IDs
     //       Do not add the entire objects inside 'requires' to the child
     unsigned int GetMapID() const;
@@ -15,8 +16,8 @@ public:
     void SetEffectID(const unsigned int effectID);
 
 private:
-    unsigned int m_mapID{1};
-    unsigned int m_effectID{1};
+    unsigned int m_mapID{0};
+    unsigned int m_effectID{0};
 };
 
 #endif
