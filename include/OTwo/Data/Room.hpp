@@ -85,6 +85,8 @@ struct RoomData
     Gx::Uint32        MinLevelLimit = 0;
     Gx::Uint32        MaxLevelLimit = 0;
     RoomMember        Members[8]    = {{},{},{},{},{},{},{},{}};
+    Gx::Uint32        MapID         = 0;
+    Gx::Uint32        EffectID      = 0;
 };
 
 #endif

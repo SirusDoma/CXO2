@@ -12,11 +12,13 @@
 #include <OTwo/Data/Game.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
-    Gx::Dialog(copy),
     Gx::UiContainer(copy),
     Gx::Node(copy),
+    Gx::Dialog(copy),
     m_initialized(false),
     m_page(0),
+    m_coverID(),
+    m_speed(),
     m_difficulty(Difficulty::EX),
     m_sort(static_cast<MusicSortMode>(-1)),
     m_order(static_cast<MusicSortOrder>(-1)),

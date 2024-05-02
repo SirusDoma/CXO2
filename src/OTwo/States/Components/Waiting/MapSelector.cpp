@@ -8,7 +8,9 @@ MapSelector::MapSelector(Gx::UiContainer &&copy) noexcept :
     Gx::UiContainer(copy),
     Gx::Node(copy),
     m_mapID(),
-    m_effectID()
+    m_effectID(),
+    m_mapCallback(nullptr),
+    m_effectCallback(nullptr)
 {
 }
 
@@ -16,50 +18,50 @@ void MapSelector::Initialize()
 {
     Node::Initialize();
 
-    auto map = FindChild<Gx::Image>("IDC_IMAGE_MAP");
+    const auto map = FindChild<Gx::Image>("IDC_IMAGE_MAP");
     map->SetFrame(0);
 
-    auto mapName = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
+    const auto mapName = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
     mapName->SetString("Random");
 
-    auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
-    for (auto effect : effectGroup1->GetChildren())
+    const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
+    for (const auto effect : effectGroup1->GetChildren())
     {
-        if (auto control = dynamic_cast<Gx::Animation*>(effect); control)
+        if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
-    auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
-    for (auto effect : effectGroup2->GetChildren())
+    const auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
+    for (const auto effect : effectGroup2->GetChildren())
     {
-        if (auto control = dynamic_cast<Gx::Animation*>(effect); control)
+        if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
-    if (auto effect1 = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_1"); effect1)
+    if (const auto effect1 = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_1"); effect1)
         effect1->SetVisible(true);
 
-    if (auto effect2 = effectGroup2->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_2"); effect2)
+    if (const auto effect2 = effectGroup2->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_2"); effect2)
         effect2->SetVisible(true);
 
-    auto mapLeftButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_LEFT");
+    const auto mapLeftButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_LEFT");
     mapLeftButton->SetClickCallback([=] (auto& sender, auto& ev){
         SetMapID(m_mapID - 1);
     });
 
-    auto mapRightButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_RIGHT");
+    const auto mapRightButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_RIGHT");
     mapRightButton->SetClickCallback([=] (auto& sender, auto& ev){
        SetMapID(m_mapID + 1);
     });
 
-    auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
+    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
     mapEffectTopButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (sender->IsChecked())
             SetEffectID(1);
     });
 
-    auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
+    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
     mapEffectBottomButton->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (sender->IsChecked())
@@ -81,18 +83,18 @@ unsigned int MapSelector::GetEffectID() const
 
 void MapSelector::SetMapID(int mapID)
 {
-    auto parent = GetParent<::State>();
+    const auto parent = GetParent<::State>();
     if (!parent)
         return;
 
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
 
-    auto sfxNavigate  = parent->Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
-    auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
-    auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
-    auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
-    auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
+    const auto sfxNavigate  = parent->Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
+    const auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
+    const auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
+    const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
+    const auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
 
     if (mapID < 0)
         mapID = map->GetFrameCount() - 1;
@@ -103,15 +105,15 @@ void MapSelector::SetMapID(int mapID)
     if (mapID == m_mapID)
         return;
 
-    for (auto effect : effectGroup1->GetChildren())
+    for (const auto effect : effectGroup1->GetChildren())
     {
-        if (auto control = dynamic_cast<Gx::Animation*>(effect); control)
+        if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
-    for (auto effect : effectGroup2->GetChildren())
+    for (const auto effect : effectGroup2->GetChildren())
     {
-        if (auto control = dynamic_cast<Gx::Animation*>(effect); control)
+        if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
@@ -134,6 +136,9 @@ void MapSelector::SetMapID(int mapID)
         animation->SetVisible(true);
 
     mixer.Play(sfxNavigate);
+
+    if (m_mapCallback)
+        m_mapCallback(m_mapID);
 }
 
 void MapSelector::SetEffectID(unsigned int effectID)
@@ -142,11 +147,24 @@ void MapSelector::SetEffectID(unsigned int effectID)
         return;
 
     m_effectID = effectID;
-    auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
-    auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
+    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
+    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
 
     if (m_effectID == 1)
         mapEffectTopButton->SetCheckedState(true);
     else
         mapEffectBottomButton->SetCheckedState(true);
+
+    if (m_effectCallback)
+        m_effectCallback(m_effectID);
+}
+
+void MapSelector::SetMapChangedCallback(const std::function<void(unsigned int)> &callback)
+{
+    m_mapCallback = callback;
+}
+
+void MapSelector::SetEffectChangedCallback(const std::function<void(unsigned int)> &callback)
+{
+    m_effectCallback = callback;
 }

@@ -2,11 +2,10 @@
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/SceneGraph/StateMetadata.hpp>
+#include <OTwo/IO/PlayingResourceContext.hpp>
 
-#include <Genode/UI.hpp>
 #include <magic_enum.hpp>
 #include <random>
-#include <OTwo/IO/PlayingResourceContext.hpp>
 
 Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
 {
@@ -26,9 +25,9 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     if (metadata == nullptr)
         return nullptr;
 
-    auto ctx = dynamic_cast<const PlayingResourceContext*>(&context);
-    if (!ctx)
-        return nullptr;
+    auto playingCtx = dynamic_cast<const PlayingResourceContext*>(&context);
+    if (!playingCtx)
+        throw Gx::NotSupportedException("Context must be a PlayingResourceContext");
 
     auto state     = std::make_unique<StatePlaying>();
     auto populator = ObjectPopulator::Decorate(state.get());
@@ -50,24 +49,24 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
             overlays.insert(key);
     }
 
-    unsigned int mapID = ctx->GetMapID();
+    unsigned int mapID = playingCtx->GetMapID();
     if (mapID == 0)
     {
         auto device     = std::random_device();
         auto seeder     = std::mt19937(device());
         auto randomizer = std::uniform_int_distribution<unsigned int>(1, maps.size());
-        mapID = randomizer(seeder);
+        mapID = 6;
     }
 
     const std::string playingBg = mapPrefix + std::to_string(mapID);
     included.insert(playingBg);
     if (const auto it = maps.find(playingBg); it == maps.end())
-        throw Gx::Exception("Invalid Playing BG Map ID: " + std::to_string(ctx->GetMapID()));
+        throw Gx::Exception("Invalid Playing BG Map ID: " + std::to_string(playingCtx->GetMapID()));
 
     const std::string noteBg = overlayPrefix + std::to_string(mapID);
     included.insert(noteBg);
     if (const auto it = overlays.find(noteBg); it == overlays.end())
-        throw Gx::Exception("Invalid Note BG Map ID: " + std::to_string(ctx->GetMapID()));
+        throw Gx::Exception("Invalid Note BG Map ID: " + std::to_string(playingCtx->GetMapID()));
 
     for (auto [key, value] : meta.Require)
     {

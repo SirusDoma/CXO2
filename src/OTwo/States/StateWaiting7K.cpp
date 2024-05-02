@@ -184,6 +184,22 @@ void StateWaiting7K::Initialize()
     auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
+    mapSelector->SetMapChangedCallback([=, s = &state, r = &room] (const unsigned int mapID)
+    {
+        auto data = RoomData(*r);
+        data.MapID = mapID;
+
+        s->SetCurrentRoom(data);
+    });
+
+    mapSelector->SetEffectChangedCallback([=, s = &state, r = &room] (const unsigned int effectID)
+    {
+        auto data = RoomData(*r);
+        data.EffectID = effectID;
+
+        s->SetCurrentRoom(data);
+    });
+
     auto instrumentSelector = Instantiate<InstrumentSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
     instrumentSelector->Initialize();
 

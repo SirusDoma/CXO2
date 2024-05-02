@@ -17,9 +17,15 @@ public:
     void SetMapID(int mapID);
     void SetEffectID(unsigned int effectID);
 
+    void SetMapChangedCallback(const std::function<void(unsigned int)> &callback);
+    void SetEffectChangedCallback(const std::function<void(unsigned int)> &callback);
+
 private:
     unsigned int m_mapID;
     unsigned int m_effectID;
+
+    std::function<void(unsigned int)> m_mapCallback;
+    std::function<void(unsigned int)> m_effectCallback;
 };
 
 #endif

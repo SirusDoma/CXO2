@@ -14,7 +14,7 @@ public :
     StatePlayingLoader() = default;
 
     Gx::ResourcePtr<StatePlaying> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const override;
-    Gx::ResourcePtr<StatePlaying> LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &ctx) const override;
+    Gx::ResourcePtr<StatePlaying> LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const override;
 };
 
 #endif
