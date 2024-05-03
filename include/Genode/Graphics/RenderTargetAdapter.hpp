@@ -2,10 +2,10 @@
 #define GENODE_RENDER_TARGET_ADAPTER_HPP
 
 #include <Genode/Graphics/RenderSurface.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 
 namespace Gx
 {
-    class sf::RenderTarget;
     class RenderTargetAdapter : public RenderSurface
     {
     public:
