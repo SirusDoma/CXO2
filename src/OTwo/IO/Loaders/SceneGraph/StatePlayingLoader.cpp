@@ -43,13 +43,13 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     auto clicks   = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
-        if (key.rfind(mapPrefix, 0) != std::string::npos)
+        if (Gx::StringHelper::StartsWith(key, mapPrefix))
             maps.insert(key);
 
-        if (key.rfind(overlayPrefix, 0) != std::string::npos)
+        if (Gx::StringHelper::StartsWith(key, overlayPrefix))
             overlays.insert(key);
 
-        if (key.rfind(noteClickPrefix, 0) != std::string::npos)
+        if (Gx::StringHelper::StartsWith(key, noteClickPrefix))
             clicks.insert(key);
     }
 
@@ -59,7 +59,7 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         auto device     = std::random_device();
         auto seeder     = std::mt19937(device());
         auto randomizer = std::uniform_int_distribution<unsigned int>(1, maps.size());
-        mapID = 6;
+        mapID           = randomizer(seeder);
     }
 
     const std::string playingBg = mapPrefix + std::to_string(mapID);
@@ -76,10 +76,10 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     if (const auto it = clicks.find(noteClick); it == clicks.end())
         throw Gx::Exception("Invalid Note Click Map ID: " + std::to_string(playingCtx->GetMapID()) + " Effect ID: " + std::to_string(playingCtx->GetEffectID()));
 
+    const std::string normalNotePrefix = "IDC_ANIMATION_NOTE_NORMAL";
+    const std::string longNotePrefix   = "IDC_ANIMATION_NOTE_LONG";
     for (auto [key, value] : meta.Require)
     {
-        if (const auto it = included.find(key); it == included.end())
-            continue;
 
         auto reference = std::any_cast<Gx::Json>(value);
         if (reference.type() != Gx::Json::value_t::string)
@@ -90,10 +90,25 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
 
         auto populator = ObjectPopulator::Decorate(state.get());
-        if (meta.Name == noteClick)
+        if (key == noteClick)
+        {
             populator = ObjectPopulator::Decorate(state.get(), true);
+            for (auto i = 1; i <= 7; i++)
+            {
+                name = meta.Name + "/" + noteClickPrefix + std::to_string(i);
+                ObjectLoader::Load(name, reference, populator, ctx);
+            }
+        }
+        else
+        {
+            if (const auto it = included.find(key); it == included.end())
+                continue;
 
-        ObjectLoader::Load(name, reference, populator, ctx);
+            if (Gx::StringHelper::StartsWith(meta.Name, normalNotePrefix) || Gx::StringHelper::StartsWith(meta.Name, longNotePrefix))
+                populator = ObjectPopulator::Decorate(state.get(), true);
+
+            ObjectLoader::Load(name, reference, populator, ctx);
+        }
     }
 
     auto populator = ObjectPopulator::Decorate(state.get());
