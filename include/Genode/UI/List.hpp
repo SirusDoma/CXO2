@@ -64,6 +64,8 @@ namespace Gx
 
     protected:
         bool IsAvailable() const;
+        bool IsBatchLevelConstrained() const override;
+
         sf::Vector2f GetNextItemPosition() const;
         void IncreaseSpacingCounter();
 

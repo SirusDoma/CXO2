@@ -2,23 +2,24 @@
 
 namespace Gx
 {
-    RenderableContainer::RenderableContainer()
-    {
-    }
-
-    RenderableContainer::~RenderableContainer()
-    {
-    }
-
     RenderStates RenderableContainer::Render(RenderSurface &surface, RenderStates states) const
     {
-        states.BatchLevel += 1.f;
+        float level  = states.BatchLevel;
         for (const auto node : GetChildren())
         {
+            states.BatchLevel += 1.f;
             if (const auto renderable = dynamic_cast<Renderable*>(node))
                 renderable->Render(surface, states);
+
+            if (IsBatchLevelConstrained())
+                states.BatchLevel = level;
         }
 
         return states;
+    }
+
+    bool RenderableContainer::IsBatchLevelConstrained() const
+    {
+        return false;
     }
 }

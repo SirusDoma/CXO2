@@ -111,6 +111,11 @@ namespace Gx
         return m_verticalCounter <= m_verticalCount &&  m_horizontalCounter <= m_horizontalCount;
     }
 
+    bool List::IsBatchLevelConstrained() const
+    {
+        return m_useBatching;
+    }
+
     sf::Vector2f List::GetNextItemPosition() const
     {
         return {

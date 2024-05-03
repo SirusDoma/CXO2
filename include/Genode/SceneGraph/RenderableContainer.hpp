@@ -12,11 +12,13 @@ namespace Gx
     class RenderableContainer : public virtual Node, public virtual Renderable
     {
     public:
-        ~RenderableContainer() override;
+        ~RenderableContainer() override = default;
 
     protected:
-        RenderableContainer();
-        RenderStates Render(RenderSurface &surface, RenderStates states) const  override;;
+        RenderableContainer() = default;
+
+        RenderStates Render(RenderSurface &surface, RenderStates states) const  override;
+        virtual bool IsBatchLevelConstrained() const;
     };
 }
 
