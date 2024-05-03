@@ -147,6 +147,11 @@ namespace Gx
 
             return name;
         }
+
+        static bool StartsWith(std::string string, std::string prefix)
+        {
+            return string.rfind(prefix, 0) != std::string::npos;
+        }
     };
 }
 
