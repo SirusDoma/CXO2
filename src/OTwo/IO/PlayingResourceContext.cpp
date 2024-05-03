@@ -17,5 +17,8 @@ unsigned int PlayingResourceContext::GetEffectID() const
 
 void PlayingResourceContext::SetEffectID(const unsigned int effectID)
 {
+    if (effectID != 1 && effectID != 2)
+        throw Gx::NotSupportedException("Effect ID must be between 1 and 2");
+
     m_effectID = effectID;
 }

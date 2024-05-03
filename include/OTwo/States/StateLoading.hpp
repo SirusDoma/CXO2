@@ -3,6 +3,7 @@
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/IO/PlayingResourceContext.hpp>
+#include <OTwo/Chart/Chart.hpp>
 
 class StateLoading : public State
 {
@@ -12,8 +13,9 @@ public:
 
 private:
     void Update(double delta) override;
+    void OnCoverLoaded(const sf::Image *cover);
+    void OnChartLoaded(const Chart *chart);
 
-    const sf::Image *m_cover;
     sf::Texture m_texture;
 };
 

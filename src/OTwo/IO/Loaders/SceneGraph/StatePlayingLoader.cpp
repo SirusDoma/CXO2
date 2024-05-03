@@ -29,17 +29,18 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     if (!playingCtx)
         throw Gx::NotSupportedException("Context must be a PlayingResourceContext");
 
-    auto state     = std::make_unique<StatePlaying>();
-    auto populator = ObjectPopulator::Decorate(state.get());
+    auto state = std::make_unique<StatePlaying>();
     state->SetName(meta.Name);
 
     auto included = std::unordered_set<std::string>();
 
-    const std::string mapPrefix     = "IDC_IMAGE_PLAYING_BG";
-    const std::string overlayPrefix = "IDC_IMAGE_NOTE_BG";
+    const std::string mapPrefix       = "IDC_IMAGE_PLAYING_BG";
+    const std::string overlayPrefix   = "IDC_IMAGE_NOTE_BG";
+    const std::string noteClickPrefix = "IDC_ANIMATION_NOTE_CLICK";
 
     auto maps     = std::unordered_set<std::string>();
     auto overlays = std::unordered_set<std::string>();
+    auto clicks   = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
         if (key.rfind(mapPrefix, 0) != std::string::npos)
@@ -47,6 +48,9 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
 
         if (key.rfind(overlayPrefix, 0) != std::string::npos)
             overlays.insert(key);
+
+        if (key.rfind(noteClickPrefix, 0) != std::string::npos)
+            clicks.insert(key);
     }
 
     unsigned int mapID = playingCtx->GetMapID();
@@ -68,6 +72,10 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     if (const auto it = overlays.find(noteBg); it == overlays.end())
         throw Gx::Exception("Invalid Note BG Map ID: " + std::to_string(playingCtx->GetMapID()));
 
+    const std::string noteClick = noteClickPrefix + std::to_string(mapID) + "_" + std::to_string(playingCtx->GetEffectID());
+    if (const auto it = clicks.find(noteClick); it == clicks.end())
+        throw Gx::Exception("Invalid Note Click Map ID: " + std::to_string(playingCtx->GetMapID()) + " Effect ID: " + std::to_string(playingCtx->GetEffectID()));
+
     for (auto [key, value] : meta.Require)
     {
         if (const auto it = included.find(key); it == included.end())
@@ -81,9 +89,14 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         auto name = meta.Name + "/" + key;
         auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
 
+        auto populator = ObjectPopulator::Decorate(state.get());
+        if (meta.Name == noteClick)
+            populator = ObjectPopulator::Decorate(state.get(), true);
+
         ObjectLoader::Load(name, reference, populator, ctx);
     }
 
+    auto populator = ObjectPopulator::Decorate(state.get());
     for (auto [key, object] : metadata->Objects)
     {
         // Rewire resource manager to the local scene

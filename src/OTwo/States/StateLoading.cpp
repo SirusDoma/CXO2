@@ -9,10 +9,11 @@
 #include <random>
 #include <thread>
 #include <iostream>
+#include <OTwo/States/StatePlaying.hpp>
+#include <Genode/Tasks/Sequence.hpp>
 
 StateLoading::StateLoading(State &state) :
-    State(state),
-    m_cover(nullptr)
+    State(state)
 {
 }
 
@@ -24,37 +25,34 @@ void StateLoading::Initialize()
     auto &state = Require<ChartState>();
     auto &room  = user.GetCurrentRoom();
 
-    auto metadata  = room.Chart;
-    auto loader = ChartLoader();
-    loader.SetCoverLoadCallback([this] (auto cover)
-    {
-        m_cover = cover;
+    auto device     = std::random_device();
+    auto seeder     = std::mt19937(device());
+    auto randomizer = std::uniform_int_distribution<int>(0, static_cast<int>(GetChildren().size()) - 1);
+    int result      = randomizer(seeder);
 
-        auto imageList = std::vector<Gx::Image*>();
-        for (auto child : GetChildren())
-        {
-            if (auto image = dynamic_cast<Gx::Image*>(child); image)
-                imageList.push_back(image);
-        }
-
-        auto device     = std::random_device();
-        auto seeder     = std::mt19937(device());
-        auto randomizer = std::uniform_int_distribution<int>(0, static_cast<int>(imageList.size()) - 1);
-        int result      = randomizer(seeder);
-
-        for (int i = 0; i < imageList.size(); i++)
-            imageList[i]->SetVisible(i == result);
-    });
-
+    std::size_t index = 0;
     for (auto child : GetChildren())
     {
         if (auto image = dynamic_cast<Gx::Image*>(child); image)
-            image->SetVisible(false);
+        {
+            image->SetVisible(index == result);
+            index++;
+        }
     }
+
+    auto metadata  = room.Chart;
+    auto loader = ChartLoader();
+
+    // TODO: Load cover after select music in StateWaiting and forward it into StateLoading
+    loader.SetCoverLoadCallback([this] (auto cover)
+    {
+        Queue([this, cover] () { OnCoverLoaded(cover); });
+    });
 
     auto thread = std::thread([=, &state] ()
     {
         state.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+        Queue([this, &state] { OnChartLoaded(state.GetChart()); });
     });
 
     thread.detach();
@@ -63,27 +61,38 @@ void StateLoading::Initialize()
 void StateLoading::Update(const double delta)
 {
     State::Update(delta);
+}
 
-    if (m_cover)
+void StateLoading::OnCoverLoaded(const sf::Image *cover)
+{
+    for (auto child : GetChildren())
     {
-        for (auto child : GetChildren())
+        if (auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVislble() && m_texture.loadFromImage(*cover))
         {
-            if (auto image = dynamic_cast<Gx::Image*>(child); image)
-            {
-                if (image->IsVislble() && m_texture.loadFromImage(*m_cover))
-                {
-                    image->SetTexture(m_texture);
-                    break;
-                }
-            }
+            image->SetTexture(m_texture);
+            return;
         }
-
-        m_cover = nullptr;
     }
+}
 
-    auto &state = Require<ChartState>();
-    if (state.GetChart())
-    {
-        // Loaded
-    }
+void StateLoading::OnChartLoaded(const Chart *chart)
+{
+    auto transition = Create<Gx::Sequence>([this, chart]
+        {
+            auto &director = GetDirector();
+            auto &state    = Require<UserState>();
+            auto &room     = state.GetCurrentRoom();
+            auto ctx       = PlayingResourceContext();
+
+            ctx.SetMapID(room.MapID);
+            ctx.SetEffectID(room.EffectID);
+
+            director.Present<StatePlaying>(ctx);
+        },
+        Gx::Sequence::ListOf({
+            Create<Gx::Delay>(sf::seconds(1.f))
+        })
+    );
+
+    Run(transition);
 }

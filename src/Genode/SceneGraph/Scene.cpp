@@ -90,7 +90,7 @@ namespace Gx
         Input(m_lastInput);
     }
 
-    void Scene::PushEvent(const std::function<void()> &evt)
+    void Scene::Queue(const std::function<void()> &evt)
     {
         if (evt)
             m_events.push(evt);

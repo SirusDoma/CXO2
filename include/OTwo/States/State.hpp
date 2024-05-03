@@ -34,6 +34,9 @@ public:
     R* Load(const std::string &source, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>
+    R* Import(Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
+
+    template<typename R>
     R* Import(const std::string &id, Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
 
     template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>

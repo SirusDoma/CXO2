@@ -15,7 +15,7 @@ public:
 
 private:
     unsigned int m_mapID{0};
-    unsigned int m_effectID{0};
+    unsigned int m_effectID{1};
 };
 
 #endif

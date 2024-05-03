@@ -37,6 +37,20 @@ R* State::Load(const std::string &source, ResourceScope scope)
 }
 
 template<typename R>
+R *State::Import(Gx::ResourcePtr<R> resource, ResourceScope scope)
+{
+    static_assert(
+        std::is_base_of_v<Gx::Node, R>,
+        "Parameter must be a Gx::Node"
+    );
+
+    if (auto node = dynamic_cast<Gx::Node*>(resource.get()); node)
+        return Import<R>(GetName() + "/" + node->GetName(), std::move(resource), scope);
+
+    return nullptr;
+}
+
+template<typename R>
 R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, ResourceScope scope)
 {
     static_assert(
@@ -56,9 +70,6 @@ R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, ResourceSco
         return nullptr;
 
     auto& result = resources->Store(id, std::move(resource), Gx::CacheMode::Update);
-    if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
-        AddChild(&result);
-
     return &result;
 }
 

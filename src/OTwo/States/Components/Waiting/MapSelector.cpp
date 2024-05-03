@@ -46,12 +46,12 @@ void MapSelector::Initialize()
 
     const auto mapLeftButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_LEFT");
     mapLeftButton->SetClickCallback([=] (auto& sender, auto& ev){
-        SetMapID(m_mapID - 1);
+        SetMapID(static_cast<int>(m_mapID) - 1);
     });
 
     const auto mapRightButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_RIGHT");
     mapRightButton->SetClickCallback([=] (auto& sender, auto& ev){
-       SetMapID(m_mapID + 1);
+       SetMapID(static_cast<int>(m_mapID) + 1);
     });
 
     const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
@@ -97,7 +97,7 @@ void MapSelector::SetMapID(int mapID)
     const auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
 
     if (mapID < 0)
-        mapID = map->GetFrameCount() - 1;
+        mapID = static_cast<unsigned int>(map->GetFrameCount() - 1);
 
     if (mapID >= map->GetFrameCount())
         mapID = 0;

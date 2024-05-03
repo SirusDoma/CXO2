@@ -37,7 +37,7 @@ namespace Gx
         void PushOverlay(Node *overlay);
         void CloseOverlay();
 
-        void PushEvent(const std::function<void()> &evt);
+        void Queue(const std::function<void()> &evt);
 
     protected:
         void Initialize() override;
