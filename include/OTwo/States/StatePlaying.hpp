@@ -4,6 +4,8 @@
 #include <OTwo/States/State.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
+#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Config/GameConfig.hpp>
 
 class StatePlaying : public State
 {
@@ -13,7 +15,12 @@ public:
 
     void Initialize() override;
 
-    void SetNoteClick(Gx::ResourcePtr<Gx::Animation> click);
+    void OnKeyDown(const sf::Event::KeyEvent ev) override;
+    void OnKeyUp(const sf::Event::KeyEvent ev) override;
+
+
+private:
+    GameConfig *m_config;
 };
 
 

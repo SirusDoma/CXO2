@@ -37,10 +37,12 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     const std::string mapPrefix       = "IDC_IMAGE_PLAYING_BG";
     const std::string overlayPrefix   = "IDC_IMAGE_NOTE_BG";
     const std::string noteClickPrefix = "IDC_ANIMATION_NOTE_CLICK";
+    const std::string keyEffectPrefix = "IDC_IMAGE_KEY_EFFECT";
 
-    auto maps     = std::unordered_set<std::string>();
-    auto overlays = std::unordered_set<std::string>();
-    auto clicks   = std::unordered_set<std::string>();
+    auto maps       = std::unordered_set<std::string>();
+    auto overlays   = std::unordered_set<std::string>();
+    auto clicks     = std::unordered_set<std::string>();
+    auto keyEffects = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
         if (Gx::StringHelper::StartsWith(key, mapPrefix))
@@ -51,6 +53,9 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
 
         if (Gx::StringHelper::StartsWith(key, noteClickPrefix))
             clicks.insert(key);
+
+        if (Gx::StringHelper::StartsWith(key, keyEffectPrefix))
+            keyEffects.insert(key);
     }
 
     unsigned int mapID = playingCtx->GetMapID();
@@ -76,11 +81,15 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     if (const auto it = clicks.find(noteClick); it == clicks.end())
         throw Gx::Exception("Invalid Note Click Map ID: " + std::to_string(playingCtx->GetMapID()) + " Effect ID: " + std::to_string(playingCtx->GetEffectID()));
 
+    const std::string keyEffect = keyEffectPrefix + std::to_string(mapID);
+    included.insert(keyEffect);
+    if (const auto it = keyEffects.find(keyEffect); it == keyEffects.end())
+        throw Gx::Exception("Invalid Key Effect Map ID: " + std::to_string(playingCtx->GetMapID()));
+
     const std::string normalNotePrefix = "IDC_ANIMATION_NOTE_NORMAL";
     const std::string longNotePrefix   = "IDC_ANIMATION_NOTE_LONG";
     for (auto [key, value] : meta.Require)
     {
-
         auto reference = std::any_cast<Gx::Json>(value);
         if (reference.type() != Gx::Json::value_t::string)
             continue;
@@ -96,6 +105,15 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
             for (auto i = 1; i <= 7; i++)
             {
                 name = meta.Name + "/" + noteClickPrefix + std::to_string(i);
+                ObjectLoader::Load(name, reference, populator, ctx);
+            }
+        }
+        else if (key == keyEffect)
+        {
+            populator = ObjectPopulator::Decorate(state.get(), true);
+            for (auto i = 1; i <= 7; i++)
+            {
+                name = meta.Name + "/" + keyEffectPrefix + std::to_string(i);
                 ObjectLoader::Load(name, reference, populator, ctx);
             }
         }
