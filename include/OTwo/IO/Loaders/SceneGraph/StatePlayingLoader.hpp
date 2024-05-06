@@ -8,6 +8,7 @@
 #include <typeindex>
 
 struct StateMetadata;
+class PlayingResourceContext;
 class StatePlayingLoader : public ResourceLoader<StatePlaying>
 {
 public :
@@ -15,6 +16,9 @@ public :
 
     Gx::ResourcePtr<StatePlaying> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const override;
     Gx::ResourcePtr<StatePlaying> LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const override;
+
+private:
+    static void LoadRequiredResource(StatePlaying *state, const StateMetadata *metadata, const std::string &key, const std::string &suffix, const Gx::ResourceContext &context, unsigned int count = 1, bool importOnly = false);
 };
 
 #endif

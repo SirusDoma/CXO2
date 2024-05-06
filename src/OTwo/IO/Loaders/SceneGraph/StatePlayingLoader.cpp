@@ -32,30 +32,11 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     auto state = std::make_unique<StatePlaying>();
     state->SetName(meta.Name);
 
-    auto included = std::unordered_set<std::string>();
-
-    const std::string mapPrefix       = "IDC_IMAGE_PLAYING_BG";
-    const std::string overlayPrefix   = "IDC_IMAGE_NOTE_BG";
-    const std::string noteClickPrefix = "IDC_ANIMATION_NOTE_CLICK";
-    const std::string keyEffectPrefix = "IDC_IMAGE_KEY_EFFECT";
-
     auto maps       = std::unordered_set<std::string>();
-    auto overlays   = std::unordered_set<std::string>();
-    auto clicks     = std::unordered_set<std::string>();
-    auto keyEffects = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
-        if (Gx::StringHelper::StartsWith(key, mapPrefix))
+        if (Gx::StringHelper::StartsWith(key, "IDC_IMAGE_PLAYING_BG"))
             maps.insert(key);
-
-        if (Gx::StringHelper::StartsWith(key, overlayPrefix))
-            overlays.insert(key);
-
-        if (Gx::StringHelper::StartsWith(key, noteClickPrefix))
-            clicks.insert(key);
-
-        if (Gx::StringHelper::StartsWith(key, keyEffectPrefix))
-            keyEffects.insert(key);
     }
 
     unsigned int mapID = playingCtx->GetMapID();
@@ -67,66 +48,15 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         mapID           = randomizer(seeder);
     }
 
-    const std::string playingBg = mapPrefix + std::to_string(mapID);
-    included.insert(playingBg);
-    if (const auto it = maps.find(playingBg); it == maps.end())
-        throw Gx::Exception("Invalid Playing BG Map ID: " + std::to_string(playingCtx->GetMapID()));
+    LoadRequiredResource(state.get(), metadata, "IDC_IMAGE_PLAYING_BG",     std::to_string(mapID), context);
+    LoadRequiredResource(state.get(), metadata, "IDC_IMAGE_NOTE_BG",        std::to_string(mapID), context);
+    LoadRequiredResource(state.get(), metadata, "IDC_IMAGE_KEY_EFFECT",     std::to_string(mapID), context, 7);
+    LoadRequiredResource(state.get(), metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(playingCtx->GetEffectID()), context, 7, true);
 
-    const std::string noteBg = overlayPrefix + std::to_string(mapID);
-    included.insert(noteBg);
-    if (const auto it = overlays.find(noteBg); it == overlays.end())
-        throw Gx::Exception("Invalid Note BG Map ID: " + std::to_string(playingCtx->GetMapID()));
-
-    const std::string noteClick = noteClickPrefix + std::to_string(mapID) + "_" + std::to_string(playingCtx->GetEffectID());
-    if (const auto it = clicks.find(noteClick); it == clicks.end())
-        throw Gx::Exception("Invalid Note Click Map ID: " + std::to_string(playingCtx->GetMapID()) + " Effect ID: " + std::to_string(playingCtx->GetEffectID()));
-
-    const std::string keyEffect = keyEffectPrefix + std::to_string(mapID);
-    included.insert(keyEffect);
-    if (const auto it = keyEffects.find(keyEffect); it == keyEffects.end())
-        throw Gx::Exception("Invalid Key Effect Map ID: " + std::to_string(playingCtx->GetMapID()));
-
-    const std::string normalNotePrefix = "IDC_ANIMATION_NOTE_NORMAL";
-    const std::string longNotePrefix   = "IDC_ANIMATION_NOTE_LONG";
-    for (auto [key, value] : meta.Require)
+    for (int i = 1; i <= 7; i++)
     {
-        auto reference = std::any_cast<Gx::Json>(value);
-        if (reference.type() != Gx::Json::value_t::string)
-            continue;
-
-        // Rewire resource manager to the local scene
-        auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
-
-        auto populator = ObjectPopulator::Decorate(state.get());
-        if (key == noteClick)
-        {
-            populator = ObjectPopulator::Decorate(state.get(), true);
-            for (auto i = 1; i <= 7; i++)
-            {
-                name = meta.Name + "/" + noteClickPrefix + std::to_string(i);
-                ObjectLoader::Load(name, reference, populator, ctx);
-            }
-        }
-        else if (key == keyEffect)
-        {
-            populator = ObjectPopulator::Decorate(state.get(), true);
-            for (auto i = 1; i <= 7; i++)
-            {
-                name = meta.Name + "/" + keyEffectPrefix + std::to_string(i);
-                ObjectLoader::Load(name, reference, populator, ctx);
-            }
-        }
-        else
-        {
-            if (const auto it = included.find(key); it == included.end())
-                continue;
-
-            if (Gx::StringHelper::StartsWith(meta.Name, normalNotePrefix) || Gx::StringHelper::StartsWith(meta.Name, longNotePrefix))
-                populator = ObjectPopulator::Decorate(state.get(), true);
-
-            ObjectLoader::Load(name, reference, populator, ctx);
-        }
+        LoadRequiredResource(state.get(), metadata, "IDC_ANIMATION_NOTE_NORMAL", std::to_string(i), context, 1, true);
+        LoadRequiredResource(state.get(), metadata, "IDC_ANIMATION_NOTE_LONG",   std::to_string(i), context, 1, true);
     }
 
     auto populator = ObjectPopulator::Decorate(state.get());
@@ -140,4 +70,25 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     }
 
     return state;
+}
+
+void StatePlayingLoader::LoadRequiredResource(StatePlaying *state, const StateMetadata *metadata, const std::string &key, const std::string &suffix, const Gx::ResourceContext &context, const unsigned int count, const bool importOnly)
+{
+    if (const auto it = metadata->Require.find(key + suffix); it != metadata->Require.end())
+    {
+        const auto name      = metadata->Name + "/" + key;
+        const auto reference = std::any_cast<Gx::Json>(it->second);
+        auto populator       = ObjectPopulator::Decorate(state, importOnly);
+        auto ctx             = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
+
+        if (count > 1)
+        {
+            for (auto i = 1; i <= count; i++)
+                ObjectLoader::Load(name + std::to_string(i), reference, populator, ctx);
+        }
+        else
+            ObjectLoader::Load(name, reference, populator, ctx);
+    }
+    else
+        throw Gx::Exception(key + " is not found within required resource references");
 }

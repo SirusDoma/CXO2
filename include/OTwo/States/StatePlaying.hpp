@@ -2,10 +2,12 @@
 #define O2JAM_STATE_PLAYING_HPP
 
 #include <OTwo/States/State.hpp>
-#include <Genode/SceneGraph.hpp>
-#include <Genode/Graphics/Animation.hpp>
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+
+#include <Genode/SceneGraph.hpp>
+#include <Genode/Graphics/Animation.hpp>
+#include <Genode/UI/Image.hpp>
 
 class StatePlaying : public State
 {
@@ -15,12 +17,15 @@ public:
 
     void Initialize() override;
 
+    void Update(const double delta) override;
+
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
 
 private:
     GameConfig *m_config;
+    std::unordered_map<Chart::Channel, Gx::Image*> m_keyDowns, m_keyEffects;
 };
 
 
