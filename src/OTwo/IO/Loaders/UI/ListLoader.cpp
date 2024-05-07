@@ -101,7 +101,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
         auto populator = ObjectPopulator::Decorate(list.get());
         if (!metadata->ItemSource.empty())
         {
-            list->UseBatching(true);
+            list->SetBatchingEnabled(true);
             for (int i = 0; i < metadata->ItemCount; i++)
             {
                 auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
@@ -112,7 +112,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
         }
         else if (!metadata->Objects.empty())
         {
-            list->UseBatching(false);
+            list->SetBatchingEnabled(false);
             for (auto [key, object] : metadata->Objects)
             {
                 auto name = meta.Name + "/" + key;

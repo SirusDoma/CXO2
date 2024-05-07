@@ -22,19 +22,18 @@ namespace Gx
         m_horizontalSpacing(horizontalSpacing),
         m_verticalCounter(),
         m_horizontalCounter(),
-        m_layouts(),
-        m_batcher(SpriteBatch::BatchMode::LayerSort)
+        m_layouts()
     {
     }
 
-    void List::UseBatching(const bool batching)
+    bool List::IsBatchingEnabled() const
     {
-        m_useBatching = batching;
+        return m_useBatching;
     }
 
-    void List::SetBatchMode(const SpriteBatch::BatchMode batchMode) const
+    void List::SetBatchingEnabled(bool batchingEnabled)
     {
-        m_batcher.SetBatchMode(batchMode);
+        m_useBatching = batchingEnabled;
     }
 
     List::Order List::GetOrder() const
@@ -106,14 +105,9 @@ namespace Gx
         }
     }
 
-    bool List::IsAvailable() const
+    bool List::IsSpaceAvailable() const
     {
         return m_verticalCounter <= m_verticalCount &&  m_horizontalCounter <= m_horizontalCount;
-    }
-
-    bool List::IsBatchLevelConstrained() const
-    {
-        return m_useBatching;
     }
 
     sf::Vector2f List::GetNextItemPosition() const
@@ -126,7 +120,7 @@ namespace Gx
 
     void List::IncreaseSpacingCounter()
     {
-        if (!IsAvailable())
+        if (!IsSpaceAvailable())
             return;
 
         if (m_order == Order::Vertical)
@@ -156,16 +150,13 @@ namespace Gx
 
     RenderStates List::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVislble())
+            return states;
+
         if (m_useBatching)
         {
-            const auto transform = states.transform;
-            states.transform     = sf::Transform();
-            UiContainer::Render(m_batcher, states);
-
-            states.transform = transform;
-            m_batcher.Render(surface, states);
-
-            return states;
+            states.transform *= GetTransform();
+            return RenderBatchContainer::Render(surface, states);
         }
 
         return UiContainer::Render(surface, states);

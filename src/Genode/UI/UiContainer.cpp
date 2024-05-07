@@ -21,6 +21,16 @@ namespace Gx
         m_radioCallback = std::move(callback);
     }
 
+    bool UiContainer::IsBatchingEnabled() const
+    {
+        return m_useBatching;
+    }
+
+    void UiContainer::SetBatchingEnabled(const bool batchingEnabled)
+    {
+        m_useBatching = batchingEnabled;
+    }
+
     void UiContainer::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
     {
         if (!IsEnabled())
@@ -28,7 +38,7 @@ namespace Gx
 
         Control::OnControlClick(sender, ev);
 
-        auto radio = dynamic_cast<RadioButton *>(sender);
+        const auto radio = dynamic_cast<RadioButton *>(sender);
         if (!radio || radio->IsChecked())
             return;
 
@@ -45,9 +55,9 @@ namespace Gx
         TextBox *first   = nullptr;
         TextBox *current = nullptr;
 
-        for (auto child : GetChildren())
+        for (const auto child : GetChildren())
         {
-            auto textBox = dynamic_cast<TextBox*>(child);
+            const auto textBox = dynamic_cast<TextBox*>(child);
             if (!textBox || !textBox->IsEnabled())
                 continue;
 
@@ -74,6 +84,15 @@ namespace Gx
 
     RenderStates UiContainer::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVislble())
+            return states;
+
+        if (m_useBatching)
+        {
+            states.transform *= GetTransform();
+            return RenderBatchContainer::Render(surface, states);
+        }
+
         return Control::Render(surface, states);
     }
 
@@ -84,16 +103,16 @@ namespace Gx
 
     bool UiContainer::Input(sf::Event ev)
     {
-        bool input = Control::Input(ev);
+        const bool input = Control::Input(ev);
         if (!m_activeRadio)
             return input;
 
-        for (auto child : GetChildren())
+        for (const auto child : GetChildren())
         {
             if (child == m_activeRadio)
                 continue;
 
-            auto other = dynamic_cast<RadioButton *>(child);
+            const auto other = dynamic_cast<RadioButton *>(child);
             if (!other || other == m_activeRadio)
                 continue;
 
@@ -113,13 +132,13 @@ namespace Gx
         auto result = sf::FloatRect();
         bool first = true;
 
-        for (auto node : GetChildren())
+        for (const auto node : GetChildren())
         {
-            auto control = dynamic_cast<Control*>(node);
+            const auto control = dynamic_cast<Control*>(node);
             if (!control)
                 continue;
 
-            auto bounds = control->GetGlobalBounds();
+            const auto bounds = control->GetGlobalBounds();
             if (first)
             {
                 result.left = bounds.left;

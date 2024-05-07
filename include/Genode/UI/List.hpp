@@ -2,12 +2,13 @@
 #define GENODE_UI_REPEATER_HPP
 
 #include <Genode/UI/UiContainer.hpp>
-#include <Genode/Graphics/SpriteBatch.hpp>
+#include <Genode/SceneGraph/RenderBatchContainer.hpp>
+
 #include <functional>
 
 namespace Gx
 {
-    class List : public virtual UiContainer
+    class List : public virtual UiContainer, public virtual RenderBatchContainer
     {
     public:
         enum class Order
@@ -30,8 +31,8 @@ namespace Gx
 
         ~List() override = default;
 
-        void UseBatching(bool batching);
-        void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
+        bool IsBatchingEnabled() const;
+        void SetBatchingEnabled(bool batchingEnabled);
 
         Order GetOrder() const;
         void SetOrder(Order order);
@@ -63,8 +64,7 @@ namespace Gx
         void Apply(const std::function<void(Control*)>& fun) const;
 
     protected:
-        bool IsAvailable() const;
-        bool IsBatchLevelConstrained() const override;
+        bool IsSpaceAvailable() const;
 
         sf::Vector2f GetNextItemPosition() const;
         void IncreaseSpacingCounter();
@@ -81,7 +81,6 @@ namespace Gx
 
         int m_verticalCounter, m_horizontalCounter;
         std::vector<LayoutItem> m_layouts;
-        mutable SpriteBatch m_batcher;
         bool m_useBatching{true};
     };
 }
