@@ -6,7 +6,7 @@ namespace Gx
     {
         for (const auto node : GetChildren())
         {
-            states.BatchLevel += 1.0f;
+            states.Layer += 1.0f;
             if (const auto renderable = dynamic_cast<Renderable*>(node))
                 renderable->Render(surface, states);
         }

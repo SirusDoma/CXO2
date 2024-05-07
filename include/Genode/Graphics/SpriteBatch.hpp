@@ -71,7 +71,7 @@ namespace Gx
             /// \brief Organizes objects into multiple layers. Groups objects
             ///        into layers based on level, then reorders objects in
             ///        each layer by texture before drawing the layers from
-            ///        furthest to closest.
+            ///        closest to furthest.
             ///
             ////////////////////////////////////////////////////////////
             LayerSort,
@@ -100,7 +100,7 @@ namespace Gx
         ///                  Only triangle primitives are supported
         /// \param texture   The texture to use for rendering
         /// \param transform The transform to apply on the vertices
-        /// \param level     The level at which the drawable will be
+        /// \param layer     The layer at which the drawable will be
         ///                  renderered. This value is used only when
         ///                  BatchMode::LayerSort mode is used.
         ///
@@ -110,12 +110,12 @@ namespace Gx
                    sf::PrimitiveType    type,
                    const sf::Texture*   texture,
                    const sf::Transform& transform = sf::Transform::Identity,
-                   float                level     = 0.f);
+                   float                layer     = 0.f);
 
         void Batch(const sf::VertexArray& vertices,
                    const sf::Texture*     texture,
                    const sf::Transform&   transform = sf::Transform::Identity,
-                   float                  level     = 0.f);
+                   float                  layer     = 0.f);
 
 
         void Update(const double delta) override;

@@ -13,7 +13,7 @@ namespace Gx
 
         const unsigned int FrameID = 0;
         const double Delta         = 0;
-        float BatchLevel           = 0.f;
+        float Layer                = 0.f;
 
         static const RenderStates Default;
 

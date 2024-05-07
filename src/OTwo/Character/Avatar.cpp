@@ -199,7 +199,7 @@ Gx::RenderStates Avatar::Render(Gx::RenderSurface &surface, Gx::RenderStates sta
             m_renderableStates[animation] = states.FrameID;
         }
 
-        states.BatchLevel += 1.f;
+        states.Layer += 1.f;
         if (type == EquipmentType::Costume && part == RenderPart::Body)
             break;
     }

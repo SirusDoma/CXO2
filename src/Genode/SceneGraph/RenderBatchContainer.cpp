@@ -11,7 +11,7 @@ namespace Gx
     {
         // Push render states
         const auto transform = states.transform;
-        const float level    = states.BatchLevel;
+        const float layer    = states.Layer;
 
         // Reset transform
         states.transform = sf::Transform();
@@ -19,12 +19,12 @@ namespace Gx
         // Render child with sprite batch
         for (const auto node : GetChildren())
         {
-            states.BatchLevel += 1.f;
+            states.Layer += 1.f;
             if (const auto renderable = dynamic_cast<Renderable*>(node))
                 renderable->Render(m_batcher, states);
 
             // Pop batch level
-            states.BatchLevel = level;
+            states.Layer = layer;
         }
 
         // Pop transform

@@ -66,9 +66,9 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Batch(const sf::VertexArray &vertices, const sf::Texture *texture, const sf::Transform &transform, float level)
+    void SpriteBatch::Batch(const sf::VertexArray &vertices, const sf::Texture *texture, const sf::Transform &transform, const float layer)
     {
-        Batch(&vertices[0], vertices.getVertexCount(), vertices.getPrimitiveType(), texture, transform, level);
+        Batch(&vertices[0], vertices.getVertexCount(), vertices.getPrimitiveType(), texture, transform, layer);
     }
 
     ////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ namespace Gx
             throw NotSupportedException("Multiple blending mode usage within single batch is not supported");
 
         m_blendMode = states.blendMode;
-        Batch(vertices, vertexCount, type, states.texture, states.transform, states.BatchLevel);
+        Batch(vertices, vertexCount, type, states.texture, states.transform, states.Layer);
     }
 
     ////////////////////////////////////////////////////////////
