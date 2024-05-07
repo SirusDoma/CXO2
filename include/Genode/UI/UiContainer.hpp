@@ -24,8 +24,8 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
         void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
-        bool IsBatchingEnabled() const;
-        void SetBatchingEnabled(bool batchingEnabled);
+        virtual bool IsBatchingEnabled() const;
+        virtual void SetBatchingEnabled(bool batchingEnabled);
 
     protected:
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;

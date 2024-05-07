@@ -98,6 +98,9 @@ namespace Gx
 
     void UiContainer::Update(const double delta)
     {
+        if (m_useBatching)
+            RenderBatchContainer::Update(delta);
+
         Control::Update(delta);
     }
 

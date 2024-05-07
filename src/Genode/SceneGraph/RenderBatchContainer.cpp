@@ -7,6 +7,12 @@ namespace Gx
         m_batcher.SetBatchMode(batchMode);
     }
 
+    void RenderBatchContainer::Update(const double delta)
+    {
+        m_batcher.Update(delta);
+        UpdatableContainer::Update(delta);
+    }
+
     RenderStates RenderBatchContainer::Render(RenderSurface &surface, RenderStates states) const
     {
         // Push render states

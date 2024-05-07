@@ -112,6 +112,12 @@ namespace Gx
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Update(const double delta)
     {
+        if (m_clearRequired)
+        {
+            Clear();
+            m_clearRequired = false;
+        }
+
         UpdatableContainer::Update(delta);
     }
 

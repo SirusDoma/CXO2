@@ -5,13 +5,15 @@
 
 namespace Gx
 {
-    class RenderBatchContainer : public virtual RenderableContainer
+    class RenderBatchContainer : public virtual RenderableContainer, public virtual UpdatableContainer
     {
     public:
         ~RenderBatchContainer() override = default;
 
     protected:
         RenderBatchContainer() = default;
+
+        void Update(const double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void SetBatchMode(SpriteBatch::BatchMode batchMode) const;

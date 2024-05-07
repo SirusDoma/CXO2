@@ -2,13 +2,12 @@
 #define GENODE_UI_REPEATER_HPP
 
 #include <Genode/UI/UiContainer.hpp>
-#include <Genode/SceneGraph/RenderBatchContainer.hpp>
 
 #include <functional>
 
 namespace Gx
 {
-    class List : public virtual UiContainer, public virtual RenderBatchContainer
+    class List : public virtual UiContainer
     {
     public:
         enum class Order
@@ -30,9 +29,6 @@ namespace Gx
         List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
 
         ~List() override = default;
-
-        bool IsBatchingEnabled() const;
-        void SetBatchingEnabled(bool batchingEnabled);
 
         Order GetOrder() const;
         void SetOrder(Order order);
@@ -81,7 +77,6 @@ namespace Gx
 
         int m_verticalCounter, m_horizontalCounter;
         std::vector<LayoutItem> m_layouts;
-        bool m_useBatching{true};
     };
 }
 

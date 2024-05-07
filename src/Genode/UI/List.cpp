@@ -26,16 +26,6 @@ namespace Gx
     {
     }
 
-    bool List::IsBatchingEnabled() const
-    {
-        return m_useBatching;
-    }
-
-    void List::SetBatchingEnabled(bool batchingEnabled)
-    {
-        m_useBatching = batchingEnabled;
-    }
-
     List::Order List::GetOrder() const
     {
         return m_order;
@@ -152,12 +142,6 @@ namespace Gx
     {
         if (!IsVislble())
             return states;
-
-        if (m_useBatching)
-        {
-            states.transform *= GetTransform();
-            return RenderBatchContainer::Render(surface, states);
-        }
 
         return UiContainer::Render(surface, states);
     }

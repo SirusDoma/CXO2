@@ -57,15 +57,16 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
             metadata.Order = Gx::List::Order::Vertical;
     }
 
-    if (auto prefab = attributes.find("prefab"); prefab != attributes.end())
+    if (auto it = metadata.Require.find("template"); it != metadata.Require.end())
     {
-        if (auto data = prefab->find("count"); data != prefab->end())
+        auto prefab = std::any_cast<Gx::Json>(it->second);
+        if (auto data = prefab.find("count"); data != prefab.end())
             metadata.ItemCount = data->get<int>();
 
-        if (auto data = prefab->find("name"); data != prefab->end())
+        if (auto data = prefab.find("name"); data != prefab.end())
             metadata.ItemName = data->get<std::string>();
 
-        if (auto data = prefab->find("source"); data != prefab->end())
+        if (auto data = prefab.find("source"); data != prefab.end())
             metadata.ItemSource = data.value();
     }
 

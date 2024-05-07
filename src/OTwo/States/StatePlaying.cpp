@@ -30,14 +30,15 @@ void StatePlaying::Initialize()
     const auto sfxVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
     sfxVolBar->SetValue(100);
 
-    auto keyEffectContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
+    const auto keyEffectContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
+    const auto keyDownContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
     for (auto [channel, _] : m_config->SevenKeyBinding)
     {
         const int id = static_cast<int>(channel) - 1;
         if (id < 1 || id > 7)
             continue;
 
-        const auto keyDown = Load<Gx::Image>("IDC_IMAGE_KEY_DOWN" + std::to_string(id));
+        const auto keyDown = keyDownContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN" + std::to_string(id));
         keyDown->SetVisible(false);
 
         const auto keyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_EFFECT" + std::to_string(id));
