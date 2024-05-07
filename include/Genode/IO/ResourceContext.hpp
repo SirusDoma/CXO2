@@ -19,6 +19,7 @@ namespace Gx
         virtual ~ResourceContext() = default;
 
         static ResourceContext Rebind(const std::string &id, const ResourceContext &ctx);
+        static const ResourceContext &MakeAvailable(const ResourceContext &ctx, ResourceManager &resources);
 
         const std::string &GetID() const;
         bool Available() const;

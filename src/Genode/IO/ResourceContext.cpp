@@ -41,6 +41,15 @@ namespace Gx
         return {id, ctx.m_resources, ctx.m_cacheMode};
     }
 
+    const ResourceContext &ResourceContext::MakeAvailable(const ResourceContext &ctx, ResourceManager &resources)
+    {
+        if (ctx.Available())
+            throw NotSupportedException("The specified context is already available");
+
+        ctx.m_resources = &resources;
+        return ctx;
+    }
+
     const std::string &ResourceContext::GetID() const
     {
         return m_id;

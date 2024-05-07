@@ -7,6 +7,7 @@ class PlayingResourceContext : public Gx::ResourceContext
 {
 public:
     using Gx::ResourceContext::ResourceContext;
+
     unsigned int GetMapID() const;
     void SetMapID(const unsigned int mapID);
 
