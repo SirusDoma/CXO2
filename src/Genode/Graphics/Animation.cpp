@@ -17,7 +17,7 @@ namespace Gx
     {
     }
 
-    Animation::Animation(const sf::Texture& texture, const sf::Time &duration, std::initializer_list<Frame> frames) :
+    Animation::Animation(const sf::Texture& texture, const sf::Time &duration, const std::initializer_list<Frame> frames) :
         Gx::Sprite(texture),
         m_frames(frames),
         m_duration(duration),
@@ -57,13 +57,13 @@ namespace Gx
         return m_repeatCount;
     }
 
-    void Animation::SetRepeatCount(unsigned int repeatCount)
+    void Animation::SetRepeatCount(const unsigned int repeatCount)
     {
         m_repeatCount = repeatCount;
         m_currentRepeat = 0;
     }
 
-    void Animation::SetLoop(bool loop)
+    void Animation::SetLoop(const bool loop)
     {
         m_loop = loop;
     }
@@ -88,17 +88,17 @@ namespace Gx
         return m_visible;
     }
 
-    void Animation::SetVisible(bool visible)
+    void Animation::SetVisible(const bool visible)
     {
         m_visible = visible;
     }
 
-    void Animation::Update(double delta)
+    void Animation::Update(const double delta)
     {
         if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
             return UpdatableContainer::Update(delta);
 
-        bool trigger = m_state != AnimationState::Playing;
+        const bool trigger = m_state != AnimationState::Playing;
         m_state      = AnimationState::Playing;
         m_elapsed   += sf::milliseconds(static_cast<int>(delta));
 
@@ -108,8 +108,7 @@ namespace Gx
                 m_animationCallback(*this);
         }
 
-        auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size()));
-        if (m_elapsed >= frameTime)
+        if (const auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size())); m_elapsed >= frameTime)
         {
             m_elapsed %= frameTime;
             m_currentFrame++;
@@ -138,12 +137,12 @@ namespace Gx
         UpdatableContainer::Update(delta);
     }
 
-    RenderStates Animation::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Animation::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!m_visible)
             return states;
 
-        return Gx::Sprite::Render(target, states);
+        return Sprite::Render(surface, states);
     }
 
     void Animation::Stop()
@@ -168,7 +167,7 @@ namespace Gx
         SetFrame(m_currentFrame);
     }
 
-    void Animation::SetFrame(unsigned int frame)
+    void Animation::SetFrame(const unsigned int frame)
     {
         if (frame < m_frames.size())
         {

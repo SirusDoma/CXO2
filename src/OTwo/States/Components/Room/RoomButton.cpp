@@ -1,8 +1,9 @@
 ﻿#include <OTwo/States/Components/Room/RoomButton.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Data/Game.hpp>
 
 RoomButton::RoomButton() :
     m_room(),
@@ -14,10 +15,6 @@ RoomButton::RoomButton() :
 void RoomButton::Initialize()
 {
     //m_button = FindChild<Gx::Button>("Interface/Metadata/State/Room/Btn_Room/Button.json");
-    m_hover  = FindChild<Gx::Image>("IDC_IMAGE_ROOM_HOVER");
-    m_hover->SetVisible(false);
-    Reset();
-
     auto number   = FindChild<Gx::Number>("IDC_NUMBER_ROOM_ID");
     auto title    = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
     auto music    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
@@ -27,6 +24,10 @@ void RoomButton::Initialize()
     auto gameMode = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
     auto ohmLevel = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
     auto lock     = FindChild<Gx::Image>("IDC_IMAGE_PASSWORD");
+
+    m_hover  = FindChild<Gx::Image>("IDC_IMAGE_ROOM_HOVER");
+    m_hover->SetVisible(false);
+    Reset();
 
 }
 
@@ -59,7 +60,7 @@ bool RoomButton::IsActive() const
     return m_active;
 }
 
-void RoomButton::OnMouseMove(sf::Event::MouseMoveEvent ev)
+void RoomButton::OnMouseMove(const sf::Event::MouseMoveEvent ev)
 {
     Control::OnMouseMove(ev);
     m_hover->SetVisible(IsFocused());
@@ -67,10 +68,9 @@ void RoomButton::OnMouseMove(sf::Event::MouseMoveEvent ev)
 
 void RoomButton::Invalidate()
 {
-    for (auto child : GetChildren())
+    for (const auto child : GetChildren())
     {
-        auto control = dynamic_cast<Gx::Control*>(child);
-        if (control)
+        if (const auto control = dynamic_cast<Gx::Control*>(child))
             control->SetVisible(m_active);
     }
 
@@ -80,20 +80,20 @@ void RoomButton::Invalidate()
     if (!m_active)
         return;
 
-    auto number     = FindChild<Gx::Number>("IDC_NUMBER_ROOM_ID");
-    auto title      = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
-    auto capacity   = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
-    auto speed      = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
-    auto state      = FindChild<Gx::Image>("IDC_IMAGE_STATE");
-    auto gameMode   = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
-    auto ohmLevel   = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
-    auto lock       = FindChild<Gx::Image>("IDC_IMAGE_PASSWORD");
-    auto levelLimit = FindChild<Gx::Image>("IDC_IMAGE_LEVEL_LIMIT");
-    auto levelRange = FindChild<Gx::Label>("IDC_TEXT_LEVEL_RANGE");
-    auto noMusic    = FindChild<Gx::Image>("IDC_IMAGE_NOT_HAVE");
+    const auto number     = FindChild<Gx::Number>("IDC_NUMBER_ROOM_ID");
+    const auto title      = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
+    const auto capacity   = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
+    const auto speed      = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
+    const auto state      = FindChild<Gx::Image>("IDC_IMAGE_STATE");
+    const auto gameMode   = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
+    const auto ohmLevel   = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
+    const auto lock       = FindChild<Gx::Image>("IDC_IMAGE_PASSWORD");
+    const auto levelLimit = FindChild<Gx::Image>("IDC_IMAGE_LEVEL_LIMIT");
+    const auto levelRange = FindChild<Gx::Label>("IDC_TEXT_LEVEL_RANGE");
+    const auto noMusic    = FindChild<Gx::Image>("IDC_IMAGE_NOT_HAVE");
 
     unsigned int memberCount = 0;
-    for (auto member : m_room.Members)
+    for (const auto member : m_room.Members)
     {
         if (member.ID != 0)
             memberCount++;
@@ -146,7 +146,7 @@ void RoomButton::Invalidate()
         }
 
         auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-        auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
+        const auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
         newIndicator->SetVisible(m_room.Chart.New);
         if (m_room.Chart.New)
         {
@@ -157,7 +157,7 @@ void RoomButton::Invalidate()
         }
         else
         {
-            auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
+            const auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
             newMusic->SetVisible(false);
         }
 
@@ -166,9 +166,9 @@ void RoomButton::Invalidate()
     }
     else if (m_room.SongMode == SongMode::Random)
     {
-        auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-        auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
-        auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
+        const auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
+        const auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
+        const auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
 
         music->SetString("Random");
         speed->SetFrame("RX" + speedStr);

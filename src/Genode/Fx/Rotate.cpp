@@ -2,20 +2,20 @@
 
 namespace Gx
 {
-    Rotate::Rotate(Transformable* target, float angle, const sf::Time& duration) :
+    Rotate::Rotate(Transformable* target, const float angle, const sf::Time& duration) :
         m_target(target),
         m_start(target->GetRotation()),
-        m_diff(0),
         m_end(angle),
+        m_diff(0),
         m_duration(duration)
     {
     }
 
-    void Rotate::Update(double delta)
+    void Rotate::Update(const double delta)
     {
         Task::Update(delta);
 
-        auto state = GetState();
+        const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
@@ -27,7 +27,7 @@ namespace Gx
 
         short rotation = 0;
         auto current   = m_target->GetRotation();
-        auto elapsed   = GetElapsed();
+        const auto elapsed   = GetElapsed();
 
         if (m_end < current)
         {

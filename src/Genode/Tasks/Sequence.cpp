@@ -47,7 +47,7 @@ namespace Gx
         return this;
     }
 
-    void Sequence::Update(double delta)
+    void Sequence::Update(const double delta)
     {
         Task::Update(delta);
         if (m_tasks.size() == 0)

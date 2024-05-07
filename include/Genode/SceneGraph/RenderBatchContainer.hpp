@@ -1,0 +1,25 @@
+#ifndef GENODE_RENDER_BATCH_CONTAINER_HPP
+#define GENODE_RENDER_BATCH_CONTAINER_HPP
+
+#include <Genode/Graphics/SpriteBatch.hpp>
+
+namespace Gx
+{
+    class RenderBatchContainer : public virtual RenderableContainer
+    {
+    public:
+        ~RenderBatchContainer() override = default;
+
+    protected:
+        RenderBatchContainer() = default;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+
+        void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
+
+    private:
+        // Batcher is kept separate so it doesn't interfere with SceneGraph hierarchy
+        mutable SpriteBatch m_batcher{SpriteBatch::BatchMode::LayerSort};
+    };
+}
+
+#endif

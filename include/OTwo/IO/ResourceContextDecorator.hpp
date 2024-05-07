@@ -12,7 +12,7 @@
 class ResourceContextDecorator : public Gx::ResourceContext
 {
 public:
-    static const ResourceContextDecorator Decorate(const Gx::ResourceContext &ctx);
+    static ResourceContextDecorator Decorate(const Gx::ResourceContext &ctx);
 
     template<typename R>
     R* Find() const;
@@ -21,7 +21,7 @@ public:
     R* Find(const ResourceMetadata &metadata) const;
 
 private:
-    ResourceContextDecorator(const Gx::ResourceContext &ctx);
+    explicit ResourceContextDecorator(const Gx::ResourceContext &ctx);
 
     template<typename R>
     Gx::ResourcePtr<R> Deserialize(const std::string &id) const;

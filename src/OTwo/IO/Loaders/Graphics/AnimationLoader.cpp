@@ -1,6 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/Metadata/Graphics/AnimationMetadata.hpp>
 
 Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
@@ -13,14 +14,26 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    auto frames = attributes.find("frames");
-    if (frames != attributes.end())
+    if (auto frames = attributes.find("frames"); frames != attributes.end())
     {
         for (const auto& frame : frames->items())
         {
             SpriteMetadata frameMetadata;
             if (!SpriteLoader::ParseMetadata(frame.value(), frameMetadata, context))
                 continue;
+
+            auto transform = frame.value().find("transform");
+            if (transform == frame.value().end() || transform.value().find("position") == transform->end())
+                frameMetadata.Position = metadata.Position;
+
+            if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
+                frameMetadata.Scale    = metadata.Scale;
+
+            if (transform == frame.value().end() || transform.value().find("rotation") == transform->end())
+                frameMetadata.Rotation = metadata.Rotation;
+
+            if (transform == frame.value().end() || transform.value().find("origin") == transform->end())
+                frameMetadata.Origin   = metadata.Origin;
 
             metadata.Frames.push_back(Gx::Animation::Frame
             {
@@ -56,23 +69,25 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
 
 Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto animation = std::make_unique<Gx::Animation>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         animation->SetTexture(*texture);
 
     for (const auto& frame : metadata->Frames)
         animation->AddFrame(frame);
 
+    if (metadata->TexCoords != sf::IntRect())
+        animation->SetTexCoords(metadata->TexCoords);
+
     animation->SetName(metadata->Name);
     animation->SetLoop(metadata->IsLoop);
     animation->SetDuration(metadata->Duration);
     animation->SetBlendMode(metadata->BlendMode);
-    animation->SetTexCoords(metadata->TexCoords);
     animation->SetColor(metadata->Color);
     animation->SetOrigin(metadata->Origin);
     animation->SetPosition(metadata->Position);

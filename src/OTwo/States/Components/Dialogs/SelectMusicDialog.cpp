@@ -1,5 +1,5 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Data/UserState.hpp>
 
 #include <Genode/UI.hpp>
@@ -8,14 +8,17 @@
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
-#include <OTwo/IO/Loaders/Chart/O2ChartLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/Data/Game.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
-    Gx::Dialog(copy),
     Gx::UiContainer(copy),
     Gx::Node(copy),
+    Gx::Dialog(copy),
     m_initialized(false),
     m_page(0),
+    m_coverID(),
+    m_speed(),
     m_difficulty(Difficulty::EX),
     m_sort(static_cast<MusicSortMode>(-1)),
     m_order(static_cast<MusicSortOrder>(-1)),
@@ -45,7 +48,7 @@ void SelectMusicDialog::Initialize()
     auto& state = app.Require<UserState>();
 
     m_page = 0;
-    m_musicList = state.GetMusicList();
+    m_musicList = state.GetInstalledMusic();
 
     for (auto& metadata : m_musicList)
         m_displayList.push_back(&metadata);
@@ -62,7 +65,7 @@ void SelectMusicDialog::Initialize()
                 return;
 
             m_page--;
-            m_music = O2ChartMetadata{};
+            m_music = ChartMetadata{};
             Invalidate();
         });
     }
@@ -72,7 +75,7 @@ void SelectMusicDialog::Initialize()
     {
         rightButton->SetClickCallback([this] (auto &sender, auto &ev)
         {
-            auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+            const auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
             if (!musicSelector)
                 return;
 
@@ -82,7 +85,7 @@ void SelectMusicDialog::Initialize()
                 return;
 
             m_page++;
-            m_music = O2ChartMetadata{};
+            m_music = ChartMetadata{};
             Invalidate();
         });
     }
@@ -215,7 +218,7 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_genre = g;
-                m_music = O2ChartMetadata{};
+                m_music = ChartMetadata{};
                 m_page  = 0;
                 m_displayList.clear();
                 for (auto& metadata : m_musicList)
@@ -426,11 +429,11 @@ void SelectMusicDialog::Initialize()
     Sort(MusicSortMode::Level, MusicSortOrder::Ascending);
 }
 
-void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
+void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Dialog::OnKeyDown(ev);
 
-    if (ev.code == sf::Keyboard::Up)
+    if (ev.code == sf::Keyboard::Key::Up)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
@@ -447,7 +450,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
                     if (!previous && m_page != 0)
                     {
                         m_page--;
-                        m_music = O2ChartMetadata{};
+                        m_music = ChartMetadata{};
                         Invalidate();
                         return;
                     }
@@ -464,7 +467,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
             }
         }
     }
-    else if (ev.code == sf::Keyboard::Down)
+    else if (ev.code == sf::Keyboard::Key::Down)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
@@ -481,7 +484,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
                     if (i == children.size() - 1 && m_page < maxPage - 1)
                     {
                         m_page++;
-                        m_music = O2ChartMetadata{};
+                        m_music = ChartMetadata{};
                         Invalidate();
                         return;
                     }
@@ -502,16 +505,16 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
             }
         }
     }
-    else if (ev.code == sf::Keyboard::Left)
+    else if (ev.code == sf::Keyboard::Key::Left)
     {
         if (m_page == 0)
             return;
 
         m_page--;
-        m_music = O2ChartMetadata{};
+        m_music = ChartMetadata{};
         Invalidate();
     }
-    else if (ev.code == sf::Keyboard::Right)
+    else if (ev.code == sf::Keyboard::Key::Right)
     {
         if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
@@ -524,7 +527,7 @@ void SelectMusicDialog::OnKeyDown(sf::Event::KeyEvent ev)
 
 
         m_page++;
-        m_music = O2ChartMetadata{};
+        m_music = ChartMetadata{};
         Invalidate();
     }
 }
@@ -553,7 +556,7 @@ void SelectMusicDialog::OnCancelled()
     mixer.Play(sfx);
 }
 
-O2ChartMetadata SelectMusicDialog::GetSelectedMusic() const
+ChartMetadata SelectMusicDialog::GetSelectedMusic() const
 {
     return m_music;
 }
@@ -606,8 +609,8 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
         case MusicSortMode::Level:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a->ToChartMetadata(m_difficulty);
-                auto y = b->ToChartMetadata(m_difficulty);
+                auto x = a->ToChartMetadataView(m_difficulty);
+                auto y = b->ToChartMetadataView(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x.Level < y.Level;
@@ -618,8 +621,8 @@ void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
         case MusicSortMode::Duration:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a->ToChartMetadata(m_difficulty);
-                auto y = b->ToChartMetadata(m_difficulty);
+                auto x = a->ToChartMetadataView(m_difficulty);
+                auto y = b->ToChartMetadataView(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x.Duration < y.Duration;
@@ -670,7 +673,7 @@ void SelectMusicDialog::Invalidate()
 
     if (m_random != static_cast<LevelCategory>(0))
     {
-        m_music = O2ChartMetadata{};
+        m_music = ChartMetadata{};
         if (pager)
             pager->SetVisible(false);
 
@@ -705,10 +708,11 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 1 - 5");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
                                     auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level <= 5; });
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
+                                            m.ToChartMetadataView(diff).Level <= 5; });
 
                                     if (result)
                                     {
@@ -725,12 +729,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 5 - 9");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
                                     auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        int level = m.ToChartMetadata(diff).Level;
+                                        int level = m.ToChartMetadataView(diff).Level;
                                         return level > 5 && level <= 9;
                                     });
 
@@ -749,12 +753,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 9 - 13");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
                                     auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        int level = m.ToChartMetadata(diff).Level;
+                                        int level = m.ToChartMetadataView(diff).Level;
                                         return level > 9 && level <= 13;
                                     });
 
@@ -773,10 +777,11 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 13 higher");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const O2ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
                                     auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return m.ToChartMetadata(diff).Level > 13; });
+                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
+                                            m.ToChartMetadataView(diff).Level > 13; });
 
                                     if (result)
                                     {
@@ -876,7 +881,7 @@ void SelectMusicDialog::Invalidate()
 
             if (i == 0 && m_displayList.empty())
             {
-                m_music = O2ChartMetadata{};
+                m_music = ChartMetadata{};
                 if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
                 {
                     for (auto child : infoList->GetChildren())
@@ -909,7 +914,7 @@ void SelectMusicDialog::Invalidate()
             continue;
         }
 
-        auto metadata = m_displayList[index]->ToChartMetadata(m_difficulty);
+        auto metadata = m_displayList[index]->ToChartMetadataView(m_difficulty);
         if (i == 0 && m_music.ID == 0)
             m_music = *m_displayList[index];
 
@@ -943,7 +948,7 @@ void SelectMusicDialog::Invalidate()
     if (m_music.ID == 0)
         return;
 
-    auto currentMetadata = m_music.ToChartMetadata(m_difficulty);
+    auto currentMetadata = m_music.ToChartMetadataView(m_difficulty);
     if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
     {
         std::vector<std::string> info =
@@ -971,13 +976,16 @@ void SelectMusicDialog::Invalidate()
 
     if (auto thumbnail = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_THUMBNAIL"); thumbnail && m_coverID != m_music.ID)
     {
-        m_coverID   = m_music.ID;
-        m_thumbnail = O2ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default);
-
-        if (m_thumbnail)
+        m_coverID  = m_music.ID;
+        auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default);
+        if (image)
         {
-            thumbnail->SetVisible(true);
-            thumbnail->SetTexture(*m_thumbnail);
+            m_thumbnail = std::make_unique<sf::Texture>();
+            if (m_thumbnail->loadFromImage(*image))
+            {
+                thumbnail->SetVisible(true);
+                thumbnail->SetTexture(*m_thumbnail);
+            }
         }
         else
             thumbnail->SetVisible(false);

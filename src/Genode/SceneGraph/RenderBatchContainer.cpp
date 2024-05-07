@@ -1,0 +1,36 @@
+#include <Genode/SceneGraph/RenderBatchContainer.hpp>
+
+namespace Gx
+{
+    void RenderBatchContainer::SetBatchMode(const SpriteBatch::BatchMode batchMode) const
+    {
+        m_batcher.SetBatchMode(batchMode);
+    }
+
+    RenderStates RenderBatchContainer::Render(RenderSurface &surface, RenderStates states) const
+    {
+        // Push render states
+        const auto transform = states.transform;
+        const float level    = states.BatchLevel;
+
+        // Reset transform
+        states.transform = sf::Transform();
+
+        // Render child with sprite batch
+        for (const auto node : GetChildren())
+        {
+            states.BatchLevel += 1.f;
+            if (const auto renderable = dynamic_cast<Renderable*>(node))
+                renderable->Render(m_batcher, states);
+
+            // Pop batch level
+            states.BatchLevel = level;
+        }
+
+        // Pop transform
+        states.transform = transform;
+
+        // Render sprite batch
+        return m_batcher.Render(surface, states);
+    }
+}

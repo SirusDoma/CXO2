@@ -9,20 +9,31 @@ namespace Gx
     {
     }
 
-    List::List(int verticalCount, float verticalSpacing) :
+    List::List(const int verticalCount, const float verticalSpacing) :
         List(verticalCount, verticalSpacing, 1, 0)
     {
     }
 
-    List::List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing) :
+    List::List(const int verticalCount, const float verticalSpacing, const int horizontalCount, const float horizontalSpacing) :
         m_order(Order::Vertical),
         m_verticalCount(verticalCount),
-        m_verticalSpacing(verticalSpacing),
         m_horizontalCount(horizontalCount),
+        m_verticalSpacing(verticalSpacing),
         m_horizontalSpacing(horizontalSpacing),
         m_verticalCounter(),
-        m_horizontalCounter()
+        m_horizontalCounter(),
+        m_layouts()
     {
+    }
+
+    bool List::IsBatchingEnabled() const
+    {
+        return m_useBatching;
+    }
+
+    void List::SetBatchingEnabled(bool batchingEnabled)
+    {
+        m_useBatching = batchingEnabled;
     }
 
     List::Order List::GetOrder() const
@@ -72,20 +83,29 @@ namespace Gx
         return m_horizontalSpacing;
     }
 
-    void List::Apply(const std::function<void(Control *)>& fun)
+    void List::AddLayout(const LayoutItem &layout)
+    {
+        m_layouts.push_back(layout);
+    }
+
+    void List::ClearLayouts()
+    {
+        m_layouts.clear();
+    }
+
+    void List::Apply(const std::function<void(Control*)>& fun) const
     {
         if (!fun)
             return;
 
-        for (auto child : GetChildren())
+        for (const auto child : GetChildren())
         {
-            auto control = dynamic_cast<Control*>(child);
-            if (control)
+            if (const auto control = dynamic_cast<Control*>(child))
                 fun(control);
         }
     }
 
-    bool List::IsAvailable() const
+    bool List::IsSpaceAvailable() const
     {
         return m_verticalCounter <= m_verticalCount &&  m_horizontalCounter <= m_horizontalCount;
     }
@@ -100,7 +120,7 @@ namespace Gx
 
     void List::IncreaseSpacingCounter()
     {
-        if (!IsAvailable())
+        if (!IsSpaceAvailable())
             return;
 
         if (m_order == Order::Vertical)
@@ -123,13 +143,43 @@ namespace Gx
         }
     }
 
+    void List::Update(const double delta)
+    {
+        UiContainer::Update(delta);
+    }
+
+    RenderStates List::Render(RenderSurface &surface, RenderStates states) const
+    {
+        if (!IsVislble())
+            return states;
+
+        if (m_useBatching)
+        {
+            states.transform *= GetTransform();
+            return RenderBatchContainer::Render(surface, states);
+        }
+
+        return UiContainer::Render(surface, states);
+    }
+
     void List::AddChild(Node *node)
     {
-        if (!node || (m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_verticalCounter >= m_verticalCount))
+        if (!node || (!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
             return;
 
-        node->SetPosition(GetNextItemPosition());
-        IncreaseSpacingCounter();
+        if (m_layouts.empty())
+        {
+            node->SetPosition(GetNextItemPosition());
+            IncreaseSpacingCounter();
+        }
+        else
+        {
+            const auto &[origin, position, rotation, scale] = m_layouts[GetChildren().size()];
+            node->SetOrigin(origin);
+            node->SetPosition(position);
+            node->SetRotation(rotation);
+            node->SetScale(scale);
+        }
 
         Node::AddChild(node);
     }
@@ -141,11 +191,22 @@ namespace Gx
 
     void List::AddChild(Control *control)
     {
-        if (!control || (m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_verticalCounter >= m_verticalCount))
+        if (!control || (!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
             return;
 
-        control->SetPosition(GetNextItemPosition());
-        IncreaseSpacingCounter();
+        if (m_layouts.empty())
+        {
+            control->SetPosition(GetNextItemPosition());
+            IncreaseSpacingCounter();
+        }
+        else
+        {
+            const auto &[origin, position, rotation, scale] = m_layouts[GetChildren().size()];
+            control->SetOrigin(origin);
+            control->SetPosition(position);
+            control->SetRotation(rotation);
+            control->SetScale(scale);
+        }
 
         Control::AddChild(control);
     }

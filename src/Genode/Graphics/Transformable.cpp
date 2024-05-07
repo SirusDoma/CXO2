@@ -43,7 +43,7 @@ namespace Gx
     {
     }
 
-    void Transformable::SetPosition(float x, float y)
+    void Transformable::SetPosition(const float x, const float y)
     {
         m_position.x = x;
         m_position.y = y;
@@ -56,7 +56,7 @@ namespace Gx
         SetPosition(position.x, position.y);
     }
 
-    void Transformable::SetRotation(float angle)
+    void Transformable::SetRotation(const float angle)
     {
         m_rotation = static_cast<float>(fmod(angle, 360));
         if (m_rotation < 0)
@@ -66,7 +66,7 @@ namespace Gx
         m_inverseTransformNeedUpdate = true;
     }
 
-    void Transformable::SetScale(float factorX, float factorY)
+    void Transformable::SetScale(const float factorX, const float factorY)
     {
         m_scale.x = factorX;
         m_scale.y = factorY;
@@ -79,7 +79,7 @@ namespace Gx
         SetScale(factors.x, factors.y);
     }
 
-    void Transformable::SetOrigin(float x, float y)
+    void Transformable::SetOrigin(const float x, const float y)
     {
         m_origin.x = x;
         m_origin.y = y;
@@ -112,7 +112,7 @@ namespace Gx
         return m_origin;
     }
 
-    void Transformable::Move(float offsetX, float offsetY)
+    void Transformable::Move(const float offsetX, const float offsetY)
     {
         SetPosition(m_position.x + offsetX, m_position.y + offsetY);
     }
@@ -122,12 +122,12 @@ namespace Gx
         SetPosition(m_position.x + offset.x, m_position.y + offset.y);
     }
 
-    void Transformable::Rotate(float angle)
+    void Transformable::Rotate(const float angle)
     {
         SetRotation(m_rotation + angle);
     }
 
-    void Transformable::Scale(float factorX, float factorY)
+    void Transformable::Scale(const float factorX, const float factorY)
     {
         SetScale(m_scale.x * factorX, m_scale.y * factorY);
     }
@@ -142,15 +142,15 @@ namespace Gx
         // Recompute the combined transform if needed
         if (m_transformNeedUpdate)
         {
-            float angle = -m_rotation * 3.141592654f / 180.f;
-            float cosine = static_cast<float>(std::cos(angle));
-            float sine = static_cast<float>(std::sin(angle));
-            float sxc = m_scale.x * cosine;
-            float syc = m_scale.y * cosine;
-            float sxs = m_scale.x * sine;
-            float sys = m_scale.y * sine;
-            float tx = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
-            float ty = m_origin.x * sxs - m_origin.y * syc + m_position.y;
+            const float angle = -m_rotation * 3.141592654f / 180.f;
+            const float cosine = static_cast<float>(std::cos(angle));
+            const float sine = static_cast<float>(std::sin(angle));
+            const float sxc = m_scale.x * cosine;
+            const float syc = m_scale.y * cosine;
+            const float sxs = m_scale.x * sine;
+            const float sys = m_scale.y * sine;
+            const float tx = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
+            const float ty = m_origin.x * sxs - m_origin.y * syc + m_position.y;
 
             m_transform = sf::Transform(sxc, sys, tx,
                 -sxs, syc, ty,

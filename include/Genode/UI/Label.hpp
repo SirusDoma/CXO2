@@ -9,13 +9,7 @@ namespace Gx
     class Label : public virtual Control, public virtual Text
     {
     public:
-        enum class Alignment
-        {
-            None,
-            Left,
-            Center,
-            Right
-        };
+        enum class Alignment { None, Left, Center, Right };
 
         using Text::Text;
         ~Label() override = default;
@@ -27,7 +21,7 @@ namespace Gx
 
     protected:
         void Update(double delta) override;
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void OnGeometryUpdated() const override;
         void Invalidate() override;

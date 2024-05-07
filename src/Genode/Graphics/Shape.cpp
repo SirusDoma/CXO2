@@ -34,7 +34,7 @@ namespace
     sf::Vector2f computeNormal(const sf::Vector2f& p1, const sf::Vector2f& p2)
     {
         sf::Vector2f normal(p1.y - p2.y, p2.x - p1.x);
-        float length = std::sqrt(normal.x * normal.x + normal.y * normal.y);
+        const float length = std::sqrt(normal.x * normal.x + normal.y * normal.y);
         if (length != 0.f)
             normal /= length;
         return normal;
@@ -55,19 +55,19 @@ namespace Gx
         m_fillColor(255, 255, 255),
         m_outlineColor(255, 255, 255),
         m_outlineThickness(0),
-        m_vertices(sf::TriangleFan),
-        m_outlineVertices(sf::TriangleStrip),
+        m_vertices(sf::PrimitiveType::TriangleFan),
+        m_outlineVertices(sf::PrimitiveType::TriangleStrip),
         m_insideBounds(),
         m_bounds(),
         m_visible(true)
     {
     }
 
-    void Shape::SetTexture(const sf::Texture &texture, bool resetRect)
+    void Shape::SetTexture(const sf::Texture &texture, const bool resetRect)
     {
         // Recompute the texture area if requested, or if there was no texture & rect before
         if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
-            SetTexCoords(sf::IntRect(0, 0, texture.getSize().x, texture.getSize().y));
+            SetTexCoords(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)));
 
         // Assign the new texture
         m_texture = &texture;
@@ -111,7 +111,7 @@ namespace Gx
         return m_outlineColor;
     }
 
-    void Shape::SetOutlineThickness(float thickness)
+    void Shape::SetOutlineThickness(const float thickness)
     {
         m_outlineThickness = thickness;
         Update(); // recompute everything because the whole shape must be offset
@@ -155,7 +155,7 @@ namespace Gx
     void Shape::Update()
     {
         // Get the total number of points of the shape
-        std::size_t count = GetPointCount();
+        const std::size_t count = GetPointCount();
         if (count < 3)
         {
             m_vertices.resize(0);
@@ -188,7 +188,7 @@ namespace Gx
         UpdateOutline();
     }
 
-    RenderStates Shape::Render(sf::RenderTarget& target, RenderStates states) const
+    RenderStates Shape::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -197,16 +197,16 @@ namespace Gx
 
         // Render the inside
         states.texture = m_texture;
-        target.draw(m_vertices, states);
+        surface.Render(m_vertices, states);
 
         // Render the outline
         if (m_outlineThickness != 0)
         {
             states.texture = nullptr;
-            target.draw(m_outlineVertices, states);
+            surface.Render(m_outlineVertices, states);
         }
 
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
     void Shape::UpdateFillColors()
@@ -217,12 +217,12 @@ namespace Gx
 
     void Shape::UpdateTexCoords()
     {
-        auto convertedTextureRect = sf::FloatRect(m_textureRect);
+        const auto convertedTextureRect = sf::FloatRect(m_textureRect);
 
         for (std::size_t i = 0; i < m_vertices.getVertexCount(); ++i)
         {
-            float xratio = m_insideBounds.width > 0 ? (m_vertices[i].position.x - m_insideBounds.left) / m_insideBounds.width : 0;
-            float yratio = m_insideBounds.height > 0 ? (m_vertices[i].position.y - m_insideBounds.top) / m_insideBounds.height : 0;
+            const float xratio = m_insideBounds.width > 0 ? (m_vertices[i].position.x - m_insideBounds.left) / m_insideBounds.width : 0;
+            const float yratio = m_insideBounds.height > 0 ? (m_vertices[i].position.y - m_insideBounds.top) / m_insideBounds.height : 0;
             m_vertices[i].texCoords.x = convertedTextureRect.left + convertedTextureRect.width * xratio;
             m_vertices[i].texCoords.y = convertedTextureRect.top + convertedTextureRect.height * yratio;
         }
@@ -238,12 +238,12 @@ namespace Gx
             return;
         }
 
-        std::size_t count = m_vertices.getVertexCount() - 2;
+        const std::size_t count = m_vertices.getVertexCount() - 2;
         m_outlineVertices.resize((count + 1) * 2);
 
         for (std::size_t i = 0; i < count; ++i)
         {
-            std::size_t index = i + 1;
+            const std::size_t index = i + 1;
 
             // Get the two segments shared by the current point
             sf::Vector2f p0 = (i == 0) ? m_vertices[count].position : m_vertices[index - 1].position;
@@ -262,7 +262,7 @@ namespace Gx
                 n2 = -n2;
 
             // Combine them to get the extrusion direction
-            float factor = 1.f + (n1.x * n2.x + n1.y * n2.y);
+            const float factor = 1.f + (n1.x * n2.x + n1.y * n2.y);
             sf::Vector2f normal = (n1 + n2) / factor;
 
             // Update the outline points
@@ -292,7 +292,7 @@ namespace Gx
         return m_visible;
     }
 
-    void Shape::SetVisible(bool visible)
+    void Shape::SetVisible(const bool visible)
     {
         m_visible = visible;
     }

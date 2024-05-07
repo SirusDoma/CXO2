@@ -39,7 +39,7 @@ namespace Gx
 
     protected:
         void Update(double delta) override;
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void Invalidate() override;
 

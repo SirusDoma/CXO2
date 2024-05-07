@@ -20,15 +20,14 @@ ChannelButton::ChannelButton() :
 
 void ChannelButton::Initialize()
 {
-    auto parent = GetParent<::State>();
-    if (!parent || m_initialized)
+    if (!GetParent<::State>() || m_initialized)
         return;
 
     m_numberIndicator   = FindChild<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
     m_nameIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NAME");
     m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");;
     m_focusIndicator    = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FOCUS");
-    m_populationCounter = FindChild<Gx::ProgressBar>("IDC_PROGRESS_BAR_CHANNEL_COUNTER");
+    m_populationCounter = FindChild<Gx::Gauge>("IDC_GAUGE_CHANNEL_COUNTER");
 
     if (m_focusIndicator)
     {
@@ -50,7 +49,7 @@ unsigned int ChannelButton::GetChannelNumber() const
     return m_numberIndicator->GetValue();
 }
 
-void ChannelButton::SetChannelNumber(unsigned int channelNumber)
+void ChannelButton::SetChannelNumber(const unsigned int channelNumber)
 {
     if (!m_numberIndicator)
         return;
@@ -63,13 +62,13 @@ unsigned int ChannelButton::GetChannelPopulation() const
     return m_population;
 }
 
-void ChannelButton::SetChannelPopulation(unsigned int population)
+void ChannelButton::SetChannelPopulation(const unsigned int population)
 {
     m_population = population;
     if (!m_populationCounter)
         return;
 
-    float percentage = static_cast<float>(population) / 20.0f;
+    const float percentage = static_cast<float>(population) / 20.0f;
     m_populationCounter->SetValue(std::ceil(percentage) * 20.0f);
 
     m_fullIndicator->SetVisible(static_cast<float>(m_population) >= m_populationCounter->GetMaximumValue());
@@ -81,15 +80,15 @@ MusicHall ChannelButton::GetPlanet() const
     return m_hall;
 }
 
-void ChannelButton::AddStateFrame(ChannelButton::Mode mode, Gx::Control::State state, const sf::IntRect &frame)
+void ChannelButton::AddStateFrame(const ChannelButton::Mode mode, const Gx::Control::State state, const sf::IntRect &frame)
 {
-    if (auto it = m_states.find(mode); it == m_states.end())
+    if (const auto it = m_states.find(mode); it == m_states.end())
         m_states[mode] = std::unordered_map<State, sf::IntRect>();
 
     m_states[mode][state] = frame;
 }
 
-void ChannelButton::SetMusicHall(MusicHall hall)
+void ChannelButton::SetMusicHall(const MusicHall hall)
 {
     if (m_hall == hall)
         return;
@@ -131,13 +130,13 @@ void ChannelButton::SetMusicHall(MusicHall hall)
     if (auto it = m_states.find(mode); it != m_states.end())
     {
         for (auto [state, frame] : it->second)
-            SetStateFrame(state, frame);
+            SetStateFrame(state, Frame{frame});
     }
 }
 
-Gx::RenderStates ChannelButton::Render(sf::RenderTarget &target, Gx::RenderStates states) const
+Gx::RenderStates ChannelButton::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    return CheckBox::Render(target, states);
+    return CheckBox::Render(surface, states);
 }
 
 void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)

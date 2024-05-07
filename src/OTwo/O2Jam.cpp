@@ -2,8 +2,6 @@
 #include <Genode.hpp>
 
 #include <OTwo/Archives/OjmArchive.hpp>
-#include <OTwo/Archives/M30Archive.hpp>
-#include <OTwo/Archives/OmcArchive.hpp>
 
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
@@ -20,7 +18,7 @@
 #include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
 #include <OTwo/IO/Loaders/UI/RadioButtonLoader.hpp>
-#include <OTwo/IO/Loaders/UI/ProgressBarLoader.hpp>
+#include <OTwo/IO/Loaders/UI/GaugeLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/DialogLoader.hpp>
 #include <OTwo/IO/Loaders/UI/TextBoxLoader.hpp>
@@ -41,9 +39,10 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 
-#include <OTwo/IO/Loaders/Chart/O2ChartMetadataLoader.hpp>
-#include <OTwo/IO/Loaders/Chart/O2ChartLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/StatePlayingLoader.hpp>
 
 #include <OTwo/Data/Character.hpp>
 #include <OTwo/Data/UserState.hpp>
@@ -54,6 +53,7 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
+#include <OTwo/States/StateLoading.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 
@@ -83,7 +83,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::CheckBox, CheckBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::ProgressBar, ProgressBarLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
@@ -104,13 +104,11 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
     Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
     // O2Jam Core Resources
-    Gx::ResourceLoaderFactory::Register<O2ChartMetadata, O2ChartMetadataLoader>();
-    Gx::ResourceLoaderFactory::Register<O2Chart, O2ChartLoader>();
+    Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
-
-
-    auto config = GameConfig();
+    Gx::ResourceLoaderFactory::Register<StatePlaying, StatePlayingLoader>();
 
     // Render settings
     auto& window = GetRenderWindow();
@@ -151,31 +149,20 @@ void O2Jam::Boot()
     Provide<UserState>([&](auto &app)
     {
         auto state = std::make_unique<UserState>();
-        auto player   = Player();
+        auto player   = PlayerData();
         player.ID     = 1;
         player.Name   = "CXO2";
         player.Level  = -1;
         player.Gender = Gender::Male;
 
         state->SetCurrentPlayer(player);
-
-        auto metaLoader = O2ChartMetadataLoader();
-        auto musicList = std::vector<O2ChartMetadata>();
-        for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
-        {
-            auto name = file.GetName();
-            auto meta = metaLoader.LoadFromFile(file.GetName(), Gx::ResourceContext::Default);
-            musicList.push_back(*meta);
-        }
-
-        state->SetMusicList(musicList);
         return state;
     });
 
-    // Force to heavy providers during start-up
-    Require<UserState>();
+    // Force to load heavy providers during start-up
+    auto _ = Require<UserState>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
-        Require<ItemFactory>().GetDefaultItems(gender);
+        auto _ = Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
     auto& resources = Require<Gx::ResourceManager>();
@@ -202,6 +189,8 @@ void O2Jam::Boot()
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
+    director.Register<StateLoading>("Interface/State/Loading.json");
+    director.Register<StatePlaying>("Interface/State/Playing.json");
 
     director.Present<StateAvi>();
 }

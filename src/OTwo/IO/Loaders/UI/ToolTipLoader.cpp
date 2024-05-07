@@ -32,11 +32,9 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, c
     else
         metadata.Color = sf::Color::Black;
 
-    auto container = attributes.find("container");
-    if (container != attributes.end())
+    if (auto container = attributes.find("container"); container != attributes.end())
     {
-        auto padding = container->find("padding");
-        if (padding != container->end())
+        if (auto padding = container->find("padding"); padding != container->end())
         {
             float x, y;
             padding->at("x").get_to(x);
@@ -60,11 +58,9 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, c
         else
             metadata.ContainerFillColor = sf::Color::White;
 
-        auto outline = container->find("outline");
-        if (outline != container->end())
+        if (auto outline = container->find("outline"); outline != container->end())
         {
-            auto thickness = outline->find("thickness");
-            if (thickness != outline->end())
+            if (auto thickness = outline->find("thickness"); thickness != outline->end())
                 metadata.ContainerOutlineThickness = thickness->get<float>();
             else
                 metadata.ContainerOutlineThickness = 1.f;
@@ -101,13 +97,13 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, c
 
 Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto toolTip = std::make_unique<Gx::ToolTip>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto font = ctx.Find<sf::Font>(*metadata); font)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         toolTip->SetFont(*font);
     else
         return nullptr;

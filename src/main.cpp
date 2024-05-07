@@ -5,7 +5,7 @@
 #include <Genode/Utilities/Debugger.hpp>
 #include <iostream>
 
-#ifndef __linux__
+#ifdef USE_BOXER
 #include <boxer/boxer.h>
 #endif
 
@@ -16,11 +16,11 @@ int main(int argc , char** argv)
         if (!Gx::Debugger::IsDebuggerAttached())
         {
             // "Fix" macOS translocation
-            if (auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
+            if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
                 Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
 
-        auto o2jam = O2Jam("O2-JAM", sf::VideoMode(800, 600), sf::VideoMode(800, 600));
+        auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::VideoMode({800, 600}));
         return o2jam.Start();
     }
     catch (std::exception &ex)
@@ -28,7 +28,7 @@ int main(int argc , char** argv)
         if (Gx::Debugger::IsDebuggerAttached())
         {
             std::cerr << ex.what() << std::endl;
-            throw ex;
+            throw;
         }
 
         auto details = std::string();
@@ -36,16 +36,12 @@ int main(int argc , char** argv)
         {
             details += "\n\nWorking Directory:\n";
             details += Gx::LocalFileSystem::GetWorkingDirectory();
-
-            details += "\n\nMounted Paths:\n";
-            for (auto &path: Gx::LocalFileSystem::GetAssetPaths())
-                details += "- " + path + "\n\n";
         }
 
-#ifndef __linux__
+#ifdef USE_BOXER
         boxer::show(std::string(std::string(ex.what()) + details).c_str(), "Fatal Error", boxer::Style::Error);
 #endif
 
-        throw ex;
+        throw;
     }
 }

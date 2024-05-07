@@ -14,9 +14,8 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &jso
     auto attributes = json.at("attributes");
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
-    
-    auto orientation = attributes.find("orientation");
-    if (orientation != attributes.end())
+
+    if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
     {
         if (orientation->get<std::string>() == "VERTICAL")
             metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Vertical;
@@ -24,27 +23,24 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &jso
             metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Horizontal;
     }
 
-    auto maximum = attributes.find("maximum");
-    if (maximum != attributes.end())
+    if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
         metadata.Maximum = maximum->get<float>();
     else
         metadata.Maximum = 100.0f;
 
-    auto step = attributes.find("step");
-    if (step != attributes.end())
+    if (const auto step = attributes.find("step"); step != attributes.end())
         metadata.Step = step->get<float>();
     else
         metadata.Step = 1.0f;
 
-    auto bounds = attributes.find("bounds");
-    if (bounds != attributes.end())
+    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
         unsigned int x, y, w, h;
         bounds->at("x").get_to(x);
         bounds->at("y").get_to(y);
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
-        metadata.Bounds = sf::FloatRect(x, y, w, h);
+        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
     }
 
     return LoadFromMetadata(metadata, context);
@@ -52,13 +48,13 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &jso
 
 Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto scrollBar = std::make_unique<Gx::ScrollBar>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         scrollBar->SetTexture(*texture);
     
     scrollBar->SetName(metadata->Name);

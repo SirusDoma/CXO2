@@ -13,7 +13,7 @@ namespace Gx
 
     protected:
         UpdatableContainer();
-        void Update(double delta) override;
+        void Update(const double delta) override;
     };
 }
 

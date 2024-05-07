@@ -1,3 +1,5 @@
+#include <magic_enum.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
@@ -13,8 +15,24 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const G
         return nullptr;
     
     auto attributes = json.at("attributes");
+    if (const auto items = attributes.find("items"); items != attributes.end())
+    {
+        for (const auto [_, id] : items->items())
+        {
+            if (id.empty())
+                continue;
 
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+            metadata.ItemIDs.push_back(id.get<unsigned int>());
+        }
+    }
+
+    if (const auto gender = attributes.find("gender"); gender != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gender>(gender->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.Gender = parsed.value();
+    }
+
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
     {
         if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
             return nullptr;
@@ -26,15 +44,24 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const G
 Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
     auto avatar = std::make_unique<Avatar>();
-    auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     avatar->SetName(metadata->Name);
+    avatar->SetGender(metadata->Gender);
     avatar->SetOrigin(metadata->Origin);
     avatar->SetPosition(metadata->Position);
     avatar->SetScale(metadata->Scale);
     avatar->SetRotation(metadata->Rotation);
+
+    auto& app         = Gx::Application::Instance();
+    const auto& items = app.Require<ItemFactory>();
+    for (const auto [_, item] : items.GetDefaultItems(avatar->GetGender()))
+        avatar->Equip(item);
+
+    for (const auto id : metadata->ItemIDs)
+        avatar->Equip(items.GetItem(id));
 
     auto populator = ObjectPopulator::Decorate(avatar.get());
     if (!metadata->Objects.empty())

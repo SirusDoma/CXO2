@@ -24,7 +24,7 @@ namespace Gx
 
             static std::vector<FileInfo> Scan(const std::string &pattern);
 
-            static bool Contains(std::string &fileName);
+            static bool Contains(const std::string &fileName);
             static std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName);
 
             static Int64 ReadFile(const std::string &fileName, void *data, Int64 size);

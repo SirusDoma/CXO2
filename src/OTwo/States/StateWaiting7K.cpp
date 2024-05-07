@@ -2,7 +2,7 @@
 
 #include <OTwo/States/StateRoom.hpp>
 
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <OTwo/Data/Room.hpp>
 #include <OTwo/Data/UserState.hpp>
@@ -18,6 +18,8 @@
 #include <Genode/UI.hpp>
 
 #include <magic_enum.hpp>
+#include <OTwo/Data/Game.hpp>
+#include <OTwo/States/StateLoading.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -34,10 +36,10 @@ void StateWaiting7K::Initialize()
     auto& mixer    = app.Require<Gx::Mixer>();
     auto& state    = app.Require<UserState>();
     auto& player   = state.GetCurrentPlayer();
-    auto& room     = state.GetRoomData();
+    auto& room     = state.GetCurrentRoom();
 
     auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
-    auto sfxNavigate    = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
+    auto sfxStart       = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
     auto sfxTeam        = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
     auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
 
@@ -182,6 +184,22 @@ void StateWaiting7K::Initialize()
     auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
+    mapSelector->SetMapChangedCallback([=, s = &state, r = &room] (const unsigned int mapID)
+    {
+        auto data = RoomData(*r);
+        data.MapID = mapID;
+
+        s->SetCurrentRoom(data);
+    });
+
+    mapSelector->SetEffectChangedCallback([=, s = &state, r = &room] (const unsigned int effectID)
+    {
+        auto data = RoomData(*r);
+        data.EffectID = effectID;
+
+        s->SetCurrentRoom(data);
+    });
+
     auto instrumentSelector = Instantiate<InstrumentSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
     instrumentSelector->Initialize();
 
@@ -245,13 +263,13 @@ void StateWaiting7K::Initialize()
         dialogSelectMusic->SetAcceptCallback([=, s = &state, r = &room] ()
         {
             auto music = dialogSelectMusic->GetSelectedMusic();
-            auto meta = music.ToChartMetadata(dialogSelectMusic->GetSelectedDifficulty());
+            auto meta = music.ToChartMetadataView(dialogSelectMusic->GetSelectedDifficulty());
             auto data = RoomData(*r);
 
             data.Chart      = meta;
             data.Difficulty = dialogSelectMusic->GetSelectedDifficulty();
             data.Speed      = dialogSelectMusic->GetSelectedSpeed();
-            s->SetRoomData(data);
+            s->SetCurrentRoom(data);
 
             std::string speedName(4, '\0');
             if (data.Speed > 0)
@@ -283,6 +301,19 @@ void StateWaiting7K::Initialize()
     auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto& sender, auto& ev) {
         director.Present<StateRoom>();
+    });
+
+    auto btnStart = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START");
+    btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
+    {
+        if (!sender->IsChecked())
+            return;
+
+        sender->SetEnabled(false);
+        btnBack->SetEnabled(false);
+
+        mixer.Play(sfxStart);
+        director.Present<StateLoading>();
     });
 
     mixer.Play(bgm, "BGM");

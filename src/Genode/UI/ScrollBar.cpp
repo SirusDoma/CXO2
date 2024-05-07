@@ -183,21 +183,21 @@ namespace Gx
         SetValue(m_value - (m_step == 0 ? 1 : m_step));
     }
 
-    RenderStates ScrollBar::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates ScrollBar::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
-        states = Control::Render(target, states);
+        states = Control::Render(surface, states);
         // TODO: Cache global bounds (or transform) to avoid recalculating bounds on mouse events
         // m_globalBounds = states.transform.transformRect(GetLocalBounds);
         // m_scrollGlobalBounds = (m_sprite.GetTransform() * states.transform).transformRect(GetLocalBounds);
 
-        target.draw(m_sprite, states);
+        surface.Render(m_sprite, states);
         return states;
     }
 
-    void ScrollBar::OnMouseMove(sf::Event::MouseMoveEvent ev)
+    void ScrollBar::OnMouseMove(const sf::Event::MouseMoveEvent ev)
     {
         Control::OnMouseMove(ev);
 
@@ -252,14 +252,14 @@ namespace Gx
         }
     }
 
-    void ScrollBar::OnMouseButtonDown(sf::Event::MouseButtonEvent ev)
+    void ScrollBar::OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonDown(ev);
 
         if (!IsEnabled())
             return;
 
-        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(ev.x, ev.y))
+        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
         {
             auto bounds   = GetScrollBarGlobalBounds();
             m_dragging    = true;
@@ -267,13 +267,13 @@ namespace Gx
         }
     }
 
-    void ScrollBar::OnMouseButtonUp(sf::Event::MouseButtonEvent ev)
+    void ScrollBar::OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)
     {
         Control::OnMouseButtonUp(ev);
         m_dragging = false;
     }
 
-    void ScrollBar::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
+    void ScrollBar::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev)
     {
         Control::OnMouseWheelScrolled(ev);
 

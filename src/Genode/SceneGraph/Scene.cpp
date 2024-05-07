@@ -10,8 +10,8 @@ namespace Gx
 
     Scene::Scene(const std::string &name) :
         Node(),
-        UpdatableContainer(),
         RenderableContainer(),
+        UpdatableContainer(),
         InputableContainer(),
         m_director(nullptr),
         m_overlays(),
@@ -52,12 +52,14 @@ namespace Gx
 
     sf::View Scene::GetView() const
     {
-        return m_view;
+        const sf::RenderTarget &target = GetApplication();
+        return target.getView();
     }
 
     void Scene::SetView(const sf::View &view)
     {
-        m_view = view;
+        sf::RenderTarget &target = GetApplication();
+        target.setView(view);
     }
 
     Node *Scene::GetCurrentOverlay() const
@@ -88,7 +90,7 @@ namespace Gx
         Input(m_lastInput);
     }
 
-    void Scene::PushEvent(std::function<void()> evt)
+    void Scene::Queue(const std::function<void()> &evt)
     {
         if (evt)
             m_events.push(evt);
@@ -110,17 +112,15 @@ namespace Gx
         }
     }
 
-    RenderStates Scene::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Scene::Render(RenderSurface &surface, RenderStates states) const
     {
-        m_view = target.getView();
-        states = RenderableContainer::Render(target, states);
-
+        states = RenderableContainer::Render(surface, states);
         if (!m_overlays.empty())
         {
             for (const auto overlay : m_overlays)
             {
                 if (const auto renderable = dynamic_cast<Renderable*>(overlay))
-                    renderable->Render(target, states);
+                    renderable->Render(surface, states);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Gx
         m_lastInput = ev;
         if (!m_overlays.empty())
         {
-            if (auto inputable = dynamic_cast<Inputable*>(m_overlays.back()))
+            if (const auto inputable = dynamic_cast<Inputable*>(m_overlays.back()))
                 return inputable->Input(ev);
 
             return false;

@@ -28,7 +28,7 @@ namespace Gx
         virtual std::vector<FileInfo> GetFileEntries() const = 0;
 
         virtual Int64 ReadFile(const std::string &fileName, void *data, Int64 size) const = 0;
-        virtual void WriteFile(const std::string &fileName, void *data, Int64 size) const = 0;
+        virtual void WriteFile(const std::string &fileName, void *data, Int64 size) = 0;
 
         virtual Int64 GetFileSize(const std::string &fileName) const = 0;
 

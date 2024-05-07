@@ -13,7 +13,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json &json, const
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto attributes = json.at("attributes");
+    const auto attributes = json.at("attributes");
     if (!ParseMetadata(attributes, metadata, context))
         return nullptr;
     
@@ -22,15 +22,26 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto label = std::make_unique<Gx::Label>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto font = ctx.Find<sf::Font>(*metadata); font)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         label->SetFont(*font);
 
+    Gx::Uint32 style = 0;
+    if (metadata->Bold)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Bold);
+
+    if (metadata->Italic)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Italic);
+
+    if (metadata->Underlined)
+        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Underlined);
+
+    label->SetStyle(style);
     label->SetCharacterSize(metadata->FontSize);
     label->SetColor(metadata->Color);
     label->SetOutlineThickness(metadata->OutlineThickness);
@@ -41,6 +52,8 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetScale(metadata->Scale);
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
+
+
 
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
@@ -65,14 +78,12 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     if (!TransformLoader::ParseMetadata(attributes.at("transform"), metadata))
         return false;
 
-    auto fontSize = attributes.find("fontSize");
-    if (fontSize != attributes.end())
+    if (auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())
         metadata.FontSize = fontSize->get<unsigned int>();
     else
         metadata.FontSize = 30;
 
-    auto string = attributes.find("string");
-    if (string != attributes.end())
+    if (auto string = attributes.find("string"); string != attributes.end())
         metadata.String = string->get<std::string>();
 
     auto color = attributes.find("color");
@@ -88,11 +99,21 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     else
         metadata.Color = sf::Color::White;
 
-    auto outline = attributes.find("outline");
-    if (outline != attributes.end())
+    metadata.Bold = false;
+    if (auto bold = attributes.find("bold"); bold != attributes.end())
+        metadata.Bold = bold->get<bool>();
+
+    metadata.Italic = false;
+    if (auto italic = attributes.find("italic"); italic != attributes.end())
+        metadata.Italic = italic->get<bool>();
+
+    metadata.Underlined = false;
+    if (auto underlined = attributes.find("underlined"); underlined != attributes.end())
+        metadata.Underlined = underlined->get<bool>();
+
+    if (auto outline = attributes.find("outline"); outline != attributes.end())
     {
-        auto thickness = outline->find("thickness");
-        if (thickness != outline->end())
+        if (auto thickness = outline->find("thickness"); thickness != outline->end())
             metadata.OutlineThickness = thickness->get<float>();
 
         color = outline->find("color");
@@ -112,8 +133,7 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
         metadata.OutlineColor = sf::Color::Transparent;
     }
 
-    auto alignment = attributes.find("alignment");
-    if (alignment != attributes.end())
+    if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
     {
         if (auto parsed = magic_enum::enum_cast<Gx::Label::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
             metadata.Alignment = parsed.value();

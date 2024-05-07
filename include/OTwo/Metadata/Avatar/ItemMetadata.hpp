@@ -21,7 +21,7 @@ struct ItemMetadata : ResourceMetadata
 
     unsigned int                     ID;
     ::EquipmentType                  EquipmentType;
-    PlanetType                       Origin;
+    Planet                       Origin;
     ::Gender                         Gender;
     bool                             IsNew;
     sf::String                       Name, Description, SmallPreview, LargePreview;

@@ -5,6 +5,8 @@
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
+#include <magic_enum.hpp>
+
 Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
     auto metadata = NumberMetadata();
@@ -15,9 +17,8 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     if (!TransformLoader::ParseMetadata(attributes["transform"], metadata, context))
         return nullptr;
 
-    
-    auto digitSize = attributes.find("digitSize");
-    if (digitSize != attributes.end())
+
+    if (auto digitSize = attributes.find("digitSize"); digitSize != attributes.end())
     {
         unsigned int w, h;
         digitSize->at("width").get_to(w);
@@ -25,14 +26,12 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
         metadata.DigitSize = sf::Vector2u(w, h);
     }
 
-    auto digitCount = attributes.find("digitCount");
-    if (digitCount != attributes.end())
+    if (auto digitCount = attributes.find("digitCount"); digitCount != attributes.end())
         metadata.DigitCount = digitCount->get<unsigned int>();
     else
         metadata.DigitCount = 1;
 
-    auto frames = attributes.find("digits");
-    if (frames != attributes.end())
+    if (auto frames = attributes.find("digits"); frames != attributes.end())
     {
         for (auto [digit, frame] : frames->items())
         {
@@ -41,12 +40,11 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
             frame.at("y").get_to(y);
             frame.at("width").get_to(w);
             frame.at("height").get_to(h);
-            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(x, y, w, h);
+            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
         }
     }
 
-    auto color = attributes.find("color");
-    if (color != attributes.end())
+    if (auto color = attributes.find("color"); color != attributes.end())
     {
         unsigned int a, r, g, b;
         color->at("a").get_to(a);
@@ -58,14 +56,22 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.Color = sf::Color::White;
 
-    auto spacing = attributes.find("letterSpacing");
-    if (spacing != attributes.end())
-        metadata.LetterSpacing = spacing->get<float>();
+    if (auto kerning = attributes.find("kerning"); kerning != attributes.end())
+        metadata.Kerning = kerning->get<float>();
     else
-        metadata.LetterSpacing = 0.f;
+        metadata.Kerning = 0.f;
 
-    auto value = attributes.find("value");
-    if (value != attributes.end())
+    if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
+    {
+        if (auto parsed = magic_enum::enum_cast<Gx::Number::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.Alignment = parsed.value();
+        else
+            metadata.Alignment = Gx::Number::Alignment::None;
+    }
+    else
+        metadata.Alignment = Gx::Number::Alignment::None;
+
+    if (auto value = attributes.find("value"); value != attributes.end())
         metadata.Value = value->get<unsigned int>();
     else
         metadata.Value = 0;
@@ -75,13 +81,13 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto number = std::make_unique<Gx::Number>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         number->SetTexture(*texture);
 
     number->SetDigitsSize(metadata->DigitSize);
@@ -90,8 +96,9 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
         number->SetDigitFrame(digit, frame);
 
     number->SetColor(metadata->Color);
-    number->SetLetterSpacing(metadata->LetterSpacing);
+    number->SetKerning(metadata->Kerning);
     number->SetValue(metadata->Value);
+    number->SetAlignment(metadata->Alignment);
 
     number->SetName(metadata->Name);
     number->SetOrigin(metadata->Origin);

@@ -4,7 +4,7 @@
 
 namespace Gx
 {
-    void TextureLoader::UseSmooth(bool smooth)
+    void TextureLoader::UseSmooth(const bool smooth)
     {
         m_smooth = smooth;
     }
@@ -19,7 +19,7 @@ namespace Gx
         return resource;
     }
 
-    ResourcePtr<sf::Texture> TextureLoader::LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const
+    ResourcePtr<sf::Texture> TextureLoader::LoadFromMemory(void *data, const std::size_t size, const ResourceContext &ctx) const
     {
         auto resource = std::make_unique<sf::Texture>();
         if (!resource->loadFromMemory(data, size))

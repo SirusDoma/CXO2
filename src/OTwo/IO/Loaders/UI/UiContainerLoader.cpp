@@ -1,5 +1,6 @@
 #include <OTwo/IO/Loaders/UI/UiContainerLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
@@ -9,6 +10,12 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json 
     UiContainerMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
+
+    if (auto attributes = json.find("attributes"); attributes != json.end())
+    {
+        if (const auto transform = attributes->find("transform"); transform != attributes->end())
+            TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+    }
 
     return LoadFromMetadata(metadata, ctx);
 }
@@ -23,6 +30,10 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
     auto populator = ObjectPopulator::Decorate(container.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     container->SetName(metadata->Name);
+    container->SetOrigin(metadata->Origin);
+    container->SetPosition(metadata->Position);
+    container->SetScale(metadata->Scale);
+    container->SetRotation(metadata->Rotation);
 
     auto metaLoader = MetadataLoader();
     for (auto [key, value] : meta.Require)

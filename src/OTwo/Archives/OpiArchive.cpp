@@ -14,8 +14,11 @@ bool OpiArchive::LoadFromFile(const std::string& fileName)
         return false;
 
     // Fetch meta data
-    m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName));
-    m_fileStream.seek(0);
+    if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
+        return false;
+
+    if (m_fileStream.seek(0) == -1)
+        return false;
 
     if (!ReadStream(&m_signature, sizeof(m_signature)))
         return false;
@@ -34,16 +37,19 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) c
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
-    if (auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
+    if (const auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
     stream->open(data, header.GetSize());
 
-    return Gx::ResourcePtr<sf::InputStream>(stream, [data] (const sf::InputStream *ms) {
-        delete ms;
-        delete[] data;
-    });
+    return {
+        stream,
+        [data] (const sf::InputStream *ms) {
+            delete ms;
+            delete[] data;
+        }
+    };
 }
 
 bool OpiArchive::Contains(const std::string& name) const
@@ -54,12 +60,14 @@ bool OpiArchive::Contains(const std::string& name) const
 
 std::vector<Gx::FileInfo> OpiArchive::GetFileEntries() const
 {
+    std::vector<Gx::FileInfo> result;
+
     // Go to first item header offset
     const auto offset = m_count * ITEM_HEADER_SIZE;
-    m_fileStream.seek(m_fileStream.getSize() - offset);
+    if (m_fileStream.seek(m_fileStream.getSize() - offset) == -1)
+        return result;
 
     // Traverse the header
-    std::vector<Gx::FileInfo> result;
     m_entries.clear();
     for (unsigned int i = 0; i < m_count; i++)
     {
@@ -86,8 +94,9 @@ std::vector<Gx::FileInfo> OpiArchive::GetFileEntries() const
         auto header = FileInfo(
             *this,
             std::string(bytes),
-            ref,
-            size1 > size2 ? size1 : size2
+            size1 > size2 ? size1 : size2,
+            i,
+            ref
         );
 
         m_entries[header.GetName()] = header;
@@ -115,7 +124,7 @@ Gx::Int64 OpiArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
 
     const FileInfo header = iterator->second;
-    if (m_fileStream.seek(header.GetOffset()) < 0)
+    if (m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())) < 0)
         throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive.");
 
     if (size > header.GetSize())
@@ -135,6 +144,6 @@ Gx::Int64 OpiArchive::GetFileSize(const std::string &fileName) const
 
 bool OpiArchive::ReadStream(void* data, Gx::Uint64 size) const
 {
-    const auto read = m_fileStream.read(data, size);
+    const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
     return read == size;
 }

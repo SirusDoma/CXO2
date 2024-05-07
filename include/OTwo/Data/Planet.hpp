@@ -3,7 +3,7 @@
 
 #include <vector>
 
-enum class PlanetType
+enum class Planet
 {
     Unknown,
     O2Planet,
@@ -36,9 +36,9 @@ struct Channel
     int MaxPopulation = 100;
 };
 
-struct Planet
+struct PlanetData
 {
-    PlanetType PlanetType = PlanetType::O2Planet;
+    ::Planet Planet = Planet::O2Planet;
     MusicHall Hall = MusicHall::None;
     std::vector<Channel> Channels;
 };

@@ -28,7 +28,7 @@ namespace Gx
         std::vector<Gx::FileInfo> Scan(const std::string &pattern, bool recursive) const override;
         bool Contains(const std::string& fileName) const override = 0;
 
-        std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const override = 0;
+        std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override = 0;
         std::vector<FileInfo> GetFileEntries() const override = 0;
 
         Int64 ReadFile(const std::string& name, void *data, Int64 size) const override = 0;

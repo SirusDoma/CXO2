@@ -33,7 +33,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
-    if (auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+    if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
@@ -56,7 +56,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
             continue;
 
         const auto data = new Gx::Uint8[header.GetSize()];
-        if (auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+        if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         {
             delete[] data;
             throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file.");
@@ -105,6 +105,7 @@ std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
             *this,
             Gx::StringHelper::Trim(std::string(waveHeader.Name, sizeof(waveHeader.Name))),
             waveHeader.ChunkSize + 44, // wav header
+            i,
             offset
         );
 
@@ -112,7 +113,9 @@ std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
         result.push_back(entry);
     }
 
-    m_fileStream.seek(m_header.BgStartOffset);
+    if (m_fileStream.seek(m_header.BgStartOffset) == -1)
+        return result;
+
     for (unsigned int i = 0; i < m_header.BgCount; i++)
     {
         const auto offset  = m_fileStream.tell();
@@ -130,6 +133,7 @@ std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
             *this,
             Gx::StringHelper::Trim(std::string(oggHeader.Name, sizeof(oggHeader.Name))),
             oggHeader.Size,
+            i + 1000,
             offset
         );
 
@@ -160,7 +164,8 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 s
 
     if (index < 1000)
     {
-        m_fileStream.seek(m_header.FxStartOffset);
+        if (m_fileStream.seek(m_header.FxStartOffset) == -1)
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header.");
 
         // We can't seek straight to desired sample because we need to calculate these counters
         int accKeyByte = 0xFF;

@@ -13,15 +13,16 @@
 class ObjectPopulator
 {
 public:
-    static ObjectPopulator Decorate(Gx::Node *populator);
+    static ObjectPopulator Decorate(Gx::Node *populator, bool importOnly = false);
 
     template<typename R>
     void Populate(const std::string &name, Gx::ResourcePtr<R> object, Gx::ResourceContext &ctx);
 
 private:
-    ObjectPopulator(Gx::Node *populator);
+    ObjectPopulator(Gx::Node *populator, bool importOnly = false);
 
     Gx::Node *m_populator;
+    bool m_importOnly;
 };
 
 #include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.inl>

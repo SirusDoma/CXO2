@@ -76,7 +76,7 @@ namespace Gx
         const State GetControlState() const override;
 
         void Update(double delta) override;
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void OnControlStateChanged(Control *sender, State state) override;
         void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
@@ -101,7 +101,7 @@ namespace Gx
             void SetHighlightColor(sf::Color color);
 
             void Update(double delta) override;
-            RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+            RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
             void Invalidate();
 

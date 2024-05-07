@@ -7,29 +7,29 @@ namespace Gx
 
     ResourceContext::ResourceContext() :
         m_id(),
-        m_resources(),
-        m_cacheMode(CacheMode::None)
+        m_cacheMode(CacheMode::None),
+        m_resources()
     {
     }
 
     ResourceContext::ResourceContext(const std::string &id) :
         m_id(id),
-        m_resources(nullptr),
-        m_cacheMode(CacheMode::None)
+        m_cacheMode(CacheMode::None),
+        m_resources(nullptr)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string &id, ResourceManager &resources, CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string &id, ResourceManager &resources, const CacheMode mode) :
         m_id(id),
-        m_resources(&resources),
-        m_cacheMode(mode)
+        m_cacheMode(mode),
+        m_resources(&resources)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string &id, ResourceManager *resources, CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string &id, ResourceManager *resources, const CacheMode mode) :
         m_id(id),
-        m_resources(resources),
-        m_cacheMode(mode)
+        m_cacheMode(mode),
+        m_resources(resources)
     {
     }
 

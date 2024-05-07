@@ -4,13 +4,13 @@
 namespace Gx
 {
     Number::Number() :
-        m_vertices(sf::TriangleStrip, 6 * 10),
+        m_vertices(sf::PrimitiveType::TriangleStrip, 6 * 10),
         m_texture(),
         m_texCoords(),
         m_digitCount(),
         m_width(),
         m_height(),
-        m_spacing(),
+        m_kerning(),
         m_value(),
         m_needUpdate(true)
     {
@@ -25,7 +25,7 @@ namespace Gx
 
     sf::FloatRect Number::GetLocalBounds() const
     {
-        return sf::FloatRect(0, 0, m_width, m_height);
+        return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_width, m_height));
     }
 
     const sf::Texture* Number::GetTexture() const
@@ -50,14 +50,14 @@ namespace Gx
             m_vertices[i].color = color;
     }
 
-    float Number::GetLetterSpacing() const
+    float Number::GetKerning() const
     {
-        return m_spacing;
+        return m_kerning;
     }
 
-    void Number::SetLetterSpacing(float spacing)
+    void Number::SetKerning(const float value)
     {
-        m_spacing = spacing;
+        m_kerning = value;
         m_needUpdate = true;
     }
 
@@ -87,7 +87,7 @@ namespace Gx
         unsigned int current = 0;
         for (int i = 0; i < 10; i++)
         {
-            SetDigitFrame(i, sf::IntRect(current, 0, size.x, size.y));
+            SetDigitFrame(i, sf::IntRect(sf::Vector2i(current, 0), sf::Vector2i(size.x, size.y)));
             current += size.x;
         }
 
@@ -105,13 +105,18 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    void Number::Align(Number::Alignment alignment)
+    Number::Alignment Number::GetAlignment() const
     {
-        m_alignment = alignment;
-        Invalidate();
+        return m_alignment;
     }
 
-    void Number::Update(double delta)
+    void Number::SetAlignment(const Alignment alignment)
+    {
+        m_alignment = alignment;
+        m_needUpdate = true;
+    }
+
+    void Number::Update(const double delta)
     {
         if (m_needUpdate)
             Invalidate();
@@ -119,22 +124,22 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Number::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Number::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
         states.transform *= GetTransform();
         states.texture    = m_texture;
-        target.draw(m_vertices, states);
+        surface.Render(m_vertices, states);
 
-        return Control::Render(target, states);
+        return Control::Render(surface, states);
     }
 
     void Number::Invalidate()
     {
         auto color = GetColor();
-        m_vertices = sf::VertexArray(sf::Triangles, 6 * 10);
+        m_vertices = sf::VertexArray(sf::PrimitiveType::Triangles, 6 * 10);
         m_width    = 0;
 
         unsigned digit = 0, digitCount = 0, leadingCount = 0, value = m_value;
@@ -160,7 +165,7 @@ namespace Gx
         for (int d = 0; d < digitCount; d++)
         {
             if (d > 0)
-                m_width += m_spacing;
+                m_width += m_kerning;
 
             bool isLeading = leadingCount > 0 && d > digitCount - leadingCount;
             if (isLeading)
@@ -186,7 +191,7 @@ namespace Gx
             digits.pop();
 
             if (i > 0)
-                position += sf::Vector2f(texCoords.width + m_spacing, 0);
+                position += sf::Vector2f(texCoords.width + m_kerning, 0);
 
             texCoords = m_texCoords[digit];
             float x = position.x;
@@ -200,12 +205,12 @@ namespace Gx
             float bottom = texCoords.top  + texCoords.height;
 
             int index = i * 6;
-            m_vertices[index + 0] = sf::Vertex(sf::Vector2f(x, y), color, sf::Vector2f(left , top));
-            m_vertices[index + 1] = sf::Vertex(sf::Vector2f(w, y), color, sf::Vector2f(right , top));
-            m_vertices[index + 2] = sf::Vertex(sf::Vector2f(x, h), color, sf::Vector2f(left , bottom));
-            m_vertices[index + 3] = sf::Vertex(sf::Vector2f(x, h), color, sf::Vector2f(left , bottom));
-            m_vertices[index + 4] = sf::Vertex(sf::Vector2f(w, y), color, sf::Vector2f(right , top));
-            m_vertices[index + 5] = sf::Vertex(sf::Vector2f(w, h), color, sf::Vector2f(right , bottom));
+            m_vertices[index + 0] = {sf::Vector2f(x, y), color, sf::Vector2f(left , top)};
+            m_vertices[index + 1] = {sf::Vector2f(w, y), color, sf::Vector2f(right , top)};
+            m_vertices[index + 2] = {sf::Vector2f(x, h), color, sf::Vector2f(left , bottom)};
+            m_vertices[index + 3] = {sf::Vector2f(x, h), color, sf::Vector2f(left , bottom)};
+            m_vertices[index + 4] = {sf::Vector2f(w, y), color, sf::Vector2f(right , top)};
+            m_vertices[index + 5] = {sf::Vector2f(w, h), color, sf::Vector2f(right , bottom)};
 
             m_height = m_height < texCoords.height ? texCoords.height : m_height;
         }

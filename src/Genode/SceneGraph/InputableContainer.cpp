@@ -10,14 +10,13 @@ namespace Gx
     {
     }
 
-    bool InputableContainer::Input(sf::Event ev)
+    bool InputableContainer::Input(const sf::Event ev)
     {
         if (Inputable::Input(ev))
         {
-            for (auto node : GetChildren())
+            for (const auto node : GetChildren())
             {
-                auto inputable = dynamic_cast<Inputable *>(node);
-                if (inputable)
+                if (const auto inputable = dynamic_cast<Inputable *>(node))
                     inputable->Input(ev);
             }
 

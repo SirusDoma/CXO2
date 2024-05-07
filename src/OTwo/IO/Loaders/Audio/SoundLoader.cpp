@@ -16,8 +16,8 @@ Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const
 {
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto buffer = ctx.Find<sf::SoundBuffer>(metadata); buffer)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto buffer = ctx.Find<sf::SoundBuffer>(metadata); buffer)
         return std::make_unique<sf::Sound>(*buffer);
 
     return nullptr;

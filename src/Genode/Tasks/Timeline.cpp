@@ -54,7 +54,7 @@ namespace Gx
         return this;
     }
     
-    void Timeline::Update(double delta)
+    void Timeline::Update(const double delta)
     {
         Task::Update(delta);
 

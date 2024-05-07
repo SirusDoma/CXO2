@@ -7,16 +7,19 @@ bool M30Archive::LoadFromFile(const std::string& fileName)
     if (!Archive::LoadFromFile(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
         return false;
 
-    m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName));
-    m_fileStream.seek(0);
+    if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
+        return false;
+
+    if (m_fileStream.seek(0) == -1)
+        return false;
 
     if (!ReadStream(&m_header, sizeof(m_header)))
         return false;
 
-    if (auto signature = std::string(m_header.Signature, 3); signature != "M30")
+    if (const auto signature = std::string(m_header.Signature, 3); signature != "M30")
         return false;
 
-    auto entries = GetFileEntries();
+    const auto entries = GetFileEntries();
     return !entries.empty();
 }
 
@@ -27,7 +30,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string &fileName) c
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
 
     const auto data = new Gx::Uint8[header->GetSize()];
-    if (auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
+    if (const auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
@@ -51,7 +54,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(unsigned int index) const
     const auto header = &iterator->second;
     const auto data = new Gx::Uint8[header->GetSize()];
 
-    if (auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
+    if (const auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
         delete[] data;
 
     const auto stream = new sf::MemoryInputStream();
@@ -116,7 +119,9 @@ std::vector<Gx::FileInfo> M30Archive::GetFileEntries() const
     std::vector<Gx::FileInfo> result;
 
     m_entries.clear();
-    m_fileStream.seek(m_header.SampleOffset);
+    if (m_fileStream.seek(m_header.SampleOffset) != -1)
+        return result;
+
     for (unsigned int i = 0; i < m_header.SampleCount; i++)
     {
         const auto offset = m_fileStream.tell();
@@ -134,6 +139,7 @@ std::vector<Gx::FileInfo> M30Archive::GetFileEntries() const
             *this,
             Gx::StringHelper::Trim(std::string(sampleHeader.Name, sizeof(sampleHeader.Name))),
             sampleHeader.Size,
+            i,
             offset
         );
 
@@ -146,14 +152,16 @@ std::vector<Gx::FileInfo> M30Archive::GetFileEntries() const
 
 bool M30Archive::ReadStream(void* data, const Gx::Uint64 size) const
 {
-    const auto read = m_fileStream.read(data, size);
+    const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
     return read == size;
 }
 
 Gx::Int64 M30Archive::ReadFile(const FileInfo &entry, void *data, Gx::Int64 size) const
 {
     auto sampleHeader = M30SampleHeader();
-    m_fileStream.seek(static_cast<Gx::Int64>(entry.GetOffset()));
+    if (m_fileStream.seek(static_cast<Gx::Int64>(entry.GetOffset())) == -1)
+        return -1;
+
     if (!ReadStream(&sampleHeader, sizeof(sampleHeader)))
         return -1;
 

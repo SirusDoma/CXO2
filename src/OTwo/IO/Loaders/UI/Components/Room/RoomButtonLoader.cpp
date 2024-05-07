@@ -10,7 +10,7 @@ Gx::ResourcePtr<RoomButton> RoomButtonLoader::LoadFromJson(const Gx::Json &json,
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto attributes = json.at("attributes");
+    const auto attributes = json.at("attributes");
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
@@ -22,12 +22,12 @@ Gx::ResourcePtr<RoomButton> RoomButtonLoader::LoadFromJson(const Gx::Json &json,
 
 Gx::ResourcePtr<RoomButton> RoomButtonLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto button = std::make_unique<RoomButton>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
+    const auto ctx = ResourceContextDecorator::Decorate(context);
 
     if (metadata->Frames.size() > 0)
     {
@@ -37,7 +37,7 @@ Gx::ResourcePtr<RoomButton> RoomButtonLoader::LoadFromMetadata(const ResourceMet
     else
         button->SetTexCoords(metadata->TexCoords);
 
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         button->SetTexture(*texture);
 
     button->SetName(metadata->Name);

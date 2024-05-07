@@ -2,11 +2,12 @@
 #define O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
 
 #include <OTwo/Data/Room.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 
 #include <vector>
+#include <OTwo/Data/Game.hpp>
 
 enum class MusicSortMode
 {
@@ -31,7 +32,7 @@ public:
     explicit SelectMusicDialog(const Gx::Dialog &copy);
     void Initialize() override;
 
-    O2ChartMetadata GetSelectedMusic() const;
+    ChartMetadata GetSelectedMusic() const;
     LevelCategory GetSelectedRandomLevels() const;
     Difficulty GetSelectedDifficulty() const;
     Genre GetSelectedGenre() const;
@@ -58,9 +59,9 @@ private:
     MusicSortOrder m_order;
     Genre m_genre;
     LevelCategory m_random;
-    O2ChartMetadata m_music;
-    std::vector<O2ChartMetadata> m_musicList;
-    std::vector<O2ChartMetadata*> m_displayList;
+    ChartMetadata m_music;
+    std::vector<ChartMetadata> m_musicList;
+    std::vector<ChartMetadata*> m_displayList;
 };
 
 #endif

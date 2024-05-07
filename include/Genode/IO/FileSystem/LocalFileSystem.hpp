@@ -31,11 +31,11 @@ namespace Gx
 
         bool Contains(const std::string &fileName) const override;
 
-        std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const override;
+        std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
         std::vector<FileInfo> GetFileEntries() const override { throw Gx::NotSupportedException(); }
 
         Int64 ReadFile(const std::string &fileName, void *data, Int64 size) const override;
-        void WriteFile(const std::string &fileName, void *data, Int64 size) const override;
+        void WriteFile(const std::string &fileName, void *data, Int64 size) override;
 
         Int64 GetFileSize(const std::string &fileName) const override;
 

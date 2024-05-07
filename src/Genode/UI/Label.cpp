@@ -7,19 +7,19 @@ namespace Gx
         return Text::GetLocalBounds();
     }
 
-    void Label::Update(double delta)
+    void Label::Update(const double delta)
     {
         Control::Update(delta);
 
         Invalidate();
     }
 
-    RenderStates Label::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Label::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
-        return Text::Render(target, states);
+        return Text::Render(surface, states);
     }
 
     Label::Alignment Label::GetAlignment() const

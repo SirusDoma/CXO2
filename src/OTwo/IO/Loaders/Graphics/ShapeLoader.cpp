@@ -40,8 +40,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
         else
             circle->Radius = 0;
 
-        auto pointCount = attributes.find("pointCount");
-        if (pointCount != attributes.end())
+        if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
             circle->PointCount = pointCount->get<unsigned int>();
         else
             circle->PointCount = 30;
@@ -52,8 +51,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
         metadata->ShapeType = ShapeMetadata::Type::Polygon;
 
         auto polygon = dynamic_cast<PolygonMetadata*>(metadata.get());
-        auto pointCount = attributes.find("pointCount");
-        if (pointCount != attributes.end())
+        if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
             polygon->PointCount = pointCount->get<unsigned int>();
         else
             polygon->PointCount = 30;
@@ -64,14 +62,12 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
         metadata->ShapeType = ShapeMetadata::Type::Rectangle;
 
         auto rectangle = dynamic_cast<RectangleMetadata*>(metadata.get());
-        auto width = attributes.find("width");
-        if (width != attributes.end())
+        if (auto width = attributes.find("width"); width != attributes.end())
             rectangle->Width = width->get<unsigned int>();
         else
             rectangle->Width = 0;
 
-        auto height = attributes.find("height");
-        if (height != attributes.end())
+        if (auto height = attributes.find("height"); height != attributes.end())
             rectangle->Height = height->get<unsigned int>();
         else
             rectangle->Height = 0;
@@ -82,14 +78,12 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
         metadata->ShapeType = ShapeMetadata::Type::RoundedRectangle;
 
         auto rectangle = dynamic_cast<RoundedRectangleMetadata*>(metadata.get());
-        auto width = attributes.find("width");
-        if (width != attributes.end())
+        if (auto width = attributes.find("width"); width != attributes.end())
             rectangle->Width = width->get<unsigned int>();
         else
             rectangle->Width = 0;
 
-        auto height = attributes.find("height");
-        if (height != attributes.end())
+        if (auto height = attributes.find("height"); height != attributes.end())
             rectangle->Height = height->get<unsigned int>();
         else
             rectangle->Height = 0;
@@ -100,8 +94,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
         else
             rectangle->CornerRadius = 1.f;
 
-        auto pointCount = attributes.find("cornerPointCount");
-        if (pointCount != attributes.end())
+        if (auto pointCount = attributes.find("cornerPointCount"); pointCount != attributes.end())
             rectangle->CornerPointCount = pointCount->get<unsigned int>();
         else
             rectangle->CornerPointCount = 30;
@@ -115,8 +108,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), *metadata, context);
 
-    auto color = attributes.find("color");
-    if (color != attributes.end())
+    if (auto color = attributes.find("color"); color != attributes.end())
     {
         unsigned int a, r, g, b;
         color->at("a").get_to(a);
@@ -133,8 +125,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
     else
         metadata->OutlineThickness = 0.f;
 
-    auto outlineColor = attributes.find("outlineColor");
-    if (outlineColor != attributes.end())
+    if (auto outlineColor = attributes.find("outlineColor"); outlineColor != attributes.end())
     {
         unsigned int a, r, g, b;
         outlineColor->at("a").get_to(a);
@@ -146,15 +137,14 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
     else
         metadata->OutlineColor = sf::Color::Transparent;
 
-    auto texCoords  = attributes.find("texCoords");
-    if (texCoords != attributes.end())
+    if (auto texCoords  = attributes.find("texCoords"); texCoords != attributes.end())
     {
         unsigned int x, y, w, h;
         texCoords->at("x").get_to(x);
         texCoords->at("y").get_to(y);
         texCoords->at("width").get_to(w);
         texCoords->at("height").get_to(h);
-        metadata->TexCoords = sf::IntRect(x, y, w, h);
+        metadata->TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
     }
     
     return LoadFromMetadata(*metadata, context);
@@ -162,37 +152,37 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     std::unique_ptr<Gx::Shape> shape;
     if (metadata->ShapeType == ShapeMetadata::Type::Circle)
     {
-        auto circle = dynamic_cast<const CircleMetadata*>(&meta);
+        const auto circle = dynamic_cast<const CircleMetadata*>(&meta);
         shape = std::make_unique<Gx::Circle>(circle->Radius, circle->PointCount);
 
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
     {
-        auto polygon = dynamic_cast<const PolygonMetadata*>(&meta);
+        const auto polygon = dynamic_cast<const PolygonMetadata*>(&meta);
         shape = std::make_unique<Gx::Polygon>(polygon->PointCount);
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
     {
-        auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta);
+        const auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta);
         shape = std::make_unique<Gx::Rectangle>(sf::Vector2f(rectangle->Width, rectangle->Height));
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
     {
-        auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta);
+        const auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta);
         shape = std::make_unique<Gx::RoundedRectangle>(sf::Vector2f(rectangle->Width, rectangle->Height), rectangle->CornerRadius, rectangle->CornerPointCount);
     }
 
     shape->SetTexCoords(metadata->TexCoords);
 
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         shape->SetTexture(*texture);
 
     shape->SetColor(metadata->Color);

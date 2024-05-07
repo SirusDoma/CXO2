@@ -22,13 +22,13 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json &json, con
 
 Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    auto metadata = dynamic_cast<const SpriteMetadata*>(&meta);
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    const auto metadata = dynamic_cast<const SpriteMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto sprite = std::make_unique<Gx::Sprite>();
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         sprite->SetTexture(*texture);
 
     sprite->SetName(metadata->Name);
@@ -48,17 +48,17 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
     if (attributes.empty())
         return false;
 
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
     metadata.BlendMode = Gx::BlendMode::Auto;
-    if (auto mode = attributes.find("blend"); mode != attributes.end())
+    if (const auto mode = attributes.find("blend"); mode != attributes.end())
     {
-        if (auto parsed = magic_enum::enum_cast<Gx::BlendMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+        if (const auto parsed = magic_enum::enum_cast<Gx::BlendMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
             metadata.BlendMode = parsed.value();
     }
 
-    auto color = attributes.find("color");
+    const auto color = attributes.find("color");
     if (color != attributes.end())
     {
         unsigned int a, r, g, b;
@@ -71,7 +71,7 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
     else
         metadata.Color = sf::Color::White;
 
-    auto texCoords  = attributes.find("texCoords");
+    const auto texCoords  = attributes.find("texCoords");
     if (texCoords != attributes.end())
     {
         unsigned int x, y, w, h;
@@ -79,7 +79,7 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
         texCoords->at("y").get_to(y);
         texCoords->at("width").get_to(w);
         texCoords->at("height").get_to(h);
-        metadata.TexCoords = sf::IntRect(x, y, w, h);
+        metadata.TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
     }
 
     return true;

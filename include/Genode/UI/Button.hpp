@@ -12,33 +12,42 @@
 
 namespace Gx
 {
-    class Button : public Control
+    class Button : public virtual Control, public virtual Colorable, Sprite
     {
     public:
-        Button();
+        struct Frame
+        {
+            sf::IntRect TexCoords = sf::IntRect();
+            sf::Color   Color     = sf::Color::White;
+        };
+
+        Button() = default;
         explicit Button(const sf::Texture& texture);
         Button(const sf::Texture& texture, const sf::IntRect& rectangle);
 
+        ~Button() override = default;
+
+        const sf::Color &GetColor() const override;
+        void SetColor(const sf::Color &color) override;
+
         sf::FloatRect GetLocalBounds() const override;
+        // ReSharper disable once CppHidingFunction
+        sf::FloatRect GetGlobalBounds() const;
 
-        const sf::Texture* GetTexture() const;
-        void SetTexture(const sf::Texture& texture);
-
-        void SetStateFrame(Button::State state, sf::IntRect texCoords, sf::Color color = sf::Color::White);
-        void SetStateFrame(Button::State state, const Gx::Sprite& sprite);
+        void SetTexture(const sf::Texture &texture);
+        void SetStateFrame(Control::State state, const Frame &frame);
 
         void PerformClick();
 
     protected:
-        const Sprite GetStateFrame(Button::State state) const;
-        Sprite *GetSprite() const;
+        Frame GetStateFrame(Control::State state) const;
+        void ApplyFrame(const Button::Frame& frame);
 
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Invalidate() override;
 
     private:
-        mutable Gx::Sprite m_sprite;
-        mutable std::unordered_map<Button::State, Sprite> m_stateData;
+        mutable std::unordered_map<Control::State, Frame> m_stateData;
     };
 }
 

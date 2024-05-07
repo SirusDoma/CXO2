@@ -18,8 +18,8 @@ public:
     ItemFactory() = default;
     explicit ItemFactory(Gx::ResourceManager &sharedResources);
 
-    std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender &gender);
-    Item *GetItem(unsigned int id);
+    std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender &gender) const;
+    Item *GetItem(unsigned int id) const;
 
 private:
     ItemData            *m_itemData;

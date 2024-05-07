@@ -2,21 +2,13 @@
 
 namespace Gx
 {
-    RenderableContainer::RenderableContainer()
+    RenderStates RenderableContainer::Render(RenderSurface &surface, RenderStates states) const
     {
-    }
-
-    RenderableContainer::~RenderableContainer()
-    {
-    }
-
-    RenderStates RenderableContainer::Render(sf::RenderTarget &target, RenderStates states) const
-    {
-        for (auto node : GetChildren())
+        for (const auto node : GetChildren())
         {
-            auto renderable = dynamic_cast<Renderable*>(node);
-            if (renderable)
-                renderable->Render(target, states);
+            states.BatchLevel += 1.0f;
+            if (const auto renderable = dynamic_cast<Renderable*>(node))
+                renderable->Render(surface, states);
         }
 
         return states;

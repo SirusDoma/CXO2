@@ -14,9 +14,8 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromJson(const Gx::Json &json, c
     auto attributes = json.at("attributes");
     if (!LabelLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
-    
-    auto bounds = attributes.find("bounds");
-    if (bounds != attributes.end())
+
+    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
         unsigned int x, y, w, h;
         bounds->at("x").get_to(x);
@@ -24,17 +23,15 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromJson(const Gx::Json &json, c
         bounds->at("width").get_to(w);
         bounds->at("height").get_to(h);
         
-        metadata.Bounds = sf::FloatRect(x, y, w, h);
+        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
     }
 
-    auto maxLength = attributes.find("maximumLength");
-    if (maxLength != attributes.end())
+    if (const auto maxLength = attributes.find("maximumLength"); maxLength != attributes.end())
         metadata.MaximumLength = maxLength->get<unsigned int>();
     else
         metadata.MaximumLength = 0;
 
-    auto highlightTextColor = attributes.find("highlightTextColor");
-    if (highlightTextColor != attributes.end())
+    if (const auto highlightTextColor = attributes.find("highlightTextColor"); highlightTextColor != attributes.end())
     {
         unsigned int a, r, g, b;
         highlightTextColor->at("a").get_to(a);
@@ -46,8 +43,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromJson(const Gx::Json &json, c
     else
         metadata.HighlightTextColor = sf::Color::Black;
 
-    auto highlightBackColor = attributes.find("highlightBackColor");
-    if (highlightBackColor != attributes.end())
+    if (const auto highlightBackColor = attributes.find("highlightBackColor"); highlightBackColor != attributes.end())
     {
         unsigned int a, r, g, b;
         highlightBackColor->at("a").get_to(a);
@@ -64,13 +60,13 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromJson(const Gx::Json &json, c
 
 Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const TextBoxMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const TextBoxMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto textBox = std::make_unique<Gx::TextBox>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto font = ctx.Find<sf::Font>(*metadata); font)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
         textBox->SetFont(*font);
 
     textBox->SetCharacterSize(metadata->FontSize);

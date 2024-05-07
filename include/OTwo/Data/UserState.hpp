@@ -3,18 +3,20 @@
 
 #include <OTwo/Data/Planet.hpp>
 #include <OTwo/Data/Room.hpp>
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/System/Module.hpp>
 
 class UserState : public Gx::Module
 {
 public:
-    const Player &GetCurrentPlayer() const;
-    void SetCurrentPlayer(const Player &player);
+    UserState() = default;
 
-    PlanetType GetPlanet() const;
-    void SetPlanet(PlanetType planet);
+    const PlayerData &GetCurrentPlayer() const;
+    void SetCurrentPlayer(const PlayerData &player);
+
+    Planet GetPlanet() const;
+    void SetPlanet(Planet planet);
 
     MusicHall GetMusicHall() const;
     void SetMusicHall(MusicHall hall);
@@ -22,19 +24,19 @@ public:
     unsigned int GetChannelID() const;
     void SetChannelID(unsigned int channelId);
 
-    const RoomData &GetRoomData() const;
-    void SetRoomData(const RoomData &room);
+    const RoomData &GetCurrentRoom() const;
+    void SetCurrentRoom(const RoomData &room);
 
-    const std::vector<O2ChartMetadata> &GetMusicList() const;
-    void SetMusicList(const std::vector<O2ChartMetadata> &musicList);
+    const std::vector<ChartMetadata> &GetInstalledMusic() const;
 
 private:
-    Player m_player;
-    PlanetType m_planet = PlanetType::O2Planet;
+    PlayerData m_player;
+    Planet m_planet = Planet::O2Planet;
     MusicHall m_hall;
     unsigned int m_channelID;
     RoomData m_room;
-    std::vector<O2ChartMetadata> m_musicList;
+
+    mutable std::vector<ChartMetadata> m_installedMusicList;
 };
 
 #endif

@@ -1,12 +1,18 @@
 #ifndef O2JAM_CHART_DATA_HPP
 #define O2JAM_CHART_DATA_HPP
 
-#include <OTwo/Metadata/Chart/O2ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Data/Game.hpp>
 
-#include <unordered_map>
+#include <Genode/System/Primitives.hpp>
+
+#include <SFML/Audio/SoundBuffer.hpp>
+
+#include <map>
 #include <vector>
+#include <memory>
 
-class O2Chart
+class Chart
 {
 public:
     enum class Channel : Gx::Uint16
@@ -33,39 +39,55 @@ public:
 
     struct Event
     {
-        Gx::Uint32 Measure;
-        Gx::Uint32 Beat;
-        Gx::Uint32 Cell;
-        Gx::Uint16 Signature;
+        float Position;
+        Chart::Channel Channel;
     };
 
     struct TimeEvent : public Event
     {
-        using Event::Event;
         float Value;
     };
 
     struct NoteEvent : public Event
     {
-        using Event::Event;
-        Gx::Uint32 ID;
-        Gx::Uint8  VolumePan;
-        NoteType   Type;
+        Gx::Uint16       ID;
+        float            Volume;
+        float            Pan;
+        NoteType         Type;
+        sf::SoundBuffer *SoundBuffer;
     };
 
-    O2Chart() = default;
+    Chart() = default;
 
-    const O2ChartMetadata &GetMetadata() const;
-    void SetMetadata(O2ChartMetadata &&metadata);
+    const ChartMetadata &GetMetadata() const;
+    void SetMetadata(const ChartMetadata &metadata);
 
-    void AddEvent(Difficulty diff, std::unique_ptr<Event> ev);
-    const std::vector<Event*> GetEvents(Difficulty diff) const;
+    template<typename T>
+    void AddEvent(Difficulty diff, T &&ev);
+    std::vector<Event*> GetEvents(Difficulty diff) const;
 
+    void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
+    sf::SoundBuffer *GetSample(Gx::Uint16 id) const;
+
+    const sf::Image *GetCover() const;
+    void SetCover(Gx::ResourcePtr<sf::Image> cover);
+
+    const sf::Image *GetThumbnail() const;
+    void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
+
+    std::string Source;
 private:
-    using EventMap = std::unordered_map<Difficulty, std::vector<std::unique_ptr<Event>>>;
+    using EventList = std::vector<std::unique_ptr<Event>>;
+    using EventMap  = std::unordered_map<Difficulty, EventList>;
+    using SampleMap = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
 
-    O2ChartMetadata m_metadata;
-    EventMap        m_events;
+    ChartMetadata m_metadata;
+    EventMap      m_events;
+    SampleMap     m_samples;
+
+    Gx::ResourcePtr<sf::Image> m_cover;
+    Gx::ResourcePtr<sf::Image> m_thumbnail;
 };
 
+#include <OTwo/Chart/Chart.inl>
 #endif

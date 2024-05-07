@@ -1,14 +1,15 @@
 #ifndef GENODE_SYSTEM_APPLICATION_HPP
 #define GENODE_SYSTEM_APPLICATION_HPP
 
+
+#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Graphics/Cursor.hpp>
+#include <Genode/Graphics/RenderSurface.hpp>
+#include <Genode/Graphics/RenderTargetAdapter.hpp>
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Config.hpp>
 
-#include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/Graphics/Cursor.hpp>
-#include <Genode/IO/ResourceManager.hpp>
-#include <Genode/Audio/Mixer.hpp>
-
-#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
 #include <functional>
@@ -18,13 +19,13 @@ namespace Gx
 {
     class Scene;
     class Module;
-    class Application : NonCopyable, public Gx::Renderable, public Gx::Updatable
+    class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
         static Application &Instance();
 
-        explicit Application(const std::string &title, sf::VideoMode mode, bool fullScreen = false);
-        Application(const std::string &title, sf::VideoMode mode, sf::VideoMode virtualMode, bool fullScreen = false);
+        explicit Application(const std::string &title, const sf::VideoMode &mode, bool fullScreen = false);
+        Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, bool fullScreen = false);
 
         ~Application() override = default;
 
@@ -59,6 +60,7 @@ namespace Gx
         T &Require();
 
         operator sf::RenderTarget&() const;
+        operator RenderSurface&() const;
 
     protected:
         sf::RenderWindow &GetRenderWindow() const;
@@ -67,7 +69,7 @@ namespace Gx
         virtual void Shutdown();
 
         void Update(double delta) override;
-        RenderStates Render(sf::RenderTarget& target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
@@ -84,6 +86,7 @@ namespace Gx
         inline static Application *m_instance = nullptr;
 
         mutable sf::RenderWindow m_window;
+        mutable RenderTargetAdapter m_targetAdapter;
         mutable SceneDirector m_director;
         sf::Event m_event;
 

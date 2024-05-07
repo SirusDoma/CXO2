@@ -12,7 +12,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json &json, const
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto attributes = json.at("attributes");
+    const auto attributes = json.at("attributes");
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
@@ -24,12 +24,12 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json &json, const
 
 Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
     auto image = std::make_unique<Gx::Image>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
+    const auto ctx = ResourceContextDecorator::Decorate(context);
 
     if (!metadata->Frames.empty())
     {
@@ -39,7 +39,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata 
     else
         image->SetTexCoords(metadata->TexCoords);
 
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         image->SetTexture(*texture);
 
     image->SetName(metadata->Name);
@@ -134,7 +134,7 @@ bool ImageLoader::ParseMetadata(const Gx::Json &attributes, ImageMetadata &metad
             t->at("width").get_to(w);
             t->at("height").get_to(h);
 
-            texCoords = sf::IntRect(x, y, w, h);
+            texCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
         }
         frame.TexCoords = texCoords;
         metadata.Frames.push_back({frameName, frame});

@@ -10,6 +10,8 @@ public:
     StateTest() = default;
     explicit StateTest(State &state);
 
+    void OnKeyDown(const sf::Event::KeyEvent ev) override;
+
     void Initialize() override;
     bool Close(bool quit = false) override;
 };

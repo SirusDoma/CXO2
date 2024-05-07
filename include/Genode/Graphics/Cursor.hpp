@@ -21,7 +21,7 @@ namespace Gx
 
     private:
         mutable sf::Cursor   m_cursor;
-        Gx::Uint8*   m_source;
+        Gx::Uint8*   m_source{};
         sf::Vector2u m_size;
     };
 }

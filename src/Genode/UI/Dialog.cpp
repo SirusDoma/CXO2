@@ -151,10 +151,10 @@ namespace Gx
             auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(static_cast<sf::RenderWindow&>(target)));
 
             if (m_acceptButton)
-                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
 
             if (m_cancelButton)
-                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(mousePosition.x, mousePosition.y));
+                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
 
             OnShown(*scene);
             Invalidate();
@@ -172,27 +172,27 @@ namespace Gx
         OnClose();
     }
 
-    RenderStates Dialog::Render(sf::RenderTarget &target, RenderStates states) const
+    RenderStates Dialog::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVislble())
             return states;
 
         if (m_backdrop.GetSize().x > 0 && m_backdrop.GetSize().y > 0)
-            target.draw(m_backdrop, sf::Transform::Identity);
+            surface.Render(m_backdrop, sf::Transform::Identity);
 
         states.transform *= GetTransform();
-        target.draw(m_sprite, states);
+        surface.Render(m_sprite, states);
 
-        return RenderableContainer::Render(target, states);
+        return RenderableContainer::Render(surface, states);
     }
 
-    void Dialog::OnKeyDown(sf::Event::KeyEvent ev)
+    void Dialog::OnKeyDown(const sf::Event::KeyEvent ev)
     {
         UiContainer::OnKeyDown(ev);
 
-        if (ev.code == sf::Keyboard::Enter)
+        if (ev.code == sf::Keyboard::Key::Enter)
             OnAccepted();
-        else if (ev.code == sf::Keyboard::Escape)
+        else if (ev.code == sf::Keyboard::Key::Escape)
             OnCancelled();
     }
 

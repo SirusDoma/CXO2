@@ -17,14 +17,14 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromJson(const Gx::Json &jso
 
 Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
 {
-    auto metadata = dynamic_cast<const TransformMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const TransformMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible.");
 
     auto transform = sf::Transform();
     transform.translate(metadata->Position);
     transform.scale(metadata->Scale);
-    transform.rotate(metadata->Rotation);
+    transform.rotate(sf::degrees(metadata->Rotation));
 
     return std::make_unique<sf::Transform>(transform);
 }
@@ -34,7 +34,7 @@ bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata &metad
     if (transform.empty())
         return false;
 
-    auto p = transform.find("position");
+    const auto p = transform.find("position");
     auto position = sf::Vector2f();
     if (p != transform.end())
     {
@@ -43,7 +43,7 @@ bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata &metad
     }
     metadata.Position = position;
 
-    auto s = transform.find("scale");
+    const auto s = transform.find("scale");
     auto scale = sf::Vector2f(1.f, 1.f);
     if (s != transform.end())
     {
@@ -52,13 +52,13 @@ bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata &metad
     }
     metadata.Scale = scale;
 
-    auto r = transform.find("rotation");
+    const auto r = transform.find("rotation");
     float rotation = 0;
     if (r != transform.end())
         r->get_to(rotation);
     metadata.Rotation = rotation;
 
-    auto o  = transform.find("origin");
+    const auto o  = transform.find("origin");
     auto origin = sf::Vector2f();
     if (o != transform.end())
     {

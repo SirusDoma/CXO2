@@ -1,6 +1,8 @@
 ﻿#include <Genode/Audio/Mixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
 
+#include <miniaudio.h>
+
 namespace Gx
 {
     Mixer::Mixer() :
@@ -32,13 +34,12 @@ namespace Gx
         return m_masterGroup.get();
     }
 
-    SoundGroup *Mixer::GetSoundGroup(const std::string &group)
+    SoundGroup *Mixer::GetSoundGroup(const std::string &groupName)
     {
-        auto iterator = m_groups.find(group);
-        if (iterator == m_groups.end())
-            m_groups[group] = ResourcePtr<SoundGroup>(new SoundGroup(group), [] (auto ptr) { delete ptr; });
+        if (const auto iterator = m_groups.find(groupName); iterator == m_groups.end())
+            m_groups[groupName] = ResourcePtr<SoundGroup>(new SoundGroup(groupName), [] (auto ptr) { delete ptr; });
 
-        return m_groups[group].get();
+        return m_groups[groupName].get();
     }
 
     sf::SoundSource* Mixer::Play(sf::SoundSource *source)
@@ -53,7 +54,7 @@ namespace Gx
             if (group.empty() || group == "master")
                 return Play(source, m_masterGroup.get());
 
-            if (auto iterator = m_groups.find(group); iterator == m_groups.end())
+            if (const auto iterator = m_groups.find(group); iterator == m_groups.end())
                 m_groups[group] = ResourcePtr<SoundGroup>(new SoundGroup(group), [] (auto ptr) { delete ptr; });
 
             return Play(source, m_groups[group].get());
@@ -72,10 +73,10 @@ namespace Gx
             if (group != m_masterGroup.get())
                 m_masterGroup->Remove(source);
 
-            for (auto& iterator : m_groups)
+            for (auto &[_, ptr] : m_groups)
             {
-                if (iterator.second.get() != group)
-                    iterator.second->Remove(source);
+                if (ptr.get() != group)
+                    ptr->Remove(source);
             }
 
             return group->Play(source);
@@ -91,7 +92,7 @@ namespace Gx
             SoundGroup *group = nullptr;
             if (groupName != "master")
             {
-                if (auto iterator = m_groups.find(groupName); iterator != m_groups.end())
+                if (const auto iterator = m_groups.find(groupName); iterator != m_groups.end())
                     group = iterator->second.get();
             }
             else
@@ -157,8 +158,7 @@ namespace Gx
 
     void Mixer::Stop(const std::string &group)
     {
-        auto iterator = m_groups.find(group);
-        if (iterator != m_groups.end())
+        if (const auto iterator = m_groups.find(group); iterator != m_groups.end())
         {
             m_groups[group]->Stop();
             m_groups.erase(iterator);
@@ -170,7 +170,7 @@ namespace Gx
         if (group)
         {
             group->Stop();
-            if (auto iterator = m_groups.find(group->GetName()); iterator != m_groups.end())
+            if (const auto iterator = m_groups.find(group->GetName()); iterator != m_groups.end())
                 m_groups.erase(iterator);
         }
     }
@@ -206,21 +206,21 @@ namespace Gx
         }
     }
 
-    void Mixer::SetVolume(float volume)
+    void Mixer::SetVolume(const float volume)
     {
         m_masterGroup->SetVolume(volume);
         for (auto& [_, group] : m_groups)
             group->SetVolume(volume);
     }
 
-    void Mixer::SetPan(float pan)
+    void Mixer::SetPan(const float pan)
     {
         m_masterGroup->SetPan(pan);
         for (auto& [_, group] : m_groups)
             group->SetPan(pan);
     }
 
-    void Mixer::Update(double delta)
+    void Mixer::Update(const double delta)
     {
         for (auto& [_, group] : m_groups)
             group->Update(delta);

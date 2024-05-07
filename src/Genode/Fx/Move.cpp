@@ -2,20 +2,20 @@
 
 namespace Gx
 {
-    Move::Move(Transformable* target, sf::Vector2f position, const sf::Time& duration) :
+    Move::Move(Transformable* target, const sf::Vector2f position, const sf::Time& duration) :
         m_target(target),
         m_start(),
-        m_diff(),
         m_end(position),
+        m_diff(),
         m_duration(duration)
     {
     }
     
-    void Move::Update(double delta)
+    void Move::Update(const double delta)
     {
         Task::Update(delta);
 
-        auto state = GetState();
+        const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
@@ -29,7 +29,7 @@ namespace Gx
 
         float offset = 0.0f;
         auto current = m_target->GetPosition();
-        auto elapsed = GetElapsed();
+        const auto elapsed = GetElapsed();
 
         if (m_end.x < current.x)
         {

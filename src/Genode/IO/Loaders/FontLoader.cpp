@@ -8,7 +8,7 @@ namespace Gx
         return true;
     }
 
-    void FontLoader::UseSmooth(bool smooth)
+    void FontLoader::UseSmooth(const bool smooth)
     {
         m_smooth = smooth;
     }

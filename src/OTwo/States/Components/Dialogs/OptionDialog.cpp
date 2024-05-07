@@ -7,7 +7,7 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/ProgressBar.hpp>
+#include <Genode/UI/Gauge.hpp>
 
 #include <magic_enum.hpp>
 
@@ -31,51 +31,52 @@ void OptionDialog::Initialize()
         return;
 
     // Rewire callbacks due to copy constructor
-    if (auto acceptButton = GetAcceptButton(); acceptButton)
+    if (const auto acceptButton = GetAcceptButton(); acceptButton)
         SetAcceptButton(*acceptButton);
 
-    if (auto cancelButton = GetCancelButton(); cancelButton)
+    if (const auto cancelButton = GetCancelButton(); cancelButton)
         SetCancelButton(*cancelButton);
 
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
     m_parent    = GetParent<::State>();
 
-    auto bgAllTest     = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
-    auto bgTest        = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
-    auto sfxTest       = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
-    auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto bgAllTest     = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
+    const auto bgTest        = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
+    const auto sfxTest       = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
+    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
-    auto background = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
+    const auto background = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
     background->SetFrame("KeyOption");
     //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
 
-    auto toolTip     = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
-    auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
-    auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
+    const auto toolTip     = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
+    const auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
+    const auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
 
-    auto keySelect = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    auto keybar = FindChild<Gx::Image>("IDC_IMAGE_KEY_BAR");
-    keySelect->AddChild(keybar);
+    const auto keySelect = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+    const auto keyBar = FindChild<Gx::Image>("IDC_IMAGE_KEY_BAR");
+    keySelect->AddChild(keyBar);
 
-    auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
+    const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
     gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.Use3D = sender->IsChecked(); });
-    auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
+    const auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
     cursorCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseWindowCursor = sender->IsChecked(); });
-    auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
+    const auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
     keyTestCheckBox->SetCheckStateChangeCallback([=] (auto sender)
     {
         m_keyTestEnabled = sender->IsChecked();
-        m_keyChannel     = O2Chart::Channel::Note1;
+        m_keyChannel     = Chart::Channel::Note1;
         keySelect->SetFrame(0);
         keySelect->SetVisible(!m_keyTestEnabled);
     });
+    keyTestCheckBox->SetCheckedState(false);
 
-    m_keyChannel = O2Chart::Channel::Note1;
+    m_keyChannel = Chart::Channel::Note1;
     for (unsigned int i = 1; i <= 7; i++)
     {
-        auto channel = static_cast<O2Chart::Channel>(i + 1);
-        auto keytext = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_TEXT_" + std::to_string(i));
+        auto channel = static_cast<Chart::Channel>(i + 1);
+        const auto keytext = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_TEXT_" + std::to_string(i));
         keytext->SetClickCallback([=] (auto &sender, auto &ev)
         {
             m_keyChannel = channel;
@@ -87,30 +88,30 @@ void OptionDialog::Initialize()
 
     for (unsigned int i = 1; i <= 7; i++)
     {
-        auto keyDown = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN_" + std::to_string(i));
-        auto channel = static_cast<O2Chart::Channel>(i + 1);
+        const auto keyDown = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN_" + std::to_string(i));
+        auto channel = static_cast<Chart::Channel>(i + 1);
 
         keyDown->SetFrame("Note" + std::to_string(i));
         m_keyDowns[channel] = keyDown;
         AddChild(keyDown);
     }
 
-    auto bgmCheckBox     = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
+    const auto bgmCheckBox           = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
     bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseBGM = sender->IsChecked(); });
-    auto masterVolumeBar = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_MASTER_VOLUME");
-    auto musicVolumeBar  = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_MUSIC_VOLUME");
-    auto effectVolumeBar = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_SOUND_VOLUME");
+    const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
+    const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
+    const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
-    auto btnMasterVolumeUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_UP");
-    auto btnMasterVolumeDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_DOWN");
+    const auto btnMasterVolumeUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_UP");
+    const auto btnMasterVolumeDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_DOWN");
     btnMasterVolumeUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        masterVolumeBar->SetValue(masterVolumeBar->GetValue() + 1);
-        musicVolumeBar->SetValue(masterVolumeBar->GetValue());
-        effectVolumeBar->SetValue(masterVolumeBar->GetValue());
+        masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() + 1);
+        musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
+        effectVolumeGauge->SetValue(masterVolumeGauge->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeBar->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeBar->GetValue());
+        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (bgAllTest->getStatus() != sf::SoundSource::Playing)
@@ -121,17 +122,17 @@ void OptionDialog::Initialize()
         }
 
         mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeBar->GetValue());
-        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeBar->GetValue());
+        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
+        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
     });
     btnMasterVolumeDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        masterVolumeBar->SetValue(masterVolumeBar->GetValue() - 1);
-        musicVolumeBar->SetValue(masterVolumeBar->GetValue());
-        effectVolumeBar->SetValue(masterVolumeBar->GetValue());
+        masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() - 1);
+        musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
+        effectVolumeGauge->SetValue(masterVolumeGauge->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeBar->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeBar->GetValue());
+        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (bgAllTest->getStatus() != sf::SoundSource::Playing)
@@ -142,17 +143,17 @@ void OptionDialog::Initialize()
         }
 
         mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeBar->GetValue());
-        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeBar->GetValue());
+        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
+        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
     });
 
-    auto btnMusicUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_UP");
-    auto btnMusicDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_DOWN");
+    const auto btnMusicUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_UP");
+    const auto btnMusicDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_DOWN");
 
     btnMusicUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        musicVolumeBar->SetValue(musicVolumeBar->GetValue() + 1);
-        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeBar->GetValue());
+        musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() + 1);
+        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (bgTest->getStatus() != sf::SoundSource::Playing)
@@ -162,12 +163,12 @@ void OptionDialog::Initialize()
             mixer.Play(bgTest, "BGTest");
         }
 
-        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeBar->GetValue());
+        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
     });
     btnMusicDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        musicVolumeBar->SetValue(musicVolumeBar->GetValue() - 1);
-        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeBar->GetValue());
+        musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() - 1);
+        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (bgTest->getStatus() != sf::SoundSource::Playing)
@@ -177,16 +178,16 @@ void OptionDialog::Initialize()
             mixer.Play(bgTest, "BGTest");
         }
 
-        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeBar->GetValue());
+        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
     });
 
-    auto btnSoundEffectUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_UP");
-    auto btnSoundEffectDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_DOWN");
+    const auto btnSoundEffectUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_UP");
+    const auto btnSoundEffectDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_DOWN");
 
     btnSoundEffectUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        effectVolumeBar->SetValue(effectVolumeBar->GetValue() + 1);
-        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeBar->GetValue());
+        effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() + 1);
+        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (sfxTest->getStatus() != sf::SoundSource::Playing)
@@ -196,12 +197,12 @@ void OptionDialog::Initialize()
         }
 
         mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeBar->GetValue());
+        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
     });
     btnSoundEffectDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
-        effectVolumeBar->SetValue(effectVolumeBar->GetValue() - 1);
-        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeBar->GetValue());
+        effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() - 1);
+        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
         mixer.Pause("BGM");
         if (sfxTest->getStatus() != sf::SoundSource::Playing)
@@ -211,10 +212,10 @@ void OptionDialog::Initialize()
         }
 
         mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeBar->GetValue());
+        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
     });
 
-    auto btnSave = FindChild<Gx::Button>("IDC_BUTTON_SAVE");
+    const auto btnSave = FindChild<Gx::Button>("IDC_BUTTON_SAVE");
     btnSave->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
     {
         if (!ValidateConfig())
@@ -224,22 +225,18 @@ void OptionDialog::Initialize()
             return;
         }
 
-        auto& app = Gx::Application::Instance();
-        app.SetConfig(m_config);
-
-        auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
-        keyTestCheckBox->SetCheckedState(false);
-
-        m_keyChannel = O2Chart::Channel::Note1;
+        auto& application = Gx::Application::Instance();
+        application.SetConfig(m_config);
+        m_keyChannel = Chart::Channel::Note1;
         keySelect->SetFrame(0);
 
-        if (auto bgGroup = mixer.GetSoundGroup("BGM"); bgGroup)
+        if (const auto bgGroup = mixer.GetSoundGroup("BGM"); bgGroup)
         {
             bgGroup->SetVolume(m_config.MusicVolume);
             bgGroup->SetEnabled(m_config.UseBGM);
         }
 
-        if (auto sfxGroup = mixer.GetSoundGroup("SFX"); sfxGroup)
+        if (const auto sfxGroup = mixer.GetSoundGroup("SFX"); sfxGroup)
             sfxGroup->SetVolume(m_config.EffectVolume);
 
         toolTip->SetString("Setting has been saved.");
@@ -247,8 +244,8 @@ void OptionDialog::Initialize()
         Invalidate();
     });
 
-    auto btnDefault = FindChild<Gx::Button>("IDC_BUTTON_DEFAULT");
-    btnDefault->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
+    const auto btnDefault = FindChild<Gx::Button>("IDC_BUTTON_DEFAULT");
+    btnDefault->SetClickCallback([=] (auto &sender, auto &ev)
     {
         m_config.Reset();
         btnSave->PerformClick();
@@ -257,16 +254,16 @@ void OptionDialog::Initialize()
         toolTip->Show(this);
     });
 
-    auto keyTab   = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
-    auto soundTab = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
+    const auto keyTab   = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
+    const auto soundTab = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
 
     keyTab->SetCheckStateChangeCallback([=, &mixer] (auto sender)
     {
         if (!sender->IsChecked())
             return;
 
-        auto bgGroup = mixer.GetSoundGroup("BGTest");
-        auto efGroup = mixer.GetSoundGroup("EFTest");
+        const auto bgGroup = mixer.GetSoundGroup("BGTest");
+        const auto efGroup = mixer.GetSoundGroup("EFTest");
         mixer.Play(sfxNavigation, "SFX");
 
         if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Playing))
@@ -328,14 +325,14 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     auto config = app.GetConfig<GameConfig>();
     m_config    = GameConfig(config);
 
-    auto background    = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
-    auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
-    auto soundTab      = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
-    auto gameOption    = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
-    auto musicOption   = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
-    auto toolTip       = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
-    auto keySelect     = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto background    = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
+    const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
+    const auto soundTab      = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
+    const auto gameOption    = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
+    const auto musicOption   = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
+    const auto toolTip       = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
+    const auto keySelect     = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
     background->SetFrame("KeyOption");
     //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
@@ -352,7 +349,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     toolTip->Hide();
 
     m_keyTestEnabled = false;
-    m_keyChannel = O2Chart::Channel::Note1;
+    m_keyChannel = Chart::Channel::Note1;
     keySelect->SetFrame(0);
 }
 
@@ -361,8 +358,8 @@ void OptionDialog::OnClose()
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
 
-    auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
-    auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
+    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
     mixer.Stop("BGTest");
     mixer.Stop("EFTest");
@@ -374,24 +371,24 @@ void OptionDialog::OnClose()
     mixer.Play(sfxNavigation, "SFX");
 }
 
-void OptionDialog::Update(double delta)
+void OptionDialog::Update(const double delta)
 {
     UiContainer::Update(delta);
 }
 
-void OptionDialog::OnKeyDown(sf::Event::KeyEvent ev)
+void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Dialog::OnKeyDown(ev);
 
-    auto gameOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
-    auto keySelect  = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+    const auto gameOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
+    const auto keySelect  = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
 
     if (gameOption->IsEnabled())
     {
         if (!m_keyTestEnabled)
         {
-            auto keytext = m_keyTexts[m_keyChannel];
-            auto keyStr = std::string(magic_enum::enum_name(ev.code));
+            const auto keytext = m_keyTexts[m_keyChannel];
+            const auto keyStr = std::string(magic_enum::enum_name(ev.code));
 
             if (!keytext || !keytext->ContainsFrame(keyStr))
                 return;
@@ -400,13 +397,13 @@ void OptionDialog::OnKeyDown(sf::Event::KeyEvent ev)
             keytext->SetFrame(keyStr);
 
             int index = static_cast<int>(m_keyChannel);
-            if (index >= static_cast<int>(O2Chart::Channel::Note7))
-                index = static_cast<int>(O2Chart::Channel::Note1);
+            if (index >= static_cast<int>(Chart::Channel::Note7))
+                index = static_cast<int>(Chart::Channel::Note1);
             else
                 index++;
 
-            m_keyChannel = static_cast<O2Chart::Channel>(index);
-            keySelect->SetFrame(index - static_cast<int>(O2Chart::Channel::Note1));
+            m_keyChannel = static_cast<Chart::Channel>(index);
+            keySelect->SetFrame(index - static_cast<int>(Chart::Channel::Note1));
             keySelect->SetVisible(true);
         }
         else
@@ -421,14 +418,14 @@ void OptionDialog::OnKeyDown(sf::Event::KeyEvent ev)
     }
 }
 
-void OptionDialog::OnKeyUp(sf::Event::KeyEvent ev)
+void OptionDialog::OnKeyUp(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyUp(ev);
 
     if (m_keyTestEnabled)
     {
-        auto gameOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
-        auto keySelect  = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+        const auto gameOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
+        const auto keySelect  = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
 
         keySelect->SetVisible(false);
         for (auto [channel, keyDown] : m_keyDowns)
@@ -439,7 +436,7 @@ void OptionDialog::OnKeyUp(sf::Event::KeyEvent ev)
     }
 }
 
-void OptionDialog::OnKeyType(sf::Event::TextEvent ev)
+void OptionDialog::OnKeyType(const sf::Event::TextEvent ev)
 {
     Inputable::OnKeyType(ev);
 }
@@ -465,26 +462,26 @@ void OptionDialog::Invalidate()
     if (!IsShown())
         return;
 
-    auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
-    auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
+    const auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
+    const auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
 
-    auto gfxCheckBox     = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
-    auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
-    auto keySelect       = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    auto bgmCheckBox     = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
-    auto masterVolumeBar = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_MASTER_VOLUME");
-    auto musicVolumeBar  = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_MUSIC_VOLUME");
-    auto effectVolumeBar = musicOption->FindChild<Gx::ProgressBar>("IDC_PROGRESSBAR_SOUND_VOLUME");
+    const auto gfxCheckBox       = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
+    const auto cursorCheckBox    = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
+    const auto keyTestCheckBox   = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
+    const auto keySelect         = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+    const auto bgmCheckBox       = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
+    const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
+    const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
+    const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
     gfxCheckBox->SetCheckedState(m_config.Use3D);
     cursorCheckBox->SetCheckedState(m_config.UseWindowCursor);
     keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
     bgmCheckBox->SetCheckedState(m_config.UseBGM);
 
-    masterVolumeBar->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : masterVolumeBar->GetValue());
-    musicVolumeBar->SetValue(m_config.MusicVolume);
-    effectVolumeBar->SetValue(m_config.EffectVolume);
+    masterVolumeGauge->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : masterVolumeGauge->GetValue());
+    musicVolumeGauge->SetValue(m_config.MusicVolume);
+    effectVolumeGauge->SetValue(m_config.EffectVolume);
 
     for (auto [channel, keytext] : m_keyTexts)
         keytext->SetFrame(std::string(magic_enum::enum_name(m_config.SevenKeyBinding[channel])));

@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include <Genode/UI/Control.hpp>
+#include <Genode/SceneGraph/RenderBatchContainer.hpp>
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 
 #include <vector>
@@ -14,7 +15,7 @@
 namespace Gx
 {
     class RadioButton;
-    class UiContainer : public Control
+    class UiContainer : public virtual Control, public virtual RenderBatchContainer
     {
     public:
         UiContainer();
@@ -23,8 +24,11 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
         void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
+        bool IsBatchingEnabled() const;
+        void SetBatchingEnabled(bool batchingEnabled);
+
     protected:
-        RenderStates Render(sf::RenderTarget &target, RenderStates states) const override;
+        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(sf::Event ev) override;
 
@@ -36,7 +40,7 @@ namespace Gx
     private:
         sf::FloatRect m_localBounds;
         RadioButton *m_activeRadio;
-        bool m_radioHandled;
+        bool m_radioHandled, m_useBatching{false};
         std::function<void(RadioButton*)> m_radioCallback;
     };
 }

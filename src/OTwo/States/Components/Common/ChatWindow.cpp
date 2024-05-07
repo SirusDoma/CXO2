@@ -5,32 +5,32 @@ ChatWindow::ChatWindow() :
     m_font(),
     m_scroll(),
     m_bounds(),
-    m_characterSize(13),
-    m_offset()
+    m_offset(),
+    m_maxChatLength(0),
+    m_characterSize(13)
 {
 }
 
-ChatWindow::ChatWindow(ChatWindow &&copy) :
-    m_font(copy.m_font),
-    m_scroll(copy.m_scroll),
-    m_bounds(copy.m_bounds),
-    m_offset(copy.m_offset),
-    m_maxChatLength(copy.m_maxChatLength),
-    m_characterSize(copy.m_characterSize),
-    m_chats(copy.m_chats),
-    m_labels(std::move(copy.m_labels))
+ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
+    m_font(other.m_font),
+    m_scroll(other.m_scroll),
+    m_bounds(other.m_bounds),
+    m_offset(other.m_offset),
+    m_maxChatLength(other.m_maxChatLength),
+    m_characterSize(other.m_characterSize),
+    m_chats(other.m_chats),
+    m_labels(std::move(other.m_labels))
 {
 }
 
 
-ChatWindow::ChatWindow(const sf::Font &font, sf::FloatRect localBounds, unsigned int characterSize) :
+ChatWindow::ChatWindow(const sf::Font &font, const sf::FloatRect &localBounds, const unsigned int characterSize) :
     m_font(&font),
     m_scroll(),
     m_bounds(localBounds),
-    m_characterSize(characterSize),
-    m_offset()
+    m_offset(), m_maxChatLength(0),
+    m_characterSize(characterSize)
 {
-
 }
 
 sf::FloatRect ChatWindow::GetLocalBounds() const
@@ -62,7 +62,7 @@ unsigned int ChatWindow::GetCharacterSize() const
     return m_characterSize;
 }
 
-void ChatWindow::SetCharacterSize(unsigned int characterSize)
+void ChatWindow::SetCharacterSize(const unsigned int characterSize)
 {
     if (m_characterSize != characterSize)
     {
@@ -76,7 +76,7 @@ unsigned int ChatWindow::GetScrollOffset() const
     return m_offset;
 }
 
-void ChatWindow::SetScrollOffset(unsigned int offset)
+void ChatWindow::SetScrollOffset(const unsigned int offset)
 {
     if (m_offset != offset)
     {
@@ -90,7 +90,7 @@ void ChatWindow::SetScrollBar(Gx::ScrollBar &scrollBar)
     if (m_scroll != &scrollBar)
     {
         m_scroll = &scrollBar;
-        m_scroll->SetValueChangedCallback([=] (auto& sender, float value)
+        m_scroll->SetValueChangedCallback([=] (auto& sender, const float value)
         {
             m_offset = static_cast<unsigned int>(value);
            Invalidate();
@@ -103,7 +103,7 @@ unsigned int ChatWindow::GetMaximumChatLength() const
     return m_maxChatLength;
 }
 
-void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
+void ChatWindow::SetMaximumChatLength(const unsigned int maxLength)
 {
     if (maxLength != m_maxChatLength)
     {
@@ -112,9 +112,9 @@ void ChatWindow::SetMaximumChatLength(unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(Player player, const sf::String &chat)
+void ChatWindow::PushMessage(const PlayerData &player, const sf::String &chat)
 {
-    auto chatData = ChatData{ player, chat };
+    const auto chatData = ChatData{ player, chat };
     // Do something if player is self
 
     if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
@@ -127,27 +127,27 @@ void ChatWindow::PushMessage(Player player, const sf::String &chat)
 
 void ChatWindow::PushSystemMessage(const sf::String &chat)
 {
-    PushMessage(Player{0}, chat);
+    PushMessage(PlayerData{0}, chat);
 }
 
-Gx::RenderStates ChatWindow::Render(sf::RenderTarget &target, Gx::RenderStates states) const
+Gx::RenderStates ChatWindow::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    states = UiContainer::Render(target, states);
+    states = UiContainer::Render(surface, states);
     for (auto& label : m_labels)
-        target.draw(*label, states);
+        surface.Render(*label, states);
 
     return states;
 }
 
-void ChatWindow::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
+void ChatWindow::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev)
 {
     Control::OnMouseWheelScrolled(ev);
 
     if (!IsEnabled() || !m_scroll)
         return;
 
-    auto position = sf::Vector2f(ev.x, ev.y);
-    float delta   = ev.delta;
+    const auto position = sf::Vector2f(ev.x, ev.y);
+    float delta         = ev.delta;
     if (m_scroll->GetScrollOrientation() == Gx::ScrollBar::ScrollOrientation::Vertical)
         delta *= -1;
 
@@ -157,7 +157,7 @@ void ChatWindow::OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev)
 
 void ChatWindow::Invalidate()
 {
-    unsigned int max = m_maxChatLength > 0 ? m_maxChatLength : m_chats.size();
+    const unsigned int max = m_maxChatLength > 0 ? m_maxChatLength : m_chats.size();
     m_offset = std::min(m_offset, static_cast<unsigned int>(m_chats.size()));
 
     if (m_scroll)
@@ -191,7 +191,7 @@ void ChatWindow::Invalidate()
 
     for (size_t i = m_offset; i < m_offset + max; i++)
     {
-        int index = i - m_offset;
+        const int index = i - m_offset;
         if (index >= m_labels.size())
             break;
 
@@ -216,9 +216,8 @@ void ChatWindow::Invalidate()
         m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
         if (chat.Sender.ID != 0)
         {
-            size_t nickLength = 16;
             auto nickname = chat.Sender.Name;
-            if (nickname.length() < nickLength)
+            if (constexpr size_t nickLength = 16; nickname.length() < nickLength)
             {
                 for (size_t j = 0; j < nickLength - nickname.length(); j++)
                     nickname = " " + nickname;

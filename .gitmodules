@@ -1,6 +1,0 @@
-[submodule "extlibs/headers/clip"]
-	path = extlibs/headers/clip
-	url = https://github.com/dacap/clip.git
-[submodule "extlibs/headers/boxer"]
-	path = extlibs/headers/boxer
-	url = https://github.com/aaronmjacobs/Boxer.git

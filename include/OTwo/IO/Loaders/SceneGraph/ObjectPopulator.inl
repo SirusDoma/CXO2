@@ -10,7 +10,13 @@ void ObjectPopulator::Populate(const std::string &name, Gx::ResourcePtr<R> objec
 
     if (auto state = dynamic_cast<State*>(m_populator); state)
     {
-        state->Import<R>(name, std::move(object), ResourceScope::Local);
+        auto result = state->Import<R>(name, std::move(object), ResourceScope::Local);
+        if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
+        {
+            if (!m_importOnly)
+                state->AddChild(result);
+        }
+
         return;
     }
 
