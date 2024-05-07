@@ -30,7 +30,7 @@ namespace Gx
     {
     }
 
-    std::string Node::GetName() const
+    const std::string &Node::GetName() const
     {
         return m_name;
     }
@@ -40,7 +40,7 @@ namespace Gx
         m_name = name;
     }
 
-    std::string Node::GetTag() const
+    const std::string &Node::GetTag() const
     {
         return m_tag;
     }

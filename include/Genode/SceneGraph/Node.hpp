@@ -15,10 +15,10 @@ namespace Gx
         Node(const Gx::Node &copy);
         ~Node() override = default;
 
-        std::string GetName() const;
+        const std::string &GetName() const;
         void SetName(const std::string& name);
 
-        std::string GetTag() const;
+        const std::string &GetTag() const;
         void SetTag(const std::string& tag);
 
         Node* GetParent() const;
