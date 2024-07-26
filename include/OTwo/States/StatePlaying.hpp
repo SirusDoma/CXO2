@@ -8,6 +8,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Data/ChartState.hpp>
 
 class StatePlaying : public State
 {
@@ -24,8 +25,9 @@ public:
 
 
 private:
+    ChartState *m_state;
     GameConfig *m_config;
-    std::unordered_map<Chart::Channel, Gx::Image*> m_keyDowns, m_keyEffects;
+    std::unordered_map<Chart::ChannelType, Gx::Image*> m_keyDowns, m_keyEffects;
 };
 
 

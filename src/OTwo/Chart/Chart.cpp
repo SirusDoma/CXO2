@@ -18,7 +18,7 @@ std::vector<Chart::Event*> Chart::GetEvents(Difficulty diff) const
     const auto source = m_events.find(diff);
     if (source == m_events.end())
         return events;
-
+ 
     for (const auto &it : source->second)
         events.push_back(it.get());
 
@@ -57,3 +57,14 @@ void Chart::SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail)
 {
     m_thumbnail = std::move(thumbnail);
 }
+
+float Chart::PositionToSeconds(const float position, const float bpm)
+{
+    return position * 4 * (60 / bpm);
+}
+
+float Chart::SecondsToPosition(const float seconds, const float bpm)
+{
+    return seconds / (4 * (60 / bpm));
+}
+

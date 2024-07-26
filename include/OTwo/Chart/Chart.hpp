@@ -15,7 +15,7 @@
 class Chart
 {
 public:
-    enum class Channel : Gx::Uint16
+    enum class ChannelType : Gx::Uint16
     {
         Measurement = 0,
         BPM         = 1,
@@ -39,8 +39,10 @@ public:
 
     struct Event
     {
-        float Position;
-        Chart::Channel Channel;
+        float        Position;
+        ChannelType Channel;
+
+        bool IsPlayable() const { return Channel != ChannelType::Measurement && Channel != ChannelType::BPM && Channel != ChannelType::BGM; }
     };
 
     struct TimeEvent : public Event
@@ -74,6 +76,9 @@ public:
 
     const sf::Image *GetThumbnail() const;
     void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
+
+    static float PositionToSeconds(float position, float bpm);
+    static float SecondsToPosition(float seconds, float bpm);
 
     std::string Source;
 private:

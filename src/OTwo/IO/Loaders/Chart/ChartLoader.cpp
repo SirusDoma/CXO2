@@ -1,6 +1,8 @@
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
+#include <magic_enum.hpp>
+
 Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata &meta, const Gx::ResourceContext &ctx) const
 {
     auto chart = LoadFromFile(meta.Source, ctx);
@@ -142,22 +144,24 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (stream.read(&count, sizeof(count)) != sizeof(count))
                 throw Gx::ResourceLoadException("Failed to read block count at note block");
 
-            auto channel = static_cast<Chart::Channel>(lane);
+            auto channel = static_cast<Chart::ChannelType>(lane);
             if (lane > 8)
-                channel = Chart::Channel::BGM;
+                channel = Chart::ChannelType::BGM;
 
             for (int i = 0; i < count; i++)
             {
                 const float position = static_cast<float>(measure) + (static_cast<float>(i) / static_cast<float>(count));
-                if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
+                const auto ev = Chart::Event{ position, channel };
+
+                if (channel == Chart::ChannelType::BPM || channel == Chart::ChannelType::Measurement)
                 {
                     std::float_t value;
                     if (stream.read(&value, sizeof(value)) != sizeof(value))
                         throw Gx::ResourceLoadException("Failed to read time event value");
 
-                    chart->AddEvent(difficulty, Chart::TimeEvent{
-                        position,
-                        channel,
+                    chart->AddEvent<Chart::TimeEvent>(difficulty,
+                    {
+                        ev,
                         value
                     });
 
@@ -180,17 +184,21 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 if (stream.read(&flag, sizeof(flag)) != sizeof(flag))
                     throw Gx::ResourceLoadException("Failed to read note flag data");
 
+                // Volume value is between 1 ~ 16.
+                // It needs to be converted to 0.f ~ 100.f range
                 auto volume = static_cast<float>((audio >> 4) & 0x0F);
-                volume = volume == 0 ? 100 : ((volume / 16.f) * 100.f);
+                volume = volume == 0 ? 100.f : ((volume / 16.f) * 100.f);
 
+                // Pan value is between 1 ~ 15 where 8 is the center
+                // It needs to be converted to -1.f to 1.f range where 0.f is the center
                 auto pan = static_cast<float>(audio & 0x0F);
                 pan = pan == 0 ? 8 : pan;
-                pan = ((pan - 8) / 8.f) * 100;
+                pan = ((pan - 1) / 14.0f) * 2.0f - 1.0f;
 
-                id = (id - 1) + (channel == Chart::Channel::BGM ? 1000 : 0);
-                chart->AddEvent(difficulty, Chart::NoteEvent{
-                    position,
-                    channel,
+                id = (id - 1) + (channel == Chart::ChannelType::BGM ? 1000 : 0);
+                chart->AddEvent<Chart::NoteEvent>(difficulty,
+                {
+                    ev,
                     id,
                     volume,
                     pan,

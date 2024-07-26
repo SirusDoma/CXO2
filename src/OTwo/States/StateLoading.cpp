@@ -22,26 +22,28 @@ void StateLoading::Initialize()
     State::Initialize();
 
     auto &user  = Require<UserState>();
-    auto &state = Require<ChartState>();
     auto &room  = user.GetCurrentRoom();
+    auto &state = Require<ChartState>();
+    state.SetMode(room.GameMode);
+    state.SetDifficulty(room.Difficulty);
 
-    auto device     = std::random_device();
-    auto seeder     = std::mt19937(device());
-    auto randomizer = std::uniform_int_distribution<int>(0, static_cast<int>(GetChildren().size()) - 1);
-    int result      = randomizer(seeder);
+    auto device      = std::random_device();
+    auto seeder      = std::mt19937(device());
+    auto randomizer  = std::uniform_int_distribution<int>(0, static_cast<int>(GetChildren().size()) - 1);
+    const int result = randomizer(seeder);
 
     std::size_t index = 0;
-    for (auto child : GetChildren())
+    for (const auto child : GetChildren())
     {
-        if (auto image = dynamic_cast<Gx::Image*>(child); image)
+        if (const auto image = dynamic_cast<Gx::Image*>(child); image)
         {
             image->SetVisible(index == result);
             index++;
         }
     }
 
-    auto metadata  = room.Chart;
-    auto loader = ChartLoader();
+    const auto metadata  = room.Chart;
+    auto loader          = ChartLoader();
 
     // TODO: Load cover after select music in StateWaiting and forward it into StateLoading
     loader.SetCoverLoadCallback([this] (auto cover)
@@ -65,9 +67,9 @@ void StateLoading::Update(const double delta)
 
 void StateLoading::OnCoverLoaded(const sf::Image *cover)
 {
-    for (auto child : GetChildren())
+    for (const auto child : GetChildren())
     {
-        if (auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVislble() && m_texture.loadFromImage(*cover))
+        if (const auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVislble() && m_texture.loadFromImage(*cover))
         {
             image->SetTexture(m_texture);
             return;
@@ -77,7 +79,7 @@ void StateLoading::OnCoverLoaded(const sf::Image *cover)
 
 void StateLoading::OnChartLoaded(const Chart *chart)
 {
-    auto transition = Create<Gx::Sequence>([this, chart]
+    const auto transition = Create<Gx::Sequence>([this, chart]
         {
             auto &director = GetDirector();
             auto &state    = Require<UserState>();

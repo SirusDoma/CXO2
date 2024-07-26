@@ -35,10 +35,10 @@ private:
     void Invalidate() override;
 
     ::State *m_parent;
-    std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
+    std::map<Chart::ChannelType, Gx::Image*> m_keyTexts, m_keyDowns;
 
     GameConfig       m_config;
-    Chart::Channel m_keyChannel;
+    Chart::ChannelType m_keyChannel;
 
     bool m_keyTestEnabled;
     bool m_initialized;

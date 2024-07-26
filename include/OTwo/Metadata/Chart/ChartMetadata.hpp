@@ -30,7 +30,7 @@ enum class Genre
 
 struct ChartMetadata
 {
-    static const Gx::Uint32 Size = 300;
+    static constexpr Gx::Uint32 Size = 300;
 
     Gx::Uint32 ID;
     char Signature[4];
