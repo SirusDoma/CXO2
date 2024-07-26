@@ -91,7 +91,7 @@ namespace Gx
         virtual void Invalidate() = 0;
 
     private:
-        constexpr static double DOUBLE_CLICK_THRESHOLD = 250.f;
+        constexpr static double DOUBLE_CLICK_THRESHOLD = 500.f;
         constexpr static double HOLD_CLICK_THRESHOLD   = 50.f;
 
         State  m_state;
