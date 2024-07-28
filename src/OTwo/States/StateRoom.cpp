@@ -15,8 +15,8 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Models/UserState.hpp>
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Room.hpp>
 
@@ -34,7 +34,7 @@ void StateRoom::Initialize()
 
     auto& director = GetDirector();
     auto& mixer    = Require<Gx::Mixer>();
-    auto& state    = Require<UserState>();
+    auto& session  = Require<SessionContext>();
     auto& items    = Require<ItemFactory>();
 
     auto bgm         = Load<sf::Music>("STATE_ROOM/IDC_MUSIC");
@@ -42,7 +42,7 @@ void StateRoom::Initialize()
     auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_07");
     auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_14");
 
-    auto player = state.GetCurrentPlayer();
+    auto player = session.GetCurrentPlayer();
     auto nicknameLabel = Load<Gx::Label>("STATE_ROOM/IDC_TEXT_NICKNAME");
     nicknameLabel->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
 
@@ -55,7 +55,7 @@ void StateRoom::Initialize()
     notice->SetString("Welcome to O2Jam! Let's play together~");
 
     auto channelCategory = Load<Gx::Image>("STATE_ROOM/IDC_IMAGE_CHANNEL_CATEGORY");
-    switch (state.GetMusicHall())
+    switch (session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
         case MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
@@ -67,7 +67,7 @@ void StateRoom::Initialize()
     }
 
     auto channelNumber = Load<Gx::Number>("STATE_ROOM/IDC_NUMBER_CHANNEL_ID");
-    channelNumber->SetValue(state.GetChannelID());
+    channelNumber->SetValue(session.GetChannelID());
 
     auto chatPanel = Load<ChatPanel>("STATE_ROOM/IDC_CHAT_PANEL");
     chatPanel->Initialize();
@@ -84,7 +84,7 @@ void StateRoom::Initialize()
     userList->Initialize();
 
     auto users = std::vector<PlayerData>();
-    userList->AddUser(state.GetCurrentPlayer());
+    userList->AddUser(session.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
         userList->AddUser(PlayerData{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
@@ -171,14 +171,14 @@ void StateRoom::Initialize()
     if (auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_CREATE_ROOM"); dialog)
     {
         auto createRoomDialog = Create<CreateRoomDialog>(*dialog);
-        createRoomButton->SetClickCallback([=, &mixer, &state, &director] (auto& sender, auto& ev) {
+        createRoomButton->SetClickCallback([=, &mixer, &session, &director] (auto& sender, auto& ev) {
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
-                auto musicList = state.GetInstalledMusic();
-                state.SetCurrentRoom(RoomData{
+                auto musicList = session.GetInstalledMusic();
+                session.SetCurrentRoom(RoomData{
                         4,
-                        state.GetCurrentPlayer().ID,
+                        session.GetCurrentPlayer().ID,
                         createRoomDialog->GetRoomName(),
                         musicList[musicList.size() / 2].ToChartMetadataView(Difficulty::EX),
                         Difficulty::EX,
@@ -191,7 +191,7 @@ void StateRoom::Initialize()
                         createRoomDialog->GetMinLevelLimit(),
                         createRoomDialog->GetMaxLevelLimit(),
                         {
-                            RoomMember{state.GetCurrentPlayer(), RoomTeam::A},
+                            RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
                             {},
                             {},
                             RoomMember{PlayerData{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221}}, RoomTeam::F},

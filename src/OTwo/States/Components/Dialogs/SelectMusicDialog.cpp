@@ -1,6 +1,6 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
@@ -44,11 +44,11 @@ void SelectMusicDialog::Initialize()
     if (auto cancelButton = GetCancelButton(); cancelButton)
         SetCancelButton(*cancelButton);
 
-    auto& app   = Gx::Application::Instance();
-    auto& state = app.Require<UserState>();
+    auto& app     = Gx::Application::Instance();
+    auto& session = app.Require<SessionContext>();
 
     m_page = 0;
-    m_musicList = state.GetInstalledMusic();
+    m_musicList = session.GetInstalledMusic();
 
     for (auto& metadata : m_musicList)
         m_displayList.push_back(&metadata);

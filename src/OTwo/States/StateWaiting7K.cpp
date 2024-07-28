@@ -8,9 +8,9 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Models/UserState.hpp>
 
 #include <OTwo/States/Components/Common/ChatPanel.hpp>
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
@@ -34,9 +34,9 @@ void StateWaiting7K::Initialize()
     auto& director = GetDirector();
     auto& items    = app.Require<ItemFactory>();
     auto& mixer    = app.Require<Gx::Mixer>();
-    auto& state    = app.Require<UserState>();
-    auto& player   = state.GetCurrentPlayer();
-    auto& room     = state.GetCurrentRoom();
+    auto& session  = app.Require<SessionContext>();
+    auto& player   = session.GetCurrentPlayer();
+    auto& room     = session.GetCurrentRoom();
 
     auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
     auto sfxStart       = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
@@ -44,7 +44,7 @@ void StateWaiting7K::Initialize()
     auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
 
     auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
-    switch (state.GetMusicHall())
+    switch (session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
         case MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
@@ -56,7 +56,7 @@ void StateWaiting7K::Initialize()
     }
 
     auto channelNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_CHANNEL_ID");
-    channelNumber->SetValue(state.GetChannelID());
+    channelNumber->SetValue(session.GetChannelID());
 
     auto roomNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_ROOM_ID");
     roomNumber->SetValue(room.ID);
@@ -117,7 +117,7 @@ void StateWaiting7K::Initialize()
             continue;
         }
 
-        if (member.ID == state.GetCurrentPlayer().ID)
+        if (member.ID == session.GetCurrentPlayer().ID)
         {
             currentMember = member;
             currentAvatarInfo = avatarInfo;
@@ -184,7 +184,7 @@ void StateWaiting7K::Initialize()
     auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
-    mapSelector->SetMapChangedCallback([=, s = &state, r = &room] (const unsigned int mapID)
+    mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
     {
         auto data = RoomData(*r);
         data.MapID = mapID;
@@ -192,7 +192,7 @@ void StateWaiting7K::Initialize()
         s->SetCurrentRoom(data);
     });
 
-    mapSelector->SetEffectChangedCallback([=, s = &state, r = &room] (const unsigned int effectID)
+    mapSelector->SetEffectChangedCallback([=, s = &session, r = &room] (const unsigned int effectID)
     {
         auto data = RoomData(*r);
         data.EffectID = effectID;
@@ -260,7 +260,7 @@ void StateWaiting7K::Initialize()
             });
         }
 
-        dialogSelectMusic->SetAcceptCallback([=, s = &state, r = &room] ()
+        dialogSelectMusic->SetAcceptCallback([=, s = &session, r = &room] ()
         {
             auto music = dialogSelectMusic->GetSelectedMusic();
             if (music.ID == 0)

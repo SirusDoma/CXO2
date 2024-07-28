@@ -1,6 +1,6 @@
 #include <OTwo/States/Components/Common/ChatPanel.hpp>
 #include <OTwo/States/Components/Common/ChatWindow.hpp>
-#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
@@ -27,7 +27,7 @@ void ChatPanel::Initialize()
     chatBox->SetPermanentFocusEnabled(true);
     chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String &text)
     {
-        chatWindow->PushMessage(Gx::Application::Instance().Require<UserState>().GetCurrentPlayer(), text);
+        chatWindow->PushMessage(Gx::Application::Instance().Require<SessionContext>().GetCurrentPlayer(), text);
     });
 
     auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON");

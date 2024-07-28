@@ -3,19 +3,18 @@
 
 #include <SFML/Audio.hpp>
 
-#include <Genode/System/Module.hpp>
+#include <Genode/System/Context.hpp>
 #include <Genode/Entities/Updatable.hpp>
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <vector>
 #include <memory>
-#include <unordered_map>
 
 namespace Gx
 {
     class SoundGroup;
-    class Mixer : public Module, public Updatable
+    class Mixer : public Context, public Updatable
     {
     public:
         Mixer();

@@ -5,14 +5,13 @@
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
-#include <Genode/System/Module.hpp>
-#include <OTwo/Models/Game.hpp>
+#include <Genode/System/Context.hpp>
 
 class Chart;
-class ChartState : public Gx::Module
+class ChartContext : public Gx::Context
 {
 public:
-    ChartState() = default;
+    ChartContext() = default;
 
     const Chart *GetChart() const;
     void SetChart(Gx::ResourcePtr<Chart> chart);

@@ -1,5 +1,5 @@
 #include <OTwo/States/Components/Dialogs/CreateRoomDialog.hpp>
-#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/State.hpp>
 
 CreateRoomDialog::CreateRoomDialog(const Gx::Dialog &copy) :
@@ -22,10 +22,10 @@ void CreateRoomDialog::Initialize()
     if (auto cancelButton = GetCancelButton(); cancelButton)
         SetCancelButton(*cancelButton);
 
-    auto& app   = Gx::Application::Instance();
-    auto& mixer = app.Require<Gx::Mixer>();
-    auto state  = app.Require<UserState>();
-    auto parent = GetParent<::State>();
+    auto& app    = Gx::Application::Instance();
+    auto& mixer  = app.Require<Gx::Mixer>();
+    auto session = app.Require<SessionContext>();
+    auto parent  = GetParent<::State>();
 
     auto sfxClick = parent->Load<sf::Sound>("IDC_DIALOG_CREATE_ROOM/IDC_SOUND_CLICK");
 
@@ -138,27 +138,27 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     Initialize();
 
-    auto& app  = Gx::Application::Instance();
-    auto state = app.Require<UserState>();
-    
+    auto& app    = Gx::Application::Instance();
+    auto session = app.Require<SessionContext>();
+
     auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
     auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");
-    
+
     auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
     auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
     auto versusModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
-    
+
     auto jamAnimation    = jamModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_JAM");
     auto singleAnimation = singleModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_SINGLE");
     auto versusAnimation = versusModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_VERSUS");
-    
+
     auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
     auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
     auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
 
     auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
-    
-    titleTextBox->SetString(state.GetCurrentPlayer().Name + "'s Room");
+
+    titleTextBox->SetString(session.GetCurrentPlayer().Name + "'s Room");
     titleTextBox->SelectAll();
     passwordTextBox->SetString("");
 

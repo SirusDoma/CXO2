@@ -2,7 +2,7 @@
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Config.hpp>
-#include <Genode/System/Module.hpp>
+#include <Genode/System/Context.hpp>
 
 namespace Gx
 {
@@ -90,9 +90,9 @@ namespace Gx
             const double delta = end - start;
 
             // Update installed modules
-            for (auto& [_, module] : m_modules)
+            for (auto& [_, context] : m_contexts)
             {
-                if (const auto updatable = dynamic_cast<Updatable*>(module.get()))
+                if (const auto updatable = dynamic_cast<Updatable*>(context.get()))
                     updatable->Update(delta);
             }
 

@@ -1,7 +1,7 @@
 #include <OTwo/States/StateLoading.hpp>
 
-#include <OTwo/Models/UserState.hpp>
-#include <OTwo/Models/ChartState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/ChartContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
 #include <Genode/UI/Image.hpp>
@@ -21,9 +21,9 @@ void StateLoading::Initialize()
 {
     State::Initialize();
 
-    auto &user  = Require<UserState>();
+    auto &user  = Require<SessionContext>();
     auto &room  = user.GetCurrentRoom();
-    auto &state = Require<ChartState>();
+    auto &state = Require<ChartContext>();
     state.SetMode(room.GameMode);
     state.SetDifficulty(room.Difficulty);
 
@@ -82,7 +82,7 @@ void StateLoading::OnChartLoaded(const Chart *chart)
     const auto transition = Create<Gx::Sequence>([this, chart]
         {
             auto &director = GetDirector();
-            auto &state    = Require<UserState>();
+            auto &state    = Require<SessionContext>();
             auto &room     = state.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 

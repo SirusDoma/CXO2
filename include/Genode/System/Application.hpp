@@ -1,7 +1,6 @@
 #ifndef GENODE_SYSTEM_APPLICATION_HPP
 #define GENODE_SYSTEM_APPLICATION_HPP
 
-
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Graphics/Cursor.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
@@ -9,6 +8,7 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Config.hpp>
+#include <Genode/System/Context.hpp>
 
 #include <SFML/Window.hpp>
 
@@ -18,7 +18,7 @@
 namespace Gx
 {
     class Scene;
-    class Module;
+    class Context;
     class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
@@ -48,7 +48,7 @@ namespace Gx
         void SetConfig(std::function<std::unique_ptr<T>(const Application&)> builder);
 
         template<typename T>
-        T &Install();
+        T &Provide();
 
         template<typename T>
         bool Provide(std::function<std::unique_ptr<T>(Application&)> builder);
@@ -80,8 +80,8 @@ namespace Gx
         using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
         using ConfigResolverMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Config>(const Application&)>>;
 
-        using ModuleMap        = std::unordered_map<std::type_index, std::unique_ptr<Module>>;
-        using ModuleFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Module>(Application&)>>;
+        using ContextMap        = std::unordered_map<std::type_index, std::unique_ptr<Context>>;
+        using ContextFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Context>(Application&)>>;
 
         inline static Application *m_instance = nullptr;
 
@@ -101,8 +101,8 @@ namespace Gx
         ConfigMap         m_configs;
         ConfigResolverMap m_configurators;
 
-        ModuleMap        m_modules;
-        ModuleFactoryMap m_factories;
+        ContextMap        m_contexts;
+        ContextFactoryMap m_factories;
 
         const std::string m_title;
         unsigned int m_frameID;

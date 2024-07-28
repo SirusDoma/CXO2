@@ -14,7 +14,7 @@ void StatePlaying::Initialize()
     State::Initialize();
 
     auto &app = GetApplication();
-    m_state   = &Require<ChartState>();
+    m_state   = &Require<ChartContext>();
     m_config  = &app.GetConfig<GameConfig>();
 
     const auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");

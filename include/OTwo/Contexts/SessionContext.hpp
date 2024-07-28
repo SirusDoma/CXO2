@@ -1,16 +1,16 @@
-#ifndef O2JAM_USER_STATE_HPP
-#define O2JAM_USER_STATE_HPP
+#ifndef O2JAM_SESSION_CONTEXT_HPP
+#define O2JAM_SESSION_CONTEXT_HPP
 
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
-#include <Genode/System/Module.hpp>
+#include <Genode/System/Context.hpp>
 
-class UserState : public Gx::Module
+class SessionContext : public Gx::Context
 {
 public:
-    UserState() = default;
+    SessionContext() = default;
 
     const PlayerData &GetCurrentPlayer() const;
     void SetCurrentPlayer(const PlayerData &player);

@@ -44,8 +44,7 @@
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StatePlayingLoader.hpp>
 
-#include <OTwo/Data/Character.hpp>
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 
 #include <OTwo/States/SceneDirectorDecorator.hpp>
 #include <OTwo/States/StateTest.hpp>
@@ -123,7 +122,7 @@ void O2Jam::Boot()
         return config;
     });
 
-    // Module configuration
+    // Context configuration
     Provide<Gx::ResourceManager>([](auto &app)
     {
         // Register shared resource container
@@ -146,23 +145,23 @@ void O2Jam::Boot()
         return factory;
     });
 
-    Provide<UserState>([&](auto &app)
+    Provide<SessionContext>([&](auto &app)
     {
-        auto state = std::make_unique<UserState>();
+        auto session  = std::make_unique<SessionContext>();
         auto player   = PlayerData();
         player.ID     = 1;
         player.Name   = "CXO2";
         player.Level  = -1;
         player.Gender = Gender::Male;
 
-        state->SetCurrentPlayer(player);
-        return state;
+        session->SetCurrentPlayer(player);
+        return session;
     });
 
     // Force to load heavy providers during start-up
-    auto _ = Require<UserState>().GetInstalledMusic();
+    auto _ = Require<SessionContext>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
-        auto _ = Require<ItemFactory>().GetDefaultItems(gender);
+        auto __ = Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
     auto& resources = Require<Gx::ResourceManager>();

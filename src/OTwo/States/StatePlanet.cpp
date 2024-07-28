@@ -1,7 +1,7 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/Components/Planet/ChannelBoard.hpp>
 #include <OTwo/Models/Planet.hpp>
-#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
@@ -18,7 +18,7 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    auto& state   = Require<UserState>();
+    auto& session = Require<SessionContext>();
     auto& mixer   = Require<Gx::Mixer>();
 
     auto bgm      = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
@@ -80,7 +80,7 @@ void StatePlanet::Initialize()
         });
     }
 
-    if (state.GetMusicHall() == MusicHall::None)
+    if (session.GetMusicHall() == MusicHall::None)
     {
         auto overlay = Create<Gx::Rectangle>(GetView().getSize());
         auto splash = Create<Gx::Sequence>([&, overlay]
@@ -137,12 +137,12 @@ void StatePlanet::OnChannelEnter(MusicHall hall, Channel channel)
         return;
     }
 
-    auto& state = Require<UserState>();
-    state.SetMusicHall(hall);
-    state.SetChannelID(channel.ID);
+    auto& session = Require<SessionContext>();
+    session.SetMusicHall(hall);
+    session.SetChannelID(channel.ID);
 
     m_connecting = true;
-    auto sequence = Create<Gx::Sequence>([&] ()
+    const auto sequence = Create<Gx::Sequence>([&] ()
         {
             auto& director = GetDirector();
             director.Present<StateRoom>();

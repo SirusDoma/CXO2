@@ -6,7 +6,7 @@
 
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Archives/OmcArchive.hpp>
-#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 
 class O2Jam : public Gx::Application
 {

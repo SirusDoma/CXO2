@@ -3,11 +3,11 @@
 
 namespace Gx
 {
-    class Module
+    class Context
     {
     public:
-        Module() = default;
-        virtual ~Module() = default;
+        Context() = default;
+        virtual ~Context() = default;
     };
 }
 

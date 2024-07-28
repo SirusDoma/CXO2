@@ -4,7 +4,7 @@
 #include <OTwo/States/State.hpp>
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
-#include <OTwo/Models/ChartState.hpp>
+#include <OTwo/Contexts/ChartContext.hpp>
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
@@ -25,7 +25,7 @@ public:
 
 
 private:
-    ChartState *m_state;
+    ChartContext *m_state;
     GameConfig *m_config;
     std::unordered_map<Chart::ChannelType, Gx::Image*> m_keyDowns, m_keyEffects;
 };

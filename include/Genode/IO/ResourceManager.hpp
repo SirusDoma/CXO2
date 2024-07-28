@@ -4,7 +4,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/ResourceContainer.hpp>
 
-#include <Genode/System/Module.hpp>
+#include <Genode/System/Context.hpp>
 
 #include <typeindex>
 #include <memory>
@@ -12,7 +12,7 @@
 namespace Gx
 {
     class ResourceContext;
-    class ResourceManager : NonCopyable, public Module
+    class ResourceManager : NonCopyable, public Context
     {
     public:
         using ContextBuilder = std::function<std::unique_ptr<ResourceContext>(const std::string&, ResourceManager&, const CacheMode)>;
