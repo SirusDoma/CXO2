@@ -8,9 +8,9 @@
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
-#include <OTwo/Data/Shop.hpp>
-#include <OTwo/Data/Equipment.hpp>
-#include <OTwo/Data/Character.hpp>
+#include <OTwo/Models/Shop.hpp>
+#include <OTwo/Models/Equipment.hpp>
+#include <OTwo/Models/Character.hpp>
 
 Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

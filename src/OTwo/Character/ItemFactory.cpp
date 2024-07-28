@@ -1,6 +1,6 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
-#include <OTwo/Data/Character.hpp>
-#include <OTwo/Data/Equipment.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
 ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
@@ -29,7 +29,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
         items[item.GetType()] = &item;
     }
 
-    auto apply = [&] (const std::initializer_list<std::string> equipments)
+    auto equips = [&] (const std::initializer_list<std::string> equipments)
     {
         for (auto& name : equipments)
         {
@@ -40,7 +40,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
 
     if (gender == Gender::Male)
     {
-        apply({
+        equips({
             "Avatar/default/male/Face.json",
             "Avatar/default/male/Hair.json",
             "Avatar/default/male/Jacket.json",
@@ -50,7 +50,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
     }
     else if (gender == Gender::Female)
     {
-        apply({
+        equips({
             "Avatar/default/female/Face.json",
             "Avatar/default/female/Hair.json",
             "Avatar/default/female/Jacket.json",

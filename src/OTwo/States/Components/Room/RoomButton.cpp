@@ -3,7 +3,7 @@
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 
 RoomButton::RoomButton() :
     m_room(),

@@ -3,8 +3,8 @@
 
 #include <OTwo/Chart/Chart.hpp>
 
-#include <OTwo/Data/Game.hpp>
-#include <OTwo/Data/Character.hpp>
+#include <OTwo/Models/Game.hpp>
+#include <OTwo/Models/Character.hpp>
 
 #include <SFML/System/String.hpp>
 

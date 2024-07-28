@@ -1,7 +1,7 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/Components/Planet/ChannelBoard.hpp>
-#include <OTwo/Data/Planet.hpp>
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/Models/UserState.hpp>
 #include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateRoom.hpp>
 

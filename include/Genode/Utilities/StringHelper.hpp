@@ -52,7 +52,7 @@ namespace Gx
         static sf::String TrimEnd(const sf::String &input)
         {
             sf::String result = input;
-            for (size_t i = result.getSize() - 1; i > 0; i--)
+            for (size_t i = result.getSize() - 1; i > 0 && i < result.getSize(); i--)
             {
                 if (result[i] != L'\0' && result[i] != L' ' && result[i] != L'\t' && result[i] != L'\n')
                 {

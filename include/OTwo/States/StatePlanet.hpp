@@ -2,7 +2,7 @@
 #define O2JAM_STATE_PLANET_HPP
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/Data/Planet.hpp>
+#include <OTwo/Models/Planet.hpp>
 
 class StatePlanet : public State
 {

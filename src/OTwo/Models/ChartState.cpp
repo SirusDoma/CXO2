@@ -1,5 +1,5 @@
-#include <OTwo/Data/ChartState.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/ChartState.hpp>
+#include <OTwo/Models/Game.hpp>
 
 const Chart *ChartState::GetChart() const
 {

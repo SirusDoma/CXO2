@@ -1,7 +1,7 @@
 #ifndef O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
 #define O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/ToolTip.hpp>

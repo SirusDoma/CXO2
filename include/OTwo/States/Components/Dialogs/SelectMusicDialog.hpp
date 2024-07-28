@@ -1,13 +1,13 @@
 #ifndef O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
 #define O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 
 #include <vector>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 
 enum class MusicSortMode
 {

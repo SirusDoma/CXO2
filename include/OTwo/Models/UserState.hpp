@@ -1,8 +1,8 @@
 #ifndef O2JAM_USER_STATE_HPP
 #define O2JAM_USER_STATE_HPP
 
-#include <OTwo/Data/Planet.hpp>
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/Models/Room.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/System/Module.hpp>

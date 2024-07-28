@@ -2,7 +2,7 @@
 #define O2JAM_CHART_DATA_HPP
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 
 #include <Genode/System/Primitives.hpp>
 

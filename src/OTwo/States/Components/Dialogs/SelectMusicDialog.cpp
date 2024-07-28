@@ -1,6 +1,6 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Models/UserState.hpp>
 
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
@@ -9,7 +9,7 @@
 #include <cmath>
 #include <unordered_set>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::UiContainer(copy),

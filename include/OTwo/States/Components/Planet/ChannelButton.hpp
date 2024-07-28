@@ -10,7 +10,7 @@
 #include <Genode/UI/Number.hpp>
 #include <Genode/UI/Gauge.hpp>
 
-#include <OTwo/Data/Planet.hpp>
+#include <OTwo/Models/Planet.hpp>
 
 class ChannelButton : public Gx::RadioButton
 {

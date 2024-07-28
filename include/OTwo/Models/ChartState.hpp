@@ -2,11 +2,11 @@
 #define O2JAM_CHART_STATE_HPP
 
 #include <OTwo/Chart/Chart.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
 #include <Genode/System/Module.hpp>
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 
 class Chart;
 class ChartState : public Gx::Module

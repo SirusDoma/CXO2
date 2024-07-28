@@ -8,17 +8,17 @@
 #include <memory>
 
 State::State() :
-    State::State(typeid(this).name())
+    State(typeid(this).name())
 {
     LoadCommonResources();
 }
 
 State::State(State &state) :
-    Gx::Scene(state)
+    Scene(state)
 {
     LoadCommonResources();
 
-    SetParent(state.GetParent());
+    State::SetParent(state.GetParent());
     SetName(state.GetName());
     SetTag(state.GetTag());
 
@@ -31,8 +31,8 @@ State::State(State &state) :
     if (state.m_resources)
         m_resources = std::move(state.m_resources);
 
-    for (auto child : state.GetChildren())
-        AddChild(child);
+    for (const auto child : state.GetChildren())
+        State::AddChild(child);
 }
 
 State::State(const std::string &name) :

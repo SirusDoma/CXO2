@@ -6,7 +6,7 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 
 #include <vector>
 #include <memory>

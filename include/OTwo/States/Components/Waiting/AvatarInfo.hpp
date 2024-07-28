@@ -1,7 +1,7 @@
 #ifndef O2JAM_WAITING_AVATAR_INFO_HPP
 #define O2JAM_WAITING_AVATAR_INFO_HPP
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 
 #include <Genode/UI/UiContainer.hpp>
 

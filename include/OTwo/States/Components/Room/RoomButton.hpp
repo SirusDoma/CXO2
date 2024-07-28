@@ -7,7 +7,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 
 class RoomButton : public Gx::Image
 {

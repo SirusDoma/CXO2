@@ -1,7 +1,7 @@
 #ifndef O2JAM_O2CHART_METADATA_HPP
 #define O2JAM_O2CHART_METADATA_HPP
 
-#include <OTwo/Data/Game.hpp>
+#include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>

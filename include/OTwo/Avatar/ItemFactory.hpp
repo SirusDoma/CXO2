@@ -4,8 +4,8 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Metadata/Avatar/ItemData.hpp>
 
-#include <OTwo/Data/Character.hpp>
-#include <OTwo/Data/Equipment.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Equipment.hpp>
 
 #include <Genode/System/Module.hpp>
 #include <Genode/IO/ResourceManager.hpp>

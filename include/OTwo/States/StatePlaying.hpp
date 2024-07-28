@@ -4,11 +4,11 @@
 #include <OTwo/States/State.hpp>
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/Models/ChartState.hpp>
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
-#include <OTwo/Data/ChartState.hpp>
 
 class StatePlaying : public State
 {

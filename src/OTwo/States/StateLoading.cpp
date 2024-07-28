@@ -1,7 +1,7 @@
 #include <OTwo/States/StateLoading.hpp>
 
-#include <OTwo/Data/UserState.hpp>
-#include <OTwo/Data/ChartState.hpp>
+#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Models/ChartState.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
 #include <Genode/UI/Image.hpp>

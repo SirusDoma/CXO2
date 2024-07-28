@@ -1,6 +1,8 @@
 #include <OTwo/States/StatePlaying.hpp>
 #include <Genode/UI.hpp>
+
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/States/StateRoom.hpp>
 
 StatePlaying::StatePlaying(State &state) :
     State(state)
@@ -12,6 +14,7 @@ void StatePlaying::Initialize()
     State::Initialize();
 
     auto &app = GetApplication();
+    m_state   = &Require<ChartState>();
     m_config  = &app.GetConfig<GameConfig>();
 
     const auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
@@ -52,11 +55,21 @@ void StatePlaying::Initialize()
     // const auto noteClick1 = Load<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK1");
     // noteClick1->SetLoop(true);
     // AddChild(noteClick1);
+
+    const auto exitButton = Load<Gx::Button>("IDC_BUTTON_EXIT");
+    exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
+    {
+        GetDirector().Present<StateRoom>();
+    });
+
 }
 
 void StatePlaying::Update(const double delta)
 {
     State::Update(delta);
+
+    if (!m_state->GetChart())
+        return;
 }
 
 void StatePlaying::OnKeyDown(const sf::Event::KeyEvent ev)

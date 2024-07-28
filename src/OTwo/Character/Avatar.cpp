@@ -1,6 +1,6 @@
 #include <OTwo/Avatar/Avatar.hpp>
-#include <OTwo/Data/Character.hpp>
-#include <OTwo/Data/Equipment.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Equipment.hpp>
 
 Avatar::RenderableStateMap Avatar::m_renderableStates;
 unsigned int Avatar::m_lastFrameID = 0;

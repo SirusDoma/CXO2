@@ -1,8 +1,8 @@
 #include <OTwo/Avatar/Item.hpp>
-#include <OTwo/Data/Shop.hpp>
-#include <OTwo/Data/Planet.hpp>
-#include <OTwo/Data/Character.hpp>
-#include <OTwo/Data/Equipment.hpp>
+#include <OTwo/Models/Shop.hpp>
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Equipment.hpp>
 
 unsigned int Item::GetID() const
 {

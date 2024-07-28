@@ -6,7 +6,7 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Label.hpp>
 
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Room.hpp>
 
 #include <vector>
 

@@ -2,13 +2,12 @@
 #define O2JAM_AVATAR_AVATAR_HPP
 
 #include <OTwo/Avatar/Item.hpp>
-#include <OTwo/Data/Equipment.hpp>
-#include <OTwo/Data/Room.hpp>
+#include <OTwo/Models/Equipment.hpp>
+#include <OTwo/Models/Room.hpp>
 
 #include <Genode/SceneGraph.hpp>
 
 #include <map>
-
 
 class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {

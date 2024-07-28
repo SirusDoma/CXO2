@@ -1,5 +1,5 @@
 #include <OTwo/States/Components/Dialogs/CreateRoomDialog.hpp>
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Models/UserState.hpp>
 #include <OTwo/States/State.hpp>
 
 CreateRoomDialog::CreateRoomDialog(const Gx::Dialog &copy) :

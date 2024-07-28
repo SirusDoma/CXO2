@@ -1,6 +1,6 @@
 #include <OTwo/States/Components/Common/ChatPanel.hpp>
 #include <OTwo/States/Components/Common/ChatWindow.hpp>
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Models/UserState.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>

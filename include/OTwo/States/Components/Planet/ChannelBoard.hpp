@@ -12,7 +12,7 @@
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/List.hpp>
 
-#include <OTwo/Data/Planet.hpp>
+#include <OTwo/Models/Planet.hpp>
 
 #include <functional>
 #include "ChannelButton.hpp"

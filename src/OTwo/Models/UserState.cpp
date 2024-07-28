@@ -1,4 +1,4 @@
-#include <OTwo/Data/UserState.hpp>
+#include <OTwo/Models/UserState.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
 const PlayerData &UserState::GetCurrentPlayer() const

@@ -1,25 +1,25 @@
 #include <OTwo/States/StateWaiting7K.hpp>
 
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateLoading.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-
-#include <OTwo/Data/Room.hpp>
-#include <OTwo/Data/UserState.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/Models/Room.hpp>
+#include <OTwo/Models/Game.hpp>
+#include <OTwo/Models/UserState.hpp>
+
+#include <OTwo/States/Components/Common/ChatPanel.hpp>
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
 #include <OTwo/States/Components/Waiting/MapSelector.hpp>
 #include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 
 #include <Genode/UI.hpp>
-
 #include <magic_enum.hpp>
-#include <OTwo/Data/Game.hpp>
-#include <OTwo/States/StateLoading.hpp>
 
 StateWaiting7K::StateWaiting7K(State &state) :
     State(state)
@@ -263,6 +263,9 @@ void StateWaiting7K::Initialize()
         dialogSelectMusic->SetAcceptCallback([=, s = &state, r = &room] ()
         {
             auto music = dialogSelectMusic->GetSelectedMusic();
+            if (music.ID == 0)
+                return;
+
             auto meta = music.ToChartMetadataView(dialogSelectMusic->GetSelectedDifficulty());
             auto data = RoomData(*r);
 

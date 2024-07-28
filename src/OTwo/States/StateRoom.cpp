@@ -1,12 +1,27 @@
 #include <OTwo/States/StateRoom.hpp>
-#include <OTwo/States/StatePlanet.hpp>
-#include <OTwo/Data/UserState.hpp>
-#include <OTwo/States/Components/Common/Marquee.hpp>
-#include <OTwo/Avatar/ItemFactory.hpp>
-#include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
-#include <OTwo/States/StateWaiting7K.hpp>
+
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Data/Game.hpp>
+
+#include <OTwo/States/StatePlanet.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
+
+#include <OTwo/States/Components/Common/Marquee.hpp>
+#include <OTwo/States/Components/Common/ChatPanel.hpp>
+#include <OTwo/States/Components/Room/RoomContainer.hpp>
+#include <OTwo/States/Components/Room/UserList.hpp>
+#include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
+
+#include <OTwo/Avatar/Item.hpp>
+#include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
+
+#include <OTwo/Models/Game.hpp>
+#include <OTwo/Models/UserState.hpp>
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/Models/Room.hpp>
+
+#include <Genode/Graphics.hpp>
+#include <Genode/SceneGraph.hpp>
 
 StateRoom::StateRoom(State &state) :
     State(state)
