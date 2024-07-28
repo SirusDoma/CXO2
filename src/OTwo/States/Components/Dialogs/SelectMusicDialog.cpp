@@ -534,6 +534,10 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
 
 void SelectMusicDialog::OnAccepted()
 {
+    // Edge case: No music in selected genre
+    if (m_music.ID == 0 && m_random == static_cast<LevelCategory>(0))
+        return;
+
     Dialog::OnAccepted();
 
     auto& app       = Gx::Application::Instance();
