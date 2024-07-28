@@ -53,8 +53,6 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
 
-
-
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
     {

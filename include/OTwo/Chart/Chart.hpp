@@ -39,10 +39,15 @@ public:
 
     struct Event
     {
-        float        Position;
+        float       Position;
         ChannelType Channel;
 
-        bool IsPlayable() const { return Channel != ChannelType::Measurement && Channel != ChannelType::BPM && Channel != ChannelType::BGM; }
+        bool IsPlayable() const
+        {
+            return Channel != ChannelType::Measurement &&
+                   Channel != ChannelType::BPM &&
+                   Channel != ChannelType::BGM;
+        }
     };
 
     struct TimeEvent : public Event
@@ -56,7 +61,7 @@ public:
         float            Volume;
         float            Pan;
         NoteType         Type;
-        sf::SoundBuffer *SoundBuffer;
+        sf::SoundBuffer *Sample;
     };
 
     Chart() = default;
