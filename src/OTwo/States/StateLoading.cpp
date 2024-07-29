@@ -1,16 +1,15 @@
 #include <OTwo/States/StateLoading.hpp>
 
+#include <OTwo/States/StatePlaying.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/ChartContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
 #include <Genode/UI/Image.hpp>
-
-#include <random>
-#include <thread>
-#include <iostream>
-#include <OTwo/States/StatePlaying.hpp>
 #include <Genode/Tasks/Sequence.hpp>
+#include <Genode/Utilities/Randomizer.hpp>
+
+#include <thread>
 
 StateLoading::StateLoading(State &state) :
     State(state)
@@ -21,18 +20,16 @@ void StateLoading::Initialize()
 {
     State::Initialize();
 
-    auto &user  = Require<SessionContext>();
-    auto &room  = user.GetCurrentRoom();
-    auto &state = Require<ChartContext>();
+    auto &session = Require<SessionContext>();
+    auto &room    = session.GetCurrentRoom();
+    auto &state   = Require<ChartContext>();
+
     state.SetMode(room.GameMode);
     state.SetDifficulty(room.Difficulty);
 
-    auto device      = std::random_device();
-    auto seeder      = std::mt19937(device());
-    auto randomizer  = std::uniform_int_distribution<int>(0, static_cast<int>(GetChildren().size()) - 1);
-    const int result = randomizer(seeder);
-
     std::size_t index = 0;
+    const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
+
     for (const auto child : GetChildren())
     {
         if (const auto image = dynamic_cast<Gx::Image*>(child); image)
@@ -42,8 +39,8 @@ void StateLoading::Initialize()
         }
     }
 
-    const auto metadata  = room.Chart;
-    auto loader          = ChartLoader();
+    const auto metadata = room.Chart;
+    auto loader         = ChartLoader();
 
     // TODO: Load cover after select music in StateWaiting and forward it into StateLoading
     loader.SetCoverLoadCallback([this] (auto cover)
@@ -82,8 +79,8 @@ void StateLoading::OnChartLoaded(const Chart *chart)
     const auto transition = Create<Gx::Sequence>([this, chart]
         {
             auto &director = GetDirector();
-            auto &state    = Require<SessionContext>();
-            auto &room     = state.GetCurrentRoom();
+            auto &session  = Require<SessionContext>();
+            auto &room     = session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
             ctx.SetMapID(room.MapID);
