@@ -9,7 +9,7 @@
 class StateRoom : public State
 {
 public:
-    explicit StateRoom(State& state);
+    explicit StateRoom(State &&state);
     void Initialize() override;
 
 private:

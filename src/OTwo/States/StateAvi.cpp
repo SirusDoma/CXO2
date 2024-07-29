@@ -8,8 +8,8 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateTest.hpp>
 
-StateAvi::StateAvi(State &state) :
-    State::State(state)
+StateAvi::StateAvi(State &&state) :
+    State(std::move(state))
 {
 }
 

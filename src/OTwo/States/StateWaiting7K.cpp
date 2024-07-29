@@ -21,8 +21,8 @@
 #include <Genode/UI.hpp>
 #include <magic_enum.hpp>
 
-StateWaiting7K::StateWaiting7K(State &state) :
-    State(state)
+StateWaiting7K::StateWaiting7K(State &&state) :
+    State(std::move(state))
 {
 }
 

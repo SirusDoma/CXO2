@@ -8,7 +8,7 @@
 class StateLoading : public State
 {
 public:
-    explicit StateLoading(State &state);
+    explicit StateLoading(State &&state);
     void Initialize() override;
 
 private:

@@ -9,8 +9,8 @@
 
 #include <OTwo/States/StateAvi.hpp>
 
-StateTest::StateTest(State &state) :
-    State::State(state)
+StateTest::StateTest(State &&state) :
+    State(std::move(state))
 {
 }
 

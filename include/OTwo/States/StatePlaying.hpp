@@ -14,7 +14,7 @@ class StatePlaying : public State
 {
 public:
     StatePlaying() = default;
-    explicit StatePlaying(State &state);
+    explicit StatePlaying(State &&state);
 
     void Initialize() override;
 

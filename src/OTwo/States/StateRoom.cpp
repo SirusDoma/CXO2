@@ -23,8 +23,8 @@
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 
-StateRoom::StateRoom(State &state) :
-    State(state)
+StateRoom::StateRoom(State &&state) :
+    State(std::move(state))
 {
 }
 

@@ -8,7 +8,7 @@ class StateTest : public State
 {
 public:
     StateTest() = default;
-    explicit StateTest(State &state);
+    explicit StateTest(State &&state);
 
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
 

@@ -8,8 +8,8 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Fade.hpp>
 
-StatePlanet::StatePlanet(State &state) :
-    State::State(state),
+StatePlanet::StatePlanet(State &&state) :
+    State(std::move(state)),
     m_connecting(false)
 {
 }

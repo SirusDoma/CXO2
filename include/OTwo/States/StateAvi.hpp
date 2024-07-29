@@ -8,7 +8,7 @@ class StateAvi : public State
 {
 public:
     StateAvi() = default;
-    explicit StateAvi(State &state);
+    explicit StateAvi(State &&state);
 
     void Initialize() override;
     bool Close(bool quit) override;

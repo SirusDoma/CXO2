@@ -2,7 +2,7 @@
 
 #include <OTwo/States/StatePlaying.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
-#include <OTwo/Contexts/ChartContext.hpp>
+#include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
 #include <Genode/UI/Image.hpp>
@@ -11,8 +11,8 @@
 
 #include <thread>
 
-StateLoading::StateLoading(State &state) :
-    State(state)
+StateLoading::StateLoading(State &&state) :
+    State(std::move(state))
 {
 }
 
@@ -22,7 +22,7 @@ void StateLoading::Initialize()
 
     auto &session = Require<SessionContext>();
     auto &room    = session.GetCurrentRoom();
-    auto &state   = Require<ChartContext>();
+    auto &state   = Require<GameContext>();
 
     state.SetMode(room.GameMode);
     state.SetDifficulty(room.Difficulty);

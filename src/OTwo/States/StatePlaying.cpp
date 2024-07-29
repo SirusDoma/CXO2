@@ -4,8 +4,8 @@
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
-StatePlaying::StatePlaying(State &state) :
-    State(state)
+StatePlaying::StatePlaying(State &&state) :
+    State(std::move(state))
 {
 }
 
