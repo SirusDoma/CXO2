@@ -1,11 +1,8 @@
 # CMake Config
 cmake_minimum_required(VERSION 3.27)
-include(CheckIncludeFiles)
 project(O2Jam LANGUAGES C CXX)
-
-# CMake private flags
-set(GTK_AVAILABLE FALSE)
-check_include_files("gtk/gtk.h" GTK_AVAILABLE)
+include(CheckIncludeFiles)
+include(FetchContent)
 
 # Compiler
 set(CMAKE_CXX_STANDARD 17)
@@ -30,7 +27,7 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 
 # External Libs Sources and Flags
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
-include(FetchContent)
+
 # -- SFML
 set(SFML_STATIC_LIBRARIES TRUE)
 fetchcontent_declare(
@@ -39,6 +36,21 @@ fetchcontent_declare(
     GIT_TAG 5da286487ae79703c4b918c00f9542be67d8e660
 )
 fetchcontent_makeavailable(SFML)
+
+# -- JSON
+fetchcontent_declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+fetchcontent_makeavailable(json)
+
+# -- Magic Enum
+fetchcontent_declare(
+    magic_enum
+    GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+    GIT_TAG v0.9.5
+)
+fetchcontent_makeavailable(magic_enum)
 
 # -- Clip Flags
 set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
@@ -51,6 +63,8 @@ fetchcontent_declare(
 fetchcontent_makeavailable(clip)
 
 # -- MessageBox
+set(GTK_AVAILABLE FALSE)
+check_include_files("gtk/gtk.h" GTK_AVAILABLE)
 set(USE_BOXER WIN32 OR APPLE OR GTK_AVAILABLE)
 if(USE_BOXER)
     # -- Boxer Flags
@@ -195,8 +209,10 @@ message("Output Directory: " ${OUTPUT_DIR})
 message("")
 
 # Link JSON
-find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+# Link Magic Enum
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link Clip
 include_directories(${FETCHCONTENT_BASE_DIR}/clip-src)
@@ -209,10 +225,6 @@ else()
     include_directories(${FETCHCONTENT_BASE_DIR}/MessageBox-X11-src)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE MessageBoxX11)
 endif()
-
-# Link Magic Enum
-find_package(magic_enum CONFIG REQUIRED)
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link SFML
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
