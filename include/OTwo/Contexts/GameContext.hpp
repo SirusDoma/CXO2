@@ -1,5 +1,5 @@
-#ifndef O2JAM_CHART_STATE_HPP
-#define O2JAM_CHART_STATE_HPP
+#ifndef O2JAM_GAME_CONTEXT_HPP
+#define O2JAM_GAME_CONTEXT_HPP
 
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -8,10 +8,10 @@
 #include <Genode/System/Context.hpp>
 
 class Chart;
-class ChartContext : public Gx::Context
+class GameContext : public Gx::Context
 {
 public:
-    ChartContext() = default;
+    GameContext() = default;
 
     const Chart *GetChart() const;
     void SetChart(Gx::ResourcePtr<Chart> chart);

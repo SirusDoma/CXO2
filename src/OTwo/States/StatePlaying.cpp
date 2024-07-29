@@ -14,7 +14,7 @@ void StatePlaying::Initialize()
     State::Initialize();
 
     auto &app = GetApplication();
-    m_state   = &Require<ChartContext>();
+    m_context = &Require<GameContext>();
     m_config  = &app.GetConfig<GameConfig>();
 
     const auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
@@ -68,7 +68,7 @@ void StatePlaying::Update(const double delta)
 {
     State::Update(delta);
 
-    if (!m_state->GetChart())
+    if (!m_context->GetChart())
         return;
 }
 
