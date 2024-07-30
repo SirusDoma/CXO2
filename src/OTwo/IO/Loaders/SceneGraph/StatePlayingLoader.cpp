@@ -6,6 +6,7 @@
 
 #include <magic_enum.hpp>
 #include <random>
+#include <Genode/UI/List.hpp>
 
 Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
 {
@@ -47,7 +48,6 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
 
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG",     std::to_string(mapID), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",        std::to_string(mapID), ctx);
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true),  metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID()), ctx, 7);
 
     for (int i = 1; i <= 7; i++)
     {
@@ -69,6 +69,27 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     {
         LoadRequiredResource(ObjectPopulator::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::to_string(mapID), ctx, 7);
         keyEffectContainer->SetBatchingEnabled(true);
+    }
+    else
+        throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");
+
+    if (auto noteClickList = state->FindChild<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    {
+        LoadRequiredResource(ObjectPopulator::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID()), ctx, 7);
+        for (auto child :noteClickList->GetChildren())
+        {
+            if (auto animation = dynamic_cast<Gx::Animation*>(child); animation)
+            {
+                for (auto i = 0; i < animation->GetFrameCount(); i++)
+                {
+                    auto &frame = animation->GetFrame(i);
+                    frame.Position = animation->GetPosition();
+                    frame.Origin = { frame.TexCoords.width / 2.f, frame.TexCoords.height / 2.f };
+                }
+            }
+        }
+
+        noteClickList->SetBatchingEnabled(true);
     }
     else
         throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");

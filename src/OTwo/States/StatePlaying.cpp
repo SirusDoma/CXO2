@@ -34,6 +34,7 @@ void StatePlaying::Initialize()
     const auto sfxVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
     sfxVolBar->SetValue(100);
 
+    const auto noteClickList = Load<Gx::UiContainer>("IDC_LIST_NOTE_CLICK");
     const auto keyEffectContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
     const auto keyDownContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
     for (auto [channel, _] : m_config->SevenKeyBinding)
@@ -42,7 +43,7 @@ void StatePlaying::Initialize()
         if (id < 1 || id > 7)
             continue;
 
-        const auto noteClick = Load<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
+        const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
         noteClick->SetVisible(false);
         noteClick->Stop();
         noteClick->SetAnimationCallback([] (auto &animation) {
@@ -86,7 +87,7 @@ void StatePlaying::OnKeyDown(const sf::Event::KeyEvent ev)
         if (code != ev.code)
             continue;
 
-        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end() && noteClick->second->GetState() != Gx::Animation::AnimationState::Playing && noteClick->second->GetState() != Gx::Animation::AnimationState::Completed)
+        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end())
             noteClick->second->Reset();
 
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
@@ -107,9 +108,6 @@ void StatePlaying::OnKeyUp(const sf::Event::KeyEvent ev)
     {
         if (code != ev.code)
             continue;
-
-        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end())
-            noteClick->second->Stop();
 
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(false);
