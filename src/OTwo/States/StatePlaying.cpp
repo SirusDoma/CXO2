@@ -1,8 +1,9 @@
 #include <OTwo/States/StatePlaying.hpp>
-#include <Genode/UI.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/States/StateRoom.hpp>
+
+#include <Genode/UI.hpp>
 
 StatePlaying::StatePlaying(State &&state) :
     State(std::move(state))
@@ -41,6 +42,13 @@ void StatePlaying::Initialize()
         if (id < 1 || id > 7)
             continue;
 
+        const auto noteClick = Load<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
+        noteClick->SetVisible(false);
+        noteClick->Stop();
+        noteClick->SetAnimationCallback([] (auto &animation) {
+            animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
+        });
+
         const auto keyDown = keyDownContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN" + std::to_string(id));
         keyDown->SetVisible(false);
 
@@ -48,13 +56,10 @@ void StatePlaying::Initialize()
         keyEffect->SetFrame(id - 1);
         keyEffect->SetVisible(false);
 
+        m_noteClicks[channel] = noteClick;
         m_keyDowns[channel]   = keyDown;
         m_keyEffects[channel] = keyEffect;
     }
-
-    // const auto noteClick1 = Load<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK1");
-    // noteClick1->SetLoop(true);
-    // AddChild(noteClick1);
 
     const auto exitButton = Load<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
@@ -81,6 +86,9 @@ void StatePlaying::OnKeyDown(const sf::Event::KeyEvent ev)
         if (code != ev.code)
             continue;
 
+        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end() && noteClick->second->GetState() != Gx::Animation::AnimationState::Playing && noteClick->second->GetState() != Gx::Animation::AnimationState::Completed)
+            noteClick->second->Reset();
+
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(true);
 
@@ -99,6 +107,9 @@ void StatePlaying::OnKeyUp(const sf::Event::KeyEvent ev)
     {
         if (code != ev.code)
             continue;
+
+        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end())
+            noteClick->second->Stop();
 
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(false);

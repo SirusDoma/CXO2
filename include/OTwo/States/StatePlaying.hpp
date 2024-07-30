@@ -23,11 +23,15 @@ public:
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
-
 private:
+    using ImageMap = std::unordered_map<Chart::ChannelType, Gx::Image*>;
+    using AnimationMap = std::unordered_map<Chart::ChannelType, Gx::Animation*>;
+
     GameContext *m_context;
     GameConfig *m_config;
-    std::unordered_map<Chart::ChannelType, Gx::Image*> m_keyDowns, m_keyEffects;
+
+    AnimationMap m_noteClicks;
+    ImageMap m_keyDowns, m_keyEffects;
 };
 
 
