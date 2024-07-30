@@ -56,6 +56,7 @@ struct ResourceMetadata
         RoomContainer,
         RoomButton,
         AvatarInfo,
+        Equalizer,
 
         // Avatar
         ItemData,

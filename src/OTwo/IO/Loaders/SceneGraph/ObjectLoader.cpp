@@ -12,6 +12,7 @@
 #include <OTwo/States/Components/Room/RoomContainer.hpp>
 #include <OTwo/States/Components/Room/RoomButton.hpp>
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <OTwo/States/Components/Playing/Equalizer.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>
@@ -165,6 +166,11 @@ void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPop
         case ResourceMetadata::ResourceType::AvatarInfo:
         {
             populator.Populate(name, LoadResource<AvatarInfo>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::Equalizer:
+        {
+            populator.Populate(name, LoadResource<Equalizer>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::None:

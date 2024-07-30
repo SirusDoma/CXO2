@@ -38,6 +38,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/RoomButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
+#include <OTwo/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
@@ -102,6 +103,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
     Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
     Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
+    Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
     // O2Jam Core Resources
     Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
