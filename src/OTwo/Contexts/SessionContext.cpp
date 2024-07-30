@@ -51,9 +51,9 @@ void SessionContext::SetCurrentRoom(const RoomData &room)
     m_room = room;
 }
 
-const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic() const
+const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic(const bool rescan) const
 {
-    if (m_installedMusicList.empty())
+    if (rescan || m_installedMusicList.empty())
     {
         const auto metaLoader = ChartMetadataLoader();
         for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))

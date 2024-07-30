@@ -27,7 +27,7 @@ public:
     const RoomData &GetCurrentRoom() const;
     void SetCurrentRoom(const RoomData &room);
 
-    const std::vector<ChartMetadata> &GetInstalledMusic() const;
+    const std::vector<ChartMetadata> &GetInstalledMusic(bool rescan = false) const;
 
 private:
     PlayerData m_player;
