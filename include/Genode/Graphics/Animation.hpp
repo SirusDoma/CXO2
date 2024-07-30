@@ -57,7 +57,7 @@ namespace Gx
         AnimationState GetState() const;
         void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
 
-        bool GetVisible() const;
+        bool IsVisible() const;
         void SetVisible(bool visible);
 
         virtual void Stop();

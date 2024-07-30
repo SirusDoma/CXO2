@@ -83,7 +83,7 @@ namespace Gx
         m_animationCallback = animationCallback;
     }
 
-    bool Animation::GetVisible() const
+    bool Animation::IsVisible() const
     {
         return m_visible;
     }
