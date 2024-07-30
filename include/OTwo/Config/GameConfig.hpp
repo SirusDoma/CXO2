@@ -11,12 +11,12 @@ struct GameConfig : public Gx::Config
 {
     GameConfig()
     {
-        Reset();
+        GameConfig::Reset();
     }
 
     void Reset() override
     {
-        Use3D           = true;
+        UseFx           = true;
         UseBGM          = true;
         UseWindowCursor = false;
         MusicVolume     = 100;
@@ -37,7 +37,7 @@ struct GameConfig : public Gx::Config
         };
     }
 
-    bool Use3D;
+    bool UseFx;
     bool UseBGM;
     bool UseWindowCursor;
 

@@ -78,11 +78,14 @@ void StateLoading::OnChartLoaded(const Chart *chart)
 {
     const auto transition = Create<Gx::Sequence>([this, chart]
         {
+            auto &app      = GetApplication();
             auto &director = GetDirector();
             auto &session  = Require<SessionContext>();
+            auto &config   = app.GetConfig<GameConfig>();
             auto &room     = session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
+            ctx.SetFxEnabled(config.UseFx);
             ctx.SetMapID(room.MapID);
             ctx.SetEffectID(room.EffectID);
 

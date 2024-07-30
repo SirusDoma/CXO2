@@ -1,5 +1,15 @@
 #include <OTwo/IO/PlayingResourceContext.hpp>
 
+bool PlayingResourceContext::IsFxEnabled() const
+{
+    return m_fxEnabled;
+}
+
+void PlayingResourceContext::SetFxEnabled(const bool enabled)
+{
+    m_fxEnabled = enabled;
+}
+
 unsigned int PlayingResourceContext::GetMapID() const
 {
     return m_mapID;

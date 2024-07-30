@@ -59,7 +59,7 @@ void OptionDialog::Initialize()
     keySelect->AddChild(keyBar);
 
     const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.Use3D = sender->IsChecked(); });
+    gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseFx = sender->IsChecked(); });
     const auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
     cursorCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseWindowCursor = sender->IsChecked(); });
     const auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
@@ -474,7 +474,7 @@ void OptionDialog::Invalidate()
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
-    gfxCheckBox->SetCheckedState(m_config.Use3D);
+    gfxCheckBox->SetCheckedState(m_config.UseFx);
     cursorCheckBox->SetCheckedState(m_config.UseWindowCursor);
     keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
     bgmCheckBox->SetCheckedState(m_config.UseBGM);
