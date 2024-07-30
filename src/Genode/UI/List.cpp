@@ -165,39 +165,7 @@ namespace Gx
             node->SetScale(scale);
         }
 
-        Node::AddChild(node);
-    }
-
-    void List::RemoveChild(Node *node)
-    {
-        Node::RemoveChild(node);
-    }
-
-    void List::AddChild(Control *control)
-    {
-        if (!control || (!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
-            return;
-
-        if (m_layouts.empty())
-        {
-            control->SetPosition(GetNextItemPosition());
-            IncreaseSpacingCounter();
-        }
-        else
-        {
-            const auto &[origin, position, rotation, scale] = m_layouts[GetChildren().size()];
-            control->SetOrigin(origin);
-            control->SetPosition(position);
-            control->SetRotation(rotation);
-            control->SetScale(scale);
-        }
-
-        Control::AddChild(control);
-    }
-
-    void List::RemoveChild(Control *control)
-    {
-        Control::RemoveChild(control);
+        Control::AddChild(node);
     }
 
     void List::Invalidate()

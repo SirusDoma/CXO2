@@ -8,11 +8,13 @@
 
 class ListLoader : public ResourceLoader<Gx::List>
 {
-public :
+public:
     ListLoader() = default;
 
     Gx::ResourcePtr<Gx::List> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
     Gx::ResourcePtr<Gx::List> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+
+    static bool ParseMetadata(Gx::Json attributes, ListMetadata &metadata, const Gx::ResourceContext &ctx);
 };
 
 #endif

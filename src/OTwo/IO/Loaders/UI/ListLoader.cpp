@@ -11,8 +11,72 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
     auto metadata = ListMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
+
+    if (!ParseMetadata(json.at("attributes"), metadata, ctx))
+        return nullptr;
+
+    return LoadFromMetadata(metadata, ctx);
+}
+
+Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+{
+    const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
+    if (!metadata)
+        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
     
-    auto attributes = json.at("attributes");
+    auto list = std::make_unique<Gx::List>(
+        metadata->VerticalCount,   metadata->VerticalSpacing,
+        metadata->HorizontalCount, metadata->HorizontalSpacing
+    );
+    
+    list->SetName(metadata->Name);
+    list->SetOrigin(metadata->Origin);
+    list->SetPosition(metadata->Position);
+    list->SetScale(metadata->Scale);
+    list->SetRotation(metadata->Rotation);
+    list->SetOrder(metadata->Order);
+
+    if (!metadata->Layouts.empty())
+    {
+        for (const auto &layout : metadata->Layouts)
+            list->AddLayout({ layout.Origin, layout.Position, layout.Rotation, layout.Scale });
+    }
+
+    if (context.Available())
+    {
+        auto populator = ObjectPopulator::Decorate(list.get());
+        if (!metadata->ItemSource.empty())
+        {
+            list->SetBatchingEnabled(true);
+            for (int i = 0; i < metadata->ItemCount; i++)
+            {
+                auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
+                auto ctx  = Gx::ResourceContext::Rebind(name, context);
+
+                ObjectLoader::Load(name, metadata->ItemSource, populator, ctx);
+            }
+        }
+        else if (!metadata->Objects.empty())
+        {
+            list->SetBatchingEnabled(false);
+            for (auto [key, object] : metadata->Objects)
+            {
+                auto name = meta.Name + "/" + key;
+                auto ctx  = Gx::ResourceContext::Rebind(name, context);
+
+                ObjectLoader::Load(name, object, populator, ctx);
+            }
+        }
+    }
+
+    return list;
+}
+
+bool ListLoader::ParseMetadata(Gx::Json attributes, ListMetadata &metadata, const Gx::ResourceContext &ctx)
+{
+    if (attributes.empty())
+        return false;
+
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
 
@@ -70,59 +134,5 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
             metadata.ItemSource = data.value();
     }
 
-    return LoadFromMetadata(metadata, ctx);
-}
-
-Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
-{
-    const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
-    if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
-    
-    auto list = std::make_unique<Gx::List>(
-        metadata->VerticalCount,   metadata->VerticalSpacing,
-        metadata->HorizontalCount, metadata->HorizontalSpacing
-    );
-    
-    list->SetName(metadata->Name);
-    list->SetOrigin(metadata->Origin);
-    list->SetPosition(metadata->Position);
-    list->SetScale(metadata->Scale);
-    list->SetRotation(metadata->Rotation);
-    list->SetOrder(metadata->Order);
-
-    if (!metadata->Layouts.empty())
-    {
-        for (const auto &layout : metadata->Layouts)
-            list->AddLayout({ layout.Origin, layout.Position, layout.Rotation, layout.Scale });
-    }
-
-    if (context.Available())
-    {
-        auto populator = ObjectPopulator::Decorate(list.get());
-        if (!metadata->ItemSource.empty())
-        {
-            list->SetBatchingEnabled(true);
-            for (int i = 0; i < metadata->ItemCount; i++)
-            {
-                auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
-                auto ctx  = Gx::ResourceContext::Rebind(name, context);
-
-                ObjectLoader::Load(name, metadata->ItemSource, populator, ctx);
-            }
-        }
-        else if (!metadata->Objects.empty())
-        {
-            list->SetBatchingEnabled(false);
-            for (auto [key, object] : metadata->Objects)
-            {
-                auto name = meta.Name + "/" + key;
-                auto ctx  = Gx::ResourceContext::Rebind(name, context);
-
-                ObjectLoader::Load(name, object, populator, ctx);
-            }
-        }
-    }
-
-    return list;
+    return true;
 }
