@@ -6,7 +6,9 @@
 #include <Genode/UI.hpp>
 
 StatePlaying::StatePlaying(State &&state) :
-    State(std::move(state))
+    State(std::move(state)),
+    m_context(),
+    m_config()
 {
 }
 
@@ -18,6 +20,13 @@ void StatePlaying::Initialize()
     m_context = &Require<GameContext>();
     m_config  = &app.GetConfig<GameConfig>();
 
+    const auto &session = Require<SessionContext>();
+    auto &room = session.GetCurrentRoom();
+
+    auto metadata = ChartMetadataView{};
+    if (m_context->GetChart())
+        metadata = m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty());
+
     const auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
     wave->SetValue(50);
 
@@ -28,7 +37,13 @@ void StatePlaying::Initialize()
     lifeBar->SetValue(75);
 
     const auto menu = Load<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
-    const auto bgmVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
+    const auto title = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
+    title->SetString(metadata.Title);
+
+    const auto level = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
+    level->SetFrame(room.GetLevelCode(true));
+
+    const auto bgmVolBar = menu->FindChild<Gx::Gauge>( "IDC_GAUGE_VOLUME_MUSIC");
     bgmVolBar->SetValue(100);
 
     const auto sfxVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");

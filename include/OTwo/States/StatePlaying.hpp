@@ -9,6 +9,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 
 class StatePlaying : public State
 {
@@ -27,8 +28,8 @@ private:
     using ImageMap = std::unordered_map<Chart::ChannelType, Gx::Image*>;
     using AnimationMap = std::unordered_map<Chart::ChannelType, Gx::Animation*>;
 
-    GameContext *m_context;
-    GameConfig *m_config;
+    const GameContext *m_context;
+    const GameConfig *m_config;
 
     AnimationMap m_noteClicks;
     ImageMap m_keyDowns, m_keyEffects;
