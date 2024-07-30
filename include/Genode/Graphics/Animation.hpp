@@ -44,6 +44,7 @@ namespace Gx
         void AddFrame(const Frame &first, Args... args);
         void AddFrame(const Frame &frame);
         unsigned int GetFrameCount() const;
+        Frame &GetFrame(unsigned int index);
 
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);

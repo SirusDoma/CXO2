@@ -184,4 +184,9 @@ namespace Gx
     {
         return m_frames.size();
     }
+
+    Animation::Frame &Animation::GetFrame(const unsigned int index)
+    {
+        return m_frames[index];
+    }
 }
