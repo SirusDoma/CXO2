@@ -87,6 +87,40 @@ struct RoomData
     RoomMember        Members[8]    = {{},{},{},{},{},{},{},{}};
     Gx::Uint32        MapID         = 0;
     Gx::Uint32        EffectID      = 1;
+
+    std::string GetLevelCode(const bool useNormalMode = false) const
+    {
+        std::string speedStr(4, '\0');
+        if (Speed > 0)
+        {
+            if (std::fmod(Speed, 1.0f) != 0)
+                speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", Speed));
+            else
+                speedStr = std::to_string(static_cast<int>(Speed));
+        }
+        else
+            speedStr = "R";
+
+        if (useNormalMode || SongMode == SongMode::Normal)
+        {
+            std::string diffName;
+            switch (Difficulty)
+            {
+                case Difficulty::EX: diffName = "EX"; break;
+                case Difficulty::NX: diffName = "NX"; break;
+                case Difficulty::HX: diffName = "HX"; break;
+                case Difficulty::MX: diffName = "MX"; break;
+            }
+
+            return diffName + speedStr;
+        }
+        else if (SongMode == SongMode::Random)
+        {
+            return "RX" + speedStr;
+        }
+
+        return "MX" + speedStr;
+    }
 };
 
 #endif
