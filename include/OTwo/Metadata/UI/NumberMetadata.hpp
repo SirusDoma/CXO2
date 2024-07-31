@@ -14,6 +14,7 @@ struct NumberMetadata : public TransformMetadata
     unsigned int Value;
     unsigned int DigitCount;
     Gx::Number::Alignment Alignment;
+    Gx::BlendMode BlendMode;
     std::unordered_map<unsigned int, sf::IntRect> DigitFrames = {};
 };
 

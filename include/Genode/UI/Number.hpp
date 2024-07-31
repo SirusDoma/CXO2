@@ -39,8 +39,11 @@ namespace Gx
         unsigned int GetValue() const;
         void SetValue(unsigned int value);
 
-        void SetAlignment(const Alignment alignment);
         Alignment GetAlignment() const;
+        void SetAlignment(Alignment alignment);
+
+        BlendMode GetBlendMode() const;
+        void SetBlendMode(Gx::BlendMode blendMode);
 
     protected:
         void Update(double delta) override;
@@ -50,6 +53,7 @@ namespace Gx
     private:
         sf::VertexArray   m_vertices;
         const sf::Texture *m_texture;
+        BlendMode         m_blendMode;
         Alignment         m_alignment;
 
         unsigned int m_value, m_digitCount;

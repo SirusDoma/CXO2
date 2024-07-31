@@ -6,6 +6,8 @@ namespace Gx
     Number::Number() :
         m_vertices(sf::PrimitiveType::TriangleStrip, 6 * 10),
         m_texture(),
+        m_blendMode(BlendMode::Auto),
+        m_alignment(Alignment::Left),
         m_texCoords(),
         m_digitCount(),
         m_width(),
@@ -116,6 +118,16 @@ namespace Gx
         m_needUpdate = true;
     }
 
+    BlendMode Number::GetBlendMode() const
+    {
+        return m_blendMode;
+    }
+
+    void Number::SetBlendMode(const Gx::BlendMode blendMode)
+    {
+        m_blendMode = blendMode;
+    }
+
     void Number::Update(const double delta)
     {
         if (m_needUpdate)
@@ -131,6 +143,16 @@ namespace Gx
 
         states.transform *= GetTransform();
         states.texture    = m_texture;
+        switch (m_blendMode)
+        {
+            case BlendMode::Alpha:          states.blendMode = sf::BlendAlpha;    break;
+            case BlendMode::Additive:       states.blendMode = sf::BlendAdd;      break;
+            case BlendMode::Multiplicative: states.blendMode = sf::BlendMultiply; break;
+            case BlendMode::Min:            states.blendMode = sf::BlendMin;      break;
+            case BlendMode::Max:            states.blendMode = sf::BlendMax;      break;
+            case BlendMode::None:           states.blendMode = sf::BlendNone;     break;
+            case BlendMode::Auto:                                                 break;
+        }
         surface.Render(m_vertices, states);
 
         return Control::Render(surface, states);

@@ -76,6 +76,13 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.Value = 0;
 
+    metadata.BlendMode = Gx::BlendMode::Auto;
+    if (const auto mode = attributes.find("blend"); mode != attributes.end())
+    {
+        if (const auto parsed = magic_enum::enum_cast<Gx::BlendMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata.BlendMode = parsed.value();
+    }
+
     return LoadFromMetadata(metadata, context);
 }
 
@@ -95,16 +102,17 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
     for (auto [digit, frame] : metadata->DigitFrames)
         number->SetDigitFrame(digit, frame);
 
-    number->SetColor(metadata->Color);
-    number->SetKerning(metadata->Kerning);
-    number->SetValue(metadata->Value);
-    number->SetAlignment(metadata->Alignment);
-
     number->SetName(metadata->Name);
     number->SetOrigin(metadata->Origin);
     number->SetPosition(metadata->Position);
     number->SetScale(metadata->Scale);
     number->SetRotation(metadata->Rotation);
+
+    number->SetColor(metadata->Color);
+    number->SetKerning(metadata->Kerning);
+    number->SetValue(metadata->Value);
+    number->SetAlignment(metadata->Alignment);
+    number->SetBlendMode(metadata->BlendMode);
 
     auto populator = ObjectPopulator::Decorate(number.get());
     if (!metadata->Objects.empty())
