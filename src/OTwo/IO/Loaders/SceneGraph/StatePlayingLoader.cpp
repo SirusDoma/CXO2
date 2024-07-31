@@ -46,8 +46,8 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         mapID           = randomizer(seeder);
     }
 
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG",     std::to_string(mapID), ctx);
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",        std::to_string(mapID), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
 
     for (int i = 1; i <= 7; i++)
     {
@@ -73,6 +73,24 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
     else
         throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");
 
+    if (auto noteJamContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM"); noteJamContainer)
+        noteJamContainer->SetVisible(false);
+    else
+        throw Gx::ResourceAccessException("IDC_CONTAINER_NOTE_JAM");
+
+    if (auto comboContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_COMBO"); comboContainer)
+    {
+        auto suffix = std::string();
+        if (ctx.IsFxEnabled())
+            suffix = std::to_string(mapID);
+
+        LoadRequiredResource(ObjectPopulator::Decorate(comboContainer), metadata, "IDC_ANIMATION_NOTE_COMBO", suffix, ctx);
+        LoadRequiredResource(ObjectPopulator::Decorate(comboContainer), metadata, "IDC_NUMBER_NOTE_COMBO", suffix, ctx);
+        comboContainer->SetVisible(false);
+    }
+    else
+        throw Gx::ResourceAccessException("IDC_CONTAINER_COMBO");
+
     if (auto noteClickList = state->FindChild<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
     {
         LoadRequiredResource(ObjectPopulator::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID()), ctx, 7);
@@ -92,7 +110,7 @@ Gx::ResourcePtr<StatePlaying> StatePlayingLoader::LoadFromMetadata(const Resourc
         noteClickList->SetBatchingEnabled(true);
     }
     else
-        throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");
+        throw Gx::ResourceAccessException("IDC_LIST_NOTE_CLICK");
 
     return state;
 }
