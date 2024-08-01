@@ -88,9 +88,6 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         void SetBatchMode(BatchMode batchMode);
 
-        bool IsDynamicBatchingEnabled() const;
-        void UseDynamicBatching(bool dynamicBatching);
-
         ////////////////////////////////////////////////////////////
         /// \brief Batches an array of vertices
         ///
@@ -148,7 +145,7 @@ namespace Gx
         ///        added
         ///
         ////////////////////////////////////////////////////////////
-        void Clear();
+        void Clear(bool force = false);
 
         ////////////////////////////////////////////////////////////
         /// \brief If true, Sprite Batch is empty
@@ -181,7 +178,7 @@ namespace Gx
         ///        efficient usage
         ///
         ////////////////////////////////////////////////////////////
-        void UpdateBatch() const;
+        void UpdateBatch(bool force = false) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Holds information about a batched triangle
@@ -225,7 +222,6 @@ namespace Gx
         // Batch Settings
         BatchMode                    m_batchMode{BatchMode::Deferred}; //!< The current batch strategy
         std::optional<sf::BlendMode> m_blendMode{};                    //!< The blending mode for rendering
-        bool                         m_dynamicBatching{true};          //!< If true, batch is cleared and re-generated every frame
         mutable bool                 m_updateRequired{true};           //!< If true, batch must be sorted before rendering
         mutable bool                 m_clearRequired{false};
     };

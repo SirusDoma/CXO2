@@ -49,22 +49,6 @@ namespace Gx
         m_updateRequired = true;
     }
 
-    bool SpriteBatch::IsDynamicBatchingEnabled() const
-    {
-        return m_dynamicBatching;
-    }
-
-    void SpriteBatch::UseDynamicBatching(const bool dynamicBatching)
-    {
-        if (dynamicBatching == m_dynamicBatching)
-            return;
-
-        if (!dynamicBatching)
-            Clear();
-
-        m_dynamicBatching = dynamicBatching;
-    }
-
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Batch(const sf::VertexArray &vertices, const sf::Texture *texture, const sf::Transform &transform, const float layer)
     {
@@ -112,33 +96,22 @@ namespace Gx
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Update(const double delta)
     {
-        if (m_clearRequired)
-        {
-            Clear();
-            m_clearRequired = false;
-        }
-
         UpdatableContainer::Update(delta);
     }
 
     ////////////////////////////////////////////////////////////
     RenderStates SpriteBatch::Render(RenderSurface &surface, RenderStates states) const
     {
+        // Apply render states
         states.transform *= GetTransform();
         states.blendMode  = m_blendMode.value_or(states.blendMode);
 
-        if (IsDynamicBatchingEnabled())
-        {
-            const RenderSurface *renderSurface = this;
-            RenderableContainer::Render(const_cast<RenderSurface&>(*renderSurface), states);
-        }
+        // Calculate and populate the vertices to render
+        auto &batcher = const_cast<SpriteBatch&>(*this);
+        RenderableContainer::Render(batcher, states);
+        UpdateBatch();
 
-        if (m_updateRequired)
-        {
-            UpdateBatch();
-            m_updateRequired = false;
-        }
-
+        // Render the batches
         auto cstates = states;
         std::size_t startTriangle = 0;
         for (const auto& batch : m_batches)
@@ -149,9 +122,8 @@ namespace Gx
             startTriangle += batch.vertexCount;
         }
 
-        if (IsDynamicBatchingEnabled())
-            m_clearRequired = true;
-
+        // Signal clear is required in next render/update
+        batcher.Clear(true); // HACK: Call non-const in Render
         return states;
     }
 
@@ -164,14 +136,10 @@ namespace Gx
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Render(const sf::Vertex *vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates &states)
     {
-        if (m_clearRequired)
-        {
-            Clear();
-            m_clearRequired = false;
-        }
-
         if (m_blendMode.has_value() && m_blendMode != states.blendMode)
             throw NotSupportedException("Multiple blending mode usage within single batch is not supported");
+
+        Clear();
 
         m_blendMode = states.blendMode;
         Batch(vertices, vertexCount, type, states.texture, states.transform, states.Layer);
@@ -207,8 +175,11 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::UpdateBatch() const
+    void SpriteBatch::UpdateBatch(const bool force) const
     {
+        if (!force && !m_updateRequired)
+            return;
+
         if (m_batchMode == BatchMode::Deferred)
         {
             // Batch based on sf::Texture change
@@ -300,8 +271,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Clear()
+    void SpriteBatch::Clear(const bool force)
     {
+        if (!force && !m_clearRequired)
+            return;
+
         m_unsortedVertices.clear();
         m_triangles.clear();
         m_vertices.clear();
