@@ -43,7 +43,7 @@
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/StatePlayingLoader.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 
@@ -56,6 +56,8 @@
 #include <OTwo/States/StateLoading.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
+
+class StatePlaying7K;
 
 void O2Jam::Boot()
 {
@@ -109,7 +111,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
-    Gx::ResourceLoaderFactory::Register<StatePlaying, StatePlayingLoader>();
+    Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
     // Render settings
     auto& window = GetRenderWindow();
@@ -191,7 +193,7 @@ void O2Jam::Boot()
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
-    director.Register<StatePlaying>("Interface/State/Playing.json");
+    director.Register<StatePlaying7K>("Interface/State/Playing.json");
 
     director.Present<StateAvi>();
 }

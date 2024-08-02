@@ -1,23 +1,27 @@
-#include <OTwo/States/StatePlaying.hpp>
+#include <OTwo/States/StatePlaying7K.hpp>
 
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
+#include <OTwo/Chart/ChartRenderer.hpp>
+
 #include <Genode/UI.hpp>
 
-StatePlaying::StatePlaying(State &&state) :
+StatePlaying7K::StatePlaying7K(State &&state) :
     State(std::move(state)),
     m_context(),
-    m_config()
+    m_config(),
+    m_viewport()
 {
 }
 
-void StatePlaying::Initialize()
+void StatePlaying7K::Initialize()
 {
     State::Initialize();
 
     auto &app = GetApplication();
-    m_context = &Require<GameContext>();
+    m_context = PrepareContext();
     m_config  = &app.GetConfig<GameConfig>();
 
     const auto &session = Require<SessionContext>();
@@ -77,15 +81,29 @@ void StatePlaying::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
+    ChartRenderer renderer(*this, {
+        Chart::ChannelType::Note1,
+        Chart::ChannelType::Note2
+    });
+
     const auto exitButton = Load<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
         GetDirector().Present<StateRoom>();
     });
-
 }
 
-void StatePlaying::Update(const double delta)
+unsigned int StatePlaying7K::GetViewport() const
+{
+    return m_viewport;
+}
+
+void StatePlaying7K::SetViewport(const unsigned int viewport)
+{
+    m_viewport = viewport;
+}
+
+void StatePlaying7K::Update(const double delta)
 {
     State::Update(delta);
 
@@ -93,7 +111,7 @@ void StatePlaying::Update(const double delta)
         return;
 }
 
-void StatePlaying::OnKeyDown(const sf::Event::KeyEvent ev)
+void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyDown(ev);
 
@@ -115,7 +133,7 @@ void StatePlaying::OnKeyDown(const sf::Event::KeyEvent ev)
     }
 }
 
-void StatePlaying::OnKeyUp(const sf::Event::KeyEvent ev)
+void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyUp(ev);
 
@@ -132,4 +150,12 @@ void StatePlaying::OnKeyUp(const sf::Event::KeyEvent ev)
 
         break;
     }
+}
+
+const GameContext *StatePlaying7K::PrepareContext() const
+{
+    const auto context = &Require<GameContext>();
+    context->SetViewport(GetViewport());
+
+    return context;
 }

@@ -22,10 +22,15 @@ public:
     GameMode GetMode() const;
     void SetMode(GameMode mode);
 
+    int GetViewport() const;
+    void SetViewport(int viewport);
+
 private:
     Gx::ResourcePtr<Chart> m_chart;
     Difficulty m_difficulty;
     GameMode m_mode;
+    int m_viewport;
+
     // TODO: Skill modifiers
 };
 

@@ -1,6 +1,6 @@
 #include <OTwo/States/StateLoading.hpp>
 
-#include <OTwo/States/StatePlaying.hpp>
+#include <OTwo/States/StatePlaying7K.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
@@ -89,7 +89,7 @@ void StateLoading::OnChartLoaded(const Chart *chart)
             ctx.SetMapID(room.MapID);
             ctx.SetEffectID(room.EffectID);
 
-            director.Present<StatePlaying>(ctx);
+            director.Present<StatePlaying7K>(ctx);
         },
         Gx::Sequence::ListOf({
             Create<Gx::Delay>(sf::seconds(1.f))

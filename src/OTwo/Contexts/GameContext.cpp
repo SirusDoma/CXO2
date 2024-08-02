@@ -29,3 +29,13 @@ void GameContext::SetMode(const GameMode mode)
 {
     m_mode = mode;
 }
+
+int GameContext::GetViewport() const
+{
+    return m_viewport;
+}
+
+void GameContext::SetViewport(const int viewport)
+{
+    m_viewport = viewport;
+}
