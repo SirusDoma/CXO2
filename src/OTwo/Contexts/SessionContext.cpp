@@ -1,12 +1,12 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
-const PlayerData &SessionContext::GetCurrentPlayer() const
+const Player &SessionContext::GetCurrentPlayer() const
 {
     return m_player;
 }
 
-void SessionContext::SetCurrentPlayer(const PlayerData &player)
+void SessionContext::SetCurrentPlayer(const Player &player)
 {
     m_player = player;
 }
@@ -41,12 +41,12 @@ void SessionContext::SetChannelID(const unsigned int channelId)
     m_channelID = channelId;
 }
 
-const RoomData &SessionContext::GetCurrentRoom() const
+const Room &SessionContext::GetCurrentRoom() const
 {
     return m_room;
 }
 
-void SessionContext::SetCurrentRoom(const RoomData &room)
+void SessionContext::SetCurrentRoom(const Room &room)
 {
     m_room = room;
 }

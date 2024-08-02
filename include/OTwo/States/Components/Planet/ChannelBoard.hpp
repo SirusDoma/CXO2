@@ -33,7 +33,7 @@ public:
     sf::FloatRect GetLocalBounds() const override;
 
     void Show(MusicHall hall, std::function<void()> callback);
-    void UpdateChannelList(const PlanetData &planet);
+    void UpdateChannelList(const PlanetInfo &planet);
     void ShowChannelList(unsigned int page);
     void ShowNotice(unsigned int page);
     void SwitchTab(Tab tab);
@@ -43,7 +43,7 @@ public:
     bool IsAnimationEnabled() const;
     void SetAnimationEnabled(bool animationEnabled);
 
-    void SetChannelEnterCallback(std::function<void(MusicHall, Channel)> callback);
+    void SetChannelEnterCallback(std::function<void(MusicHall, ServerChannel)> callback);
 
     unsigned int GetChannelsPerPage() const;
     void SetChannelsPerPage(unsigned int channelsPerPage);
@@ -62,9 +62,9 @@ private:
     Gx::Image m_duplicateImage;
     sf::RenderTexture m_renderTexture;
 
-    PlanetData m_planet;
+    PlanetInfo m_planetInfo;
     ChannelBoard::Tab m_tab;
-    std::function<void(MusicHall, Channel)> m_callback;
+    std::function<void(MusicHall, ServerChannel)> m_callback;
 
     bool m_transitioning, m_animationEnabled;
     int m_selectedChannel;

@@ -40,7 +40,7 @@ void RoomContainer::Initialize()
     AddChild(roomList);
 }
 
-void RoomContainer::PushRoomData(RoomData room)
+void RoomContainer::Add(const Room &room)
 {
     m_rooms[room.ID] = room;
     Invalidate();
@@ -92,7 +92,7 @@ void RoomContainer::Invalidate()
         auto room = m_rooms.find(roomNumber);
 
         if (room != m_rooms.end() && (!m_waiting || room->second.State == RoomState::Waiting))
-            roomButton->SetRoomData(room->second);
+            roomButton->SetRoomInfo(room->second);
         else
             roomButton->Reset();
     }

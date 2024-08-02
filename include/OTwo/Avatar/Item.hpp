@@ -68,7 +68,7 @@ private:
 
     unsigned int     m_id;
     EquipmentType    m_type;
-    Planet       m_origin;
+    Planet           m_origin;
     Gender           m_gender;
     bool             m_isNew;
     unsigned int     m_price;

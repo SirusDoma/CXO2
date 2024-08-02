@@ -112,9 +112,9 @@ void ChatWindow::SetMaximumChatLength(const unsigned int maxLength)
     }
 }
 
-void ChatWindow::PushMessage(const PlayerData &player, const sf::String &chat)
+void ChatWindow::PushMessage(const Player &player, const sf::String &chat)
 {
-    const auto chatData = ChatData{ player, chat };
+    const auto chatData = ChatMessage{ player, chat };
     // Do something if player is self
 
     if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
@@ -127,7 +127,7 @@ void ChatWindow::PushMessage(const PlayerData &player, const sf::String &chat)
 
 void ChatWindow::PushSystemMessage(const sf::String &chat)
 {
-    PushMessage(PlayerData{0}, chat);
+    PushMessage(Player{0}, chat);
 }
 
 Gx::RenderStates ChatWindow::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
@@ -223,9 +223,9 @@ void ChatWindow::Invalidate()
                     nickname = " " + nickname;
             }
 
-            m_labels[index]->SetString(sf::String("[" + nickname + "] ") + chat.Message);
+            m_labels[index]->SetString(sf::String("[" + nickname + "] ") + chat.Content);
         }
         else
-            m_labels[index]->SetString(chat.Message);
+            m_labels[index]->SetString(chat.Content);
     }
 }

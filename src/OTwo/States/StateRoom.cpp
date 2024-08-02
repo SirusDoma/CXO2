@@ -83,16 +83,16 @@ void StateRoom::Initialize()
     auto userList = Load<UserList>("STATE_ROOM/IDC_USER_LIST");
     userList->Initialize();
 
-    auto users = std::vector<PlayerData>();
+    auto users = std::vector<Player>();
     userList->AddUser(session.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
-        userList->AddUser(PlayerData{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
+        userList->AddUser(Player{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
 
     auto roomContainer = Load<RoomContainer>("STATE_ROOM/IDC_ROOM_CONTAINER");
     roomContainer->Initialize();
-    RoomData rooms[] = {
-        RoomData{
+    Room rooms[] = {
+        Room{
             /* .ID           = */ 0,
             /* .RoomMasterID = */ 0,
             /* .Title        = */ "Let's play together~",
@@ -119,7 +119,7 @@ void StateRoom::Initialize()
             /*.MaxLevelLimit = */ 0,
             /*.Members       = */ { RoomMember{ 1 } }
         },
-        RoomData{
+        Room{
             /* .ID            = */ 5,
             /* .RoomMasterID  = */ 0,
             /* .Title         = */ "Pimplex's room",
@@ -135,7 +135,7 @@ void StateRoom::Initialize()
             /* .MaxLevelLimit = */ 0,
             /* .Members       = */ { RoomMember{ 2 } }
         },
-        RoomData{
+        Room{
             /* .ID           = */ 3,
             /* .RoomMasterID = */ 0,
             /* .Title        = */ "kYo-Abhiem's room",
@@ -165,7 +165,7 @@ void StateRoom::Initialize()
     };
 
     for (auto& room : rooms)
-        roomContainer->PushRoomData(room);
+        roomContainer->Add(room);
 
     auto createRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_CREATE_ROOM");
     if (auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_CREATE_ROOM"); dialog)
@@ -176,27 +176,27 @@ void StateRoom::Initialize()
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
                 auto musicList = session.GetInstalledMusic();
-                session.SetCurrentRoom(RoomData{
-                        4,
-                        session.GetCurrentPlayer().ID,
-                        createRoomDialog->GetRoomName(),
-                        musicList[musicList.size() / 2].ToChartMetadataView(Difficulty::EX),
-                        Difficulty::EX,
-                        createRoomDialog->GetRoomMode(),
-                        SongMode::Normal,
-                        RoomState::Waiting,
-                        1.0f,
-                        !createRoomDialog->GetRoomPassword().empty(),
-                        8,
-                        createRoomDialog->GetMinLevelLimit(),
-                        createRoomDialog->GetMaxLevelLimit(),
-                        {
-                            RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
-                            {},
-                            {},
-                            RoomMember{PlayerData{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221}}, RoomTeam::F},
-                            RoomMember{PlayerData{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {482}}, RoomTeam::G}
-                        }
+                session.SetCurrentRoom(Room{
+                    4,
+                    session.GetCurrentPlayer().ID,
+                    createRoomDialog->GetRoomName(),
+                    musicList[musicList.size() / 2].ToChartMetadataView(Difficulty::EX),
+                    Difficulty::EX,
+                    createRoomDialog->GetRoomMode(),
+                    SongMode::Normal,
+                    RoomState::Waiting,
+                    1.0f,
+                    !createRoomDialog->GetRoomPassword().empty(),
+                    8,
+                    createRoomDialog->GetMinLevelLimit(),
+                    createRoomDialog->GetMaxLevelLimit(),
+                    {
+                        RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
+                        {},
+                        {},
+                        RoomMember{Player{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221}}, RoomTeam::F},
+                        RoomMember{Player{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {482}}, RoomTeam::G}
+                    }
                 });
                 director.Present<StateWaiting7K>();
             });

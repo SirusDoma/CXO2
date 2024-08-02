@@ -49,7 +49,7 @@ void UserList::Initialize()
     });
 }
 
-void UserList::AddUser(PlayerData user)
+void UserList::AddUser(Player user)
 {
     m_users.push_back(user);
     Invalidate();

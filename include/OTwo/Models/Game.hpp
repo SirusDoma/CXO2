@@ -1,5 +1,5 @@
-#ifndef O2JAM_GAME_DATA_HPP
-#define O2JAM_GAME_DATA_HPP
+#ifndef O2JAM_MODELS_GAME_HPP
+#define O2JAM_MODELS_GAME_HPP
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Texture.hpp>

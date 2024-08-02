@@ -45,7 +45,7 @@ void StatePlaying7K::Initialize()
     title->SetString(metadata.Title);
 
     const auto level = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
-    level->SetFrame(room.GetLevelCode(true));
+    level->SetFrame(room.GetRoomLevelCode(true));
 
     const auto bgmVolBar = menu->FindChild<Gx::Gauge>( "IDC_GAUGE_VOLUME_MUSIC");
     bgmVolBar->SetValue(100);

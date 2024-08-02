@@ -1,5 +1,5 @@
-#ifndef O2JAM_ROOM_DATA_HPP
-#define O2JAM_ROOM_DATA_HPP
+#ifndef O2JAM_MODELS_ROOM_HPP
+#define O2JAM_MODELS_ROOM_HPP
 
 #include <OTwo/Chart/Chart.hpp>
 
@@ -10,6 +10,13 @@
 
 #include <string>
 #include <vector>
+
+enum class KeyMode
+{
+    Three,
+    Five,
+    Seven
+};
 
 enum class RoomState
 {
@@ -23,7 +30,7 @@ enum class SongMode
     Random
 };
 
-struct PlayerData
+struct Player
 {
     using ItemList = std::vector<Gx::Uint32>;
 
@@ -38,12 +45,12 @@ struct PlayerData
     ItemList     Inventory;
 };
 
-struct ChatData
+struct ChatMessage
 {
-    PlayerData Sender;
-    sf::String Message;
+    Player Sender;
+    sf::String Content;
 
-    PlayerData Recipient;
+    Player Recipient;
     // MegaphoneInfo Megaphone;
 };
 
@@ -59,22 +66,20 @@ enum class RoomTeam
     H
 };
 
-struct RoomMember : PlayerData
+struct RoomMember : Player
 {
     RoomMember() = default;
     
-    RoomTeam   Team  = static_cast<RoomTeam>(-1);
-    Gx::Uint32 Index = 0;
+    RoomTeam  Team  = static_cast<RoomTeam>(-1);
+    Gx::Uint8 Index = 0;
 };
 
-struct RoomData
+struct Room
 {
-    using MemberList = RoomMember[];
-
     Gx::Uint32        ID;
     Gx::Uint32        RoomMasterID  = 0;
     std::string       Title;
-    ChartMetadataView Chart;
+    ChartMetadataView ChartMetadata;
     ::Difficulty      Difficulty;
     ::GameMode        GameMode;
     ::SongMode        SongMode;
@@ -88,7 +93,7 @@ struct RoomData
     Gx::Uint32        MapID         = 0;
     Gx::Uint32        EffectID      = 1;
 
-    std::string GetLevelCode(const bool useNormalMode = false) const
+    std::string GetRoomLevelCode(const bool useNormalMode = false) const
     {
         std::string speedStr(4, '\0');
         if (Speed > 0)

@@ -16,12 +16,12 @@ public:
     UserList();
     void Initialize() override;
 
-    void AddUser(PlayerData user);
+    void AddUser(Player user);
     void Clear();
 
 private:
     void Invalidate() override;
-    std::vector<PlayerData> m_users;
+    std::vector<Player> m_users;
 
     unsigned int m_selectedUser;
     unsigned int m_page = 1;

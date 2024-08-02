@@ -152,7 +152,7 @@ void O2Jam::Boot()
     Provide<SessionContext>([&](auto &app)
     {
         auto session  = std::make_unique<SessionContext>();
-        auto player   = PlayerData();
+        auto player   = Player();
         player.ID     = 1;
         player.Name   = "CXO2";
         player.Level  = -1;

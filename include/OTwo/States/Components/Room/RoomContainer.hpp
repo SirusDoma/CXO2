@@ -15,7 +15,7 @@ public:
 
     void Initialize() override;
 
-    void PushRoomData(RoomData room);
+    void Add(const Room &room);
     void Clear();
 
     void ShowAll();
@@ -29,7 +29,7 @@ private:
 
     void Invalidate() override;
 
-    std::map<unsigned int, RoomData> m_rooms;
+    std::map<unsigned int, Room> m_rooms;
 
     unsigned int m_page;
     bool m_waiting;

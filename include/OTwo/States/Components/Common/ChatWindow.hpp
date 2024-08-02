@@ -33,7 +33,7 @@ public:
     void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int maxLength);
 
-    void PushMessage(const PlayerData &player, const sf::String &chat);
+    void PushMessage(const Player &player, const sf::String &chat);
     void PushSystemMessage(const sf::String &chat);
 
 private:
@@ -47,7 +47,7 @@ private:
     sf::FloatRect m_bounds;
     unsigned int m_offset, m_maxChatLength, m_characterSize;
 
-    std::vector<ChatData> m_chats;
+    std::vector<ChatMessage> m_chats;
     std::vector<std::unique_ptr<Gx::Label>> m_labels;
 };
 

@@ -65,7 +65,7 @@ void StateWaiting7K::Initialize()
     roomName->SetString(room.Title);
 
     auto musicName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
-    musicName->SetString(room.Chart.Title + " [BPM: " + Gx::StringHelper::ToString(room.Chart.BPM, 2) + "]");
+    musicName->SetString(room.ChartMetadata.Title + " [BPM: " + Gx::StringHelper::ToString(room.ChartMetadata.BPM, 2) + "]");
 
     std::string speedName(4, '\0');
     if (room.Speed > 0)
@@ -186,7 +186,7 @@ void StateWaiting7K::Initialize()
 
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
     {
-        auto data = RoomData(*r);
+        auto data = Room(*r);
         data.MapID = mapID;
 
         s->SetCurrentRoom(data);
@@ -194,7 +194,7 @@ void StateWaiting7K::Initialize()
 
     mapSelector->SetEffectChangedCallback([=, s = &session, r = &room] (const unsigned int effectID)
     {
-        auto data = RoomData(*r);
+        auto data = Room(*r);
         data.EffectID = effectID;
 
         s->SetCurrentRoom(data);
@@ -267,9 +267,9 @@ void StateWaiting7K::Initialize()
                 return;
 
             auto meta = music.ToChartMetadataView(dialogSelectMusic->GetSelectedDifficulty());
-            auto data = RoomData(*r);
+            auto data = Room(*r);
 
-            data.Chart      = meta;
+            data.ChartMetadata      = meta;
             data.Difficulty = dialogSelectMusic->GetSelectedDifficulty();
             data.Speed      = dialogSelectMusic->GetSelectedSpeed();
             s->SetCurrentRoom(data);

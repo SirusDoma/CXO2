@@ -110,14 +110,14 @@ void StatePlanet::OnMusicHallSelected(MusicHall hall)
     m_connecting = true;
     auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
 
-    auto planetInfo = PlanetData();
+    auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;
 
     for (int x = 0; x < 2; x++)
     {
         for (int i = 1; i <= 20; i++)
         {
-            auto channel       = Channel();
+            auto channel       = ServerChannel();
             channel.ID         = (x * 20) + i;
             channel.Population = static_cast<int>((i / 20.f) * 100.f);
 
@@ -129,7 +129,7 @@ void StatePlanet::OnMusicHallSelected(MusicHall hall)
     channelBoard->UpdateChannelList(planetInfo);
 }
 
-void StatePlanet::OnChannelEnter(MusicHall hall, Channel channel)
+void StatePlanet::OnChannelEnter(MusicHall hall, ServerChannel channel)
 {
     if (channel.Population >= channel.MaxPopulation)
     {

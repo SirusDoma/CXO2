@@ -14,7 +14,7 @@ private:
     bool IsConnecting() const;
 
     void OnMusicHallSelected(MusicHall hall);
-    void OnChannelEnter(MusicHall hall, Channel channel);
+    void OnChannelEnter(MusicHall hall, ServerChannel channel);
 
     bool m_connecting;
 };

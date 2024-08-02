@@ -1,5 +1,5 @@
-#ifndef O2JAM_ROOM_ROOM_BUTTON_HPP
-#define O2JAM_ROOM_ROOM_BUTTON_HPP
+#ifndef O2JAM_ROOM_BUTTON_HPP
+#define O2JAM_ROOM_BUTTON_HPP
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Button.hpp>
@@ -19,15 +19,15 @@ public:
 
     bool IsActive() const;
 
-    const RoomData &GetRoomData() const;
-    void SetRoomData(const RoomData& data);
+    const Room &GetRoomInfo() const;
+    void SetRoomInfo(const Room& data);
     void Reset();
 
 private:
     void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
     void Invalidate() override;
 
-    RoomData m_room;
+    Room m_room;
     Gx::Image *m_hover;
     bool m_active;
 };

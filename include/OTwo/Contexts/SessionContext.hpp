@@ -12,8 +12,8 @@ class SessionContext : public Gx::Context
 public:
     SessionContext() = default;
 
-    const PlayerData &GetCurrentPlayer() const;
-    void SetCurrentPlayer(const PlayerData &player);
+    const Player &GetCurrentPlayer() const;
+    void SetCurrentPlayer(const Player &player);
 
     Planet GetPlanet() const;
     void SetPlanet(Planet planet);
@@ -24,17 +24,17 @@ public:
     unsigned int GetChannelID() const;
     void SetChannelID(unsigned int channelId);
 
-    const RoomData &GetCurrentRoom() const;
-    void SetCurrentRoom(const RoomData &room);
+    const Room &GetCurrentRoom() const;
+    void SetCurrentRoom(const Room &room);
 
     const std::vector<ChartMetadata> &GetInstalledMusic(bool rescan = false) const;
 
 private:
-    PlayerData m_player;
+    Player m_player;
     Planet m_planet = Planet::O2Planet;
     MusicHall m_hall;
     unsigned int m_channelID;
-    RoomData m_room;
+    Room m_room;
 
     mutable std::vector<ChartMetadata> m_installedMusicList;
 };

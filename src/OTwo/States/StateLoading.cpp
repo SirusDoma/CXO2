@@ -39,7 +39,7 @@ void StateLoading::Initialize()
         }
     }
 
-    const auto metadata = room.Chart;
+    const auto metadata = room.ChartMetadata;
     auto loader         = ChartLoader();
 
     // TODO: Load cover after select music in StateWaiting and forward it into StateLoading

@@ -36,12 +36,12 @@ sf::FloatRect RoomButton::GetLocalBounds() const
     return Gx::Image::GetLocalBounds();
 }
 
-const RoomData &RoomButton::GetRoomData() const
+const Room &RoomButton::GetRoomInfo() const
 {
     return m_room;
 }
 
-void RoomButton::SetRoomData(const RoomData &data)
+void RoomButton::SetRoomInfo(const Room &data)
 {
     m_room = data;
     m_active = true;
@@ -50,7 +50,7 @@ void RoomButton::SetRoomData(const RoomData &data)
 
 void RoomButton::Reset()
 {
-    m_room = RoomData();
+    m_room = Room();
     m_active = false;
     Invalidate();
 }
@@ -137,7 +137,7 @@ void RoomButton::Invalidate()
             case Difficulty::MX: diffName = "MX"; break;
         }
 
-        switch (m_room.Chart.GetLevelCategory())
+        switch (m_room.ChartMetadata.GetLevelCategory())
         {
             case LevelCategory::Level1: ohmLevel->SetFrame("Beginner"); break;
             case LevelCategory::Level2: ohmLevel->SetFrame("Intermediate"); break;
@@ -147,8 +147,8 @@ void RoomButton::Invalidate()
 
         auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
         const auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
-        newIndicator->SetVisible(m_room.Chart.New);
-        if (m_room.Chart.New)
+        newIndicator->SetVisible(m_room.ChartMetadata.New);
+        if (m_room.ChartMetadata.New)
         {
             music->SetVisible(false);
 
@@ -161,7 +161,7 @@ void RoomButton::Invalidate()
             newMusic->SetVisible(false);
         }
 
-        music->SetString("Lv." + std::to_string(m_room.Chart.Level) + " - " + m_room.Chart.Title);
+        music->SetString("Lv." + std::to_string(m_room.ChartMetadata.Level) + " - " + m_room.ChartMetadata.Title);
         speed->SetFrame(diffName + speedStr);
     }
     else if (m_room.SongMode == SongMode::Random)
