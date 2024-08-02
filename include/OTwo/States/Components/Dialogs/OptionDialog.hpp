@@ -37,7 +37,7 @@ private:
     ::State *m_parent;
     std::map<Chart::ChannelType, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    GameConfig       m_config;
+    GameConfig         m_config;
     Chart::ChannelType m_keyChannel;
 
     bool m_keyTestEnabled;

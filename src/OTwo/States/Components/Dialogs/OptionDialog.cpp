@@ -226,7 +226,8 @@ void OptionDialog::Initialize()
         }
 
         auto& application = Gx::Application::Instance();
-        application.SetConfig(m_config);
+        application.Require<GameConfig>().Apply(m_config);
+
         m_keyChannel = Chart::ChannelType::Note1;
         keySelect->SetFrame(0);
 
@@ -320,10 +321,10 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     Dialog::OnShown(scene);
     Initialize();
 
-    auto& app   = scene.GetApplication();
-    auto& mixer = app.Require<Gx::Mixer>();
-    auto config = app.GetConfig<GameConfig>();
-    m_config    = GameConfig(config);
+    auto& app    = scene.GetApplication();
+    auto& mixer  = app.Require<Gx::Mixer>();
+    auto& config = app.Require<GameConfig>();
+    m_config     = GameConfig(config);
 
     const auto background    = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
@@ -393,7 +394,7 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
             if (!keytext || !keytext->ContainsFrame(keyStr))
                 return;
 
-            m_config.SevenKeyBinding[m_keyChannel] = ev.code;
+            m_config.KeyBindings[KeyMode::Seven][m_keyChannel] = ev.code;
             keytext->SetFrame(keyStr);
 
             int index = static_cast<int>(m_keyChannel);
@@ -411,7 +412,7 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
             keySelect->SetVisible(false);
             for (auto [channel, keyDown] : m_keyDowns)
             {
-                if (m_config.SevenKeyBinding[channel] == ev.code)
+                if (m_config.KeyBindings[KeyMode::Seven][channel] == ev.code)
                     keyDown->SetVisible(true);
             }
         }
@@ -430,7 +431,7 @@ void OptionDialog::OnKeyUp(const sf::Event::KeyEvent ev)
         keySelect->SetVisible(false);
         for (auto [channel, keyDown] : m_keyDowns)
         {
-            if (m_config.SevenKeyBinding[channel] == ev.code)
+            if (m_config.KeyBindings[KeyMode::Seven][channel] == ev.code)
                 keyDown->SetVisible(false);
         }
     }
@@ -443,9 +444,9 @@ void OptionDialog::OnKeyType(const sf::Event::TextEvent ev)
 
 bool OptionDialog::ValidateConfig()
 {
-    for (auto [channel, key] : m_config.SevenKeyBinding)
+    for (auto [channel, key] : m_config.KeyBindings[KeyMode::Seven])
     {
-        for (auto [pairChannel, pairKey] : m_config.SevenKeyBinding)
+        for (auto [pairChannel, pairKey] : m_config.KeyBindings[KeyMode::Seven])
         {
             if (channel != pairChannel && key == pairKey)
                 return false;
@@ -484,7 +485,7 @@ void OptionDialog::Invalidate()
     effectVolumeGauge->SetValue(m_config.EffectVolume);
 
     for (auto [channel, keytext] : m_keyTexts)
-        keytext->SetFrame(std::string(magic_enum::enum_name(m_config.SevenKeyBinding[channel])));
+        keytext->SetFrame(std::string(magic_enum::enum_name(m_config.KeyBindings[KeyMode::Seven][channel])));
 
     if (!m_keyTestEnabled)
     {

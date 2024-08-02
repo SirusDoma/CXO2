@@ -5,9 +5,9 @@
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 
-class SessionContext : public Gx::Context
+class SessionContext : public Gx::Provider
 {
 public:
     SessionContext() = default;

@@ -5,10 +5,10 @@
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 
 class Chart;
-class GameContext : public Gx::Context
+class GameContext : public Gx::Provider
 {
 public:
     GameContext() = default;

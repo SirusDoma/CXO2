@@ -81,7 +81,7 @@ void StateLoading::OnChartLoaded(const Chart *chart)
             auto &app      = GetApplication();
             auto &director = GetDirector();
             auto &session  = Require<SessionContext>();
-            auto &config   = app.GetConfig<GameConfig>();
+            auto &config   = Require<GameConfig>();
             auto &room     = session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 

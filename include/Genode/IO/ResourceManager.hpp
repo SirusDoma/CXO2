@@ -4,7 +4,7 @@
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/ResourceContainer.hpp>
 
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 
 #include <typeindex>
 #include <memory>
@@ -12,14 +12,14 @@
 namespace Gx
 {
     class ResourceContext;
-    class ResourceManager : NonCopyable, public Context
+    class ResourceManager : NonCopyable, public Provider
     {
     public:
         using ContextBuilder = std::function<std::unique_ptr<ResourceContext>(const std::string&, ResourceManager&, const CacheMode)>;
 
         ResourceManager();
         ResourceManager(ResourceManager &&other) noexcept;
-        virtual ~ResourceManager() = default;
+        ~ResourceManager() override = default;
 
         ResourceManager& operator=(ResourceManager&& right) noexcept;
 

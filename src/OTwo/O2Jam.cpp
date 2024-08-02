@@ -119,7 +119,7 @@ void O2Jam::Boot()
     window.setFramerateLimit(0);
 
     // Setup configuration
-    SetConfig<GameConfig>([] (auto &app)
+    Provide<GameConfig>([] (auto &app)
     {
         // TODO: Load game config from file
         auto config = std::make_unique<GameConfig>();
@@ -216,7 +216,7 @@ void O2Jam::OnFocusChanged(bool focus)
     Application::OnFocusChanged(focus);
 
     auto& director = GetSceneDirector();
-    auto config    = GetConfig<GameConfig>();
+    auto& config   = Require<GameConfig>();
     auto& mixer    = Require<Gx::Mixer>();
 
     if (focus)

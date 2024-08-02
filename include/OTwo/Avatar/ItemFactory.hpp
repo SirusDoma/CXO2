@@ -7,12 +7,12 @@
 #include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Equipment.hpp>
 
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <unordered_map>
 
-class ItemFactory : public Gx::Context
+class ItemFactory : public Gx::Provider
 {
 public:
     ItemFactory() = default;

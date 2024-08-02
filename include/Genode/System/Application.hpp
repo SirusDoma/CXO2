@@ -7,8 +7,7 @@
 #include <Genode/Graphics/RenderTargetAdapter.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/System/Config.hpp>
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 
 #include <SFML/Window.hpp>
 
@@ -18,7 +17,7 @@
 namespace Gx
 {
     class Scene;
-    class Context;
+    class Provider;
     class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
@@ -37,15 +36,6 @@ namespace Gx
 
         unsigned int GetRenderFrequency() const;
         void SetCursor(Cursor &cursor);
-
-        template<typename T>
-        T &GetConfig();
-
-        template<typename T>
-        void SetConfig(const T& config);
-
-        template<typename T>
-        void SetConfig(std::function<std::unique_ptr<T>(const Application&)> builder);
 
         template<typename T>
         T &Provide();
@@ -77,11 +67,8 @@ namespace Gx
         virtual void OnClose();
 
     private:
-        using ConfigMap         = std::unordered_map<std::type_index, std::unique_ptr<Config>>;
-        using ConfigResolverMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Config>(const Application&)>>;
-
-        using ContextMap        = std::unordered_map<std::type_index, std::unique_ptr<Context>>;
-        using ContextFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Context>(Application&)>>;
+        using ProviderMap        = std::unordered_map<std::type_index, std::unique_ptr<Provider>>;
+        using ProviderFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Provider>(Application&)>>;
 
         inline static Application *m_instance = nullptr;
 
@@ -98,11 +85,8 @@ namespace Gx
         sf::Clock m_timer;
         Cursor* m_cursor;
 
-        ConfigMap         m_configs;
-        ConfigResolverMap m_configurators;
-
-        ContextMap        m_contexts;
-        ContextFactoryMap m_factories;
+        ProviderMap        m_providers;
+        ProviderFactoryMap m_factories;
 
         const std::string m_title;
         unsigned int m_frameID;

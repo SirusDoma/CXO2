@@ -3,7 +3,7 @@
 
 #include <SFML/Audio.hpp>
 
-#include <Genode/System/Context.hpp>
+#include <Genode/System/Provider.hpp>
 #include <Genode/Entities/Updatable.hpp>
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/IO/ResourceManager.hpp>
@@ -14,7 +14,7 @@
 namespace Gx
 {
     class SoundGroup;
-    class Mixer : public Context, public Updatable
+    class Mixer : public Provider, public Updatable
     {
     public:
         Mixer();

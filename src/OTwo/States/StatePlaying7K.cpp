@@ -22,7 +22,7 @@ void StatePlaying7K::Initialize()
 
     auto &app = GetApplication();
     m_context = PrepareContext();
-    m_config  = &app.GetConfig<GameConfig>();
+    m_config  = &Require<GameConfig>();
 
     const auto &session = Require<SessionContext>();
     auto &room = session.GetCurrentRoom();
@@ -56,7 +56,7 @@ void StatePlaying7K::Initialize()
     const auto noteClickList = Load<Gx::UiContainer>("IDC_LIST_NOTE_CLICK");
     const auto keyEffectContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
     const auto keyDownContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
-    for (auto [channel, _] : m_config->SevenKeyBinding)
+    for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         const int id = static_cast<int>(channel) - 1;
         if (id < 1 || id > 7)
@@ -115,7 +115,7 @@ void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyDown(ev);
 
-    for (auto [channel, code] : m_config->SevenKeyBinding)
+    for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         if (code != ev.code)
             continue;
@@ -137,7 +137,7 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyUp(ev);
 
-    for (auto [channel, code] : m_config->SevenKeyBinding)
+    for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         if (code != ev.code)
             continue;
