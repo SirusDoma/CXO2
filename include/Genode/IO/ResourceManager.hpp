@@ -72,6 +72,9 @@ namespace Gx
         R *Find(const std::string &id) const;
 
         template<typename R>
+        void Each(const std::function<void(const std::string&, R&)> &callback);
+
+        template<typename R>
         unsigned int Count() const;
 
         template<typename R>

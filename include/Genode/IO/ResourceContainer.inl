@@ -89,6 +89,16 @@ namespace Gx
     }
 
     template<typename R>
+    void ResourceContainer<R>::Each(const std::function<void(const std::string &, R &)> &callback)
+    {
+        if (!callback)
+            return;
+
+        for (auto& [key, resource] : m_caches)
+            callback(key, *resource.get());
+    }
+
+    template<typename R>
     bool ResourceContainer<R>::Contains(const std::string& id) const
     {
         return m_caches.contains(id);

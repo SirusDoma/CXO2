@@ -197,6 +197,20 @@ namespace Gx
     }
 
     template<typename R>
+    void ResourceManager::Each(const std::function<void(const std::string &, R&)> &callback)
+    {
+        const auto it = m_containers.find(typeid(R));
+        if (it == m_containers.end())
+            return;
+
+        auto managed = dynamic_cast<ManagedContainer<R>*>(it->second.get());
+        if (!managed)
+            return;
+
+        managed->Container->Each(callback);
+    }
+
+    template<typename R>
     bool ResourceManager::Destroy(const R &resource)
     {
         const auto it = m_containers.find(typeid(R));
