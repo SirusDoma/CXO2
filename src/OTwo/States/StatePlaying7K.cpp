@@ -56,16 +56,16 @@ void StatePlaying7K::Initialize()
     if (m_context->GetChart())
         metadata = m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty());
 
-    const auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
+    const auto wave = Instantiate<Gx::Gauge>("IDC_GAUGE_WAVE");
     wave->SetValue(50);
 
-    const auto jam = Load<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
+    const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(50);
 
-    const auto lifeBar = Load<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
     lifeBar->SetValue(75);
 
-    const auto menu = Load<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
+    const auto menu = Instantiate<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
     const auto title = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
     title->SetString(metadata.Title);
 
@@ -78,9 +78,9 @@ void StatePlaying7K::Initialize()
     const auto sfxVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
     sfxVolBar->SetValue(100);
 
-    const auto noteClickList = Load<Gx::UiContainer>("IDC_LIST_NOTE_CLICK");
-    const auto keyEffectContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
-    const auto keyDownContainer = Load<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
+    const auto noteClickList = Instantiate<Gx::UiContainer>("IDC_LIST_NOTE_CLICK");
+    const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
+    const auto keyDownContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
     for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         const int id = static_cast<int>(channel) - 1;
@@ -106,7 +106,7 @@ void StatePlaying7K::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
-    const auto exitButton = Load<Gx::Button>("IDC_BUTTON_EXIT");
+    const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
         GetDirector().Present<StateRoom>();

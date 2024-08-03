@@ -37,12 +37,12 @@ void StateWaiting7K::Initialize()
     auto& player   = session.GetCurrentPlayer();
     auto& room     = session.GetCurrentRoom();
 
-    const auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
-    const auto sfxStart       = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
-    const auto sfxTeam        = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
-    const auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
+    const auto bgm            = Instantiate<sf::Music>("STATE_WAITING/IDC_MUSIC");
+    const auto sfxStart       = Instantiate<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
+    const auto sfxTeam        = Instantiate<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
+    const auto sfxSelectMusic = Instantiate<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
 
-    const auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelCategory = Instantiate<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
@@ -54,22 +54,22 @@ void StateWaiting7K::Initialize()
         default: break;
     }
 
-    const auto channelNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Instantiate<Gx::Number>("STATE_WAITING/IDC_NUMBER_CHANNEL_ID");
     channelNumber->SetValue(session.GetChannelID());
 
-    const auto roomNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_ROOM_ID");
+    const auto roomNumber = Instantiate<Gx::Number>("STATE_WAITING/IDC_NUMBER_ROOM_ID");
     roomNumber->SetValue(room.ID);
 
-    const auto roomName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_ROOM_NAME");
+    const auto roomName = Instantiate<Gx::Label>("STATE_WAITING/IDC_TEXT_ROOM_NAME");
     roomName->SetString(room.Title);
 
-    const auto musicName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
+    const auto musicName = Instantiate<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
     musicName->SetString(room.ChartMetadata.Title + " [BPM: " + Gx::StringHelper::ToString(room.ChartMetadata.BPM, 2) + "]");
 
-    const auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
+    const auto level = Instantiate<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
     level->SetFrame(room.GetRoomLevelCode());
 
-    const auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
+    const auto avatarList = Instantiate<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
 
     AvatarInfo *currentAvatarInfo = nullptr;
     auto currentMember = RoomMember();
@@ -116,7 +116,7 @@ void StateWaiting7K::Initialize()
         memberIndex++;
     }
 
-    const auto teamButtons = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
+    const auto teamButtons = Instantiate<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
     auto teamButtonMatcher = [=] (RoomTeam team) -> Gx::RadioButton*
     {
         switch (team)
@@ -159,7 +159,7 @@ void StateWaiting7K::Initialize()
         });
     }
 
-    const auto mapSelector = Load<MapSelector>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
+    const auto mapSelector = Instantiate<MapSelector>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
@@ -178,7 +178,7 @@ void StateWaiting7K::Initialize()
         s->SetCurrentRoom(data);
     });
 
-    const auto instrumentSelector = Load<InstrumentSelector>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
+    const auto instrumentSelector = Instantiate<InstrumentSelector>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
     instrumentSelector->Initialize();
 
     if (currentAvatarInfo)
@@ -214,11 +214,11 @@ void StateWaiting7K::Initialize()
     instrumentSelector->AddInstrument(items.GetItem(412));
     instrumentSelector->AddInstrument(items.GetItem(1429));
 
-    const auto readyButton = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
+    const auto readyButton = Instantiate<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
     readyButton->SetVisible(false);
     readyButton->SetEnabled(false);
 
-    const auto chatPanel  = Load<ChatPanel>("STATE_WAITING/IDC_CHAT_PANEL");
+    const auto chatPanel  = Instantiate<ChatPanel>("STATE_WAITING/IDC_CHAT_PANEL");
     chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
 
@@ -226,11 +226,11 @@ void StateWaiting7K::Initialize()
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    if (const auto dialog = Load<Gx::Dialog>("STATE_WAITING/IDC_DIALOG_SELECT_MUSIC"); dialog)
+    if (const auto dialog = Instantiate<Gx::Dialog>("STATE_WAITING/IDC_DIALOG_SELECT_MUSIC"); dialog)
     {
         const auto selectMusicDialog = Create<SelectMusicDialog>(*dialog);
         selectMusicDialog->Initialize();
-        if (const auto selectMusicButton = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
+        if (const auto selectMusicButton = Instantiate<Gx::Button>("STATE_WAITING/IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
             selectMusicButton->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
             {
@@ -270,12 +270,12 @@ void StateWaiting7K::Initialize()
     }
 
 
-    const auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
+    const auto btnBack = Instantiate<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto& sender, auto& ev) {
         director.Present<StateRoom>();
     });
 
-    const auto btnStart = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START");
+    const auto btnStart = Instantiate<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START");
     btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
     {
         if (!sender->IsChecked())

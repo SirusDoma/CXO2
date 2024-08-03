@@ -31,7 +31,7 @@ public:
     ~State() override;
 
     template<typename R>
-    R* Load(const std::string &source, ResourceScope scope = ResourceScope::Local);
+    R* Instantiate(const std::string &source, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>
     R* Import(Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
@@ -41,18 +41,6 @@ public:
 
     template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>
     R* Create(Args&&... args);
-
-    template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>
-    R* Make(const std::string &id, Args&&... args);
-
-    template<typename R>
-    R *Instantiate(const std::string &id, ResourceScope scope = ResourceScope::Local);
-
-    template<typename R, typename T>
-    R *Instantiate(const std::string &id, ResourceScope scope = ResourceScope::Local);
-
-    template<typename R>
-    R *Instantiate(const std::string &source, const std::string &id, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>
     R* Find(const std::string &id, ResourceScope scope = ResourceScope::Local);

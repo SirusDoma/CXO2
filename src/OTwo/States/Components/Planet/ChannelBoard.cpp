@@ -29,16 +29,16 @@ void ChannelBoard::Initialize()
 
     auto& app            = Gx::Application::Instance();
     auto& mixer          = app.Require<Gx::Mixer>();
-    auto sfxNavigate     = parent->Load<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_PAGE");
-    auto sfxEnter        = parent->Load<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_ENTER");
+    auto sfxNavigate     = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_PAGE");
+    auto sfxEnter        = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_ENTER");
     const auto container = parent->Create<Gx::UiContainer>();
     container->SetName("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
     AddChild(container);
 
-    const auto category  = parent->Load<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto category  = parent->Instantiate<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_CATEGORY");
     container->AddChild(category);
 
-    const auto channelTabButton = parent->Load<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_TAB");
+    const auto channelTabButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_TAB");
     channelTabButton->SetEnabled(false);
     channelTabButton->SetClickCallback(
         [=] (auto& sender, auto& ev)
@@ -53,7 +53,7 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto noticeTabButton = parent->Load<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_NOTICE_TAB");
+    const auto noticeTabButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_NOTICE_TAB");
     noticeTabButton->SetClickCallback(
         [=] (auto& sender, auto& ev)
         {
@@ -67,15 +67,15 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto channelList = parent->Load<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
+    const auto channelList = parent->Instantiate<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
     container->AddChild(channelList);
 
-    const auto currentPageNumber = parent->Load<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto maxPageNumber     = parent->Load<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto currentPageNumber = parent->Instantiate<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto maxPageNumber     = parent->Instantiate<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
     currentPageNumber->SetDigitCount(2);
     maxPageNumber->SetDigitCount(2);
 
-    const auto enterButton = parent->Load<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_ENTER");
+    const auto enterButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_ENTER");
     container->AddChild(enterButton);
     enterButton->SetClickCallback(
         [&, sfxEnter] (auto& sender, auto& ev)
@@ -107,7 +107,7 @@ void ChannelBoard::Initialize()
         channelButton->Initialize();
     }
 
-    const auto leftButton = parent->Load<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_LEFT");
+    const auto leftButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_LEFT");
     leftButton->SetClickCallback(
         [&, sfxNavigate] (auto& sender, auto& ev)
         {
@@ -125,7 +125,7 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto rightButton = parent->Load<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_RIGHT");
+    const auto rightButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_RIGHT");
     rightButton->SetClickCallback(
         [&, sfxNavigate] (auto& sender, auto& ev)
         {
@@ -143,7 +143,7 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto notice = parent->Load<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_NOTICE");
+    const auto notice = parent->Instantiate<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_NOTICE");
     m_noticePageIndex = 1;
     m_noticeMaxPage   = notice->GetFrameCount();
 
@@ -272,7 +272,7 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
         return;
 
     const auto parent = GetParent<::State>();
-    const auto sfxPopup    = parent->Load<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_OPEN");
+    const auto sfxPopup    = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_OPEN");
     const auto container   = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
     const auto category    = container->FindChild<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_CATEGORY");
     const auto channelList = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");

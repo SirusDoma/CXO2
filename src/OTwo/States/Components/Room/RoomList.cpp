@@ -21,7 +21,7 @@ void RoomContainer::Initialize()
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
 
-    auto sfxInvalid  = parent->Load<sf::Sound>("STATE_ROOM/IDC_SOUND_15");
+    auto sfxInvalid  = parent->Instantiate<sf::Sound>("STATE_ROOM/IDC_SOUND_15");
     auto roomList    = FindChild<Gx::List>("IDC_LIST_ROOM");
     for (auto child : roomList->GetChildren())
     {

@@ -19,8 +19,8 @@ void StateAvi::Initialize()
 
     auto& director  = GetDirector();
     auto& mixer     = Require<Gx::Mixer>();
-    auto background = Load<Gx::Sprite>("STATE_AVI/IDC_IMAGE_STATE_AVI");
-    auto bgm        = Load<sf::Music>("STATE_AVI/IDC_MUSIC");
+    auto background = Instantiate<Gx::Sprite>("STATE_AVI/IDC_IMAGE_STATE_AVI");
+    auto bgm        = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
     mixer.Play(bgm, "BGM");
 
     auto splash = Create<Gx::Sequence>([&]

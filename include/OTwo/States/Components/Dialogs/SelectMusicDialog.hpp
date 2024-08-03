@@ -2,12 +2,12 @@
 #define O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
 
 #include <OTwo/Models/Room.hpp>
+#include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 
 #include <vector>
-#include <OTwo/Models/Game.hpp>
 
 enum class MusicSortMode
 {
@@ -28,8 +28,8 @@ class SelectMusicDialog : public Gx::Dialog
 {
 public:
     using Gx::Dialog::Dialog;
-
     explicit SelectMusicDialog(const Gx::Dialog &copy);
+
     void Initialize() override;
 
     ChartMetadata GetSelectedMusic() const;

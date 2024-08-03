@@ -15,6 +15,7 @@ namespace Gx
     {
     public:
         Dialog();
+        explicit Dialog(const Dialog &copy);
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 

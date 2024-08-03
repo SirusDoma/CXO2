@@ -68,15 +68,15 @@ void State::LoadCommonResources()
         return;
 
     m_prompted    = false;
-    m_dialogInfo  = Load<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
-    m_dialog1     = Load<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
-    m_dialog2     = Load<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-    m_cancelSound = Load<sf::Sound>("Interface/Sound/Effect/03.json", ResourceScope::Shared);
-    m_popupSound  = Load<sf::Sound>("Interface/Sound/Effect/06.json", ResourceScope::Shared);
+    m_dialogInfo  = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
+    m_dialog1     = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
+    m_dialog2     = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+    m_cancelSound = Instantiate<sf::Sound>("Interface/Sound/Effect/03.json", ResourceScope::Shared);
+    m_popupSound  = Instantiate<sf::Sound>("Interface/Sound/Effect/06.json", ResourceScope::Shared);
 
     if (m_dialog2)
     {
-        m_exitDialog = Load<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
         m_exitDialog->SetAcceptCallback([&]
         {
             m_prompted = true;

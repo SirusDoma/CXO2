@@ -1,7 +1,7 @@
 #include <Genode/Utilities/StringHelper.hpp>
 
 template<typename R>
-R* State::Load(const std::string &source, ResourceScope scope)
+R* State::Instantiate(const std::string &source, ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||

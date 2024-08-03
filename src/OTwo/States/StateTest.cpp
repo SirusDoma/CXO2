@@ -18,16 +18,16 @@ void StateTest::Initialize()
 {
     State::Initialize();
 
-    auto wave = Load<Gx::Gauge>("IDC_GAUGE_WAVE");
+    auto wave = Instantiate<Gx::Gauge>("IDC_GAUGE_WAVE");
     wave->SetValue(50);
 
-    auto jam = Load<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
+    auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(50);
 
-    auto lifeBar = Load<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
     lifeBar->SetValue(75);
 
-    auto menu = Load<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
+    auto menu = Instantiate<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
     auto bgmVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
     bgmVolBar->SetValue(100);
 

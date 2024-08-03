@@ -21,22 +21,22 @@ void StatePlanet::Initialize()
     const auto& session = Require<SessionContext>();
     auto& mixer         = Require<Gx::Mixer>();
 
-    const auto bgm = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
-    auto clickSfx  = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
-    auto hoverSfx  = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
+    const auto bgm = Instantiate<sf::Music>("STATE_PLANET/IDC_MUSIC");
+    auto clickSfx  = Instantiate<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
+    auto hoverSfx  = Instantiate<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
 
-    auto euta     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_01");
-    auto thalo    = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_02");
-    auto melpomin = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_03");
-    auto kalliope = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_HIGH_01");
-    auto kleo     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_INTERMEDIATE_01");
-    auto philix   = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PREMIUM_01");
+    auto euta     = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_01");
+    auto thalo    = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_02");
+    auto melpomin = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_03");
+    auto kalliope = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_HIGH_01");
+    auto kleo     = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_INTERMEDIATE_01");
+    auto philix   = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PREMIUM_01");
 
-    auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
     channelBoard->Initialize();
     channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
 
-    const auto exitButton = Load<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
+    const auto exitButton = Instantiate<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([&] (auto& sender, auto& ev) { GetApplication().Close(); });
 
     const auto container = Create<Gx::UiContainer>();
@@ -109,7 +109,7 @@ bool StatePlanet::IsConnecting() const
 void StatePlanet::OnMusicHallSelected(MusicHall hall)
 {
     m_connecting = true;
-    const auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    const auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
 
     auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;

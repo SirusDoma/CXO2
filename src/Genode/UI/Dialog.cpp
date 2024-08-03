@@ -8,14 +8,33 @@
 namespace Gx
 {
     Dialog::Dialog() :
-        m_shown(false),
-        m_accepted(false),
-        m_scene(),
         m_sprite(),
-        m_promptText(),
         m_acceptButton(),
-        m_cancelButton()
+        m_cancelButton(),
+        m_promptText(),
+        m_scene(),
+        m_accepted(false),
+        m_shown(false)
     {
+    }
+
+    Dialog::Dialog(const Dialog &copy) :
+        UiContainer(copy),
+        Node(copy),
+        m_sprite(copy.m_sprite),
+        m_acceptButton(copy.m_acceptButton),
+        m_cancelButton(copy.m_cancelButton),
+        m_promptText(copy.m_promptText),
+        m_scene(copy.m_scene),
+        m_accepted(copy.m_accepted),
+        m_shown(copy.m_shown)
+    {
+        // Rewire callbacks due to copy constructor
+        if (m_acceptButton)
+            SetAcceptButton(*m_acceptButton);
+
+        if (m_cancelButton)
+            SetCancelButton(*m_cancelButton);
     }
 
     Dialog::Dialog(const sf::Texture &texture) :

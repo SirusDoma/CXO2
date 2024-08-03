@@ -1,6 +1,8 @@
 #include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/Models/Game.hpp>
 
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
@@ -8,11 +10,8 @@
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
-#include <OTwo/Models/Game.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
-    Gx::UiContainer(copy),
     Gx::Node(copy),
     Gx::Dialog(copy),
     m_initialized(false),
@@ -34,15 +33,6 @@ void SelectMusicDialog::Initialize()
 {
     if (m_initialized)
         return;
-
-    Gx::Dialog::Initialize();
-
-    // Rewire callbacks due to copy constructor
-    if (auto acceptButton = GetAcceptButton(); acceptButton)
-        SetAcceptButton(*acceptButton);
-
-    if (auto cancelButton = GetCancelButton(); cancelButton)
-        SetCancelButton(*cancelButton);
 
     auto& app     = Gx::Application::Instance();
     auto& session = app.Require<SessionContext>();
@@ -79,8 +69,8 @@ void SelectMusicDialog::Initialize()
             if (!musicSelector)
                 return;
 
-            unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
-            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+            const unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
+            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
             if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
                 return;
 
@@ -113,7 +103,7 @@ void SelectMusicDialog::Initialize()
 
             button->SetCheckStateChangeCallback([this, i] (auto sender)
             {
-                auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+                const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
                 if (!sender->IsChecked())
                 {
                     if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
@@ -125,8 +115,8 @@ void SelectMusicDialog::Initialize()
                 if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                     activeHighlighter->SetVisible(true);
 
-                unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
-                auto music = *m_displayList[i + static_cast<int>(m_page * itemListCount)];
+                const unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
+                const auto music = *m_displayList[i + static_cast<int>(m_page * itemListCount)];
                 if (m_music.ID == music.ID)
                     return;
 
@@ -254,7 +244,7 @@ void SelectMusicDialog::Initialize()
                 else
                     m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
 
-                if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+                if (const auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
                 {
                     std::unordered_map<std::string, Genre> genreMap = {
                         {"IDC_RADIO_GENRE_ALL",         static_cast<Genre>(-1)},
@@ -276,7 +266,7 @@ void SelectMusicDialog::Initialize()
                         if (genre != m_genre)
                             continue;
 
-                        if (auto button = genreSelector->FindChild<Gx::RadioButton>(key); button)
+                        if (const auto button = genreSelector->FindChild<Gx::RadioButton>(key); button)
                         {
                             button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
@@ -284,7 +274,7 @@ void SelectMusicDialog::Initialize()
                     }
                 }
 
-                if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+                if (const auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
                 {
                     std::unordered_map<std::string, Difficulty> diffMap = {
                         {"IDC_RADIO_NOTE_EX", Difficulty::EX},
@@ -297,7 +287,7 @@ void SelectMusicDialog::Initialize()
                         if (diff != m_difficulty)
                             continue;
 
-                        if (auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
+                        if (const auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
                         {
                             button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
@@ -435,13 +425,13 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
 
     if (ev.code == sf::Keyboard::Key::Up)
     {
-        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
-            auto children = list->GetChildren();
+            const auto children = list->GetChildren();
             Gx::RadioButton *previous = nullptr;
             for (int i = 0; i < children.size(); i++)
             {
-                auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
+                const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
                 if (!button)
                     continue;
 
@@ -469,13 +459,13 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
     }
     else if (ev.code == sf::Keyboard::Key::Down)
     {
-        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
-            auto children = list->GetChildren();
-            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+            const auto children = list->GetChildren();
+            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
             for (int i = 0; i < children.size(); i++)
             {
-                auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
+                const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
                 if (!button)
                     continue;
 
@@ -492,7 +482,7 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
                     {
                         for (int j = i + 1; j < children.size(); j++)
                         {
-                            if (auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
+                            if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
                             {
                                 next->SetCheckedState(true);
                                 break;
@@ -516,10 +506,10 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
     }
     else if (ev.code == sf::Keyboard::Key::Right)
     {
-        if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
-            auto children = list->GetChildren();
-            unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+            const auto children = list->GetChildren();
+            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
 
             if (m_page == maxPage - 1)
                 return;
@@ -544,7 +534,7 @@ void SelectMusicDialog::OnAccepted()
     auto& mixer     = app.Require<Gx::Mixer>();
     auto& resources = app.Require<Gx::ResourceManager>();
 
-    auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
+    const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
     mixer.Play(sfx);
 }
 
@@ -556,7 +546,7 @@ void SelectMusicDialog::OnCancelled()
     auto& mixer     = app.Require<Gx::Mixer>();
     auto& resources = app.Require<Gx::ResourceManager>();
 
-    auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
+    const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
     mixer.Play(sfx);
 }
 
@@ -714,9 +704,9 @@ void SelectMusicDialog::Invalidate()
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
-                                            m.ToChartMetadataView(diff).Level <= 5; });
+                                    const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
+                                                                            m.ToChartMetadataView(diff).Level <= 5; });
 
                                     if (result)
                                     {
@@ -735,10 +725,10 @@ void SelectMusicDialog::Invalidate()
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        int level = m.ToChartMetadataView(diff).Level;
+                                        const int level = m.ToChartMetadataView(diff).Level;
                                         return level > 5 && level <= 9;
                                     });
 
@@ -759,10 +749,10 @@ void SelectMusicDialog::Invalidate()
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        int level = m.ToChartMetadataView(diff).Level;
+                                        const int level = m.ToChartMetadataView(diff).Level;
                                         return level > 9 && level <= 13;
                                     });
 
@@ -783,9 +773,9 @@ void SelectMusicDialog::Invalidate()
 
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
                                 {
-                                    auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
-                                            m.ToChartMetadataView(diff).Level > 13; });
+                                    const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
+                                                                            m.ToChartMetadataView(diff).Level > 13; });
 
                                     if (result)
                                     {

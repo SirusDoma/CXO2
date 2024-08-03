@@ -8,11 +8,11 @@
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Gauge.hpp>
+#include <Genode/UI/ToolTip.hpp>
 
 #include <magic_enum.hpp>
 
 OptionDialog::OptionDialog(const Gx::Dialog &copy) :
-    Gx::UiContainer(copy),
     Gx::Node(copy),
     Gx::Dialog(copy),
     m_parent(),
@@ -30,25 +30,17 @@ void OptionDialog::Initialize()
     if (m_initialized)
         return;
 
-    // Rewire callbacks due to copy constructor
-    if (const auto acceptButton = GetAcceptButton(); acceptButton)
-        SetAcceptButton(*acceptButton);
-
-    if (const auto cancelButton = GetCancelButton(); cancelButton)
-        SetCancelButton(*cancelButton);
-
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
     m_parent    = GetParent<::State>();
 
-    const auto bgAllTest     = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
-    const auto bgTest        = m_parent->Load<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
-    const auto sfxTest       = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
-    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto bgAllTest     = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
+    const auto bgTest        = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
+    const auto sfxTest       = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
     const auto background = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
     background->SetFrame("KeyOption");
-    //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
 
     const auto toolTip     = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
     const auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
@@ -333,7 +325,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     const auto musicOption   = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
     const auto toolTip       = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
     const auto keySelect     = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
     background->SetFrame("KeyOption");
     //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
@@ -360,7 +352,7 @@ void OptionDialog::OnClose()
     auto& mixer = app.Require<Gx::Mixer>();
 
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
-    const auto sfxNavigation = m_parent->Load<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
     mixer.Stop("BGTest");
     mixer.Stop("EFTest");
