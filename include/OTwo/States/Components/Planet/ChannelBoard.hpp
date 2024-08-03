@@ -20,7 +20,6 @@
 class ChannelBoard : public Gx::Image, public Gx::TaskContainer
 {
 public:
-    constexpr static const unsigned int CHANNEL_LIST_PER_PAGE = 20;
     enum class Tab
     {
         Notice,

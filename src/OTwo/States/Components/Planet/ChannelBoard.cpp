@@ -326,8 +326,11 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
 
 void ChannelBoard::UpdateChannelList(const PlanetInfo &planet)
 {
+    const auto container   = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
+    const auto channelList = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
+
     m_planetInfo = planet;
-    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / CHANNEL_LIST_PER_PAGE));
+    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildren().size()));
 
     const auto maxPageNumber = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
     maxPageNumber->SetValue(m_channelMaxPage);
