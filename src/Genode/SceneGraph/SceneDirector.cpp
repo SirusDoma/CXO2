@@ -80,6 +80,9 @@ namespace Gx
 
     Application &SceneDirector::GetApplication() const
     {
+        if (!m_application)
+            return Application::Instance();
+
         return *m_application;
     }
 

@@ -30,20 +30,19 @@ void StateWaiting7K::Initialize()
 {
     State::Initialize();
 
-    auto& app      = GetApplication();
     auto& director = GetDirector();
-    auto& items    = app.Require<ItemFactory>();
-    auto& mixer    = app.Require<Gx::Mixer>();
-    auto& session  = app.Require<SessionContext>();
+    auto& items    = Require<ItemFactory>();
+    auto& mixer    = Require<Gx::Mixer>();
+    auto& session  = Require<SessionContext>();
     auto& player   = session.GetCurrentPlayer();
     auto& room     = session.GetCurrentRoom();
 
-    auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
-    auto sfxStart       = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
-    auto sfxTeam        = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
-    auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
+    const auto bgm            = Load<sf::Music>("STATE_WAITING/IDC_MUSIC");
+    const auto sfxStart       = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
+    const auto sfxTeam        = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_34");
+    const auto sfxSelectMusic = Load<sf::Sound>("STATE_WAITING/IDC_SOUND_35");
 
-    auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelCategory = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
@@ -55,58 +54,37 @@ void StateWaiting7K::Initialize()
         default: break;
     }
 
-    auto channelNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_CHANNEL_ID");
     channelNumber->SetValue(session.GetChannelID());
 
-    auto roomNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_ROOM_ID");
+    const auto roomNumber = Load<Gx::Number>("STATE_WAITING/IDC_NUMBER_ROOM_ID");
     roomNumber->SetValue(room.ID);
 
-    auto roomName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_ROOM_NAME");
+    const auto roomName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_ROOM_NAME");
     roomName->SetString(room.Title);
 
-    auto musicName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
+    const auto musicName = Load<Gx::Label>("STATE_WAITING/IDC_TEXT_MUSIC_NAME");
     musicName->SetString(room.ChartMetadata.Title + " [BPM: " + Gx::StringHelper::ToString(room.ChartMetadata.BPM, 2) + "]");
 
-    std::string speedName(4, '\0');
-    if (room.Speed > 0)
-    {
-        if (std::fmod(room.Speed, 1.0f) != 0)
-            speedName.resize(std::snprintf(&speedName[0], speedName.size(), "%.1f", room.Speed));
-        else
-            speedName = std::to_string(static_cast<int>(room.Speed));
-    }
-    else
-        speedName = "R";
+    const auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
+    level->SetFrame(room.GetRoomLevelCode());
 
-    std::string diffName;
-    switch (room.Difficulty)
-    {
-        case Difficulty::EX: diffName = "EX"; break;
-        case Difficulty::NX: diffName = "NX"; break;
-        case Difficulty::HX: diffName = "HX"; break;
-        case Difficulty::MX: diffName = "MX"; break;
-        default:             diffName = "RX"; break;
-    }
-
-    auto level = Load<Gx::Image>("STATE_WAITING/IDC_IMAGE_ROOM_LEVEL");
-    level->SetFrame(diffName + speedName);
-
-    auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
+    const auto avatarList = Load<Gx::List>("STATE_WAITING/IDC_LIST_AVATAR");
 
     AvatarInfo *currentAvatarInfo = nullptr;
     auto currentMember = RoomMember();
     int memberIndex = 0;
 
-    for (auto child : avatarList->GetChildren())
+    for (const auto child : avatarList->GetChildren())
     {
         if (memberIndex >= sizeof(room.Members) / sizeof(RoomMember))
             break;
 
-        auto avatar = dynamic_cast<Avatar*>(child);
+        const auto avatar = dynamic_cast<Avatar*>(child);
         if (!avatar)
             continue;
 
-        auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
+        const auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
         auto& member = room.Members[memberIndex];
         if (member.ID == 0)
         {
@@ -129,16 +107,16 @@ void StateWaiting7K::Initialize()
         for (auto [_, item]: items.GetDefaultItems(member.Gender))
             avatar->SetDefaultItem(item);
 
-        for (auto itemID : member.EquippedItemIDs)
+        for (const auto itemID : member.EquippedItemIDs)
         {
-            if (auto item = items.GetItem(itemID); item)
+            if (const auto item = items.GetItem(itemID); item)
                 avatar->Equip(item);
         }
 
         memberIndex++;
     }
 
-    auto teamButtons = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
+    const auto teamButtons = Load<Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_TEAM_BUTTONS");
     auto teamButtonMatcher = [=] (RoomTeam team) -> Gx::RadioButton*
     {
         switch (team)
@@ -155,13 +133,13 @@ void StateWaiting7K::Initialize()
         }
     };
 
-    if (auto currentTeamButton = teamButtonMatcher(currentMember.Team); currentTeamButton)
+    if (const auto currentTeamButton = teamButtonMatcher(currentMember.Team); currentTeamButton)
         currentTeamButton->SetCheckedState(true);
 
 
-    for (auto team : {RoomTeam::A, RoomTeam::B, RoomTeam::C, RoomTeam::D, RoomTeam::E, RoomTeam::F, RoomTeam::G, RoomTeam::H })
+    for (const auto team : {RoomTeam::A, RoomTeam::B, RoomTeam::C, RoomTeam::D, RoomTeam::E, RoomTeam::F, RoomTeam::G, RoomTeam::H })
     {
-        auto teamButton = teamButtonMatcher(team);
+        const auto teamButton = teamButtonMatcher(team);
         if (!teamButton)
             continue;
 
@@ -172,7 +150,7 @@ void StateWaiting7K::Initialize()
 
             if (currentAvatarInfo)
             {
-                if (auto member = currentAvatarInfo->GetMember(); member)
+                if (const auto member = currentAvatarInfo->GetMember(); member)
                     member->Team = team;
 
                 currentAvatarInfo->Invalidate();
@@ -181,7 +159,7 @@ void StateWaiting7K::Initialize()
         });
     }
 
-    auto mapSelector = Instantiate<MapSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
+    const auto mapSelector = Load<MapSelector>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
 
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
@@ -200,14 +178,14 @@ void StateWaiting7K::Initialize()
         s->SetCurrentRoom(data);
     });
 
-    auto instrumentSelector = Instantiate<InstrumentSelector, Gx::UiContainer>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
+    const auto instrumentSelector = Load<InstrumentSelector>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
     instrumentSelector->Initialize();
 
     if (currentAvatarInfo)
     {
         instrumentSelector->SetInstrumentSelectCallack([=] (Item *item)
         {
-            if (auto avatar = currentAvatarInfo->GetAvatar(); avatar)
+            if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)
             {
                 if (!item || avatar->IsEquiped(item))
                 {
@@ -236,77 +214,68 @@ void StateWaiting7K::Initialize()
     instrumentSelector->AddInstrument(items.GetItem(412));
     instrumentSelector->AddInstrument(items.GetItem(1429));
 
-    auto readyButton = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
+    const auto readyButton = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_READY");
     readyButton->SetVisible(false);
     readyButton->SetEnabled(false);
 
-    auto chatPanel  = Load<ChatPanel>("STATE_WAITING/IDC_CHAT_PANEL");
+    const auto chatPanel  = Load<ChatPanel>("STATE_WAITING/IDC_CHAT_PANEL");
     chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
 
-    auto chatWindow = chatPanel->GetChatWindow();
+    const auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    if (auto dialogSelectMusic = Instantiate<SelectMusicDialog, Gx::Dialog>("STATE_WAITING/IDC_DIALOG_SELECT_MUSIC"); dialogSelectMusic)
+    if (const auto dialog = Load<Gx::Dialog>("STATE_WAITING/IDC_DIALOG_SELECT_MUSIC"); dialog)
     {
-        dialogSelectMusic->Initialize();
-        if (auto selectMusicButton = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
+        const auto selectMusicDialog = Create<SelectMusicDialog>(*dialog);
+        selectMusicDialog->Initialize();
+        if (const auto selectMusicButton = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
             selectMusicButton->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
             {
                 mixer.Play(sfxSelectMusic);
-                dialogSelectMusic->Show(this, std::string(), false);
+                selectMusicDialog->Show(this, std::string(), false);
             });
         }
 
-        dialogSelectMusic->SetAcceptCallback([=, s = &session, r = &room] ()
+        selectMusicDialog->SetAcceptCallback([=, &session, &room] ()
         {
-            auto music = dialogSelectMusic->GetSelectedMusic();
-            if (music.ID == 0)
-                return;
+            auto data = Room(room);
+            data.Difficulty = selectMusicDialog->GetSelectedDifficulty();
+            data.Speed      = selectMusicDialog->GetSelectedSpeed();
 
-            auto meta = music.ToChartMetadataView(dialogSelectMusic->GetSelectedDifficulty());
-            auto data = Room(*r);
-
-            data.ChartMetadata      = meta;
-            data.Difficulty = dialogSelectMusic->GetSelectedDifficulty();
-            data.Speed      = dialogSelectMusic->GetSelectedSpeed();
-            s->SetCurrentRoom(data);
-
-            std::string speedName(4, '\0');
-            if (data.Speed > 0)
+            const auto music  = selectMusicDialog->GetSelectedMusic();
+            const auto random = selectMusicDialog->GetSelectedRandomLevels() != static_cast<LevelCategory>(0);
+            if (music.ID != 0)
             {
-                if (std::fmod(data.Speed, 1.0f) != 0)
-                    speedName.resize(std::snprintf(&speedName[0], speedName.size(), "%.1f", data.Speed));
-                else
-                    speedName = std::to_string(static_cast<int>(data.Speed));
+                const auto meta = music.ToChartMetadataView(selectMusicDialog->GetSelectedDifficulty());
+
+                data.SongMode      = SongMode::Normal;
+                data.ChartMetadata = meta;
+
+                musicName->SetString(meta.Title + " [BPM: " + Gx::StringHelper::ToString(meta.BPM, 2) + "]");
             }
-            else
-                speedName = "R";
-
-            std::string diffName;
-            switch (data.Difficulty)
+            else if (random)
             {
-                case Difficulty::EX: diffName = "EX"; break;
-                case Difficulty::NX: diffName = "NX"; break;
-                case Difficulty::HX: diffName = "HX"; break;
-                case Difficulty::MX: diffName = "MX"; break;
-                default:             diffName = "RX"; break;
+                data.SongMode = SongMode::Random;
+                data.ChartMetadata = {};
+
+                musicName->SetString("Random");
             }
 
-            musicName->SetString(meta.Title + " [BPM: " + Gx::StringHelper::ToString(meta.BPM, 2) + "]");
-            level->SetFrame(diffName + speedName);
+            session.SetCurrentRoom(data);
+            level->SetFrame(data.GetRoomLevelCode());
         });
     }
 
 
-    auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
+    const auto btnBack = Load<Gx::Button>("STATE_WAITING/IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto& sender, auto& ev) {
         director.Present<StateRoom>();
     });
 
-    auto btnStart = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START");
+    const auto btnStart = Load<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START");
     btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
     {
         if (!sender->IsChecked())

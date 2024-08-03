@@ -12,6 +12,8 @@
 #include <OTwo/States/Components/Room/RoomContainer.hpp>
 #include <OTwo/States/Components/Room/RoomButton.hpp>
 #include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <OTwo/States/Components/Waiting/MapSelector.hpp>
+#include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
 #include <OTwo/States/Components/Playing/Equalizer.hpp>
 
 #include <Genode/Graphics.hpp>
@@ -166,6 +168,16 @@ void ObjectLoader::Load(const std::string &name, const Gx::Json &json, ObjectPop
         case ResourceMetadata::ResourceType::AvatarInfo:
         {
             populator.Populate(name, LoadResource<AvatarInfo>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::MapSelector:
+        {
+            populator.Populate(name, LoadResource<MapSelector>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::InstrumentSelector:
+        {
+            populator.Populate(name, LoadResource<InstrumentSelector>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Equalizer:

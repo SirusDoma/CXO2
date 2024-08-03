@@ -30,7 +30,6 @@ struct ResourceMetadata
         Shape,
         Image,
         Animation,
-        Avatar,
 
         // UI
         List,
@@ -56,9 +55,12 @@ struct ResourceMetadata
         RoomContainer,
         RoomButton,
         AvatarInfo,
+        MapSelector,
+        InstrumentSelector,
         Equalizer,
 
         // Avatar
+        Avatar,
         ItemData,
         Item
     };

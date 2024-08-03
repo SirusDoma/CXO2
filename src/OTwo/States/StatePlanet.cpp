@@ -18,12 +18,12 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    auto& session = Require<SessionContext>();
-    auto& mixer   = Require<Gx::Mixer>();
+    const auto& session = Require<SessionContext>();
+    auto& mixer         = Require<Gx::Mixer>();
 
-    auto bgm      = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
-    auto clickSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
-    auto hoverSfx = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
+    const auto bgm = Load<sf::Music>("STATE_PLANET/IDC_MUSIC");
+    auto clickSfx  = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
+    auto hoverSfx  = Load<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
 
     auto euta     = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_01");
     auto thalo    = Load<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_02");
@@ -36,10 +36,11 @@ void StatePlanet::Initialize()
     channelBoard->Initialize();
     channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
 
-    auto exitButton = Load<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
+    const auto exitButton = Load<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([&] (auto& sender, auto& ev) { GetApplication().Close(); });
 
-    auto container = Make<Gx::UiContainer>("STATE_PLANET/IDC_CONTAINER_MUSIC_HALL");
+    const auto container = Create<Gx::UiContainer>();
+    container->SetName("STATE_PLANET/IDC_CONTAINER_MUSIC_HALL");
     container->AddChild(philix, kleo, kalliope, euta, thalo, melpomin);
     AddChild(container);
 
@@ -57,7 +58,7 @@ void StatePlanet::Initialize()
     {
         radio->SetFocusChangedCallback([&, hoverSfx] (auto &sender, auto &ev)
         {
-            if (auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
+            if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;
 
             mixer.Play(hoverSfx, "SFX");
@@ -65,7 +66,7 @@ void StatePlanet::Initialize()
 
         radio->SetClickCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender, auto& ev)
         {
-            auto r = dynamic_cast<Gx::RadioButton*>(&sender);
+            const auto r = dynamic_cast<Gx::RadioButton*>(&sender);
             if (!r)
                 return;
 
@@ -83,13 +84,13 @@ void StatePlanet::Initialize()
     if (session.GetMusicHall() == MusicHall::None)
     {
         auto overlay = Create<Gx::Rectangle>(GetView().getSize());
-        auto splash = Create<Gx::Sequence>([&, overlay]
-            {
-                RemoveChild(overlay);
-            },
-            Gx::Sequence::ListOf({
-                Create<Gx::Fade>(overlay, 0, sf::seconds(2.5f))
-            })
+        const auto splash = Create<Gx::Sequence>([&, overlay]
+                                                 {
+                                                     RemoveChild(overlay);
+                                                 },
+                                                 Gx::Sequence::ListOf({
+                                                     Create<Gx::Fade>(overlay, 0, sf::seconds(2.5f))
+                                                 })
         );
 
         overlay->SetFillColor(sf::Color::White);
@@ -108,7 +109,7 @@ bool StatePlanet::IsConnecting() const
 void StatePlanet::OnMusicHallSelected(MusicHall hall)
 {
     m_connecting = true;
-    auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    const auto channelBoard = Load<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
 
     auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;

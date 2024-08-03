@@ -12,16 +12,16 @@
 #include <magic_enum.hpp>
 
 OptionDialog::OptionDialog(const Gx::Dialog &copy) :
-    Gx::Dialog(copy),
     Gx::UiContainer(copy),
     Gx::Node(copy),
-    m_initialized(false),
+    Gx::Dialog(copy),
     m_parent(),
     m_keyTexts(),
     m_keyDowns(),
     m_config(),
     m_keyChannel(),
-    m_keyTestEnabled(false)
+    m_keyTestEnabled(false),
+    m_initialized(false)
 {
 }
 

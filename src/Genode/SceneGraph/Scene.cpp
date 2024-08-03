@@ -37,11 +37,17 @@ namespace Gx
 
     Application &Scene::GetApplication() const
     {
+        if (!m_director)
+            return Application::Instance();
+
         return m_director->GetApplication();
     }
 
     SceneDirector& Scene::GetDirector() const
     {
+        if (!m_director)
+            throw Exception("SceneDirector is not ready yet.");
+
         return *m_director;
     }
 

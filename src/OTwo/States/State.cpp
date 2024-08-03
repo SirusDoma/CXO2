@@ -76,7 +76,7 @@ void State::LoadCommonResources()
 
     if (m_dialog2)
     {
-        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_exitDialog = Load<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
         m_exitDialog->SetAcceptCallback([&]
         {
             m_prompted = true;

@@ -35,26 +35,26 @@ void StateRoom::Initialize()
     auto& director = GetDirector();
     auto& mixer    = Require<Gx::Mixer>();
     auto& session  = Require<SessionContext>();
-    auto& items    = Require<ItemFactory>();
+    const auto& items    = Require<ItemFactory>();
 
-    auto bgm         = Load<sf::Music>("STATE_ROOM/IDC_MUSIC");
-    auto sfxAccept   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_02");
-    auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_07");
-    auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_14");
+    const auto bgm         = Load<sf::Music>("STATE_ROOM/IDC_MUSIC");
+    const auto sfxAccept   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_02");
+    const auto sfxNavigate = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_07");
+    const auto sfxToggle   = Load<sf::Sound>("STATE_ROOM/IDC_SOUND_14");
 
-    auto player = session.GetCurrentPlayer();
-    auto nicknameLabel = Load<Gx::Label>("STATE_ROOM/IDC_TEXT_NICKNAME");
+    const auto player = session.GetCurrentPlayer();
+    const auto nicknameLabel = Load<Gx::Label>("STATE_ROOM/IDC_TEXT_NICKNAME");
     nicknameLabel->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
 
-    auto avatar = Load<Avatar>("STATE_ROOM/IDC_AVATAR");
+    const auto avatar = Load<Avatar>("STATE_ROOM/IDC_AVATAR");
     avatar->SetGender(player.Gender);
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
-    auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
+    const auto notice = Load<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");
 
-    auto channelCategory = Load<Gx::Image>("STATE_ROOM/IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelCategory = Load<Gx::Image>("STATE_ROOM/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
@@ -66,21 +66,21 @@ void StateRoom::Initialize()
         default: break;
     }
 
-    auto channelNumber = Load<Gx::Number>("STATE_ROOM/IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Load<Gx::Number>("STATE_ROOM/IDC_NUMBER_CHANNEL_ID");
     channelNumber->SetValue(session.GetChannelID());
 
-    auto chatPanel = Load<ChatPanel>("STATE_ROOM/IDC_CHAT_PANEL");
+    const auto chatPanel = Load<ChatPanel>("STATE_ROOM/IDC_CHAT_PANEL");
     chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
 
-    auto chatWindow = chatPanel->GetChatWindow();
+    const auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam");
     chatWindow->PushSystemMessage("/w Receiver   : Send message (whisper)");
     chatWindow->PushSystemMessage("F7            : Effect 2D/3D mode setting");
     chatWindow->PushSystemMessage("F8            : Cursor mode setting");
     chatWindow->PushSystemMessage("F9            : Toggle equalizer on/off");
 
-    auto userList = Load<UserList>("STATE_ROOM/IDC_USER_LIST");
+    const auto userList = Load<UserList>("STATE_ROOM/IDC_USER_LIST");
     userList->Initialize();
 
     auto users = std::vector<Player>();
@@ -89,7 +89,7 @@ void StateRoom::Initialize()
     for (unsigned int i = 0; i < 34; i++)
         userList->AddUser(Player{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
 
-    auto roomContainer = Load<RoomContainer>("STATE_ROOM/IDC_ROOM_CONTAINER");
+    const auto roomContainer = Load<RoomContainer>("STATE_ROOM/IDC_ROOM_CONTAINER");
     roomContainer->Initialize();
     Room rooms[] = {
         Room{
@@ -167,15 +167,15 @@ void StateRoom::Initialize()
     for (auto& room : rooms)
         roomContainer->Add(room);
 
-    auto createRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_CREATE_ROOM");
-    if (auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_CREATE_ROOM"); dialog)
+    const auto createRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_CREATE_ROOM");
+    if (const auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_CREATE_ROOM"); dialog)
     {
         auto createRoomDialog = Create<CreateRoomDialog>(*dialog);
         createRoomButton->SetClickCallback([=, &mixer, &session, &director] (auto& sender, auto& ev) {
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
-                auto musicList = session.GetInstalledMusic();
+                const auto musicList = session.GetInstalledMusic();
                 session.SetCurrentRoom(Room{
                     4,
                     session.GetCurrentPlayer().ID,
@@ -203,8 +203,8 @@ void StateRoom::Initialize()
         });
     }
 
-    auto showAllButton     = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_ALL");
-    auto waitingRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_WAITING");
+    const auto showAllButton     = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_ALL");
+    const auto waitingRoomButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_SHOW_WAITING");
 
     showAllButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
         mixer.Play(sfxToggle, "SFX");
@@ -230,8 +230,8 @@ void StateRoom::Initialize()
         roomContainer->ShowAll();
     });
 
-    auto roomLeftButton  = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_ROOM_LEFT");
-    auto roomRightButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_ROOM_RIGHT");
+    const auto roomLeftButton  = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_ROOM_LEFT");
+    const auto roomRightButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_ROOM_RIGHT");
 
     roomLeftButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
         mixer.Play(sfxNavigate, "SFX");
@@ -243,22 +243,22 @@ void StateRoom::Initialize()
         roomContainer->NextPage();
     });
 
-    if (auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_OPTION"); dialog)
+    if (const auto dialog = Load<Gx::Dialog>("STATE_ROOM/IDC_DIALOG_OPTION"); dialog)
     {
-        auto optionDialog = Create<OptionDialog>(*dialog);
-        auto optionButton = FindChild<Gx::Button>("IDC_BUTTON_OPTION");
+        const auto optionDialog = Create<OptionDialog>(*dialog);
+        const auto optionButton = FindChild<Gx::Button>("IDC_BUTTON_OPTION");
         optionButton->SetClickCallback([=] (auto& sender, auto& ev) {
             optionDialog->Show(this, std::string(), false);
         });
     }
 
-    auto backButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_BACK");
+    const auto backButton = Load<Gx::Button>("STATE_ROOM/IDC_BUTTON_BACK");
     backButton->SetClickCallback([&](auto &, auto &) { OnBackClicked(); });
 
     mixer.Play(bgm, "BGM");
 }
 
-void StateRoom::OnBackClicked()
+void StateRoom::OnBackClicked() const
 {
     auto& director = GetDirector();
     director.Present<StatePlanet>();

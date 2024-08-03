@@ -13,7 +13,7 @@ public:
     void Initialize() override;
 
 private:
-    void OnBackClicked();
+    void OnBackClicked() const;
 
     OptionDialog m_optionDialog;
     CreateRoomDialog m_createRoomDialog;
