@@ -34,6 +34,9 @@ public:
     R* Instantiate(const std::string &source, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>
+    R* Instantiate(const R& prefab, ResourceScope scope = ResourceScope::Immediate);
+
+    template<typename R>
     R* Import(Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
 
     template<typename R>
@@ -43,7 +46,7 @@ public:
     R* Create(Args&&... args);
 
     template<typename R>
-    R* Find(const std::string &id, ResourceScope scope = ResourceScope::Local);
+    R* FindResource(const std::string &id, ResourceScope scope = ResourceScope::Local);
 
     Gx::ResourceManager &GetLocalResources() const;
     bool Close(bool quit) override;

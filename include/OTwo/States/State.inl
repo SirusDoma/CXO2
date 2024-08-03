@@ -1,7 +1,7 @@
 #include <Genode/Utilities/StringHelper.hpp>
 
 template<typename R>
-R* State::Instantiate(const std::string &source, ResourceScope scope)
+R* State::Instantiate(const std::string &source, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||
@@ -36,7 +36,31 @@ R* State::Instantiate(const std::string &source, ResourceScope scope)
 }
 
 template<typename R>
-R *State::Import(Gx::ResourcePtr<R> resource, ResourceScope scope)
+R* State::Instantiate(const R& prefab, const ResourceScope scope)
+{
+    static_assert(
+        std::is_base_of_v<Gx::Node, R>,
+        "Parameter must be a Gx::Node"
+    );
+
+    auto resources = m_tempResources.get();
+    if (scope == ResourceScope::Shared)
+        resources = &Require<Gx::ResourceManager>();
+    else if (scope == ResourceScope::Local)
+        resources = m_resources.get();
+
+    auto name     = GetName() + "/" + prefab.GetName() + "_" + std::to_string(resources->Count<R>());
+    auto resource = Gx::ResourcePtr<R>(new R(prefab), [] (auto ptr) { delete ptr; });
+    auto instance = &resources->Store<R>(name, std::move(resource), Gx::CacheMode::None);
+
+    if constexpr (!std::is_base_of_v<Gx::Dialog, R>)
+        AddChild(instance);
+
+    return instance;
+}
+
+template<typename R>
+R *State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R>,
@@ -50,7 +74,7 @@ R *State::Import(Gx::ResourcePtr<R> resource, ResourceScope scope)
 }
 
 template<typename R>
-R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, ResourceScope scope)
+R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||
@@ -88,7 +112,7 @@ R *State::Create(Args&&... args)
 }
 
 template<typename R>
-R *State::Find(const std::string &id, ResourceScope scope)
+R *State::FindResource(const std::string &id, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||

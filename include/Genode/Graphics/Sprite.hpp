@@ -39,7 +39,7 @@
 
 namespace Gx
 {
-    class Sprite : virtual public Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual Colorable
+    class Sprite : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual Colorable
     {
     public:
         Sprite();
