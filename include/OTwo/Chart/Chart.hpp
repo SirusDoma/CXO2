@@ -15,7 +15,7 @@
 class Chart
 {
 public:
-    enum class ChannelType : Gx::Uint16
+    enum class Channel : Gx::Uint16
     {
         Measurement = 0,
         BPM         = 1,
@@ -39,14 +39,14 @@ public:
 
     struct Event
     {
-        float       Position;
-        ChannelType Channel;
+        float   Position;
+        Channel Channel;
 
         bool IsPlayable() const
         {
-            return Channel != ChannelType::Measurement &&
-                   Channel != ChannelType::BPM &&
-                   Channel != ChannelType::BGM;
+            return Channel != Channel::Measurement &&
+                   Channel != Channel::BPM &&
+                   Channel != Channel::BGM;
         }
     };
 

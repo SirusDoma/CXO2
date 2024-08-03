@@ -8,8 +8,33 @@
 
 #include <Genode/UI.hpp>
 
+StatePlaying7K::StatePlaying7K() :
+    m_renderer(*this, {
+        Chart::Channel::Note1,
+        Chart::Channel::Note2,
+        Chart::Channel::Note3,
+        Chart::Channel::Note4,
+        Chart::Channel::Note5,
+        Chart::Channel::Note6,
+        Chart::Channel::Note7
+    }),
+    m_context(),
+    m_config(),
+    m_viewport()
+{
+}
+
 StatePlaying7K::StatePlaying7K(State &&state) :
     State(std::move(state)),
+    m_renderer(*this, {
+        Chart::Channel::Note1,
+        Chart::Channel::Note2,
+        Chart::Channel::Note3,
+        Chart::Channel::Note4,
+        Chart::Channel::Note5,
+        Chart::Channel::Note6,
+        Chart::Channel::Note7
+    }),
     m_context(),
     m_config(),
     m_viewport()
@@ -81,16 +106,13 @@ void StatePlaying7K::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
-    ChartRenderer renderer(*this, {
-        Chart::ChannelType::Note1,
-        Chart::ChannelType::Note2
-    });
-
     const auto exitButton = Load<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
         GetDirector().Present<StateRoom>();
     });
+
+    m_renderer.Initialize(*m_context);
 }
 
 unsigned int StatePlaying7K::GetViewport() const

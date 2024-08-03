@@ -144,16 +144,16 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (stream.read(&count, sizeof(count)) != sizeof(count))
                 throw Gx::ResourceLoadException("Failed to read block count at note block");
 
-            auto channel = static_cast<Chart::ChannelType>(lane);
+            auto channel = static_cast<Chart::Channel>(lane);
             if (lane > 8)
-                channel = Chart::ChannelType::BGM;
+                channel = Chart::Channel::BGM;
 
             for (int i = 0; i < count; i++)
             {
                 const float position = static_cast<float>(measure) + (static_cast<float>(i) / static_cast<float>(count));
                 const auto ev = Chart::Event{ position, channel };
 
-                if (channel == Chart::ChannelType::BPM || channel == Chart::ChannelType::Measurement)
+                if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
                 {
                     std::float_t value;
                     if (stream.read(&value, sizeof(value)) != sizeof(value))
@@ -195,7 +195,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 pan = pan == 0 ? 8 : pan;
                 pan = ((pan - 1) / 14.0f) * 2.0f - 1.0f;
 
-                id = (id - 1) + (channel == Chart::ChannelType::BGM ? 1000 : 0);
+                id = (id - 1) + (channel == Chart::Channel::BGM ? 1000 : 0);
                 chart->AddEvent<Chart::NoteEvent>(difficulty,
                 {
                     ev,

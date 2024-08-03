@@ -3,6 +3,7 @@
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Chart/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
@@ -13,7 +14,7 @@
 class StatePlaying7K : public State
 {
 public:
-    StatePlaying7K() = default;
+    StatePlaying7K();
     explicit StatePlaying7K(State &&state);
 
     void Initialize() override;
@@ -29,8 +30,10 @@ public:
 private:
     const GameContext *PrepareContext() const;
 
-    using ImageMap = std::unordered_map<Chart::ChannelType, Gx::Image*>;
-    using AnimationMap = std::unordered_map<Chart::ChannelType, Gx::Animation*>;
+    using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
+    using AnimationMap = std::unordered_map<Chart::Channel, Gx::Animation*>;
+
+    ChartRenderer m_renderer;
 
     const GameContext *m_context;
     const GameConfig *m_config;

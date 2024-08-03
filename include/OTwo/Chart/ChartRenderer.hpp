@@ -15,18 +15,20 @@
 class ChartRenderer : public Gx::Updatable
 {
 public:
-    explicit ChartRenderer(Gx::Node &node, std::initializer_list<Chart::ChannelType> instantiables = {});
+    explicit ChartRenderer(State &state, std::initializer_list<Chart::Channel> instantiables = {});
 
     void Initialize(const GameContext &context);
 
     void Update(double delta) override;
 
 private:
-    Gx::Node *m_container;
+    using TemplateMap = std::unordered_map<Chart::NoteType, std::vector<Gx::Animation*>>;
+
+    State *m_parent;
     const GameContext *m_context;
 
-    std::vector<Chart::ChannelType> m_instantiables;
-    std::unordered_map<Chart::ChannelType, std::vector<Gx::Animation>> m_templates;
+    std::vector<Chart::Channel> m_instantiables;
+    std::unordered_map<Chart::Channel, TemplateMap> m_templates;
 };
 
 #endif
