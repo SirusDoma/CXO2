@@ -26,6 +26,7 @@ namespace Gx
         ~Control() override = default;
 
         virtual sf::FloatRect GetLocalBounds() const = 0;
+        // ReSharper disable once CppHiddenFunction
         sf::FloatRect GetGlobalBounds() const;
 
         virtual bool IsFocused() const;
