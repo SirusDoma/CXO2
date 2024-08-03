@@ -84,7 +84,7 @@ namespace Gx
 
     RenderStates UiContainer::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         if (m_useBatching)

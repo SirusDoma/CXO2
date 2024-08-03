@@ -193,7 +193,7 @@ namespace Gx
 
     RenderStates Dialog::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         if (m_backdrop.GetSize().x > 0 && m_backdrop.GetSize().y > 0)

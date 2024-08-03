@@ -73,7 +73,7 @@ namespace Gx
         bool IsNextCharacterFit();
 
         void SetControlState(const State &state) override;
-        const State GetControlState() const override;
+        State GetControlState() const override;
 
         void Update(double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;

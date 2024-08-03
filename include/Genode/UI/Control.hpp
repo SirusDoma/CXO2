@@ -43,8 +43,7 @@ namespace Gx
         void SetEnabled(bool enabled);
         bool IsEnabled() const;
 
-        void SetVisible(bool visible);
-        bool IsVislble() const;
+        void SetVisible(bool visible) override;
 
         virtual void AddChild(Control *node);
         virtual void RemoveChild(Control *node);
@@ -61,7 +60,7 @@ namespace Gx
     protected:
         Control();
 
-        virtual const State GetControlState() const;
+        virtual State GetControlState() const;
         virtual void SetControlState(const State &state);
 
         const std::function<void(Control&, Event&)>& GetFocusChangedCallback();
@@ -96,7 +95,7 @@ namespace Gx
         constexpr static double HOLD_CLICK_THRESHOLD   = 50.f;
 
         State  m_state;
-        bool   m_enabled, m_visible, m_focused, m_clicked;
+        bool   m_enabled, m_focused, m_clicked;
         double m_deltaClickDuration, m_deltaHoldDuration;
 
         std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onScrollWheel, m_onFocusChanged, m_onGainFocus, m_onLostFocus;

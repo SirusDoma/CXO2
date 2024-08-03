@@ -3,10 +3,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
-#include <Genode/SceneGraph/UpdatableContainer.hpp>
-#include <Genode/SceneGraph/InputableContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -58,9 +55,6 @@ namespace Gx
         AnimationState GetState() const;
         void SetAnimationCallback(const std::function<void(Animation &)> &animationCallback);
 
-        bool IsVisible() const;
-        void SetVisible(bool visible);
-
         virtual void Stop();
         virtual void Reset();
 
@@ -71,8 +65,6 @@ namespace Gx
         void SetFrame(unsigned int index);
 
         AnimationState m_state;
-        bool m_visible;
-
         sf::Time m_duration;
         sf::Time m_elapsed;
         unsigned int m_currentFrame;

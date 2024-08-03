@@ -57,9 +57,6 @@ namespace Gx
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color& color) override;
 
-        bool IsVisible() const;
-        void SetVisible(bool visible);
-
         virtual std::size_t GetPointCount() const = 0;
         virtual sf::Vector2f GetPoint(std::size_t index) const = 0;
 
@@ -87,7 +84,6 @@ namespace Gx
         sf::VertexArray    m_outlineVertices;  
         sf::FloatRect      m_insideBounds;     
         sf::FloatRect      m_bounds;
-        bool               m_visible;
     };
 
 }

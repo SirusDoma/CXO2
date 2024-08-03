@@ -140,7 +140,7 @@ namespace Gx
 
     RenderStates List::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         return UiContainer::Render(surface, states);

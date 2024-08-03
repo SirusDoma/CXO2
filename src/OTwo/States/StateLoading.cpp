@@ -66,7 +66,7 @@ void StateLoading::OnCoverLoaded(const sf::Image *cover)
 {
     for (const auto child : GetChildren())
     {
-        if (const auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVislble() && m_texture.loadFromImage(*cover))
+        if (const auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVisible() && m_texture.loadFromImage(*cover))
         {
             image->SetTexture(m_texture);
             return;

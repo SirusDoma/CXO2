@@ -72,7 +72,7 @@ void ChannelButton::SetChannelPopulation(const unsigned int population)
     m_populationCounter->SetValue(std::ceil(percentage) * 20.0f);
 
     m_fullIndicator->SetVisible(static_cast<float>(m_population) >= m_populationCounter->GetMaximumValue());
-    m_populationCounter->SetVisible(!m_fullIndicator->IsVislble());
+    m_populationCounter->SetVisible(!m_fullIndicator->IsVisible());
 }
 
 MusicHall ChannelButton::GetPlanet() const

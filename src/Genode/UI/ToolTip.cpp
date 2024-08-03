@@ -146,7 +146,7 @@ namespace Gx
 
     RenderStates ToolTip::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (IsVislble() && !GetString().isEmpty())
+        if (IsVisible() && !GetString().isEmpty())
         {
             auto tempStates = states;
             tempStates.transform *= GetTransform();
@@ -163,7 +163,7 @@ namespace Gx
         if (m_elapsed < m_duration)
             m_elapsed += sf::milliseconds(delta);
 
-        if (IsVislble())
+        if (IsVisible())
             Invalidate();
     }
 

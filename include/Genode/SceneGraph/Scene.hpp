@@ -53,6 +53,9 @@ namespace Gx
         T &Require() const;
 
     private:
+        bool IsVisible() const override { return true; }
+        void SetVisible(const bool visible) override {}
+
         mutable sf::View m_view;
 
         SceneDirector     *m_director;

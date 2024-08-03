@@ -6,7 +6,6 @@
 #include <Genode/Graphics/RenderTargetAdapter.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
 namespace Gx
@@ -19,12 +18,18 @@ namespace Gx
 
         virtual RenderStates Render(RenderSurface &surface, RenderStates states) const = 0;
 
+        virtual bool IsVisible() const { return m_visible; }
+        virtual void SetVisible(const bool visible) { m_visible = visible; }
+
     protected:
         void draw(sf::RenderTarget& target, const sf::RenderStates states) const override
         {
             auto adapter = RenderTargetAdapter(target);
             Render(adapter, RenderStates(states));
         }
+
+    private:
+        bool m_visible = true;
     };
 }
 

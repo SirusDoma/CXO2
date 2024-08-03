@@ -138,7 +138,7 @@ namespace Gx
 
     RenderStates Number::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         states.transform *= GetTransform();

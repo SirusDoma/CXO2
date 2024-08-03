@@ -185,7 +185,7 @@ namespace Gx
 
     RenderStates ScrollBar::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         states = Control::Render(surface, states);

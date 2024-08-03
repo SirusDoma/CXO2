@@ -6,7 +6,6 @@ namespace Gx
     Control::Control() :
         m_state(State::Normal),
         m_enabled(true),
-        m_visible(true),
         m_focused(false),
         m_clicked(false),
         m_deltaClickDuration(),
@@ -57,21 +56,16 @@ namespace Gx
         return m_enabled;
     }
 
-    void Control::SetVisible(bool visible)
+    void Control::SetVisible(const bool visible)
     {
-        if (m_visible != visible)
+        if (Renderable::IsVisible() != visible)
         {
-            m_visible = visible;
+            Renderable::SetVisible(visible);
             Invalidate();
         }
     }
 
-    bool Control::IsVislble() const
-    {
-        return m_visible;
-    }
-
-    const Control::State Control::GetControlState() const
+    Control::State Control::GetControlState() const
     {
         return m_state;
     }
@@ -210,7 +204,7 @@ namespace Gx
 
     RenderStates Control::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         states.transform *= GetTransform();
