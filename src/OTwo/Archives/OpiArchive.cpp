@@ -58,13 +58,12 @@ bool OpiArchive::Contains(const std::string& name) const
     return iterator != m_entries.end();
 }
 
-std::vector<Gx::FileInfo> OpiArchive::GetFileEntries() const
+std::vector<std::unique_ptr<Gx::FileInfo>> OpiArchive::GetFileEntries() const
 {
-    std::vector<Gx::FileInfo> result;
+    std::vector<std::unique_ptr<Gx::FileInfo>> result;
 
     // Go to first item header offset
-    const auto offset = m_count * ITEM_HEADER_SIZE;
-    if (m_fileStream.seek(m_fileStream.getSize() - offset) == -1)
+    if (const auto offset = m_count * ITEM_HEADER_SIZE; m_fileStream.seek(m_fileStream.getSize() - offset) == -1)
         return result;
 
     // Traverse the header
@@ -100,7 +99,7 @@ std::vector<Gx::FileInfo> OpiArchive::GetFileEntries() const
         );
 
         m_entries[header.GetName()] = header;
-        result.push_back(header);
+        result.push_back(std::make_unique<FileInfo>(header));
     }
 
     return result;

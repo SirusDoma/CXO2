@@ -11,24 +11,50 @@
 
 #include <unordered_map>
 
+using NoteSpriteMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
-class ChartRenderer : public Gx::Updatable
+class ChartRenderer : public Gx::Renderable
 {
 public:
+    static constexpr unsigned int DefaultMeasureHeight = 384;
+
     explicit ChartRenderer(State &state, std::initializer_list<Chart::Channel> instantiables = {});
 
     void Initialize(const GameContext &context);
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
-    void Update(double delta) override;
+    const GameContext &GetContext() const;
+    float GetSpeed(Chart::Channel channel) const;
+    double GetRenderPosition() const;
 
 private:
-    using TemplateMap = std::unordered_map<Chart::NoteType, std::vector<Gx::Animation*>>;
+    struct EventState
+    {
+        Chart::Event *Event;
+        Accuracy      Accuracy = Accuracy::None;
+        double        Latency  = 0;
+
+        Chart::Event *operator->() const { return Event; }
+    };
+
+    using PrefabMap      = std::unordered_map<Chart::Channel, std::unordered_map<Chart::NoteType, NoteSpriteMap>>;
+    using EventStateList = std::vector<EventState>;
 
     State *m_parent;
+    Gx::UiContainer *m_container;
     const GameContext *m_context;
 
     std::vector<Chart::Channel> m_instantiables;
-    std::unordered_map<Chart::Channel, TemplateMap> m_templates;
+    std::unordered_map<Chart::Channel, float> m_speeds;
+
+    mutable PrefabMap m_prefabs;
+    mutable EventStateList m_events;
+    mutable double m_position;
+    mutable double m_start;
+    mutable double m_elapsed;
+    mutable double m_reference;
+    mutable double m_bpm;
+    mutable unsigned int m_frameId;
 };
 
 #endif

@@ -51,7 +51,7 @@ public:
     Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
     bool Contains(const std::string& name) const override;
-    std::vector<Gx::FileInfo> GetFileEntries() const override;
+    std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
     std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
 
     Gx::Int64 ReadFile(unsigned int index, void *data, Gx::Int64 size) const;

@@ -93,7 +93,7 @@ namespace Gx
 
     RenderStates Button::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!IsVislble())
+        if (!IsVisible())
             return states;
 
         return Sprite::Render(surface, states);

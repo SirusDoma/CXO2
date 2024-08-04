@@ -58,8 +58,8 @@ const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic(const bool r
         const auto metaLoader = ChartMetadataLoader();
         for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
         {
-            auto name = file.GetName();
-            auto meta = metaLoader.LoadFromFile(file.GetName(), Gx::ResourceContext::Default);
+            auto name = file->GetName();
+            auto meta = metaLoader.LoadFromFile(file->GetName(), Gx::ResourceContext::Default);
             m_installedMusicList.push_back(*meta);
         }
     }

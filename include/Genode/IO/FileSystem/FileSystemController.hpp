@@ -21,11 +21,11 @@ namespace Gx
 
         virtual ResourcePtr<sf::InputStream> Open(const std::string &fileName) const = 0;
 
-        virtual std::vector<FileInfo> Scan(const std::string &pattern, bool recursive) const;
+        virtual std::vector<std::unique_ptr<FileInfo>> Scan(const std::string &pattern, bool recursive) const;
         virtual bool Contains(const std::string &fileName) const = 0;
 
         virtual std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const = 0;
-        virtual std::vector<FileInfo> GetFileEntries() const = 0;
+        virtual std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const = 0;
 
         virtual Int64 ReadFile(const std::string &fileName, void *data, Int64 size) const = 0;
         virtual void WriteFile(const std::string &fileName, void *data, Int64 size) = 0;

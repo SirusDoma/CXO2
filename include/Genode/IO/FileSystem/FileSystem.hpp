@@ -22,7 +22,7 @@ namespace Gx
 
             static ResourcePtr<sf::InputStream> Open(const std::string &fileName);
 
-            static std::vector<FileInfo> Scan(const std::string &pattern);
+            static std::vector<std::unique_ptr<FileInfo>> Scan(const std::string &pattern);
 
             static bool Contains(const std::string &fileName);
             static std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName);

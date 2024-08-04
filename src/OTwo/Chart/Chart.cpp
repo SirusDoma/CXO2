@@ -12,7 +12,7 @@ void Chart::SetMetadata(const ChartMetadata &metadata)
     m_metadata = metadata;
 }
 
-std::vector<Chart::Event*> Chart::GetEvents(Difficulty diff) const
+std::vector<Chart::Event*> Chart::GetEvents(const Difficulty diff) const
 {
     auto events = std::vector<Event*>();
     const auto source = m_events.find(diff);
@@ -25,17 +25,88 @@ std::vector<Chart::Event*> Chart::GetEvents(Difficulty diff) const
     return events;
 }
 
-void Chart::AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample)
+void Chart::SortEvents()
+{
+    for (auto diff : { Difficulty::EX, Difficulty::NX, Difficulty::HX, Difficulty::MX })
+    {
+        if (m_events.find(diff) == m_events.end())
+            continue;
+
+        std::sort(m_events[diff].begin(), m_events[diff].end(), [] (const std::unique_ptr<Event> &a, const std::unique_ptr<Event> &b)
+        {
+            return a->Position < b->Position;
+        });
+
+        // Combine Hold and Release NoteType into one
+        // This will preserve the `Hold` note and remove the `Release` note.
+        auto holds = std::unordered_map<Channel, NoteEvent*>();
+        auto it = m_events[diff].begin();
+        while (it != m_events[diff].end())
+        {
+            const auto ev = it->get();
+            if (ev->Channel == Channel::Measurement || ev->Channel == Channel::BPM)
+            {
+                ++it;
+                continue;
+            }
+
+            // Long Note transform rule:
+            // - Any abnormal playable notes occurence in the middle of holds are treated as `Release` type substitute.
+            // - Any abnormal `Release` notes occurence without holds are treated as `Normal` type.
+            // - Any hold non-playable events are treated as `Normal` type.
+            // - Under any circumstances, do not remove `Normal` non-playable events.
+            // - Under any circumstances, remove `Release` type.
+
+            const auto note = static_cast<NoteEvent*>(ev);
+            if (holds[ev->Channel])
+            {
+                holds[ev->Channel]->Length = note->Position - ev->Position;
+                holds[ev->Channel] = nullptr;
+
+                it = m_events[diff].erase(it);
+            }
+            else
+            {
+                if (note->Type == NoteType::Hold)
+                {
+                    if (ev->IsPlayable())
+                        holds[note->Channel] = note;
+                    else
+                        note->Type = NoteType::Normal;
+                }
+                else if (note->Type == NoteType::Release)
+                {
+                    if (!ev->IsPlayable())
+                    {
+                        it = m_events[diff].erase(it);
+                        continue;
+                    }
+                    else
+                        note->Type = NoteType::Normal;
+                }
+
+                ++it;
+            }
+        }
+    }
+}
+
+void Chart::AddSample(const Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample)
 {
     m_samples[id] = std::move(sample);
 }
 
-sf::SoundBuffer *Chart::GetSample(Gx::Uint16 id) const
+sf::SoundBuffer *Chart::GetSample(const Gx::Uint16 id) const
 {
     if (const auto it = m_samples.find(id); it != m_samples.end())
         return it->second.get();
 
     return nullptr;
+}
+
+unsigned int Chart::GetSampleCount() const
+{
+    return m_samples.size();
 }
 
 const sf::Image *Chart::GetCover() const

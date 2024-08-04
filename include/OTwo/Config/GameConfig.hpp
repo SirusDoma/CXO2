@@ -6,6 +6,14 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
+#include <map>
+
+enum class NoteShape : Gx::Uint8
+{
+    Square = 1,
+    Circle = 2
+};
+
 struct GameConfig : Gx::Provider
 {
     GameConfig()
@@ -20,6 +28,8 @@ struct GameConfig : Gx::Provider
         UseWindowCursor = src.UseWindowCursor;
         MusicVolume     = src.MusicVolume;
         EffectVolume    = src.EffectVolume;
+        NoteShapeType   = src.NoteShapeType;
+        NoteGuideLength = src.NoteGuideLength;
         KeyBindings     = src.KeyBindings;
     }
 
@@ -30,6 +40,8 @@ struct GameConfig : Gx::Provider
         UseWindowCursor = false;
         MusicVolume     = 100;
         EffectVolume    = 100;
+        NoteShapeType            = NoteShape::Square,
+        NoteGuideLength = 0,
         KeyBindings     = {
             {
                 KeyMode::Seven,
@@ -70,6 +82,9 @@ struct GameConfig : Gx::Provider
 
     unsigned int MusicVolume;
     unsigned int EffectVolume;
+
+    NoteShape NoteShapeType;
+    unsigned int NoteGuideLength;
 
     std::map<KeyMode, std::map<Chart::Channel, sf::Keyboard::Key>> KeyBindings;
 };

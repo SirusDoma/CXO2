@@ -102,6 +102,9 @@ namespace Gx
     ////////////////////////////////////////////////////////////
     RenderStates SpriteBatch::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         // Apply render states
         states.transform *= GetTransform();
         states.blendMode  = m_blendMode.value_or(states.blendMode);

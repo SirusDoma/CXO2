@@ -1,21 +1,17 @@
 #ifndef O2JAM_MODELS_GAME_HPP
 #define O2JAM_MODELS_GAME_HPP
 
-#include <SFML/System/Time.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <Genode/Utilities/StringHelper.hpp>
 #include <Genode/System/Primitives.hpp>
-#include <Genode/IO/ResourceLoader.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
-#include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
-constexpr float SupportedHiSpeeds[] = {0.5f, 1.f, 1.5f, 2.f, 2.5f, 3.f, 3.5f, 4.f, 4.5f, 5.f, 6.f, 8.f };
+#include <array>
+
+constexpr std::array<float, 12> SupportedHiSpeeds = { 0.5f, 1.f, 1.5f, 2.f, 2.5f, 3.f, 3.5f, 4.f, 4.5f, 5.f, 6.f, 8.f };
 
 constexpr float XrSpeed = -1.0f;
 constexpr float TdSpeed = -2.0f;
 
-enum class GameMode
+enum class GameMode : Gx::Uint8
 {
     Single,
     Versus,
@@ -25,11 +21,21 @@ enum class GameMode
     Jam
 };
 
-enum class  Difficulty
+enum class  Difficulty : Gx::Uint8
 {
     EX = 0,
     NX = 1,
     HX = 2,
     MX = 3
 };
+
+enum class Accuracy : Gx::Uint8
+{
+    None = 0,
+    Cool = 1,
+    Good = 2,
+    Bad  = 3,
+    Miss = 4
+};
+
 #endif

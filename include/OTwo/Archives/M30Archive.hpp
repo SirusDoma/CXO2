@@ -45,7 +45,8 @@ public:
     Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
 
     bool Contains(const std::string& name) const override;
-    std::vector<Gx::FileInfo> GetFileEntries() const override;
+
+    std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
     std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
 
     Gx::Int64 ReadFile(unsigned int index, void *data, Gx::Int64 size) const;
@@ -58,7 +59,7 @@ private:
     bool ReadStream(void* data, Gx::Uint64 size) const;
     Gx::Int64 ReadFile(const FileInfo &entry, void *data, Gx::Int64 size) const;
 
-    static Gx::Uint8* DecodeSample(const Gx::Uint8* encoded, int length, int encodingCode);
+    static void DecodeSample(std::vector<Gx::Uint8> &data, int encodingCode);
 
     M30Header m_header = M30Header();
     mutable std::unordered_map<unsigned int, FileInfo> m_entries;

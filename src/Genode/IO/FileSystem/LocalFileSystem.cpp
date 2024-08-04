@@ -267,9 +267,9 @@ namespace Gx
         fs.close();
     }
 
-    std::vector<FileInfo> LocalFileSystem::Scan(const std::string &pattern, const bool recursive) const
+    std::vector<std::unique_ptr<FileInfo>> LocalFileSystem::Scan(const std::string &pattern, const bool recursive) const
     {
-        std::vector<FileInfo> files;
+        std::vector<std::unique_ptr<FileInfo>> files;
         std::unordered_set<std::string> scanned;
 
         auto paths = m_paths;
@@ -294,7 +294,7 @@ namespace Gx
                     continue;
 
                 if (StringHelper::IsGlobMatch(entry.path().filename().string(), pattern))
-                    files.push_back(std::move(FileInfo(*this, fileName, GetFileSize(fileName))));
+                    files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName)));
             }
         }
 

@@ -8,9 +8,9 @@
 
 #include <SFML/Audio/SoundBuffer.hpp>
 
-#include <map>
 #include <vector>
 #include <memory>
+#include <set>
 
 class Chart
 {
@@ -37,10 +37,39 @@ public:
         Sample  = 4
     };
 
+    static constexpr std::array<Channel, 7> PlayableChannels = {
+        Channel::Note1,
+        Channel::Note2,
+        Channel::Note3,
+        Channel::Note4,
+        Channel::Note5,
+        Channel::Note6,
+        Channel::Note7
+    };
+
+    static constexpr std::array<Channel, 8> NoteChannels = {
+        Channel::Note1,
+        Channel::Note2,
+        Channel::Note3,
+        Channel::Note4,
+        Channel::Note5,
+        Channel::Note6,
+        Channel::Note7,
+        Channel::BGM
+    };
+
     struct Event
     {
-        float   Position;
         Channel Channel;
+        double  Position;
+
+        Event(const Chart::Channel channel, const double position) :
+            Channel(channel),
+            Position(position)
+        {
+        }
+
+        virtual ~Event() = default;
 
         bool IsPlayable() const
         {
@@ -50,18 +79,36 @@ public:
         }
     };
 
-    struct TimeEvent : public Event
+    struct TimeEvent : Event
     {
         float Value;
+
+        TimeEvent(const Event &ev, const float value) :
+           Event(ev),
+           Value(value)
+        {
+        }
     };
 
-    struct NoteEvent : public Event
+    struct NoteEvent : Event
     {
         Gx::Uint16       ID;
         float            Volume;
         float            Pan;
         NoteType         Type;
         sf::SoundBuffer *Sample;
+        double           Length;
+
+        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, sf::SoundBuffer *sample) :
+            Event(ev),
+            ID(id),
+            Volume(volume),
+            Pan(pan),
+            Type(type),
+            Sample(sample),
+            Length(0)
+        {
+        }
     };
 
     Chart() = default;
@@ -70,11 +117,13 @@ public:
     void SetMetadata(const ChartMetadata &metadata);
 
     template<typename T>
-    void AddEvent(Difficulty diff, T &&ev);
+    T* AddEvent(Difficulty diff, T &&ev);
     std::vector<Event*> GetEvents(Difficulty diff) const;
+    void SortEvents();
 
     void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
     sf::SoundBuffer *GetSample(Gx::Uint16 id) const;
+    unsigned int GetSampleCount() const;
 
     const sf::Image *GetCover() const;
     void SetCover(Gx::ResourcePtr<sf::Image> cover);

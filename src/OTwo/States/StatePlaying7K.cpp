@@ -7,6 +7,7 @@
 #include <OTwo/Chart/ChartRenderer.hpp>
 
 #include <Genode/UI.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
 
 StatePlaying7K::StatePlaying7K() :
     m_renderer(*this, {
@@ -109,7 +110,7 @@ void StatePlaying7K::Initialize()
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
-        GetDirector().Present<StateRoom>();
+        GetDirector().Present<StateWaiting7K>();
     });
 
     m_renderer.Initialize(*m_context);
@@ -174,10 +175,19 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
     }
 }
 
+Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+{
+    m_renderer.Render(surface, states);
+    return State::Render(surface, states);
+}
+
 const GameContext *StatePlaying7K::PrepareContext() const
 {
     const auto context = &Require<GameContext>();
     context->SetViewport(GetViewport());
+
+    if (!context->GetConfig())
+        context->SetConfig(Require<GameConfig>());
 
     return context;
 }

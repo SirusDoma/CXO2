@@ -21,11 +21,15 @@ void StateLoading::Initialize()
     State::Initialize();
 
     auto &session = Require<SessionContext>();
+    auto &config  = Require<GameConfig>();
     auto &room    = session.GetCurrentRoom();
-    auto &state   = Require<GameContext>();
+    auto &game    = Require<GameContext>();
 
-    state.SetMode(room.GameMode);
-    state.SetDifficulty(room.Difficulty);
+    game.Clear();
+    game.SetConfig(config);
+    game.SetMode(room.GameMode);
+    game.SetDifficulty(room.Difficulty);
+    game.SetSpeed(room.Speed);
 
     std::size_t index = 0;
     const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
@@ -48,10 +52,10 @@ void StateLoading::Initialize()
         Queue([this, cover] () { OnCoverLoaded(cover); });
     });
 
-    auto thread = std::thread([=, &state] ()
+    auto thread = std::thread([=, &game] ()
     {
-        state.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
-        Queue([this, &state] { OnChartLoaded(state.GetChart()); });
+        game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+        Queue([this, &game] { OnChartLoaded(game.GetChart()); });
     });
 
     thread.detach();

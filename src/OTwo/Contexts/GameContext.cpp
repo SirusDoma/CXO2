@@ -10,6 +10,16 @@ void GameContext::SetChart(Gx::ResourcePtr<Chart> chart)
     m_chart = std::move(chart);
 }
 
+GameConfig *GameContext::GetConfig() const
+{
+    return m_config;
+}
+
+void GameContext::SetConfig(GameConfig &config)
+{
+    m_config = &config;
+}
+
 Difficulty GameContext::GetDifficulty() const
 {
     return m_difficulty;
@@ -30,6 +40,16 @@ void GameContext::SetMode(const GameMode mode)
     m_mode = mode;
 }
 
+float GameContext::GetSpeed() const
+{
+    return m_speed;
+}
+
+void GameContext::SetSpeed(const float speed)
+{
+    m_speed = speed;
+}
+
 int GameContext::GetViewport() const
 {
     return m_viewport;
@@ -38,4 +58,11 @@ int GameContext::GetViewport() const
 void GameContext::SetViewport(const int viewport)
 {
     m_viewport = viewport;
+}
+
+void GameContext::Clear()
+{
+    m_chart = nullptr;
+    m_config = nullptr;
+    m_viewport = 0;
 }

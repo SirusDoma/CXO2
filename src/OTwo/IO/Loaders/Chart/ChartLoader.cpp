@@ -57,15 +57,14 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
     if (m_onThumbnailLoaded)
         m_onThumbnailLoaded(chart->GetThumbnail());
 
-    bool samplesLoaded = false;
-    auto loadSamples   = [&chart] (OjmArchive *archive)
+    auto loadSamples = [&chart] (const OjmArchive* archive)
     {
         if (!archive)
             return;
 
-        for (const auto &e : archive->GetFileEntries())
+        for (const auto& e : archive->GetFileEntries())
         {
-            const auto entry = dynamic_cast<const FileInfo*>(&e);
+            const auto entry = dynamic_cast<const FileInfo*>(e.get());
             if (!entry)
                 continue;
 
@@ -74,33 +73,29 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 continue;
 
             const auto loader = Gx::ResourceLoaderFactory::GetLoader<sf::SoundBuffer>();
-            if (auto buffer = loader->LoadFromMemory(&payload, entry->GetSize(), Gx::ResourceContext::Default); buffer)
+            if (auto buffer = loader->LoadFromMemory(&payload[0], entry->GetSize(), Gx::ResourceContext::Default); buffer)
                 chart->AddSample(entry->GetIndex(), std::move(buffer));
         }
     };
 
+    // Use resource manager at first attmpt
     if (ctx.Available())
     {
         if (const auto archive = ctx.Find<OjmArchive>(metadata.OJM); archive)
-        {
             loadSamples(archive);
-            samplesLoaded = true;
-        }
     }
 
-    if (!samplesLoaded)
+    // Archive not loaded from resource manager, try to open the file directly
+    if (chart->GetSampleCount() == 0)
     {
         auto archive = OjmArchive();
         if (archive.LoadFromFile(Gx::StringHelper::Trim(metadata.OJM)))
-        {
             loadSamples(&archive);
-            samplesLoaded = true;
-        }
     }
 
-    for (int d = 0; d < 3; d++)
+    for (int diff = 0; diff < 3; diff++)
     {
-        const auto difficulty = static_cast<Difficulty>(d);
+        const auto difficulty = static_cast<Difficulty>(diff);
 
         Gx::Uint32 offset = 0;
         Gx::Uint32 blockCount = 0;
@@ -126,89 +121,69 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
         if (offset == 0 || blockCount == 0)
             continue;
 
-        if (stream.seek(static_cast<Gx::Int64>(offset)) == -1)
+        if (stream.seek(offset) == -1)
             continue;
 
-        for (int block = 0; block < blockCount; block++)
+        for (int p = 0; p < blockCount; p++)
         {
-            Gx::Uint32 measure;
-            Gx::Uint16 lane;
-            Gx::Uint16 count;
+            auto block = NoteBlockHeader();
+            if (stream.read(&block, sizeof(NoteBlockHeader)) != sizeof(NoteBlockHeader))
+                throw Gx::ResourceLoadException("Failed to read the note block");
 
-            if (stream.read(&measure, sizeof(measure)) != sizeof(measure))
-                throw Gx::ResourceLoadException("Failed to read measure at note block");
-
-            if (stream.read(&lane, sizeof(lane)) != sizeof(lane))
-                throw Gx::ResourceLoadException("Failed to read channel at note block");
-
-            if (stream.read(&count, sizeof(count)) != sizeof(count))
-                throw Gx::ResourceLoadException("Failed to read block count at note block");
-
-            auto channel = static_cast<Chart::Channel>(lane);
-            if (lane > 8)
-                channel = Chart::Channel::BGM;
-
-            for (int i = 0; i < count; i++)
+            const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::BGM;
+            for (int i = 0; i < block.EventCount; i++)
             {
-                const float position = static_cast<float>(measure) + (static_cast<float>(i) / static_cast<float>(count));
-                const auto ev = Chart::Event{ position, channel };
+                const double position = static_cast<double>(block.Measure) + (static_cast<double>(i) / static_cast<double>(block.EventCount));
+                const auto ev = Chart::Event(channel, position);
 
                 if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
                 {
-                    std::float_t value;
+                    float value;
                     if (stream.read(&value, sizeof(value)) != sizeof(value))
                         throw Gx::ResourceLoadException("Failed to read time event value");
 
-                    chart->AddEvent<Chart::TimeEvent>(difficulty,
-                    {
-                        ev,
-                        value
-                    });
+                    if (value == 0.f)
+                        continue;
 
+                    chart->AddEvent<Chart::TimeEvent>(difficulty, Chart::TimeEvent(ev, value));
                     continue;
                 }
 
-                Gx::Uint16 id;
-                Gx::Int8 audio;
-                Chart::NoteType flag;
-
-                if (stream.read(&id, sizeof(id)) != sizeof(id))
+                auto note = NoteEventHeader();
+                if (stream.read(&note, sizeof(NoteEventHeader)) != sizeof(NoteEventHeader))
                     throw Gx::ResourceLoadException("Failed to read note event id");
 
-                if (id == 0)
+                // Ignore padding event
+                if (note.ID == 0)
                     continue;
-
-                if (stream.read(&audio, sizeof(audio)) != sizeof(audio))
-                    throw Gx::ResourceLoadException("Failed to read note audio data");
-
-                if (stream.read(&flag, sizeof(flag)) != sizeof(flag))
-                    throw Gx::ResourceLoadException("Failed to read note flag data");
 
                 // Volume value is between 1 ~ 16.
                 // It needs to be converted to 0.f ~ 100.f range
-                auto volume = static_cast<float>((audio >> 4) & 0x0F);
+                auto volume = static_cast<float>((note.Audio >> 4) & 0x0F);
                 volume = volume == 0 ? 100.f : ((volume / 16.f) * 100.f);
 
                 // Pan value is between 1 ~ 15 where 8 is the center
                 // It needs to be converted to -1.f to 1.f range where 0.f is the center
-                auto pan = static_cast<float>(audio & 0x0F);
+                auto pan = static_cast<float>(note.Audio & 0x0F);
                 pan = pan == 0 ? 8 : pan;
                 pan = ((pan - 1) / 14.0f) * 2.0f - 1.0f;
 
-                id = (id - 1) + (channel == Chart::Channel::BGM ? 1000 : 0);
-                chart->AddEvent<Chart::NoteEvent>(difficulty,
+                // Resolve the note type and ref id
+                auto type = note.Type % 8 > 3 ? Chart::NoteType::Sample : Chart::NoteType::Normal;
+                const int id = (note.ID - 1) + (type == Chart::NoteType::Sample ? 1000 : 0);
+                switch(note.Type % 4)
                 {
-                    ev,
-                    id,
-                    volume,
-                    pan,
-                    flag,
-                    chart->GetSample(id)
-                });
+                    case 2: type = Chart::NoteType::Hold;    break;
+                    case 3: type = Chart::NoteType::Release; break;
+                    default: break;
+                }
+
+                chart->AddEvent<Chart::NoteEvent>(difficulty, Chart::NoteEvent(ev, id, volume, pan, type, chart->GetSample(id)));
             }
         }
     }
 
+    chart->SortEvents();
     return chart;
 }
 

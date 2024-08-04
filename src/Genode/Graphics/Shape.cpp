@@ -58,8 +58,7 @@ namespace Gx
         m_vertices(sf::PrimitiveType::TriangleFan),
         m_outlineVertices(sf::PrimitiveType::TriangleStrip),
         m_insideBounds(),
-        m_bounds(),
-        m_visible(true)
+        m_bounds()
     {
     }
 
@@ -285,16 +284,6 @@ namespace Gx
     {
         for (std::size_t i = 0; i < m_outlineVertices.getVertexCount(); ++i)
             m_outlineVertices[i].color = m_outlineColor;
-    }
-
-    bool Shape::IsVisible() const
-    {
-        return m_visible;
-    }
-
-    void Shape::SetVisible(const bool visible)
-    {
-        m_visible = visible;
     }
 
 }

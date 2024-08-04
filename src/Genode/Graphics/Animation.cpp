@@ -11,7 +11,6 @@ namespace Gx
         m_currentRepeat(0),
         m_repeatCount(0),
         m_state(AnimationState::Initial),
-        m_visible(true),
         m_loop(false),
         m_animationCallback()
     {
@@ -26,7 +25,6 @@ namespace Gx
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
-        m_visible(true),
         m_loop(false),
         m_animationCallback()
     {
@@ -83,16 +81,6 @@ namespace Gx
         m_animationCallback = animationCallback;
     }
 
-    bool Animation::IsVisible() const
-    {
-        return m_visible;
-    }
-
-    void Animation::SetVisible(const bool visible)
-    {
-        m_visible = visible;
-    }
-
     void Animation::Update(const double delta)
     {
         if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
@@ -139,9 +127,6 @@ namespace Gx
 
     RenderStates Animation::Render(RenderSurface &surface, RenderStates states) const
     {
-        if (!m_visible)
-            return states;
-
         return Sprite::Render(surface, states);
     }
 

@@ -26,13 +26,13 @@ namespace Gx
         return m_filename;
     }
 
-    std::vector<Gx::FileInfo> Archive::Scan(const std::string &pattern, bool recursive) const
+    std::vector<std::unique_ptr<FileInfo>> Archive::Scan(const std::string &pattern, bool recursive) const
     {
-        std::vector<FileInfo> files;
+        std::vector<std::unique_ptr<FileInfo>> files;
         for (const auto &entry : GetFileEntries())
         {
-            if (auto fileName = entry.GetName(); StringHelper::IsGlobMatch(fileName, pattern))
-                files.push_back(std::move(FileInfo(*this, fileName, GetFileSize(fileName))));
+            if (auto fileName = entry->GetName(); StringHelper::IsGlobMatch(fileName, pattern))
+                files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName)));
         }
 
         return files;

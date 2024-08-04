@@ -11,8 +11,11 @@ bool OmcArchive::LoadFromFile(const std::string &fileName)
     if (!Archive::LoadFromFile(fileName))
         return false;
 
-    m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName));
-    m_fileStream.seek(0);
+    if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
+        return false;
+
+    if (m_fileStream.seek(0) == -1)
+        return false;
 
     if (!ReadStream(&m_header, sizeof(m_header)))
         return false;
@@ -82,12 +85,14 @@ bool OmcArchive::Contains(const std::string &name) const
     return std::any_of(m_entries.begin(), m_entries.end(), [name] (auto pair) { return pair.second.GetName() == name; });
 }
 
-std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
+std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
 {
-    std::vector<Gx::FileInfo> result;
+    std::vector<std::unique_ptr<Gx::FileInfo>> result;
     m_entries.clear();
 
-    m_fileStream.seek(m_header.FxStartOffset);
+    if (m_fileStream.seek(m_header.FxStartOffset) == -1)
+        return result;
+
     for (unsigned int i = 0; i < m_header.FxCount; i++)
     {
         const auto offset  = m_fileStream.tell();
@@ -110,7 +115,7 @@ std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
         );
 
         m_entries[i] = entry;
-        result.push_back(entry);
+        result.push_back(std::make_unique<FileInfo>(entry));
     }
 
     if (m_fileStream.seek(m_header.BgStartOffset) == -1)
@@ -138,7 +143,7 @@ std::vector<Gx::FileInfo> OmcArchive::GetFileEntries() const
         );
 
         m_entries[i + 1000] = entry;
-        result.push_back(entry);
+        result.push_back(std::make_unique<FileInfo>(entry));
     }
 
     return result;

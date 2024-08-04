@@ -59,7 +59,7 @@ bool OjmArchive::Contains(const std::string &name) const
     return false;
 }
 
-std::vector<Gx::FileInfo> OjmArchive::GetFileEntries() const
+std::vector<std::unique_ptr<Gx::FileInfo>> OjmArchive::GetFileEntries() const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::GetFileEntries();

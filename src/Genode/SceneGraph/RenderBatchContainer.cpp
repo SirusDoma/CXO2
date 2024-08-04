@@ -15,6 +15,9 @@ namespace Gx
 
     RenderStates RenderBatchContainer::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         // Push render states
         const auto transform = states.transform;
         const float layer    = states.Layer;

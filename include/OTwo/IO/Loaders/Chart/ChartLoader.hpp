@@ -25,6 +25,20 @@ public:
     static Gx::ResourcePtr<sf::Image> LoadCoverArt(sf::InputStream &stream, ChartMetadata &metadata, const Gx::ResourceContext &ctx);
 
 private:
+    struct NoteBlockHeader
+    {
+        Gx::Uint32 Measure;
+        Gx::Uint16 Channel;
+        Gx::Uint16 EventCount;
+    };
+
+    struct NoteEventHeader
+    {
+        Gx::Uint16 ID;
+        Gx::Int8   Audio;
+        Gx::Int8   Type;
+    };
+
     std::function<void(const sf::Image*)> m_onCoverLoaded;
     std::function<void(const sf::Image*)> m_onThumbnailLoaded;
 };

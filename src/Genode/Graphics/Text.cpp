@@ -373,6 +373,9 @@ namespace Gx
 
     RenderStates Text::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         if (m_font)
         {
             EnsureGeometryUpdate();

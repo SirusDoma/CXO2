@@ -25,11 +25,12 @@ namespace Gx
 
         ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override = 0;
 
-        std::vector<Gx::FileInfo> Scan(const std::string &pattern, bool recursive) const override;
+        std::vector<std::unique_ptr<FileInfo>> Scan(const std::string &pattern, bool recursive) const override;
         bool Contains(const std::string& fileName) const override = 0;
 
-        std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override = 0;
-        std::vector<FileInfo> GetFileEntries() const override = 0;
+        std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const override = 0;
+
+        std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override = 0;
 
         Int64 ReadFile(const std::string& name, void *data, Int64 size) const override = 0;
         virtual Int64 ReadFile(const FileInfo &entry, void *data) const;

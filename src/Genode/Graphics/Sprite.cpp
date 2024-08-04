@@ -135,6 +135,9 @@ namespace Gx
 
     RenderStates Sprite::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         states.transform     *= GetTransform();
         states.coordinateType = sf::CoordinateType::Pixels;
         switch (m_blendMode)

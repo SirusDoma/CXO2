@@ -53,12 +53,13 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
 
-    for (int i = 1; i <= 7; i++)
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE", std::string(), ctx, 1);
+    for (int i = 1; i <= 7; i++) // Channel
     {
-        for (int t = 1; t <= 2; t++)
+        for (int s = 1; s <= 2; s++) // Shape (Square, Circle)
         {
-            LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_NORMAL" + std::to_string(i) + "_" + std::to_string(t), std::string(), ctx, 1);
-            LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_LONG"   + std::to_string(i) + "_" + std::to_string(t), std::string(), ctx, 1);
+            LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_NORMAL" + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
+            LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_LONG"   + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
         }
     }
 

@@ -22,12 +22,14 @@ public:
     unsigned int GetViewport() const;
     void SetViewport(unsigned int viewport);
 
-    void Update(const double delta) override;
 
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
 private:
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    void Update(const double delta) override;
+
     const GameContext *PrepareContext() const;
 
     using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;

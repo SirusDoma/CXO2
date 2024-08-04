@@ -344,7 +344,7 @@ namespace Gx
         }
     }
 
-    const Control::State TextBox::GetControlState() const
+    Control::State TextBox::GetControlState() const
     {
         return m_state;
     }
@@ -367,6 +367,9 @@ namespace Gx
 
     RenderStates TextBox::Render(RenderSurface &surface, RenderStates states) const
     {
+        if (!IsVisible())
+            return states;
+
         states.transform *= GetTransform();
         if (m_caret.SelectionLength != 0)
             surface.Render(m_caret.GetHighlight(), states);

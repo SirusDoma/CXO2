@@ -114,12 +114,12 @@ Gx::Int64 M30Archive::GetFileSize(const std::string &fileName) const
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
 }
 
-std::vector<Gx::FileInfo> M30Archive::GetFileEntries() const
+std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const
 {
-    std::vector<Gx::FileInfo> result;
+    std::vector<std::unique_ptr<Gx::FileInfo>> result;
 
     m_entries.clear();
-    if (m_fileStream.seek(m_header.SampleOffset) != -1)
+    if (m_fileStream.seek(m_header.SampleOffset) == -1)
         return result;
 
     for (unsigned int i = 0; i < m_header.SampleCount; i++)
@@ -135,16 +135,17 @@ std::vector<Gx::FileInfo> M30Archive::GetFileEntries() const
         if (m_fileStream.seek(m_fileStream.tell() + sampleHeader.Size) == -1)
             continue;
 
+        unsigned int reference = sampleHeader.Reference + (sampleHeader.CodecCode == 0 ? 1000 : 0);
         auto entry = FileInfo(
             *this,
             Gx::StringHelper::Trim(std::string(sampleHeader.Name, sizeof(sampleHeader.Name))),
             sampleHeader.Size,
-            i,
+            reference,
             offset
         );
 
-        m_entries[i] = entry;
-        result.push_back(entry);
+        m_entries[reference] = entry;
+        result.push_back(std::make_unique<FileInfo>(entry));
     }
 
     return result;
@@ -165,44 +166,31 @@ Gx::Int64 M30Archive::ReadFile(const FileInfo &entry, void *data, Gx::Int64 size
     if (!ReadStream(&sampleHeader, sizeof(sampleHeader)))
         return -1;
 
-    const auto encodedData = new Gx::Uint8[sampleHeader.Size];
-    const auto read = m_fileStream.read(encodedData, sampleHeader.Size);
+    auto sampleData = std::vector<Gx::Uint8>(sampleHeader.Size);
+    const auto read = m_fileStream.read(&sampleData[0], sampleHeader.Size);
 
     if (read <= 0)
-    {
-        delete[] encodedData;
         return -1;
-    }
 
     if (size > read)
         size = read;
 
-    const auto decodedData = DecodeSample(encodedData, sampleHeader.Size, m_header.EncodingCode);
-    memcpy(data, decodedData, size);
-
-    delete[] decodedData;
-    delete[] encodedData;
+    DecodeSample(sampleData, m_header.EncodingCode);
+    memcpy(data, &sampleData[0], size);;
 
     return read;
 }
 
-Gx::Uint8* M30Archive::DecodeSample(const Gx::Uint8* encoded, int length, int encodingCode)
+void M30Archive::DecodeSample(std::vector<Gx::Uint8> &data, const int encodingCode)
 {
-    auto* sample = new Gx::Uint8[length];
     if (encodingCode == 16) // nami
     {
-        for (unsigned int i = 0; i + 3 < length; i += 4)
+        for (unsigned int i = 0; i + 3 < data.size(); i += 4)
         {
-            sample[i + 0] = 'n' ^ encoded[i + 0];
-            sample[i + 1] = 'a' ^ encoded[i + 1];
-            sample[i + 2] = 'm' ^ encoded[i + 2];
-            sample[i + 3] = 'i' ^ encoded[i + 3];
+            data[i + 0] = 'n' ^ data[i + 0];
+            data[i + 1] = 'a' ^ data[i + 1];
+            data[i + 2] = 'm' ^ data[i + 2];
+            data[i + 3] = 'i' ^ data[i + 3];
         }
     }
-    else
-    {
-        memcpy(sample, encoded, length);
-    }
-
-    return sample;
 }

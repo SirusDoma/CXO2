@@ -51,15 +51,18 @@ namespace Gx
         return false;
     }
 
-    std::vector<FileInfo> FileSystem::Scan(const std::string &pattern)
+    std::vector<std::unique_ptr<FileInfo>> FileSystem::Scan(const std::string &pattern)
     {
         EnsureDefaultFileSystemsRegistered();
 
-        std::vector<FileInfo> files;
+        std::vector<std::unique_ptr<FileInfo>> files;
         for (const auto controller : m_controllers)
         {
             if (auto f = controller->Scan(pattern, false); !f.empty())
-                files.insert(files.end(), f.begin(), f.end());
+            {
+                for (auto& e : f)
+                    files.push_back(std::move(e));
+            }
         }
 
         return files;
