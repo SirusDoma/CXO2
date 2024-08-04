@@ -3,6 +3,7 @@
 #include <OTwo/Chart/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Chart/Note.hpp>
+#include <OTwo/Chart/LongNote.hpp>
 
 ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Channel> instantiables) :
     m_parent(&state),
@@ -89,12 +90,16 @@ void ChartRenderer::Initialize(const GameContext &context)
         m_events.push_back(EventState{ ev });
         if (ev->IsPlayable())
         {
-            const auto note  = static_cast<Chart::NoteEvent*>(ev);
-            if (note->Type != Chart::NoteType::Normal)
-                continue;
-
-            const auto node = m_parent->Create<Note>(*this, *ev, m_prefabs[note->Channel][note->Type]);
-            m_container->AddChild(node);
+            if (const auto note  = static_cast<Chart::NoteEvent*>(ev); note->Type == Chart::NoteType::Normal)
+            {
+                const auto node = m_parent->Create<Note>(*this, *note, m_prefabs[note->Channel][note->Type]);
+                m_container->AddChild(node);
+            }
+            else if (note->Type == Chart::NoteType::Hold)
+            {
+                const auto node = m_parent->Create<LongNote>(*this, *note, m_prefabs[note->Channel][note->Type], m_prefabs[note->Channel][Chart::NoteType::Normal]);
+                m_container->AddChild(node);
+            }
         }
     }
 
@@ -119,10 +124,13 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     // Update note animation
     for (auto channel : m_instantiables)
     {
-        for (auto shape : { NoteShape::Square, NoteShape::Circle })
+        for (auto type : { Chart::NoteType::Normal, Chart::NoteType::Hold })
         {
-            const auto instance = static_cast<Gx::Updatable*>(m_prefabs[channel][Chart::NoteType::Normal][shape]);
-            instance->Update(states.Delta);
+            for (auto shape : { NoteShape::Square, NoteShape::Circle })
+            {
+                const auto instance = static_cast<Gx::Updatable*>(m_prefabs[channel][type][shape]);
+                instance->Update(states.Delta);
+            }
         }
     }
 

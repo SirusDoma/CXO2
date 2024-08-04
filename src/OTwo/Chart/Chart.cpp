@@ -60,7 +60,7 @@ void Chart::SortEvents()
             const auto note = static_cast<NoteEvent*>(ev);
             if (holds[ev->Channel])
             {
-                holds[ev->Channel]->Length = note->Position - ev->Position;
+                holds[ev->Channel]->Length = note->Position - holds[ev->Channel]->Position;
                 holds[ev->Channel] = nullptr;
 
                 it = m_events[diff].erase(it);

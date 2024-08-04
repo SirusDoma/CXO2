@@ -160,6 +160,14 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyUp(ev);
 
+    if (ev.code == sf::Keyboard::Key::F5)
+    {
+        if (m_config->NoteShapeType == NoteShape::Square)
+            m_config->NoteShapeType = NoteShape::Circle;
+        else
+            m_config->NoteShapeType = NoteShape::Square;
+    }
+
     for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         if (code != ev.code)

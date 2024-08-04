@@ -38,7 +38,7 @@ private:
     ChartRenderer m_renderer;
 
     const GameContext *m_context;
-    const GameConfig *m_config;
+    GameConfig *m_config;
 
     AnimationMap m_noteClicks;
     ImageMap m_keyDowns, m_keyEffects;
