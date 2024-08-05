@@ -21,7 +21,9 @@ public:
     Accuracy GetJudgementAccuracy() const;
     void Judge(Accuracy accuracy);
 
-private:
+protected:
+    Note(const ChartRenderer &renderer, const Chart::Channel channel, const double position);
+
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void Update(const double delta) override;
 
@@ -29,6 +31,8 @@ private:
     const Chart::Channel  m_channel;
     const double          m_position;
     GameConfig           *m_config;
+
+private:
     NoteSpriteMap         m_sprites;
 
     bool m_visible;

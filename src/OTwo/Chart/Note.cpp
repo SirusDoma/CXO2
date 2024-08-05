@@ -14,7 +14,18 @@ Note::Note(const ChartRenderer &renderer, const Chart::Channel channel, const do
     m_visible(true),
     m_accuracy(Accuracy::None)
 {
-    m_config = m_renderer->GetContext().GetConfig();
+    m_config = m_renderer->GetRenderSettings().Config;
+}
+
+Note::Note(const ChartRenderer &renderer, const Chart::Channel channel, const double position) :
+    m_renderer(&renderer),
+    m_channel(channel),
+    m_position(position),
+    m_config(nullptr),
+    m_visible(true),
+    m_accuracy(Accuracy::None)
+{
+    m_config = m_renderer->GetRenderSettings().Config;
 }
 
 bool Note::IsVisible() const
@@ -40,10 +51,10 @@ void Note::Judge(const Accuracy accuracy)
     m_accuracy = accuracy;
 }
 
+
 Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    const auto context = &m_renderer->GetContext();
-    if (const auto position = GetPosition(); !IsVisible() || position.y < -50 || position.y > context->GetViewport() + 50)
+    if (const auto position = GetPosition(); !IsVisible() || position.y < -50 || position.y > m_renderer->GetRenderSettings().Viewport + 50)
         return states;
 
     states.transform *= GetTransform();
@@ -55,10 +66,8 @@ Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates state
 
 void Note::Update(const double delta)
 {
-    const auto context  = &m_renderer->GetContext();
-    const auto speed    = m_renderer->GetSpeed(m_channel);
-    const auto position = (m_position - m_renderer->GetRenderPosition()) * (static_cast<float>(ChartRenderer::DefaultMeasureHeight) * speed);
-    SetPosition(GetPosition().x, context->GetViewport() - position);
+    const double position = m_position - m_renderer->GetRenderPosition();
+    SetPosition(GetPosition().x, m_renderer->MapRenderPositionToPixels(m_channel, position));
 
     UpdatableContainer::Update(delta);
 }

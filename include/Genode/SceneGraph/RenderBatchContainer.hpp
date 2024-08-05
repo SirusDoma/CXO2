@@ -8,15 +8,14 @@ namespace Gx
     class RenderBatchContainer : public virtual RenderableContainer, public virtual UpdatableContainer
     {
     public:
+        RenderBatchContainer() = default;
         ~RenderBatchContainer() override = default;
 
-    protected:
-        RenderBatchContainer() = default;
+        void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
 
+    protected:
         void Update(const double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
-
-        void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
 
     private:
         // Batcher is kept separate so it doesn't interfere with SceneGraph hierarchy

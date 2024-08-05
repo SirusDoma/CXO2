@@ -7,8 +7,7 @@ LongNote::LongNote(const ChartRenderer &renderer, const Chart::NoteEvent &ev, co
 }
 
 LongNote::LongNote(const ChartRenderer &renderer, const Chart::Channel channel, const double position, const double length, const NoteSpriteMap &sprites, const NoteSpriteMap &heads) :
-    m_renderer(&renderer),
-    m_channel(channel),
+    Note::Note(renderer, channel, position),
     m_position(position),
     m_length(length),
     m_sprites(sprites),
@@ -16,11 +15,9 @@ LongNote::LongNote(const ChartRenderer &renderer, const Chart::Channel channel, 
     m_visible(true),
     m_accuracy(Accuracy::None)
 {
-    m_config = m_renderer->GetContext().GetConfig();
-
+    m_config = m_renderer->GetRenderSettings().Config;
     const auto sprite     = m_sprites[m_config->NoteShapeType];
-    const double speed    = m_renderer->GetSpeed(m_channel);
-    const double distance = m_length * (static_cast<float>(ChartRenderer::DefaultMeasureHeight) * speed);
+    const double distance = m_renderer->MapRenderPositionToPixels(m_channel, m_length, true);
 
     SetScale(GetScale().x, distance / sprite->GetLocalBounds().height);
 }
@@ -35,22 +32,9 @@ void LongNote::SetVisible(const bool visible)
     m_visible = visible;
 }
 
-Accuracy LongNote::GetJudgementAccuracy() const
-{
-    return m_accuracy;
-}
-
-void LongNote::Judge(const Accuracy accuracy)
-{
-    if (accuracy == Accuracy::None || m_accuracy != Accuracy::None)
-        return;
-
-    m_accuracy = accuracy;
-}
-
 Gx::RenderStates LongNote::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    if (!IsVisible() || (m_position + m_length) - m_renderer->GetRenderPosition() < -0.5)
+    if (!IsVisible() || !m_renderer->InRenderProximity(m_position + m_length))
         return states;
 
     auto cstates = states;
@@ -60,14 +44,13 @@ Gx::RenderStates LongNote::Render(Gx::RenderSurface &surface, Gx::RenderStates s
 
     // For heads and tails: only apply position, ignore scale
     cstates.transform.translate(GetPosition());
-    const auto speed = m_renderer->GetSpeed(m_channel);
     if (const auto it = m_heads.find(m_config->NoteShapeType); it != m_heads.end())
     {
         // Tail
         surface.Render(*it->second, cstates);
 
         // Head
-        const double distance = m_length * (static_cast<float>(ChartRenderer::DefaultMeasureHeight) * speed);
+        const double distance = m_renderer->MapRenderPositionToPixels(m_channel, m_length, true);
         cstates.transform.translate({0, static_cast<float>(distance)});
         surface.Render(*it->second, cstates);
     }
@@ -77,10 +60,8 @@ Gx::RenderStates LongNote::Render(Gx::RenderSurface &surface, Gx::RenderStates s
 
 void LongNote::Update(const double delta)
 {
-    const auto context  = &m_renderer->GetContext();
-    const auto speed    = m_renderer->GetSpeed(m_channel);
-    const auto position = ((m_position + m_length) - m_renderer->GetRenderPosition()) * (static_cast<float>(ChartRenderer::DefaultMeasureHeight) * speed);
-    SetPosition(GetPosition().x, context->GetViewport() - position);
+    const double position = (m_position + m_length) - m_renderer->GetRenderPosition();
+    SetPosition(GetPosition().x, m_renderer->MapRenderPositionToPixels(m_channel, position));
 
     UpdatableContainer::Update(delta);
 }

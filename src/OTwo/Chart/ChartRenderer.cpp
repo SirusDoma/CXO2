@@ -7,8 +7,9 @@
 
 ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Channel> instantiables) :
     m_parent(&state),
+    m_chart(),
     m_container(),
-    m_context(),
+    m_settings(),
     m_instantiables(instantiables),
     m_prefabs(),
     m_speeds(),
@@ -21,14 +22,40 @@ ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Ch
 {
 }
 
-void ChartRenderer::Initialize(const GameContext &context)
+void ChartRenderer::Render(const Chart &chart, const GameContext &context)
 {
-    m_context   = &context;
-    m_container = m_parent->Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE");
-    m_container->SetBatchingEnabled(true);
+    if (!context.GetConfig())
+        throw Gx::Exception("GameConfig cannot be null");
+
+    Render(chart, RenderSettings{
+        context.GetConfig(),
+        context.GetViewport(),
+        context.GetSpeed(),
+        context.GetDifficulty()
+    });
+}
+
+void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
+{
+    if (!settings.Config)
+        throw Gx::Exception("GameConfig cannot be null");
+
+    m_chart    = &chart;
+    m_settings = settings;
+
+    // Setup note container
+    // TODO: Replace this with RenderTexture container
+    if (!m_container)
+    {
+        if (m_container = m_parent->FindChild<Gx::RenderBatchContainer>("IDC_CONTAINER_NOTE"); !m_container)
+        {
+            m_container = m_parent->Create<Gx::RenderBatchContainer>();
+            m_parent->AddChild(m_container);
+        }
+    }
 
     // Set-up Speed
-    const auto speed = m_context->GetSpeed();
+    const auto speed = settings.Speed;
     for (auto channel : Chart::NoteChannels)
     {
         if (speed == XrSpeed)
@@ -42,7 +69,7 @@ void ChartRenderer::Initialize(const GameContext &context)
             m_speeds[channel] = speed;
     }
 
-    // Load note templates
+    // Load notes templates
     for (auto channel : m_instantiables)
     {
         const int key = static_cast<Gx::Uint16>(channel) - 1;
@@ -61,14 +88,13 @@ void ChartRenderer::Initialize(const GameContext &context)
     }
 
     // Set-up rendering states
-    const auto chart = m_context->GetChart();
     m_position  = 0;
     m_start     = 0;
     m_elapsed   = 0;
     m_reference = 0;
-    m_bpm       = chart->GetMetadata().BPM;
+    m_bpm       = chart.GetMetadata().BPM;
 
-    const auto events = chart->GetEvents(m_context->GetDifficulty());
+    const auto events = chart.GetEvents(settings.Difficulty);
 
     // Instantiate measure
     const auto max = *std::max_element(events.begin(), events.end(), [] (auto a, auto b) { return a->Position < b->Position; });
@@ -76,7 +102,6 @@ void ChartRenderer::Initialize(const GameContext &context)
         { NoteShape::Square, m_parent->FindResource<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE") },
         { NoteShape::Circle, m_parent->FindResource<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE") }
     };
-
     for (int i = 0; i < std::ceil(max->Position) + 1; i++)
     {
         const auto node = m_parent->Create<Note>(*this, Chart::Channel::BGM, static_cast<double>(i), measure);
@@ -102,19 +127,13 @@ void ChartRenderer::Initialize(const GameContext &context)
             }
         }
     }
-
-    // TODO:
-    // 1. Get Chart and Events
-    // 2. Get Note Templates from "Require"
-    // 3. Spawn (Both Circle and Square) Notes from the Templates to Note Container
-
-    // TODO:
-    // Add "viewport" attributes in Playing.json asset to determine play area (e.g Size <width?>, 480px)
-    // X and Y coordinate should infer from the Note min X and min Y position
 }
 
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
+    if (!m_chart)
+        return states;
+
     if (states.FrameID != m_frameId)
         m_elapsed += states.Delta;
 
@@ -134,6 +153,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
     }
 
+    // TODO: Gameplay
     for (auto &ev : m_events)
     {
         const double position = ev->Position - m_position;
@@ -185,12 +205,9 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     return states;
 }
 
-const GameContext &ChartRenderer::GetContext() const
+const ChartRenderer::RenderSettings &ChartRenderer::GetRenderSettings() const
 {
-    if (!m_context)
-        throw Gx::Exception("ChartRenderer is not initialized yet");
-
-    return *m_context;
+    return m_settings;
 }
 
 float ChartRenderer::GetSpeed(const Chart::Channel channel) const
@@ -204,5 +221,21 @@ float ChartRenderer::GetSpeed(const Chart::Channel channel) const
 double ChartRenderer::GetRenderPosition() const
 {
     return m_position;
+}
+
+int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool relative) const
+{
+    float speed = 1.0f;
+    if (const auto it = m_speeds.find(channel); it != m_speeds.end())
+        speed = it->second;
+
+    const unsigned int pixels = (position * (static_cast<float>(DefaultMeasureHeight) * speed));
+    return relative ? pixels : m_settings.Viewport - pixels;
+}
+
+bool ChartRenderer::InRenderProximity(const double position) const
+{
+    const double distance = position - m_position;
+    return distance < std::ceil(m_settings.Viewport / DefaultMeasureHeight) + 0.1f || distance > -0.1f;
 }
 

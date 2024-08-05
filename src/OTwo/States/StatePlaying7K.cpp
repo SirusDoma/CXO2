@@ -1,13 +1,14 @@
 #include <OTwo/States/StatePlaying7K.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
+#include <OTwo/States/StateRoom.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
-#include <OTwo/States/StateRoom.hpp>
 
 #include <OTwo/Chart/ChartRenderer.hpp>
 
 #include <Genode/UI.hpp>
-#include <OTwo/States/StateWaiting7K.hpp>
+#include <Genode/Utilities/Debugger.hpp>
 
 StatePlaying7K::StatePlaying7K() :
     m_renderer(*this, {
@@ -53,9 +54,17 @@ void StatePlaying7K::Initialize()
     const auto &session = Require<SessionContext>();
     auto &room = session.GetCurrentRoom();
 
-    auto metadata = ChartMetadataView{};
-    if (m_context->GetChart())
-        metadata = m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty());
+    if (!m_context->GetChart())
+    {
+        if (Gx::Debugger::IsDebuggerAttached())
+            GetDirector().Present<StateWaiting7K>();
+        else
+            throw Gx::Exception("Chart cannot be null");
+
+        return;
+    }
+
+    const auto metadata = m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty());
 
     const auto wave = Instantiate<Gx::Gauge>("IDC_GAUGE_WAVE");
     wave->SetValue(50);
@@ -113,7 +122,7 @@ void StatePlaying7K::Initialize()
         GetDirector().Present<StateWaiting7K>();
     });
 
-    m_renderer.Initialize(*m_context);
+    m_renderer.Render(*m_context->GetChart(), *m_context);
 }
 
 unsigned int StatePlaying7K::GetViewport() const
