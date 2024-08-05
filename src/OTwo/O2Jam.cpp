@@ -226,7 +226,7 @@ void O2Jam::OnFocusChanged(bool focus)
     if (focus)
     {
         mixer.SetVolume(static_cast<float>(config.MusicVolume));
-        if (director.IsPresenting<StateAvi>())
+        if (director.IsPresenting<StateAvi>() || director.IsPresenting<StatePlaying7K>())
             return;
 
         mixer.Stop("SFX");
@@ -235,7 +235,7 @@ void O2Jam::OnFocusChanged(bool focus)
     else
     {
         mixer.SetVolume(0.f);
-        if (director.IsPresenting<StateAvi>())
+        if (director.IsPresenting<StateAvi>() || director.IsPresenting<StatePlaying7K>())
             return;
 
         mixer.PauseAll();
