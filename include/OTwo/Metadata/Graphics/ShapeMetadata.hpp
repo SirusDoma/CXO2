@@ -23,6 +23,7 @@ struct ShapeMetadata : TransformMetadata
     sf::IntRect TexCoords;
     float       OutlineThickness;
     sf::Color   OutlineColor;
+    std::unordered_map<unsigned int, sf::Color> ColorMap;
 };
 
 struct CircleMetadata : ShapeMetadata
@@ -38,6 +39,7 @@ struct PolygonMetadata : ShapeMetadata
     ~PolygonMetadata() override = default;
 
     unsigned int PointCount;
+    std::vector<sf::Vector2f> Points;
 };
 
 struct RectangleMetadata : ShapeMetadata

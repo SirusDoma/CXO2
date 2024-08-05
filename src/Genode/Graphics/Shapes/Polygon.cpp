@@ -26,7 +26,14 @@
 
 namespace Gx
 {
-    Polygon::Polygon(const std::size_t pointCount)
+    Polygon::Polygon(const std::size_t pointCount) :
+        Shape()
+    {
+        SetPointCount(pointCount);
+    }
+
+    Polygon::Polygon(sf::PrimitiveType primitiveType, const std::size_t pointCount) :
+        Shape(primitiveType)
     {
         SetPointCount(pointCount);
     }

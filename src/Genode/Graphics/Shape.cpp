@@ -50,12 +50,17 @@ namespace
 namespace Gx
 {
     Shape::Shape() :
+        Shape(sf::PrimitiveType::TriangleFan)
+    {
+    }
+
+    Shape::Shape(const sf::PrimitiveType primitiveType) :
         m_texture(nullptr),
         m_textureRect(),
         m_fillColor(255, 255, 255),
         m_outlineColor(255, 255, 255),
         m_outlineThickness(0),
-        m_vertices(sf::PrimitiveType::TriangleFan),
+        m_vertices(primitiveType),
         m_outlineVertices(sf::PrimitiveType::TriangleStrip),
         m_insideBounds(),
         m_bounds()
@@ -126,9 +131,23 @@ namespace Gx
         return GetFillColor();
     }
 
+    const sf::Color& Shape::GetColor(const unsigned int index) const
+    {
+        if (const auto it = m_colorMap.find(index); it != m_colorMap.end())
+           return it->second;
+
+        return GetFillColor();
+    }
+
     void Shape::SetColor(const sf::Color& color)
     {
         SetFillColor(color);
+        //SetOutlineColor(color);
+    }
+
+    void Shape::SetColor(const unsigned int index, const sf::Color& color)
+    {
+        m_colorMap[index] = color;
         //SetOutlineColor(color);
     }
 
@@ -211,7 +230,7 @@ namespace Gx
     void Shape::UpdateFillColors()
     {
         for (std::size_t i = 0; i < m_vertices.getVertexCount(); ++i)
-            m_vertices[i].color = m_fillColor;
+            m_vertices[i].color = GetColor(i);
     }
 
     void Shape::UpdateTexCoords()

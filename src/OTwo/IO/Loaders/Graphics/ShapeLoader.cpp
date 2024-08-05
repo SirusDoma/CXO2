@@ -55,6 +55,17 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
             polygon->PointCount = pointCount->get<unsigned int>();
         else
             polygon->PointCount = 30;
+
+        if (auto points = attributes.find("points"); points != attributes.end())
+        {
+            for (auto& point : points->items())
+            {
+                polygon->Points.push_back({
+                    point.value().at("x").get<float>(),
+                    point.value().at("y").get<float>(),
+                });
+            }
+        }
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
     {
@@ -107,6 +118,21 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
 
     if (auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), *metadata, context);
+
+    if (auto colorMap = attributes.find("colorMap"); colorMap != attributes.end())
+    {
+        unsigned int i = 0;
+        for (auto& color : colorMap->items())
+        {
+            unsigned int a, r, g, b;
+            color.value().at("a").get_to(a);
+            color.value().at("r").get_to(r);
+            color.value().at("g").get_to(g);
+            color.value().at("b").get_to(b);
+
+            metadata->ColorMap[i++] = sf::Color(r, g, b, a);
+        }
+    }
 
     if (auto color = attributes.find("color"); color != attributes.end())
     {
@@ -165,8 +191,12 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
     {
-        const auto polygon = dynamic_cast<const PolygonMetadata*>(&meta);
-        shape = std::make_unique<Gx::Polygon>(polygon->PointCount);
+        const auto polyMeta = dynamic_cast<const PolygonMetadata*>(&meta);
+        auto polygon = std::make_unique<Gx::Polygon>(polyMeta->PointCount);
+        for (int i = 0; i < polyMeta->Points.size(); i++)
+            polygon->SetPoint(i, polyMeta->Points[i]);
+
+        shape = std::move(polygon);
     }
     else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
     {
@@ -184,6 +214,9 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         shape->SetTexture(*texture);
+
+    for (auto& [i, color] : metadata->ColorMap)
+        shape->SetColor(i, color);
 
     shape->SetColor(metadata->Color);
     shape->SetOutlineThickness(metadata->OutlineThickness);

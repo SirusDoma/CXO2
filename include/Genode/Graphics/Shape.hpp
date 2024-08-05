@@ -33,6 +33,8 @@
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
 
+#include <unordered_map>
+
 namespace Gx
 {
     class Shape : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
@@ -55,7 +57,9 @@ namespace Gx
         float GetOutlineThickness() const;
         
         const sf::Color& GetColor() const override;
+        const sf::Color& GetColor(unsigned int index) const;
         void SetColor(const sf::Color& color) override;
+        void SetColor(unsigned int index, const sf::Color& color);
 
         virtual std::size_t GetPointCount() const = 0;
         virtual sf::Vector2f GetPoint(std::size_t index) const = 0;
@@ -65,9 +69,12 @@ namespace Gx
 
     protected:
         Shape();
+        Shape(sf::PrimitiveType primitiveType);
+
         void Update();
 
     private:
+        using ColorMap = std::unordered_map<unsigned int, sf::Color>;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
         void UpdateFillColors();
@@ -78,7 +85,8 @@ namespace Gx
         const sf::Texture* m_texture;          
         sf::IntRect        m_textureRect;      
         sf::Color          m_fillColor;        
-        sf::Color          m_outlineColor;     
+        sf::Color          m_outlineColor;
+        ColorMap           m_colorMap;
         float              m_outlineThickness; 
         sf::VertexArray    m_vertices;         
         sf::VertexArray    m_outlineVertices;  

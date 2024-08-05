@@ -34,6 +34,7 @@ namespace Gx
     {
     public:
         explicit Polygon(std::size_t pointCount = 0);
+        Polygon(sf::PrimitiveType primitiveType, std::size_t pointCount = 0);
 
         void SetPointCount(std::size_t count);
         std::size_t GetPointCount() const override;
