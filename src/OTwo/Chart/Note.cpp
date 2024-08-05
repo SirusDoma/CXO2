@@ -1,3 +1,4 @@
+#include <Genode/Graphics/Shapes/Polygon.hpp>
 #include <OTwo/Chart/Note.hpp>
 
 Note::Note(const ChartRenderer &renderer, const Chart::Event &ev, const NoteSpriteMap &sprites) :
@@ -59,7 +60,31 @@ Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates state
 
     states.transform *= GetTransform();
     if (const auto it = m_sprites.find(m_config->NoteShapeType); it != m_sprites.end())
+    {
         surface.Render(*it->second, states);
+
+        if (m_channel != Chart::Channel::BGM)
+        {
+            // TODO: GRID LENGTH
+            const auto length = m_config->NoteGuideLength * (m_renderer->GetBPM() / 60.f * 5.5f) *  m_renderer->GetSpeed(m_channel);
+            const auto x1 = it->second->GetPosition().x;
+            const auto x2 = x1 + 1;
+
+            auto grid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
+            grid.append({ sf::Vector2f(x1, -length), sf::Color::Black });
+            grid.append({ sf::Vector2f(x2, -length), sf::Color::Black });
+            grid.append({ sf::Vector2f(x1, 0), sf::Color(125, 125, 125) });
+            grid.append({ sf::Vector2f(x2, 0), sf::Color(125, 125, 125) });
+            grid.append({ sf::Vector2f(x1, length), sf::Color::Black });
+            grid.append({ sf::Vector2f(x2, length), sf::Color::Black });
+            surface.Render(grid, states);
+
+            for (int i = 0; i < grid.getVertexCount(); i++)
+                grid[i].position.x += it->second->GetLocalBounds().width;
+
+            surface.Render(grid, states);
+        }
+    }
 
     return RenderableContainer::Render(surface, states);
 }

@@ -38,10 +38,10 @@ public:
     const RenderSettings &GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
     double GetRenderPosition() const;
-
-    int MapRenderPositionToPixels(Chart::Channel channel, double position, bool relative = false) const;
+    double GetBPM() const;
 
     bool InRenderProximity(double position) const;
+    int MapRenderPositionToPixels(Chart::Channel channel, double position, bool relative = false) const;
 
 private:
     struct EventState

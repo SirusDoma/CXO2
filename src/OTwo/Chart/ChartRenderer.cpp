@@ -202,6 +202,14 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
     }
 
+
+    auto va = sf::VertexArray(sf::PrimitiveType::Lines, 3);
+    va.append({ sf::Vector2f(300, -5.5f), sf::Color::Black });
+    va.append({ sf::Vector2f(300, 0.f), sf::Color::White });
+    va.append({ sf::Vector2f(300, 5.5f), sf::Color::Black });
+
+    surface.Render(va, states);
+
     return states;
 }
 
@@ -223,6 +231,17 @@ double ChartRenderer::GetRenderPosition() const
     return m_position;
 }
 
+double ChartRenderer::GetBPM() const
+{
+    return m_bpm;
+}
+
+bool ChartRenderer::InRenderProximity(const double position) const
+{
+    const double distance = position - m_position;
+    return distance < std::ceil(m_settings.Viewport / DefaultMeasureHeight) + 0.1f || distance > -0.1f;
+}
+
 int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool relative) const
 {
     float speed = 1.0f;
@@ -232,10 +251,3 @@ int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const
     const unsigned int pixels = (position * (static_cast<float>(DefaultMeasureHeight) * speed));
     return relative ? pixels : m_settings.Viewport - pixels;
 }
-
-bool ChartRenderer::InRenderProximity(const double position) const
-{
-    const double distance = position - m_position;
-    return distance < std::ceil(m_settings.Viewport / DefaultMeasureHeight) + 0.1f || distance > -0.1f;
-}
-

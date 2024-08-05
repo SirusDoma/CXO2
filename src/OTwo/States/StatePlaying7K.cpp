@@ -177,6 +177,14 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
             m_config->NoteShapeType = NoteShape::Square;
     }
 
+    if (ev.code == sf::Keyboard::Key::F6)
+    {
+        if (m_config->NoteGuideLength == 3)
+            m_config->NoteGuideLength = 0;
+        else
+            m_config->NoteGuideLength++;
+    }
+
     for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
     {
         if (code != ev.code)

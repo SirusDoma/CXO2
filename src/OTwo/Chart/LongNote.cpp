@@ -49,10 +49,43 @@ Gx::RenderStates LongNote::Render(Gx::RenderSurface &surface, Gx::RenderStates s
         // Tail
         surface.Render(*it->second, cstates);
 
+        // TODO: GRID LENGTH
+        const auto length = m_config->NoteGuideLength * (m_renderer->GetBPM() / 60.f * 5.5f) *  m_renderer->GetSpeed(m_channel);
+        const auto x1 = it->second->GetPosition().x;
+        const auto x2 = x1 + 1;
+        const auto y1 = 0;
+        const auto y2 = length;
+
+        // Tail grid
+        auto tailGrid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
+        tailGrid.append({ sf::Vector2f(x1, -y2), sf::Color::Black });
+        tailGrid.append({ sf::Vector2f(x2, -y2), sf::Color::Black });
+        tailGrid.append({ sf::Vector2f(x1,  y1), sf::Color(125, 125, 125) });
+        tailGrid.append({ sf::Vector2f(x2,  y1), sf::Color(125, 125, 125) });
+        surface.Render(tailGrid, states);
+
+        for (int i = 0; i < tailGrid.getVertexCount(); i++)
+            tailGrid[i].position.x += it->second->GetLocalBounds().width;
+
+        surface.Render(tailGrid, states);
+
         // Head
         const double distance = m_renderer->MapRenderPositionToPixels(m_channel, m_length, true);
         cstates.transform.translate({0, static_cast<float>(distance)});
         surface.Render(*it->second, cstates);
+
+        // Head grid
+        auto headGrid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
+        headGrid.append({ sf::Vector2f(x1,  y1), sf::Color(125, 125, 125) });
+        headGrid.append({ sf::Vector2f(x2,  y1), sf::Color(125, 125, 125) });
+        headGrid.append({ sf::Vector2f(x1,  y2), sf::Color::Black });
+        headGrid.append({ sf::Vector2f(x2,  y2), sf::Color::Black });
+        surface.Render(headGrid, cstates);
+
+        for (int i = 0; i < headGrid.getVertexCount(); i++)
+            headGrid[i].position.x += it->second->GetLocalBounds().width;
+
+        surface.Render(headGrid, cstates);
     }
 
     return RenderableContainer::Render(surface, states);
