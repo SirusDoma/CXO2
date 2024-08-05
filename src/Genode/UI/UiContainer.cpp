@@ -100,8 +100,8 @@ namespace Gx
     {
         if (m_useBatching)
             RenderBatchContainer::Update(delta);
-
-        Control::Update(delta);
+        else
+            Control::Update(delta);
     }
 
     bool UiContainer::Input(sf::Event ev)
