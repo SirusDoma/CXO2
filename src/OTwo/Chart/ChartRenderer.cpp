@@ -44,7 +44,7 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
     m_settings = settings;
 
     // Setup note container
-    // TODO: Replace this with RenderTexture container
+    // TODO: CREATE NOTE-FACTORY CLASS, USE VERTEX BUFFER AND STATIC RENDER BATCHING
     if (!m_container)
     {
         if (m_container = m_parent->FindChild<Gx::RenderBatchContainer>("IDC_CONTAINER_NOTE"); !m_container)
@@ -134,6 +134,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     if (!m_chart)
         return states;
 
+    // TODO: FIX ELAPSED NOT TO USE DELTA!
     if (states.FrameID != m_frameId)
         m_elapsed += states.Delta;
 
@@ -165,12 +166,17 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
             if (position > 0)
                 continue;
 
+            ev.Accuracy = Accuracy::Cool;
+            ev.Latency  = position;
+
             if (ev->Channel == Chart::Channel::BPM)
             {
                 const auto time = static_cast<Chart::TimeEvent*>(ev.Event);
                 m_reference = m_position;
                 m_start     = m_elapsed;
                 m_bpm       = time->Value;
+
+                break;
             }
             else if (ev->Channel == Chart::Channel::BGM)
             {
@@ -181,9 +187,6 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                     mixer.Play(sound, "BGM");
                 }
             }
-
-            ev.Accuracy = Accuracy::Cool;
-            ev.Latency  = position;
         }
         else
         {

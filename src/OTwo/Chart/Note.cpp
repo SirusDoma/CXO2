@@ -66,23 +66,25 @@ Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates state
         if (m_channel != Chart::Channel::BGM)
         {
             // TODO: GRID LENGTH
-            const auto length = m_config->NoteGuideLength * (m_renderer->GetBPM() / 60.f * 5.5f) *  m_renderer->GetSpeed(m_channel);
-            const auto x1 = it->second->GetPosition().x;
-            const auto x2 = x1 + 1;
+            if (const auto length = m_config->NoteGuideLength * (m_renderer->GetBPM() / 60.f * 5.5f) *  m_renderer->GetSpeed(m_channel); length > 0)
+            {
+                const auto x1 = it->second->GetPosition().x;
+                const auto x2 = x1 + 1;
 
-            auto grid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
-            grid.append({ sf::Vector2f(x1, -length), sf::Color::Black });
-            grid.append({ sf::Vector2f(x2, -length), sf::Color::Black });
-            grid.append({ sf::Vector2f(x1, 0), sf::Color(125, 125, 125) });
-            grid.append({ sf::Vector2f(x2, 0), sf::Color(125, 125, 125) });
-            grid.append({ sf::Vector2f(x1, length), sf::Color::Black });
-            grid.append({ sf::Vector2f(x2, length), sf::Color::Black });
-            surface.Render(grid, states);
+                auto grid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
+                grid.append({ sf::Vector2f(x1, -length), sf::Color::Black });
+                grid.append({ sf::Vector2f(x2, -length), sf::Color::Black });
+                grid.append({ sf::Vector2f(x1, 0), sf::Color(125, 125, 125) });
+                grid.append({ sf::Vector2f(x2, 0), sf::Color(125, 125, 125) });
+                grid.append({ sf::Vector2f(x1, length), sf::Color::Black });
+                grid.append({ sf::Vector2f(x2, length), sf::Color::Black });
+                surface.Render(grid, states);
 
-            for (int i = 0; i < grid.getVertexCount(); i++)
-                grid[i].position.x += it->second->GetLocalBounds().width;
+                for (int i = 0; i < grid.getVertexCount(); i++)
+                    grid[i].position.x += it->second->GetLocalBounds().width;
 
-            surface.Render(grid, states);
+                surface.Render(grid, states);
+            }
         }
     }
 
