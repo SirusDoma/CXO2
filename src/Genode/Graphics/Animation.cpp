@@ -4,28 +4,30 @@ namespace Gx
 {
     Animation::Animation() :
         Gx::Sprite(),
-        m_frames(),
+        m_state(AnimationState::Initial),
         m_duration(sf::Time::Zero),
         m_elapsed(sf::Time::Zero),
+        m_speed(1.f),
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
-        m_state(AnimationState::Initial),
         m_loop(false),
+        m_frames(),
         m_animationCallback()
     {
     }
 
     Animation::Animation(const sf::Texture& texture, const sf::Time &duration, const std::initializer_list<Frame> frames) :
         Gx::Sprite(texture),
-        m_frames(frames),
+        m_state(AnimationState::Initial),
         m_duration(duration),
         m_elapsed(sf::Time::Zero),
-        m_state(AnimationState::Initial),
+        m_speed(1.f),
         m_currentFrame(0),
         m_currentRepeat(0),
         m_repeatCount(0),
         m_loop(false),
+        m_frames(frames),
         m_animationCallback()
     {
     }
@@ -43,6 +45,16 @@ namespace Gx
     void Animation::SetDuration(const sf::Time &duration)
     {
         m_duration = duration;
+    }
+
+    float Animation::GetSpeed() const
+    {
+        return m_speed;
+    }
+
+    void Animation::SetSpeed(const float speed)
+    {
+        m_speed = speed;
     }
 
     const sf::Time& Animation::GetDuration() const
@@ -96,7 +108,7 @@ namespace Gx
                 m_animationCallback(*this);
         }
 
-        if (const auto frameTime = sf::milliseconds(m_duration.asMilliseconds() / static_cast<int>(m_frames.size())); m_elapsed >= frameTime)
+        if (const auto frameTime = sf::milliseconds( static_cast<int>(m_duration.asMilliseconds() / m_speed) / static_cast<int>(m_frames.size())); m_elapsed >= frameTime)
         {
             m_elapsed %= frameTime;
             m_currentFrame++;

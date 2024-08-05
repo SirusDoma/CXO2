@@ -59,6 +59,10 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
 
     auto loop = attributes.find("isLoop");
     metadata.IsLoop = loop != attributes.end() && loop->get<bool>();
+
+    auto speed = attributes.find("speed");
+    metadata.Speed = speed != attributes.end() ? speed->get<float>() : 1.0f;
+
     if (auto duration = attributes.find("duration"); duration != attributes.end())
         metadata.Duration = sf::milliseconds(duration->get<unsigned int>());
     else
@@ -87,6 +91,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
     animation->SetName(metadata->Name);
     animation->SetLoop(metadata->IsLoop);
     animation->SetDuration(metadata->Duration);
+    animation->SetSpeed(metadata->Speed);
     animation->SetBlendMode(metadata->BlendMode);
     animation->SetColor(metadata->Color);
     animation->SetOrigin(metadata->Origin);

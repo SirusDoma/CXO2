@@ -46,6 +46,9 @@ namespace Gx
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);
 
+        float GetSpeed() const;
+        void SetSpeed(const float speed);
+
         unsigned int GetRepeatCount() const;
         void SetRepeatCount(unsigned int repeatCount);
 
@@ -67,6 +70,7 @@ namespace Gx
         AnimationState m_state;
         sf::Time m_duration;
         sf::Time m_elapsed;
+        float m_speed;
         unsigned int m_currentFrame;
         unsigned int m_currentRepeat;
         unsigned int m_repeatCount;

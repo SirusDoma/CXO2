@@ -12,6 +12,7 @@ struct AnimationMetadata : SpriteMetadata
 
     bool     IsLoop;
     sf::Time Duration;
+    float    Speed;
     std::vector<Gx::Animation::Frame> Frames;
 };
 
