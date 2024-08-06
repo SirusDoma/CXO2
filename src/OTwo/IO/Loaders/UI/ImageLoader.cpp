@@ -3,7 +3,7 @@
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 
 #include <OTwo/Metadata/UI/ImageMetadata.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const

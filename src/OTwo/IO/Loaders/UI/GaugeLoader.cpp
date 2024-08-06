@@ -5,7 +5,7 @@
 
 #include <OTwo/Metadata/UI/GaugeMetadata.hpp>
 
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
 Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

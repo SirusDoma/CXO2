@@ -2,7 +2,7 @@
 #define O2JAM_CHANNEL_BUTTON_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Planet/ChannelButton.hpp>
+#include <OTwo/UI/Planet/ChannelButton.hpp>
 
 class ChannelButtonLoader : public ResourceLoader<ChannelButton>
 {

@@ -2,7 +2,7 @@
 #define O2JAM_CHANNEL_BUTTON_METADATA_HPP
 
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
-#include <OTwo/States/Components/Planet/ChannelButton.hpp>
+#include <OTwo/UI/Planet/ChannelButton.hpp>
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
 #include <Genode/IO/Json.hpp>

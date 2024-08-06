@@ -6,7 +6,7 @@
 #include <magic_enum.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
 #include <OTwo/Models/Shop.hpp>
 #include <OTwo/Models/Equipment.hpp>

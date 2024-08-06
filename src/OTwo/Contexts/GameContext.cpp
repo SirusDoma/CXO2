@@ -60,9 +60,12 @@ void GameContext::SetViewport(const int viewport)
     m_viewport = viewport;
 }
 
-void GameContext::Clear()
+void GameContext::Reset()
 {
-    m_chart = nullptr;
-    m_config = nullptr;
-    m_viewport = 0;
+    m_chart      = nullptr;
+    m_config     = nullptr;
+    m_difficulty = Difficulty::EX;
+    m_mode       = GameMode::Single;
+    m_speed      = 0;
+    m_viewport   = 0;
 }

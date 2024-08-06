@@ -37,6 +37,7 @@ public:
 
     const RenderSettings &GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
+    double GetCurrentTime() const;
     double GetRenderPosition() const;
     double GetBPM() const;
 
@@ -70,7 +71,7 @@ private:
     mutable sf::Clock m_timer;
     mutable PrefabMap m_prefabs;
     mutable EventStateList m_events;
-    mutable double m_position;
+    mutable double m_currentTime;
     mutable double m_refTime;
     mutable double m_refPosition;
     mutable double m_bpm;

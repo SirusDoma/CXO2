@@ -3,7 +3,7 @@
 #include <OTwo/Metadata/UI/Components/Common/ChatWindowMetadata.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const

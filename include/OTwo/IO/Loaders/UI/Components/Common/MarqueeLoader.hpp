@@ -4,7 +4,7 @@
 #include <OTwo/IO/ResourceLoader.hpp>
 
 #include <OTwo/Metadata/UI/Components/Common/MarqueeMetadata.hpp>
-#include <OTwo/States/Components/Common/Marquee.hpp>
+#include <OTwo/UI/Common/Marquee.hpp>
 
 class MarqueeLoader : public ResourceLoader<Marquee>
 {

@@ -3,18 +3,18 @@
 
 #include <OTwo/Avatar/Avatar.hpp>
 
-#include <OTwo/States/Components/Common/Marquee.hpp>
-#include <OTwo/States/Components/Common/ChatPanel.hpp>
-#include <OTwo/States/Components/Common/ChatWindow.hpp>
-#include <OTwo/States/Components/Planet/ChannelButton.hpp>
-#include <OTwo/States/Components/Planet/ChannelBoard.hpp>
-#include <OTwo/States/Components/Room/UserList.hpp>
-#include <OTwo/States/Components/Room/RoomContainer.hpp>
-#include <OTwo/States/Components/Room/RoomButton.hpp>
-#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
-#include <OTwo/States/Components/Waiting/MapSelector.hpp>
-#include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
-#include <OTwo/States/Components/Playing/Equalizer.hpp>
+#include <OTwo/UI/Common/Marquee.hpp>
+#include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Common/ChatWindow.hpp>
+#include <OTwo/UI/Planet/ChannelButton.hpp>
+#include <OTwo/UI/Planet/ChannelBoard.hpp>
+#include <OTwo/UI/Room/UserList.hpp>
+#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomButton.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
+#include <OTwo/UI/Waiting/MapSelector.hpp>
+#include <OTwo/UI/Waiting/InstrumentSelector.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>

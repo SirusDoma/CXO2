@@ -2,7 +2,7 @@
 #define O2JAM_ROOM_CONTAINER_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomContainer.hpp>
 
 class RoomContainerLoader : public ResourceLoader<RoomContainer>
 {

@@ -2,7 +2,7 @@
 #define O2JAM_LOADER_EQUALIZER_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Playing/Equalizer.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 class EqualizerLoader : public ResourceLoader<Equalizer>
 {

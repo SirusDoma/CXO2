@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/ToolTipLoader.hpp>
 #include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const

@@ -5,11 +5,11 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 
-#include <OTwo/States/Components/Common/Marquee.hpp>
-#include <OTwo/States/Components/Common/ChatPanel.hpp>
-#include <OTwo/States/Components/Room/RoomContainer.hpp>
-#include <OTwo/States/Components/Room/UserList.hpp>
-#include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
+#include <OTwo/UI/Common/Marquee.hpp>
+#include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/UserList.hpp>
+#include <OTwo/UI/Dialogs/OptionDialog.hpp>
 
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Avatar/Avatar.hpp>

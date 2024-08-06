@@ -2,7 +2,7 @@
 #define O2JAM_CHAT_PANEL_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Common/ChatPanel.hpp>
+#include <OTwo/UI/Common/ChatPanel.hpp>
 
 class ChatPanelLoader : public ResourceLoader<ChatPanel>
 {

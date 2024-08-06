@@ -2,7 +2,7 @@
 #define O2JAM_INSTRUMENT_SELECTOR_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
+#include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 
 class InstrumentSelectorLoader : public ResourceLoader<InstrumentSelector>
 {

@@ -12,11 +12,11 @@
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <OTwo/States/Components/Common/ChatPanel.hpp>
-#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
-#include <OTwo/States/Components/Waiting/MapSelector.hpp>
-#include <OTwo/States/Components/Waiting/InstrumentSelector.hpp>
-#include <OTwo/States/Components/Dialogs/SelectMusicDialog.hpp>
+#include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
+#include <OTwo/UI/Waiting/MapSelector.hpp>
+#include <OTwo/UI/Waiting/InstrumentSelector.hpp>
+#include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 
 #include <Genode/UI.hpp>
 #include <magic_enum.hpp>

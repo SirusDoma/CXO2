@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
 #include <OTwo/Metadata/UI/CheckBoxMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>

@@ -25,7 +25,7 @@ void StateLoading::Initialize()
     auto &room    = session.GetCurrentRoom();
     auto &game    = Require<GameContext>();
 
-    game.Clear();
+    game.Reset();
     game.SetConfig(config);
     game.SetMode(room.GameMode);
     game.SetDifficulty(room.Difficulty);

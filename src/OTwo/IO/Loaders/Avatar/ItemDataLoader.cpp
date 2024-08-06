@@ -1,7 +1,7 @@
 #include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Avatar/Item.hpp>
 
 Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const

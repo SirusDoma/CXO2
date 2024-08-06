@@ -2,7 +2,7 @@
 #define O2JAM_CHAT_WINDOW_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Common/ChatWindow.hpp>
+#include <OTwo/UI/Common/ChatWindow.hpp>
 
 class ChatWindowLoader : public ResourceLoader<ChatWindow>
 {

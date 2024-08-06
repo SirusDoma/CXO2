@@ -32,7 +32,7 @@ public:
     int GetViewport() const;
     void SetViewport(int viewport);
 
-    void Clear();
+    void Reset();
 
 private:
     Gx::ResourcePtr<Chart> m_chart;

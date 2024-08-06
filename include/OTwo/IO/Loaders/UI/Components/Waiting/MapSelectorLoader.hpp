@@ -2,7 +2,7 @@
 #define O2JAM_MAP_SELECTOR_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Waiting/MapSelector.hpp>
+#include <OTwo/UI/Waiting/MapSelector.hpp>
 
 class MapSelectorLoader : public ResourceLoader<MapSelector>
 {

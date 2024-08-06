@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/TextBoxLoader.hpp>
 #include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Metadata/UI/TextBoxMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 

@@ -2,7 +2,7 @@
 #define O2JAM_USER_LIST_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Room/UserList.hpp>
+#include <OTwo/UI/Room/UserList.hpp>
 
 class UserListLoader : public ResourceLoader<UserList>
 {

@@ -2,7 +2,7 @@
 #define O2JAM_CHANNEL_BOARD_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Planet/ChannelBoard.hpp>
+#include <OTwo/UI/Planet/ChannelBoard.hpp>
 
 class ChannelBoardLoader : public ResourceLoader<ChannelBoard>
 {

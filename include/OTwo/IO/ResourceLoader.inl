@@ -1,5 +1,5 @@
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 

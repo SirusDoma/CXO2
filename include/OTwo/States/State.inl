@@ -22,17 +22,17 @@ R* State::Instantiate(const std::string &source, const ResourceScope scope)
     if (!resources)
         return nullptr;
 
-    R* resource = nullptr;
-    if (resource = resources->Find<R>(source); !resource)
+    R* instance = nullptr;
+    if (instance = resources->Find<R>(source); !instance)
     {
-        if (resource = resources->Find<R>(GetName() + "/" + source); !resource)
-            resource = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+        if (instance = resources->Find<R>(GetName() + "/" + source); !instance)
+            instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
     }
 
     if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
-        AddChild(resource);
+        AddChild(instance);
 
-    return resource;
+    return instance;
 }
 
 template<typename R>

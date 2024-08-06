@@ -1,5 +1,5 @@
 #include <OTwo/States/StatePlanet.hpp>
-#include <OTwo/States/Components/Planet/ChannelBoard.hpp>
+#include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/StateTest.hpp>

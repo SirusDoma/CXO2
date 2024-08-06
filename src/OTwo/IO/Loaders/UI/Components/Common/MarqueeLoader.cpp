@@ -1,7 +1,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Common/MarqueeLoader.hpp>
 #include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
 Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

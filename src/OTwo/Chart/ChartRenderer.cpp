@@ -1,22 +1,23 @@
-#include <iostream>
-#include <Genode/Utilities/Randomizer.hpp>
 #include <OTwo/Chart/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+
 #include <OTwo/Chart/Note.hpp>
 #include <OTwo/Chart/LongNote.hpp>
 
+#include <Genode/Utilities/Randomizer.hpp>
+
 ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Channel> instantiables) :
     m_parent(&state),
-    m_chart(),
     m_container(),
+    m_chart(),
     m_settings(),
     m_instantiables(instantiables),
+    m_speeds(),
     m_timer(),
     m_prefabs(),
-    m_speeds(),
-    m_position(0),
-    m_refPosition(0),
+    m_currentTime(0),
     m_refTime(0),
+    m_refPosition(0),
     m_bpm(0),
     m_frameId(0)
 {
@@ -122,7 +123,7 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
     }
 
     // Set-up rendering states
-    m_position    = 0;
+    m_currentTime = 0;
     m_refPosition = 0;
     m_refTime     = 0;
     m_frameId     = 0;
@@ -134,6 +135,13 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 {
     if (!m_chart)
         return states;
+
+    // Save the current frame time so the generated render position is always consistent across multiple calls in the same frame
+    if (states.FrameID != m_frameId)
+    {
+        m_currentTime = m_timer.getElapsedTime().asMilliseconds();
+        m_frameId = states.FrameID;
+    }
 
     // Update note animation
     for (auto channel : m_instantiables)
@@ -149,15 +157,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     // TODO: Gameplay
-    const double currentTime  = m_timer.getElapsedTime().asMilliseconds();
     for (auto &ev : m_events)
     {
-        m_position = ((currentTime - m_refTime) / TickSignature * m_bpm) + m_refPosition;
-        const double latency = ev->Position - m_position;
-
         if (ev.Accuracy != Accuracy::None)
             continue;
 
+        const double latency = ev->Position - GetRenderPosition();
         if (!ev->IsPlayable())
         {
             if (latency > 0)
@@ -227,9 +232,14 @@ float ChartRenderer::GetSpeed(const Chart::Channel channel) const
     return 1.0f;
 }
 
+double ChartRenderer::GetCurrentTime() const
+{
+    return m_currentTime;
+}
+
 double ChartRenderer::GetRenderPosition() const
 {
-    return m_position;
+    return ((m_currentTime - m_refTime) / TickSignature * m_bpm) + m_refPosition;
 }
 
 double ChartRenderer::GetBPM() const
@@ -239,7 +249,7 @@ double ChartRenderer::GetBPM() const
 
 bool ChartRenderer::InRenderProximity(const double position) const
 {
-    const double distance = position - m_position;
+    const double distance = position - GetRenderPosition();
     return distance < std::ceil(m_settings.Viewport / DefaultMeasureHeight) + 0.1f || distance > -0.1f;
 }
 

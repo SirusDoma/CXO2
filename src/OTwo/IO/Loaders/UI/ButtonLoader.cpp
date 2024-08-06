@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/ResourceContextDecorator.hpp>
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const

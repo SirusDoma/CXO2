@@ -47,9 +47,9 @@
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
 
+#include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 
-#include <OTwo/States/SceneDirectorDecorator.hpp>
 #include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateAvi.hpp>
 #include <OTwo/States/StatePlanet.hpp>

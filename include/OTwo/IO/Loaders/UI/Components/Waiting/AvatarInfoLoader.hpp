@@ -2,7 +2,7 @@
 #define O2JAM_AVATAR_INFO_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/States/Components/Waiting/AvatarInfo.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
 class AvatarInfoLoader : public ResourceLoader<AvatarInfo>
 {

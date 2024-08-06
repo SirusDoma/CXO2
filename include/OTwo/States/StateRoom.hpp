@@ -3,8 +3,8 @@
 
 #include <OTwo/States/State.hpp>
 
-#include <OTwo/States/Components/Dialogs/CreateRoomDialog.hpp>
-#include <OTwo/States/Components/Dialogs/OptionDialog.hpp>
+#include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
+#include <OTwo/UI/Dialogs/OptionDialog.hpp>
 
 class StateRoom : public State
 {
