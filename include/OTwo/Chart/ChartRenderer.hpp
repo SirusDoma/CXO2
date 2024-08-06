@@ -44,6 +44,9 @@ public:
     int MapRenderPositionToPixels(Chart::Channel channel, double position, bool relative = false) const;
 
 private:
+    // Beat interval per millisecond in 1/4 note
+    static constexpr double TickSignature = 60000.f * 4.f;
+
     struct EventState
     {
         Chart::Event *Event;
@@ -64,12 +67,12 @@ private:
     std::vector<Chart::Channel> m_instantiables;
     std::unordered_map<Chart::Channel, float> m_speeds;
 
+    mutable sf::Clock m_timer;
     mutable PrefabMap m_prefabs;
     mutable EventStateList m_events;
     mutable double m_position;
-    mutable double m_start;
-    mutable double m_elapsed;
-    mutable double m_reference;
+    mutable double m_refTime;
+    mutable double m_refPosition;
     mutable double m_bpm;
     mutable unsigned int m_frameId;
 };

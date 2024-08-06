@@ -11,12 +11,12 @@ ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Ch
     m_container(),
     m_settings(),
     m_instantiables(instantiables),
+    m_timer(),
     m_prefabs(),
     m_speeds(),
     m_position(0),
-    m_start(0),
-    m_elapsed(0),
-    m_reference(0),
+    m_refPosition(0),
+    m_refTime(0),
     m_bpm(0),
     m_frameId(0)
 {
@@ -87,13 +87,6 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
         };
     }
 
-    // Set-up rendering states
-    m_position  = 0;
-    m_start     = 0;
-    m_elapsed   = 0;
-    m_reference = 0;
-    m_bpm       = chart.GetMetadata().BPM;
-
     const auto events = chart.GetEvents(settings.Difficulty);
 
     // Instantiate measure
@@ -127,19 +120,20 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
             }
         }
     }
+
+    // Set-up rendering states
+    m_position    = 0;
+    m_refPosition = 0;
+    m_refTime     = 0;
+    m_frameId     = 0;
+    m_bpm         = chart.GetMetadata().BPM;
+    m_timer.restart();
 }
 
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     if (!m_chart)
         return states;
-
-    // TODO: FIX ELAPSED NOT TO USE DELTA!
-    if (states.FrameID != m_frameId)
-        m_elapsed += states.Delta;
-
-    m_frameId  = states.FrameID;
-    m_position = m_reference + ((m_elapsed - m_start) / (60000 / m_bpm) / 4);
 
     // Update note animation
     for (auto channel : m_instantiables)
@@ -155,28 +149,32 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     // TODO: Gameplay
+    const double currentTime  = m_timer.getElapsedTime().asMilliseconds();
     for (auto &ev : m_events)
     {
-        const double position = ev->Position - m_position;
+        m_position = ((currentTime - m_refTime) / TickSignature * m_bpm) + m_refPosition;
+        const double latency = ev->Position - m_position;
+
         if (ev.Accuracy != Accuracy::None)
             continue;
 
         if (!ev->IsPlayable())
         {
-            if (position > 0)
+            if (latency > 0)
                 continue;
 
             ev.Accuracy = Accuracy::Cool;
-            ev.Latency  = position;
+            ev.Latency  = latency;
 
             if (ev->Channel == Chart::Channel::BPM)
             {
                 const auto time = static_cast<Chart::TimeEvent*>(ev.Event);
-                m_reference = m_position;
-                m_start     = m_elapsed;
-                m_bpm       = time->Value;
+                if (std::abs(time->Value - m_bpm) < 0.f)
+                    continue;
 
-                break;
+                m_refTime     += (time->Position - m_refPosition) / m_bpm * TickSignature;
+                m_refPosition  = time->Position;
+                m_bpm          = time->Value;
             }
             else if (ev->Channel == Chart::Channel::BGM)
             {
@@ -190,7 +188,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
         else
         {
-            if (position > 0)
+            if (latency > 0)
                 continue;
 
             if (const auto note = static_cast<Chart::NoteEvent*>(ev.Event); note->Sample)
@@ -200,7 +198,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                 mixer.Play(sound, "BGM");
 
                 ev.Accuracy = Accuracy::Cool;
-                ev.Latency  = position;
+                ev.Latency  = latency;
             }
         }
     }
