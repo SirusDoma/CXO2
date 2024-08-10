@@ -7,6 +7,7 @@
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/VertexBuffer.hpp>
+#include <SFML/Graphics/View.hpp>
 
 namespace Gx
 {
@@ -36,6 +37,10 @@ namespace Gx
                             const std::size_t       vertexCount,
                             const RenderStates&     states = RenderStates::Default
         ) = 0;
+
+        virtual const sf::View& GetDefaultView() const = 0;
+        virtual const sf::View& GetView() const = 0;
+        virtual void SetView(const sf::View &view) = 0;
     };
 }
 

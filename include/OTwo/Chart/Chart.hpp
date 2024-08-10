@@ -26,12 +26,12 @@ public:
         Note5       = 6,
         Note6       = 7,
         Note7       = 8,
-        BGM
+        Background
     };
 
     enum class NoteType : Gx::Uint8
     {
-        Normal  = 0,
+        Tap     = 0,
         Hold    = 2,
         Release = 3,
         Sample  = 4
@@ -55,7 +55,7 @@ public:
         Channel::Note5,
         Channel::Note6,
         Channel::Note7,
-        Channel::BGM
+        Channel::Background
     };
 
     struct Event
@@ -75,7 +75,7 @@ public:
         {
             return Channel != Channel::Measurement &&
                    Channel != Channel::BPM &&
-                   Channel != Channel::BGM;
+                   Channel != Channel::Background;
         }
     };
 

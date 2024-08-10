@@ -94,13 +94,16 @@ void State::LoadCommonResources()
     loaded = true;
 }
 
-void State::ShowDialog(const std::string &content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback)
+void State::ShowDialog(const std::string &content, const DialogStyle style, const bool backdrop, const std::function<void(bool)> &callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
         dialog = m_dialog1;
     else if (style == DialogStyle::YesNo)
         dialog = m_dialog2;
+
+    const auto label = dialog->GetLabel();
+    label->SetVisible(true);
 
     dialog->SetAcceptCallback([=] () { callback(true); });
     dialog->SetCancelCallback([=] () { callback(false); });
@@ -108,7 +111,7 @@ void State::ShowDialog(const std::string &content, DialogStyle style, bool backd
     dialog->Show(this, content, backdrop);
 }
 
-void State::ShowDialog(Gx::Node *content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback)
+void State::ShowDialog(Gx::Node *content, const DialogStyle style, const bool backdrop, const std::function<void(bool)> &callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
@@ -116,12 +119,13 @@ void State::ShowDialog(Gx::Node *content, DialogStyle style, bool backdrop, cons
     else if (style == DialogStyle::YesNo)
         dialog = m_dialog2;
 
-    auto label        = dialog->GetLabel();
-    auto acceptButton = dialog->GetAcceptButton();
-    auto cancelButton = dialog->GetCancelButton();
+    const auto label        = dialog->GetLabel();
+    const auto acceptButton = dialog->GetAcceptButton();
+    const auto cancelButton = dialog->GetCancelButton();
 
     dialog->ClearChildren();
     dialog->AddChild(label, acceptButton, cancelButton, content);
+    label->SetVisible(false);
 
     dialog->SetAcceptCallback([=] () { callback(true); });
     dialog->SetCancelCallback([=] () { callback(false); });
@@ -129,7 +133,7 @@ void State::ShowDialog(Gx::Node *content, DialogStyle style, bool backdrop, cons
     dialog->Show(this, std::string(), backdrop);
 }
 
-bool State::Close(bool quit)
+bool State::Close(const bool quit)
 {
     if (quit && !m_prompted)
     {
@@ -146,7 +150,12 @@ bool State::Close(bool quit)
     return Scene::Close(quit);
 }
 
-Gx::ResourceManager &State::GetLocalResources() const
+Gx::ResourceManager &State::GetResources(const ResourceScope scope) const
 {
-    return *m_resources;
+    switch (scope)
+    {
+        case ResourceScope::Immediate: return *m_tempResources;
+        case ResourceScope::Local:     return *m_resources;
+        default:                       return Require<Gx::ResourceManager>();
+    }
 }

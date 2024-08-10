@@ -50,12 +50,12 @@ void GameContext::SetSpeed(const float speed)
     m_speed = speed;
 }
 
-int GameContext::GetViewport() const
+unsigned int GameContext::GetViewport() const
 {
     return m_viewport;
 }
 
-void GameContext::SetViewport(const int viewport)
+void GameContext::SetViewport(const unsigned int viewport)
 {
     m_viewport = viewport;
 }

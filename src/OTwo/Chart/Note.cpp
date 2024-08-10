@@ -1,100 +1,158 @@
-#include <Genode/Graphics/Shapes/Polygon.hpp>
 #include <OTwo/Chart/Note.hpp>
+#include <OTwo/Chart/ChartRenderer.hpp>
 
-Note::Note(const ChartRenderer &renderer, const Chart::Event &ev, const NoteSpriteMap &sprites) :
-    Note::Note(renderer, ev.Channel, ev.Position, sprites)
+Note::Note(const Chart::NoteEvent &ev) :
+    Note(ev.Position, ev.Channel)
 {
-
 }
 
-Note::Note(const ChartRenderer &renderer, const Chart::Channel channel, const double position, const NoteSpriteMap &sprites) :
-    m_renderer(&renderer),
-    m_channel(channel),
+Note::Note(const double position, const Chart::Channel channel) :
+    m_vertices(),
     m_position(position),
-    m_sprites(sprites),
-    m_visible(true),
-    m_accuracy(Accuracy::None)
+    m_channel(channel),
+    m_line(*this),
+    m_hit(false)
 {
-    m_config = m_renderer->GetRenderSettings().Config;
+    for (int i = 0; i < m_vertices.size(); i++)
+        m_vertices[i] = nullptr;
 }
 
-Note::Note(const ChartRenderer &renderer, const Chart::Channel channel, const double position) :
-    m_renderer(&renderer),
-    m_channel(channel),
-    m_position(position),
-    m_config(nullptr),
-    m_visible(true),
-    m_accuracy(Accuracy::None)
+double Note::GetRenderPosition() const
 {
-    m_config = m_renderer->GetRenderSettings().Config;
+    return m_position;
+}
+
+Chart::Channel Note::GetChannel() const
+{
+    return m_channel;
+}
+
+NoteGuideLine* Note::GetGuideLine()
+{
+    return &m_line;
+}
+
+const std::array<sf::Vertex*, 6>& Note::GetVertices() const
+{
+    return m_vertices;
+}
+
+void Note::SetVertices(const std::array<sf::Vertex*, 6> &vertices)
+{
+    m_vertices = vertices;
+}
+
+const Gx::Sprite* Note::GetPrefab(const NoteShape shape) const
+{
+    if (const auto it = m_prefabs.find(shape); it != m_prefabs.end())
+        return it->second;
+
+    return nullptr;
+}
+
+void Note::SetPrefab(const NoteShape shape, Gx::Sprite &prefab)
+{
+    m_prefabs[shape] = &prefab;
 }
 
 bool Note::IsVisible() const
 {
-    return m_visible && m_accuracy == Accuracy::None;
+    return m_vertices[0] && m_vertices[0]->color.a > 0;
 }
 
 void Note::SetVisible(const bool visible)
 {
-    m_visible = visible;
+    for (const auto v : m_vertices)
+    {
+        if (!v)
+            break;
+
+        if (!visible)
+        {
+            v->position  = sf::Vector2f();
+            v->texCoords = sf::Vector2f();
+            v->color     = sf::Color::Transparent;
+        }
+        else
+            v->color = sf::Color::White;
+    }
 }
 
-Accuracy Note::GetJudgementAccuracy() const
+void Note::Hit()
 {
-    return m_accuracy;
+    m_hit = true;
 }
 
-void Note::Judge(const Accuracy accuracy)
+void Note::Render(const ChartRenderer &renderer, const double delta)
 {
-    if (accuracy == Accuracy::None || m_accuracy != Accuracy::None)
+    if (!m_vertices[0])
         return;
 
-    m_accuracy = accuracy;
+    const double latency = m_position - renderer.GetRenderPosition();
+    if (m_hit || latency > 5.f || latency < -0.5f)
+    {
+        if (IsVisible() && m_hit)
+        {
+            SetVisible(false);
+            GetGuideLine()->Render(renderer, delta);
+        }
+
+        return;
+    }
+
+    const Gx::Sprite* sprite = GetPrefab(renderer.GetRenderSettings().Config->NoteShapeType);
+    if (!sprite)
+    {
+        SetVisible(false);
+        GetGuideLine()->Render(renderer, delta);
+
+        return;
+    }
+
+    SetVisible(true);
+    GetGuideLine()->Render(renderer, delta);
+
+    const auto transform = sprite->GetTransform();
+    const auto position  = transform.transformPoint(sf::Vector2f(0, renderer.MapRenderPositionToPixels(GetChannel(), latency)));
+    const auto bounds    = transform.transformRect(sprite->GetLocalBounds());
+
+    UpdatePositions(m_vertices, position, bounds);
+    UpdateTexCoords(m_vertices, sprite->GetTexCoords());
 }
 
+void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &position, const sf::FloatRect &bounds)
+{
+    vertices[0]->position = sf::Vector2f(position.x, position.y);
+    vertices[1]->position = sf::Vector2f(position.x + bounds.width, position.y);
+    vertices[2]->position = sf::Vector2f(position.x + bounds.width, position.y + bounds.height);
+    vertices[3]->position = sf::Vector2f(position.x, position.y);
+    vertices[4]->position = sf::Vector2f(position.x + bounds.width, position.y + bounds.height);
+    vertices[5]->position = sf::Vector2f(position.x, position.y + bounds.height);
+}
+
+void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texcoords)
+{
+    const float left     = static_cast<float>(texcoords.left);
+    const float right    = left + static_cast<float>(texcoords.width);
+    const float top      = static_cast<float>(texcoords.top);
+    const float bottom   = top + static_cast<float>(texcoords.height);
+
+    vertices[0]->texCoords = sf::Vector2f(left, top);
+    vertices[1]->texCoords = sf::Vector2f(right, top);
+    vertices[2]->texCoords = sf::Vector2f(right, bottom);
+    vertices[3]->texCoords = sf::Vector2f(left, top);
+    vertices[4]->texCoords = sf::Vector2f(right, bottom);
+    vertices[5]->texCoords = sf::Vector2f(left, bottom);
+}
 
 Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    if (const auto position = GetPosition(); !IsVisible() || position.y < -50 || position.y > m_renderer->GetRenderSettings().Viewport + 50)
-        return states;
-
-    states.transform *= GetTransform();
-    if (const auto it = m_sprites.find(m_config->NoteShapeType); it != m_sprites.end())
+    for (const auto v : m_vertices)
     {
-        surface.Render(*it->second, states);
-
-        if (m_channel != Chart::Channel::BGM)
-        {
-            // TODO: GRID LENGTH
-            if (const auto length = m_config->NoteGuideLength * (m_renderer->GetBPM() / 60.f * 5.5f) *  m_renderer->GetSpeed(m_channel); length > 0)
-            {
-                const auto x1 = it->second->GetPosition().x;
-                const auto x2 = x1 + 1;
-
-                auto grid = sf::VertexArray(sf::PrimitiveType::TriangleStrip);
-                grid.append({ sf::Vector2f(x1, -length), sf::Color::Black });
-                grid.append({ sf::Vector2f(x2, -length), sf::Color::Black });
-                grid.append({ sf::Vector2f(x1, 0), sf::Color(125, 125, 125) });
-                grid.append({ sf::Vector2f(x2, 0), sf::Color(125, 125, 125) });
-                grid.append({ sf::Vector2f(x1, length), sf::Color::Black });
-                grid.append({ sf::Vector2f(x2, length), sf::Color::Black });
-                surface.Render(grid, states);
-
-                for (int i = 0; i < grid.getVertexCount(); i++)
-                    grid[i].position.x += it->second->GetLocalBounds().width;
-
-                surface.Render(grid, states);
-            }
-        }
+        if (!v)
+            return states;
     }
 
-    return RenderableContainer::Render(surface, states);
-}
-
-void Note::Update(const double delta)
-{
-    const double position = m_position - m_renderer->GetRenderPosition();
-    SetPosition(GetPosition().x, m_renderer->MapRenderPositionToPixels(m_channel, position));
-
-    UpdatableContainer::Update(delta);
+    surface.Render(m_vertices[0], m_vertices.size(), sf::PrimitiveType::Triangles, states);
+    return states;
 }

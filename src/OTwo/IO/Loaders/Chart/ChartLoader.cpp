@@ -130,7 +130,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (stream.read(&block, sizeof(NoteBlockHeader)) != sizeof(NoteBlockHeader))
                 throw Gx::ResourceLoadException("Failed to read the note block");
 
-            const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::BGM;
+            const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::Background;
             for (int i = 0; i < block.EventCount; i++)
             {
                 const double position = static_cast<double>(block.Measure) + (static_cast<double>(i) / static_cast<double>(block.EventCount));
@@ -169,7 +169,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 pan = ((pan - 1) / 14.0f) * 2.0f - 1.0f;
 
                 // Resolve the note type and ref id
-                auto type = note.Type % 8 > 3 ? Chart::NoteType::Sample : Chart::NoteType::Normal;
+                auto type = note.Type % 8 > 3 ? Chart::NoteType::Sample : Chart::NoteType::Tap;
                 const int id = (note.ID - 1) + (type == Chart::NoteType::Sample ? 1000 : 0);
                 switch(note.Type % 4)
                 {

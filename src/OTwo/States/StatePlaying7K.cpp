@@ -11,7 +11,7 @@
 #include <Genode/Utilities/Debugger.hpp>
 
 StatePlaying7K::StatePlaying7K() :
-    m_renderer(*this, {
+    m_renderer(*this, ChannelSet{
         Chart::Channel::Note1,
         Chart::Channel::Note2,
         Chart::Channel::Note3,
@@ -28,7 +28,7 @@ StatePlaying7K::StatePlaying7K() :
 
 StatePlaying7K::StatePlaying7K(State &&state) :
     State(std::move(state)),
-    m_renderer(*this, {
+    m_renderer(*this, ChannelSet{
         Chart::Channel::Note1,
         Chart::Channel::Note2,
         Chart::Channel::Note3,
@@ -67,17 +67,20 @@ void StatePlaying7K::Initialize()
     const auto metadata = m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty());
 
     const auto wave = Instantiate<Gx::Gauge>("IDC_GAUGE_WAVE");
-    wave->SetValue(50);
+    wave->SetValue(0);
 
     const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
-    jam->SetValue(50);
+    jam->SetValue(0);
 
     const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
-    lifeBar->SetValue(75);
+    lifeBar->SetValue(100);
 
     const auto menu = Instantiate<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
     const auto title = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
     title->SetString(metadata.Title);
+
+    if (const auto playIcon = menu->FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON"))
+        playIcon->SetDuration(sf::milliseconds((60000.f / metadata.BPM) * playIcon->GetFrameCount()) / 4.f);
 
     const auto level = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
     level->SetFrame(room.GetRoomLevelCode(true));
@@ -87,6 +90,18 @@ void StatePlaying7K::Initialize()
 
     const auto sfxVolBar = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
     sfxVolBar->SetValue(100);
+
+    const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
+    const auto avaContainers = avatarList->GetChildren();
+    unsigned int pIndex = 0;
+    for (const auto container : avaContainers)
+    {
+        const auto renderable = dynamic_cast<Gx::Renderable*>(container);
+        if (pIndex != 1)
+            renderable->SetVisible(false);
+
+        pIndex++;
+    }
 
     const auto noteClickList = Instantiate<Gx::UiContainer>("IDC_LIST_NOTE_CLICK");
     const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
@@ -152,8 +167,8 @@ void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
         if (code != ev.code)
             continue;
 
-        if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end())
-            noteClick->second->Reset();
+        // if (const auto noteClick = m_noteClicks.find(channel); noteClick != m_noteClicks.end())
+        //     noteClick->second->Reset();
 
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(true);
@@ -161,6 +176,7 @@ void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
             keyDown->second->SetVisible(true);
 
+        m_renderer.Input(channel, true);
         break;
     }
 }
@@ -196,14 +212,23 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
             keyDown->second->SetVisible(false);
 
+        m_renderer.Input(channel, false);
         break;
     }
 }
 
 Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
+    states =  State::Render(surface, states);
     m_renderer.Render(surface, states);
-    return State::Render(surface, states);
+
+    if (const auto menu = FindChild<Gx::Image>("IDC_IMAGE_PLAYING_MENU"); menu)
+    {
+        if (const auto playIcon = menu->FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON"))
+            playIcon->SetDuration(sf::milliseconds((60000.f / m_renderer.GetCurrentBPM()) * playIcon->GetFrameCount()) / 4.f);
+    }
+
+    return states;
 }
 
 const GameContext *StatePlaying7K::PrepareContext() const

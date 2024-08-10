@@ -26,3 +26,18 @@ void Gx::RenderTargetAdapter::Render(const sf::VertexBuffer &vertexBuffer, const
 {
     m_target->draw(vertexBuffer, firstVertex, vertexCount, states);
 }
+
+const sf::View & Gx::RenderTargetAdapter::GetDefaultView() const
+{
+    return m_target->getDefaultView();
+}
+
+const sf::View& Gx::RenderTargetAdapter::GetView() const
+{
+    return m_target->getView();
+}
+
+void Gx::RenderTargetAdapter::SetView(const sf::View &view)
+{
+    m_target->setView(view);
+}

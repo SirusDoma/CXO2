@@ -1,20 +1,23 @@
 #include <OTwo/Chart/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
-#include <OTwo/Chart/Note.hpp>
-#include <OTwo/Chart/LongNote.hpp>
+#include <OTwo/Chart/NoteContainer.hpp>
+#include <OTwo/Chart/NoteFactory.hpp>
 
 #include <Genode/Utilities/Randomizer.hpp>
 
-ChartRenderer::ChartRenderer(State &state, const std::initializer_list<Chart::Channel> instantiables) :
+ChartRenderer::ChartRenderer(State &state, const ChannelSet &instantiables) :
     m_parent(&state),
     m_container(),
     m_chart(),
     m_settings(),
     m_instantiables(instantiables),
     m_speeds(),
+    m_sounds(),
     m_timer(),
     m_prefabs(),
+    m_events(),
+    m_frontBuffers(),
     m_currentTime(0),
     m_refTime(0),
     m_refPosition(0),
@@ -44,83 +47,39 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
     m_chart    = &chart;
     m_settings = settings;
 
-    // Setup note container
-    // TODO: CREATE NOTE-FACTORY CLASS, USE VERTEX BUFFER AND STATIC RENDER BATCHING
-    if (!m_container)
-    {
-        if (m_container = m_parent->FindChild<Gx::RenderBatchContainer>("IDC_CONTAINER_NOTE"); !m_container)
-        {
-            m_container = m_parent->Create<Gx::RenderBatchContainer>();
-            m_parent->AddChild(m_container);
-        }
-    }
-
     // Set-up Speed
     const auto speed = settings.Speed;
     for (auto channel : Chart::NoteChannels)
     {
         if (speed == XrSpeed)
         {
-            if (channel == Chart::Channel::BGM)
+            if (channel == Chart::Channel::Background)
                 m_speeds[channel] = 1.0f;
             else
                 m_speeds[channel] = SupportedHiSpeeds[Gx::Randomizer::Randomize(0, static_cast<int>(SupportedHiSpeeds.size()) - 1)];
         }
         else
             m_speeds[channel] = speed;
-    }
 
-    // Load notes templates
-    for (auto channel : m_instantiables)
-    {
-        const int key = static_cast<Gx::Uint16>(channel) - 1;
-        if (key <= 0 || key >= 8)
-            continue;
-
-        m_prefabs[channel] = {};
-        m_prefabs[channel][Chart::NoteType::Normal] = {
-            { NoteShape::Square, m_parent->FindResource<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_1") },
-            { NoteShape::Circle, m_parent->FindResource<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_2") },
-        };
-        m_prefabs[channel][Chart::NoteType::Hold] = {
-            { NoteShape::Square, m_parent->FindResource<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_1") },
-            { NoteShape::Circle, m_parent->FindResource<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_2") },
-        };
-    }
-
-    const auto events = chart.GetEvents(settings.Difficulty);
-
-    // Instantiate measure
-    const auto max = *std::max_element(events.begin(), events.end(), [] (auto a, auto b) { return a->Position < b->Position; });
-    NoteSpriteMap measure = {
-        { NoteShape::Square, m_parent->FindResource<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE") },
-        { NoteShape::Circle, m_parent->FindResource<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE") }
-    };
-    for (int i = 0; i < std::ceil(max->Position) + 1; i++)
-    {
-        const auto node = m_parent->Create<Note>(*this, Chart::Channel::BGM, static_cast<double>(i), measure);
-        m_container->AddChild(node);
-    }
-
-    // Instantiate note objects
-    m_events.clear();
-    for (Chart::Event *ev : events)
-    {
-        m_events.push_back(EventState{ ev });
-        if (ev->IsPlayable())
+        if (m_instantiables.find(channel) != m_instantiables.end())
         {
-            if (const auto note  = static_cast<Chart::NoteEvent*>(ev); note->Type == Chart::NoteType::Normal)
-            {
-                const auto node = m_parent->Create<Note>(*this, *note, m_prefabs[note->Channel][note->Type]);
-                m_container->AddChild(node);
-            }
-            else if (note->Type == Chart::NoteType::Hold)
-            {
-                const auto node = m_parent->Create<LongNote>(*this, *note, m_prefabs[note->Channel][note->Type], m_prefabs[note->Channel][Chart::NoteType::Normal]);
-                m_container->AddChild(node);
-            }
+            m_inputs[channel] = false;
+            m_frontBuffers[channel] = nullptr;
         }
     }
+
+    // Create Note Container with Note Factory
+    const auto factory = NoteFactory(
+        m_parent->GetResources(ResourceScope::Immediate),
+        m_parent->GetResources(ResourceScope::Local),
+        m_instantiables
+    );
+    m_container = factory.Generate(chart, settings);
+
+    // Register events for processing
+    m_events.clear();
+    for (Chart::Event *ev : m_chart->GetEvents(settings.Difficulty))
+        m_events.push_back(EventState{ ev });
 
     // Set-up rendering states
     m_currentTime = 0;
@@ -144,17 +103,8 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     // Update note animation
-    for (auto channel : m_instantiables)
-    {
-        for (auto type : { Chart::NoteType::Normal, Chart::NoteType::Hold })
-        {
-            for (auto shape : { NoteShape::Square, NoteShape::Circle })
-            {
-                const auto instance = static_cast<Gx::Updatable*>(m_prefabs[channel][type][shape]);
-                instance->Update(states.Delta);
-            }
-        }
-    }
+    for (const auto updatable : m_container->GetRegisteredPrefabs())
+        updatable->Update(states.Delta);
 
     // TODO: Gameplay
     for (auto &ev : m_events)
@@ -181,7 +131,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                 m_refPosition  = time->Position;
                 m_bpm          = time->Value;
             }
-            else if (ev->Channel == Chart::Channel::BGM)
+            else if (ev->Channel == Chart::Channel::Background)
             {
                 if (const auto bgm = static_cast<Chart::NoteEvent*>(ev.Event); bgm->Sample)
                 {
@@ -193,30 +143,51 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
         else
         {
+            if (const auto front = m_frontBuffers[ev->Channel]; !front || latency < 1.f / 16.f)
+                m_frontBuffers[ev->Channel] = &ev;
+
             if (latency > 0)
                 continue;
 
-            if (const auto note = static_cast<Chart::NoteEvent*>(ev.Event); note->Sample)
+            if (latency < -0.5f)
             {
-                auto& mixer = m_parent->GetApplication().Require<Gx::Mixer>();
-                const auto sound = m_parent->Create<sf::Sound>(*note->Sample);
-                mixer.Play(sound, "BGM");
-
-                ev.Accuracy = Accuracy::Cool;
+                ev.Accuracy = Accuracy::Miss;
                 ev.Latency  = latency;
             }
         }
     }
 
-
-    auto va = sf::VertexArray(sf::PrimitiveType::Lines, 3);
-    va.append({ sf::Vector2f(300, -5.5f), sf::Color::Black });
-    va.append({ sf::Vector2f(300, 0.f), sf::Color::White });
-    va.append({ sf::Vector2f(300, 5.5f), sf::Color::Black });
-
-    surface.Render(va, states);
+    m_container->Render(*this, states.Delta);
+    surface.Render(*m_container, states);
 
     return states;
+}
+
+void ChartRenderer::Input(const Chart::Channel channel, const bool pressed)
+{
+    if (const auto it = m_inputs.find(channel); it != m_inputs.end() && it->second == pressed)
+        return;
+
+    m_inputs[channel] = pressed;
+    if (const auto front = m_frontBuffers[channel]; front)
+    {
+        const auto note = static_cast<Chart::NoteEvent*>(front->Event);
+        if (!pressed || !note->Sample)
+            return;
+
+        auto& mixer = m_parent->GetApplication().Require<Gx::Mixer>();
+        if (m_sounds.find(note->ID) == m_sounds.end())
+            m_sounds[note->ID] = m_parent->Create<sf::Sound>(*note->Sample);
+
+        mixer.Play(m_sounds[note->ID], "BGM");
+        if (note->Position - GetRenderPosition() < 1.f / 16.f)
+        {
+            m_container->GetNote(front->Event->Channel, front->Event->Position)->Hit();
+
+            front->Accuracy = Accuracy::Cool;
+            front->Latency  = 0;
+        }
+    }
 }
 
 const ChartRenderer::RenderSettings &ChartRenderer::GetRenderSettings() const
@@ -242,23 +213,17 @@ double ChartRenderer::GetRenderPosition() const
     return ((m_currentTime - m_refTime) / TickSignature * m_bpm) + m_refPosition;
 }
 
-double ChartRenderer::GetBPM() const
+double ChartRenderer::GetCurrentBPM() const
 {
     return m_bpm;
 }
 
-bool ChartRenderer::InRenderProximity(const double position) const
-{
-    const double distance = position - GetRenderPosition();
-    return distance < std::ceil(m_settings.Viewport / DefaultMeasureHeight) + 0.1f || distance > -0.1f;
-}
-
-int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool relative) const
+int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool absolute) const
 {
     float speed = 1.0f;
     if (const auto it = m_speeds.find(channel); it != m_speeds.end())
         speed = it->second;
 
     const unsigned int pixels = (position * (static_cast<float>(DefaultMeasureHeight) * speed));
-    return relative ? pixels : m_settings.Viewport - pixels;
+    return absolute ? pixels : m_settings.Viewport - pixels;
 }

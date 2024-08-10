@@ -26,6 +26,10 @@ namespace Gx
                     const RenderStates&     states = RenderStates::Default
         ) override;
 
+        const sf::View& GetDefaultView() const override;
+        const sf::View& GetView() const override;
+        void SetView(const sf::View &view) override;
+
     private:
         sf::RenderTarget *m_target = nullptr;
     };

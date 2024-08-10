@@ -16,6 +16,14 @@ namespace Gx
         float Layer                = 0.f;
 
         static const RenderStates Default;
+        
+        // ReSharper disable CppNonExplicitConvertingConstructor
+        RenderStates(const sf::BlendMode& blendMode);
+        RenderStates(const sf::StencilMode& stencilMode);
+        RenderStates(const sf::Transform& transform);
+        RenderStates(const sf::Texture* texture);
+        RenderStates(const sf::Shader* shader);
+        // ReSharper restore CppNonExplicitConvertingConstructor
 
         explicit RenderStates(const sf::RenderStates &states, unsigned int frameID = 0, double delta = 0);
 

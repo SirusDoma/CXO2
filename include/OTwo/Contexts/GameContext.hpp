@@ -29,8 +29,8 @@ public:
     float GetSpeed() const;
     void SetSpeed(float speed);
 
-    int GetViewport() const;
-    void SetViewport(int viewport);
+    unsigned int GetViewport() const;
+    void SetViewport(unsigned int viewport);
 
     void Reset();
 
@@ -40,7 +40,7 @@ private:
     Difficulty m_difficulty;
     GameMode m_mode;
     float m_speed;
-    int m_viewport;
+    unsigned int m_viewport;
 
     // TODO: Skill modifiers
 };

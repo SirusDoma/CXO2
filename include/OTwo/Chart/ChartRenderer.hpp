@@ -5,47 +5,49 @@
 #include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
-#include <Genode/Entities/Updatable.hpp>
 #include <Genode/Graphics/Animation.hpp>
 
 #include <unordered_map>
 
-using NoteSpriteMap = std::unordered_map<NoteShape, Gx::Sprite*>;
+using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
+using ChannelSet = std::unordered_set<Chart::Channel>;
+using SpeedMap = std::unordered_map<Chart::Channel, float>;
+
+class NoteContainer;
 class ChartRenderer : public Gx::Renderable
 {
 public:
     struct RenderSettings
     {
-        GameConfig *Config;
-        int         Viewport;
-        float       Speed;
-        Difficulty  Difficulty;
+        GameConfig   *Config;
+        unsigned int  Viewport;
+        float         Speed;
+        Difficulty    Difficulty;
 
         // TODO: Modifiers
     };
 
     static constexpr unsigned int DefaultMeasureHeight = 384;
 
-    explicit ChartRenderer(State &state, std::initializer_list<Chart::Channel> instantiables = {});
+    explicit ChartRenderer(State &state, const ChannelSet &instantiables = {});
 
     void Render(const Chart &chart, const GameContext &context);
     void Render(const Chart &chart, const RenderSettings &settings);
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    void Input(Chart::Channel channel, bool pressed);
 
     const RenderSettings &GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
     double GetCurrentTime() const;
     double GetRenderPosition() const;
-    double GetBPM() const;
+    double GetCurrentBPM() const;
 
-    bool InRenderProximity(double position) const;
-    int MapRenderPositionToPixels(Chart::Channel channel, double position, bool relative = false) const;
+    int MapRenderPositionToPixels(Chart::Channel channel, double position, bool absolute = false) const;
 
 private:
-    // Beat interval per millisecond in 1/4 note
+    // Measure interval per millisecond @ 60bpm in 1/4 note
     static constexpr double TickSignature = 60000.f * 4.f;
 
     struct EventState
@@ -57,20 +59,27 @@ private:
         Chart::Event *operator->() const { return Event; }
     };
 
-    using PrefabMap      = std::unordered_map<Chart::Channel, std::unordered_map<Chart::NoteType, NoteSpriteMap>>;
+    using PrefabMap      = std::unordered_map<Chart::Channel, std::unordered_map<Chart::NoteType, NotePrefabMap>>;
     using EventStateList = std::vector<EventState>;
+    using FrontBufferMap = std::unordered_map<Chart::Channel, EventState*>;
+    using InputStateMap  = std::unordered_map<Chart::Channel, bool>;
+    using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
     State *m_parent;
-    Gx::RenderBatchContainer *m_container;
+    NoteContainer* m_container;
+
     const Chart *m_chart;
     RenderSettings m_settings;
 
-    std::vector<Chart::Channel> m_instantiables;
-    std::unordered_map<Chart::Channel, float> m_speeds;
+    ChannelSet m_instantiables;
+    SpeedMap m_speeds;
+    InputStateMap m_inputs;
+    SoundMap m_sounds;
 
-    mutable sf::Clock m_timer;
+    sf::Clock m_timer;
     mutable PrefabMap m_prefabs;
     mutable EventStateList m_events;
+    mutable FrontBufferMap m_frontBuffers;
     mutable double m_currentTime;
     mutable double m_refTime;
     mutable double m_refPosition;

@@ -30,6 +30,7 @@ struct GameConfig : Gx::Provider
         EffectVolume    = src.EffectVolume;
         NoteShapeType   = src.NoteShapeType;
         NoteGuideLength = src.NoteGuideLength;
+        PollingRate     = src.PollingRate;
         KeyBindings     = src.KeyBindings;
     }
 
@@ -40,8 +41,9 @@ struct GameConfig : Gx::Provider
         UseWindowCursor = false;
         MusicVolume     = 100;
         EffectVolume    = 100;
-        NoteShapeType            = NoteShape::Square,
+        NoteShapeType   = NoteShape::Square,
         NoteGuideLength = 0,
+        PollingRate     = 1000; // hz
         KeyBindings     = {
             {
                 KeyMode::Seven,
@@ -85,6 +87,8 @@ struct GameConfig : Gx::Provider
 
     NoteShape NoteShapeType;
     unsigned int NoteGuideLength;
+
+    unsigned int PollingRate;
 
     std::map<KeyMode, std::map<Chart::Channel, sf::Keyboard::Key>> KeyBindings;
 };

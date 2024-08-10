@@ -36,7 +36,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
 
         // Rewire resource manager to the local scene
         auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
+        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
         ObjectLoader::Load(name, reference, populator, ctx);
     }
@@ -45,7 +45,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
     {
         // Rewire resource manager to the local scene
         auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
+        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
         ObjectLoader::Load(name, object, populator, ctx);
     }

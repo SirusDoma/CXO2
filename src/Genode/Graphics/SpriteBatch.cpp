@@ -160,6 +160,21 @@ namespace Gx
         throw NotSupportedException("Vertex Buffer is already live in GPU Memory.");
     }
 
+    const sf::View & SpriteBatch::GetDefaultView() const
+    {
+        throw NotSupportedException("SpriteBatch does not have a view.");
+    }
+
+    const sf::View & SpriteBatch::GetView() const
+    {
+        throw NotSupportedException("SpriteBatch does not have a view.");
+    }
+
+    void SpriteBatch::SetView(const sf::View &view)
+    {
+        throw NotSupportedException("SpriteBatch does not have a view.");
+    }
+
     ////////////////////////////////////////////////////////////
     void SpriteBatch::PushTriangle(const sf::Vertex&    a,
                                    const sf::Vertex&    b,

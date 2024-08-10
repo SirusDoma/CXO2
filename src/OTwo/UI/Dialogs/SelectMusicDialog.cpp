@@ -484,7 +484,9 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
                         {
                             if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
                             {
-                                next->SetCheckedState(true);
+                                if (next->IsVisible() && next->IsEnabled())
+                                    next->SetCheckedState(true);
+
                                 break;
                             }
                         }

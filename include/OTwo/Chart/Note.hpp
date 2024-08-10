@@ -1,42 +1,57 @@
 #ifndef O2JAM_CHART_NOTE_HPP
 #define O2JAM_CHART_NOTE_HPP
 
+
 #include <OTwo/Chart/Chart.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
-#include <OTwo/Models/Game.hpp>
+#include <OTwo/Config/GameConfig.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
-#include <Genode/SceneGraph/RenderableContainer.hpp>
-#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/Entities/Renderable.hpp>
+#include <Genode/Graphics/Sprite.hpp>
+#include <OTwo/Chart/NoteGuideLine.hpp>
 
-class Note : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
+static constexpr unsigned int DefaultMeasureHeight = 384;
+
+class ChartRenderer;
+class Note : public Gx::Renderable
 {
 public:
-    Note(const ChartRenderer &renderer, const Chart::Event &ev, const NoteSpriteMap &sprites);
-    Note(const ChartRenderer &renderer, Chart::Channel channel, double position, const NoteSpriteMap &sprites);
+    explicit Note(const Chart::NoteEvent& ev);
+    explicit Note(double position, Chart::Channel channel = Chart::Channel::Background);
+
+    double GetRenderPosition() const;
+    Chart::Channel GetChannel() const;
+    NoteGuideLine* GetGuideLine();
+
+    const std::array<sf::Vertex*, 6>& GetVertices() const;
+    void SetVertices(const std::array<sf::Vertex*, 6>& vertices);
+
+    const Gx::Sprite* GetPrefab(NoteShape shape) const;
+    void SetPrefab(NoteShape shape, Gx::Sprite& prefab);
 
     bool IsVisible() const override;
-    void SetVisible(bool visible) override;
+    void SetVisible(const bool visible) override;
 
-    Accuracy GetJudgementAccuracy() const;
-    void Judge(Accuracy accuracy);
+    void Hit();
+    virtual void Render(const ChartRenderer &renderer, double delta);
 
 protected:
-    Note(const ChartRenderer &renderer, const Chart::Channel channel, const double position);
+    using VerticesPtr = std::array<sf::Vertex*, 6>;
+    using PrefabMap   = std::unordered_map<NoteShape, Gx::Sprite*>;
 
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
-    void Update(const double delta) override;
-
-    const ChartRenderer  *m_renderer;
-    const Chart::Channel  m_channel;
-    const double          m_position;
-    GameConfig           *m_config;
+    static void UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &position, const sf::FloatRect &bounds);
+    static void UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texcoords);
 
 private:
-    NoteSpriteMap         m_sprites;
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
-    bool m_visible;
-    Accuracy m_accuracy;
+    VerticesPtr    m_vertices;
+    PrefabMap      m_prefabs;
+    double         m_position;
+    Chart::Channel m_channel;
+    NoteGuideLine  m_line;
+    bool           m_hit;
 };
 
-#endif
+using Measure = Note;
+
+#endif //NOTE_HPP

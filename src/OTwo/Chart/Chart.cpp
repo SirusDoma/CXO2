@@ -72,7 +72,7 @@ void Chart::SortEvents()
                     if (ev->IsPlayable())
                         holds[note->Channel] = note;
                     else
-                        note->Type = NoteType::Normal;
+                        note->Type = NoteType::Tap;
                 }
                 else if (note->Type == NoteType::Release)
                 {
@@ -82,7 +82,7 @@ void Chart::SortEvents()
                         continue;
                     }
                     else
-                        note->Type = NoteType::Normal;
+                        note->Type = NoteType::Tap;
                 }
 
                 ++it;

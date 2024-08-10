@@ -33,7 +33,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     state->SetName(meta.Name);
     state->SetViewport(metadata->Viewport);
 
-    auto ctx  = static_cast<const PlayingResourceContext&>(Gx::ResourceContext::MakeAvailable(context, state->GetLocalResources()));
+    auto ctx  = static_cast<const PlayingResourceContext&>(Gx::ResourceContext::MakeAvailable(context, state->GetResources()));
     auto maps = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
@@ -53,7 +53,9 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
 
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE", std::string(), ctx, 1);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1", std::string(), ctx, 1);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE2", std::string(), ctx, 1);
+
     for (int i = 1; i <= 7; i++) // Channel
     {
         for (int s = 1; s <= 2; s++) // Shape (Square, Circle)
@@ -68,7 +70,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     {
         // Rewire resource manager to the local scene
         auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext(name, state->GetLocalResources(), context.GetCacheMode());
+        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
         ObjectLoader::Load(name, object, populator, ctx);
     }

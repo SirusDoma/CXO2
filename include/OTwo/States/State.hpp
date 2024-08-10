@@ -48,7 +48,7 @@ public:
     template<typename R>
     R* FindResource(const std::string &id, ResourceScope scope = ResourceScope::Local);
 
-    Gx::ResourceManager &GetLocalResources() const;
+    Gx::ResourceManager &GetResources(ResourceScope scope = ResourceScope::Local) const;
     bool Close(bool quit) override;
 
 protected:
