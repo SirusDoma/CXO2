@@ -140,8 +140,11 @@ namespace Gx
     void LocalFileSystem::SetWorkingDirectory(const std::string &inputPath)
     {
         auto workingDir = path(inputPath);
+
+#ifdef __APPLE__
         if (workingDir.has_filename() || workingDir.has_extension())
             workingDir = workingDir.parent_path();
+#endif
 
         if (!exists(workingDir))
             return;
