@@ -1,7 +1,7 @@
 #ifndef O2JAM_MODELS_ROOM_HPP
 #define O2JAM_MODELS_ROOM_HPP
 
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Models/Character.hpp>
@@ -11,11 +11,11 @@
 #include <string>
 #include <vector>
 
-enum class KeyMode
+enum class KeyMode : std::size_t
 {
-    Three,
-    Five,
-    Seven
+    Three = 3,
+    Five  = 5,
+    Seven = 7
 };
 
 enum class RoomState

@@ -19,8 +19,8 @@ namespace Gx
         using SceneFactory = std::function<std::unique_ptr<Scene>(const ResourceContext&)>;
 
         SceneDirector(SceneDirector &&director) noexcept;
-        SceneDirector(Application &app, sf::RenderTarget &target);
-        SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene);
+        SceneDirector(Application &app);
+        SceneDirector(Application &app, Scene &scene);
         ~SceneDirector() override;
 
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
@@ -58,7 +58,6 @@ namespace Gx
         void Stage();
         void Unstage();
 
-        const sf::RenderTarget *m_target;
         Application            *m_application;
         SceneFactoryMap         m_factories;
         SceneCacheMap           m_caches;

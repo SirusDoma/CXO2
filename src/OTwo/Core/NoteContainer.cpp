@@ -1,18 +1,21 @@
-#include <OTwo/Chart/NoteContainer.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/NoteContainer.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 NoteContainer::NoteContainer() :
     m_noteVertices(sf::PrimitiveType::Triangles),
     m_measureVertices(sf::PrimitiveType::Triangles),
     m_guideLineVertices(sf::PrimitiveType::Lines),
     m_notes(),
-    m_shape(NoteShape::Square)
+    m_shape(NoteShape::Square),
+    m_lastMeasure()
 {
 }
 
 void NoteContainer::Add(Note& note)
 {
     m_notes[note.GetRenderPosition()].push_back(&note);
+    if (const auto position = static_cast<unsigned int>(std::ceil(note.GetRenderPosition())); m_lastMeasure < position)
+        m_lastMeasure = position;
 }
 
 Note *NoteContainer::GetNote(const Chart::Channel channel, const double position) const
@@ -75,6 +78,19 @@ void NoteContainer::RegisterPrefab(Gx::Updatable &prefab)
 std::unordered_set<Gx::Updatable*> NoteContainer::GetRegisteredPrefabs()
 {
     return m_prefabs;
+}
+
+unsigned int NoteContainer::GetLastMeasure() const
+{
+    return m_lastMeasure;
+}
+
+void NoteContainer::Update(const double delta)
+{
+    for (const auto updatable : GetRegisteredPrefabs())
+        updatable->Update(delta);
+
+    UpdatableContainer::Update(delta);
 }
 
 void NoteContainer::Render(const ChartRenderer &renderer, const double delta)

@@ -2,8 +2,8 @@
 #define O2JAM_STATE_PLAYING_7K_HPP
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/Chart/Chart.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/Chart.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
@@ -39,8 +39,6 @@ private:
 
     const GameContext *m_context;
     GameConfig *m_config;
-
-    AnimationMap m_noteClicks;
     ImageMap m_keyDowns, m_keyEffects;
 
     unsigned int m_viewport;

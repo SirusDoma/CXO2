@@ -53,8 +53,11 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
 
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1", std::string(), ctx, 1);
-    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE2", std::string(), ctx, 1);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_PLAYING_MENU",   std::string(), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_LIST_NOTE_CLICK",      std::string(), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_LIST_LONG_NOTE_EFFECT",std::string(), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1",  std::string(), ctx, 1);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE2",  std::string(), ctx, 1);
 
     for (int i = 1; i <= 7; i++) // Channel
     {
@@ -64,6 +67,18 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
             LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_LONG"   + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
         }
     }
+
+    auto sfxSuffix = std::string();
+    if (ctx.IsFxEnabled())
+        sfxSuffix = std::to_string(mapID);
+
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COMBO", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_NUMBER_NOTE_COMBO", sfxSuffix, ctx);
+
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COOL", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_GOOD", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_BAD", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_MISS", sfxSuffix, ctx);
 
     auto populator = ObjectPopulator::Decorate(state.get());
     for (auto [key, object] : metadata->Objects)
@@ -88,20 +103,27 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     else
         throw Gx::ResourceAccessException("IDC_CONTAINER_NOTE_JAM");
 
-    if (auto comboContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_COMBO"); comboContainer)
+    if (auto longNoteEffectList = state->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
     {
-        auto suffix = std::string();
-        if (ctx.IsFxEnabled())
-            suffix = std::to_string(mapID);
+        for (auto child :longNoteEffectList->GetChildren())
+        {
+            if (auto animation = dynamic_cast<Gx::Animation*>(child); animation)
+            {
+                for (auto i = 0; i < animation->GetFrameCount(); i++)
+                {
+                    auto &frame    = animation->GetFrame(i);
+                    frame.Position = animation->GetPosition();
+                    frame.Origin   = animation->GetOrigin();
+                }
+            }
+        }
 
-        LoadRequiredResource(ObjectPopulator::Decorate(comboContainer), metadata, "IDC_ANIMATION_NOTE_COMBO", suffix, ctx);
-        LoadRequiredResource(ObjectPopulator::Decorate(comboContainer), metadata, "IDC_NUMBER_NOTE_COMBO", suffix, ctx);
-        comboContainer->SetVisible(false);
+        longNoteEffectList->SetBatchingEnabled(true);
     }
     else
-        throw Gx::ResourceAccessException("IDC_CONTAINER_COMBO");
+        throw Gx::ResourceAccessException("IDC_LIST_LONG_NOTE_EFFECT");
 
-    if (auto noteClickList = state->FindChild<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    if (auto noteClickList = state->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
     {
         LoadRequiredResource(ObjectPopulator::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID()), ctx, 7);
         for (auto child :noteClickList->GetChildren())
@@ -110,9 +132,9 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
             {
                 for (auto i = 0; i < animation->GetFrameCount(); i++)
                 {
-                    auto &frame = animation->GetFrame(i);
+                    auto &frame    = animation->GetFrame(i);
                     frame.Position = animation->GetPosition();
-                    frame.Origin = { frame.TexCoords.width / 2.f, frame.TexCoords.height / 2.f };
+                    frame.Origin   = animation->GetOrigin();
                 }
             }
         }

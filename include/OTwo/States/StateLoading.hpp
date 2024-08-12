@@ -3,7 +3,7 @@
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/IO/PlayingResourceContext.hpp>
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 
 class StateLoading : public State
 {

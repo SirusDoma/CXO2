@@ -5,35 +5,32 @@ namespace Gx
 {
     SceneDirector::SceneDirector(SceneDirector &&director) noexcept :
         m_application(director.m_application),
-        m_target(director.m_target),
-        m_currentScene(std::move(director.m_currentScene)),
-        m_nextScene(std::move(director.m_nextScene)),
         m_factories(std::move(director.m_factories)),
         m_caches(std::move(director.m_caches)),
-        m_staged(),
-        m_cacheEnabled()
+        m_currentScene(std::move(director.m_currentScene)),
+        m_nextScene(std::move(director.m_nextScene)),
+        m_cacheEnabled(),
+        m_staged()
     {
     }
 
-    SceneDirector::SceneDirector(Application &app, sf::RenderTarget &target, Scene &scene) :
+    SceneDirector::SceneDirector(Application &app, Scene &scene) :
         m_application(&app),
-        m_target(&target),
+        m_factories(),
+        m_caches(),
         m_currentScene(&scene),
-        m_factories(),
-        m_caches(),
-        m_staged(),
-        m_cacheEnabled()
+        m_cacheEnabled(),
+        m_staged()
     {
     }
 
-    SceneDirector::SceneDirector(Application &app, sf::RenderTarget &target) :
+    SceneDirector::SceneDirector(Application &app) :
         m_application(&app),
-        m_target(&target),
-        m_currentScene(),
         m_factories(),
         m_caches(),
-        m_staged(),
-        m_cacheEnabled()
+        m_currentScene(),
+        m_cacheEnabled(),
+        m_staged()
     {
     }
 
@@ -49,8 +46,9 @@ namespace Gx
             m_nextScene = nullptr;
 
             m_currentScene->SetDirector(*this);
-            if (m_target)
-                m_currentScene->SetView(m_target->getView());
+
+            const sf::RenderTarget& target = *m_application;
+            m_currentScene->SetView(target.getView());
 
             m_currentScene->Initialize();
             m_staged = true;

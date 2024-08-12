@@ -129,7 +129,10 @@ R *State::FindResource(const std::string &id, const ResourceScope scope)
     if (!resources)
         return nullptr;
 
-    return resources->Find<R>(id);
+    if (auto resource = resources->Find<R>(id); resource)
+        return resource;
+
+    return resources->Find<R>(GetName() + "/" + id);
 }
 
 

@@ -1,7 +1,7 @@
-#ifndef O2JAM_CHART_LONG_NOTE_HPP
-#define O2JAM_CHART_LONG_NOTE_HPP
+#ifndef O2JAM_CORE_LONG_NOTE_HPP
+#define O2JAM_CORE_LONG_NOTE_HPP
 
-#include <OTwo/Chart/Note.hpp>
+#include <OTwo/Core/Note.hpp>
 
 class LongNote : public Note
 {

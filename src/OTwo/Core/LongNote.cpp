@@ -1,5 +1,5 @@
-#include <OTwo/Chart/LongNote.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/LongNote.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 LongNote::LongNote(const Chart::NoteEvent &ev) :
     LongNote(ev.Position, ev.Length, ev.Channel)

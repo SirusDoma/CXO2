@@ -13,7 +13,7 @@ State::State() :
     LoadCommonResources();
 }
 
-State::State(State &&state) :
+State::State(State &&state) noexcept :
     Scene(state)
 {
     LoadCommonResources();

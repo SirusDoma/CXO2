@@ -1,13 +1,12 @@
-#ifndef O2JAM_CHART_NOTE_HPP
-#define O2JAM_CHART_NOTE_HPP
+#ifndef O2JAM_CORE_NOTE_HPP
+#define O2JAM_CORE_NOTE_HPP
 
-
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
-#include <OTwo/Chart/NoteGuideLine.hpp>
+#include <OTwo/Core/NoteGuideLine.hpp>
 
 static constexpr unsigned int DefaultMeasureHeight = 384;
 

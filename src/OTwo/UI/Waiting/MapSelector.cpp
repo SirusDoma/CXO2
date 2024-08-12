@@ -81,7 +81,7 @@ unsigned int MapSelector::GetEffectID() const
     return m_effectID;
 }
 
-void MapSelector::SetMapID(int mapID)
+void MapSelector::SetMapID(int mapID, const bool silent)
 {
     const auto parent = GetParent<::State>();
     if (!parent)
@@ -135,13 +135,14 @@ void MapSelector::SetMapID(int mapID)
     if (animation)
         animation->SetVisible(true);
 
-    mixer.Play(sfxNavigate);
+    if (!silent)
+        mixer.Play(sfxNavigate);
 
     if (m_mapCallback)
         m_mapCallback(m_mapID);
 }
 
-void MapSelector::SetEffectID(unsigned int effectID)
+void MapSelector::SetEffectID(const unsigned int effectID)
 {
     if (m_effectID == effectID)
         return;

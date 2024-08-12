@@ -28,11 +28,9 @@ namespace Gx
         //static Sequence* Routine(T* task, unsigned int count, sf::Time delay = sf::Time::Zero);
         static std::initializer_list<Task*> ListOf(std::initializer_list<Task*> &&tasks);
 
-        void Reset() override;
-
-    protected:
         void Update(double delta) override;
         void Complete() override;
+        void Reset() override;
 
     private:
         std::vector<Task*>::iterator m_iterator;

@@ -1,8 +1,12 @@
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Contexts/SessionContext.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+
 #include <OTwo/Models/Game.hpp>
+
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+
+#include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/MusicSelectionContext.hpp>
 
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
@@ -34,8 +38,9 @@ void SelectMusicDialog::Initialize()
     if (m_initialized)
         return;
 
-    auto& app     = Gx::Application::Instance();
-    auto& session = app.Require<SessionContext>();
+    auto& app       = Gx::Application::Instance();
+    auto& session   = app.Require<SessionContext>();
+    auto& selection = app.Require<MusicSelectionContext>();
 
     m_page = 0;
     m_musicList = session.GetInstalledMusic();
@@ -43,8 +48,16 @@ void SelectMusicDialog::Initialize()
     for (auto& metadata : m_musicList)
         m_displayList.push_back(&metadata);
 
+    m_random = selection.GetRandomLevel();
+    m_difficulty = selection.GetDifficulty();
+    m_speed = selection.GetSpeed();
     if (!m_displayList.empty())
-        m_music = *m_displayList[m_displayList.size() / 2];
+    {
+        if (selection.GetMetadata().ID != 0)
+            m_music = selection.GetMetadata();
+        else
+            m_music = *m_displayList[m_displayList.size() - 1];
+    }
 
     auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
     if (leftButton)
@@ -360,12 +373,6 @@ void SelectMusicDialog::Initialize()
 
     if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
     {
-        if (auto speedButton = speedSelector->FindChild<Gx::RadioButton>("IDC_RADIO_SPEED_10"); speedButton)
-        {
-            speedButton->SetCheckedState(true);
-            m_speed = 1.f;
-        }
-
         for (auto child : speedSelector->GetChildren())
         {
             auto button = dynamic_cast<Gx::RadioButton*>(child);
@@ -406,6 +413,9 @@ void SelectMusicDialog::Initialize()
                     continue;
             }
 
+            if (speed == m_speed)
+                button->SetCheckedState(true);
+
             button->SetCheckStateChangeCallback([this, speed] (auto sender)
             {
                 if (!sender->IsChecked())
@@ -416,7 +426,7 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    Sort(MusicSortMode::Level, MusicSortOrder::Ascending);
+    Sort(selection.GetSortMode(), selection.GetSortOrder());
 }
 
 void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
@@ -524,6 +534,87 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
     }
 }
 
+void SelectMusicDialog::OnShown(Gx::Scene &scene)
+{
+    Dialog::OnShown(scene);
+
+    auto& app             = scene.GetApplication();
+    const auto& session   = app.Require<SessionContext>();
+    const auto& selection = app.Require<MusicSelectionContext>();
+
+    m_musicList = session.GetInstalledMusic();
+    if (selection.GetMetadata().ID != 0)
+        m_music = selection.GetMetadata();
+    else
+        m_music = m_musicList[m_musicList.size() - 1];
+
+    m_random = selection.GetRandomLevel();
+    m_difficulty = selection.GetDifficulty();
+    if (const auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+    {
+        std::unordered_map<std::string, Difficulty> diffMap = {
+            {"IDC_RADIO_NOTE_EX", Difficulty::EX},
+            {"IDC_RADIO_NOTE_NX", Difficulty::NX},
+            {"IDC_RADIO_NOTE_HX", Difficulty::HX},
+        };
+
+        for (auto [key, diff]: diffMap)
+        {
+            if (const auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
+                button->SetCheckedState(diff == m_difficulty && m_random == static_cast<LevelCategory>(0));
+        }
+    }
+
+    m_speed = selection.GetSpeed();
+    if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
+    {
+        for (auto child : speedSelector->GetChildren())
+        {
+            auto button = dynamic_cast<Gx::RadioButton*>(child);
+            if (!button)
+                continue;
+
+            auto name = button->GetName();
+            if (auto index = name.find_last_of('/'); index != -1)
+                name = name.substr(index + 1);
+
+            auto prefix = std::string("IDC_RADIO_SPEED_");
+            if (name.compare(0, prefix.size(), prefix) != 0)
+                continue;
+
+            auto speedName = name.substr(prefix.size());
+            float speed = 0.f;
+
+            if (speedName == "XR")
+                speed = XrSpeed;
+            else if (speedName == "3D")
+                speed = TdSpeed;
+            else if (speedName.size() == 2)
+                speed = std::stof(std::string(1, speedName[0]) + "." + std::string(1, speedName[1]));
+
+            if (speed != XrSpeed && speed != TdSpeed)
+            {
+                bool supported = false;
+                for (float s : SupportedHiSpeeds)
+                {
+                    if (speed == s)
+                    {
+                        supported = true;
+                        break;
+                    }
+                }
+
+                if (!supported)
+                    continue;
+            }
+
+            button->SetCheckedState(speed == m_speed);
+        }
+    }
+
+    Sort(selection.GetSortMode(), selection.GetSortOrder());
+}
+
 void SelectMusicDialog::OnAccepted()
 {
     // Edge case: No music in selected genre
@@ -535,6 +626,14 @@ void SelectMusicDialog::OnAccepted()
     auto& app       = Gx::Application::Instance();
     auto& mixer     = app.Require<Gx::Mixer>();
     auto& resources = app.Require<Gx::ResourceManager>();
+    auto& selection = app.Require<MusicSelectionContext>();
+
+    selection.SetMetadata(m_music);
+    selection.SetRandomLevel(m_random);
+    selection.SetSortMode(m_sort);
+    selection.SetSortOrder(m_order);
+    selection.SetDifficulty(m_difficulty);
+    selection.SetSpeed(m_speed);
 
     const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
     mixer.Play(sfx);
@@ -577,7 +676,7 @@ float SelectMusicDialog::GetSelectedSpeed() const
     return m_speed;
 }
 
-void SelectMusicDialog::Sort(MusicSortMode sort, MusicSortOrder order)
+void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder order)
 {
     m_sort = sort;
     m_order = order;

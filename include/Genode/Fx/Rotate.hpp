@@ -11,7 +11,6 @@ namespace Gx
     public:
         Rotate(Transformable* target, float rotation, const sf::Time& duration);
 
-    protected:
         void Update(double delta) override;
         void Reset() override;
 

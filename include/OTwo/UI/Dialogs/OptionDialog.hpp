@@ -1,7 +1,7 @@
 #ifndef O2JAM_DIALOG_OPTION_DIALOG_HPP
 #define O2JAM_DIALOG_OPTION_DIALOG_HPP
 
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/States/State.hpp>
 

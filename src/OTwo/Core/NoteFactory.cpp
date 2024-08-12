@@ -1,9 +1,9 @@
-#include <OTwo/Chart/NoteFactory.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/NoteFactory.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
-#include <OTwo/Chart/Note.hpp>
-#include <OTwo/Chart/LongNote.hpp>
-#include <OTwo/Chart/NoteGuideLine.hpp>
+#include <OTwo/Core/Note.hpp>
+#include <OTwo/Core/LongNote.hpp>
+#include <OTwo/Core/NoteGuideLine.hpp>
 
 NoteFactory::NoteFactory(Gx::ResourceManager &resources, const ChannelSet &instantiables) :
     NoteFactory(resources, resources, instantiables)
@@ -104,7 +104,7 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
         if (!events[i] || events[i]->Channel == Chart::Channel::Measurement || events[i]->Channel == Chart::Channel::BPM || events[i]->Channel == Chart::Channel::Background)
             continue;
 
-        const auto ev = static_cast<Chart::NoteEvent&>(*events[i]);
+        const auto& ev = static_cast<Chart::NoteEvent&>(*events[i]);
         if (ev.Type == Chart::NoteType::Tap)
         {
             auto& note = m_resources->Create<Note>("STATE_PLAYING/IDC_TAP_NOTE_" + std::to_string(i), ev.Position, ev.Channel);

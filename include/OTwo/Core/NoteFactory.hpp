@@ -1,9 +1,9 @@
-#ifndef O2JAM_CHART_NOTE_FACTORY_HPP
-#define O2JAM_CHART_NOTE_FACTORY_HPP
+#ifndef O2JAM_CORE_NOTE_FACTORY_HPP
+#define O2JAM_CORE_NOTE_FACTORY_HPP
 
-#include <OTwo/Chart/Chart.hpp>
-#include <OTwo/Chart/NoteContainer.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/Chart.hpp>
+#include <OTwo/Core/NoteContainer.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 

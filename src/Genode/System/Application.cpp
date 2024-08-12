@@ -11,10 +11,11 @@ namespace Gx
     }
 
     Application::Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, const bool fullScreen) :
-        m_window(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
-        m_targetAdapter(m_window),
-        m_director(SceneDirector(*this, m_window)),
+        m_window(std::make_unique<sf::RenderWindow>(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed)),
+        m_targetAdapter(*m_window),
+        m_director(SceneDirector(*this)),
         m_event(),
+        m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
         m_resources(),
         m_timer(),
         m_cursor(),
@@ -45,15 +46,8 @@ namespace Gx
         // Initialize application instance and director
         m_instance = this;
 
-        // Set render frequency
-        m_window.setVerticalSyncEnabled(true);
-        m_window.setFramerateLimit(60);
-
-        // Setup view
-        auto view = m_window.getDefaultView();
-        view.setSize(sf::Vector2f(static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)));
-        view.setCenter(sf::Vector2f(m_virtualMode.size.x / 2.0f, m_virtualMode.size.y / 2.0f));
-        m_window.setView(view);
+        // Prepare window
+        SetupWindow();
 
         // Bootstrap the game
         Boot();
@@ -63,11 +57,11 @@ namespace Gx
         double start = m_timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
 
         // Main game loop
-        while (m_window.isOpen())
+        while (m_window->isOpen())
         {
             // Poll window event
             auto event = sf::Event();
-            while (m_window.pollEvent(event))
+            while (m_window->pollEvent(event))
             {
                 // Call window event handlers based on received event
                 switch (event.type)
@@ -81,9 +75,9 @@ namespace Gx
             }
 
             // Check if window is closed after polling the events
-            if (m_closeRequested || !m_window.isOpen())
+            if (m_closeRequested || !m_window->isOpen())
             {
-                m_window.close();
+                m_window->close();
                 break;
             }
 
@@ -102,12 +96,12 @@ namespace Gx
             Update(delta);
 
             // Render the window
-            m_window.clear(sf::Color::White);
+            m_window->clear(sf::Color::White);
             {
                 // Render objects
                 Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
             }
-            m_window.display();
+            m_window->display();
 
             // Execute post-processing events
             m_director.ProcessEvents();
@@ -118,7 +112,7 @@ namespace Gx
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
-                m_window.setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
+                m_window->setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta = 0.0f;
             }
@@ -145,7 +139,7 @@ namespace Gx
 
     sf::RenderWindow &Application::GetRenderWindow() const
     {
-        return m_window;
+        return *m_window;
     }
 
     SceneDirector &Application::GetSceneDirector() const
@@ -181,10 +175,27 @@ namespace Gx
         return m_renderFreq;
     }
 
+    sf::State Application::GetWindowState() const
+    {
+        return m_state;
+    }
+
+    void Application::SetWindowState(const sf::State state)
+    {
+        if (m_state == state)
+            return;
+        
+        m_window->close();
+        m_window = std::make_unique<sf::RenderWindow>(m_mode, m_title, sf::Style::Titlebar | sf::Style::Close, state);
+        m_state  = state;
+
+        SetupWindow();
+    }
+
     void Application::SetCursor(Cursor& cursor)
     {
         m_cursor = &cursor;
-        m_window.setMouseCursor(m_cursor->GetHandle());
+        m_window->setMouseCursor(m_cursor->GetHandle());
     }
 
     void Application::OnFocusChanged(bool focus)
@@ -204,7 +215,7 @@ namespace Gx
             {
                 case sf::Event::MouseMoved:
                 {
-                    auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
+                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
                     ev.mouseMove = sf::Event::MouseMoveEvent{
                         static_cast<int>(position.x),
                         static_cast<int>(position.y)
@@ -215,7 +226,7 @@ namespace Gx
                 case sf::Event::MouseButtonPressed:
                 case sf::Event::MouseButtonReleased:
                 {
-                    auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
+                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
                     ev.mouseButton = sf::Event::MouseButtonEvent{
                         ev.mouseButton.button,
                         static_cast<int>(position.x),
@@ -226,7 +237,7 @@ namespace Gx
                 }
                 case sf::Event::MouseWheelScrolled:
                 {
-                    auto position = m_window.mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
+                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
                     ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
                         ev.mouseWheelScroll.wheel,
                         ev.mouseWheelScroll.delta,
@@ -264,9 +275,23 @@ namespace Gx
             m_closeRequested = true;
     }
 
+    void Application::SetupWindow() const
+    {
+        // Set render frequency
+        m_window->setVerticalSyncEnabled(true);
+
+        // Setup view
+        auto view = m_window->getDefaultView();
+        view.setSize(sf::Vector2f(static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)));
+        view.setCenter(sf::Vector2f(m_virtualMode.size.x / 2.0f, m_virtualMode.size.y / 2.0f));
+        m_window->setView(view);
+
+        m_targetAdapter = RenderTargetAdapter(*m_window);
+    }
+
     Application::operator sf::RenderTarget&() const
     {
-        return m_window;
+        return *m_window;
     }
 
     Application::operator RenderSurface&() const

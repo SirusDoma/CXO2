@@ -1,7 +1,7 @@
-#include <OTwo/Chart/NoteGuideLine.hpp>
-#include <OTwo/Chart/Note.hpp>
-#include <OTwo/Chart/LongNote.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/NoteGuideLine.hpp>
+#include <OTwo/Core/Note.hpp>
+#include <OTwo/Core/LongNote.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 NoteGuideLine::NoteGuideLine(const NoteGuideLine &copy) :
     m_parent(copy.m_parent),

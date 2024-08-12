@@ -1,7 +1,7 @@
 #ifndef O2JAM_CONFIG_GAME_CONFIG_HPP
 #define O2JAM_CONFIG_GAME_CONFIG_HPP
 
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
 
 #include <SFML/Window/Keyboard.hpp>

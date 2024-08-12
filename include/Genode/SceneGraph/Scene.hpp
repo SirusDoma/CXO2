@@ -37,6 +37,9 @@ namespace Gx
         void PushOverlay(Node *overlay);
         void CloseOverlay();
 
+        template<typename T>
+        T &Require() const;
+
         void Queue(const std::function<void()> &evt);
 
     protected:
@@ -49,8 +52,7 @@ namespace Gx
 
         virtual void ProcessSceneEvents();
 
-        template<typename T>
-        T &Require() const;
+
 
     private:
         bool IsVisible() const override { return true; }

@@ -17,8 +17,12 @@ public:
 
 protected:
     void Boot() override;
+    void Update(const double delta) override;
     void Shutdown() override;
     void OnFocusChanged(bool focus) override;
+
+private:
+    bool m_switched;
 };
 
 #endif

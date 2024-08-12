@@ -1,12 +1,12 @@
-#ifndef O2JAM_NOTE_CONTAINER_HPP
-#define O2JAM_NOTE_CONTAINER_HPP
+#ifndef O2JAM_CORE_NOTE_CONTAINER_HPP
+#define O2JAM_CORE_NOTE_CONTAINER_HPP
 
 #include <Genode/SceneGraph.hpp>
 
-#include <OTwo/Chart/Note.hpp>
+#include <OTwo/Core/Note.hpp>
 
 class ChartRenderer;
-class NoteContainer : public virtual Gx::Renderable, public virtual Gx::Updatable, Gx::RenderableContainer, Gx::UpdatableContainer
+class NoteContainer : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
     NoteContainer();
@@ -27,11 +27,14 @@ public:
     void RegisterPrefab(Gx::Updatable &prefab);
     std::unordered_set<Gx::Updatable*> GetRegisteredPrefabs();
 
+    unsigned int GetLastMeasure() const;
+
     void Render(const ChartRenderer &renderer, double delta);
 
 private:
     using TextureMap = std::unordered_map<NoteShape, const sf::Texture*>;
 
+    void Update(const double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
     sf::FloatRect   m_viewport;
@@ -44,6 +47,7 @@ private:
 
     TextureMap m_textures;
     NoteShape  m_shape;
+    unsigned int m_lastMeasure;
 
 };
 

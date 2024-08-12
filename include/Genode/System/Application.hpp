@@ -33,8 +33,11 @@ namespace Gx
         void Close();
 
         SceneDirector &GetSceneDirector() const;
-
         unsigned int GetRenderFrequency() const;
+
+        sf::State GetWindowState() const;
+        void SetWindowState(const sf::State state);
+
         void SetCursor(Cursor &cursor);
 
         template<typename T>
@@ -70,12 +73,15 @@ namespace Gx
         using ProviderMap        = std::unordered_map<std::type_index, std::unique_ptr<Provider>>;
         using ProviderFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Provider>(Application&)>>;
 
+        void SetupWindow() const;
+
         inline static Application *m_instance = nullptr;
 
-        mutable sf::RenderWindow m_window;
+        mutable std::unique_ptr<sf::RenderWindow> m_window;
         mutable RenderTargetAdapter m_targetAdapter;
         mutable SceneDirector m_director;
         sf::Event m_event;
+        sf::State m_state;
 
         ResourceManager m_resources;
 

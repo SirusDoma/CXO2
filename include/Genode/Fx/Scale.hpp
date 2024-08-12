@@ -13,7 +13,6 @@ namespace Gx
     public:
         Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration);
 
-    protected:
         void Update(double delta) override;
         void Reset() override;
 

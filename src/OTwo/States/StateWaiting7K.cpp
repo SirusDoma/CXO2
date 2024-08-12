@@ -30,12 +30,13 @@ void StateWaiting7K::Initialize()
 {
     State::Initialize();
 
-    auto& director = GetDirector();
-    auto& items    = Require<ItemFactory>();
-    auto& mixer    = Require<Gx::Mixer>();
-    auto& session  = Require<SessionContext>();
-    auto& player   = session.GetCurrentPlayer();
-    auto& room     = session.GetCurrentRoom();
+    auto& director  = GetDirector();
+    auto& items     = Require<ItemFactory>();
+    auto& mixer     = Require<Gx::Mixer>();
+    auto& session   = Require<SessionContext>();
+    auto& selection = Require<MusicSelectionContext>();
+    auto& player    = session.GetCurrentPlayer();
+    auto& room      = session.GetCurrentRoom();
 
     const auto bgm            = Instantiate<sf::Music>("STATE_WAITING/IDC_MUSIC");
     const auto sfxStart       = Instantiate<sf::Sound>("STATE_WAITING/IDC_SOUND_33");
@@ -161,7 +162,8 @@ void StateWaiting7K::Initialize()
 
     const auto mapSelector = Instantiate<MapSelector>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
-
+    mapSelector->SetMapID(room.MapID, true);
+    mapSelector->SetEffectID(room.EffectID);
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
     {
         auto data = Room(*r);

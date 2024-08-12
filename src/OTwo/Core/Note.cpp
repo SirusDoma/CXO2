@@ -1,5 +1,5 @@
-#include <OTwo/Chart/Note.hpp>
-#include <OTwo/Chart/ChartRenderer.hpp>
+#include <OTwo/Core/Note.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 Note::Note(const Chart::NoteEvent &ev) :
     Note(ev.Position, ev.Channel)
@@ -91,7 +91,7 @@ void Note::Render(const ChartRenderer &renderer, const double delta)
     const double latency = m_position - renderer.GetRenderPosition();
     if (m_hit || latency > 5.f || latency < -0.5f)
     {
-        if (IsVisible() && m_hit)
+        if (m_hit)
         {
             SetVisible(false);
             GetGuideLine()->Render(renderer, delta);

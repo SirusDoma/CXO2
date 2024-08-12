@@ -1,5 +1,5 @@
-#ifndef O2JAM_CHART_DATA_HPP
-#define O2JAM_CHART_DATA_HPP
+#ifndef O2JAM_CORE_CHART_HPP
+#define O2JAM_CORE_CHART_HPP
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -148,5 +148,5 @@ private:
     Gx::ResourcePtr<sf::Image> m_thumbnail;
 };
 
-#include <OTwo/Chart/Chart.inl>
+#include <OTwo/Core/Chart.inl>
 #endif

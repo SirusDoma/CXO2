@@ -4,25 +4,11 @@
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Contexts/MusicSelectionContext.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 
 #include <vector>
-
-enum class MusicSortMode
-{
-    ID,
-    Title,
-    Level,
-    Duration
-};
-
-enum class MusicSortOrder
-{
-    None,
-    Ascending,
-    Descending
-};
 
 class SelectMusicDialog : public Gx::Dialog
 {
@@ -38,11 +24,12 @@ public:
     Genre GetSelectedGenre() const;
     float GetSelectedSpeed() const;
 
-    void Sort(MusicSortMode mode, MusicSortOrder order = static_cast<MusicSortOrder>(0));
+    void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
 
 protected:
     void OnKeyDown(sf::Event::KeyEvent ev) override;
 
+    void OnShown(Gx::Scene &scene) override;
     void OnAccepted() override;
     void OnCancelled() override;
 

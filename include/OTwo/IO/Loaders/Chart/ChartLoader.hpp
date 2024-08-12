@@ -2,7 +2,7 @@
 #define O2JAM_CHART_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 
 #include <SFML/Graphics/Image.hpp>
 

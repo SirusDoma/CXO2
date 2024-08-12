@@ -1,11 +1,19 @@
-#ifndef O2JAM_CHART_RENDERER_HPP
-#define O2JAM_CHART_RENDERER_HPP
+#ifndef O2JAM_CORE_CHART_RENDERER_HPP
+#define O2JAM_CORE_CHART_RENDERER_HPP
+
+#include <OTwo/Core/Chart.hpp>
+#include <OTwo/Core/JudgementStrategy.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/Chart/Chart.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
+#include <OTwo/UI/Playing/ComboCounter.hpp>
+#include <OTwo/UI/Playing/JudgementIndicator.hpp>
+#include <OTwo/UI/Playing/PlayMenu.hpp>
 
+#include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Graphics/Animation.hpp>
+#include <Genode/UI/Number.hpp>
 
 #include <unordered_map>
 
@@ -15,7 +23,8 @@ using ChannelSet = std::unordered_set<Chart::Channel>;
 using SpeedMap = std::unordered_map<Chart::Channel, float>;
 
 class NoteContainer;
-class ChartRenderer : public Gx::Renderable
+class JudgementStrategy;
+class ChartRenderer : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
     struct RenderSettings
@@ -36,7 +45,7 @@ public:
     void Render(const Chart &chart, const RenderSettings &settings);
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
-    void Input(Chart::Channel channel, bool pressed);
+    void Input(Chart::Channel channel, bool pressed) const ;
 
     const RenderSettings &GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
@@ -53,33 +62,50 @@ private:
     struct EventState
     {
         Chart::Event *Event;
-        Accuracy      Accuracy = Accuracy::None;
-        double        Latency  = 0;
+        Judgement    Tap     = {Accuracy::None, 0.f};
+        Judgement    Release = {Accuracy::None, 0};
+
+        bool IsRegistered() const
+        {
+            const auto note = dynamic_cast<Chart::NoteEvent*>(Event);
+            return Tap.Accuracy != Accuracy::None && ((note && note->Length == 0) || Release.Accuracy != Accuracy::None);
+        }
 
         Chart::Event *operator->() const { return Event; }
     };
 
+    void PlaySample(const Chart::NoteEvent* ev, const std::string &group = "BGM") const;
+    void OnScoreUpdated(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count) const;
+
     using PrefabMap      = std::unordered_map<Chart::Channel, std::unordered_map<Chart::NoteType, NotePrefabMap>>;
+    using AnimationMap   = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using EventStateList = std::vector<EventState>;
     using FrontBufferMap = std::unordered_map<Chart::Channel, EventState*>;
     using InputStateMap  = std::unordered_map<Chart::Channel, bool>;
     using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
-    State *m_parent;
+    State* m_parent;
     NoteContainer* m_container;
+    Gx::Node* m_menu;
 
-    const Chart *m_chart;
+    const Chart* m_chart;
     RenderSettings m_settings;
+    JudgementStrategy* m_judgement;
+    ScoreTracker* m_scores;
 
     ChannelSet m_instantiables;
     SpeedMap m_speeds;
-    InputStateMap m_inputs;
-    SoundMap m_sounds;
-
     sf::Clock m_timer;
     mutable PrefabMap m_prefabs;
+    mutable AnimationMap m_noteClicks;
+    mutable AnimationMap m_longNoteEffects;
+    mutable JudgementIndicator m_judgementIndicator;
+    mutable ComboCounter m_comboCounter;
+    mutable PlayMenu m_playMenu;
     mutable EventStateList m_events;
     mutable FrontBufferMap m_frontBuffers;
+    mutable InputStateMap m_inputs;
+    mutable SoundMap m_sounds;
     mutable double m_currentTime;
     mutable double m_refTime;
     mutable double m_refPosition;

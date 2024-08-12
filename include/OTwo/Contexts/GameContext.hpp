@@ -1,7 +1,7 @@
 #ifndef O2JAM_GAME_CONTEXT_HPP
 #define O2JAM_GAME_CONTEXT_HPP
 
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef O2JAM_CHART_NOTE_GUIDE_LINE_HPP
-#define O2JAM_CHART_NOTE_GUIDE_LINE_HPP
+#ifndef O2JAM_CORE_NOTE_GUIDE_LINE_HPP
+#define O2JAM_CORE_NOTE_GUIDE_LINE_HPP
 
 #include <Genode/Entities/Renderable.hpp>
 

@@ -16,6 +16,7 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/MusicSelectionContext.hpp>
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Room.hpp>
@@ -32,9 +33,10 @@ void StateRoom::Initialize()
 {
     State::Initialize();
 
-    auto& director = GetDirector();
-    auto& mixer    = Require<Gx::Mixer>();
-    auto& session  = Require<SessionContext>();
+    auto& director       = GetDirector();
+    auto& mixer          = Require<Gx::Mixer>();
+    auto& session        = Require<SessionContext>();
+    auto& selection      = Require<MusicSelectionContext>();
     const auto& items    = Require<ItemFactory>();
 
     const auto bgm         = Instantiate<sf::Music>("STATE_ROOM/IDC_MUSIC");
@@ -57,7 +59,7 @@ void StateRoom::Initialize()
     const auto channelCategory = Instantiate<Gx::Image>("STATE_ROOM/IDC_IMAGE_CHANNEL_CATEGORY");
     switch (session.GetMusicHall())
     {
-        case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
+        case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
         case MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
         case MusicHall::Philix:   channelCategory->SetFrame("Philix");   break;
         case MusicHall::Melpomin: channelCategory->SetFrame("Melpomin"); break;
@@ -176,16 +178,17 @@ void StateRoom::Initialize()
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = session.GetInstalledMusic();
+                const auto music = selection.GetMetadata().ID != 0 ? selection.GetMetadata() : musicList[musicList.size() - 1];
                 session.SetCurrentRoom(Room{
                     4,
                     session.GetCurrentPlayer().ID,
                     createRoomDialog->GetRoomName(),
-                    musicList[musicList.size() / 2].ToChartMetadataView(Difficulty::EX),
-                    Difficulty::EX,
+                    music.ToChartMetadataView(selection.GetDifficulty()),
+                    selection.GetDifficulty(),
                     createRoomDialog->GetRoomMode(),
                     SongMode::Normal,
                     RoomState::Waiting,
-                    1.0f,
+                    selection.GetSpeed(),
                     !createRoomDialog->GetRoomPassword().empty(),
                     8,
                     createRoomDialog->GetMinLevelLimit(),

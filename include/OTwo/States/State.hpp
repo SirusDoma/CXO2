@@ -24,7 +24,7 @@ class State : public virtual Gx::Scene
 {
 public:
     State();
-    State(State &&state);
+    State(State &&state) noexcept;
     explicit State(const std::string& name);
     State(const std::string& name, Gx::ResourceManager &resources);
 

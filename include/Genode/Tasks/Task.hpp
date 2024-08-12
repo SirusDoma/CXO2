@@ -30,16 +30,16 @@ namespace Gx
         void OnStopped(std::function<void()> callback);
         void OnCompleted(std::function<void()> callback);
 
-        void Update(double delta) override;
+        virtual void Stop();
+        virtual void Complete();
         virtual void Reset();
+
+        void Update(double delta) override;
 
     protected:
         Task();
 
         void SetState(const TaskState &state);
-
-        virtual void Stop();
-        virtual void Complete();
 
     private:
         TaskState m_state;

@@ -14,7 +14,7 @@ public:
     unsigned int GetMapID() const;
     unsigned int GetEffectID() const;
 
-    void SetMapID(int mapID);
+    void SetMapID(int mapID, bool silent = false);
     void SetEffectID(unsigned int effectID);
 
     void SetMapChangedCallback(const std::function<void(unsigned int)> &callback);

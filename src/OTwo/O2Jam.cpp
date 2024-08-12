@@ -50,6 +50,10 @@
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 
+#include <OTwo/Core/JudgementStrategy.hpp>
+#include <OTwo/Core/Judgements/TimeJudgementStrategy.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
+
 #include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateAvi.hpp>
 #include <OTwo/States/StatePlanet.hpp>
@@ -166,6 +170,16 @@ void O2Jam::Boot()
         return session;
     });
 
+    Provide<JudgementStrategy>([] (auto &app)
+    {
+        return std::make_unique<TimeJudgementStrategy>();
+    });
+
+    Provide<ScoreTracker>([] (auto &app)
+    {
+        return std::make_unique<ScoreTracker>();
+    });
+
     // Force to load heavy providers during start-up
     auto _ = Require<SessionContext>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
@@ -200,6 +214,19 @@ void O2Jam::Boot()
     director.Register<StatePlaying7K>("Interface/State/Playing.json");
 
     director.Present<StateAvi>();
+}
+
+void O2Jam::Update(const double delta)
+{
+    Application::Update(delta);
+
+    if (isKeyPressed(sf::Keyboard::Key::LAlt) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
+    {
+        m_switched = true;
+        SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
+    }
+    else if (m_switched && (!isKeyPressed(sf::Keyboard::Key::LAlt) || !isKeyPressed(sf::Keyboard::Key::Enter)))
+        m_switched = false;
 }
 
 void O2Jam::Shutdown()

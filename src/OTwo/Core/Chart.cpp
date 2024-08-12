@@ -1,4 +1,4 @@
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 
 #include <vector>
 

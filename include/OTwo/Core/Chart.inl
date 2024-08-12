@@ -1,4 +1,4 @@
-#include <OTwo/Chart/Chart.hpp>
+#include <OTwo/Core/Chart.hpp>
 
 template<typename T>
 T* Chart::AddEvent(Difficulty diff, T &&ev)
