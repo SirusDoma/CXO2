@@ -136,7 +136,7 @@ namespace Gx
             return loader->LoadFromStream(stream, *ctx);
         };
 
-        return &managed->Container->Store(id, deserializer, mode);
+        return managed->Container->Store(id, deserializer, mode);
     }
 
     template<typename R>
