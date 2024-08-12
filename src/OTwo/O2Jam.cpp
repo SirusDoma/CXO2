@@ -60,6 +60,7 @@
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
+#include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 
@@ -211,6 +212,7 @@ void O2Jam::Boot()
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
+    director.Register<StateResult>("Interface/State/Result.json");
     director.Register<StatePlaying7K>("Interface/State/Playing.json");
 
     director.Present<StateAvi>();
