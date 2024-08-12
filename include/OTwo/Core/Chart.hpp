@@ -131,6 +131,9 @@ public:
     const sf::Image *GetThumbnail() const;
     void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
 
+    float GetMeasureFraction(int measure) const;
+    void SetMeasureFraction(int measure, float size);
+
     static float PositionToSeconds(float position, float bpm);
     static float SecondsToPosition(float seconds, float bpm);
 
@@ -139,10 +142,12 @@ private:
     using EventList = std::vector<std::unique_ptr<Event>>;
     using EventMap  = std::unordered_map<Difficulty, EventList>;
     using SampleMap = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
+    using SizeMap   = std::unordered_map<Gx::Uint32, float>;
 
     ChartMetadata m_metadata;
     EventMap      m_events;
     SampleMap     m_samples;
+    SizeMap       m_fractions;
 
     Gx::ResourcePtr<sf::Image> m_cover;
     Gx::ResourcePtr<sf::Image> m_thumbnail;

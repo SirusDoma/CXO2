@@ -53,6 +53,7 @@ namespace Gx
         T &Require();
 
         operator sf::RenderTarget&() const;
+        operator sf::RenderWindow&() const;
         operator RenderSurface&() const;
 
     protected:

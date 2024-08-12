@@ -185,9 +185,11 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
     auto& measureVertices = container->GetMeasureVertices();
     measureVertices.resize(max * 6);
 
-    for (int m = 0; m < max; m++)
+    double mpos = 0;
+    for (int m = 1; m <= max; m++)
     {
-        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), m, Chart::Channel::Background);
+        mpos += chart.GetMeasureFraction(m);
+        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), mpos, Chart::Channel::Background);
         auto vx = std::array<sf::Vertex*, 6>();
 
         for (int v = 0; v < vx.size(); v++)

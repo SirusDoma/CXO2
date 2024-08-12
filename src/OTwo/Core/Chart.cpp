@@ -129,6 +129,19 @@ void Chart::SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail)
     m_thumbnail = std::move(thumbnail);
 }
 
+float Chart::GetMeasureFraction(const int measure) const
+{
+    if (const auto it = m_fractions.find(measure); it != m_fractions.end())
+        return it->second;
+
+    return 1.f;
+}
+
+void Chart::SetMeasureFraction(const int measure, const float size)
+{
+    m_fractions[measure] = size;
+}
+
 float Chart::PositionToSeconds(const float position, const float bpm)
 {
     return position * 4 * (60 / bpm);

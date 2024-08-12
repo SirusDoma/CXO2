@@ -133,9 +133,11 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::Background;
             for (int i = 0; i < block.EventCount; i++)
             {
-                const double position = static_cast<double>(block.Measure) + (static_cast<double>(i) / static_cast<double>(block.EventCount));
-                const auto ev = Chart::Event(channel, position);
+                double position = (static_cast<double>(i) / static_cast<double>(block.EventCount));
+                for (int m = 0; m < block.Measure; m++)
+                    position += chart->GetMeasureFraction(m);
 
+                auto ev = Chart::Event(channel, position);
                 if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
                 {
                     float value;
@@ -144,6 +146,9 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
                     if (value == 0.f)
                         continue;
+
+                    if (ev.Channel == Chart::Channel::Measurement)
+                        chart->SetMeasureFraction(block.Measure, value);
 
                     chart->AddEvent<Chart::TimeEvent>(difficulty, Chart::TimeEvent(ev, value));
                     continue;

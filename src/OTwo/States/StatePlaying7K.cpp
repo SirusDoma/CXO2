@@ -1,6 +1,7 @@
 #include <OTwo/States/StatePlaying7K.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Core/ChartRenderer.hpp>
 
@@ -11,7 +12,7 @@
 #include <Genode/Utilities/Debugger.hpp>
 
 StatePlaying7K::StatePlaying7K() :
-    m_renderer(*this, ChannelSet{
+    m_renderer(ChannelSet{
         Chart::Channel::Note1,
         Chart::Channel::Note2,
         Chart::Channel::Note3,
@@ -28,7 +29,7 @@ StatePlaying7K::StatePlaying7K() :
 
 StatePlaying7K::StatePlaying7K(State &&state) :
     State(std::move(state)),
-    m_renderer(*this, ChannelSet{
+    m_renderer(ChannelSet{
         Chart::Channel::Note1,
         Chart::Channel::Note2,
         Chart::Channel::Note3,
@@ -49,9 +50,6 @@ void StatePlaying7K::Initialize()
 
     m_context = PrepareContext();
     m_config  = &Require<GameConfig>();
-
-    const auto wave = Instantiate<Gx::Gauge>("IDC_GAUGE_WAVE");
-    wave->SetValue(0);
 
     const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(0);
@@ -91,14 +89,30 @@ void StatePlaying7K::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
+    AddChild(&m_renderer);
+    m_renderer.Render(*m_context->GetChart(), *m_context, [this] () {
+        const auto resources = &GetResources(ResourceScope::Shared);
+        const sf::RenderTarget& target = GetApplication();
+        const auto view = target.getView();
+
+        if (auto texture = std::make_unique<sf::Texture>(); texture->create(sf::Vector2u{static_cast<unsigned int>(view.getSize().x), static_cast<unsigned int>(view.getSize().y)}))
+        {
+            texture->update(GetApplication());
+            resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
+        }
+
+        GetDirector().Present<StateResult>();
+    });
+
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
         GetDirector().Present<StateWaiting7K>();
     });
 
-    AddChild(&m_renderer);
-    m_renderer.Render(*m_context->GetChart(), *m_context);
+    // HACK: Make exit button top-level
+    RemoveChild(exitButton);
+    AddChild(exitButton);
 }
 
 unsigned int StatePlaying7K::GetViewport() const

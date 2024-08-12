@@ -7,6 +7,7 @@
 
 #include <Genode/System/Provider.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
 
 class Chart;
 class GameContext : public Gx::Provider
@@ -14,10 +15,10 @@ class GameContext : public Gx::Provider
 public:
     GameContext() = default;
 
-    const Chart *GetChart() const;
+    const Chart* GetChart() const;
     void SetChart(Gx::ResourcePtr<Chart> chart);
 
-    GameConfig *GetConfig() const;
+    GameConfig* GetConfig() const;
     void SetConfig(GameConfig &config);
 
     Difficulty GetDifficulty() const;

@@ -1,7 +1,8 @@
 #include <OTwo/UI/Playing/PlayMenu.hpp>
-#include <OTwo/States/State.hpp>
-
 #include <OTwo/Core/ChartRenderer.hpp>
+
+#include <OTwo/States/State.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
 
 void PlayMenu::Initialize()
 {
@@ -15,7 +16,10 @@ void PlayMenu::Initialize()
     m_title    = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
     m_playIcon = menu->FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
     m_level    = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
-    m_bgmVol   = menu->FindChild<Gx::Gauge>( "IDC_GAUGE_VOLUME_MUSIC");
+    m_wave     = menu->FindChild<Gx::Gauge>("IDC_GAUGE_WAVE");
+    m_minutes  = menu->FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_MINUTE");
+    m_seconds  = menu->FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_SECOND");
+    m_bgmVol   = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
     m_sfxVol   = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
 
     if (const auto pointList = menu->FindChild<Gx::List>("IDC_LIST_NOTE_POINT_NUMBER"); pointList)
@@ -46,6 +50,9 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
 
     if (m_title)
         m_title->SetString(metadata.Title);
+
+    if (m_wave)
+        m_wave->SetMaximumValue(metadata.Duration.asSeconds());
 
     if (m_level)
     {
@@ -87,6 +94,18 @@ const ScoreTracker* PlayMenu::GetScoreTracker() const
 
 void PlayMenu::Update(const double delta)
 {
+    if (m_elapsed < m_metadata.Duration.asMilliseconds())
+        m_elapsed += delta;
+
+    if (m_wave)
+        m_wave->SetValue(std::floor(m_elapsed / 1000.f));
+
+    if (m_minutes)
+        m_minutes->SetValue(std::floor((m_elapsed / 1000.f) / 60.f));
+
+    if (m_seconds)
+        m_seconds->SetValue(static_cast<int>(std::floor((m_elapsed / 1000.f))) % 60);
+
     if (const auto renderer = GetParent<ChartRenderer>())
     {
         if (m_playIcon)
@@ -105,6 +124,8 @@ void PlayMenu::Update(const double delta)
         for (auto [acc, number] : m_counters)
             number->SetValue(acc == Accuracy::None ? m_scoreTracker->GetMaxCombo() : m_scoreTracker->GetPoint(acc));
     }
+
+
 
     UpdatableContainer::Update(delta);
 }

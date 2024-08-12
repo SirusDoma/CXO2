@@ -39,10 +39,10 @@ public:
 
     static constexpr unsigned int DefaultMeasureHeight = 384;
 
-    explicit ChartRenderer(State &state, const ChannelSet &instantiables = {});
+    explicit ChartRenderer(const ChannelSet &instantiables);
 
-    void Render(const Chart &chart, const GameContext &context);
-    void Render(const Chart &chart, const RenderSettings &settings);
+    void Render(const Chart &chart, const GameContext &context, const std::function<void()>& callback);
+    void Render(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback);
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void Input(Chart::Channel channel, bool pressed) const ;
@@ -84,7 +84,6 @@ private:
     using InputStateMap  = std::unordered_map<Chart::Channel, bool>;
     using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
-    State* m_parent;
     NoteContainer* m_container;
     Gx::Node* m_menu;
 
@@ -111,6 +110,9 @@ private:
     mutable double m_refPosition;
     mutable double m_bpm;
     mutable unsigned int m_frameId;
+    mutable bool m_callbackCalled;
+
+    std::function<void()> m_callback;
 };
 
 #endif

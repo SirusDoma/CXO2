@@ -12,7 +12,7 @@ namespace Gx
 
     Application::Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, const bool fullScreen) :
         m_window(std::make_unique<sf::RenderWindow>(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed)),
-        m_targetAdapter(*m_window),
+        m_targetAdapter(*this),
         m_director(SceneDirector(*this)),
         m_event(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
@@ -286,10 +286,15 @@ namespace Gx
         view.setCenter(sf::Vector2f(m_virtualMode.size.x / 2.0f, m_virtualMode.size.y / 2.0f));
         m_window->setView(view);
 
-        m_targetAdapter = RenderTargetAdapter(*m_window);
+        m_targetAdapter = RenderTargetAdapter(*this);
     }
 
     Application::operator sf::RenderTarget&() const
+    {
+        return *m_window;
+    }
+
+    Application::operator sf::RenderWindow&() const
     {
         return *m_window;
     }

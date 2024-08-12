@@ -10,8 +10,7 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-ChartRenderer::ChartRenderer(State &state, const ChannelSet &instantiables) :
-    m_parent(&state),
+ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_container(),
     m_menu(),
     m_chart(),
@@ -34,11 +33,13 @@ ChartRenderer::ChartRenderer(State &state, const ChannelSet &instantiables) :
     m_refTime(0),
     m_refPosition(0),
     m_bpm(0),
-    m_frameId(0)
+    m_frameId(0),
+    m_callbackCalled(false),
+    m_callback()
 {
 }
 
-void ChartRenderer::Render(const Chart &chart, const GameContext &context)
+void ChartRenderer::Render(const Chart &chart, const GameContext &context, const std::function<void()>& callback)
 {
     if (!context.GetConfig())
         throw Gx::Exception("GameConfig cannot be null");
@@ -48,23 +49,28 @@ void ChartRenderer::Render(const Chart &chart, const GameContext &context)
         context.GetViewport(),
         context.GetSpeed(),
         context.GetDifficulty()
-    });
+    }, callback);
 }
 
-void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
+void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback)
 {
+    const auto parent = GetParent<State>();
+    if (!parent)
+        throw Gx::Exception("ChartRenderer needs to be attached into a State!");
+    
     if (!settings.Config)
         throw Gx::Exception("GameConfig cannot be null");
 
     m_chart    = &chart;
     m_settings = settings;
+    m_callback = callback;
 
     // Setup judgement
-    m_judgement = &m_parent->Require<JudgementStrategy>();
+    m_judgement = &parent->Require<JudgementStrategy>();
     m_judgement->Initialize(*this);
 
     // Setup score tracker
-    m_scores = &m_parent->Require<ScoreTracker>();
+    m_scores = &parent->Require<ScoreTracker>();
     m_scores->Initialize(settings.Difficulty);
     m_scores->SetUpdateCallback([this] (auto ch, auto acc, auto count) {
         OnScoreUpdated(ch, acc, count);
@@ -94,8 +100,8 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
 
     // Create Note Container with Note Factory
     const auto factory = NoteFactory(
-        m_parent->GetResources(ResourceScope::Immediate),
-        m_parent->GetResources(ResourceScope::Local),
+        parent->GetResources(ResourceScope::Immediate),
+        parent->GetResources(ResourceScope::Local),
         m_instantiables
     );
     RemoveChild(FindChild<NoteContainer>("IDC_NOTE_CONTAINER"));
@@ -128,7 +134,7 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
 
     // Setup Note Clicks
     const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-    if (const auto noteClickList = m_parent->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    if (const auto noteClickList = parent->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
     {
         for (auto [channel, _] : settings.Config->KeyBindings.at(keyMode))
         {
@@ -148,7 +154,7 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings)
         }
     }
 
-    if (const auto longNoteEffectList = m_parent->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
+    if (const auto longNoteEffectList = parent->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
     {
         for (auto [channel, _] : settings.Config->KeyBindings.at(keyMode))
         {
@@ -182,6 +188,20 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 {
     if (!m_chart)
         return states;
+
+    if (GetRenderPosition() > m_container->GetLastMeasure())
+    {
+        m_container->Render(*this, states.Delta);
+        states = RenderableContainer::Render(surface, states);
+
+        if (m_callback && !m_callbackCalled)
+        {
+            m_callback();
+            m_callbackCalled = true;
+        }
+
+        return states;
+    }
 
     // Save the current frame time so the generated render position is always consistent across multiple calls in the same frame
     if (states.FrameID != m_frameId)
@@ -348,10 +368,11 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &gr
     if (!ev || !ev->Sample)
         return;
 
-    auto& mixer = m_parent->GetApplication().Require<Gx::Mixer>();
+    const auto parent = GetParent<State>();
+    auto& mixer = parent->GetApplication().Require<Gx::Mixer>();
     if (m_sounds.find(ev->ID) == m_sounds.end())
     {
-        m_sounds[ev->ID] = m_parent->Create<sf::Sound>(*ev->Sample);
+        m_sounds[ev->ID] = parent->Create<sf::Sound>(*ev->Sample);
         m_sounds[ev->ID]->setVolume(ev->Volume);
     }
 

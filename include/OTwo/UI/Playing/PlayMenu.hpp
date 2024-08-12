@@ -28,9 +28,13 @@ private:
     Difficulty m_difficulty;
     const ScoreTracker* m_scoreTracker;
 
+    double m_elapsed = 0;
     Gx::Label* m_title;
     Gx::Animation* m_playIcon;
     Gx::Image* m_level;
+    Gx::Number* m_minutes;
+    Gx::Number* m_seconds;
+    Gx::Gauge* m_wave;
     Gx::Gauge* m_bgmVol;
     Gx::Gauge* m_sfxVol;
     std::unordered_map<Accuracy, Gx::Number*> m_counters;

@@ -22,7 +22,6 @@ public:
     unsigned int GetViewport() const;
     void SetViewport(unsigned int viewport);
 
-
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
