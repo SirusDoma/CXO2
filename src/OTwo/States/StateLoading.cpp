@@ -20,10 +20,11 @@ void StateLoading::Initialize()
 {
     State::Initialize();
 
-    auto &session = Require<SessionContext>();
-    auto &config  = Require<GameConfig>();
-    auto &room    = session.GetCurrentRoom();
-    auto &game    = Require<GameContext>();
+    auto& session   = Require<SessionContext>();
+    auto& config    = Require<GameConfig>();
+    auto& room      = session.GetCurrentRoom();
+    auto& game      = Require<GameContext>();
+    auto& resources = Require<Gx::ResourceManager>();
 
     game.Reset();
     game.SetConfig(config);
@@ -45,12 +46,17 @@ void StateLoading::Initialize()
 
     const auto metadata = room.ChartMetadata;
     auto loader         = ChartLoader();
-
-    // TODO: Load cover after select music in StateWaiting and forward it into StateLoading
-    loader.SetCoverLoadCallback([this] (auto cover)
+    if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
     {
-        Queue([this, cover] () { OnCoverLoaded(cover); });
-    });
+        OnCoverLoaded(image);
+    }
+    else
+    {
+        loader.SetCoverLoadCallback([this] (auto cover)
+        {
+            Queue([this, cover] () { OnCoverLoaded(cover); });
+        });
+    }
 
     auto thread = std::thread([=, &game] ()
     {

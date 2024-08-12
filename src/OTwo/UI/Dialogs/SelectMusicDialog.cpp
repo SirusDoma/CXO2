@@ -635,6 +635,21 @@ void SelectMusicDialog::OnAccepted()
     selection.SetDifficulty(m_difficulty);
     selection.SetSpeed(m_speed);
 
+    if (m_music.ID != 0)
+    {
+        try
+        {
+            if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
+                resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+            else
+                resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+        }
+        catch (Gx::Exception)
+        {
+            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+        }
+    }
+
     const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
     mixer.Play(sfx);
 }
