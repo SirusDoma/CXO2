@@ -37,8 +37,8 @@ void JudgementIndicator::Play(const Accuracy accuracy)
 
             m_target = indicator;
             m_target->SetVisible(true);
-            m_target->SetScale(sf::Vector2f(0.f, 0.f));
-            m_scale = std::make_unique<Gx::Scale>(m_target, sf::Vector2f(1.f, 1.f), sf::milliseconds(100));
+            m_target->SetScale(sf::Vector2f(0.5f, 0.5f));
+            m_scale = std::make_unique<Gx::Scale>(m_target, sf::Vector2f(1.f, 1.f), sf::seconds(0.12083333f));
         }
         else
             indicator->SetVisible(false);

@@ -42,7 +42,7 @@ private:
     sf::VertexArray m_measureVertices;
     sf::VertexArray m_guideLineVertices;
 
-    std::unordered_map<double, std::vector<Note*>> m_notes;
+    std::vector<Note*> m_notes;
     std::unordered_set<Gx::Updatable*> m_prefabs;
 
     TextureMap m_textures;

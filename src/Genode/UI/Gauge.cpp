@@ -225,7 +225,7 @@ namespace Gx
         float top          = static_cast<float>(m_texCoords.top);
         const float bottom = top + h;
 
-        if (m_value < 100)
+        if (m_value < m_maximum)
         {
             if (m_orientation == Orientation::Horizontal)
             {

@@ -6,7 +6,7 @@
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/UI.hpp>
 
-class PlayMenu : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
+class PlayMenu : public virtual Gx::UiContainer
 {
 public:
     PlayMenu() = default;

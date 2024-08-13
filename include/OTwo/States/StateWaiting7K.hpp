@@ -9,6 +9,8 @@ public:
     explicit StateWaiting7K(State &&state);
 
     void Initialize() override;
+
+    void OnKeyDown(const sf::Event::KeyEvent ev) override;
 };
 
 #endif

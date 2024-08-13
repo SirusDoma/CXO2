@@ -451,6 +451,17 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
                     {
                         m_page--;
                         m_music = ChartMetadata{};
+                        for (int j = children.size() - 1; j > 0; j--)
+                        {
+                            if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
+                            {
+                                if (next->IsVisible() && next->IsEnabled())
+                                    next->SetCheckedState(true);
+
+                                break;
+                            }
+                        }
+
                         Invalidate();
                         return;
                     }
@@ -1087,8 +1098,7 @@ void SelectMusicDialog::Invalidate()
     if (auto thumbnail = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_THUMBNAIL"); thumbnail && m_coverID != m_music.ID)
     {
         m_coverID  = m_music.ID;
-        auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default);
-        if (image)
+        if (auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default))
         {
             m_thumbnail = std::make_unique<sf::Texture>();
             if (m_thumbnail->loadFromImage(*image))

@@ -1,4 +1,5 @@
-﻿#include <Genode/System/Application.hpp>
+﻿#include <Genode/Graphics/Sprite.hpp>
+#include <Genode/System/Application.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Provider.hpp>
@@ -11,13 +12,11 @@ namespace Gx
     }
 
     Application::Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, const bool fullScreen) :
-        m_window(std::make_unique<sf::RenderWindow>(mode, title, sf::Style::Titlebar | sf::Style::Close, fullScreen ? sf::State::Fullscreen : sf::State::Windowed)),
-        m_targetAdapter(*this),
+        m_target(std::make_unique<sf::RenderTexture>()),
+        m_adapter(*this),
         m_director(SceneDirector(*this)),
         m_event(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
-        m_resources(),
-        m_timer(),
         m_cursor(),
         m_title(title),
         m_frameID(0),
@@ -28,6 +27,8 @@ namespace Gx
         m_virtualMode    = virtualMode;
         m_fullScreen     = fullScreen;
         m_closeRequested = false;
+
+        SetWindowState(fullScreen ? sf::State::Fullscreen : sf::State::Windowed);
     }
 
     Application &Application::Instance()
@@ -53,8 +54,8 @@ namespace Gx
         Boot();
 
         // Setup timer
-        m_timer = sf::Clock();
-        double start = m_timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
+        auto timer  = sf::Clock();
+        double last = timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
 
         // Main game loop
         while (m_window->isOpen())
@@ -82,8 +83,8 @@ namespace Gx
             }
 
             // Calculate delta
-            const double end = m_timer.getElapsedTime().asMilliseconds();
-            const double delta = end - start;
+            const double now   = timer.getElapsedTime().asMilliseconds();
+            const double delta = now - last;
 
             // Update installed modules
             for (auto& [_, context] : m_providers)
@@ -96,10 +97,31 @@ namespace Gx
             Update(delta);
 
             // Render the window
-            m_window->clear(sf::Color::White);
+            m_window->clear(m_clearColor);
             {
-                // Render objects
-                Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
+                // Use render target only when full screen
+                if (m_state == sf::State::Fullscreen)
+                {
+                    // Setup Render Target
+                    SetupTarget();
+
+                    // Render objects
+                    m_target->clear(m_clearColor);
+                    {
+                        auto surface = RenderTargetAdapter(*m_target);
+                        Render(surface, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
+                    }
+                    m_target->display();
+
+                    // Render the target
+                    auto sprite = Gx::Sprite(m_target->getTexture());
+                    m_window->draw(sprite);
+                }
+                else
+                {
+                    // Render objects
+                    Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
+                }
             }
             m_window->display();
 
@@ -114,11 +136,11 @@ namespace Gx
                 m_frames = 0;
                 m_window->setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
-                fpsDelta = 0.0f;
+                fpsDelta -= 1000.f;
             }
 
             // Update starting point of delta time
-            start = end;
+            last = now;
 
             // Update fps counter
             m_frames++;
@@ -182,13 +204,24 @@ namespace Gx
 
     void Application::SetWindowState(const sf::State state)
     {
-        if (m_state == state)
+        if (m_window && m_state == state)
             return;
-        
-        m_window->close();
-        m_window = std::make_unique<sf::RenderWindow>(m_mode, m_title, sf::Style::Titlebar | sf::Style::Close, state);
-        m_state  = state;
 
+        if (m_window)
+            m_window->close();
+
+        auto mode = m_mode;
+        if (state == sf::State::Fullscreen)
+            mode = sf::VideoMode::getDesktopMode();
+
+        m_window = std::make_unique<sf::RenderWindow>(
+            mode,
+            m_title,
+            state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
+            sf::State::Windowed
+        );
+
+        m_state = state;
         SetupWindow();
     }
 
@@ -209,7 +242,7 @@ namespace Gx
     void Application::OnInputReceived(sf::Event ev)
     {
         // Re-map mouse coordinate when using virtual mode
-        if (m_mode != m_virtualMode)
+        if (m_mode != m_virtualMode || m_state == sf::State::Fullscreen)
         {
             switch (ev.type)
             {
@@ -254,18 +287,6 @@ namespace Gx
 
         // Pass input into active scene via director
         m_director.Input(ev);
-
-        //// Move cursor
-        //if (ev.type == sf::Event::MouseMoved)
-        //    m_cursor.setPosition(static_cast<float>(ev.mouseMove.x), static_cast<float>(ev.mouseMove.y));
-
-        //// Mouse click
-        //if (ev.type == sf::Event::MouseButtonPressed && m_cursorFrame)
-        //    m_cursor.setTextureRect(sf::IntRect(m_cursorFrame->width, 0, m_cursorFrame->width, m_cursorFrame->height));
-
-        //// Mouse release
-        //if (ev.type == sf::Event::MouseButtonReleased && m_cursorFrame)
-        //    m_cursor.setTextureRect(sf::IntRect(0, 0, m_cursorFrame->width, m_cursorFrame->height));
     }
 
     void Application::OnClose()
@@ -283,14 +304,68 @@ namespace Gx
         // Setup view
         auto view = m_window->getDefaultView();
         view.setSize(sf::Vector2f(static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)));
-        view.setCenter(sf::Vector2f(m_virtualMode.size.x / 2.0f, m_virtualMode.size.y / 2.0f));
-        m_window->setView(view);
+        view.setCenter(sf::Vector2f(std::floor(m_virtualMode.size.x / 2.0f), std::floor(m_virtualMode.size.y / 2.0f)));
 
-        m_targetAdapter = RenderTargetAdapter(*this);
+        if (m_state == sf::State::Fullscreen)
+            view = GetLetterBoxView(view, m_window->getSize());
+
+        m_window->setView(view);
+        m_adapter = RenderTargetAdapter(*this);
+    }
+
+    void Application::SetupTarget() const
+    {
+        if (m_target->getSize().x == 0 || m_target->getSize().y == 0)
+        {
+            if (!m_target->create(m_mode.size))
+                return;
+
+            m_target->setSmooth(true);
+        }
+    }
+
+    sf::View Application::GetLetterBoxView(sf::View view, sf::Vector2u size)
+    {
+        const float windowRatio = static_cast<float>(size.x) / static_cast<float>(size.y);
+        const float viewRatio = view.getSize().x / static_cast<float>(view.getSize().y);
+        float sizeX = 1;
+        float sizeY = 1;
+        float posX = 0;
+        float posY = 0;
+
+        bool horizontalSpacing = true;
+        if (windowRatio < viewRatio)
+            horizontalSpacing = false;
+
+        if (horizontalSpacing) {
+            sizeX = viewRatio / windowRatio;
+            posX = (1 - sizeX) / 2.f;
+        }
+
+        else {
+            sizeY = windowRatio / viewRatio;
+            posY = (1 - sizeY) / 2.f;
+        }
+
+        view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
+        return view;
+    }
+
+    const sf::Color& Application::GetClearColor() const
+    {
+        return m_clearColor;
+    }
+
+    void Application::SetClearColor(const sf::Color &clearColor)
+    {
+        m_clearColor = clearColor;
     }
 
     Application::operator sf::RenderTarget&() const
     {
+        if (m_state == sf::State::Fullscreen)
+            return *m_target;
+
         return *m_window;
     }
 
@@ -301,6 +376,6 @@ namespace Gx
 
     Application::operator RenderSurface&() const
     {
-        return m_targetAdapter;
+        return m_adapter;
     }
 }

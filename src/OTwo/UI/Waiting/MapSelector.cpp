@@ -144,18 +144,16 @@ void MapSelector::SetMapID(int mapID, const bool silent)
 
 void MapSelector::SetEffectID(const unsigned int effectID)
 {
+    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
+    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
+
+    mapEffectTopButton->SetCheckedState(m_effectID == 1);
+    mapEffectBottomButton->SetCheckedState(m_effectID == 2);
+
     if (m_effectID == effectID)
         return;
 
     m_effectID = effectID;
-    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
-    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
-
-    if (m_effectID == 1)
-        mapEffectTopButton->SetCheckedState(true);
-    else
-        mapEffectBottomButton->SetCheckedState(true);
-
     if (m_effectCallback)
         m_effectCallback(m_effectID);
 }

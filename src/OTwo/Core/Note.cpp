@@ -57,11 +57,14 @@ void Note::SetPrefab(const NoteShape shape, Gx::Sprite &prefab)
 
 bool Note::IsVisible() const
 {
-    return m_vertices[0] && m_vertices[0]->color.a > 0;
+    return m_vertices[0] && m_vertices[5]->color.a > 0;
 }
 
 void Note::SetVisible(const bool visible)
 {
+    if (IsVisible() == visible)
+        return;
+
     for (const auto v : m_vertices)
     {
         if (!v)
@@ -91,11 +94,8 @@ void Note::Render(const ChartRenderer &renderer, const double delta)
     const double latency = m_position - renderer.GetRenderPosition();
     if (m_hit || latency > 5.f || latency < -0.5f)
     {
-        if (m_hit)
-        {
-            SetVisible(false);
-            GetGuideLine()->Render(renderer, delta);
-        }
+        SetVisible(false);
+        GetGuideLine()->Render(renderer, delta);
 
         return;
     }

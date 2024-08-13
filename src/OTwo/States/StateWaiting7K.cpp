@@ -20,6 +20,7 @@
 
 #include <Genode/UI.hpp>
 #include <magic_enum.hpp>
+#include <Genode/Tasks/Sequence.hpp>
 
 StateWaiting7K::StateWaiting7K(State &&state) :
     State(std::move(state))
@@ -162,8 +163,6 @@ void StateWaiting7K::Initialize()
 
     const auto mapSelector = Instantiate<MapSelector>("STATE_WAITING/IDC_CONTAINER_MAP_SELECTOR");
     mapSelector->Initialize();
-    mapSelector->SetMapID(room.MapID, true);
-    mapSelector->SetEffectID(room.EffectID);
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
     {
         auto data = Room(*r);
@@ -179,6 +178,9 @@ void StateWaiting7K::Initialize()
 
         s->SetCurrentRoom(data);
     });
+
+    mapSelector->SetMapID(room.MapID, true);
+    mapSelector->SetEffectID(room.EffectID);
 
     const auto instrumentSelector = Instantiate<InstrumentSelector>("STATE_WAITING/IDC_CONTAINER_INSTRUMENT_SELECTOR");
     instrumentSelector->Initialize();
@@ -285,11 +287,27 @@ void StateWaiting7K::Initialize()
 
         sender->SetEnabled(false);
         btnBack->SetEnabled(false);
-
         mixer.Play(sfxStart);
-        director.Present<StateLoading>();
+
+        Run(Create<Gx::Sequence>([&director]
+            {
+                director.Present<StateLoading>();
+            },
+            Gx::Sequence::ListOf({ Create<Gx::Delay>(sf::milliseconds(100.f)) })
+        ));
     });
 
     mixer.Play(bgm, "BGM");
+}
+
+void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent ev)
+{
+    State::OnKeyDown(ev);
+
+    if (ev.code == sf::Keyboard::Key::F3)
+    {
+        if (const auto btnStart = Instantiate<Gx::CheckBox>("STATE_WAITING/IDC_BUTTON_START"))
+            btnStart->SetCheckedState(true);
+    }
 }
 

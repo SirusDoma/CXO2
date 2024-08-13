@@ -2,11 +2,10 @@
 #include <OTwo/Core/ChartRenderer.hpp>
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/States/StateWaiting7K.hpp>
 
 void PlayMenu::Initialize()
 {
-    const auto parent = GetParent<State>();
+    const auto parent = GetParent<::State>();
     if (!parent)
         return;
 
@@ -31,6 +30,8 @@ void PlayMenu::Initialize()
             m_counters[acc] = dynamic_cast<Gx::Number*>(children[i]);
         }
     }
+
+    SetBatchingEnabled(true);
 }
 
 ChartMetadataView PlayMenu::GetMetadata() const
@@ -124,8 +125,6 @@ void PlayMenu::Update(const double delta)
         for (auto [acc, number] : m_counters)
             number->SetValue(acc == Accuracy::None ? m_scoreTracker->GetMaxCombo() : m_scoreTracker->GetPoint(acc));
     }
-
-
 
     UpdatableContainer::Update(delta);
 }

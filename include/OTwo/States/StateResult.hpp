@@ -13,6 +13,7 @@ public:
 
 private:
     void Update(double delta) override;
+    void OnKeyDown(const sf::Event::KeyEvent ev) override;
 };
 
 #endif

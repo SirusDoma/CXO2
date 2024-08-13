@@ -142,6 +142,14 @@ void Chart::SetMeasureFraction(const int measure, const float size)
     m_fractions[measure] = size;
 }
 
+double Chart::GetLastEventPosition(const Difficulty diff) const
+{
+    if (const auto it = m_lasts.find(diff); it != m_lasts.end())
+        return it->second;
+
+    return 0.f;
+}
+
 float Chart::PositionToSeconds(const float position, const float bpm)
 {
     return position * 4 * (60 / bpm);

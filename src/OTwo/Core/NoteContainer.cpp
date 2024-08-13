@@ -13,20 +13,17 @@ NoteContainer::NoteContainer() :
 
 void NoteContainer::Add(Note& note)
 {
-    m_notes[note.GetRenderPosition()].push_back(&note);
+    m_notes.push_back(&note);
     if (const auto position = static_cast<unsigned int>(std::ceil(note.GetRenderPosition())); m_lastMeasure < position)
         m_lastMeasure = position;
 }
 
 Note *NoteContainer::GetNote(const Chart::Channel channel, const double position) const
 {
-    if (const auto it = m_notes.find(position); it != m_notes.end())
+    for (const auto note : m_notes)
     {
-        for (const auto note : it->second)
-        {
-            if (note->GetChannel() == channel)
-                return note;
-        }
+        if (note->GetRenderPosition() == position && note->GetChannel() == channel)
+            return note;
     }
 
     return nullptr;
@@ -96,10 +93,18 @@ void NoteContainer::Update(const double delta)
 void NoteContainer::Render(const ChartRenderer &renderer, const double delta)
 {
     m_shape = renderer.GetRenderSettings().Config->NoteShapeType;
-    for (const auto& [_, group] : m_notes)
+    for (const auto note : m_notes)
     {
-        for (const auto& note : group)
-            note->Render(renderer, delta);
+        const double latency = note->GetRenderPosition() - renderer.GetRenderPosition();
+        if (note->GetChannel() == Chart::Channel::Background)
+        {
+            if (latency < -1.f && latency > 5.f)
+                continue;
+        }
+        else if (latency > 5.f)
+            break;
+
+        note->Render(renderer, delta);
     }
 }
 
@@ -111,21 +116,26 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         const auto view = surface.GetView();
         if (m_viewport.width > 0 && m_viewport.height > 0)
         {
-            auto viewport = surface.GetView();
-            viewport.setScissor({
-                { m_viewport.left  / view.getSize().x, 0.f },
+            auto scissorView = surface.GetView();
+            auto area  = sf::FloatRect({
+                { view.getViewport().left + (m_viewport.left / view.getSize().x), 0.f },
                 { m_viewport.width / view.getSize().x, m_viewport.height / view.getSize().y }
             });
 
-            surface.SetView(viewport);
+            if (area.left < -1.f || area.left > 1.f)
+                area.left = view.getViewport().left;
+
+            scissorView.setScissor(area);
+            surface.SetView(scissorView);
         }
 
         states.texture = it->second;
-        surface.Render(m_measureVertices, states);
         surface.Render(m_noteVertices, states);
-
-        states.texture = nullptr;
-        surface.Render(m_guideLineVertices, states);
+        if (GetParent<ChartRenderer>()->GetRenderSettings().Config->NoteGuideLength > 0)
+        {
+            states.texture = nullptr;
+            surface.Render(m_guideLineVertices, states);
+        }
 
         surface.SetView(view);
     }

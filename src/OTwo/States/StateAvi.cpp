@@ -3,6 +3,7 @@
 #include <SFML/Audio/Music.hpp>
 
 #include <Genode/Fx/Fade.hpp>
+#include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
 #include <OTwo/States/StatePlanet.hpp>
@@ -23,14 +24,20 @@ void StateAvi::Initialize()
     auto bgm        = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
     mixer.Play(bgm, "BGM");
 
-    auto splash = Create<Gx::Sequence>([&]
+    auto overlay = Create<Gx::Rectangle>(GetView().getSize());
+    overlay->SetColor(sf::Color(0, 0, 0, 255));
+    AddChild(overlay);
+
+    const auto splash = Create<Gx::Sequence>([&]
         {
             director.Present<StatePlanet>();
         },
         Gx::Sequence::ListOf(
         {
-            Create<Gx::Fade>(background, 255, sf::seconds(2.25f)),
-            Create<Gx::Fade>(background, 000, sf::seconds(2.25f))
+            Create<Gx::Fade>(overlay, 000, sf::seconds(2.5f)),
+            Create<Gx::Fade>(overlay, 255, sf::seconds(2.5f)),
+            Create<Gx::Action>([=] { AddChild(overlay); }),
+
         })
     );
 

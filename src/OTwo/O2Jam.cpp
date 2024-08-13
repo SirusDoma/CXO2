@@ -222,12 +222,12 @@ void O2Jam::Update(const double delta)
 {
     Application::Update(delta);
 
-    if (isKeyPressed(sf::Keyboard::Key::LAlt) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
+    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
     {
         m_switched = true;
         SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
     }
-    else if (m_switched && (!isKeyPressed(sf::Keyboard::Key::LAlt) || !isKeyPressed(sf::Keyboard::Key::Enter)))
+    else if (m_switched && !isKeyPressed(sf::Keyboard::Key::Enter))
         m_switched = false;
 }
 
@@ -236,8 +236,8 @@ void O2Jam::Shutdown()
     Application::Shutdown();
 
     auto& resources = Require<Gx::ResourceManager>();
-    auto& mixer    = Require<Gx::Mixer>();
-    auto& director = GetSceneDirector();
+    auto& mixer     = Require<Gx::Mixer>();
+    auto& director  = GetSceneDirector();
 
     mixer.Clear();
     director.Unload();
@@ -252,10 +252,13 @@ void O2Jam::OnFocusChanged(bool focus)
     auto& config   = Require<GameConfig>();
     auto& mixer    = Require<Gx::Mixer>();
 
+    const bool ignored = director.IsPresenting<StateAvi>()       ||
+                         director.IsPresenting<StatePlaying7K>() ||
+                         director.IsPresenting<StateResult>();
     if (focus)
     {
         mixer.SetVolume(static_cast<float>(config.MusicVolume));
-        if (director.IsPresenting<StateAvi>() || director.IsPresenting<StatePlaying7K>())
+        if (ignored)
             return;
 
         mixer.Stop("SFX");
@@ -264,7 +267,7 @@ void O2Jam::OnFocusChanged(bool focus)
     else
     {
         mixer.SetVolume(0.f);
-        if (director.IsPresenting<StateAvi>() || director.IsPresenting<StatePlaying7K>())
+        if (ignored)
             return;
 
         mixer.PauseAll();

@@ -84,17 +84,17 @@ void StatePlanet::Initialize()
     if (session.GetMusicHall() == MusicHall::None)
     {
         auto overlay = Create<Gx::Rectangle>(GetView().getSize());
-        const auto splash = Create<Gx::Sequence>([&, overlay]
-                                                 {
-                                                     RemoveChild(overlay);
-                                                 },
-                                                 Gx::Sequence::ListOf({
-                                                     Create<Gx::Fade>(overlay, 0, sf::seconds(2.5f))
-                                                 })
-        );
-
-        overlay->SetFillColor(sf::Color::White);
+        overlay->SetFillColor(sf::Color::Black);
         AddChild(overlay);
+
+        const auto splash = Create<Gx::Sequence>([&, overlay]
+            {
+                RemoveChild(overlay);
+            },
+            Gx::Sequence::ListOf({
+                Create<Gx::Fade>(overlay, 0, sf::seconds(2.5f))
+            })
+        );
         Run(splash);
     }
 

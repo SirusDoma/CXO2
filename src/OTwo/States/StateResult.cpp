@@ -52,8 +52,10 @@ void StateResult::Initialize()
     const auto btnBack = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     btnBack->SetVisible(false);
     btnBack->SetEnabled(false);
-    btnBack->SetClickCallback([this, &mixer] (const auto &sender, const auto &ev)
+    btnBack->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
     {
+        sender.SetEnabled(false);
+
         mixer.StopAll();
         GetDirector().Present<StateWaiting7K>();
     });
@@ -80,4 +82,15 @@ void StateResult::Initialize()
 void StateResult::Update(const double delta)
 {
     State::Update(delta);
+}
+
+void StateResult::OnKeyDown(const sf::Event::KeyEvent ev)
+{
+    State::OnKeyDown(ev);
+
+    if (ev.code == sf::Keyboard::Key::Enter)
+    {
+        if (const auto btnBack = Instantiate<Gx::Button>("IDC_BUTTON_BACK"))
+            btnBack->PerformClick();
+    }
 }

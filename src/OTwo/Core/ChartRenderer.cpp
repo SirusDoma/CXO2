@@ -196,22 +196,24 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 
         if (m_callback && !m_callbackCalled)
         {
-            m_callback();
             m_callbackCalled = true;
+            m_callback();
         }
 
         return states;
     }
 
+    // Skip multiple render calls
+    if (states.FrameID == m_frameId)
+        return RenderableContainer::Render(surface, states);
+
     // Save the current frame time so the generated render position is always consistent across multiple calls in the same frame
-    if (states.FrameID != m_frameId)
-    {
-        m_currentTime = m_timer.getElapsedTime().asMilliseconds();
-        m_frameId = states.FrameID;
-    }
+    m_currentTime = m_timer.getElapsedTime().asMilliseconds();
+    m_frameId = states.FrameID;
 
     // Update input states
     // TODO: Implement poll rate
+    m_inputTime = m_currentTime;
     const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
     for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
         Input(channel, isKeyPressed(key));
@@ -256,8 +258,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
             const auto result = m_judgement->Judge(note);
 
             // Fill buffer with valid event
-            if (const auto front = m_frontBuffers[ev->Channel]; !front || (front->IsRegistered() && (result.Accuracy != Accuracy::None && result.Accuracy != Accuracy::Miss)))
+            if (const auto front = m_frontBuffers[ev->Channel]; !front || front->IsRegistered())
+            {
                 m_frontBuffers[ev->Channel] = &ev;
+                if (front)
+                   ev.LastEvent = front->Event;
+            }
         }
         else
         {
@@ -299,13 +305,28 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
         const auto note = static_cast<Chart::NoteEvent*>(front->Event);
         if (pressed)
         {
-            PlaySample(note, "SFX");
-            if (const auto result = m_judgement->Judge(*note); front->Tap.Accuracy == Accuracy::None && result.Accuracy != Accuracy::None)
+            const auto result = m_judgement->Judge(*note);
+            if (front->Tap.Accuracy == Accuracy::None && result.Accuracy != Accuracy::None)
             {
                 front->Tap = result;
-                m_container->GetNote(front->Event->Channel, front->Event->Position)->Hit();
                 m_scores->Increment(*note, result.Accuracy);
+                if (note->Length > 0 && result.Accuracy == Accuracy::Bad)
+                {
+                    auto release      = Chart::NoteEvent(*note);
+                    release.Type      = Chart::NoteType::Release;
+                    release.Position += note->Length;
+
+                    front->Release = Judgement{ Accuracy::Miss, 0.f };
+                    m_scores->Increment(release, Accuracy::Miss);
+                }
+                else
+                    m_container->GetNote(front->Event->Channel, front->Event->Position)->Hit();
             }
+
+            if (front->LastEvent && front->Tap.Accuracy == Accuracy::None)
+                PlaySample(static_cast<Chart::NoteEvent*>(front->LastEvent), "SFX");
+            else
+                PlaySample(note, "SFX");
         }
         else if (note->Length > 0 && front->Tap.Accuracy != Accuracy::None)
         {

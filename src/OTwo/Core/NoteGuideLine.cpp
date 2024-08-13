@@ -32,11 +32,14 @@ NoteGuideLine::NoteGuideLine(const LongNote &parent) :
 
 bool NoteGuideLine::IsVisible() const
 {
-    return m_vertices[0] && m_vertices[0]->color.a > 0;
+    return m_vertices[0] && m_vertices[7]->color.a > 0;
 }
 
 void NoteGuideLine::SetVisible(const bool visible)
 {
+    if (IsVisible() == visible)
+        return;
+
     for (const auto v : m_vertices)
     {
         if (!v)

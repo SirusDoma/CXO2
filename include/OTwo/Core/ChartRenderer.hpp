@@ -62,6 +62,7 @@ private:
     struct EventState
     {
         Chart::Event *Event;
+        Chart::Event *LastEvent;
         Judgement    Tap     = {Accuracy::None, 0.f};
         Judgement    Release = {Accuracy::None, 0};
 
@@ -109,6 +110,7 @@ private:
     mutable double m_refTime;
     mutable double m_refPosition;
     mutable double m_bpm;
+    mutable double m_inputTime;
     mutable unsigned int m_frameId;
     mutable bool m_callbackCalled;
 

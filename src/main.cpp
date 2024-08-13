@@ -20,7 +20,7 @@ int main(int argc , char** argv)
                 Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
 
-        auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::VideoMode({800, 600}));
+        auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::VideoMode({800, 600}), true);
         return o2jam.Start();
     }
     catch (std::exception &ex)
@@ -35,7 +35,11 @@ int main(int argc , char** argv)
         if (typeid(ex) == typeid(Gx::ResourceAccessException) || typeid(ex) == typeid(Gx::ResourceLoadException))
         {
             details += "\n\nWorking Directory:\n";
-            details += Gx::LocalFileSystem::GetWorkingDirectory();
+            details += Gx::LocalFileSystem::GetWorkingDirectory() + "\n";
+
+            details += "\n\nAsset paths:\n";
+            for (auto path : Gx::LocalFileSystem::GetAssetPaths())
+                details += path + "\n";
         }
 
 #ifdef USE_BOXER

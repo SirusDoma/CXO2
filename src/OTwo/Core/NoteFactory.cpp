@@ -84,7 +84,7 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
 
     // TODO: Apply Arrangement Modifiers
 
-    unsigned int max = 0;
+    unsigned int max = chart.GetLastEventPosition(settings.Difficulty) + 1;
     const auto events = chart.GetEvents(settings.Difficulty);
 
     // Initializes vertices and reserve the array to prevent vertex address from shifting
@@ -92,15 +92,43 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
     auto& guideLineVertices = container->GetGuideLineVertices();
 
     // Resize to worst case scenario (which is LN)
-    vertices.resize(events.size() * 6 * 3); // LN = 3 objects (head, tail, and body)
+    vertices.resize((events.size() * 6 * 3) + (max * 6)); // LN = 3 objects (head, tail, and body)
     guideLineVertices.resize(events.size() * 2 * 4); // 4 objects (head (left + right), tail (left + right))
 
     // TODO: Better vertices index tracking and allocation
     unsigned int vi = 0;
     unsigned int vg = 0;
+
+    // Prepare  measure prefabs
+    std::unordered_map<NoteShape, Gx::Sprite*> measurePrefab = {
+        { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE1") },
+        { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE2") }
+    };
+    container->RegisterPrefab(*measurePrefab[NoteShape::Square]);
+    container->RegisterPrefab(*measurePrefab[NoteShape::Circle]);
+
+    // Configure measure vertices
+    double mpos = 0;
+    for (int m = 1; m <= max; m++)
+    {
+        mpos += chart.GetMeasureFraction(m);
+        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), mpos, Chart::Channel::Background);
+        auto vx = std::array<sf::Vertex*, 6>();
+
+        for (int v = 0; v < vx.size(); v++)
+            vx[v] = &vertices[vi + v];
+
+        vi += 6;
+        measure.SetVertices(vx);
+        for (const auto shape : { NoteShape::Square, NoteShape::Circle })
+            measure.SetPrefab(shape, *measurePrefab[shape]);
+
+        container->Add(measure);
+    }
+
+    // Configure note vertices
     for (int i = 0; i < events.size(); i++)
     {
-        max = max < (events[i] ? std::ceil(events[i]->Position) : 0) ? std::ceil(events[i]->Position) : max;
         if (!events[i] || events[i]->Channel == Chart::Channel::Measurement || events[i]->Channel == Chart::Channel::BPM || events[i]->Channel == Chart::Channel::Background)
             continue;
 
@@ -171,37 +199,6 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
     // Reduce the vertices number to actual usage
     vertices.resize(vi);
     guideLineVertices.resize(vg);
-
-    std::unordered_map<NoteShape, Gx::Sprite*> measurePrefab = {
-        { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE1") },
-        { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE2") }
-    };
-    container->RegisterPrefab(*measurePrefab[NoteShape::Square]);
-    container->RegisterPrefab(*measurePrefab[NoteShape::Circle]);
-
-    vi = 0;
-    max += 1;
-
-    auto& measureVertices = container->GetMeasureVertices();
-    measureVertices.resize(max * 6);
-
-    double mpos = 0;
-    for (int m = 1; m <= max; m++)
-    {
-        mpos += chart.GetMeasureFraction(m);
-        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), mpos, Chart::Channel::Background);
-        auto vx = std::array<sf::Vertex*, 6>();
-
-        for (int v = 0; v < vx.size(); v++)
-            vx[v] = &measureVertices[vi + v];
-
-        vi += 6;
-        measure.SetVertices(vx);
-        for (const auto shape : { NoteShape::Square, NoteShape::Circle })
-            measure.SetPrefab(shape, *measurePrefab[shape]);
-
-        container->Add(measure);
-    }
 
     return container;
 }

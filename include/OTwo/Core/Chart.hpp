@@ -134,20 +134,24 @@ public:
     float GetMeasureFraction(int measure) const;
     void SetMeasureFraction(int measure, float size);
 
+    double GetLastEventPosition(Difficulty diff) const;
+
     static float PositionToSeconds(float position, float bpm);
     static float SecondsToPosition(float seconds, float bpm);
 
     std::string Source;
 private:
-    using EventList = std::vector<std::unique_ptr<Event>>;
-    using EventMap  = std::unordered_map<Difficulty, EventList>;
-    using SampleMap = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
-    using SizeMap   = std::unordered_map<Gx::Uint32, float>;
+    using EventList   = std::vector<std::unique_ptr<Event>>;
+    using EventMap    = std::unordered_map<Difficulty, EventList>;
+    using SampleMap   = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
+    using FractionMap = std::unordered_map<Gx::Uint32, float>;
+    using PositionMap = std::unordered_map<Difficulty, double>;
 
     ChartMetadata m_metadata;
     EventMap      m_events;
     SampleMap     m_samples;
-    SizeMap       m_fractions;
+    FractionMap   m_fractions;
+    PositionMap   m_lasts;
 
     Gx::ResourcePtr<sf::Image> m_cover;
     Gx::ResourcePtr<sf::Image> m_thumbnail;

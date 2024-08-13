@@ -30,6 +30,7 @@ private:
     void Update(const double delta) override;
 
     const GameContext *PrepareContext() const;
+    void CaptureScreen();
 
     using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
     using AnimationMap = std::unordered_map<Chart::Channel, Gx::Animation*>;

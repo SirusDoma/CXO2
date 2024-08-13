@@ -21,13 +21,8 @@ bool LongNote::IsVisible() const
 
 void LongNote::SetVisible(const bool visible)
 {
-    for (const auto v : GetVertices())
-    {
-        if (!v)
-            break;
-
-        v->color = visible ? sf::Color::White : sf::Color::Transparent;
-    }
+    if (IsVisible() == visible)
+        return;
 
     for (const auto v : m_headVertices)
     {
@@ -38,6 +33,14 @@ void LongNote::SetVisible(const bool visible)
     }
 
     for (const auto v : m_tailVertices)
+    {
+        if (!v)
+            break;
+
+        v->color = visible ? sf::Color::White : sf::Color::Transparent;
+    }
+
+    for (const auto v : GetVertices())
     {
         if (!v)
             break;

@@ -62,6 +62,12 @@ namespace Gx
         return target.getView();
     }
 
+    sf::View Scene::GetDefaultView() const
+    {
+        const sf::RenderTarget &target = GetApplication();
+        return target.getDefaultView();
+    }
+
     void Scene::SetView(const sf::View &view)
     {
         sf::RenderTarget &target = GetApplication();

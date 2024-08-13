@@ -38,6 +38,9 @@ namespace Gx
         sf::State GetWindowState() const;
         void SetWindowState(const sf::State state);
 
+        const sf::Color& GetClearColor() const;
+        void SetClearColor(const sf::Color &clearColor);
+
         void SetCursor(Cursor &cursor);
 
         template<typename T>
@@ -75,21 +78,20 @@ namespace Gx
         using ProviderFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Provider>(Application&)>>;
 
         void SetupWindow() const;
+        void SetupTarget() const;
+        static sf::View GetLetterBoxView(sf::View view, sf::Vector2u size);
 
         inline static Application *m_instance = nullptr;
 
         mutable std::unique_ptr<sf::RenderWindow> m_window;
-        mutable RenderTargetAdapter m_targetAdapter;
+        mutable std::unique_ptr<sf::RenderTexture> m_target;
+        mutable RenderTargetAdapter m_adapter;
         mutable SceneDirector m_director;
         sf::Event m_event;
         sf::State m_state;
 
-        ResourceManager m_resources;
-
         sf::VideoMode m_mode;
         sf::VideoMode m_virtualMode;
-
-        sf::Clock m_timer;
         Cursor* m_cursor;
 
         ProviderMap        m_providers;
@@ -101,6 +103,7 @@ namespace Gx
         unsigned int m_renderFreq;
         bool m_fullScreen;
         bool m_closeRequested;
+        sf::Color m_clearColor = sf::Color::Black;
     };
 }
 

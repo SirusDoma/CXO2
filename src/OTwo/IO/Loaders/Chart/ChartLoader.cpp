@@ -206,11 +206,14 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(ChartMetadata &metadata, co
 
 Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, ChartMetadata &metadata, const Gx::ResourceContext &ctx)
 {
+    if (metadata.ThumbnailSize == 0)
+        return nullptr;
+
     if (stream.seek(metadata.CoverOffset + metadata.CoverSize) == -1)
         return nullptr;
 
     auto data = std::vector<Gx::Uint8>(metadata.ThumbnailSize);
-    if (stream.read(&data[0], metadata.ThumbnailSize) != metadata.ThumbnailSize)
+    if (const auto read = stream.read(&data[0], metadata.ThumbnailSize); std::abs(read - metadata.ThumbnailSize) > 4)
         return nullptr;
 
     auto image  = std::make_unique<sf::Image>();
@@ -222,6 +225,9 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, C
 
 Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream &stream, ChartMetadata &metadata, const Gx::ResourceContext &ctx)
 {
+    if (metadata.CoverSize == 0)
+        return nullptr;
+
     if (stream.seek(metadata.CoverOffset) == -1)
         return nullptr;
 

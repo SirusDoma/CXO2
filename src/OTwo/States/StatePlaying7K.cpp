@@ -9,7 +9,6 @@
 #include <OTwo/Config/GameConfig.hpp>
 
 #include <Genode/UI.hpp>
-#include <Genode/Utilities/Debugger.hpp>
 
 StatePlaying7K::StatePlaying7K() :
     m_renderer(ChannelSet{
@@ -77,7 +76,6 @@ void StatePlaying7K::Initialize()
         if (id < 1 || id > 7)
             continue;
 
-
         const auto keyDown = keyDownContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN" + std::to_string(id));
         keyDown->SetVisible(false);
 
@@ -91,16 +89,7 @@ void StatePlaying7K::Initialize()
 
     AddChild(&m_renderer);
     m_renderer.Render(*m_context->GetChart(), *m_context, [this] () {
-        const auto resources = &GetResources(ResourceScope::Shared);
-        const sf::RenderTarget& target = GetApplication();
-        const auto view = target.getView();
-
-        if (auto texture = std::make_unique<sf::Texture>(); texture->create(sf::Vector2u{static_cast<unsigned int>(view.getSize().x), static_cast<unsigned int>(view.getSize().y)}))
-        {
-            texture->update(GetApplication());
-            resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
-        }
-
+        CaptureScreen();
         GetDirector().Present<StateResult>();
     });
 
@@ -148,7 +137,6 @@ void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
             keyDown->second->SetVisible(true);
 
-        //m_renderer.Input(channel, true);
         break;
     }
 }
@@ -184,7 +172,6 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
             keyDown->second->SetVisible(false);
 
-        //m_renderer.Input(channel, false);
         break;
     }
 }
@@ -203,4 +190,25 @@ const GameContext *StatePlaying7K::PrepareContext() const
         context->SetConfig(Require<GameConfig>());
 
     return context;
+}
+
+void StatePlaying7K::CaptureScreen()
+{
+    const auto resources = &GetResources(ResourceScope::Shared);
+    const sf::RenderTarget& window = GetApplication();
+
+    if (auto target = sf::RenderTexture(); target.create(window.getSize()))
+    {
+        target.clear(GetApplication().GetClearColor());
+        {
+            auto surface = Gx::RenderTargetAdapter(target);
+
+            Update(0);
+            surface.Render(*this, Gx::RenderStates::Default);
+        }
+        target.display();
+
+        auto texture = std::make_unique<sf::Texture>(target.getTexture());
+        resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
+    }
 }

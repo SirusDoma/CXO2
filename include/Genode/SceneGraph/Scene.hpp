@@ -31,7 +31,9 @@ namespace Gx
 
         Application &GetApplication() const;
         SceneDirector &GetDirector() const;
+
         sf::View GetView() const;
+        sf::View GetDefaultView() const;
 
         Node *GetCurrentOverlay() const;
         void PushOverlay(Node *overlay);
