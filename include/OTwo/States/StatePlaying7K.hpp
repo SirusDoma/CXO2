@@ -37,8 +37,9 @@ private:
 
     ChartRenderer m_renderer;
 
-    const GameContext *m_context;
-    GameConfig *m_config;
+    const GameContext* m_context;
+    GameConfig* m_config;
+    ScoreTracker* m_scores;
     ImageMap m_keyDowns, m_keyEffects;
 
     unsigned int m_viewport;

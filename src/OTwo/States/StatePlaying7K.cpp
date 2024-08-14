@@ -49,6 +49,7 @@ void StatePlaying7K::Initialize()
 
     m_context = PrepareContext();
     m_config  = &Require<GameConfig>();
+    m_scores  = &Require<ScoreTracker>();
 
     const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(0);
@@ -93,6 +94,44 @@ void StatePlaying7K::Initialize()
         GetDirector().Present<StateResult>();
     });
 
+    const auto scoreNumber = Instantiate<Gx::Number>("IDC_NUMBER_POINT_NUMBER");
+
+    const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
+    const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
+    const auto buffers = bufferContainer->GetChildren();
+    for (int i = 0; i < buffers.size(); i++)
+    {
+        const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
+        renderable->SetVisible(false);
+    }
+
+    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
+    const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
+    const auto jamNumber    = jamContainer->FindChild<Gx::Number>("IDC_NUMBER_NOTE_JAM");
+
+    jamContainer->SetVisible(false);
+    jamAnimation->Stop();
+    jamAnimation->SetAnimationCallback([=] (auto animation) {
+        jamContainer->SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
+    });
+
+    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo) {
+        scoreNumber->SetValue(m_scores->GetScore());
+        for (int i = 0; i < buffers.size(); i++)
+        {
+            const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
+            renderable->SetVisible(i < m_scores->GetBufferCount());
+        }
+
+        jamGauge->SetValue(m_scores->GetJamProgress());
+    });
+
+    m_renderer.SetJamComboCallback([=] (auto& ev, auto acc, auto jamCombo) {
+        jamNumber->SetValue(jamCombo);
+        jamAnimation->Reset();
+        jamContainer->SetVisible(true);
+    });
+
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
     {
@@ -117,9 +156,6 @@ void StatePlaying7K::SetViewport(const unsigned int viewport)
 void StatePlaying7K::Update(const double delta)
 {
     State::Update(delta);
-
-    if (!m_context->GetChart())
-        return;
 }
 
 void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)

@@ -23,8 +23,7 @@ namespace Gx
     {
         static_assert(std::is_base_of_v<Provider, T>, "Parameter must be a Gx::Provider");
 
-        if (const auto iterator = m_providers.find(typeid(T)); iterator != m_providers.end())
-            return false;
+        Uninstall<T>();
 
         m_factories[typeid(T)] = builder;
         return true;

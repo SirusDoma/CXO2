@@ -5,29 +5,82 @@ ScoreTracker::ScoreTracker(const Difficulty diff) :
     m_score(0),
     m_maxCombo(0),
     m_combo(0),
+    m_jams(0),
     m_maxJamCombo(0),
     m_jamCombo(0),
-    m_jamProgress(0)
+    m_jamProgress(0),
+    m_buffer(0),
+    m_bufferProgress(0)
 {
 }
 
-void ScoreTracker::Increment(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned int count)
+Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count)
 {
     if (acc == Accuracy::None)
-        return;
+        return acc;
+
+    if (acc == Accuracy::Bad && m_buffer > 0)
+    {
+        m_bufferProgress = 0;
+        if (count > m_buffer)
+        {
+            count -= m_buffer;
+            Increment(ev, Accuracy::Cool, m_buffer);
+        }
+        else
+            acc = Accuracy::Cool;
+
+        m_buffer -= count;
+    }
 
     m_points[acc] += count;
-    if (acc == Accuracy::Bad || acc == Accuracy::Miss)
-        m_combo  = 0;
-    else
+    if (acc == Accuracy::Cool || acc == Accuracy::Good)
+    {
         m_combo += count;
+        if (acc == Accuracy::Cool)
+        {
+            m_bufferProgress += count;
+            m_jamProgress += 4 * count;
+        }
+        else
+        {
+            m_bufferProgress = 0;
+            m_jamProgress += 2 * count;
+        }
+
+        // Buffer
+        if (m_bufferProgress >= 15)
+        {
+            m_buffer = std::min<unsigned int>(m_buffer + 1, 5);
+            m_bufferProgress = 0;
+        }
+
+        // Jam Combo
+        if (m_jamProgress >= 100)
+        {
+            m_jamProgress %= 100;
+            m_jamCombo++;
+            m_jams++;
+
+            if (m_jamComboCallback)
+                m_jamComboCallback(ev, acc, m_jamCombo);
+        }
+    }
+    else
+    {
+        m_combo = 0;
+        m_bufferProgress = 0;
+        m_jamProgress = 0;
+        m_jamCombo = 0;
+    }
 
     m_maxCombo = m_maxCombo < m_combo && m_combo > 2 ? m_combo : m_maxCombo;
+    m_maxJamCombo = std::max(m_maxJamCombo, m_jamCombo);
 
-    // TODO: Update score and jam
+    if (m_incrementCallback)
+        m_incrementCallback(ev, acc, count);
 
-    if (m_callback)
-        m_callback(ev, acc, count);
+    return acc;
 }
 
 void ScoreTracker::Initialize(const Difficulty diff)
@@ -36,14 +89,24 @@ void ScoreTracker::Initialize(const Difficulty diff)
     Reset();
 }
 
-void ScoreTracker::SetUpdateCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &callback)
+void ScoreTracker::SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)>& callback)
 {
-    m_callback = std::move(callback);
+    m_incrementCallback = std::move(callback);
+}
+
+void ScoreTracker::SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)>& callback)
+{
+    m_jamComboCallback = callback;
 }
 
 unsigned int ScoreTracker::GetScore() const
 {
-    return m_score;
+    const int score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
+                      m_points[Accuracy::Good] * (100 + 5  * m_jams) +
+                      m_points[Accuracy::Bad]  * 4 -
+                      m_points[Accuracy::Miss] * 10;
+
+    return std::max(score, 0);
 }
 
 unsigned int ScoreTracker::GetPoint(Accuracy acc) const
@@ -74,19 +137,31 @@ unsigned int ScoreTracker::GetJamCombo() const
     return m_jamCombo;
 }
 
-float ScoreTracker::GetJamProgress() const
+unsigned int ScoreTracker::GetJamProgress() const
 {
     return m_jamProgress;
 }
 
+unsigned int ScoreTracker::GetBufferCount() const
+{
+    return m_buffer;
+}
+
+unsigned int ScoreTracker::GetBufferProgress() const
+{
+    return m_bufferProgress;
+}
+
 void ScoreTracker::Reset()
 {
-    m_score       = 0;
-    m_maxCombo    = 0;
-    m_combo       = 0;
-    m_maxJamCombo = 0;
-    m_jamCombo    = 0;
-    m_jamProgress = 0.f;
+    m_score          = 0;
+    m_maxCombo       = 0;
+    m_combo          = 0;
+    m_maxJamCombo    = 0;
+    m_jamCombo       = 0;
+    m_jamProgress    = 0;
+    m_buffer         = 0;
+    m_bufferProgress = 0;
 
     for (auto acc : { Accuracy::Cool, Accuracy::Good, Accuracy::Bad, Accuracy::Miss })
         m_points[acc] = 0;

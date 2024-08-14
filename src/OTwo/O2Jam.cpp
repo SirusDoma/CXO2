@@ -51,6 +51,7 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 
 #include <OTwo/Core/JudgementStrategy.hpp>
+#include <OTwo/Core/Judgements/RenderPositionJudgementStrategy.hpp>
 #include <OTwo/Core/Judgements/TimeJudgementStrategy.hpp>
 #include <OTwo/Core/ScoreTracker.hpp>
 
@@ -173,7 +174,7 @@ void O2Jam::Boot()
 
     Provide<JudgementStrategy>([] (auto &app)
     {
-        return std::make_unique<TimeJudgementStrategy>();
+        return std::make_unique<RenderPositionJudgementStrategy>();
     });
 
     Provide<ScoreTracker>([] (auto &app)

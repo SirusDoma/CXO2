@@ -35,7 +35,9 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_bpm(0),
     m_frameId(0),
     m_callbackCalled(false),
-    m_callback()
+    m_callback(),
+    m_incrementCallback(),
+    m_jamComboCallback()
 {
 }
 
@@ -72,8 +74,15 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, c
     // Setup score tracker
     m_scores = &parent->Require<ScoreTracker>();
     m_scores->Initialize(settings.Difficulty);
-    m_scores->SetUpdateCallback([this] (auto ch, auto acc, auto count) {
-        OnScoreUpdated(ch, acc, count);
+    m_scores->SetIncrementCallback([this] (auto ev, auto acc, auto count) {
+        OnScoreUpdated(ev, acc, count);
+        if (m_incrementCallback)
+            m_incrementCallback(ev, acc, count);
+    });
+
+    m_scores->SetJamComboCallback([this] (auto ev, auto acc, auto count) {
+        if (m_jamComboCallback)
+            m_jamComboCallback(ev, acc, count);
     });
 
     // Setup Speed
@@ -305,12 +314,12 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
         const auto note = static_cast<Chart::NoteEvent*>(front->Event);
         if (pressed)
         {
-            const auto result = m_judgement->Judge(*note);
+            auto result = m_judgement->Judge(*note);
             if (front->Tap.Accuracy == Accuracy::None && result.Accuracy != Accuracy::None)
             {
-                front->Tap = result;
-                m_scores->Increment(*note, result.Accuracy);
-                if (note->Length > 0 && result.Accuracy == Accuracy::Bad)
+                result.Accuracy = m_scores->Increment(*note, result.Accuracy);
+                front->Tap      = result;
+                if (note->Length > 0 && result.Accuracy == Accuracy::Bad && m_scores->GetBufferCount() <= 0)
                 {
                     auto release      = Chart::NoteEvent(*note);
                     release.Type      = Chart::NoteType::Release;
@@ -339,8 +348,9 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
                 if (result.Accuracy == Accuracy::None)
                     result.Accuracy = Accuracy::Miss;
 
-                front->Release = result;
-                m_scores->Increment(release, result.Accuracy);
+                result.Accuracy = m_scores->Increment(release, result.Accuracy);
+                front->Release  = result;
+
             }
         }
     }
@@ -372,6 +382,16 @@ double ChartRenderer::GetRenderPosition() const
 double ChartRenderer::GetCurrentBPM() const
 {
     return m_bpm;
+}
+
+void ChartRenderer::SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& incrementCallback)
+{
+    m_incrementCallback = incrementCallback;
+}
+
+void ChartRenderer::SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& jamComboCallback)
+{
+    m_jamComboCallback = jamComboCallback;
 }
 
 int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool absolute) const

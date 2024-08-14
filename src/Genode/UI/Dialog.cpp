@@ -166,8 +166,8 @@ namespace Gx
             m_scene->PushOverlay(this);
             m_shown = true;
 
-            sf::RenderTarget& target = m_scene->GetApplication();
-            auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(static_cast<sf::RenderWindow&>(target)));
+            const sf::RenderWindow& target = m_scene->GetApplication();
+            const auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(target));
 
             if (m_acceptButton)
                 m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));

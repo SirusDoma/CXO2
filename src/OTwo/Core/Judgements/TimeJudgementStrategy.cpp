@@ -7,7 +7,7 @@ TimeJudgementStrategy::TimeJudgementStrategy()
 {
     // Base Formula:
     // 1 frame / 60fps = 0.016667 sec per frame (or 16.667ms per frame)
-    constexpr double framePerMilliseconds = (1.f / 60.f) * 1000.f;
+    constexpr double FramePerMilliseconds = (1.f / 60.f) * 1000.f;
 
     auto evaluator = [] (const ChartRenderer& renderer, const Chart::NoteEvent &ev, const double tolerance)
     {
@@ -19,16 +19,16 @@ TimeJudgementStrategy::TimeJudgementStrategy()
 
     Register(Accuracy::Cool, [=] (const auto& renderer, const auto& ev)
     {
-        return evaluator(renderer, ev, framePerMilliseconds * 3.2f);
+        return evaluator(renderer, ev, FramePerMilliseconds * 3.2f);
     });
 
     Register(Accuracy::Good, [=] (const auto& renderer, const auto& ev)
     {
-        return evaluator(renderer, ev, framePerMilliseconds * 8.f);
+        return evaluator(renderer, ev, FramePerMilliseconds * 8.f);
     });
 
     Register(Accuracy::Bad, [=] (const auto& renderer, const auto& ev)
     {
-        return evaluator(renderer, ev, framePerMilliseconds * 10.f);
+        return evaluator(renderer, ev, FramePerMilliseconds * 15.f);
     });
 }

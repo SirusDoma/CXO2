@@ -12,13 +12,16 @@
 class ScoreTracker : public Gx::Provider
 {
 public:
+
     ScoreTracker() = default;
     explicit ScoreTracker(Difficulty diff);
 
-    virtual void Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count = 1);
+    virtual Accuracy Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count = 1);
 
     void Initialize(Difficulty diff = Difficulty::MX);
-    void SetUpdateCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
+
+    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
+    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
 
     virtual unsigned int GetScore() const;
     unsigned int GetPoint(Accuracy acc) const;
@@ -28,21 +31,29 @@ public:
 
     unsigned int GetMaxJamCombo() const;
     unsigned int GetJamCombo() const;
-    virtual float GetJamProgress() const;
+    virtual unsigned int GetJamProgress() const;
+
+    unsigned int GetBufferCount() const;
+    unsigned int GetBufferProgress() const;
 
     void Reset();
 
 private:
     Difficulty m_difficulty;
-    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_callback;
-    std::unordered_map<Accuracy, unsigned int> m_points;
+    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_incrementCallback;
+    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_jamComboCallback;
+
+    mutable std::unordered_map<Accuracy, unsigned int> m_points;
 
     unsigned int m_score;
     unsigned int m_maxCombo;
     unsigned int m_combo;
+    unsigned int m_jams;
     unsigned int m_maxJamCombo;
     unsigned int m_jamCombo;
-    float m_jamProgress;
+    unsigned int m_jamProgress;
+    unsigned int m_buffer;
+    unsigned int m_bufferProgress;
 };
 
 #endif
