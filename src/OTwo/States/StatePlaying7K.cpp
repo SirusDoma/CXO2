@@ -105,7 +105,11 @@ void StatePlaying7K::Initialize()
         renderable->SetVisible(false);
     }
 
+    // HACK: Make jam container top-level
     const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
+    RemoveChild(jamContainer);
+    AddChild(jamContainer);
+
     const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
     const auto jamNumber    = jamContainer->FindChild<Gx::Number>("IDC_NUMBER_NOTE_JAM");
 
