@@ -26,6 +26,7 @@ StatePlaying7K::StatePlaying7K() :
         Chart::Channel::Note6,
         Chart::Channel::Note7
     }),
+    m_self(),
     m_context(),
     m_config(),
     m_viewport()
@@ -43,6 +44,7 @@ StatePlaying7K::StatePlaying7K(State &&state) :
         Chart::Channel::Note6,
         Chart::Channel::Note7
     }),
+    m_self(),
     m_context(),
     m_config(),
     m_viewport()
