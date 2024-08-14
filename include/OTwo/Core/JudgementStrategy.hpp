@@ -11,7 +11,7 @@
 
 struct Judgement
 {
-    Accuracy Accuracy;
+    ::Accuracy Accuracy;
     double   Latency;
 };
 

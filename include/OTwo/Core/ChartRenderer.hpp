@@ -32,7 +32,7 @@ public:
         GameConfig   *Config;
         unsigned int  Viewport;
         float         Speed;
-        Difficulty    Difficulty;
+        ::Difficulty  Difficulty;
 
         // TODO: Modifiers
     };

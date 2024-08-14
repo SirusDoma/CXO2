@@ -60,8 +60,8 @@ public:
 
     struct Event
     {
-        Channel Channel;
-        double  Position;
+        Chart::Channel Channel;
+        double         Position;
 
         Event(const Chart::Channel channel, const double position) :
             Channel(channel),

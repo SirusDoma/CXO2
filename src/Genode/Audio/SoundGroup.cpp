@@ -1,5 +1,6 @@
 ﻿#include <Genode/Audio/SoundGroup.hpp>
 
+#include <algorithm>
 #include <cmath>
 
 namespace Gx

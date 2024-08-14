@@ -6,7 +6,7 @@
 
 struct AvatarMetadata : public TransformMetadata
 {
-    Gender Gender = Gender::Male;
+    ::Gender Gender = Gender::Male;
     std::vector<unsigned int> ItemIDs = {};
 };
 
