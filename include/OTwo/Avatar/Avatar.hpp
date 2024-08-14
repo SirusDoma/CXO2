@@ -4,6 +4,7 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Models/Room.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
 #include <Genode/SceneGraph.hpp>
 
@@ -28,6 +29,8 @@ public:
 
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
     const Instrument &GetEquipedInstrumentType() const;
+
+    AvatarInfo* GetAvatarInfo() const;
 
 private:
     using ItemMap            = std::unordered_map<EquipmentType, const Item*>;

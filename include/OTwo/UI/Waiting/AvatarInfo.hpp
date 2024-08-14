@@ -4,6 +4,7 @@
 #include <OTwo/Models/Room.hpp>
 
 #include <Genode/UI/UiContainer.hpp>
+#include <Genode/UI/Gauge.hpp>
 
 #include <unordered_map>
 
@@ -15,8 +16,9 @@ public:
 
     void Initialize() override;
 
-    Avatar *GetAvatar() const;
-    RoomMember *GetMember() const;
+    Avatar* GetAvatar() const;
+    Gx::Gauge* GetLifeBar() const;
+    RoomMember* GetMember() const;
     const sf::Color &GetTeamColor(RoomTeam team);
 
     void SetMember(RoomMember &member);

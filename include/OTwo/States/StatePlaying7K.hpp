@@ -11,6 +11,7 @@
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
 
+class Avatar;
 class StatePlaying7K : public State
 {
 public:
@@ -34,12 +35,14 @@ private:
 
     using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
     using AnimationMap = std::unordered_map<Chart::Channel, Gx::Animation*>;
+    using AvatarMap = std::unordered_map<unsigned int, Avatar*>;
 
     ChartRenderer m_renderer;
+    AvatarMap m_avatars;
+    Avatar* m_self;
 
     const GameContext* m_context;
     GameConfig* m_config;
-    ScoreTracker* m_scores;
     ImageMap m_keyDowns, m_keyEffects;
 
     unsigned int m_viewport;

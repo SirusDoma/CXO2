@@ -4,11 +4,17 @@
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Core/ChartRenderer.hpp>
+#include <OTwo/Core/LifeSystem.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
+#include <OTwo/Avatar/Avatar.hpp>
+
+#include <Genode/Tasks/Step.hpp>
 #include <Genode/UI.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
 StatePlaying7K::StatePlaying7K() :
     m_renderer(ChannelSet{
@@ -49,24 +55,52 @@ void StatePlaying7K::Initialize()
 
     m_context = PrepareContext();
     m_config  = &Require<GameConfig>();
-    m_scores  = &Require<ScoreTracker>();
+
+    auto& session = Require<SessionContext>();
+    auto& room    = session.GetCurrentRoom();
+    auto& items   = Require<ItemFactory>();
+
+
+    // IMPORTANT: Don't use callback of these systems, it is being used by chart renderer
+    // TODO: Implement multiple listeners for the callback
+    const auto scoreTracker = &Require<ScoreTracker>();
+    const auto lifeSystem   = &Require<LifeSystem>();
+    scoreTracker->Initialize(m_context->GetDifficulty());
+    lifeSystem->Initialize(m_context->GetDifficulty());
 
     const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(0);
 
-    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
-    lifeBar->SetValue(100);
-
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
     const auto avaContainers = avatarList->GetChildren();
-    unsigned int pIndex = 0;
-    for (const auto container : avaContainers)
+    for (int i = 0; i < avaContainers.size(); i++)
     {
+        const auto container  = avaContainers[i];
         const auto renderable = dynamic_cast<Gx::Renderable*>(container);
-        if (pIndex != 1)
-            renderable->SetVisible(false);
+        if (!renderable)
+            continue;
 
-        pIndex++;
+        auto member = room.Members[i];
+        renderable->SetVisible(member.ID != 0);
+
+        if (!renderable->IsVisible())
+            continue;
+
+        const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
+        for (const auto id : member.EquippedItemIDs)
+            avatar->Equip(items.GetItem(id));
+
+        const auto info = avatar->GetAvatarInfo();
+        info->SetMember(member);
+
+        const auto playerLifeBar = info->GetLifeBar();
+        playerLifeBar->SetMaximumValue(lifeSystem->GetMaxLifePoint());
+        playerLifeBar->SetValue(lifeSystem->GetMaxLifePoint());
+
+        if (session.GetCurrentPlayer().ID == member.ID)
+            m_self = avatar;
+
+        m_avatars[i] = avatar;
     }
 
     const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
@@ -88,14 +122,25 @@ void StatePlaying7K::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
+    m_renderer.SetName("IDC_CHART_RENDERER");
     AddChild(&m_renderer);
-    m_renderer.Render(*m_context->GetChart(), *m_context, [this] () {
+    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this] () {
         CaptureScreen();
         GetDirector().Present<StateResult>();
     });
 
-    const auto scoreNumber = Instantiate<Gx::Number>("IDC_NUMBER_POINT_NUMBER");
+    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Render` in order to preserve correct layout ordering
 
+    // Setup Play Menu
+    const auto playMenu = Create<PlayMenu>();
+    playMenu->SetName("IDC_PLAY_MENU");
+    AddChild(playMenu);
+    playMenu->Initialize();
+    playMenu->SetMetadata(m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty()), m_context->GetDifficulty());
+    playMenu->SetScoreTracker(*scoreTracker);
+
+    // Setup Score Counter
+    const auto scoreNumber = Instantiate<Gx::Number>("IDC_NUMBER_POINT_NUMBER");
     const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
     const auto buffers = bufferContainer->GetChildren();
@@ -105,11 +150,15 @@ void StatePlaying7K::Initialize()
         renderable->SetVisible(false);
     }
 
-    // HACK: Make jam container top-level
-    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
-    RemoveChild(jamContainer);
-    AddChild(jamContainer);
+    // Setup Life Bar
+    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    lifeBar->SetSlanted(true);
+    lifeBar->SetMaximumValue(lifeSystem->GetMaxLifePoint());
+    lifeBar->SetValue(0);
 
+    // Setup Jam Combo
+    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
+    jamContainer->SetVisible(false);
     const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
     const auto jamNumber    = jamContainer->FindChild<Gx::Number>("IDC_NUMBER_NOTE_JAM");
 
@@ -119,18 +168,38 @@ void StatePlaying7K::Initialize()
         jamContainer->SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
     });
 
-    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo) {
-        scoreNumber->SetValue(m_scores->GetScore());
+    // Setup Combo Counter
+    const auto comboCounter = Create<ComboCounter>();
+    comboCounter->SetName("IDC_CONTAINER_COMBO");
+    AddChild(comboCounter);
+    comboCounter->Initialize();
+
+    // Setup Judgement Indicator
+    const auto judgementIndicator = Create<JudgementIndicator>();
+    judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
+    AddChild(judgementIndicator);
+    judgementIndicator->Initialize();
+
+    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo)
+    {
+        comboCounter->SetCombo(scoreTracker->GetCombo());
+        judgementIndicator->Play(acc);
+
+        lifeBar->SetValue(lifeSystem->GetCurrentLifePoint());
+        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
+
+        scoreNumber->SetValue(scoreTracker->GetScore());
         for (int i = 0; i < buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
-            renderable->SetVisible(i < m_scores->GetBufferCount());
+            renderable->SetVisible(i < scoreTracker->GetBufferCount());
         }
 
-        jamGauge->SetValue(m_scores->GetJamProgress());
+        jamGauge->SetValue(scoreTracker->GetJamProgress());
     });
 
-    m_renderer.SetJamComboCallback([=] (auto& ev, auto acc, auto jamCombo) {
+    m_renderer.SetJamComboCallback([=] (auto& ev, auto acc, auto jamCombo)
+    {
         jamNumber->SetValue(jamCombo);
         jamAnimation->Reset();
         jamContainer->SetVisible(true);
@@ -142,9 +211,26 @@ void StatePlaying7K::Initialize()
         GetDirector().Present<StateWaiting7K>();
     });
 
-    // HACK: Make exit button top-level
-    RemoveChild(exitButton);
-    AddChild(exitButton);
+    Run(Create<Gx::Step>
+    (
+        sf::seconds((lifeSystem->GetMaxLifePoint() / (lifeSystem->GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
+        sf::seconds(1.f / 60.f),
+        [this, lifeSystem, lifeBar] (const Gx::Step* step, auto const delta)
+        {
+            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(lifeSystem->GetMaxLifePoint() * 0.01f));
+            for (auto [_, avatar] : m_avatars)
+                avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
+
+            if (step->GetState() == Gx::TaskState::Completed)
+            {
+                lifeBar->SetValue(lifeSystem->GetMaxLifePoint());
+                for (auto [_, avatar] : m_avatars)
+                    avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
+
+                m_renderer.StartRender();
+            }
+        }
+    ));
 }
 
 unsigned int StatePlaying7K::GetViewport() const

@@ -16,6 +16,7 @@
 #include <Genode/UI/Number.hpp>
 
 #include <unordered_map>
+#include <OTwo/Core/LifeSystem.hpp>
 
 using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
@@ -41,8 +42,12 @@ public:
 
     explicit ChartRenderer(const ChannelSet &instantiables);
 
-    void Render(const Chart &chart, const GameContext &context, const std::function<void()>& callback);
-    void Render(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback);
+    void Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& callback);
+    void Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback);
+
+    void StartRender();
+
+    bool IsStarted() const;
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void Input(Chart::Channel channel, bool pressed) const ;
@@ -53,11 +58,8 @@ public:
     double GetRenderPosition() const;
     double GetCurrentBPM() const;
 
-    void SetIncrementCallback(
-        const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &incrementCallback);
-
-    void SetJamComboCallback(
-        const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &jamComboCallback);
+    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &incrementCallback);
+    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &jamComboCallback);
 
     int MapRenderPositionToPixels(Chart::Channel channel, double position, bool absolute = false) const;
 
@@ -92,12 +94,13 @@ private:
     using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
     NoteContainer* m_container;
-    Gx::Node* m_menu;
+    bool m_started;
 
     const Chart* m_chart;
     RenderSettings m_settings;
     JudgementStrategy* m_judgement;
     ScoreTracker* m_scores;
+    LifeSystem* m_life;
 
     ChannelSet m_instantiables;
     SpeedMap m_speeds;
@@ -105,9 +108,6 @@ private:
     mutable PrefabMap m_prefabs;
     mutable AnimationMap m_noteClicks;
     mutable AnimationMap m_longNoteEffects;
-    mutable JudgementIndicator m_judgementIndicator;
-    mutable ComboCounter m_comboCounter;
-    mutable PlayMenu m_playMenu;
     mutable EventStateList m_events;
     mutable FrontBufferMap m_frontBuffers;
     mutable InputStateMap m_inputs;

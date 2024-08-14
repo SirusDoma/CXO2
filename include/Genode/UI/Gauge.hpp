@@ -22,6 +22,9 @@ namespace Gx
         bool IsFlickering() const;
         void SetFlickering(const bool flicker);
 
+        bool IsSlanted() const;
+        void SetSlanted(const bool slanted);
+
         Animation::AnimationState GetAnimationState() const;
 
         template<typename... Args>
@@ -62,7 +65,7 @@ namespace Gx
         sf::IntRect        m_texCoords;
         Orientation        m_orientation;
         float              m_value, m_maximum;
-        bool               m_flicker, m_flickerActivate;
+        bool               m_flicker, m_flickerActivate, m_slanted;
 
         Animation::AnimationState m_animationState;
         unsigned int m_currentFrame;

@@ -2,6 +2,7 @@
 #include <OTwo/Avatar/Avatar.hpp>
 
 #include <Genode/UI/Label.hpp>
+#include <Genode/UI/Gauge.hpp>
 
 void AvatarInfo::Initialize()
 {
@@ -13,6 +14,12 @@ Avatar *AvatarInfo::GetAvatar() const
 {
     return GetParent<Avatar>();
 }
+
+Gx::Gauge *AvatarInfo::GetLifeBar() const
+{
+    return FindChild<Gx::Gauge>("IDC_GAUGE_AVATAR_INFO_LIFE");
+}
+
 
 RoomMember *AvatarInfo::GetMember() const
 {
@@ -62,7 +69,7 @@ void AvatarInfo::Invalidate()
     }
     else
     {
-        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_LEVEL"); label)
         {
             if (m_member)
                 label->SetString("Lv." + std::to_string(m_member->Level));

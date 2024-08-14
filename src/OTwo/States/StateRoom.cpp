@@ -77,10 +77,11 @@ void StateRoom::Initialize()
 
     const auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam");
-    chatWindow->PushSystemMessage("/w Receiver   : Send message (whisper)");
-    chatWindow->PushSystemMessage("F7            : Effect 2D/3D mode setting");
-    chatWindow->PushSystemMessage("F8            : Cursor mode setting");
-    chatWindow->PushSystemMessage("F9            : Toggle equalizer on/off");
+    chatWindow->PushSystemMessage("Alt+Enter     : Toggle windowed/fullscreen mode setting");
+    chatWindow->PushSystemMessage("/w Receiver  : Send message (whisper)");
+    chatWindow->PushSystemMessage("F7                 : Effect 2D/3D mode setting");
+    chatWindow->PushSystemMessage("F8                 : Cursor mode setting");
+    chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
 
     const auto userList = Instantiate<UserList>("STATE_ROOM/IDC_USER_LIST");
     userList->Initialize();

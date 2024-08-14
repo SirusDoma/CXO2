@@ -12,20 +12,18 @@
 
 ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_container(),
-    m_menu(),
+    m_started(false),
     m_chart(),
     m_settings(),
     m_judgement(),
     m_scores(),
+    m_life(),
     m_instantiables(instantiables),
     m_speeds(),
     m_timer(),
     m_prefabs(),
     m_noteClicks(),
     m_longNoteEffects(),
-    m_judgementIndicator(),
-    m_comboCounter(),
-    m_playMenu(),
     m_events(),
     m_frontBuffers(),
     m_sounds(),
@@ -33,6 +31,7 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_refTime(0),
     m_refPosition(0),
     m_bpm(0),
+    m_inputTime(0),
     m_frameId(0),
     m_callbackCalled(false),
     m_callback(),
@@ -41,12 +40,12 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
 {
 }
 
-void ChartRenderer::Render(const Chart &chart, const GameContext &context, const std::function<void()>& callback)
+void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& callback)
 {
     if (!context.GetConfig())
         throw Gx::Exception("GameConfig cannot be null");
 
-    Render(chart, RenderSettings{
+    Initialize(chart, RenderSettings{
         context.GetConfig(),
         context.GetViewport(),
         context.GetSpeed(),
@@ -54,7 +53,7 @@ void ChartRenderer::Render(const Chart &chart, const GameContext &context, const
     }, callback);
 }
 
-void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback)
+void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback)
 {
     const auto parent = GetParent<State>();
     if (!parent)
@@ -70,6 +69,10 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, c
     // Setup judgement
     m_judgement = &parent->Require<JudgementStrategy>();
     m_judgement->Initialize(*this);
+
+    // Setup life system
+    m_life = &parent->Require<LifeSystem>();
+    m_life->Initialize(settings.Difficulty);
 
     // Setup score tracker
     m_scores = &parent->Require<ScoreTracker>();
@@ -117,29 +120,6 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, c
     m_container = factory.Generate(chart, settings);
     m_container->SetName("IDC_NOTE_CONTAINER");
     AddChild(m_container);
-
-    // Setup menu
-    RemoveChild(FindChild<PlayMenu>("IDC_PLAY_MENU"));
-    m_playMenu = PlayMenu();
-    m_playMenu.SetName("IDC_PLAY_MENU");
-    AddChild(&m_playMenu);
-    m_playMenu.Initialize();
-    m_playMenu.SetMetadata(chart.GetMetadata().ToChartMetadataView(settings.Difficulty), settings.Difficulty);
-    m_playMenu.SetScoreTracker(*m_scores);
-
-    // Setup Combo Animation
-    RemoveChild(FindChild<ComboCounter>("IDC_CONTAINER_COMBO"));
-    m_comboCounter = ComboCounter();
-    m_comboCounter.SetName("IDC_CONTAINER_COMBO");
-    AddChild(&m_comboCounter);
-    m_comboCounter.Initialize();
-
-    // Setup Judgement Indicator
-    RemoveChild(FindChild<JudgementIndicator>("IDC_NOTE_JUDGEMENT_INDICATOR"));
-    m_judgementIndicator = JudgementIndicator();
-    m_judgementIndicator.SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
-    AddChild(&m_judgementIndicator);
-    m_judgementIndicator.Initialize();
 
     // Setup Note Clicks
     const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
@@ -193,12 +173,22 @@ void ChartRenderer::Render(const Chart &chart, const RenderSettings &settings, c
     m_timer.restart();
 }
 
+void ChartRenderer::StartRender()
+{
+    m_started = true;
+}
+
+bool ChartRenderer::IsStarted() const
+{
+    return m_started;
+}
+
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    if (!m_chart)
+    if (!m_chart || !m_started)
         return states;
 
-    if (GetRenderPosition() > m_container->GetLastMeasure())
+    if ((GetRenderPosition() > m_container->GetLastMeasure()) || (m_settings.Difficulty != Difficulty::EX && m_life->GetCurrentLifePoint() == 0))
     {
         m_container->Render(*this, states.Delta);
         states = RenderableContainer::Render(surface, states);
@@ -263,9 +253,6 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         // Fill front buffers and check for misses
         if (ev->IsPlayable())
         {
-            auto& note = static_cast<Chart::NoteEvent&>(*ev.Event);
-            const auto result = m_judgement->Judge(note);
-
             // Fill buffer with valid event
             if (const auto front = m_frontBuffers[ev->Channel]; !front || front->IsRegistered())
             {
@@ -420,10 +407,9 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &gr
     mixer.Play(m_sounds[ev->ID], group);
 }
 
-void ChartRenderer::OnScoreUpdated(const Chart::NoteEvent& ev, const Accuracy acc, unsigned int count) const
+void ChartRenderer::OnScoreUpdated(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned int count) const
 {
-    m_judgementIndicator.Play(acc);
-    m_comboCounter.SetCombo(m_scores->GetCombo());
+    m_life->Update(acc, count);
 
     m_noteClicks[ev.Channel]->Reset();
     m_longNoteEffects[ev.Channel]->SetVisible(false);

@@ -12,6 +12,7 @@ void PlayMenu::Initialize()
     const auto menu = parent->FindResource<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
     AddChild(menu);
 
+    m_renderer = parent->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
     m_title    = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
     m_playIcon = menu->FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
     m_level    = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
@@ -55,10 +56,11 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
     if (m_wave)
         m_wave->SetMaximumValue(metadata.Duration.asSeconds());
 
+    const auto  state   = GetParent<::State>();
+    const auto& context = state->Require<GameContext>();
     if (m_level)
     {
-        const auto renderer = GetParent<ChartRenderer>();
-        const auto speed = renderer->GetRenderSettings().Speed;
+        const auto  speed = context.GetSpeed();
         std::string speedStr(4, '\0');
         if (speed > 0)
         {
@@ -81,6 +83,12 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
 
         m_level->SetFrame(diffName + speedStr);
     }
+
+    if (m_bgmVol)
+        m_bgmVol->SetValue(context.GetConfig()->MusicVolume);
+
+    if (m_sfxVol)
+        m_sfxVol->SetValue(context.GetConfig()->EffectVolume);
 }
 
 void PlayMenu::SetScoreTracker(const ScoreTracker &scores)
@@ -95,28 +103,28 @@ const ScoreTracker* PlayMenu::GetScoreTracker() const
 
 void PlayMenu::Update(const double delta)
 {
-    if (m_elapsed < m_metadata.Duration.asMilliseconds())
-        m_elapsed += delta;
-
-    if (m_wave)
-        m_wave->SetValue(std::floor(m_elapsed / 1000.f));
-
-    if (m_minutes)
-        m_minutes->SetValue(std::floor((m_elapsed / 1000.f) / 60.f));
-
-    if (m_seconds)
-        m_seconds->SetValue(static_cast<int>(std::floor((m_elapsed / 1000.f))) % 60);
-
-    if (const auto renderer = GetParent<ChartRenderer>())
+    if (m_renderer && m_renderer->IsStarted())
     {
+        if (m_elapsed < m_metadata.Duration.asMilliseconds())
+            m_elapsed += delta;
+
+        if (m_wave)
+            m_wave->SetValue(std::floor(m_elapsed / 1000.f));
+
+        if (m_minutes)
+            m_minutes->SetValue(std::floor((m_elapsed / 1000.f) / 60.f));
+
+        if (m_seconds)
+            m_seconds->SetValue(static_cast<int>(std::floor((m_elapsed / 1000.f))) % 60);
+
         if (m_playIcon)
-            m_playIcon->SetDuration(sf::milliseconds((60000.f / renderer->GetCurrentBPM()) * m_playIcon->GetFrameCount()) / 4.f);
+            m_playIcon->SetDuration(sf::milliseconds((60000.f / m_renderer->GetCurrentBPM()) * m_playIcon->GetFrameCount()) / 4.f);
 
         if (m_bgmVol)
-            m_bgmVol->SetValue(renderer->GetRenderSettings().Config->MusicVolume);
+            m_bgmVol->SetValue(m_renderer->GetRenderSettings().Config->MusicVolume);
 
         if (m_sfxVol)
-            m_sfxVol->SetValue(renderer->GetRenderSettings().Config->EffectVolume);
+            m_sfxVol->SetValue(m_renderer->GetRenderSettings().Config->EffectVolume);
     }
 
     if (m_scoreTracker)

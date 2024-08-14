@@ -217,7 +217,7 @@ namespace Gx
         m_window = std::make_unique<sf::RenderWindow>(
             mode,
             m_title,
-            state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
+            state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar,
             sf::State::Windowed
         );
 

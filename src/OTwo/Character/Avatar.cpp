@@ -157,6 +157,11 @@ const Instrument &Avatar::GetEquipedInstrumentType() const
     return m_instrument;
 }
 
+AvatarInfo* Avatar::GetAvatarInfo() const
+{
+    return FindChild<AvatarInfo>("IDC_AVATAR_INFO");
+}
+
 const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems() const
 {
     return m_items;

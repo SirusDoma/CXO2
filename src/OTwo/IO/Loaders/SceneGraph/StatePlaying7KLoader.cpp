@@ -80,6 +80,9 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_BAD", sfxSuffix, ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_MISS", sfxSuffix, ctx);
 
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_CONTAINER_NOTE_JAM", std::string(), ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_BUTTON_EXIT", std::string(), ctx);
+
     auto populator = ObjectPopulator::Decorate(state.get());
     for (auto [key, object] : metadata->Objects)
     {
@@ -97,11 +100,6 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     }
     else
         throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");
-
-    if (auto noteJamContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM"); noteJamContainer)
-        noteJamContainer->SetVisible(false);
-    else
-        throw Gx::ResourceAccessException("IDC_CONTAINER_NOTE_JAM");
 
     if (auto longNoteEffectList = state->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
     {

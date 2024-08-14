@@ -23,6 +23,10 @@ public:
     void SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
     void SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
 
+    bool IsEnabled() const;
+
+    void SetEnabled(const bool enabled);
+
     virtual unsigned int GetScore() const;
     unsigned int GetPoint(Accuracy acc) const;
 
@@ -45,6 +49,7 @@ private:
 
     mutable std::unordered_map<Accuracy, unsigned int> m_points;
 
+    bool m_enabled;
     unsigned int m_score;
     unsigned int m_maxCombo;
     unsigned int m_combo;

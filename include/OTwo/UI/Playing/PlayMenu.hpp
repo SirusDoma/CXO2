@@ -6,6 +6,7 @@
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/UI.hpp>
 
+class ChartRenderer;
 class PlayMenu : public virtual Gx::UiContainer
 {
 public:
@@ -29,6 +30,7 @@ private:
     const ScoreTracker* m_scoreTracker;
 
     double m_elapsed = 0;
+    ChartRenderer* m_renderer;
     Gx::Label* m_title;
     Gx::Animation* m_playIcon;
     Gx::Image* m_level;

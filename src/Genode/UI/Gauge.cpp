@@ -12,6 +12,7 @@ namespace Gx
         m_maximum(100.0f),
         m_flicker(false),
         m_flickerActivate(false),
+        m_slanted(false),
         m_animationState(Animation::AnimationState::Initial),
         m_currentFrame(0)
     {
@@ -46,6 +47,16 @@ namespace Gx
             m_flicker = flicker;
             Invalidate();
         }
+    }
+
+    bool Gauge::IsSlanted() const
+    {
+        return m_slanted;
+    }
+
+    void Gauge::SetSlanted(const bool slanted)
+    {
+        m_slanted = slanted;
     }
 
     Animation::AnimationState Gauge::GetAnimationState() const
@@ -253,7 +264,7 @@ namespace Gx
             }
         }
 
-        m_vertices[0] = {sf::Vector2f(x, y), color, sf::Vector2f(left, top)};
+        m_vertices[0] = {sf::Vector2f(x, y + (m_slanted && m_value != m_maximum && m_value != 0 && y + 10 < y + bottom ? 10 : 0)), color, sf::Vector2f(left, top)};
         m_vertices[1] = {sf::Vector2f(x, h), color, sf::Vector2f(left, bottom)};
         m_vertices[2] = {sf::Vector2f(w, y), color, sf::Vector2f(right, top)};
         m_vertices[3] = {sf::Vector2f(w, h), color, sf::Vector2f(right, bottom)};

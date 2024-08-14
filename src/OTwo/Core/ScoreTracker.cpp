@@ -2,6 +2,7 @@
 
 ScoreTracker::ScoreTracker(const Difficulty diff) :
     m_difficulty(diff),
+    m_enabled(true),
     m_score(0),
     m_maxCombo(0),
     m_combo(0),
@@ -16,8 +17,13 @@ ScoreTracker::ScoreTracker(const Difficulty diff) :
 
 Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count)
 {
-    if (acc == Accuracy::None)
+    if (acc == Accuracy::None || !m_enabled)
+    {
+        if (!m_enabled)
+            acc = Accuracy::None;
+
         return acc;
+    }
 
     if (acc == Accuracy::Bad && m_buffer > 0)
     {
@@ -85,6 +91,7 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
 
 void ScoreTracker::Initialize(const Difficulty diff)
 {
+    m_enabled    = true;
     m_difficulty = diff;
     Reset();
 }
@@ -97,6 +104,16 @@ void ScoreTracker::SetIncrementCallback(const std::function<void(const Chart::No
 void ScoreTracker::SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)>& callback)
 {
     m_jamComboCallback = callback;
+}
+
+bool ScoreTracker::IsEnabled() const
+{
+    return m_enabled;
+}
+
+void ScoreTracker::SetEnabled(const bool enabled)
+{
+    m_enabled = enabled;
 }
 
 unsigned int ScoreTracker::GetScore() const
