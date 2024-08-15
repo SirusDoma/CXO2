@@ -163,19 +163,22 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
     m_events.clear();
     for (Chart::Event *ev : m_chart->GetEvents(settings.Difficulty))
         m_events.push_back(EventState{ ev });
+}
+
+void ChartRenderer::StartRender()
+{
+    if (m_started)
+        return;
+
+    m_started = true;
 
     // Reset rendering states
     m_currentTime = 0;
     m_refPosition = 0;
     m_refTime     = 0;
     m_frameId     = 0;
-    m_bpm         = chart.GetMetadata().BPM;
+    m_bpm         = m_chart->GetMetadata().BPM;
     m_timer.restart();
-}
-
-void ChartRenderer::StartRender()
-{
-    m_started = true;
 }
 
 bool ChartRenderer::IsStarted() const
