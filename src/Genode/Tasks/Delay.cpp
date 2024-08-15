@@ -7,9 +7,15 @@ namespace Gx
     {
     }
 
-    Delay::Delay(sf::Time duration) :
+    Delay::Delay(const sf::Time duration) :
         m_duration(duration)
     {
+    }
+
+    Delay::Delay(const sf::Time duration, const std::function<void()>& callback) :
+        m_duration(duration)
+    {
+        OnCompleted(callback);
     }
 
     sf::Time Delay::GetDuration() const

@@ -10,6 +10,7 @@ namespace Gx
     public:
         Delay();
         explicit Delay(sf::Time duration);
+        Delay(sf::Time duration, const std::function<void()>& callback);
         ~Delay() override = default;
 
         sf::Time GetDuration() const;

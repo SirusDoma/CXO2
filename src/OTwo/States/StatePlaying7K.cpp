@@ -126,7 +126,7 @@ void StatePlaying7K::Initialize()
 
     m_renderer.SetName("IDC_CHART_RENDERER");
     AddChild(&m_renderer);
-    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this] () {
+    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this, lifeSystem] () {
         CaptureScreen();
         GetDirector().Present<StateResult>();
     });
@@ -184,11 +184,29 @@ void StatePlaying7K::Initialize()
 
     m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo)
     {
-        comboCounter->SetCombo(scoreTracker->GetCombo());
-        judgementIndicator->Play(acc);
-
         lifeBar->SetValue(lifeSystem->GetCurrentLifePoint());
         m_self->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
+
+        if (lifeSystem->GetCurrentLifePoint() == 0)
+        {
+            if (m_context->GetDifficulty() != Difficulty::EX && m_self->IsAlive())
+            {
+                Run(Create<Gx::Delay>(sf::milliseconds(2000),
+                    [this] {
+                        CaptureScreen();
+                        GetDirector().Present<StateResult>();
+                    })
+                );
+            }
+
+            scoreTracker->SetEnabled(false);
+            m_self->Die();
+
+            return;
+        }
+
+        comboCounter->SetCombo(scoreTracker->GetCombo());
+        judgementIndicator->Play(acc);
 
         scoreNumber->SetValue(scoreTracker->GetScore());
         for (int i = 0; i < buffers.size(); i++)

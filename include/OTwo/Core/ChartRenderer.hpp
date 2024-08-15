@@ -94,7 +94,7 @@ private:
     using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
     NoteContainer* m_container;
-    bool m_started;
+    bool m_rendering;
 
     const Chart* m_chart;
     RenderSettings m_settings;

@@ -12,7 +12,7 @@
 
 ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_container(),
-    m_started(false),
+    m_rendering(false),
     m_chart(),
     m_settings(),
     m_judgement(),
@@ -167,10 +167,10 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
 
 void ChartRenderer::StartRender()
 {
-    if (m_started)
+    if (m_rendering)
         return;
 
-    m_started = true;
+    m_rendering = true;
 
     // Reset rendering states
     m_currentTime = 0;
@@ -183,15 +183,15 @@ void ChartRenderer::StartRender()
 
 bool ChartRenderer::IsStarted() const
 {
-    return m_started;
+    return m_rendering;
 }
 
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    if (!m_chart || !m_started)
+    if (!m_chart || !m_rendering)
         return states;
 
-    if ((GetRenderPosition() > m_container->GetLastMeasure()) || (m_settings.Difficulty != Difficulty::EX && m_life->GetCurrentLifePoint() == 0))
+    if ((GetRenderPosition() > m_container->GetLastMeasure()))
     {
         m_container->Render(*this, states.Delta);
         states = RenderableContainer::Render(surface, states);

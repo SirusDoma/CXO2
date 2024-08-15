@@ -10,6 +10,7 @@ Avatar::Avatar() :
     m_instrument(Instrument::None),
     m_items(),
     m_defaultItems(),
+    m_alive(true),
     m_elapsed()
 {
     m_renderableStates.clear();
@@ -19,6 +20,11 @@ Avatar::Avatar(const Gender gender) :
     Avatar()
 {
     m_gender = gender;
+}
+
+void Avatar::Initialize()
+{
+    Node::Initialize();
 }
 
 Gender Avatar::GetGender() const
@@ -157,6 +163,21 @@ const Instrument &Avatar::GetEquipedInstrumentType() const
     return m_instrument;
 }
 
+bool Avatar::IsAlive() const
+{
+    return m_alive;
+}
+
+void Avatar::Die()
+{
+    m_alive = false;
+}
+
+void Avatar::Revive()
+{
+    m_alive = true;
+}
+
 AvatarInfo* Avatar::GetAvatarInfo() const
 {
     return FindChild<AvatarInfo>("IDC_AVATAR_INFO");
@@ -169,6 +190,36 @@ const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems()
 
 void Avatar::Update(const double delta)
 {
+    const auto ohmEffect = FindChild<Gx::Animation>("IDC_ANIMATION_OHM_EFFECT");
+    const auto ohm = FindChild<Gx::Animation>("IDC_ANIMATION_OHM");
+
+    if (m_alive)
+    {
+        if (ohmEffect)
+        {
+            ohmEffect->Stop();
+            ohmEffect->SetVisible(false);
+        }
+
+        if (ohm)
+            ohm->SetVisible(false);
+    }
+    else if (ohmEffect && ohm && ohmEffect->GetState() != Gx::Animation::AnimationState::Playing && ohmEffect->GetState() != Gx::Animation::AnimationState::Completed)
+    {
+        ohmEffect->SetAnimationCallback([ohm] (auto& animation)
+        {
+            if (animation.GetState() == Gx::Animation::AnimationState::Completed)
+            {
+                animation.SetVisible(false);
+                if (ohm)
+                    ohm->SetVisible(true);
+            }
+        });
+
+        ohmEffect->SetVisible(true);
+        ohmEffect->Reset();
+    }
+
     // Item instance are shared between multiple instances of Avatar
     // Therefore, we need to avoid making multiple Update calls on the item animations.
     // To do that, we need "Frame ID" from the RenderStates. Thus, the animation update need to be done in Render()
@@ -178,6 +229,8 @@ void Avatar::Update(const double delta)
 Gx::RenderStates Avatar::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     states.transform *= GetTransform();
+    if (!m_alive)
+        return RenderableContainer::Render(surface, states);
 
     // This will prevent static state map from growing non-stop
     if (m_lastFrameID != states.FrameID)

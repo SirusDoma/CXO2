@@ -16,6 +16,8 @@ public:
     Avatar();
     explicit Avatar(Gender gender);
 
+    void Initialize() override;
+
     Gender GetGender() const;
     void SetGender(Gender gender);
 
@@ -29,6 +31,10 @@ public:
 
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
     const Instrument &GetEquipedInstrumentType() const;
+
+    bool IsAlive() const;
+    void Die();
+    void Revive();
 
     AvatarInfo* GetAvatarInfo() const;
 
@@ -147,6 +153,7 @@ private:
     Gender     m_gender;
     Instrument m_instrument;
     ItemMap    m_items, m_defaultItems;
+    bool       m_alive;
 
     mutable double m_elapsed;
 
