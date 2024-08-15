@@ -187,10 +187,12 @@ void StateWaiting7K::Initialize()
 
     if (currentAvatarInfo)
     {
-        instrumentSelector->SetInstrumentSelectCallack([=] (Item *item)
+        instrumentSelector->SetInstrumentSelectCallack([=, &session, &room] (const Item *item)
         {
+
             if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)
             {
+                auto data = Room(room);
                 if (!item || avatar->IsEquiped(item))
                 {
                     avatar->Unequip(EquipmentType::Bass);
@@ -200,6 +202,18 @@ void StateWaiting7K::Initialize()
                 }
                 else
                     avatar->Equip(item);
+
+                for (auto& member : data.Members)
+                {
+                    if (member.ID != currentAvatarInfo->GetMember()->ID)
+                        continue;
+
+                    member.EquippedItemIDs.clear();
+                    for (auto [_, equipedItem] : avatar->GetEquipedItems())
+                        member.EquippedItemIDs.push_back(equipedItem->GetID());
+                }
+
+                session.SetCurrentRoom(data);
             }
         });
     }
