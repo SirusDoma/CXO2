@@ -198,8 +198,8 @@ void StateRoom::Initialize()
                         RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
                         {},
                         {},
-                        RoomMember{Player{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221}}, RoomTeam::F},
-                        RoomMember{Player{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {482}}, RoomTeam::G}
+                        RoomMember{Player{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F},
+                        RoomMember{Player{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G}
                     }
                 });
                 director.Present<StateWaiting7K>();

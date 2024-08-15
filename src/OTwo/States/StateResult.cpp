@@ -49,19 +49,7 @@ void StateResult::Initialize()
     top->SetPosition(0.f, -height);
     bottom->SetPosition(0.f, view.getSize().y + height);
 
-    const auto btnBack = bottom->FindChild<Gx::Button>("IDC_BUTTON_BACK");
-    btnBack->SetVisible(false);
-    btnBack->SetEnabled(false);
-    btnBack->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
-    {
-        sender.SetEnabled(false);
-
-        mixer.StopAll();
-        GetDirector().Present<StateWaiting7K>();
-    });
-
     const auto btnRetry = bottom->FindChild<Gx::Button>("IDC_BUTTON_PLAY_RETRY");
-    btnRetry->SetVisible(true);
     btnRetry->SetEnabled(false);
     btnRetry->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
     {
@@ -79,12 +67,28 @@ void StateResult::Initialize()
         // GetDirector().Present<StatePlaying7K>(ctx);
     });
 
+    const auto btnBack = bottom->FindChild<Gx::Button>("IDC_BUTTON_BACK");
+    btnBack->SetEnabled(false);
+    btnBack->SetFocusChangedCallback([btnRetry] (auto &sender, const auto &ev)
+    {
+        btnRetry->SetFocus(sender.IsFocused() ? false : btnRetry->IsFocused());
+        btnRetry->SetEnabled(!sender.IsFocused());
+    });
+    btnBack->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
+    {
+        sender.SetEnabled(false);
+
+        mixer.StopAll();
+        GetDirector().Present<StateWaiting7K>();
+    });
+
+
+
     const auto topFx    = Create<Gx::Move>(top, sf::Vector2f(0, 0), sf::seconds(2.f));
     const auto bottomFx = Create<Gx::Sequence>([=]
         {
-            btnBack->SetVisible(true);
-            btnBack->SetEnabled(true);
             btnRetry->SetEnabled(true);
+            btnBack->SetEnabled(true);
         },
         Gx::Sequence::ListOf(
         {
