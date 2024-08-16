@@ -2,11 +2,6 @@
 #define O2JAM_HPP
 
 #include <Genode/System/Application.hpp>
-#include <Genode/IO/ResourceManager.hpp>
-
-#include <OTwo/Avatar/ItemFactory.hpp>
-#include <OTwo/Archives/OmcArchive.hpp>
-#include <OTwo/Contexts/SessionContext.hpp>
 
 class O2Jam : public Gx::Application
 {
@@ -17,6 +12,7 @@ public:
 
 protected:
     void Boot() override;
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void Update(const double delta) override;
     void Shutdown() override;
     void OnFocusChanged(bool focus) override;

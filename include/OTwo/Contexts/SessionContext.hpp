@@ -11,9 +11,9 @@ class SessionContext : public Gx::Provider
 {
 public:
     SessionContext() = default;
+    explicit SessionContext(const Player &player);
 
     const Player &GetCurrentPlayer() const;
-    void SetCurrentPlayer(const Player &player);
 
     Planet GetPlanet() const;
     void SetPlanet(Planet planet);

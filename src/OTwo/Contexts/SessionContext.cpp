@@ -1,14 +1,17 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
+SessionContext::SessionContext(const Player &player) :
+    m_player(player),
+    m_hall(MusicHall::None),
+    m_channelID(0),
+    m_room()
+{
+}
+
 const Player &SessionContext::GetCurrentPlayer() const
 {
     return m_player;
-}
-
-void SessionContext::SetCurrentPlayer(const Player &player)
-{
-    m_player = player;
 }
 
 Planet SessionContext::GetPlanet() const

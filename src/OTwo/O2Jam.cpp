@@ -50,6 +50,7 @@
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 
+#include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
 #include <OTwo/Core/Judgements/RenderPositionJudgementStrategy.hpp>
 #include <OTwo/Core/Judgements/TimeJudgementStrategy.hpp>
@@ -64,8 +65,6 @@
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
-
-class StatePlaying7K;
 
 void O2Jam::Boot()
 {
@@ -123,12 +122,12 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
-    // Render settings
+    // Render Settings
     auto& window = GetRenderWindow();
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(0);
 
-    // Setup configuration
+    // Setup Providers
     Provide<GameConfig>([] (auto &app)
     {
         // TODO: Load game config from file
@@ -136,7 +135,6 @@ void O2Jam::Boot()
         return config;
     });
 
-    // Context configuration
     Provide<Gx::ResourceManager>([](auto &app)
     {
         // Register shared resource container
@@ -161,14 +159,13 @@ void O2Jam::Boot()
 
     Provide<SessionContext>([&](auto &app)
     {
-        auto session  = std::make_unique<SessionContext>();
         auto player   = Player();
         player.ID     = 1;
         player.Name   = "CXO2";
         player.Level  = -1;
         player.Gender = Gender::Male;
 
-        session->SetCurrentPlayer(player);
+        auto session  = std::make_unique<SessionContext>(player);
         return session;
     });
 
@@ -219,6 +216,11 @@ void O2Jam::Boot()
     director.Present<StateAvi>();
 }
 
+Gx::RenderStates O2Jam::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+{
+    return Application::Render(surface, states);
+}
+
 void O2Jam::Update(const double delta)
 {
     Application::Update(delta);
@@ -245,17 +247,16 @@ void O2Jam::Shutdown()
     resources.Clear();
 }
 
-void O2Jam::OnFocusChanged(bool focus)
+void O2Jam::OnFocusChanged(const bool focus)
 {
     Application::OnFocusChanged(focus);
 
-    auto& director = GetSceneDirector();
-    auto& config   = Require<GameConfig>();
-    auto& mixer    = Require<Gx::Mixer>();
+    const auto& config = Require<GameConfig>();
+    auto& mixer        = Require<Gx::Mixer>();
 
-    const bool ignored = director.IsPresenting<StateAvi>()       ||
-                         director.IsPresenting<StatePlaying7K>() ||
-                         director.IsPresenting<StateResult>();
+    const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
+                         GetSceneDirector().IsPresenting<StatePlaying7K>() ||
+                         GetSceneDirector().IsPresenting<StateResult>();
     if (focus)
     {
         mixer.SetVolume(static_cast<float>(config.MusicVolume));
