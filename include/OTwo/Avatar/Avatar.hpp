@@ -29,14 +29,14 @@ public:
     void Unequip(EquipmentType type);
     void ClearEquipments();
 
+    AvatarInfo* GetAvatarInfo() const;
+    const Instrument& GetEquipedInstrumentType() const;
     const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
-    const Instrument &GetEquipedInstrumentType() const;
 
     bool IsAlive() const;
     void Die();
     void Revive();
 
-    AvatarInfo* GetAvatarInfo() const;
 
 private:
     using ItemMap            = std::unordered_map<EquipmentType, const Item*>;

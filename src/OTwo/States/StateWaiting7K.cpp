@@ -208,9 +208,24 @@ void StateWaiting7K::Initialize()
                     if (member.ID != currentAvatarInfo->GetMember()->ID)
                         continue;
 
+                    const auto defaultItems = items.GetDefaultItems(member.Gender);
                     member.EquippedItemIDs.clear();
+
                     for (auto [_, equipedItem] : avatar->GetEquipedItems())
-                        member.EquippedItemIDs.push_back(equipedItem->GetID());
+                    {
+                        bool found = false;
+                        for (auto& [_, defaultItem] : defaultItems)
+                        {
+                            if (defaultItem->GetID() == equipedItem->GetID())
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                            member.EquippedItemIDs.push_back(equipedItem->GetID());
+                    }
                 }
 
                 session.SetCurrentRoom(data);

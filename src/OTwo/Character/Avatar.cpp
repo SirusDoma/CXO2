@@ -57,6 +57,9 @@ void Avatar::Equip(const Item *item, const bool reset)
 {
     if (item)
     {
+        if (const auto equipped = m_items[item->GetType()]; equipped && equipped->GetID() == item->GetID())
+            return;
+
         if (item->GetGender() != Gender::Any && item->GetGender() != m_gender)
             return;
 
@@ -158,11 +161,6 @@ void Avatar::Unequip(const EquipmentType type)
         Equip(iterator->second);
 }
 
-const Instrument &Avatar::GetEquipedInstrumentType() const
-{
-    return m_instrument;
-}
-
 bool Avatar::IsAlive() const
 {
     return m_alive;
@@ -183,7 +181,12 @@ AvatarInfo* Avatar::GetAvatarInfo() const
     return FindChild<AvatarInfo>("IDC_AVATAR_INFO");
 }
 
-const std::unordered_map<EquipmentType, const Item *> &Avatar::GetEquipedItems() const
+const Instrument& Avatar::GetEquipedInstrumentType() const
+{
+    return m_instrument;
+}
+
+const std::unordered_map<EquipmentType, const Item*>& Avatar::GetEquipedItems() const
 {
     return m_items;
 }
