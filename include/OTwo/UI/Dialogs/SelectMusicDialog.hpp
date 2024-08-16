@@ -33,6 +33,8 @@ protected:
     void OnAccepted() override;
     void OnCancelled() override;
 
+    void CacheMusicCover() const;
+
     void Invalidate() override;
 
 private:

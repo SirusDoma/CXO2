@@ -192,19 +192,19 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
     return chart;
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(ChartMetadata &metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
 {
     const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadThumbnail(*fs, metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(ChartMetadata &metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
 {
     const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadCoverArt(*fs, metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, ChartMetadata &metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
 {
     if (metadata.ThumbnailSize == 0)
         return nullptr;
@@ -223,7 +223,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, C
     return image;
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream &stream, ChartMetadata &metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
 {
     if (metadata.CoverSize == 0)
         return nullptr;

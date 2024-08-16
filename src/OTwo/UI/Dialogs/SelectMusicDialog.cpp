@@ -427,6 +427,7 @@ void SelectMusicDialog::Initialize()
     }
 
     Sort(selection.GetSortMode(), selection.GetSortOrder());
+    CacheMusicCover();
 }
 
 void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
@@ -645,21 +646,7 @@ void SelectMusicDialog::OnAccepted()
     selection.SetSortOrder(m_order);
     selection.SetDifficulty(m_difficulty);
     selection.SetSpeed(m_speed);
-
-    if (m_music.ID != 0)
-    {
-        try
-        {
-            if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
-                resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
-            else
-                resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
-        }
-        catch (Gx::Exception)
-        {
-            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
-        }
-    }
+    CacheMusicCover();
 
     const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
     mixer.Play(sfx);
@@ -675,6 +662,28 @@ void SelectMusicDialog::OnCancelled()
 
     const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
     mixer.Play(sfx);
+}
+
+void SelectMusicDialog::CacheMusicCover() const
+{
+
+    if (m_music.ID == 0)
+        return;
+
+    auto& app       = Gx::Application::Instance();
+    auto& resources = app.Require<Gx::ResourceManager>();
+
+    try
+    {
+        if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
+            resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+        else
+            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+    }
+    catch (Gx::Exception)
+    {
+        resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+    }
 }
 
 ChartMetadata SelectMusicDialog::GetSelectedMusic() const
