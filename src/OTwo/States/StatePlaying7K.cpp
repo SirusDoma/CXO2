@@ -62,7 +62,6 @@ void StatePlaying7K::Initialize()
     auto& room    = session.GetCurrentRoom();
     auto& items   = Require<ItemFactory>();
 
-
     // IMPORTANT: Don't use callback of these systems, it is being used by chart renderer
     // TODO: Implement multiple listeners for the callback
     const auto scoreTracker = &Require<ScoreTracker>();
@@ -131,7 +130,10 @@ void StatePlaying7K::Initialize()
         GetDirector().Present<StateResult>();
     });
 
-    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Render` in order to preserve correct layout ordering
+    // -------------------------------------------------------------------------------------------------------------------------------------
+    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Render` in order to preserve correct layout ordering.
+    //            Every resource below is likely to be a prefab (Resources that are defined under `"require"`).
+    // -------------------------------------------------------------------------------------------------------------------------------------
 
     // Setup Play Menu
     const auto playMenu = Create<PlayMenu>();
