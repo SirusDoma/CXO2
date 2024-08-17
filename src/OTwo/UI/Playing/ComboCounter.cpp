@@ -32,16 +32,18 @@ void ComboCounter::Initialize()
 
             SetVisible(false);
         },
-        Gx::Sequence::ListOf({
-            parent->Create<Gx::Action>([this] {
+        Gx::Sequence::ListOf(
+        {
+            parent->Create<Gx::Action>([this]
+            {
                 if (m_header)
                     m_header->Reset();
 
                 SetVisible(true);
             }),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -10.f), sf::milliseconds(50)),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, 0.f), sf::milliseconds(50)),
-            parent->Create<Gx::Delay>(sf::milliseconds(750))
+            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -10.f), sf::milliseconds(30)),
+            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, 0.f), sf::milliseconds(30)),
+            parent->Create<Gx::Delay>(sf::milliseconds(1000))
         })
     );
     m_sequence.Stop();
