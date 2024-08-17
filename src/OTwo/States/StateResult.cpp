@@ -57,14 +57,6 @@ void StateResult::Initialize()
 
         mixer.StopAll();
         GetDirector().Present<StateLoading>();
-
-        // const auto& config  = Require<GameConfig>();
-        // auto ctx = PlayingResourceContext();
-        // ctx.SetFxEnabled(config.UseFx);
-        // ctx.SetMapID(room.MapID);
-        // ctx.SetEffectID(room.EffectID);
-        //
-        // GetDirector().Present<StatePlaying7K>(ctx);
     });
 
     const auto btnBack = bottom->FindChild<Gx::Button>("IDC_BUTTON_BACK");
@@ -82,8 +74,6 @@ void StateResult::Initialize()
         GetDirector().Present<StateWaiting7K>();
     });
 
-
-
     const auto topFx    = Create<Gx::Move>(top, sf::Vector2f(0, 0), sf::seconds(2.f));
     const auto bottomFx = Create<Gx::Sequence>([=]
         {
@@ -100,6 +90,7 @@ void StateResult::Initialize()
         mixer.Play(bgm, "BGM");
 
     Run(topFx, bottomFx);
+    Run(Create<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); }));
 }
 
 void StateResult::Update(const double delta)

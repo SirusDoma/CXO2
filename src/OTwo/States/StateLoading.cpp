@@ -26,12 +26,6 @@ void StateLoading::Initialize()
     auto& game      = Require<GameContext>();
     auto& resources = Require<Gx::ResourceManager>();
 
-    game.Reset();
-    game.SetConfig(config);
-    game.SetMode(room.GameMode);
-    game.SetDifficulty(room.Difficulty);
-    game.SetSpeed(room.Speed);
-
     std::size_t index = 0;
     const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
 
@@ -45,26 +39,42 @@ void StateLoading::Initialize()
     }
 
     const auto metadata = room.ChartMetadata;
-    auto loader         = ChartLoader();
-    if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
+    if (!game.GetChart() || std::to_string(game.GetChart()->GetMetadata().ID) != metadata.ID)
     {
-        OnCoverLoaded(image);
+        game.Reset();
+        game.SetConfig(config);
+        game.SetMode(room.GameMode);
+        game.SetDifficulty(room.Difficulty);
+        game.SetSpeed(room.Speed);
+
+        auto loader  = ChartLoader();
+        if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
+        {
+            OnCoverLoaded(image);
+        }
+        else
+        {
+            loader.SetCoverLoadCallback([this] (auto cover)
+            {
+                Queue([this, cover] () { OnCoverLoaded(cover); });
+            });
+        }
+
+        auto thread = std::thread([=, &game] ()
+        {
+            game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+            Queue([this, &game] { OnChartLoaded(game.GetChart()); });
+        });
+
+        thread.detach();
     }
     else
     {
-        loader.SetCoverLoadCallback([this] (auto cover)
-        {
-            Queue([this, cover] () { OnCoverLoaded(cover); });
-        });
+        if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
+            OnCoverLoaded(image);
+
+        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this, &game] { OnChartLoaded(game.GetChart()); }));
     }
-
-    auto thread = std::thread([=, &game] ()
-    {
-        game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
-        Queue([this, &game] { OnChartLoaded(game.GetChart()); });
-    });
-
-    thread.detach();
 }
 
 void StateLoading::Update(const double delta)
@@ -102,7 +112,7 @@ void StateLoading::OnChartLoaded(const Chart *chart)
             director.Present<StatePlaying7K>(ctx);
         },
         Gx::Sequence::ListOf({
-            Create<Gx::Delay>(sf::seconds(1.f))
+            Create<Gx::Delay>(sf::seconds(0.5f))
         })
     );
 
