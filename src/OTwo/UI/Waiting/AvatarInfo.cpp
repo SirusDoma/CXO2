@@ -62,7 +62,7 @@ void AvatarInfo::Invalidate()
         if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
         {
             if (m_member)
-                label->SetString("Lv: " + std::to_string(m_member->Level) + " " + m_member->Name);
+                label->SetString("Lv:" + std::to_string(m_member->Level) + " " + m_member->Name);
             else
                 label->SetString(std::string());
         }
