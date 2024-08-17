@@ -39,14 +39,13 @@ void StateLoading::Initialize()
     }
 
     const auto metadata = room.ChartMetadata;
+    game.SetConfig(config);
+    game.SetMode(room.GameMode);
+    game.SetDifficulty(room.Difficulty);
+    game.SetSpeed(room.Speed);
+
     if (!game.GetChart() || std::to_string(game.GetChart()->GetMetadata().ID) != metadata.ID)
     {
-        game.Reset();
-        game.SetConfig(config);
-        game.SetMode(room.GameMode);
-        game.SetDifficulty(room.Difficulty);
-        game.SetSpeed(room.Speed);
-
         auto loader  = ChartLoader();
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
         {
