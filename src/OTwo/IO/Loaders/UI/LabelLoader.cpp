@@ -53,6 +53,9 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
 
+    if (metadata->LetterSpacing > 0)
+        label->SetLetterSpacing(metadata->LetterSpacing);
+
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
     {
@@ -108,6 +111,10 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     metadata.Underlined = false;
     if (auto underlined = attributes.find("underlined"); underlined != attributes.end())
         metadata.Underlined = underlined->get<bool>();
+
+    metadata.LetterSpacing = 0;
+    if (auto spacing = attributes.find("spacing"); spacing != attributes.end())
+        metadata.LetterSpacing = spacing->get<float>();
 
     if (auto outline = attributes.find("outline"); outline != attributes.end())
     {

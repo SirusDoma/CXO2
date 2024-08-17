@@ -12,6 +12,7 @@ struct LabelMetadata : public TransformMetadata
     bool                 Italic;
     bool                 Underlined;
     float                OutlineThickness;
+    float                LetterSpacing;
     sf::Color            Color;
     sf::Color            OutlineColor;
     Gx::Label::Alignment Alignment;
