@@ -13,6 +13,7 @@ public:
 
 private:
     void Update(double delta) override;
+    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
 };
 

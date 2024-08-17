@@ -7,11 +7,8 @@
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
-#include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-
-#include <thread>
 #include <Genode/Fx/Move.hpp>
 
 StateResult::StateResult(State &&state) :
@@ -96,6 +93,11 @@ void StateResult::Initialize()
 void StateResult::Update(const double delta)
 {
     State::Update(delta);
+}
+
+Gx::RenderStates StateResult::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+{
+    return State::Render(surface, states);
 }
 
 void StateResult::OnKeyDown(const sf::Event::KeyEvent ev)
