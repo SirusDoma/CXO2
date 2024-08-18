@@ -5,7 +5,8 @@ SessionContext::SessionContext(const Player &player) :
     m_player(player),
     m_hall(MusicHall::None),
     m_channelID(0),
-    m_room()
+    m_room(),
+    m_lastResult()
 {
 }
 
@@ -52,6 +53,19 @@ const Room &SessionContext::GetCurrentRoom() const
 void SessionContext::SetCurrentRoom(const Room &room)
 {
     m_room = room;
+}
+
+const std::array<ScoreResultItem, 8> & SessionContext::GetLatestScoreResults() const
+{
+    return m_lastResult;
+}
+
+void SessionContext::SetLatestScoreResults(const std::array<ScoreResultItem, 8> &result)
+{
+    for (int i = 0; i < m_lastResult.size(); i++)
+        m_lastResult[i] = result[i];
+
+    std::sort(m_lastResult.begin(), m_lastResult.end(), [] (auto& a, auto& b) { return a.ScorePoint > b.ScorePoint; });
 }
 
 const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic(const bool rescan) const
