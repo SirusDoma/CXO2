@@ -2,7 +2,6 @@
 #define GENODE_UI_DIALOG_HPP
 
 #include <Genode/UI/UiContainer.hpp>
-#include <Genode/UI/Label.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <functional>
@@ -10,6 +9,7 @@
 namespace Gx
 {
     class Scene;
+    class Label;
     class Button;
     class Dialog : public virtual UiContainer
     {

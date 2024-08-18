@@ -41,8 +41,10 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     if (metadata->Underlined)
         style |= static_cast<Gx::Uint32>(Gx::Label::Style::Underlined);
 
+    label->SetName(metadata->Name);
     label->SetStyle(style);
     label->SetCharacterSize(metadata->FontSize);
+    label->SetCharacterWidth(metadata->FontWidth);
     label->SetColor(metadata->Color);
     label->SetOutlineThickness(metadata->OutlineThickness);
     label->SetOutlineColor(metadata->OutlineColor);
@@ -53,8 +55,8 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
 
-    if (metadata->LetterSpacing > 0)
-        label->SetLetterSpacing(metadata->LetterSpacing);
+    if (metadata->Kerning > 0)
+        label->SetLetterSpacing(metadata->Kerning);
 
     auto populator = ObjectPopulator::Decorate(label.get());
     if (!metadata->Objects.empty())
@@ -79,10 +81,13 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     if (!TransformLoader::ParseMetadata(attributes.at("transform"), metadata))
         return false;
 
+    metadata.FontSize = 30;
     if (auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())
         metadata.FontSize = fontSize->get<unsigned int>();
-    else
-        metadata.FontSize = 30;
+
+    metadata.FontWidth = 0;
+    if (auto fontWidth = attributes.find("fontWidth"); fontWidth != attributes.end())
+        metadata.FontWidth = fontWidth->get<unsigned int>();
 
     if (auto string = attributes.find("string"); string != attributes.end())
         metadata.String = string->get<std::string>();
@@ -112,9 +117,9 @@ bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, co
     if (auto underlined = attributes.find("underlined"); underlined != attributes.end())
         metadata.Underlined = underlined->get<bool>();
 
-    metadata.LetterSpacing = 0;
-    if (auto spacing = attributes.find("spacing"); spacing != attributes.end())
-        metadata.LetterSpacing = spacing->get<float>();
+    metadata.Kerning = 0;
+    if (auto spacing = attributes.find("kerning"); spacing != attributes.end())
+        metadata.Kerning = spacing->get<float>();
 
     if (auto outline = attributes.find("outline"); outline != attributes.end())
     {

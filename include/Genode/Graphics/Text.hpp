@@ -25,7 +25,6 @@
 #ifndef GENODE_GRAPHICS_TEXT_HPP
 #define GENODE_GRAPHICS_TEXT_HPP
 
-#include <Genode/Graphics/Font.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Entities.hpp>
 #include <Genode/System/Primitives.hpp>
@@ -62,6 +61,7 @@ namespace
 
 namespace Gx
 {
+    class Font;
     typedef std::shared_ptr<const Font> FontHandle;
 
     class Text : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
@@ -84,6 +84,7 @@ namespace Gx
         void SetMasked(bool masked);
 
         void SetCharacterSize(unsigned int size);
+        void SetCharacterWidth(const unsigned int characterWidth);
         void SetLineSpacing(float spacingFactor);
         void SetLetterSpacing(float spacingFactor);
         void SetStyle(Uint32 style);
@@ -99,6 +100,7 @@ namespace Gx
         bool IsMasked() const;
 
         unsigned int GetCharacterSize() const;
+        unsigned int GetCharacterWidth() const;
         float GetLetterSpacing() const;
         float GetLineSpacing() const;
         Uint32 GetStyle() const;
@@ -124,6 +126,7 @@ namespace Gx
         sf::String              m_string;
         const Font*             m_font;
         unsigned int            m_characterSize;
+        unsigned int            m_characterWidth;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;
         Uint32                  m_style;

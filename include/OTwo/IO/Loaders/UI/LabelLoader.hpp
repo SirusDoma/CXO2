@@ -3,7 +3,6 @@
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
-#include <Genode/UI/Label.hpp>
 
 class LabelLoader : public ResourceLoader<Gx::Label>
 {

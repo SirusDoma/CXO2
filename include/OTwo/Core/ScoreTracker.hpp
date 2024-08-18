@@ -27,7 +27,7 @@ public:
 
     void SetEnabled(const bool enabled);
 
-    virtual unsigned int GetScore() const;
+    virtual unsigned int GetScorePoint() const;
     unsigned int GetPoint(Accuracy acc) const;
 
     unsigned int GetMaxCombo() const;

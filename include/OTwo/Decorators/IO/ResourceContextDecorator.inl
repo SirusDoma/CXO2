@@ -38,6 +38,52 @@ Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string &id) 
 }
 
 template<typename R>
+R* ResourceContextDecorator::Instantiate(const ResourceMetadata &metadata, const std::string &newID) const
+{
+    const auto resources = GetResourceManager();
+    if (!resources)
+        throw Gx::ResourceAccessException(GetID(), "ResourceManager is not set within this context.");
+
+    auto require = metadata.Require;
+    if (require.empty())
+        return nullptr;
+
+    auto instance = Find<R>(metadata);
+    if (!instance)
+        return nullptr;
+
+    std::string id = newID;
+    if (id.empty())
+    {
+        if constexpr (std::is_base_of_v<R, sf::Texture>)
+        {
+            if (const auto key = require.find("texture"); key != require.end() && key->second.type() == typeid(Gx::Json))
+                id = std::any_cast<Gx::Json>(key->second).get<std::string>();
+        }
+        else if constexpr (std::is_base_of_v<R, Gx::Font>)
+        {
+            if (const auto key = require.find("font"); key != require.end() && key->second.type() == typeid(Gx::Json))
+                id = std::any_cast<Gx::Json>(key->second).get<std::string>();
+        }
+        else if constexpr (std::is_base_of_v<R, sf::SoundBuffer>)
+        {
+            if (const auto key = require.find("sound"); key != require.end() && key->second.type() == typeid(Gx::Json))
+                id = std::any_cast<Gx::Json>(key->second).get<std::string>();
+        }
+        else
+        {
+            static_assert(TypeChecker<R>::value, "Resource type is not supported.");
+            throw Gx::NotSupportedException("Resource type is not supported.");
+        }
+
+        id += "_" + std::to_string(resources->Count<R>());
+    }
+
+
+    return &Store(id, *instance);
+}
+
+template<typename R>
 R* ResourceContextDecorator::Find() const
 {
     const auto resources = GetResourceManager();
@@ -52,7 +98,7 @@ R* ResourceContextDecorator::Find() const
 }
 
 template<typename R>
-R* ResourceContextDecorator::Find(const ResourceMetadata &metadata) const
+R* ResourceContextDecorator::Find(const ResourceMetadata &metadata, Gx::CacheMode cacheMode) const
 {
     const auto resources = GetResourceManager();
     if (!resources)
@@ -87,5 +133,5 @@ R* ResourceContextDecorator::Find(const ResourceMetadata &metadata) const
     if (id.empty())
         return nullptr;
 
-    return &resources->AddFromDeserializer<R>(id, [&] { return Deserialize<R>(id); });
+    return &resources->AddFromDeserializer<R>(id, [&] { return Deserialize<R>(id); }, cacheMode);
 }

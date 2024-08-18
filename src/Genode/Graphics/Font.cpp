@@ -52,7 +52,7 @@
 namespace
 {
     // FreeType callbacks that operate on a sf::InputStream
-    unsigned long read(FT_Stream rec, unsigned long offset, unsigned char* buffer, unsigned long count)
+    unsigned long read(const FT_Stream rec, const unsigned long offset, unsigned char* buffer, const unsigned long count)
     {
         const auto convertedOffset = static_cast<std::int64_t>(offset);
         auto*      stream          = static_cast<sf::InputStream*>(rec->descriptor.pointer);
@@ -81,10 +81,17 @@ namespace
     }
 
     // Combine outline thickness, boldness and font glyph index into a single 64-bit key
-    std::uint64_t combine(float outlineThickness, bool bold, std::uint32_t index)
+    std::uint64_t combine(const float outlineThickness, const bool bold, const std::uint32_t index)
     {
         return (static_cast<std::uint64_t>(reinterpret<std::uint32_t>(outlineThickness)) << 32) |
                (static_cast<std::uint64_t>(bold) << 31) | index;
+    }
+
+    // Combine characterSize and characterWidth into a single 64-bit key
+    std::uint64_t combine(const std::uint32_t characterSize, const std::uint32_t characterWidth)
+    {
+        return static_cast<std::uint64_t>(characterSize) << 32 |
+               static_cast<std::uint64_t>(characterWidth);
     }
 }
 
@@ -310,10 +317,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    const sf::Glyph& Font::GetGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness) const
+    const sf::Glyph& Font::GetGlyph(std::uint32_t codePoint, const unsigned int characterSize, const bool bold, const float outlineThickness, const unsigned int characterWidth) const
     {
         // Get the page corresponding to the character size
-        GlyphTable& glyphs = LoadPage(characterSize).glyphs;
+        Page& page = LoadPage(characterSize, characterWidth);
+        GlyphTable& glyphs = page.glyphs;
 
         // Build the key by combining the glyph index (based on code point), bold flag, and outline thickness
         const std::uint64_t key = combine(outlineThickness,
@@ -329,7 +337,7 @@ namespace Gx
         else
         {
             // Not found: we have to load it
-            const sf::Glyph glyph = LoadGlyph(codePoint, characterSize, bold, outlineThickness);
+            const sf::Glyph glyph = LoadGlyph(codePoint, characterSize, bold, outlineThickness, characterWidth);
             return glyphs.emplace(key, glyph).first->second;
         }
     }
@@ -343,7 +351,7 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetKerning(std::uint32_t first, std::uint32_t second, unsigned int characterSize, bool bold) const
+    float Font::GetKerning(std::uint32_t first, std::uint32_t second, const unsigned int characterSize, const bool bold, const unsigned int characterWidth) const
     {
         // Special case where first or second is 0 (null character)
         if (first == 0 || second == 0)
@@ -351,7 +359,7 @@ namespace Gx
 
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize))
+        if (face && SetCurrentSize(characterSize, characterWidth))
         {
             // Convert the characters to indices
             const FT_UInt index1 = FT_Get_Char_Index(face, first);
@@ -384,11 +392,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetLineSpacing(unsigned int characterSize) const
+    float Font::GetLineSpacing(const unsigned int characterSize, const unsigned int characterWidth) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize))
+        if (face && SetCurrentSize(characterSize, characterWidth))
         {
             return static_cast<float>(face->size->metrics.height) / static_cast<float>(1 << 6);
         }
@@ -400,11 +408,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetUnderlinePosition(unsigned int characterSize) const
+    float Font::GetUnderlinePosition(const unsigned int characterSize, const unsigned int characterWidth) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize))
+        if (face && SetCurrentSize(characterSize, characterWidth))
         {
             // Return a fixed position if font is a bitmap font
             if (!FT_IS_SCALABLE(face))
@@ -421,11 +429,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetUnderlineThickness(unsigned int characterSize) const
+    float Font::GetUnderlineThickness(const unsigned int characterSize, const unsigned int characterWidth) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize))
+        if (face && SetCurrentSize(characterSize, characterWidth))
         {
             // Return a fixed thickness if font is a bitmap font
             if (!FT_IS_SCALABLE(face))
@@ -442,13 +450,13 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    const sf::Texture& Font::GetTexture(unsigned int characterSize) const
+    const sf::Texture& Font::GetTexture(const unsigned int characterSize, const unsigned int characterWidth) const
     {
-        return LoadPage(characterSize).texture;
+        return LoadPage(characterSize, characterWidth).texture;
     }
 
     ////////////////////////////////////////////////////////////
-    void Font::SetSmooth(bool smooth)
+    void Font::SetSmooth(const bool smooth)
     {
         if (smooth != m_isSmooth)
         {
@@ -481,14 +489,14 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    Font::Page& Font::LoadPage(unsigned int characterSize) const
+    Font::Page& Font::LoadPage(const unsigned int characterSize, const unsigned int characterWidth) const
     {
-        return m_pages.try_emplace(characterSize, m_isSmooth).first->second;
+        return m_pages.try_emplace(combine(characterSize, characterWidth), m_isSmooth).first->second;
     }
 
 
     ////////////////////////////////////////////////////////////
-    sf::Glyph Font::LoadGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness) const
+    sf::Glyph Font::LoadGlyph(std::uint32_t codePoint, const unsigned int characterSize, const bool bold, const float outlineThickness, const unsigned int characterWidth) const
     {
         // The glyph to return
         sf::Glyph glyph;
@@ -503,7 +511,7 @@ namespace Gx
             return glyph;
 
         // Set the character size
-        if (!SetCurrentSize(characterSize))
+        if (!SetCurrentSize(characterSize, characterWidth))
             return glyph;
 
         // Load the glyph corresponding to the code point
@@ -580,7 +588,7 @@ namespace Gx
             height += 2 * padding;
 
             // Get the glyphs page corresponding to the character size
-            Page& page = LoadPage(characterSize);
+            Page& page = LoadPage(characterSize, characterWidth);
 
             // Find a good position for the new glyph into the texture
             glyph.textureRect = FindGlyphRect(page, {width, height});
@@ -734,18 +742,19 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    bool Font::SetCurrentSize(unsigned int characterSize) const
+    bool Font::SetCurrentSize(unsigned int characterSize, unsigned int characterWidth) const
     {
         // FT_Set_Pixel_Sizes is an expensive function, so we must call it
         // only when necessary to avoid killing performances
 
         // m_fontHandles and m_fontHandles->face are checked to be non-null before calling this method
-        FT_Face         face        = m_fontHandles->face;
-        const FT_UShort currentSize = face->size->metrics.x_ppem;
+        FT_Face         face          = m_fontHandles->face;
+        const FT_UShort currentWidth  = face->size->metrics.x_ppem;
+        const FT_UShort currentHeight = face->size->metrics.y_ppem;
 
-        if (currentSize != characterSize)
+        if ((characterWidth != 0 && characterWidth != currentWidth) || characterSize != currentHeight)
         {
-            const FT_Error result = FT_Set_Pixel_Sizes(face, 0, characterSize);
+            const FT_Error result = FT_Set_Pixel_Sizes(face, characterWidth, characterSize);
 
             if (result == FT_Err_Invalid_Pixel_Size)
             {
@@ -775,7 +784,7 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    Font::Page::Page(bool smooth)
+    Font::Page::Page(const bool smooth)
     {
         // Make sure that the texture is initialized by default
         sf::Image image;

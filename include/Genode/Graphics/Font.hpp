@@ -151,7 +151,7 @@ namespace Gx
         /// \return The glyph corresponding to \a codePoint and \a characterSize
         ///
         ////////////////////////////////////////////////////////////
-        const sf::Glyph& GetGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness = 0) const;
+        const sf::Glyph& GetGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness = 0, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Determine if this font has a glyph representing the requested code point
@@ -187,7 +187,7 @@ namespace Gx
         /// \return Kerning value for \a first and \a second, in pixels
         ///
         ////////////////////////////////////////////////////////////
-        float GetKerning(std::uint32_t first, std::uint32_t second, unsigned int characterSize, bool bold = false) const;
+        float GetKerning(std::uint32_t first, std::uint32_t second, unsigned int characterSize, bool bold = false, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the line spacing
@@ -200,7 +200,7 @@ namespace Gx
         /// \return Line spacing, in pixels
         ///
         ////////////////////////////////////////////////////////////
-        float GetLineSpacing(unsigned int characterSize) const;
+        float GetLineSpacing(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the position of the underline
@@ -215,7 +215,7 @@ namespace Gx
         /// \see GetUnderlineThickness
         ///
         ////////////////////////////////////////////////////////////
-        float GetUnderlinePosition(unsigned int characterSize) const;
+        float GetUnderlinePosition(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the thickness of the underline
@@ -229,7 +229,7 @@ namespace Gx
         /// \see GetUnderlinePosition
         ///
         ////////////////////////////////////////////////////////////
-        float GetUnderlineThickness(unsigned int characterSize) const;
+        float GetUnderlineThickness(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Retrieve the texture containing the loaded glyphs of a certain size
@@ -243,7 +243,7 @@ namespace Gx
         /// \return Texture containing the glyphs of the requested size
         ///
         ////////////////////////////////////////////////////////////
-        const sf::Texture& GetTexture(unsigned int characterSize) const;
+        const sf::Texture& GetTexture(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Enable or disable the smooth filter
@@ -318,7 +318,7 @@ namespace Gx
         /// \return The glyphs page corresponding to \a characterSize
         ///
         ////////////////////////////////////////////////////////////
-        Page& LoadPage(unsigned int characterSize) const;
+        Page& LoadPage(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Load a new glyph and store it in the cache
@@ -331,7 +331,7 @@ namespace Gx
         /// \return The glyph corresponding to \a codePoint and \a characterSize
         ///
         ////////////////////////////////////////////////////////////
-        sf::Glyph LoadGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness) const;
+        sf::Glyph LoadGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Find a suitable rectangle within the texture for a glyph
@@ -352,13 +352,13 @@ namespace Gx
         /// \return True on success, false if any error happened
         ///
         ////////////////////////////////////////////////////////////
-        [[nodiscard]] bool SetCurrentSize(unsigned int characterSize) const;
+        [[nodiscard]] bool SetCurrentSize(unsigned int characterSize, unsigned int characterWidth = 0) const;
 
         ////////////////////////////////////////////////////////////
         // Types
         ////////////////////////////////////////////////////////////
         struct FontHandles;
-        using PageTable = std::unordered_map<unsigned int, Page>; //!< Table mapping a character size to its page (texture)
+        using PageTable = std::unordered_map<std::uint64_t, Page>; //!< Table mapping a character size to its page (texture)
 
         ////////////////////////////////////////////////////////////
         // Member data
@@ -367,7 +367,7 @@ namespace Gx
         bool                              m_isSmooth{true}; //!< Status of the smooth filter
         sf::Font::Info                    m_info;           //!< Information about the font
         mutable PageTable                 m_pages;          //!< Table containing the glyphs pages by character size
-        mutable std::vector<std::uint8_t> m_pixelBuffer; //!< Pixel buffer holding a glyph's pixels before being written to the texture
+        mutable std::vector<std::uint8_t> m_pixelBuffer;    //!< Pixel buffer holding a glyph's pixels before being written to the texture
     };
 
 }

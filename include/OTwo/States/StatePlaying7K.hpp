@@ -26,9 +26,13 @@ public:
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
+
+
 private:
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void Update(const double delta) override;
+
+    void OnRenderComplete();
 
     const GameContext *PrepareContext() const;
     void CaptureScreen();

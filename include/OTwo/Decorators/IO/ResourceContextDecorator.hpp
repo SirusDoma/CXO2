@@ -15,10 +15,13 @@ public:
     static ResourceContextDecorator Decorate(const Gx::ResourceContext &ctx);
 
     template<typename R>
+    R* Instantiate(const ResourceMetadata &metadata, const std::string& newID) const;
+
+    template<typename R>
     R* Find() const;
 
     template<typename R>
-    R* Find(const ResourceMetadata &metadata) const;
+    R* Find(const ResourceMetadata &metadata, Gx::CacheMode cacheMode = Gx::CacheMode::Reuse) const;
 
 private:
     explicit ResourceContextDecorator(const Gx::ResourceContext &ctx);

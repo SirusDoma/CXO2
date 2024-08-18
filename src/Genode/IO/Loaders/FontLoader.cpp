@@ -1,6 +1,8 @@
 ﻿#include <Genode/IO/Loaders/FontLoader.hpp>
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 
+#include <Genode/Graphics/Font.hpp>
+
 namespace Gx
 {
     bool FontLoader::IsStreaming() const

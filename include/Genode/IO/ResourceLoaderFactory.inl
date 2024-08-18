@@ -1,8 +1,8 @@
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 
-#include <SFML/Audio/SoundBuffer.hpp>
+#include <Genode/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 namespace Gx
 {

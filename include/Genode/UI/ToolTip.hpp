@@ -3,7 +3,6 @@
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
-#include <Genode/Graphics/Text.hpp>
 
 namespace Gx
 {

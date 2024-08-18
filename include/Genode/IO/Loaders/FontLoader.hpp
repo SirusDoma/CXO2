@@ -2,10 +2,11 @@
 #define GENODE_IO_FONT_LOADER_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
-#include <Genode/Graphics/Font.hpp>
+#include <string>
 
 namespace Gx
 {
+    class Font;
     class FontLoader final : public ResourceLoader<Font>
     {
     public:

@@ -3,6 +3,7 @@
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
+#include <Genode/UI/Label.hpp>
 #include <Genode/UI/Button.hpp>
 
 #include <memory>
