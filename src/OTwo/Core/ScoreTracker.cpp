@@ -116,7 +116,7 @@ void ScoreTracker::SetEnabled(const bool enabled)
     m_enabled = enabled;
 }
 
-unsigned int ScoreTracker::GetScore() const
+unsigned int ScoreTracker::GetScorePoint() const
 {
     const int score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
                       m_points[Accuracy::Good] * (100 + 5  * m_jams) +

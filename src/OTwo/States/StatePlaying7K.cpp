@@ -10,11 +10,12 @@
 #include <OTwo/Config/GameConfig.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
 #include <Genode/Tasks/Step.hpp>
 #include <Genode/UI.hpp>
-#include <OTwo/Avatar/ItemFactory.hpp>
-#include <OTwo/UI/Waiting/AvatarInfo.hpp>
+#include <Genode/Utilities/Randomizer.hpp>
 
 StatePlaying7K::StatePlaying7K() :
     m_renderer(ChannelSet{
@@ -125,9 +126,8 @@ void StatePlaying7K::Initialize()
 
     m_renderer.SetName("IDC_CHART_RENDERER");
     AddChild(&m_renderer);
-    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this, lifeSystem] () {
-        CaptureScreen();
-        GetDirector().Present<StateResult>();
+    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this] () {
+        OnRenderComplete();
     });
 
     // -------------------------------------------------------------------------------------------------------------------------------------
@@ -195,8 +195,7 @@ void StatePlaying7K::Initialize()
             {
                 Run(Create<Gx::Delay>(sf::milliseconds(2000),
                     [this] {
-                        CaptureScreen();
-                        GetDirector().Present<StateResult>();
+                        OnRenderComplete();
                     })
                 );
             }
@@ -210,7 +209,7 @@ void StatePlaying7K::Initialize()
         comboCounter->SetCombo(scoreTracker->GetCombo());
         judgementIndicator->Play(acc);
 
-        scoreNumber->SetValue(scoreTracker->GetScore());
+        scoreNumber->SetValue(scoreTracker->GetScorePoint());
         for (int i = 0; i < buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
@@ -253,6 +252,51 @@ void StatePlaying7K::Initialize()
             }
         }
     ));
+}
+
+void StatePlaying7K::OnRenderComplete()
+{
+    auto& session = Require<SessionContext>();
+    const auto& scoreTracker = Require<ScoreTracker>();
+
+    auto items = std::array<ScoreResultItem, 8>();
+    for (int i = 0; i < items.size(); i++)
+    {
+        auto& member = session.GetCurrentRoom().Members[i];
+        if (member.ID == session.GetCurrentPlayer().ID)
+        {
+            items[i] = ScoreResultItem{
+                member,
+                scoreTracker.GetPoint(Accuracy::Cool),
+                scoreTracker.GetPoint(Accuracy::Good),
+                scoreTracker.GetPoint(Accuracy::Bad),
+                scoreTracker.GetPoint(Accuracy::Miss),
+                scoreTracker.GetMaxCombo(),
+                scoreTracker.GetMaxJamCombo(),
+                scoreTracker.GetScorePoint()
+            };
+        }
+        else if (member.ID != 0)
+        {
+            items[i] = ScoreResultItem{
+                member,
+                Gx::Randomizer::Randomize<unsigned int>(100, 500),
+                Gx::Randomizer::Randomize<unsigned int>(100, 500),
+                Gx::Randomizer::Randomize<unsigned int>(0, 10),
+                Gx::Randomizer::Randomize<unsigned int>(5, 20),
+                Gx::Randomizer::Randomize<unsigned int>(0, 200),
+                Gx::Randomizer::Randomize<unsigned int>(1, 20),
+                Gx::Randomizer::Randomize<unsigned int>(10000, 20000),
+            };
+        }
+        else
+            items[i] = ScoreResultItem{};
+    }
+
+    session.SetLatestScoreResults(items);
+
+    CaptureScreen();
+    GetDirector().Present<StateResult>();
 }
 
 unsigned int StatePlaying7K::GetViewport() const
