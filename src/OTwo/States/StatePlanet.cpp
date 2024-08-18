@@ -92,7 +92,7 @@ void StatePlanet::Initialize()
                 RemoveChild(overlay);
             },
             Gx::Sequence::ListOf({
-                Create<Gx::Fade>(overlay, 0, sf::seconds(2.5f))
+                Create<Gx::Fade>(overlay, 0, sf::seconds(1.5f))
             })
         );
         Run(splash);
