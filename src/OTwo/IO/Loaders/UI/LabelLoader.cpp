@@ -28,7 +28,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     
     auto label = std::make_unique<Gx::Label>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
+    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         label->SetFont(*font);
 
     Gx::Uint32 style = 0;

@@ -17,7 +17,7 @@ namespace Gx
     {
     }
 
-    TextBox::TextBox(const sf::String &string, const sf::Font &font, unsigned int characterSize, sf::FloatRect bounds) :
+    TextBox::TextBox(const sf::String &string, const Font &font, unsigned int characterSize, sf::FloatRect bounds) :
         m_text(string, font, characterSize),
         m_caret(*this),
         m_bounds(bounds),
@@ -54,7 +54,7 @@ namespace Gx
         m_text.SetString(string);
     }
 
-    void TextBox::SetFont(const sf::Font &font)
+    void TextBox::SetFont(const Font &font)
     {
         m_text.SetFont(font);
     }
@@ -129,7 +129,7 @@ namespace Gx
         return m_text.GetString();
     }
 
-    const sf::Font *TextBox::GetFont() const
+    const Font *TextBox::GetFont() const
     {
         return m_text.GetFont();
     }
@@ -636,7 +636,7 @@ namespace Gx
 
         if (Instance.GetFont())
         {
-            auto glyph = Instance.GetFont()->getGlyph('|', Instance.GetCharacterSize(), false);
+            auto glyph = Instance.GetFont()->GetGlyph('|', Instance.GetCharacterSize(), false);
             m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
         }
 

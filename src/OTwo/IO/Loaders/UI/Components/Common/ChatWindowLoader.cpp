@@ -51,7 +51,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
     window->SetLocalBounds(metadata->Bounds);
 
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
+    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         window->SetFont(*font);
     else
         return nullptr;

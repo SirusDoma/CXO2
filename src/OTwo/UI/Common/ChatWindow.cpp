@@ -24,7 +24,7 @@ ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
 }
 
 
-ChatWindow::ChatWindow(const sf::Font &font, const sf::FloatRect &localBounds, const unsigned int characterSize) :
+ChatWindow::ChatWindow(const Gx::Font &font, const sf::FloatRect &localBounds, const unsigned int characterSize) :
     m_font(&font),
     m_scroll(),
     m_bounds(localBounds),
@@ -43,12 +43,12 @@ void ChatWindow::SetLocalBounds(const sf::FloatRect &bounds)
     m_bounds = bounds;
 }
 
-const sf::Font *ChatWindow::GetFont() const
+const Gx::Font *ChatWindow::GetFont() const
 {
     return m_font;
 }
 
-void ChatWindow::SetFont(const sf::Font &font)
+void ChatWindow::SetFont(const Gx::Font &font)
 {
     if (m_font != &font)
     {

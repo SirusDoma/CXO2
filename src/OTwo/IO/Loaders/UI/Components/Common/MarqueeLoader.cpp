@@ -39,7 +39,7 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromMetadata(const ResourceMetadata 
 
     auto marquee = std::make_unique<Marquee>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
+    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         marquee->SetFont(*font);
     else
         return nullptr;

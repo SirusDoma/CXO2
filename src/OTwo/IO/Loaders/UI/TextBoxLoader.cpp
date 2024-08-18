@@ -66,7 +66,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromMetadata(const ResourceMetad
     
     auto textBox = std::make_unique<Gx::TextBox>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
+    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         textBox->SetFont(*font);
 
     textBox->SetCharacterSize(metadata->FontSize);

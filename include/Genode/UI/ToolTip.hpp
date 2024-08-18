@@ -13,7 +13,7 @@ namespace Gx
         enum class Alignment { Left, Center, Right };
 
         ToolTip();
-        ToolTip(const sf::String &string, const sf::Font &font, unsigned int characterSize = 30);
+        ToolTip(const sf::String &string, const Font &font, unsigned int characterSize = 30);
 
         sf::FloatRect GetLocalBounds() const override;
 

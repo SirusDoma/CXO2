@@ -2,12 +2,11 @@
 #define GENODE_IO_FONT_LOADER_HPP
 
 #include <Genode/IO/ResourceLoader.hpp>
-
-#include <SFML/Graphics/Font.hpp>
+#include <Genode/Graphics/Font.hpp>
 
 namespace Gx
 {
-    class FontLoader final : public ResourceLoader<sf::Font>
+    class FontLoader final : public ResourceLoader<Font>
     {
     public:
         FontLoader() = default;
@@ -15,9 +14,9 @@ namespace Gx
         bool IsStreaming() const override;
         void UseSmooth(bool smooth);
 
-        ResourcePtr<sf::Font> LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const override;
-        ResourcePtr<sf::Font> LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const override;
-        ResourcePtr<sf::Font> LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const override;
+        ResourcePtr<Font> LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const override;
+        ResourcePtr<Font> LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const override;
+        ResourcePtr<Font> LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const override;
 
     private:
         bool m_smooth = true;

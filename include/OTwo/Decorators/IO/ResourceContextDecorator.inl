@@ -2,6 +2,8 @@
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/Graphics/Font.hpp>
+
 #include <SFML/Audio/Music.hpp>
 
 #include <any>
@@ -66,7 +68,7 @@ R* ResourceContextDecorator::Find(const ResourceMetadata &metadata) const
         if (const auto resource = require.find("texture"); resource != require.end() && resource->second.type() == typeid(Gx::Json))
             id = std::any_cast<Gx::Json>(resource->second).get<std::string>();
     }
-    else if constexpr (std::is_base_of_v<R, sf::Font>)
+    else if constexpr (std::is_base_of_v<R, Gx::Font>)
     {
         if (const auto resource = require.find("font"); resource != require.end() && resource->second.type() == typeid(Gx::Json))
             id = std::any_cast<Gx::Json>(resource->second).get<std::string>();

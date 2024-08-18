@@ -14,7 +14,7 @@ namespace Gx
     {
     }
 
-    ToolTip::ToolTip(const sf::String &string, const sf::Font &font, unsigned int characterSize) :
+    ToolTip::ToolTip(const sf::String &string, const Font &font, unsigned int characterSize) :
         Text(string, font, characterSize),
         m_rectangle(),
         m_padding(characterSize * (10.f / 100.f), characterSize * (10.f / 100.f)),

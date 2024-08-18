@@ -8,6 +8,7 @@
 #include <Genode/Graphics/Transformable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/Graphics/Animation.hpp>
+#include <Genode/Graphics/Font.hpp>
 #include <Genode/Graphics/Text.hpp>
 #include <Genode/Graphics/Shape.hpp>
 #include <Genode/Graphics/Shapes/Circle.hpp>

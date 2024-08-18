@@ -16,15 +16,15 @@ class ChatWindow : public Gx::List
 public:
     ChatWindow();
     ChatWindow(ChatWindow &&other) noexcept;
-    ChatWindow(const sf::Font &font, const sf::FloatRect &localBounds, unsigned int characterSize = 13);
+    ChatWindow(const Gx::Font &font, const sf::FloatRect &localBounds, unsigned int characterSize = 13);
 
     sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect &bounds);
 
-    void SetFont(const sf::Font &font);
+    void SetFont(const Gx::Font &font);
     void SetCharacterSize(unsigned int characterSize);
 
-    const sf::Font *GetFont() const;
+    const Gx::Font *GetFont() const;
     unsigned int GetScrollOffset() const;
     unsigned int GetCharacterSize() const;
     unsigned int GetMaximumChatLength() const;
@@ -41,7 +41,7 @@ private:
     void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
     void Invalidate() override;
 
-    const sf::Font *m_font;
+    const Gx::Font *m_font;
     Gx::ScrollBar *m_scroll;
 
     sf::FloatRect m_bounds;

@@ -231,3 +231,7 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-s
 if(WIN32)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
 endif()
+
+# Include FreeType
+find_package(Freetype REQUIRED)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE Freetype::Freetype)

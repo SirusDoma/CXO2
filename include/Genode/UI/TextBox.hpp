@@ -12,14 +12,14 @@ namespace Gx
     {
     public:
         TextBox();
-        TextBox(const sf::String& string, const sf::Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
+        TextBox(const sf::String& string, const Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;
         sf::FloatRect GetLocalBounds() const override;
         virtual void SetLocalBounds(sf::FloatRect bounds);
 
         void SetString(const sf::String& string);
-        void SetFont(const sf::Font& font);
+        void SetFont(const Font& font);
         void SetMasked(bool masked);
         void SetNumericModeEnabled(bool enabled);
 
@@ -36,7 +36,7 @@ namespace Gx
         void SetOutlineThickness(float thickness);
 
         const sf::String& GetString() const;
-        const sf::Font* GetFont() const;
+        const Font* GetFont() const;
         bool IsMasked() const;
         bool IsNumericMode() const;
 

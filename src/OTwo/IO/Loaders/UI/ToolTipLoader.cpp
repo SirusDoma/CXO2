@@ -103,7 +103,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetad
 
     auto toolTip = std::make_unique<Gx::ToolTip>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<sf::Font>(*metadata); font)
+    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         toolTip->SetFont(*font);
     else
         return nullptr;

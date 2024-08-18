@@ -25,13 +25,13 @@
 #ifndef GENODE_GRAPHICS_TEXT_HPP
 #define GENODE_GRAPHICS_TEXT_HPP
 
+#include <Genode/Graphics/Font.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Entities.hpp>
 #include <Genode/System/Primitives.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
-#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -62,7 +62,7 @@ namespace
 
 namespace Gx
 {
-    typedef std::shared_ptr<const sf::Font> FontHandle;
+    typedef std::shared_ptr<const Font> FontHandle;
 
     class Text : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
@@ -77,10 +77,10 @@ namespace Gx
         };
 
         Text();
-        Text(const sf::String& string, const sf::Font& font, unsigned int characterSize = 30);
+        Text(const sf::String& string, const Font& font, unsigned int characterSize = 30);
 
         void SetString(const sf::String& string);
-        void SetFont(const sf::Font& font);
+        void SetFont(const Font& font);
         void SetMasked(bool masked);
 
         void SetCharacterSize(unsigned int size);
@@ -95,7 +95,7 @@ namespace Gx
         void SetOutlineThickness(float thickness);
 
         const sf::String& GetString() const;
-        const sf::Font* GetFont() const;
+        const Font* GetFont() const;
         bool IsMasked() const;
 
         unsigned int GetCharacterSize() const;
@@ -122,7 +122,7 @@ namespace Gx
         using ColorMap = std::unordered_map<size_t, sf::Color>;
 
         sf::String              m_string;
-        const sf::Font*         m_font;
+        const Font*             m_font;
         unsigned int            m_characterSize;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;
