@@ -134,7 +134,7 @@ void MapSelector::SetMapID(int mapID, const bool silent)
         animation->SetVisible(true);
 
     if (!silent)
-        mixer.Play(sfxNavigate);
+        mixer.Play(sfxNavigate, "SFX");
 
     if (m_mapCallback)
         m_mapCallback(m_mapID);

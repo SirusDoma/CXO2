@@ -10,7 +10,6 @@
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Models/Room.hpp>
-#include <OTwo/Models/Game.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
@@ -19,8 +18,9 @@
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 
 #include <Genode/UI.hpp>
-#include <magic_enum.hpp>
 #include <Genode/Tasks/Sequence.hpp>
+
+#include <magic_enum.hpp>
 
 StateWaiting7K::StateWaiting7K(State &&state) :
     State(std::move(state))
@@ -316,7 +316,7 @@ void StateWaiting7K::Initialize()
 
         sender->SetEnabled(false);
         btnBack->SetEnabled(false);
-        mixer.Play(sfxStart);
+        mixer.Play(sfxStart, "SFX");
 
         Run(Create<Gx::Sequence>([&director]
             {

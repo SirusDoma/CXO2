@@ -257,18 +257,25 @@ void O2Jam::OnFocusChanged(const bool focus)
     const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
                          GetSceneDirector().IsPresenting<StatePlaying7K>() ||
                          GetSceneDirector().IsPresenting<StateResult>();
+
+    const auto bgm = mixer.GetSoundGroup("BGM");
+    const auto sfx = mixer.GetSoundGroup("SFX");
     if (focus)
     {
-        mixer.SetVolume(static_cast<float>(config.MusicVolume));
+        bgm->SetVolume(static_cast<float>(config.MusicVolume));
+        sfx->SetVolume(static_cast<float>(config.EffectVolume));
+
         if (ignored)
             return;
 
-        mixer.Stop("SFX");
-        mixer.Play("BGM");
+        mixer.Resume(sfx);
+        mixer.Play(bgm);
     }
     else
     {
-        mixer.SetVolume(0.f);
+        bgm->SetVolume(0.f);
+        sfx->SetVolume(0.f);
+
         if (ignored)
             return;
 
