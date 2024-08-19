@@ -41,8 +41,7 @@ void ComboCounter::Initialize()
 
                 SetVisible(true);
             }),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -10.f), sf::milliseconds(30)),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, 0.f), sf::milliseconds(30)),
+            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 5)),
             parent->Create<Gx::Delay>(sf::milliseconds(1000))
         })
     );
@@ -62,7 +61,7 @@ void ComboCounter::SetCombo(const unsigned int combo)
     if (m_counter)
         m_counter->SetValue(combo);
 
-    if (combo > 1)
+    if (combo > 0)
     {
         SetVisible(true);
         m_sequence.Reset();

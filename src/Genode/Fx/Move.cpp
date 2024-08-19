@@ -73,8 +73,6 @@ namespace Gx
     void Move::Reset()
     {
         Task::Reset();
-
-        if (GetState() != TaskState::Initial)
-            m_target->SetPosition(m_start);
+        m_target->SetPosition(m_start);
     }
 }
