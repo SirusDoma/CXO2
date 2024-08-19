@@ -98,7 +98,7 @@ void NoteContainer::Render(const ChartRenderer &renderer, const double delta)
         const double latency = note->GetRenderPosition() - renderer.GetRenderPosition();
         if (note->GetChannel() == Chart::Channel::Background)
         {
-            if (latency < -1.f && latency > 5.f)
+            if (latency < -1.f || latency > 5.f)
                 continue;
         }
         else if (latency > 5.f)
