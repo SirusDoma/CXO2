@@ -42,7 +42,7 @@ void ComboCounter::Initialize()
 
                 SetVisible(true);
             }),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 4)),
+            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6)),
             parent->Create<Gx::Delay>(sf::milliseconds(1000))
         })
     );
