@@ -50,7 +50,7 @@ private:
     LevelCategory m_random;
     ChartMetadata m_music;
     std::vector<ChartMetadata> m_musicList;
-    std::vector<ChartMetadata*> m_displayList;
+    std::vector<ChartMetadata> m_displayList;
 };
 
 #endif

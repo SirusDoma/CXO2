@@ -46,7 +46,7 @@ void SelectMusicDialog::Initialize()
     m_musicList = session.GetInstalledMusic();
 
     for (auto& metadata : m_musicList)
-        m_displayList.push_back(&metadata);
+        m_displayList.push_back(metadata);
 
     m_random = selection.GetRandomLevel();
     m_difficulty = selection.GetDifficulty();
@@ -56,7 +56,7 @@ void SelectMusicDialog::Initialize()
         if (selection.GetMetadata().ID != 0)
             m_music = selection.GetMetadata();
         else
-            m_music = *m_displayList[m_displayList.size() - 1];
+            m_music = m_displayList[m_displayList.size() - 1];
     }
 
     auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
@@ -129,7 +129,7 @@ void SelectMusicDialog::Initialize()
                     activeHighlighter->SetVisible(true);
 
                 const unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
-                const auto music = *m_displayList[i + static_cast<int>(m_page * itemListCount)];
+                const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
                 if (m_music.ID == music.ID)
                     return;
 
@@ -227,7 +227,7 @@ void SelectMusicDialog::Initialize()
                 for (auto& metadata : m_musicList)
                 {
                     if (m_genre == static_cast<Genre>(-1) || metadata.Genre == m_genre)
-                        m_displayList.push_back(&metadata);
+                        m_displayList.push_back(metadata);
                 }
 
                 Sort(m_sort, m_order);
@@ -554,7 +554,14 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
     const auto& session   = app.Require<SessionContext>();
     const auto& selection = app.Require<MusicSelectionContext>();
 
-    m_musicList = session.GetInstalledMusic();
+    m_musicList = session.GetInstalledMusic(true);
+    m_displayList.clear();
+    for (auto& metadata : m_musicList)
+    {
+        if (m_genre == static_cast<Genre>(-1) || metadata.Genre == m_genre)
+            m_displayList.push_back(metadata);
+    }
+
     if (selection.GetMetadata().ID != 0)
         m_music = selection.GetMetadata();
     else
@@ -722,25 +729,25 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
-                    return a->ID < b->ID;
+                    return a.ID < b.ID;
 
-                return a->ID > b->ID;
+                return a.ID > b.ID;
             });
             break;
         case MusicSortMode::Title:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
                 if (m_order == MusicSortOrder::Ascending)
-                    return std::string(a->Title) < std::string(b->Title);
+                    return std::string(a.Title) < std::string(b.Title);
 
-                return std::string(a->Title) > std::string(b->Title);
+                return std::string(a.Title) > std::string(b.Title);
             });
             break;
         case MusicSortMode::Level:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a->ToChartMetadataView(m_difficulty);
-                auto y = b->ToChartMetadataView(m_difficulty);
+                auto x = a.ToChartMetadataView(m_difficulty);
+                auto y = b.ToChartMetadataView(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x.Level < y.Level;
@@ -751,8 +758,8 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
         case MusicSortMode::Duration:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a->ToChartMetadataView(m_difficulty);
-                auto y = b->ToChartMetadataView(m_difficulty);
+                auto x = a.ToChartMetadataView(m_difficulty);
+                auto y = b.ToChartMetadataView(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x.Duration < y.Duration;
@@ -784,7 +791,7 @@ void SelectMusicDialog::Invalidate()
         unsigned int i = 0;
         for (auto m : m_displayList)
         {
-            if (m->ID == m_music.ID)
+            if (m.ID == m_music.ID)
                 break;
 
             i++;
@@ -1044,9 +1051,9 @@ void SelectMusicDialog::Invalidate()
             continue;
         }
 
-        auto metadata = m_displayList[index]->ToChartMetadataView(m_difficulty);
+        auto metadata = m_displayList[index].ToChartMetadataView(m_difficulty);
         if (i == 0 && m_music.ID == 0)
-            m_music = *m_displayList[index];
+            m_music = m_displayList[index];
 
         if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
         {
@@ -1070,7 +1077,7 @@ void SelectMusicDialog::Invalidate()
             duration->SetString("[" + std::to_string(minute) + ":" + Gx::StringHelper::ToString(remainder, 2) + "]");
         }
 
-        button->SetCheckedState(m_music.ID == m_displayList[index]->ID);
+        button->SetCheckedState(m_music.ID == m_displayList[index].ID);
         button->SetEnabled(true);
         button->SetVisible(true);
     }

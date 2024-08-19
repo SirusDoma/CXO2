@@ -72,6 +72,7 @@ const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic(const bool r
 {
     if (rescan || m_installedMusicList.empty())
     {
+        m_installedMusicList.clear();
         const auto metaLoader = ChartMetadataLoader();
         for (const auto &file : Gx::FileSystem::Scan("o2ma*.ojn"))
         {
