@@ -176,7 +176,7 @@ Gx::Int64 M30Archive::ReadFile(const FileInfo &entry, void *data, Gx::Int64 size
         size = read;
 
     DecodeSample(sampleData, m_header.EncodingCode);
-    memcpy(data, &sampleData[0], size);;
+    memcpy(data, &sampleData[0], size);
 
     return read;
 }

@@ -25,7 +25,7 @@ void ChannelButton::Initialize()
 
     m_numberIndicator   = FindChild<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
     m_nameIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NAME");
-    m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");;
+    m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");
     m_focusIndicator    = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FOCUS");
     m_populationCounter = FindChild<Gx::Gauge>("IDC_GAUGE_CHANNEL_COUNTER");
 

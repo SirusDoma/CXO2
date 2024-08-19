@@ -290,7 +290,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     m_container->Render(*this, states.Delta);
-    return RenderableContainer::Render(surface, states);;
+    return RenderableContainer::Render(surface, states);
 }
 
 void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) const
