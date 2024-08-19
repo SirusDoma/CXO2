@@ -562,7 +562,7 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
             m_displayList.push_back(metadata);
     }
 
-    if (selection.GetMetadata().ID != 0)
+    if (!selection.GetMetadata().Source.empty())
         m_music = selection.GetMetadata();
     else
         m_music = m_musicList[m_musicList.size() - 1];
@@ -791,7 +791,7 @@ void SelectMusicDialog::Invalidate()
         unsigned int i = 0;
         for (auto m : m_displayList)
         {
-            if (m.ID == m_music.ID)
+            if (m.Source == m_music.Source)
                 break;
 
             i++;
