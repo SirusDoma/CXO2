@@ -2,6 +2,7 @@
 #include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
+#include <OTwo/Core/Note.hpp>
 #include <OTwo/Core/NoteContainer.hpp>
 #include <OTwo/Core/NoteFactory.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
@@ -13,6 +14,7 @@
 ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_container(),
     m_rendering(false),
+    m_endPosition(),
     m_chart(),
     m_settings(),
     m_judgement(),
@@ -31,7 +33,8 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_refPosition(0),
     m_bpm(0),
     m_inputTime(0),
-    m_frameId(0),
+    m_frameID(0),
+    m_lastEventID(0),
     m_callbackCalled(false),
     m_callback(),
     m_incrementCallback(),
@@ -116,8 +119,9 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
         m_instantiables
     );
     RemoveChild(FindChild<NoteContainer>("IDC_NOTE_CONTAINER"));
-    m_container = factory.Generate(chart, settings);
+    m_container = factory.Generate(settings);
     m_container->SetName("IDC_NOTE_CONTAINER");
+    m_container->Initialize(*this, chart, settings.Difficulty);
     AddChild(m_container);
 
     // Setup Note Clicks
@@ -175,8 +179,10 @@ void ChartRenderer::StartRender()
     m_currentTime = 0;
     m_refPosition = 0;
     m_refTime     = 0;
-    m_frameId     = 0;
+    m_frameID     = 0;
+    m_lastEventID = 0;
     m_bpm         = m_chart->GetMetadata().BPM;
+    m_endPosition = std::ceil(m_chart->GetLastEventPosition(m_settings.Difficulty)) + 1.f;
     m_timer.restart();
 }
 
@@ -190,7 +196,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     if (!m_chart || !m_rendering)
         return states;
 
-    if ((GetRenderPosition() > m_container->GetLastMeasure()))
+    if (GetRenderPosition() > m_endPosition)
     {
         m_container->Render(*this, states.Delta);
         states = RenderableContainer::Render(surface, states);
@@ -205,12 +211,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     // Skip multiple render calls
-    if (states.FrameID == m_frameId)
+    if (states.FrameID == m_frameID)
         return RenderableContainer::Render(surface, states);
 
     // Save the current frame time so the generated render position is always consistent across multiple calls in the same frame
     m_currentTime = m_timer.getElapsedTime().asMilliseconds();
-    m_frameId = states.FrameID;
+    m_frameID = states.FrameID;
 
     // Update input states
     // TODO: Implement poll rate
@@ -247,26 +253,50 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
     }
 
-    for (auto &ev : m_events)
+    bool updated = false;
+    for (unsigned int i = m_lastEventID; i < m_events.size(); i++)
     {
-        if (ev.Tap.Accuracy != Accuracy::None)
+        auto &ev = m_events[i];
+        const double latency = ev->Position - GetRenderPosition();
+
+        if (ev->IsPlayable())
+        {
+            const auto& note = static_cast<const Chart::NoteEvent&>(*ev.Event);
+            if (note.Length > 0 && latency + note.Length > 0)
+                m_container->Render(note, states.Delta);
+        }
+
+        if (ev.IsRegistered())
             continue;
+
+        if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 5.f)
+            break;
+
+        if (!updated)
+        {
+            m_lastEventID = i;
+            updated = true;
+        }
 
         // Fill front buffers and check for misses
         if (ev->IsPlayable())
         {
             // Fill buffer with valid event
+            const auto& note = static_cast<const Chart::NoteEvent&>(*ev.Event);
             if (const auto front = m_frontBuffers[ev->Channel]; !front || front->IsRegistered())
             {
                 m_frontBuffers[ev->Channel] = &ev;
                 if (front)
                    ev.LastEvent = front->Event;
             }
+
+            if (note.Length == 0)
+                m_container->Render(note, states.Delta);
         }
         else
         {
-            // Ignore non playable events that are not inside perfect line
-            if (const double latency = ev->Position - GetRenderPosition(); latency > 0)
+            // Ignore non-playable events that are not inside perfect line
+            if (latency > 0)
                 continue;
 
             ev.Tap = Judgement{Accuracy::Cool, 0};
@@ -288,7 +318,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
     }
 
-    m_container->Render(*this, states.Delta);
+    //m_container->Render(*this, states.Delta);
     return RenderableContainer::Render(surface, states);
 }
 
@@ -317,8 +347,6 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
                     front->Release = Judgement{ Accuracy::Miss, 0.f };
                     m_scores->Increment(release, Accuracy::Miss);
                 }
-                else
-                    m_container->GetNote(front->Event->Channel, front->Event->Position)->Hit();
             }
 
             if (front->LastEvent && front->Tap.Accuracy == Accuracy::None)

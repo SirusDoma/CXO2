@@ -1,24 +1,49 @@
 #include <OTwo/Core/NoteContainer.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
+#include <OTwo/Core/Note.hpp>
+#include <OTwo/Core/LongNote.hpp>
+
 NoteContainer::NoteContainer() :
+    m_renderer(),
+    m_chart(),
+    m_difficulty(),
     m_noteVertices(sf::PrimitiveType::Triangles),
     m_measureVertices(sf::PrimitiveType::Triangles),
     m_guideLineVertices(sf::PrimitiveType::Lines),
     m_notes(),
+    m_measures(),
     m_shape(NoteShape::Square),
-    m_lastMeasure()
+    m_lastMeasure(),
+    m_tapCounter(0),
+    m_longCounter(0)
 {
 }
 
-void NoteContainer::Add(Note& note)
+void NoteContainer::Initialize(const ChartRenderer &renderer, const Chart& chart, const Difficulty difficulty)
 {
-    m_notes.push_back(&note);
+    m_renderer = &renderer;
+    m_chart = &chart;
+    m_difficulty = difficulty;
+}
+
+void NoteContainer::AddNote(Note& note)
+{
+    if (const auto ln = dynamic_cast<LongNote*>(&note); ln)
+        m_longNotes.push_back(ln);
+    else
+        m_notes.push_back(&note);
+
     if (const auto position = static_cast<unsigned int>(std::ceil(note.GetRenderPosition())); m_lastMeasure < position)
         m_lastMeasure = position;
 }
 
-Note *NoteContainer::GetNote(const Chart::Channel channel, const double position) const
+void NoteContainer::AddMeasure(Measure &measure)
+{
+    m_measures.push_back(&measure);
+}
+
+Note* NoteContainer::GetNote(const Chart::Channel channel, const Chart::NoteType type, const double position) const
 {
     for (const auto note : m_notes)
     {
@@ -82,6 +107,43 @@ unsigned int NoteContainer::GetLastMeasure() const
     return m_lastMeasure;
 }
 
+void NoteContainer::Render(const Chart::NoteEvent &ev, const double delta) const
+{
+    if (m_tapCounter == 0)
+    {
+        double position = std::ceil(m_renderer->GetRenderPosition()) - 1.f;
+        for (const auto measure : m_measures)
+        {
+            measure->SetRenderPosition(position);
+            measure->Render(*m_renderer, delta);
+
+            position += m_chart->GetMeasureFraction(m_difficulty, position);
+        }
+    }
+
+    Note* note = nullptr;
+    if (ev.Type == Chart::NoteType::Hold)
+    {
+        if (m_longCounter >= m_longNotes.size())
+            return;
+
+        note = m_longNotes[m_longCounter++];
+        static_cast<LongNote*>(note)->SetLength(ev.Length);
+    }
+    else
+    {
+        if (m_tapCounter >= m_notes.size())
+            return;
+
+        note = m_notes[m_tapCounter++];
+    }
+
+    note->SetRenderPosition(ev.Position);
+    note->SetChannel(ev.Channel);
+    note->SetVisible(true);
+    note->Render(*m_renderer, delta);
+}
+
 void NoteContainer::Update(const double delta)
 {
     for (const auto updatable : GetRegisteredPrefabs())
@@ -110,6 +172,14 @@ void NoteContainer::Render(const ChartRenderer &renderer, const double delta)
 
 Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
+    for (int i = m_tapCounter; i < m_notes.size(); i++)
+        m_notes[i]->SetVisible(false);
+
+    for (int i = m_longCounter; i < m_longNotes.size(); i++)
+        m_longNotes[i]->SetVisible(false);
+
+    m_tapCounter = 0;
+    m_longCounter = 0;
     if (const auto it = m_textures.find(m_shape); it != m_textures.end())
     {
         // Use scissor test to mask the playable area

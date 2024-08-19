@@ -31,7 +31,7 @@ NoteFactory::NoteFactory(Gx::ResourceManager &instantiationResources, Gx::Resour
     }
 }
 
-NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::RenderSettings &settings) const
+NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settings) const
 {
     const auto container = &m_resources->Create<NoteContainer>("STATE_PLAYING/IDC_NOTE_CONTAINER");
     auto tapNotePrefabs = PrefabMap();
@@ -84,70 +84,61 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
 
     // TODO: Apply Arrangement Modifiers
 
-    unsigned int max = chart.GetLastEventPosition(settings.Difficulty) + 1;
-    const auto& events = chart.GetEvents(settings.Difficulty);
-
     // Initializes vertices and reserve the array to prevent vertex address from shifting
     auto& vertices = container->GetNoteVertices();
     auto& guideLineVertices = container->GetGuideLineVertices();
 
-    // Resize to worst case scenario (which is LN)
-    vertices.resize((events.size() * 6 * 3) + (max * 6)); // LN = 3 objects (head, tail, and body)
-    guideLineVertices.resize(events.size() * 2 * 4); // 4 objects (head (left + right), tail (left + right))
-
-    // TODO: Use pooling system instead: e.g Create only 192 x 5 note vertices and re-use them
+    // Resize the vertices to buffer size
+    constexpr int bufferSize = 192 * 20 * 2;                    // Notes + LNs worth of 5 measures
+    vertices.resize((bufferSize * 6 * 3) + (20 * 6)); // LN = 3 objects (head, tail, and body) + 5 measures
+    guideLineVertices.resize(bufferSize * 2 * 4);     // 4 objects (head (left + right), tail (left + right))
 
     // TODO: Better vertices index tracking and allocation
     unsigned int vi = 0;
     unsigned int vg = 0;
 
     // Prepare  measure prefabs
-    std::unordered_map<NoteShape, Gx::Sprite*> measurePrefab = {
+    auto measurePrefabs = PrefabMap();
+    measurePrefabs[Chart::Channel::Background] = {
         { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE1") },
         { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE2") }
     };
-    container->RegisterPrefab(*measurePrefab[NoteShape::Square]);
-    container->RegisterPrefab(*measurePrefab[NoteShape::Circle]);
+
+    container->RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);
+    container->RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Circle]);
 
     // Set-up temp vertices
     auto vx = std::array<sf::Vertex*, 6>();
     auto vz = std::array<sf::Vertex*, 8>();
 
     // Configure measure vertices
-    double mpos = 0;
-    for (int m = 1; m <= max; m++)
+    for (int m = 1; m <= 20; m++)
     {
-        mpos += chart.GetMeasureFraction(settings.Difficulty, m);
-        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), mpos, Chart::Channel::Background);
+        auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), m, Chart::Channel::Background);
 
         for (int v = 0; v < vx.size(); v++)
             vx[v] = &vertices[vi + v];
 
         vi += 6;
         measure.SetVertices(vx);
-        for (const auto shape : { NoteShape::Square, NoteShape::Circle })
-            measure.SetPrefab(shape, *measurePrefab[shape]);
+        measure.SetPrefabs(measurePrefabs);
 
-        container->Add(measure);
+
+        container->AddMeasure(measure);
     }
 
     // Configure note vertices
-    for (int i = 0; i < events.size(); i++)
+    for (int i = 0; i < bufferSize; i++)
     {
-        if (!events[i] || events[i]->Channel == Chart::Channel::Measurement || events[i]->Channel == Chart::Channel::BPM || events[i]->Channel == Chart::Channel::Background)
-            continue;
-
-        const auto& ev = static_cast<Chart::NoteEvent&>(*events[i]);
-        if (ev.Type == Chart::NoteType::Tap)
+        if (i < bufferSize / 2)
         {
-            auto& note = m_resources->Create<Note>("STATE_PLAYING/IDC_TAP_NOTE_" + std::to_string(i), ev.Position, ev.Channel);
+            auto& note = m_resources->Create<Note>("STATE_PLAYING/IDC_TAP_NOTE_" + std::to_string(i), 0, Chart::Channel::Note4);
             for (int v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             note.SetVertices(vx);
-            for (const auto shape : { NoteShape::Square, NoteShape::Circle })
-                note.SetPrefab(shape, *tapNotePrefabs[ev.Channel][shape]);
+            note.SetPrefabs(tapNotePrefabs);
 
             for (int v = 0; v < vz.size(); v++)
                 vz[v] = &guideLineVertices[vg + v];
@@ -155,18 +146,17 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
             vg += 8;
             note.GetGuideLine()->SetVertices(vz);
 
-            container->Add(note);
+            container->AddNote(note);
         }
-        else if (ev.Type == Chart::NoteType::Hold)
+        else
         {
-            auto& longNote = m_resources->Create<LongNote>("STATE_PLAYING/IDC_LONG_NOTE_" + std::to_string(i), ev.Position, ev.Length, ev.Channel);
+            auto& longNote = m_resources->Create<LongNote>("STATE_PLAYING/IDC_LONG_NOTE_" + std::to_string(i), 0, 1, Chart::Channel::Note4);
             for (int v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             longNote.SetVertices(vx);
-            for (const auto shape : { NoteShape::Square, NoteShape::Circle })
-                longNote.SetPrefab(shape, *longNotePrefabs[ev.Channel][shape]);
+            longNote.SetPrefabs(longNotePrefabs);
 
             for (int v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
@@ -186,10 +176,8 @@ NoteContainer *NoteFactory::Generate(const Chart &chart, const ChartRenderer::Re
             vg += 8;
             longNote.GetGuideLine()->SetVertices(vz);
 
-            for (const auto shape : { NoteShape::Square, NoteShape::Circle })
-                longNote.SetEdgePrefab(shape, *tapNotePrefabs[ev.Channel][shape]);
-
-            container->Add(longNote);
+            longNote.SetEdgePrefabs(tapNotePrefabs);
+            container->AddNote(longNote);
         }
     }
 

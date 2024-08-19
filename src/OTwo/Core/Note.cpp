@@ -22,9 +22,19 @@ double Note::GetRenderPosition() const
     return m_position;
 }
 
+void Note::SetRenderPosition(const double position)
+{
+    m_position = position;
+}
+
 Chart::Channel Note::GetChannel() const
 {
     return m_channel;
+}
+
+void Note::SetChannel(Chart::Channel channel)
+{
+    m_channel = channel;
 }
 
 NoteGuideLine* Note::GetGuideLine()
@@ -44,15 +54,18 @@ void Note::SetVertices(const std::array<sf::Vertex*, 6> &vertices)
 
 const Gx::Sprite* Note::GetPrefab(const NoteShape shape) const
 {
-    if (const auto it = m_prefabs.find(shape); it != m_prefabs.end())
-        return it->second;
+    if (const auto it = m_prefabs.find(m_channel); it != m_prefabs.end())
+    {
+        if (const auto it2 = it->second.find(shape); it2 != it->second.end())
+            return it2->second;
+    }
 
     return nullptr;
 }
 
-void Note::SetPrefab(const NoteShape shape, Gx::Sprite &prefab)
+void Note::SetPrefabs(const PrefabMap &prefabs)
 {
-    m_prefabs[shape] = &prefab;
+    m_prefabs = prefabs;
 }
 
 bool Note::IsVisible() const

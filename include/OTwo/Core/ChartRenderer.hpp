@@ -76,8 +76,14 @@ private:
 
         bool IsRegistered() const
         {
-            const auto note = dynamic_cast<Chart::NoteEvent*>(Event);
-            return Tap.Accuracy != Accuracy::None && ((note && note->Length == 0) || Release.Accuracy != Accuracy::None);
+            if (!Event)
+                return true;
+
+            if (!Event->IsPlayable() && Tap.Accuracy != Accuracy::None)
+                return true;
+
+            const auto note = static_cast<Chart::NoteEvent*>(Event);
+            return Tap.Accuracy != Accuracy::None && (note->Length == 0 || Release.Accuracy != Accuracy::None);
         }
 
         Chart::Event *operator->() const { return Event; }
@@ -94,6 +100,7 @@ private:
 
     NoteContainer* m_container;
     bool m_rendering;
+    double m_endPosition;
 
     const Chart* m_chart;
     RenderSettings m_settings;
@@ -115,7 +122,8 @@ private:
     mutable double m_refPosition;
     mutable double m_bpm;
     mutable double m_inputTime;
-    mutable unsigned int m_frameId;
+    mutable unsigned int m_frameID;
+    mutable unsigned int m_lastEventID;
     mutable bool m_callbackCalled;
 
     std::function<void()> m_callback;

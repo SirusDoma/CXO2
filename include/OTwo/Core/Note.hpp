@@ -4,9 +4,11 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
+#include <OTwo/Core/NoteFactory.hpp>
+#include <OTwo/Core/NoteGuideLine.hpp>
+
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
-#include <OTwo/Core/NoteGuideLine.hpp>
 
 static constexpr unsigned int DefaultMeasureHeight = 384;
 
@@ -18,14 +20,18 @@ public:
     explicit Note(double position, Chart::Channel channel = Chart::Channel::Background);
 
     double GetRenderPosition() const;
+    void SetRenderPosition(double position);
+
     Chart::Channel GetChannel() const;
+    void SetChannel(Chart::Channel channel);
+
     NoteGuideLine* GetGuideLine();
 
     const std::array<sf::Vertex*, 6>& GetVertices() const;
     void SetVertices(const std::array<sf::Vertex*, 6>& vertices);
 
     const Gx::Sprite* GetPrefab(NoteShape shape) const;
-    void SetPrefab(NoteShape shape, Gx::Sprite& prefab);
+    void SetPrefabs(const PrefabMap &prefabs);
 
     bool IsVisible() const override;
     void SetVisible(const bool visible) override;
@@ -35,7 +41,6 @@ public:
 
 protected:
     using VerticesPtr = std::array<sf::Vertex*, 6>;
-    using PrefabMap   = std::unordered_map<NoteShape, Gx::Sprite*>;
 
     static void UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &position, const sf::FloatRect &bounds);
     static void UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texcoords);
@@ -50,7 +55,5 @@ private:
     NoteGuideLine  m_line;
     bool           m_hit;
 };
-
-using Measure = Note;
 
 #endif //NOTE_HPP

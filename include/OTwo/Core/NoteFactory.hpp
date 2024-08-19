@@ -5,7 +5,7 @@
 #include <OTwo/Core/NoteContainer.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-#include <Genode/IO/ResourceManager.hpp>
+using PrefabMap = std::unordered_map<Chart::Channel, std::unordered_map<NoteShape, Gx::Sprite*>>;
 
 class NoteFactory
 {
@@ -22,10 +22,9 @@ public:
 
     NoteFactory(Gx::ResourceManager &instantiationResources, Gx::ResourceManager &prefabResources, const ChannelSet &instantiables);
 
-    NoteContainer *Generate(const Chart &chart, const ChartRenderer::RenderSettings &settings) const;
+    NoteContainer *Generate(const ChartRenderer::RenderSettings &settings) const;
 
 private:
-    using PrefabMap = std::unordered_map<Chart::Channel, std::unordered_map<NoteShape, Gx::Sprite*>>;
     Gx::ResourceManager *m_resources, *m_prefabResources;
     ChannelSet           m_channels;
 };

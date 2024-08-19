@@ -81,15 +81,18 @@ void LongNote::SetTailVertices(const std::array<sf::Vertex*, 6>& vertices)
 
 const Gx::Sprite* LongNote::GetEdgePrefab(const NoteShape shape) const
 {
-    if (const auto it = m_edgePrefabs.find(shape); it != m_edgePrefabs.end())
-        return it->second;
+    if (const auto it = m_edgePrefabs.find(GetChannel()); it != m_edgePrefabs.end())
+    {
+        if (const auto it2 = it->second.find(shape); it2 != it->second.end())
+            return it2->second;
+    }
 
     return nullptr;
 }
 
-void LongNote::SetEdgePrefab(const NoteShape shape, Gx::Sprite &prefab)
+void LongNote::SetEdgePrefabs(const PrefabMap& prefabs)
 {
-    m_edgePrefabs[shape] = &prefab;
+    m_edgePrefabs = prefabs;
 }
 
 void LongNote::Render(const ChartRenderer &renderer, const double delta)
