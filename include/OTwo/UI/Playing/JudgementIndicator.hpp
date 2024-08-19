@@ -14,7 +14,7 @@
 class JudgementIndicator : public Gx::Node, public Gx::Renderable, public Gx::Updatable
 {
 public:
-    JudgementIndicator() = default;
+    explicit JudgementIndicator(bool useFx = true);
 
     void Initialize() override;
     void Play(Accuracy accuracy);
@@ -23,6 +23,7 @@ private:
     void Update(const double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
+    bool m_useFx;
     double m_elapsed;
     Gx::Animation* m_target;
     std::unordered_map<Accuracy, Gx::Animation*> m_indicators;

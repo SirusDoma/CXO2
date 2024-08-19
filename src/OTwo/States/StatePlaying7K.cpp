@@ -179,7 +179,7 @@ void StatePlaying7K::Initialize()
     comboCounter->Initialize();
 
     // Setup Judgement Indicator
-    const auto judgementIndicator = Create<JudgementIndicator>();
+    const auto judgementIndicator = Create<JudgementIndicator>(m_config->UseFx);
     judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
     AddChild(judgementIndicator);
     judgementIndicator->Initialize();
