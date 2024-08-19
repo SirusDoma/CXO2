@@ -25,6 +25,7 @@ void ComboCounter::Initialize()
     }
 
     SetVisible(false);
+    SetPosition(sf::Vector2f(0.f, -30.f / 5.f));
     m_sequence = Gx::Sequence([this] ()
         {
             if (m_header)
@@ -41,7 +42,7 @@ void ComboCounter::Initialize()
 
                 SetVisible(true);
             }),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 5)),
+            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 4)),
             parent->Create<Gx::Delay>(sf::milliseconds(1000))
         })
     );

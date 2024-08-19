@@ -80,7 +80,7 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
         m_jamCombo = 0;
     }
 
-    m_maxCombo = m_maxCombo < m_combo && m_combo > 2 ? m_combo : m_maxCombo;
+    m_maxCombo = m_maxCombo < GetCombo() ? GetCombo() : m_maxCombo;
     m_maxJamCombo = std::max(m_maxJamCombo, m_jamCombo);
 
     if (m_incrementCallback)
@@ -141,7 +141,7 @@ unsigned int ScoreTracker::GetMaxCombo() const
 
 unsigned int ScoreTracker::GetCombo() const
 {
-    return m_combo;
+    return m_combo > 0 ? m_combo - 1 : m_combo;
 }
 
 unsigned int ScoreTracker::GetMaxJamCombo() const
