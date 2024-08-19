@@ -95,15 +95,41 @@ void StateResult::Initialize()
                 continue;
             }
 
+            // TODO: Make this adjustable?
+
+            auto primaryTeamColor = std::unordered_map<RoomTeam, sf::Color>
+            ({
+                { RoomTeam::A, sf::Color(255, 000, 16, 50) },
+                { RoomTeam::B, sf::Color(255, 190, 16, 50) },
+                { RoomTeam::C, sf::Color(247, 255, 0, 50) },
+                { RoomTeam::D, sf::Color(155, 206, 82, 50) },
+                { RoomTeam::E, sf::Color(107, 235, 230, 50) },
+                { RoomTeam::F, sf::Color(000, 000, 230, 50) },
+                { RoomTeam::G, sf::Color(156, 81, 214, 50) },
+                { RoomTeam::H, sf::Color(181, 77, 025, 50) },
+            });
+
+            auto secondaryTeamColor = std::unordered_map<RoomTeam, sf::Color>
+            ({
+                { RoomTeam::A, sf::Color(123, 130, 16, 50) },
+                { RoomTeam::B, sf::Color(123, 223, 16, 50) },
+                { RoomTeam::C, sf::Color(123, 125, 0, 50) },
+                { RoomTeam::D, sf::Color(74, 231, 82, 50) },
+                { RoomTeam::E, sf::Color(49, 247, 230, 50) },
+                { RoomTeam::F, sf::Color(000, 000, 230, 50) },
+                { RoomTeam::G, sf::Color(74, 170, 214, 50) },
+                { RoomTeam::H, sf::Color(90, 36, 25, 50) },
+            });
+
+            if (scoreItems[i].Member.ID == session.GetCurrentPlayer().ID)
+                banner->SetFrame(i == 0 ? "win" : "lose");
+
             if (const auto highlighter = item->FindChild<Gx::Rectangle>("IDC_RECTANGLE_HIGHLIGHT"); highlighter)
             {
                 if (scoreItems[i].Member.ID == session.GetCurrentPlayer().ID)
-                {
-                    banner->SetFrame(i == 0 ? "win" : "lose");
-                    highlighter->SetColor(sf::Color(184, 72, 0, 90));
-                }
+                    highlighter->SetColor(primaryTeamColor[scoreItems[i].Member.Team]);
                 else
-                    highlighter->SetColor(sf::Color(200, 200, 200, 90));
+                    highlighter->SetColor(secondaryTeamColor[scoreItems[i].Member.Team]);
             }
 
             if (const auto rank = item->FindChild<Gx::Label>("IDC_TEXT_RANK_NUMBER"); rank)
