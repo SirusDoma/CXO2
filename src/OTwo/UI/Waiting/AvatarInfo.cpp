@@ -54,10 +54,20 @@ void AvatarInfo::Invalidate()
 
     if (const auto plate = FindChild<Gx::Colorable>("IDC_IMAGE_AVATAR_INFO_PLATE"); plate)
     {
-        if (m_member)
-            plate->SetColor(GetTeamColor(m_member->Team));
+        if (m_member && m_member->ID != 0)
+        {
+            if (!m_teamColors.empty())
+            {
+                const auto& color = GetTeamColor(m_member->Team);
+                plate->SetColor(color);
+                m_member->Color = color;
+            }
+            else
+                plate->SetColor(m_member->Color);
+        }
         else
             plate->SetColor(sf::Color::Transparent);
+
 
         if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
         {
@@ -82,7 +92,15 @@ void AvatarInfo::Invalidate()
             if (m_member)
             {
                 label->SetString(m_member->Name);
-                label->SetColor(GetTeamColor(m_member->Team));
+                if (!m_teamColors.empty())
+                {
+                    const auto& color = GetTeamColor(m_member->Team);
+                    label->SetColor(GetTeamColor(m_member->Team));
+                    m_member->Color = color;
+                }
+                else
+                    label->SetColor(m_member->Color);
+
             }
             else
                 label->SetString(std::string());

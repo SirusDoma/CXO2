@@ -7,6 +7,7 @@
 #include <OTwo/Models/Character.hpp>
 
 #include <SFML/System/String.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 #include <string>
 #include <vector>
@@ -71,6 +72,7 @@ struct RoomMember : Player
     RoomMember() = default;
     
     RoomTeam  Team  = static_cast<RoomTeam>(-1);
+    sf::Color Color = sf::Color::Transparent;
     Gx::Uint8 Index = 0;
 };
 
