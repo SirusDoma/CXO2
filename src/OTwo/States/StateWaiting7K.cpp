@@ -280,7 +280,7 @@ void StateWaiting7K::Initialize()
 
             const auto music  = selectMusicDialog->GetSelectedMusic();
             const auto random = selectMusicDialog->GetSelectedRandomLevels() != static_cast<LevelCategory>(0);
-            if (music.ID != 0)
+            if (!music.Source.empty())
             {
                 const auto meta = music.ToChartMetadataView(selectMusicDialog->GetSelectedDifficulty());
 

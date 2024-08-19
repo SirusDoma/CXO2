@@ -12,17 +12,14 @@ void Chart::SetMetadata(const ChartMetadata &metadata)
     m_metadata = metadata;
 }
 
-std::vector<Chart::Event*> Chart::GetEvents(const Difficulty diff) const
+const Chart::EventList& Chart::GetEvents(const Difficulty diff) const
 {
-    auto events = std::vector<Event*>();
+    auto events = EventList();
     const auto source = m_events.find(diff);
-    if (source == m_events.end())
-        return events;
- 
-    for (const auto &it : source->second)
-        events.push_back(it.get());
+    if (source != m_events.end())
+        return source->second;
 
-    return events;
+    throw Gx::Exception("Chart events not found");
 }
 
 void Chart::SortEvents()
@@ -129,17 +126,36 @@ void Chart::SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail)
     m_thumbnail = std::move(thumbnail);
 }
 
-float Chart::GetMeasureFraction(const int measure) const
+unsigned int Chart::GetMeasureFractionCount(Difficulty diff) const
 {
-    if (const auto it = m_fractions.find(measure); it != m_fractions.end())
+    if (const auto it = m_fractions.find(diff); it != m_fractions.end())
+        return it->second.size();
+
+    return 0;
+}
+
+std::map<Gx::Uint32, float> Chart::GetMeasureFractions(const Difficulty diff) const
+{
+    if (const auto it = m_fractions.find(diff); it != m_fractions.end())
         return it->second;
+
+    return {};
+}
+
+float Chart::GetMeasureFraction(const Difficulty diff, const int measure) const
+{
+    if (const auto it = m_fractions.find(diff); it != m_fractions.end())
+    {
+        if (const auto f = it->second.find(measure); f != it->second.end())
+            return f->second;
+    }
 
     return 1.f;
 }
 
-void Chart::SetMeasureFraction(const int measure, const float size)
+void Chart::SetMeasureFraction(const Difficulty diff, const int measure, const float size)
 {
-    m_fractions[measure] = size;
+    m_fractions[diff][measure] = size;
 }
 
 double Chart::GetLastEventPosition(const Difficulty diff) const

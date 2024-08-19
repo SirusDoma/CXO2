@@ -21,7 +21,6 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_instantiables(instantiables),
     m_speeds(),
     m_timer(),
-    m_prefabs(),
     m_noteClicks(),
     m_longNoteEffects(),
     m_events(),
@@ -161,8 +160,8 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
 
     // Register events for processing
     m_events.clear();
-    for (Chart::Event *ev : m_chart->GetEvents(settings.Difficulty))
-        m_events.push_back(EventState{ ev });
+    for (auto& ev : m_chart->GetEvents(settings.Difficulty))
+        m_events.push_back(EventState{ ev.get() });
 }
 
 void ChartRenderer::StartRender()

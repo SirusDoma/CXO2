@@ -130,7 +130,7 @@ void SelectMusicDialog::Initialize()
 
                 const unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
                 const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
-                if (m_music.ID == music.ID)
+                if (m_music.Source == music.Source)
                     return;
 
                 m_music = music;
@@ -637,7 +637,7 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
 void SelectMusicDialog::OnAccepted()
 {
     // Edge case: No music in selected genre
-    if (m_music.ID == 0 && m_random == static_cast<LevelCategory>(0))
+    if (m_music.Source.empty() && m_random == static_cast<LevelCategory>(0))
         return;
 
     Dialog::OnAccepted();
@@ -674,7 +674,7 @@ void SelectMusicDialog::OnCancelled()
 void SelectMusicDialog::CacheMusicCover() const
 {
 
-    if (m_music.ID == 0)
+    if (m_music.Source.empty())
         return;
 
     auto& app       = Gx::Application::Instance();
@@ -786,7 +786,7 @@ void SelectMusicDialog::Invalidate()
     unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
     unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
 
-    if (m_music.ID != 0)
+    if (!m_music.Source.empty())
     {
         unsigned int i = 0;
         for (auto m : m_displayList)
@@ -1052,7 +1052,7 @@ void SelectMusicDialog::Invalidate()
         }
 
         auto metadata = m_displayList[index].ToChartMetadataView(m_difficulty);
-        if (i == 0 && m_music.ID == 0)
+        if (i == 0 && m_music.Source.empty())
             m_music = m_displayList[index];
 
         if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
@@ -1077,12 +1077,12 @@ void SelectMusicDialog::Invalidate()
             duration->SetString("[" + std::to_string(minute) + ":" + Gx::StringHelper::ToString(remainder, 2) + "]");
         }
 
-        button->SetCheckedState(m_music.ID == m_displayList[index].ID);
+        button->SetCheckedState(m_music.Source == m_displayList[index].Source);
         button->SetEnabled(true);
         button->SetVisible(true);
     }
 
-    if (m_music.ID == 0)
+    if (m_music.Source.empty())
         return;
 
     auto currentMetadata = m_music.ToChartMetadataView(m_difficulty);
@@ -1104,7 +1104,7 @@ void SelectMusicDialog::Invalidate()
             if (!label)
                 continue;
 
-            if (m_music.ID != 0 && x < info.size())
+            if (!m_music.Source.empty() && x < info.size())
                 label->SetString(info[x]);
             else
                 label->SetString(std::string());

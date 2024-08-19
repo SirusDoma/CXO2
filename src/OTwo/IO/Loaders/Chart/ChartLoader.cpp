@@ -99,20 +99,24 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
 
         Gx::Uint32 offset = 0;
         Gx::Uint32 blockCount = 0;
+        Gx::Uint32 size = 0;
 
         switch (difficulty)
         {
             case Difficulty::EX:
                 offset = metadata.BlockOffsetEx;
                 blockCount = metadata.BlockCountEx;
+                size = metadata.BlockOffsetNx - offset;
                 break;
             case Difficulty::NX:
                 offset = metadata.BlockOffsetNx;
                 blockCount = metadata.BlockCountNx;
+                size = metadata.BlockOffsetHx - offset;
                 break;
             case Difficulty::HX:
                 offset = metadata.BlockOffsetHx;
                 blockCount = metadata.BlockCountHx;
+                size = metadata.CoverOffset - offset;
                 break;
             case Difficulty::MX:
                 break;
@@ -133,9 +137,17 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::Background;
             for (int i = 0; i < block.EventCount; i++)
             {
-                double position = (static_cast<double>(i) / static_cast<double>(block.EventCount));
-                for (int m = 0; m < block.Measure; m++)
-                    position += chart->GetMeasureFraction(m);
+                double position = block.Measure + (static_cast<double>(i) / static_cast<double>(block.EventCount));
+                if (auto fractions = chart->GetMeasureFractions(difficulty); fractions.size() > 0)
+                {
+                    for (auto [m, fraction] : fractions)
+                    {
+                        if (m > block.Measure)
+                            break;
+
+                        position -= 1.f - fraction;
+                    }
+                }
 
                 auto ev = Chart::Event(channel, position);
                 if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
@@ -148,7 +160,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                         continue;
 
                     if (ev.Channel == Chart::Channel::Measurement)
-                        chart->SetMeasureFraction(block.Measure, value);
+                        chart->SetMeasureFraction(difficulty, block.Measure, value);
 
                     chart->AddEvent<Chart::TimeEvent>(difficulty, Chart::TimeEvent(ev, value));
                     continue;

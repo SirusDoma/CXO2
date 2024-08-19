@@ -86,7 +86,6 @@ private:
     void PlaySample(const Chart::NoteEvent* ev, const std::string &group = "BGM") const;
     void OnScoreUpdated(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count) const;
 
-    using PrefabMap      = std::unordered_map<Chart::Channel, std::unordered_map<Chart::NoteType, NotePrefabMap>>;
     using AnimationMap   = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using EventStateList = std::vector<EventState>;
     using FrontBufferMap = std::unordered_map<Chart::Channel, EventState*>;
@@ -105,7 +104,6 @@ private:
     ChannelSet m_instantiables;
     SpeedMap m_speeds;
     sf::Clock m_timer;
-    mutable PrefabMap m_prefabs;
     mutable AnimationMap m_noteClicks;
     mutable AnimationMap m_longNoteEffects;
     mutable EventStateList m_events;

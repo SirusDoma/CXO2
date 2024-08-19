@@ -10,7 +10,8 @@
 
 #include <vector>
 #include <memory>
-#include <set>
+#include <map>
+#include <unordered_map>
 
 class Chart
 {
@@ -111,6 +112,8 @@ public:
         }
     };
 
+    using EventList   = std::vector<std::unique_ptr<Event>>;
+
     Chart() = default;
 
     const ChartMetadata &GetMetadata() const;
@@ -118,7 +121,7 @@ public:
 
     template<typename T>
     T* AddEvent(Difficulty diff, T &&ev);
-    std::vector<Event*> GetEvents(Difficulty diff) const;
+    const EventList& GetEvents(Difficulty diff) const;
     void SortEvents();
 
     void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
@@ -131,8 +134,11 @@ public:
     const sf::Image *GetThumbnail() const;
     void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
 
-    float GetMeasureFraction(int measure) const;
-    void SetMeasureFraction(int measure, float size);
+    unsigned int GetMeasureFractionCount(Difficulty diff) const;
+    std::map<Gx::Uint32, float> GetMeasureFractions(Difficulty diff) const;
+
+    float GetMeasureFraction(Difficulty diff, int measure) const;
+    void SetMeasureFraction(Difficulty diff, int measure, float size);
 
     double GetLastEventPosition(Difficulty diff) const;
 
@@ -141,10 +147,9 @@ public:
 
     std::string Source;
 private:
-    using EventList   = std::vector<std::unique_ptr<Event>>;
     using EventMap    = std::unordered_map<Difficulty, EventList>;
     using SampleMap   = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
-    using FractionMap = std::unordered_map<Gx::Uint32, float>;
+    using FractionMap = std::unordered_map<Difficulty, std::map<Gx::Uint32, float>>;
     using PositionMap = std::unordered_map<Difficulty, double>;
 
     ChartMetadata m_metadata;
