@@ -36,7 +36,7 @@ public:
     unsigned int GetLastMeasure() const;
 
     void Render(const Chart::NoteEvent& ev, double delta) const;
-    void Render(const ChartRenderer &renderer, double delta);
+    void RenderMeasures(double delta) const;
 
 private:
     using TextureMap = std::unordered_map<NoteShape, const sf::Texture*>;

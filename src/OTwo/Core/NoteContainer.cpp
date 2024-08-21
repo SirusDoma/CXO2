@@ -109,17 +109,7 @@ unsigned int NoteContainer::GetLastMeasure() const
 
 void NoteContainer::Render(const Chart::NoteEvent &ev, const double delta) const
 {
-    if (m_tapCounter == 0)
-    {
-        double position = std::ceil(m_renderer->GetRenderPosition()) - 1.f;
-        for (const auto measure : m_measures)
-        {
-            measure->SetRenderPosition(position);
-            measure->Render(*m_renderer, delta);
-
-            position += m_chart->GetMeasureFraction(m_difficulty, position);
-        }
-    }
+    RenderMeasures(delta);
 
     Note* note = nullptr;
     if (ev.Type == Chart::NoteType::Hold)
@@ -144,6 +134,21 @@ void NoteContainer::Render(const Chart::NoteEvent &ev, const double delta) const
     note->Render(*m_renderer, delta);
 }
 
+void NoteContainer::RenderMeasures(double delta) const
+{
+    if (m_tapCounter == 0)
+    {
+        double position = std::ceil(m_renderer->GetRenderPosition()) - 1.f;
+        for (const auto measure : m_measures)
+        {
+            measure->SetRenderPosition(position);
+            measure->Render(*m_renderer, delta);
+
+            position += m_chart->GetMeasureFraction(m_difficulty, position);
+        }
+    }
+}
+
 void NoteContainer::Update(const double delta)
 {
     for (const auto updatable : GetRegisteredPrefabs())
@@ -152,26 +157,10 @@ void NoteContainer::Update(const double delta)
     UpdatableContainer::Update(delta);
 }
 
-void NoteContainer::Render(const ChartRenderer &renderer, const double delta)
-{
-    m_shape = renderer.GetRenderSettings().Config->NoteShapeType;
-    for (const auto note : m_notes)
-    {
-        const double latency = note->GetRenderPosition() - renderer.GetRenderPosition();
-        if (note->GetChannel() == Chart::Channel::Background)
-        {
-            if (latency < -1.f || latency > 5.f)
-                continue;
-        }
-        else if (latency > 5.f)
-            break;
-
-        note->Render(renderer, delta);
-    }
-}
 
 Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
+    RenderMeasures(states.Delta);
     for (int i = m_tapCounter; i < m_notes.size(); i++)
         m_notes[i]->SetVisible(false);
 

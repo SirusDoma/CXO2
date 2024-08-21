@@ -198,9 +198,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 
     if (GetRenderPosition() > m_endPosition)
     {
-        m_container->Render(*this, states.Delta);
         states = RenderableContainer::Render(surface, states);
-
         if (m_callback && !m_callbackCalled)
         {
             m_callbackCalled = true;
@@ -226,10 +224,19 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         Input(channel, isKeyPressed(key));
 
     // Check judgement status of front buffer events
+    bool frontBuffersFilled = true;
     for (auto& [channel, state] : m_frontBuffers)
     {
         if (!state || state->IsRegistered())
+        {
+            if (!state)
+            {
+                m_lastEventID = 0;
+                frontBuffersFilled = false;
+            }
+
             continue;
+        }
 
         auto& ev = static_cast<Chart::NoteEvent&>(*state->Event);
         if (const auto tapResult = m_judgement->Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Accuracy == Accuracy::Miss)
@@ -262,14 +269,22 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         if (ev->IsPlayable())
         {
             const auto& note = static_cast<const Chart::NoteEvent&>(*ev.Event);
-            if (note.Length > 0 && latency + note.Length > 0)
+            if (note.Length > 0 && note.Position + note.Length > GetRenderPosition())
+            {
+                if (!updated)
+                {
+                    m_lastEventID = i;
+                    updated = true;
+                }
+
                 m_container->Render(note, states.Delta);
+            }
         }
 
         if (ev.IsRegistered())
             continue;
 
-        if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 5.f)
+        if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 5.f && frontBuffersFilled)
             break;
 
         if (!updated)
