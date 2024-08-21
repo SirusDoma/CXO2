@@ -123,16 +123,21 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     if (auto noteClickList = state->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
     {
-        LoadRequiredResource(ObjectPopulator::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID()), ctx, 7);
+        auto noteClickSuffix = std::string();
+        if (ctx.IsFxEnabled())
+            noteClickSuffix = std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID());
+
+        LoadRequiredResource(ObjectPopulator::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", noteClickSuffix, ctx, 7);
         for (auto child :noteClickList->GetChildren())
         {
             if (auto animation = dynamic_cast<Gx::Animation*>(child); animation)
             {
                 for (auto i = 0; i < animation->GetFrameCount(); i++)
                 {
-                    auto &frame    = animation->GetFrame(i);
+                    auto &frame = animation->GetFrame(i);
                     frame.Position = animation->GetPosition();
-                    frame.Origin   = animation->GetOrigin();
+                    if (frame.TexCoords.width == animation->GetOrigin().x * 2 && frame.TexCoords.height == animation->GetOrigin().y * 2)
+                        frame.Origin = animation->GetOrigin();
                 }
             }
         }
