@@ -24,6 +24,7 @@ void LongNote::SetVisible(const bool visible)
     if (IsVisible() == visible)
         return;
 
+    GetGuideLine()->SetVisible(visible);
     for (const auto v : m_headVertices)
     {
         if (!v)

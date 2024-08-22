@@ -5,7 +5,6 @@
 
 NoteGuideLine::NoteGuideLine(const NoteGuideLine &copy) :
     m_parent(copy.m_parent),
-    m_noteLength(copy.m_noteLength),
     m_guideLength(),
     m_delta(),
     m_vertices(copy.m_vertices)
@@ -14,7 +13,6 @@ NoteGuideLine::NoteGuideLine(const NoteGuideLine &copy) :
 
 NoteGuideLine::NoteGuideLine(const Note &parent) :
     m_parent(&parent),
-    m_noteLength(-1), // TODO: The parent object could be a long note!
     m_guideLength(),
     m_delta(),
     m_vertices()
@@ -23,7 +21,6 @@ NoteGuideLine::NoteGuideLine(const Note &parent) :
 
 NoteGuideLine::NoteGuideLine(const LongNote &parent) :
     m_parent(&parent),
-    m_noteLength(parent.GetLength()),
     m_guideLength(),
     m_delta(),
     m_vertices()
@@ -68,7 +65,7 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
     }
 
     // Special thanks to MATERIALIZER
-    // For reversing the original behavior of note guide line on original O2Jam Client!
+    // For reversing the original behavior of note guide-line on original O2Jam Client!
 
     // Determine base guide length and the speed multiplier factor length based on config
     float base = 0.f;
@@ -99,7 +96,7 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
     if (guideLength > 120.f)
         guideLength = 120.f;
 
-    // The line grow/shrunk at rate of 20ms per pixel when the current length is different than the desired length
+    // The line grow/shrunk at rate of 20ms per pixel when the current length is different from the desired length
     if (m_guideLength != guideLength)
     {
         m_delta += delta;
@@ -110,36 +107,28 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
         }
     }
     else
-    {
         m_delta = 0;
-        if (m_guideLength == 0)
-        {
-            SetVisible(false);
-            return;
-        }
-    }
 
     guideLength = m_guideLength;
-    const double distance = m_parent->GetRenderPosition() - renderer.GetRenderPosition();
-    SetVisible(true);
+    SetVisible(guideLength > 0);
+    if (!IsVisible())
+        return;
 
-    // HACK: How to pass the note length?
-    if (m_noteLength < 0.f)
+    const double distance = m_parent->GetRenderPosition() - renderer.GetRenderPosition();
+    const auto shape = renderer.GetRenderSettings().Config->NoteShapeType;
+    auto prefab = m_parent->GetPrefab(shape);
+
+    float noteLength = 0.f;
+    if (const auto ln = dynamic_cast<const LongNote*>(m_parent); ln)
     {
-        m_noteLength = 0.f;
-        if (const auto ln = dynamic_cast<const LongNote*>(m_parent); ln)
-            m_noteLength = ln->GetLength();
+        prefab     = ln->GetEdgePrefab(shape);
+        noteLength = ln->GetLength();
     }
 
-    const auto shape = renderer.GetRenderSettings().Config->NoteShapeType;
-    auto sprite = m_parent->GetPrefab(shape);
-    if (m_noteLength > 0)
-        sprite  = static_cast<const LongNote*>(m_parent)->GetEdgePrefab(shape);
-
-    const auto transform = sprite ? sprite->GetTransform() : sf::Transform::Identity;
-    const auto texCoords = sprite ? sprite->GetTexCoords() : sf::IntRect();
-    const auto width     = sprite ? sprite->GetLocalBounds().width  : 0.f;
-    const auto height    = sprite ? sprite->GetLocalBounds().height : 0.f;
+    const auto transform = prefab ? prefab->GetTransform() : sf::Transform::Identity;
+    const auto texCoords = prefab ? prefab->GetTexCoords() : sf::IntRect();
+    const auto width     = prefab ? prefab->GetLocalBounds().width  : 0.f;
+    const auto height    = prefab ? prefab->GetLocalBounds().height : 0.f;
 
     for (int i = 0; i < 4; i += 2)
     {
@@ -150,11 +139,11 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
         // Tail
         if (i >= 2)
         {
-            target = distance + m_noteLength;
+            target = distance + noteLength;
             bounds   = sf::FloatRect({}, {0.f, -guideLength + 1});
         }
 
-        const float pixels  = renderer.MapRenderPositionToPixels(m_parent->GetChannel(), target) + (height / 2.0f);
+        const float pixels  = renderer.MapRenderPositionToPixels(m_parent->GetChannel(), target) + (height / 2.0f) - 0.1f;
         const auto position = transform.transformPoint(sf::Vector2f(1.f, pixels));
 
         m_vertices[i + 0]->position = sf::Vector2f(position.x, position.y);

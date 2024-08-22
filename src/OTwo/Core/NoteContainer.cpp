@@ -190,11 +190,9 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 
         states.texture = it->second;
         surface.Render(m_noteVertices, states);
-        if (GetParent<ChartRenderer>()->GetRenderSettings().Config->NoteGuideLength > 0)
-        {
-            states.texture = nullptr;
-            surface.Render(m_guideLineVertices, states);
-        }
+
+        states.texture = nullptr;
+        surface.Render(m_guideLineVertices, states);
 
         surface.SetView(view);
     }

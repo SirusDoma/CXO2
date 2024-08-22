@@ -24,9 +24,7 @@ public:
 private:
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
 
-
     const Note* m_parent;
-    double m_noteLength;
     double m_guideLength;
     double m_delta;
     std::array<sf::Vertex*, 8> m_vertices;

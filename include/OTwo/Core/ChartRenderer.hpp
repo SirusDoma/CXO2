@@ -74,6 +74,18 @@ private:
         Judgement    Tap     = {Accuracy::None, 0.f};
         Judgement    Release = {Accuracy::None, 0};
 
+        bool IsRenderable(const double position) const
+        {
+            if (!Event)
+                return false;
+
+            if (!Event->IsPlayable() && Tap.Accuracy != Accuracy::None)
+                return false;
+
+            const auto note = static_cast<Chart::NoteEvent*>(Event);
+            return Tap.Accuracy == Accuracy::None || (note->Length > 0 & note->Position + note->Length > position);
+        }
+
         bool IsRegistered() const
         {
             if (!Event)

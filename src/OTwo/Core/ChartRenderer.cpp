@@ -266,22 +266,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         auto &ev = m_events[i];
         const double latency = ev->Position - GetRenderPosition();
 
-        if (ev->IsPlayable())
-        {
-            const auto& note = static_cast<const Chart::NoteEvent&>(*ev.Event);
-            if (note.Length > 0 && note.Position + note.Length > GetRenderPosition())
-            {
-                if (!updated)
-                {
-                    m_lastEventID = i;
-                    updated = true;
-                }
-
-                m_container->Render(note, states.Delta);
-            }
-        }
-
-        if (ev.IsRegistered())
+        if (!ev.IsRenderable(GetRenderPosition()))
             continue;
 
         if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 5.f && frontBuffersFilled)
@@ -305,13 +290,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                    ev.LastEvent = front->Event;
             }
 
-            if (note.Length == 0)
-                m_container->Render(note, states.Delta);
+            m_container->Render(note, states.Delta);
         }
         else
         {
             // Ignore non-playable events that are not inside perfect line
-            if (latency > 0)
+            if (ev.Tap.Accuracy != Accuracy::None || latency > 0)
                 continue;
 
             ev.Tap = Judgement{Accuracy::Cool, 0};
