@@ -59,9 +59,9 @@ void StatePlaying7K::Initialize()
     m_context = PrepareContext();
     m_config  = &Require<GameConfig>();
 
-    auto& session = Require<SessionContext>();
+    const auto& session = Require<SessionContext>();
     auto& room    = session.GetCurrentRoom();
-    auto& items   = Require<ItemFactory>();
+    const auto& items   = Require<ItemFactory>();
 
     // IMPORTANT: Don't use callback of these systems, it is being used by chart renderer
     // TODO: Implement multiple listeners for the callback
@@ -77,20 +77,40 @@ void StatePlaying7K::Initialize()
     const auto avaContainers = avatarList->GetChildren();
     for (int i = 0; i < avaContainers.size(); i++)
     {
-        const auto container  = avaContainers[i];
-        const auto renderable = dynamic_cast<Gx::Renderable*>(container);
-        if (!renderable)
+        const auto container = dynamic_cast<Gx::UiContainer*>(avaContainers[i]);
+        if (!container)
             continue;
 
         auto member = room.Members[i];
-        renderable->SetVisible(member.ID != 0);
+        container->SetVisible(member.ID != 0);
 
-        if (!renderable->IsVisible())
+        if (!container->IsVisible())
             continue;
 
         const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
         for (const auto id : member.EquippedItemIDs)
             avatar->Equip(items.GetItem(id));
+
+        const auto effectContainer = Create<Gx::UiContainer>();
+        effectContainer->SetName("IDC_CONTAINER_EFFECT_JAM");
+        if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
+        {
+            const auto fx = Create<Gx::Animation>(*fxPrefab);
+            fx->Stop();
+            fx->SetAnimationCallback([=] (auto& _) {
+                effectContainer->SetVisible(
+                    fx->GetState() == Gx::Animation::AnimationState::Playing ||
+                    fx->GetState() == Gx::Animation::AnimationState::Initial
+                );
+            });
+
+            effectContainer->AddChild(fx);
+        }
+
+        // TODO: Number
+
+        effectContainer->SetVisible(false);
+        avatar->AddChild(effectContainer);
 
         const auto info = avatar->GetAvatarInfo();
         info->SetMember(member);
@@ -224,6 +244,17 @@ void StatePlaying7K::Initialize()
         jamNumber->SetValue(jamCombo);
         jamAnimation->Reset();
         jamContainer->SetVisible(true);
+
+        const auto effectContainer = m_self->FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_JAM");
+        if (!effectContainer)
+            return;
+
+        for (const auto child : effectContainer->GetChildren())
+        {
+            // TODO: Number
+            if (const auto animation = dynamic_cast<Gx::Animation*>(child); animation)
+                animation->Reset();
+        }
     });
 
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");

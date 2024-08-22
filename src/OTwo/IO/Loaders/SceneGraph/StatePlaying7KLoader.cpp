@@ -4,9 +4,12 @@
 #include <OTwo/Metadata/SceneGraph/StatePlayingMetadata.hpp>
 #include <OTwo/IO/PlayingResourceContext.hpp>
 
+#include <OTwo/Avatar/Avatar.hpp>
+
+#include <Genode/UI/List.hpp>
+
 #include <magic_enum.hpp>
 #include <random>
-#include <Genode/UI/List.hpp>
 
 Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
 {
@@ -74,6 +77,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COMBO", sfxSuffix, ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_NUMBER_NOTE_COMBO", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_EFFECT_JAM", sfxSuffix, ctx);
 
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COOL", sfxSuffix, ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_GOOD", sfxSuffix, ctx);
