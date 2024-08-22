@@ -445,10 +445,11 @@ void ChartRenderer::OnScoreUpdated(const Chart::NoteEvent& ev, const Accuracy ac
 
     if (acc == Accuracy::Bad || acc == Accuracy::Miss)
     {
-        m_longNoteEffects[ev.Channel]->SetVisible(false);
+        if (m_settings.Config->UseFx)
+            m_longNoteEffects[ev.Channel]->SetVisible(false);
         m_noteClicks[ev.Channel]->Stop();
     }
-    else if (ev.Type == Chart::NoteType::Hold)
+    else if (ev.Type == Chart::NoteType::Hold && m_settings.Config->UseFx)
     {
         m_longNoteEffects[ev.Channel]->Reset();
         m_longNoteEffects[ev.Channel]->SetVisible(true);
