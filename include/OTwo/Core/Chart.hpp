@@ -134,9 +134,7 @@ public:
     const sf::Image *GetThumbnail() const;
     void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
 
-    unsigned int GetMeasureFractionCount(Difficulty diff) const;
-    std::map<Gx::Uint32, float> GetMeasureFractions(Difficulty diff) const;
-
+    std::map<int, float> GetMeasureFractions(Difficulty diff) const;
     float GetMeasureFraction(Difficulty diff, int measure) const;
     void SetMeasureFraction(Difficulty diff, int measure, float size);
 
@@ -149,7 +147,7 @@ public:
 private:
     using EventMap    = std::unordered_map<Difficulty, EventList>;
     using SampleMap   = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
-    using FractionMap = std::unordered_map<Difficulty, std::map<Gx::Uint32, float>>;
+    using FractionMap = std::unordered_map<Difficulty, std::map<int, float>>;
     using PositionMap = std::unordered_map<Difficulty, double>;
 
     ChartMetadata m_metadata;

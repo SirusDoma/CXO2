@@ -160,7 +160,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                         continue;
 
                     if (ev.Channel == Chart::Channel::Measurement)
-                        chart->SetMeasureFraction(difficulty, block.Measure, value);
+                        chart->SetMeasureFraction(difficulty, block.Measure + 1, value);
 
                     chart->AddEvent<Chart::TimeEvent>(difficulty, Chart::TimeEvent(ev, value));
                     continue;

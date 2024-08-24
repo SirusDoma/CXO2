@@ -126,15 +126,8 @@ void Chart::SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail)
     m_thumbnail = std::move(thumbnail);
 }
 
-unsigned int Chart::GetMeasureFractionCount(Difficulty diff) const
-{
-    if (const auto it = m_fractions.find(diff); it != m_fractions.end())
-        return it->second.size();
 
-    return 0;
-}
-
-std::map<Gx::Uint32, float> Chart::GetMeasureFractions(const Difficulty diff) const
+std::map<int, float> Chart::GetMeasureFractions(const Difficulty diff) const
 {
     if (const auto it = m_fractions.find(diff); it != m_fractions.end())
         return it->second;
