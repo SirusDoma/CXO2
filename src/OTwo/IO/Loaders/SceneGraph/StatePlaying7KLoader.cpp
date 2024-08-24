@@ -84,6 +84,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_BAD", sfxSuffix, ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_MISS", sfxSuffix, ctx);
 
+    LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_NUMBER_EFFECT_JAM", std::string(), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_CONTAINER_NOTE_JAM", std::string(), ctx);
     LoadRequiredResource(ObjectPopulator::Decorate(state.get(), true), metadata, "IDC_BUTTON_EXIT", std::string(), ctx);
 

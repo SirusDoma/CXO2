@@ -17,7 +17,6 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     if (!TransformLoader::ParseMetadata(attributes["transform"], metadata, context))
         return nullptr;
 
-
     if (auto digitSize = attributes.find("digitSize"); digitSize != attributes.end())
     {
         unsigned int w, h;
@@ -31,16 +30,41 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     else
         metadata.DigitCount = 1;
 
-    if (auto frames = attributes.find("digits"); frames != attributes.end())
+    if (auto duration = attributes.find("duration"); duration != attributes.end())
+        metadata.Duration = sf::milliseconds(duration->get<float>());
+
+    if (auto digits = attributes.find("digits"); digits != attributes.end())
     {
-        for (auto [digit, frame] : frames->items())
+        for (auto [digit, data] : digits->items())
         {
-            unsigned int x, y, w, h;
-            frame.at("x").get_to(x);
-            frame.at("y").get_to(y);
-            frame.at("width").get_to(w);
-            frame.at("height").get_to(h);
-            metadata.DigitFrames[std::stoi(digit)] = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
+            if (data.is_array())
+            {
+                auto frames = std::vector<sf::IntRect>();
+                for (auto frame : data)
+                {
+                    unsigned int x, y, w, h;
+                    frame.at("x").get_to(x);
+                    frame.at("y").get_to(y);
+                    frame.at("width").get_to(w);
+                    frame.at("height").get_to(h);
+
+                    frames.push_back(sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h)));
+                }
+
+                if (metadata.Duration == sf::Time::Zero)
+                    metadata.Duration = sf::milliseconds(frames.size() * 60);
+
+                metadata.DigitFrames[std::stoi(digit)] = frames;
+            }
+            else
+            {
+                unsigned int x, y, w, h;
+                data.at("x").get_to(x);
+                data.at("y").get_to(y);
+                data.at("width").get_to(w);
+                data.at("height").get_to(h);
+                metadata.DigitFrames[std::stoi(digit)] = { sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h)) };
+            }
         }
     }
 
@@ -99,8 +123,12 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
 
     number->SetDigitsSize(metadata->DigitSize);
     number->SetDigitCount(metadata->DigitCount);
-    for (auto [digit, frame] : metadata->DigitFrames)
-        number->SetDigitFrame(digit, frame);
+    for (auto [digit, frames] : metadata->DigitFrames)
+    {
+        number->SetDigitFrames(digit, frames);
+        if (metadata->Duration != sf::Time::Zero)
+            number->SetAnimationDuration(digit, metadata->Duration);
+    }
 
     number->SetName(metadata->Name);
     number->SetOrigin(metadata->Origin);

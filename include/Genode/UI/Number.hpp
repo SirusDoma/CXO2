@@ -1,11 +1,13 @@
 #ifndef GENODE_UI_NUMBER_HPP
 #define GENODE_UI_NUMBER_HPP
 
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-
+#include <Genode/Graphics/Animation.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Control.hpp>
+
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Time.hpp>
 
 #include <unordered_map>
 
@@ -33,6 +35,11 @@ namespace Gx
         int GetDigitCount() const;
         void SetDigitCount(int count);
 
+        const sf::Time& GetAnimationDuration(unsigned int digit) const;
+        void SetAnimationDuration(const sf::Time& duration);
+        void SetAnimationDuration(unsigned int digit, const sf::Time& duration);
+
+        void SetDigitFrames(unsigned int digit, const std::vector<sf::IntRect>& texCoords);
         void SetDigitFrame(unsigned int digit, sf::IntRect texCoords);
         void SetDigitsSize(sf::Vector2u size);
 
@@ -45,6 +52,12 @@ namespace Gx
         BlendMode GetBlendMode() const;
         void SetBlendMode(Gx::BlendMode blendMode);
 
+        Animation::AnimationState GetAnimationState() const;
+        void SetAnimationCallback(const std::function<void(Number&)> &animationCallback);
+
+        void Stop();
+        void Reset();
+
     protected:
         void Update(double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
@@ -56,11 +69,17 @@ namespace Gx
         BlendMode         m_blendMode;
         Alignment         m_alignment;
 
+        Animation::AnimationState m_state;
         unsigned int m_value, m_digitCount;
         float m_width, m_height, m_kerning;
         bool m_needUpdate;
 
-        std::unordered_map<unsigned int, sf::IntRect> m_texCoords;
+        std::unordered_map<unsigned int, sf::Time> m_durations;
+        std::unordered_map<unsigned int, sf::Time> m_elapseds;
+        std::unordered_map<unsigned int, unsigned int> m_frames;
+
+        std::function<void(Number&)> m_callback;
+        std::unordered_map<unsigned int, std::vector<sf::IntRect>> m_texCoords;
     };
 }
 

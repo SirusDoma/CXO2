@@ -9,6 +9,7 @@ namespace Gx
         m_blendMode(BlendMode::Auto),
         m_alignment(Alignment::Left),
         m_texCoords(),
+        m_state(Animation::AnimationState::Initial),
         m_digitCount(),
         m_width(),
         m_height(),
@@ -68,19 +69,50 @@ namespace Gx
         return m_digitCount;
     }
 
-    void Number::SetDigitCount(int count)
+    void Number::SetDigitCount(const int count)
     {
         m_digitCount = count;
         m_needUpdate = true;
     }
 
-    void Number::SetDigitFrame(unsigned int digit, sf::IntRect texCoords)
+    const sf::Time& Number::GetAnimationDuration(const unsigned int digit) const
+    {
+        if (const auto it = m_durations.find(digit % 10); it != m_durations.end())
+            return it->second;
+
+        return sf::Time::Zero;
+    }
+
+    void Number::SetAnimationDuration(const sf::Time &duration)
+    {
+        for (unsigned int digit = 0; digit < 10; digit++)
+            m_durations[digit] = duration;
+    }
+
+    void Number::SetAnimationDuration(const unsigned int digit, const sf::Time &duration)
+    {
+        m_durations[digit % 10] = duration;
+    }
+
+    void Number::SetDigitFrames(const unsigned int digit, const std::vector<sf::IntRect>& texCoords)
     {
         m_texCoords[digit % 10] = texCoords;
+        m_elapseds[digit % 10] = sf::Time::Zero;
+        m_frames[digit % 10] = 0;
+
         m_needUpdate = true;
     }
 
-    void Number::SetDigitsSize(sf::Vector2u size)
+    void Number::SetDigitFrame(const unsigned int digit, sf::IntRect texCoords)
+    {
+        m_texCoords[digit % 10] = { texCoords };
+        m_elapseds[digit % 10] = sf::Time::Zero;
+        m_frames[digit % 10] = 0;
+
+        m_needUpdate = true;
+    }
+
+    void Number::SetDigitsSize(const sf::Vector2u size)
     {
         if (size == sf::Vector2u())
             return;
@@ -101,7 +133,7 @@ namespace Gx
         return m_value;
     }
 
-    void Number::SetValue(unsigned int value)
+    void Number::SetValue(const unsigned int value)
     {
         m_value = value;
         m_needUpdate = true;
@@ -128,8 +160,69 @@ namespace Gx
         m_blendMode = blendMode;
     }
 
+    Animation::AnimationState Number::GetAnimationState() const
+    {
+        return m_state;
+    }
+
+    void Number::SetAnimationCallback(const std::function<void(Number&)> &animationCallback)
+    {
+        m_callback = animationCallback;
+    }
+
+    void Number::Stop()
+    {
+        m_state = Animation::AnimationState::Stopped;
+        if (m_callback)
+            m_callback(*this);
+    }
+
+    void Number::Reset()
+    {
+        for (auto& [digit, _] : m_frames)
+        {
+            m_frames[digit] = 0;
+            m_elapseds[digit] = sf::Time::Zero;
+            m_state = Animation::AnimationState::Initial;
+            if (m_callback)
+                m_callback(*this);
+        }
+    }
+
     void Number::Update(const double delta)
     {
+        if (m_state == Animation::AnimationState::Initial || m_state == Animation::AnimationState::Playing)
+        {
+            for (auto& [digit, elapsed] : m_durations)
+            {
+                if (m_texCoords[digit].size() <= 1)
+                    continue;
+
+                m_elapseds[digit] += sf::milliseconds(static_cast<int>(delta));
+                if (const auto frameTime = sf::milliseconds(m_durations[digit].asMilliseconds() / static_cast<int>(m_texCoords[digit].size())); m_elapseds[digit] >= frameTime)
+                {
+                    if (m_state != Animation::AnimationState::Playing)
+                    {
+                        m_state = Animation::AnimationState::Playing;
+                        if (m_callback)
+                            m_callback(*this);
+                    }
+
+                    m_elapseds[digit] %= frameTime;
+                    if (m_frames[digit] + 1 >= m_texCoords[digit].size())
+                    {
+                        m_state = Animation::AnimationState::Completed;
+                        if (m_callback)
+                            m_callback(*this);
+                    }
+                    else
+                        m_frames[digit]++;
+
+                    m_needUpdate = true;
+                }
+            }
+        }
+
         if (m_needUpdate)
             Invalidate();
 
@@ -199,7 +292,7 @@ namespace Gx
                 value /= 10;
 
             auto texCoords = m_texCoords[digit];
-            m_width += texCoords.width;
+            m_width += texCoords[m_frames[digit]].width;
 
             digits.push(digit);
         }
@@ -215,7 +308,7 @@ namespace Gx
             if (i > 0)
                 position += sf::Vector2f(texCoords.width + m_kerning, 0);
 
-            texCoords = m_texCoords[digit];
+            texCoords = m_texCoords[digit][m_frames[digit]];
             float x = position.x;
             float y = position.y;
             float w = position.x + texCoords.width;

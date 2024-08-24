@@ -93,9 +93,11 @@ void StatePlaying7K::Initialize()
 
         const auto effectContainer = Create<Gx::UiContainer>();
         effectContainer->SetName("IDC_CONTAINER_EFFECT_JAM");
+
         if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
         {
             const auto fx = Create<Gx::Animation>(*fxPrefab);
+            fx->SetName("IDC_ANIMATION_EFFECT_JAM");
             fx->Stop();
             fx->SetAnimationCallback([=] (auto& _) {
                 effectContainer->SetVisible(
@@ -107,7 +109,18 @@ void StatePlaying7K::Initialize()
             effectContainer->AddChild(fx);
         }
 
-        // TODO: Number
+        if (const auto numPrefab = FindResource<Gx::Number>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
+        {
+            const auto numEffect = Create<Gx::Number>(*numPrefab);
+            numEffect->SetName("IDC_NUMBER_EFFECT_JAM");
+            numEffect->SetAnimationCallback([=] (auto& _) {
+                numEffect->SetVisible(
+                    numEffect->GetAnimationState() == Gx::Animation::AnimationState::Playing ||
+                    numEffect->GetAnimationState() == Gx::Animation::AnimationState::Initial
+                );
+            });
+            effectContainer->AddChild(numEffect);
+        }
 
         effectContainer->SetVisible(false);
         avatar->AddChild(effectContainer);
@@ -251,7 +264,12 @@ void StatePlaying7K::Initialize()
 
         for (const auto child : effectContainer->GetChildren())
         {
-            // TODO: Number
+            if (const auto number = dynamic_cast<Gx::Number*>(child); number)
+            {
+                number->SetValue(jamCombo);
+                number->Reset();
+            }
+
             if (const auto animation = dynamic_cast<Gx::Animation*>(child); animation)
                 animation->Reset();
         }
