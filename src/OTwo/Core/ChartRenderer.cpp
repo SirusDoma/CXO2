@@ -48,6 +48,7 @@ void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, c
         throw Gx::Exception("GameConfig cannot be null");
 
     Initialize(chart, RenderSettings{
+        false,
         context.GetConfig(),
         context.GetViewport(),
         context.GetSpeed(),
@@ -217,11 +218,44 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     m_frameID = states.FrameID;
 
     // Update input states
-    // TODO: Implement poll rate
-    m_inputTime = m_currentTime;
-    const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-    for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
-        Input(channel, isKeyPressed(key));
+
+    if (!m_settings.Autoplay)
+    {
+        // TODO: Implement poll rate
+        m_inputTime = m_currentTime;
+        const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
+        for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
+            Input(channel, isKeyPressed(key));
+    }
+    else
+    {
+        for (auto& [channel, state] : m_frontBuffers)
+        {
+            if (!state || state->IsRegistered())
+            {
+                Input(channel, false);
+                continue;
+            }
+
+            auto& ev = static_cast<Chart::NoteEvent&>(*state->Event);
+            if (state->Tap.Accuracy != Accuracy::None && ev.Length > 0)
+            {
+                auto release = Chart::NoteEvent(ev);
+                release.Type = Chart::NoteType::Release;
+                release.Position += ev.Length;
+                if (const auto releaseResult = m_judgement->Judge(release); releaseResult.Latency <= 0)
+                {
+                    Input(channel, false);
+                }
+            }
+            else if (const auto tapResult = m_judgement->Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Latency <= 0)
+            {
+                Input(channel, true);
+                if (ev.Length == 0)
+                    Input(channel, false);
+            }
+        }
+    }
 
     // Check judgement status of front buffer events
     bool frontBuffersFilled = true;

@@ -30,6 +30,7 @@ class ChartRenderer : public virtual Gx::Node, public Gx::RenderableContainer, p
 public:
     struct RenderSettings
     {
+        bool          Autoplay;
         GameConfig   *Config;
         unsigned int  Viewport;
         float         Speed;
