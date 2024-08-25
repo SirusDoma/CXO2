@@ -108,6 +108,40 @@ void StateWaiting7K::Initialize()
         });
     }
 
+    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_CHANGE_TITLE"); dialog)
+    {
+        const auto titleBox = dialog->FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
+        titleBox->SetMaximumTextLength(21);
+        dialog->SetAcceptCallback([=, r = &room, s = &session]
+        {
+            if (titleBox->GetString().isEmpty())
+                return;
+
+            auto data = Room(*r);
+            data.Title = titleBox->GetString();
+
+            s->SetCurrentRoom(data);
+            roomName->SetString(data.Title);
+        });
+
+        const auto changeTitleButton = Instantiate<Gx::Button>("IDC_BUTTON_CHANGE_TITLE");
+        changeTitleButton->SetClickCallback([=, r = &room, s = &session] (auto& sender, auto& ev)
+        {
+            if (r->RoomMasterID != s->GetCurrentPlayer().ID)
+            {
+                ShowDialog("Only Room master can change the room title.", DialogStyle::Information, false, [] (auto _) {});
+                return;
+            }
+
+            dialog->Show(this, "Please enter a room name.", false);
+            changeTitleButton->SetFocus(false);
+
+            titleBox->SetString(roomName->GetString());
+            titleBox->SetFocus(true);
+            titleBox->SelectAll();
+        });
+    }
+
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
 
     AvatarInfo *currentAvatarInfo = nullptr;
