@@ -125,7 +125,7 @@ void StateRoom::Initialize()
         Room{
             /* .ID            = */ 5,
             /* .RoomMasterID  = */ 0,
-            /* .Title         = */ "Pimplex's room",
+            /* .Title         = */ "Another's room",
             /* .Chart         = */ ChartMetadataView{},
             /* .Difficulty    = */ Difficulty::HX,
             /* .GameMode      = */ GameMode::Single,
@@ -141,7 +141,7 @@ void StateRoom::Initialize()
         Room{
             /* .ID           = */ 3,
             /* .RoomMasterID = */ 0,
-            /* .Title        = */ "kYo-Abhiem's room",
+            /* .Title        = */ "Someone's room",
             /* .Chart        = */ ChartMetadataView
             {
                 /*.ID           = */ "2",
@@ -198,8 +198,11 @@ void StateRoom::Initialize()
                         RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
                         {},
                         {},
-                        RoomMember{Player{2, "DJZMO", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F},
-                        RoomMember{Player{3, "kYo-Abhiem", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G}
+                        RoomMember{Player{2, "Random #1", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F},
+                        {},
+                        {},
+                        {},
+                        RoomMember{Player{3, "Random #2", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G}
                     }
                 });
                 director.Present<StateWaiting7K>();
