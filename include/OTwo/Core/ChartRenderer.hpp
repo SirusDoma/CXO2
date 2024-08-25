@@ -3,20 +3,14 @@
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
-#include <OTwo/Core/ScoreTracker.hpp>
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
-#include <OTwo/UI/Playing/ComboCounter.hpp>
-#include <OTwo/UI/Playing/JudgementIndicator.hpp>
-#include <OTwo/UI/Playing/PlayMenu.hpp>
 
-#include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Graphics/Animation.hpp>
-#include <Genode/UI/Number.hpp>
 
 #include <unordered_map>
-#include <OTwo/Core/LifeSystem.hpp>
+#include <Genode/Tasks/Delay.hpp>
 
 using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
@@ -24,7 +18,8 @@ using ChannelSet = std::unordered_set<Chart::Channel>;
 using SpeedMap = std::unordered_map<Chart::Channel, float>;
 
 class NoteContainer;
-class JudgementStrategy;
+class LifeSystem;
+class ScoreTracker;
 class ChartRenderer : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
@@ -43,7 +38,7 @@ public:
 
     explicit ChartRenderer(const ChannelSet &instantiables);
 
-    void Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& callback);
+    void Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& completeCallback);
     void Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback);
 
     void StartRender();
@@ -59,6 +54,7 @@ public:
     double GetRenderPosition() const;
     double GetCurrentBPM() const;
 
+    void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
     void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &incrementCallback);
     void SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &jamComboCallback);
 
@@ -103,7 +99,6 @@ private:
     };
 
     void PlaySample(const Chart::NoteEvent* ev, const std::string &group = "BGM") const;
-    void OnScoreUpdated(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count) const;
 
     using AnimationMap   = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using EventStateList = std::vector<EventState>;
@@ -117,15 +112,14 @@ private:
 
     const Chart* m_chart;
     RenderSettings m_settings;
-    JudgementStrategy* m_judgement;
-    ScoreTracker* m_scores;
     LifeSystem* m_life;
+    ScoreTracker* m_scores;
+    JudgementStrategy* m_judgement;
+    mutable std::unordered_map<Chart::Channel, Gx::Delay> m_autoDelays;
 
     ChannelSet m_instantiables;
     SpeedMap m_speeds;
     sf::Clock m_timer;
-    mutable AnimationMap m_noteClicks;
-    mutable AnimationMap m_longNoteEffects;
     mutable EventStateList m_events;
     mutable FrontBufferMap m_frontBuffers;
     mutable InputStateMap m_inputs;
@@ -137,9 +131,10 @@ private:
     mutable double m_inputTime;
     mutable unsigned int m_frameID;
     mutable unsigned int m_lastEventID;
-    mutable bool m_callbackCalled;
+    mutable bool m_completed;
 
-    std::function<void()> m_callback;
+    std::function<void()> m_completeCallback;
+    std::function<void(Chart::Channel, bool)> m_inputCallback;
     std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_incrementCallback;
     std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_jamComboCallback;
 };

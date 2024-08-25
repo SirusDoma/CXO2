@@ -15,7 +15,7 @@ NoteFactory::NoteFactory(Gx::ResourceManager &instantiationResources, Gx::Resour
     m_prefabResources(&prefabResources)
 {
     const auto registerChannel = [this] (const Chart::Channel &channel) {
-        if (channel != Chart::Channel::Measurement && channel != Chart::Channel::BPM && channel != Chart::Channel::Background)
+        if (channel != Chart::Channel::Measure && channel != Chart::Channel::BPM && channel != Chart::Channel::Background)
             m_channels.insert(channel);
     };
 

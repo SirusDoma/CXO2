@@ -41,7 +41,7 @@ void Chart::SortEvents()
         while (it != m_events[diff].end())
         {
             const auto ev = it->get();
-            if (ev->Channel == Channel::Measurement || ev->Channel == Channel::BPM)
+            if (ev->Channel == Channel::Measure || ev->Channel == Channel::BPM)
             {
                 ++it;
                 continue;

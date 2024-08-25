@@ -10,8 +10,7 @@ Note::Note(const double position, const Chart::Channel channel) :
     m_vertices(),
     m_position(position),
     m_channel(channel),
-    m_line(*this),
-    m_hit(false)
+    m_line(*this)
 {
     for (int i = 0; i < m_vertices.size(); i++)
         m_vertices[i] = nullptr;
@@ -95,18 +94,13 @@ void Note::SetVisible(const bool visible)
     }
 }
 
-void Note::Hit()
-{
-    m_hit = true;
-}
-
 void Note::Render(const ChartRenderer &renderer, const double delta)
 {
     if (!m_vertices[0])
         return;
 
     const double latency = m_position - renderer.GetRenderPosition();
-    if (m_hit || latency > 5.f || latency < -0.5f)
+    if (latency > 5.f || latency < -0.5f)
     {
         SetVisible(false);
         GetGuideLine()->Render(renderer, delta);

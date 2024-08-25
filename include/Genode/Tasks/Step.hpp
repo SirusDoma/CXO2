@@ -9,7 +9,7 @@ namespace Gx
     {
     public:
         Step();
-        explicit Step(sf::Time duration, sf::Time stepDuration, const std::function<void(const Step*, double)> &update);
+        explicit Step(sf::Time duration, sf::Time stepDuration, const std::function<void(const Step&, double)> &update);
         ~Step() override = default;
 
     protected:
@@ -19,7 +19,7 @@ namespace Gx
 
     private:
         sf::Time m_stepDuration, m_elapsed;
-        std::function<void(const Step*, double)> m_callback;
+        std::function<void(const Step&, double)> m_callback;
     };
 }
 

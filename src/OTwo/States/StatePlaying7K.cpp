@@ -5,12 +5,17 @@
 
 #include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/Core/LifeSystem.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
+
+#include <OTwo/UI/Playing/ComboCounter.hpp>
+#include <OTwo/UI/Playing/JudgementIndicator.hpp>
+#include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
 #include <Genode/Tasks/Step.hpp>
@@ -80,6 +85,9 @@ void StatePlaying7K::Initialize()
         const auto container = dynamic_cast<Gx::UiContainer*>(avaContainers[i]);
         if (!container)
             continue;
+
+        if (i >= room.MaxCapacity)
+            break;
 
         auto member = room.Members[i];
         container->SetVisible(member.ID != 0);
@@ -163,10 +171,50 @@ void StatePlaying7K::Initialize()
         OnRenderComplete();
     });
 
-    // -------------------------------------------------------------------------------------------------------------------------------------
-    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Render` in order to preserve correct layout ordering.
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Initialize` in order to preserve correct layout ordering.
     //            Every resource below is likely to be a prefab (Resources that are defined under `"require"`).
-    // -------------------------------------------------------------------------------------------------------------------------------------
+    //
+    //            With this, we don't have to maintain depth position, which SFML does not support natively.
+    // ----------------------------------------------------------------------------------------------------------------------------------------
+
+    // Setup Long Note effects
+    if (const auto longNoteEffectList = FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
+    {
+        for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
+        {
+            const int id = static_cast<int>(channel) - 1;
+            if (id < 1 || id > 7)
+                continue;
+
+            const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>("IDC_ANIMATION_LONG_NOTE_EFFECT" + std::to_string(id));
+            longNoteEffect->SetVisible(false);
+            m_longNoteEffects[channel] = longNoteEffect;
+
+            AddChild(longNoteEffect);
+        }
+    }
+
+    // Setup Note Clicks
+    if (const auto noteClickList = FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    {
+        for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
+        {
+            const int id = static_cast<int>(channel) - 1;
+            if (id < 1 || id > 7)
+                continue;
+
+            const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
+            noteClick->SetVisible(false);
+            noteClick->Stop();
+            noteClick->SetAnimationCallback([] (auto &animation) {
+                animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
+            });
+
+            m_noteClicks[channel] = noteClick;
+            AddChild(noteClick);
+        }
+    }
 
     // Setup Play Menu
     const auto playMenu = Create<PlayMenu>();
@@ -217,11 +265,22 @@ void StatePlaying7K::Initialize()
     AddChild(judgementIndicator);
     judgementIndicator->Initialize();
 
+    // Setup Key Effects
+    m_renderer.SetInputCallback([=] (auto channel, bool state)
+    {
+        if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
+            keyEffect->second->SetVisible(state);
+
+        if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
+            keyDown->second->SetVisible(state);
+    });
+
+    // Setup Score changes
     m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo)
     {
+        // Life System
         lifeBar->SetValue(lifeSystem->GetCurrentLifePoint());
         m_self->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
-
         if (lifeSystem->GetCurrentLifePoint() == 0)
         {
             if (m_context->GetDifficulty() != Difficulty::EX && m_self->IsAlive())
@@ -239,19 +298,38 @@ void StatePlaying7K::Initialize()
             return;
         }
 
+        // Note Click and Long Note Effects
+        m_noteClicks[ev.Channel]->Reset();
+        m_longNoteEffects[ev.Channel]->SetVisible(false);
+        if (acc == Accuracy::Bad || acc == Accuracy::Miss)
+        {
+            m_noteClicks[ev.Channel]->Stop();
+            if (m_config->UseFx)
+                m_longNoteEffects[ev.Channel]->SetVisible(false);
+        }
+        else if (ev.Type == Chart::NoteType::Hold && m_config->UseFx)
+        {
+            m_longNoteEffects[ev.Channel]->Reset();
+            m_longNoteEffects[ev.Channel]->SetVisible(true);
+        }
+
+        // Combo
         comboCounter->SetCombo(scoreTracker->GetCombo());
         judgementIndicator->Play(acc);
 
+        // Score and Jam Combo
         scoreNumber->SetValue(scoreTracker->GetScorePoint());
+        jamGauge->SetValue(scoreTracker->GetJamProgress());
+
+        // Buffer
         for (int i = 0; i < buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
             renderable->SetVisible(i < scoreTracker->GetBufferCount());
         }
-
-        jamGauge->SetValue(scoreTracker->GetJamProgress());
     });
 
+    // Setup jam combo effect
     m_renderer.SetJamComboCallback([=] (auto& ev, auto acc, auto jamCombo)
     {
         jamNumber->SetValue(jamCombo);
@@ -285,15 +363,17 @@ void StatePlaying7K::Initialize()
     (
         sf::seconds((lifeSystem->GetMaxLifePoint() / (lifeSystem->GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
         sf::seconds(1.f / 60.f),
-        [this, lifeSystem, lifeBar] (const Gx::Step* step, auto const delta)
+        [this, lifeSystem, lifeBar] (const auto& step, auto const delta)
         {
             lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(lifeSystem->GetMaxLifePoint() * 0.01f));
             for (auto [_, avatar] : m_avatars)
                 avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
-            if (step->GetState() == Gx::TaskState::Completed)
+            if (step.GetState() == Gx::TaskState::Completed)
             {
                 lifeBar->SetValue(lifeSystem->GetMaxLifePoint());
+
+                // TODO: There's no need to animate avatar life bar?
                 for (auto [_, avatar] : m_avatars)
                     avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
@@ -366,20 +446,6 @@ void StatePlaying7K::Update(const double delta)
 void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
 {
     Inputable::OnKeyDown(ev);
-
-    for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
-    {
-        if (code != ev.code)
-            continue;
-
-        if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
-            keyEffect->second->SetVisible(true);
-
-        if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
-            keyDown->second->SetVisible(true);
-
-        break;
-    }
 }
 
 void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
@@ -400,20 +466,6 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
             m_config->NoteGuideLength = 0;
         else
             m_config->NoteGuideLength++;
-    }
-
-    for (auto [channel, code] : m_config->KeyBindings.at(KeyMode::Seven))
-    {
-        if (code != ev.code)
-            continue;
-
-        if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
-            keyEffect->second->SetVisible(false);
-
-        if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
-            keyDown->second->SetVisible(false);
-
-        break;
     }
 }
 

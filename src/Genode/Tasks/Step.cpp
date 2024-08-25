@@ -9,7 +9,7 @@ namespace Gx
     {
     }
 
-    Step::Step(const sf::Time duration, const sf::Time stepDuration, const std::function<void(const Step*, double)> &update) :
+    Step::Step(const sf::Time duration, const sf::Time stepDuration, const std::function<void(const Step&, double)> &update) :
         Delay(duration),
         m_stepDuration(stepDuration),
         m_callback(update)
@@ -24,7 +24,7 @@ namespace Gx
             m_elapsed += sf::milliseconds(delta);
             if (m_callback && m_elapsed >= m_stepDuration)
             {
-                m_callback(this, m_elapsed.asMilliseconds());
+                m_callback(*this, m_elapsed.asMilliseconds());
                 m_elapsed -= m_stepDuration;
             }
         }
@@ -34,7 +34,7 @@ namespace Gx
     {
         Delay::Complete();
         if (m_callback)
-            m_callback(this, m_elapsed.asMilliseconds());
+            m_callback(*this, m_elapsed.asMilliseconds());
 
         m_elapsed = sf::Time::Zero;
     }

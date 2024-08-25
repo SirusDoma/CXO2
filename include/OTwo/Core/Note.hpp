@@ -36,7 +36,6 @@ public:
     bool IsVisible() const override;
     void SetVisible(const bool visible) override;
 
-    void Hit();
     virtual void Render(const ChartRenderer &renderer, double delta);
 
 protected:
@@ -53,7 +52,6 @@ private:
     double         m_position;
     Chart::Channel m_channel;
     NoteGuideLine  m_line;
-    bool           m_hit;
 };
 
 #endif //NOTE_HPP

@@ -41,6 +41,8 @@ private:
 
     ChartRenderer m_renderer;
     AvatarMap m_avatars;
+    AnimationMap m_noteClicks;
+    AnimationMap m_longNoteEffects;
     Avatar* m_self;
 
     const GameContext* m_context;

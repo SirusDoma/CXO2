@@ -1,11 +1,10 @@
 
 #include <OTwo/Core/ChartRenderer.hpp>
-#include <OTwo/Config/GameConfig.hpp>
-
+#include <OTwo/Core/LifeSystem.hpp>
 #include <OTwo/Core/Note.hpp>
 #include <OTwo/Core/NoteContainer.hpp>
 #include <OTwo/Core/NoteFactory.hpp>
-#include <OTwo/Core/JudgementStrategy.hpp>
+#include <OTwo/Config/GameConfig.hpp>
 
 #include <Genode/Fx/Fade.hpp>
 #include <Genode/UI/List.hpp>
@@ -17,14 +16,12 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_endPosition(),
     m_chart(),
     m_settings(),
-    m_judgement(),
-    m_scores(),
     m_life(),
+    m_scores(),
+    m_judgement(),
     m_instantiables(instantiables),
     m_speeds(),
     m_timer(),
-    m_noteClicks(),
-    m_longNoteEffects(),
     m_events(),
     m_frontBuffers(),
     m_sounds(),
@@ -35,14 +32,15 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
     m_inputTime(0),
     m_frameID(0),
     m_lastEventID(0),
-    m_callbackCalled(false),
-    m_callback(),
+    m_completed(false),
+    m_completeCallback(),
+    m_inputCallback(),
     m_incrementCallback(),
     m_jamComboCallback()
 {
 }
 
-void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& callback)
+void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& completeCallback)
 {
     if (!context.GetConfig())
         throw Gx::Exception("GameConfig cannot be null");
@@ -53,7 +51,7 @@ void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, c
         context.GetViewport(),
         context.GetSpeed(),
         context.GetDifficulty()
-    }, callback);
+    }, completeCallback);
 }
 
 void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback)
@@ -67,7 +65,7 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
 
     m_chart    = &chart;
     m_settings = settings;
-    m_callback = callback;
+    m_completeCallback = callback;
 
     // Setup judgement
     m_judgement = &parent->Require<JudgementStrategy>();
@@ -81,7 +79,7 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
     m_scores = &parent->Require<ScoreTracker>();
     m_scores->Initialize(settings.Difficulty);
     m_scores->SetIncrementCallback([this] (auto ev, auto acc, auto count) {
-        OnScoreUpdated(ev, acc, count);
+        m_life->Update(acc, count);
         if (m_incrementCallback)
             m_incrementCallback(ev, acc, count);
     });
@@ -109,7 +107,6 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
         {
             m_inputs[channel] = false;
             m_frontBuffers[channel] = nullptr;
-            m_noteClicks[channel] = nullptr;
         }
     }
 
@@ -124,44 +121,6 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
     m_container->SetName("IDC_NOTE_CONTAINER");
     m_container->Initialize(*this, chart, settings.Difficulty);
     AddChild(m_container);
-
-    // Setup Note Clicks
-    const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-    if (const auto noteClickList = parent->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
-    {
-        for (auto [channel, _] : settings.Config->KeyBindings.at(keyMode))
-        {
-            const int id = static_cast<int>(channel) - 1;
-            if (id < 1 || id > 7)
-                continue;
-
-            const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
-            noteClick->SetVisible(false);
-            noteClick->Stop();
-            noteClick->SetAnimationCallback([] (auto &animation) {
-                animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
-            });
-
-            m_noteClicks[channel] = noteClick;
-            AddChild(noteClick);
-        }
-    }
-
-    if (const auto longNoteEffectList = parent->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
-    {
-        for (auto [channel, _] : settings.Config->KeyBindings.at(keyMode))
-        {
-            const int id = static_cast<int>(channel) - 1;
-            if (id < 1 || id > 7)
-                continue;
-
-            const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>("IDC_ANIMATION_LONG_NOTE_EFFECT" + std::to_string(id));
-            longNoteEffect->SetVisible(false);
-            m_longNoteEffects[channel] = longNoteEffect;
-
-            AddChild(longNoteEffect);
-        }
-    }
 
     // Register events for processing
     m_events.clear();
@@ -195,15 +154,22 @@ bool ChartRenderer::IsStarted() const
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     if (!m_chart || !m_rendering)
+    {
+        // Still send key press event with empty front buffers for fun
+        const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
+        for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
+            Input(channel, isKeyPressed(key));
+
         return states;
+    }
 
     if (GetRenderPosition() > m_endPosition)
     {
         states = RenderableContainer::Render(surface, states);
-        if (m_callback && !m_callbackCalled)
+        if (m_completeCallback && !m_completed)
         {
-            m_callbackCalled = true;
-            m_callback();
+            m_completed = true;
+            m_completeCallback();
         }
 
         return states;
@@ -229,8 +195,10 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
     else
     {
+
         for (auto& [channel, state] : m_frontBuffers)
         {
+            static_cast<Gx::Updatable*>(&m_autoDelays[channel])->Update(states.Delta);
             if (!state || state->IsRegistered())
             {
                 Input(channel, false);
@@ -250,9 +218,15 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
             }
             else if (const auto tapResult = m_judgement->Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Latency <= 0)
             {
+                if (m_inputs[channel])
+                {
+                    m_autoDelays[channel].Stop();
+                    Input(channel, false);
+                }
+
                 Input(channel, true);
                 if (ev.Length == 0)
-                    Input(channel, false);
+                    m_autoDelays[channel] = Gx::Delay(sf::seconds(1.f / 60.f * 5.f), [this, channel] { Input(channel, false); });
             }
         }
     }
@@ -313,7 +287,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         }
 
         // Fill front buffers and check for misses
-        if (ev->IsPlayable())
+        if (ev->IsPlayable() && m_instantiables.find(ev->Channel) != m_instantiables.end())
         {
             // Fill buffer with valid event
             const auto& note = static_cast<const Chart::NoteEvent&>(*ev.Event);
@@ -343,7 +317,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                 m_refPosition  = time->Position;
                 m_bpm          = time->Value;
             }
-            else if (ev->Channel == Chart::Channel::Background)
+            else
             {
                 if (const auto bgm = static_cast<Chart::NoteEvent*>(ev.Event); bgm)
                     PlaySample(bgm, "BGM");
@@ -404,6 +378,9 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
             }
         }
     }
+
+    if (m_inputCallback)
+        m_inputCallback(channel, pressed);
 }
 
 const ChartRenderer::RenderSettings &ChartRenderer::GetRenderSettings() const
@@ -432,6 +409,11 @@ double ChartRenderer::GetRenderPosition() const
 double ChartRenderer::GetCurrentBPM() const
 {
     return m_bpm;
+}
+
+void ChartRenderer::SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback)
+{
+    m_inputCallback = inputCallback;
 }
 
 void ChartRenderer::SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& incrementCallback)
@@ -468,24 +450,4 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &gr
     }
 
     mixer.Play(m_sounds[ev->ID], group);
-}
-
-void ChartRenderer::OnScoreUpdated(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned int count) const
-{
-    m_life->Update(acc, count);
-
-    m_noteClicks[ev.Channel]->Reset();
-    m_longNoteEffects[ev.Channel]->SetVisible(false);
-
-    if (acc == Accuracy::Bad || acc == Accuracy::Miss)
-    {
-        if (m_settings.Config->UseFx)
-            m_longNoteEffects[ev.Channel]->SetVisible(false);
-        m_noteClicks[ev.Channel]->Stop();
-    }
-    else if (ev.Type == Chart::NoteType::Hold && m_settings.Config->UseFx)
-    {
-        m_longNoteEffects[ev.Channel]->Reset();
-        m_longNoteEffects[ev.Channel]->SetVisible(true);
-    }
 }

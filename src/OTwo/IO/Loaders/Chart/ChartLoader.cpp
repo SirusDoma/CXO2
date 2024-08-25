@@ -134,7 +134,11 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (stream.read(&block, sizeof(NoteBlockHeader)) != sizeof(NoteBlockHeader))
                 throw Gx::ResourceLoadException("Failed to read the note block");
 
-            const auto channel = block.Channel <= 8 ? static_cast<Chart::Channel>(block.Channel) : Chart::Channel::Background;
+            // ====================================================================================================
+            // WARNING: Channel::Background will not map, but this will retain the original channel value.
+            const auto channel = static_cast<Chart::Channel>(block.Channel);
+            // ====================================================================================================
+
             for (int i = 0; i < block.EventCount; i++)
             {
                 double position = block.Measure + (static_cast<double>(i) / static_cast<double>(block.EventCount));
@@ -150,7 +154,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 }
 
                 auto ev = Chart::Event(channel, position);
-                if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measurement)
+                if (channel == Chart::Channel::BPM || channel == Chart::Channel::Measure)
                 {
                     float value;
                     if (stream.read(&value, sizeof(value)) != sizeof(value))
@@ -159,7 +163,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                     if (value == 0.f)
                         continue;
 
-                    if (ev.Channel == Chart::Channel::Measurement)
+                    if (ev.Channel == Chart::Channel::Measure)
                         chart->SetMeasureFraction(difficulty, block.Measure + 1, value);
 
                     chart->AddEvent<Chart::TimeEvent>(difficulty, Chart::TimeEvent(ev, value));
@@ -185,9 +189,12 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                 pan = pan == 0 ? 8 : pan;
                 pan = ((pan - 1) / 14.0f) * 2.0f - 1.0f;
 
-                // Resolve the note type and ref id
-                auto type = note.Type % 8 > 3 ? Chart::NoteType::Sample : Chart::NoteType::Tap;
-                const int id = (note.ID - 1) + (type == Chart::NoteType::Sample ? 1000 : 0);
+                // Resolve the sample type and ref id
+                auto sampleType = note.Type % 8 > 3 ? Chart::SampleType::Background : Chart::SampleType::KeySound;
+                const int id = (note.ID - 1) + (sampleType == Chart::SampleType::Background ? 1000 : 0);
+
+                // Resolve note type
+                auto type = Chart::NoteType::Tap;
                 switch(note.Type % 4)
                 {
                     case 2: type = Chart::NoteType::Hold;    break;
@@ -195,7 +202,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
                     default: break;
                 }
 
-                chart->AddEvent<Chart::NoteEvent>(difficulty, Chart::NoteEvent(ev, id, volume, pan, type, chart->GetSample(id)));
+                chart->AddEvent<Chart::NoteEvent>(difficulty, Chart::NoteEvent(ev, id, volume, pan, type, sampleType, chart->GetSample(id)));
             }
         }
     }

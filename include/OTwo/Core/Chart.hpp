@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <set>
 #include <unordered_map>
 
 class Chart
@@ -18,7 +19,7 @@ class Chart
 public:
     enum class Channel : Gx::Uint16
     {
-        Measurement = 0,
+        Measure     = 0,
         BPM         = 1,
         Note1       = 2,
         Note2       = 3,
@@ -27,6 +28,8 @@ public:
         Note5       = 6,
         Note6       = 7,
         Note7       = 8,
+
+        // WARNING: Comparison against Chart::Channel background should be avoided
         Background
     };
 
@@ -34,11 +37,16 @@ public:
     {
         Tap     = 0,
         Hold    = 2,
-        Release = 3,
-        Sample  = 4
+        Release = 3
     };
 
-    static constexpr std::array<Channel, 7> PlayableChannels = {
+    enum class SampleType : Gx::Uint8
+    {
+        KeySound   = 0,
+        Background = 4
+    };
+
+    inline static const std::set<Channel> PlayableChannels = {
         Channel::Note1,
         Channel::Note2,
         Channel::Note3,
@@ -48,7 +56,14 @@ public:
         Channel::Note7
     };
 
-    static constexpr std::array<Channel, 8> NoteChannels = {
+    inline static const std::set<Channel> NonPlayableChannels = {
+        Channel::Measure,
+        Channel::BPM
+    };
+
+    inline static const std::set<Channel> TimeChannels = NonPlayableChannels;
+
+    inline static const std::set<Channel> NoteChannels = {
         Channel::Note1,
         Channel::Note2,
         Channel::Note3,
@@ -74,9 +89,7 @@ public:
 
         bool IsPlayable() const
         {
-            return Channel != Channel::Measurement &&
-                   Channel != Channel::BPM &&
-                   Channel != Channel::Background;
+            return PlayableChannels.find(Channel) != PlayableChannels.end();
         }
     };
 
@@ -97,15 +110,17 @@ public:
         float            Volume;
         float            Pan;
         NoteType         Type;
+        SampleType       SampleType;
         sf::SoundBuffer *Sample;
         double           Length;
 
-        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, sf::SoundBuffer *sample) :
+        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum SampleType sampleType, sf::SoundBuffer *sample) :
             Event(ev),
             ID(id),
             Volume(volume),
             Pan(pan),
             Type(type),
+            SampleType(sampleType),
             Sample(sample),
             Length(0)
         {

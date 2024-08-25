@@ -95,6 +95,8 @@ struct Room
     Gx::Uint32        MapID         = 0;
     Gx::Uint32        EffectID      = 1;
 
+    static constexpr std::size_t MaxCapacity = sizeof(Members) / sizeof(RoomMember);
+
     std::string GetRoomLevelCode(const bool useNormalMode = false) const
     {
         std::string speedStr(4, '\0');

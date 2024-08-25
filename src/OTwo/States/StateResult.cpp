@@ -10,6 +10,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 #include <Genode/Fx/Move.hpp>
+#include <Genode/UI.hpp>
 
 StateResult::StateResult(State &&state) :
     State(std::move(state))
@@ -48,7 +49,7 @@ void StateResult::Initialize()
     if (height < top->GetLocalBounds().height)
         height = top->GetLocalBounds().height;
 
-    top->SetPosition(0.f, -height);
+    top->SetPosition(0.f, -height + -top->GetLocalBounds().height);
     bottom->SetPosition(0.f, view.getSize().y + height);
 
     if (const auto container = top->FindChild<Gx::UiContainer>("IDC_CONTAINER_PLAYER_SCORE"); container)
@@ -204,7 +205,7 @@ void StateResult::Initialize()
         mixer.Play(bgm, "BGM");
 
     Run(topFx, bottomFx);
-   //  Run(Create<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); }));
+    Run(Create<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); }));
 }
 
 void StateResult::Update(const double delta)
