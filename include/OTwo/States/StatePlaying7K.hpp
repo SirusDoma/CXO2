@@ -10,6 +10,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
+#include <Genode/UI/TextBox.hpp>
 
 class Avatar;
 class StatePlaying7K : public State
@@ -47,6 +48,7 @@ private:
 
     const GameContext* m_context;
     GameConfig* m_config;
+    Gx::TextBox* m_chatBox;
     ImageMap m_keyDowns, m_keyEffects;
 
     unsigned int m_viewport;

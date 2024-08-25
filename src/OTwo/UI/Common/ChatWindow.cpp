@@ -3,21 +3,25 @@
 
 ChatWindow::ChatWindow() :
     m_font(),
+    m_textColor(sf::Color::White),
     m_scroll(),
     m_bounds(),
     m_offset(),
     m_maxChatLength(0),
-    m_characterSize(13)
+    m_characterSize(13),
+    m_lineSpacing(0)
 {
 }
 
 ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
     m_font(other.m_font),
+    m_textColor(other.m_textColor),
     m_scroll(other.m_scroll),
     m_bounds(other.m_bounds),
     m_offset(other.m_offset),
     m_maxChatLength(other.m_maxChatLength),
     m_characterSize(other.m_characterSize),
+    m_lineSpacing(other.m_lineSpacing),
     m_chats(other.m_chats),
     m_labels(std::move(other.m_labels))
 {
@@ -26,10 +30,12 @@ ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
 
 ChatWindow::ChatWindow(const Gx::Font &font, const sf::FloatRect &localBounds, const unsigned int characterSize) :
     m_font(&font),
+    m_textColor(sf::Color::White),
     m_scroll(),
     m_bounds(localBounds),
     m_offset(), m_maxChatLength(0),
-    m_characterSize(characterSize)
+    m_characterSize(characterSize),
+    m_lineSpacing(0)
 {
 }
 
@@ -46,6 +52,11 @@ void ChatWindow::SetLocalBounds(const sf::FloatRect &bounds)
 const Gx::Font *ChatWindow::GetFont() const
 {
     return m_font;
+}
+
+sf::Color ChatWindow::GetTextColor() const
+{
+    return m_textColor;
 }
 
 void ChatWindow::SetFont(const Gx::Font &font)
@@ -85,6 +96,15 @@ void ChatWindow::SetScrollOffset(const unsigned int offset)
     }
 }
 
+void ChatWindow::SetTextColor(const sf::Color &textColor)
+{
+    if (m_textColor != textColor)
+    {
+        m_textColor = textColor;
+        Invalidate();
+    }
+}
+
 void ChatWindow::SetScrollBar(Gx::ScrollBar &scrollBar)
 {
     if (m_scroll != &scrollBar)
@@ -103,11 +123,25 @@ unsigned int ChatWindow::GetMaximumChatLength() const
     return m_maxChatLength;
 }
 
+float ChatWindow::GetLineSpacing() const
+{
+    return m_lineSpacing;
+}
+
 void ChatWindow::SetMaximumChatLength(const unsigned int maxLength)
 {
     if (maxLength != m_maxChatLength)
     {
         m_maxChatLength = maxLength;
+        Invalidate();
+    }
+}
+
+void ChatWindow::SetLineSpacing(const float lineSpacing)
+{
+    if (m_lineSpacing != lineSpacing)
+    {
+        m_lineSpacing = lineSpacing;
         Invalidate();
     }
 }
@@ -123,7 +157,6 @@ void ChatWindow::PushMessage(const Player &player, const sf::String &chat)
     m_chats.push_back(chatData);
     Invalidate();
 }
-
 
 void ChatWindow::PushSystemMessage(const sf::String &chat)
 {
@@ -173,12 +206,13 @@ void ChatWindow::Invalidate()
         {
             auto label = std::make_unique<Gx::Label>();
             label->SetFont(*m_font);
+            label->SetColor(m_textColor);
             label->SetCharacterSize(GetCharacterSize());
 
             if (i == 0)
             {
                 // TODO: Configurable spacing
-                SetVerticalRepeat(max, label->GetCharacterSize() + 5.5f);
+                SetVerticalRepeat(max, m_lineSpacing > 0 ? m_lineSpacing : label->GetCharacterSize() + 5.5f);
                 SetHorizontalRepeat(1, 0);
             }
 
@@ -206,14 +240,23 @@ void ChatWindow::Invalidate()
         auto chat = m_chats[i];
         m_labels[index]->SetVisible(true);
 
-        if (chat.Sender.Administrator || chat.Sender.ID == 0)
-            m_labels[index]->SetColor(sf::Color(200, 155, 55));
-        else
-            m_labels[index]->SetColor(sf::Color::White);
+        if (m_textColor == sf::Color::White)
+        {
+            if (chat.Sender.Administrator || chat.Sender.ID == 0)
+                m_labels[index]->SetColor(sf::Color(200, 155, 55));
+            else
+                m_labels[index]->SetColor(sf::Color::White);
 
-        // TODO: Configurable outline
-        m_labels[index]->SetOutlineThickness(0.05f);
-        m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
+            // TODO: Configurable outline
+            m_labels[index]->SetOutlineThickness(0.05f);
+            m_labels[index]->SetOutlineColor(m_labels[index]->GetColor());
+        }
+        else
+        {
+            m_labels[index]->SetColor(m_textColor);
+            m_labels[index]->SetOutlineThickness(0.f);
+
+        }
         if (chat.Sender.ID != 0)
         {
             auto nickname = chat.Sender.Name;

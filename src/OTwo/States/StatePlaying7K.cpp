@@ -13,6 +13,7 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/UI/Common/ChatPanel.hpp>
 #include <OTwo/UI/Playing/ComboCounter.hpp>
 #include <OTwo/UI/Playing/JudgementIndicator.hpp>
 #include <OTwo/UI/Playing/PlayMenu.hpp>
@@ -35,6 +36,7 @@ StatePlaying7K::StatePlaying7K() :
     m_self(),
     m_context(),
     m_config(),
+    m_chatBox(),
     m_viewport()
 {
 }
@@ -53,6 +55,7 @@ StatePlaying7K::StatePlaying7K(State &&state) :
     m_self(),
     m_context(),
     m_config(),
+    m_chatBox(),
     m_viewport()
 {
 }
@@ -67,6 +70,13 @@ void StatePlaying7K::Initialize()
     const auto& session = Require<SessionContext>();
     auto& room    = session.GetCurrentRoom();
     const auto& items   = Require<ItemFactory>();
+
+    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
+    chatPanel->Initialize();
+    chatPanel->SetMaximumTextLength(50);
+    m_chatBox = chatPanel->FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
+    m_chatBox->SetPermanentFocusEnabled(true);
+    m_chatBox->SetEnabled(false);
 
     // IMPORTANT: Don't use callback of these systems, it is being used by chart renderer
     // TODO: Implement multiple listeners for the callback
@@ -467,6 +477,9 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
         else
             m_config->NoteGuideLength++;
     }
+
+    if (ev.code == sf::Keyboard::Key::Enter)
+        m_chatBox->SetEnabled(true);
 }
 
 Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const

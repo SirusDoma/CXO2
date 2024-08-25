@@ -12,27 +12,30 @@ ChatPanel::ChatPanel()
 
 void ChatPanel::Initialize()
 {
-    auto chatWindow = GetChatWindow();
-    auto scrollChat = FindChild<Gx::ScrollBar>("IDC_SCROLL_BAR_CHAT");
+    const auto chatWindow = GetChatWindow();
+    const auto scrollChat = FindChild<Gx::ScrollBar>("IDC_SCROLL_BAR_CHAT");
     // scrollChat->SetValueChangedCallback([=] (auto& sender, float value) { chatWindow->SetScrollOffset(static_cast<unsigned int>(value)); });
     if (scrollChat)
         chatWindow->SetScrollBar(*scrollChat);
 
-    auto btnChatScrollUp = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_UP");
-    auto btnChatScrollDown = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_DOWN");
-    btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
-    btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+    if (const auto btnChatScrollUp = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_UP"))
+        btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
 
-    auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
+    if (const auto btnChatScrollDown = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_DOWN"))
+        btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+
+    const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
     chatBox->SetPermanentFocusEnabled(true);
     chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String &text)
     {
         chatWindow->PushMessage(Gx::Application::Instance().Require<SessionContext>().GetCurrentPlayer(), text);
     });
 
-    auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON");
-    auto btnChatAll     = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_ALL");
-    btnChatAll->SetCheckedState(true);
+    if (const auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON"))
+    {
+        const auto btnChatAll     = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_ALL");
+        btnChatAll->SetCheckedState(true);
+    }
 }
 
 ChatWindow *ChatPanel::GetChatWindow() const
@@ -40,14 +43,14 @@ ChatWindow *ChatPanel::GetChatWindow() const
     return FindChild<ChatWindow>("IDC_CHAT_WINDOW");
 }
 
-void ChatPanel::SetInputEnabled(bool enabled)
+void ChatPanel::SetInputEnabled(const bool enabled)
 {
-    if (auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
         chatBox->SetEnabled(enabled);
 }
 
-void ChatPanel::SetMaximumTextLength(unsigned int length)
+void ChatPanel::SetMaximumTextLength(const unsigned int length)
 {
-    if (auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
         chatBox->SetMaximumTextLength(length);
 }

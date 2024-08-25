@@ -25,13 +25,17 @@ public:
     void SetCharacterSize(unsigned int characterSize);
 
     const Gx::Font *GetFont() const;
+    sf::Color GetTextColor() const;
     unsigned int GetScrollOffset() const;
     unsigned int GetCharacterSize() const;
     unsigned int GetMaximumChatLength() const;
+    float GetLineSpacing() const;
 
+    void SetTextColor(const sf::Color &textColor);
     void SetScrollBar(Gx::ScrollBar &scrollBar);
     void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int maxLength);
+    void SetLineSpacing(const float lineSpacing);
 
     void PushMessage(const Player &player, const sf::String &chat);
     void PushSystemMessage(const sf::String &chat);
@@ -42,10 +46,12 @@ private:
     void Invalidate() override;
 
     const Gx::Font *m_font;
+    sf::Color m_textColor;
     Gx::ScrollBar *m_scroll;
 
     sf::FloatRect m_bounds;
     unsigned int m_offset, m_maxChatLength, m_characterSize;
+    float m_lineSpacing;
 
     std::vector<ChatMessage> m_chats;
     std::vector<std::unique_ptr<Gx::Label>> m_labels;

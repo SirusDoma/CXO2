@@ -13,19 +13,38 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
     {
         if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
             return nullptr;
     }
 
-    if (auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())
+    if (const auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())
         metadata.FontSize = fontSize->get<unsigned int>();
     else
         metadata.FontSize = 13;
 
+    if (const auto textColor = attributes.find("color"); textColor != attributes.end())
+    {
+        unsigned int a, r, g, b;
+        textColor->at("a").get_to(a);
+        textColor->at("r").get_to(r);
+        textColor->at("g").get_to(g);
+        textColor->at("b").get_to(b);
+        metadata.Color = sf::Color(r, g, b, a);
+    }
+    else
+        metadata.Color = sf::Color::White;
+
     metadata.MaximumChatsLength = attributes.at("maximumChatLength").get<unsigned int>();
-    if (auto bounds = attributes.find("bounds"); bounds != attributes.end())
+    if (const auto lineSpacing = attributes.find("lineSpacing"); lineSpacing != attributes.end())
+    {
+        metadata.LineSpacing = lineSpacing->get<unsigned int>();
+        if (metadata.LineSpacing < 0)
+            metadata.LineSpacing = 0;
+    }
+
+    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
         unsigned int x, y, w, h;
         bounds->at("x").get_to(x);
@@ -47,7 +66,9 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
     auto window = std::make_unique<ChatWindow>();
     window->SetName(metadata->Name);
     window->SetCharacterSize(metadata->FontSize);
+    window->SetTextColor(metadata->Color);
     window->SetMaximumChatLength(metadata->MaximumChatsLength);
+    window->SetLineSpacing(metadata->LineSpacing);
     window->SetLocalBounds(metadata->Bounds);
 
     const auto ctx = ResourceContextDecorator::Decorate(context);
