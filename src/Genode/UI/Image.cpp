@@ -14,7 +14,7 @@ namespace Gx
 
     const Image::Frame *Image::GetFrame(const std::string &name) const
     {
-        if (auto it = m_frames.find(name); it != m_frames.end())
+        if (const auto it = m_frames.find(name); it != m_frames.end())
             return &it->second;
 
         return nullptr;
@@ -38,9 +38,14 @@ namespace Gx
         return m_frameName;
     }
 
+    const unsigned int & Image::GetCurrentFrameIndex() const
+    {
+        return m_frameIndex;
+    }
+
     bool Image::ContainsFrame(const std::string &name) const
     {
-        auto it = m_frames.find(name);
+        const auto it = m_frames.find(name);
         return it != m_frames.end();
     }
 
@@ -71,18 +76,25 @@ namespace Gx
 
     void Image::SetFrame(const std::string &name)
     {
-        if (auto frame = GetFrame(name); frame)
+        for (int i = 0; i < m_indices.size(); i++)
         {
-            m_frameName = name;
-            ApplyFrame(*frame);
+            if (m_indices[i] == name)
+            {
+                m_frameName = name;
+                m_frameIndex = i;
+                ApplyFrame(m_frames[m_frameName]);
+
+                return;
+            }
         }
     }
 
     void Image::SetFrame(unsigned int index)
     {
-        if (auto frame = GetFrame(index); frame)
+        if (const auto frame = GetFrame(index); frame)
         {
             m_frameName = m_indices[index];
+            m_frameIndex = index;
             ApplyFrame(*frame);
         }
     }

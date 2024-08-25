@@ -32,6 +32,7 @@ namespace Gx
         const Frame *GetFrame(unsigned int index) const;
         const Frame *GetCurrentFrame() const;
         const std::string &GetCurrentFrameName() const;
+        const unsigned int &GetCurrentFrameIndex() const;
 
         bool ContainsFrame(const std::string &name) const;
         bool ContainsFrame(unsigned int index) const;
@@ -51,6 +52,7 @@ namespace Gx
         void ApplyFrame(const Frame &frame);
 
         std::string m_frameName;
+        unsigned int m_frameIndex;
         const Frame *m_currentFrame;
         std::vector<std::string> m_indices;
         std::unordered_map<std::string, Frame> m_frames;
