@@ -317,7 +317,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                 m_refPosition  = time->Position;
                 m_bpm          = time->Value;
             }
-            else
+            else if (ev->Channel != Chart::Channel::Measure)
             {
                 if (const auto bgm = static_cast<Chart::NoteEvent*>(ev.Event); bgm)
                     PlaySample(bgm, "BGM");
