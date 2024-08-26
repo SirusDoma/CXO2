@@ -211,7 +211,6 @@ void ChatWindow::Invalidate()
 
             if (i == 0)
             {
-                // TODO: Configurable spacing
                 SetVerticalRepeat(max, m_lineSpacing > 0 ? m_lineSpacing : label->GetCharacterSize() + 5.5f);
                 SetHorizontalRepeat(1, 0);
             }

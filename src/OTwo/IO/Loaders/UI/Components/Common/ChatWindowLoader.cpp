@@ -43,6 +43,8 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
         if (metadata.LineSpacing < 0)
             metadata.LineSpacing = 0;
     }
+    else
+        metadata.LineSpacing = 0;
 
     if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
     {
