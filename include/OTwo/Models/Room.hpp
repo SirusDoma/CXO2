@@ -74,6 +74,7 @@ struct RoomMember : Player
     RoomTeam  Team  = static_cast<RoomTeam>(-1);
     sf::Color Color = sf::Color::Transparent;
     Gx::Uint8 Index = 0;
+    bool      Ready = false;
 };
 
 struct Room

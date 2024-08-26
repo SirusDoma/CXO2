@@ -3,6 +3,7 @@
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Gauge.hpp>
+#include <Genode/UI/Image.hpp>
 
 void AvatarInfo::Initialize()
 {
@@ -67,45 +68,42 @@ void AvatarInfo::Invalidate()
         }
         else
             plate->SetColor(sf::Color::Transparent);
-
-
-        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
-        {
-            if (m_member)
-                label->SetString("Lv:" + std::to_string(m_member->Level) + " " + m_member->Name);
-            else
-                label->SetString(std::string());
-        }
     }
-    else
-    {
-        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_LEVEL"); label)
-        {
-            if (m_member)
-                label->SetString("Lv." + std::to_string(m_member->Level));
-            else
-                label->SetString(std::string());
-        }
 
-        if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+    if (const auto readyIndicator = FindChild<Gx::Image>("IDC_IMAGE_AVATAR_READY_INDICATOR"); readyIndicator)
+        readyIndicator->SetVisible(m_member && m_member->Ready);
+
+    if (const auto level = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_LEVEL"); level)
+    {
+        if (m_member)
+            level->SetString("Lv." + std::to_string(m_member->Level));
+        else
+            level->SetString(std::string());
+
+        if (const auto name = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); name)
         {
             if (m_member)
             {
-                label->SetString(m_member->Name);
+                name->SetString(m_member->Name);
                 if (!m_teamColors.empty())
                 {
                     const auto& color = GetTeamColor(m_member->Team);
-                    label->SetColor(GetTeamColor(m_member->Team));
+                    name->SetColor(GetTeamColor(m_member->Team));
                     m_member->Color = color;
                 }
                 else
-                    label->SetColor(m_member->Color);
+                    name->SetColor(m_member->Color);
 
             }
             else
-                label->SetString(std::string());
+                name->SetString(std::string());
         }
     }
-
-
+    else if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+    {
+        if (m_member)
+            label->SetString("Lv:" + std::to_string(m_member->Level) + " " + m_member->Name);
+        else
+            label->SetString(std::string());
+    }
 }

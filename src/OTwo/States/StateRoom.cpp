@@ -195,14 +195,14 @@ void StateRoom::Initialize()
                     createRoomDialog->GetMinLevelLimit(),
                     createRoomDialog->GetMaxLevelLimit(),
                     {
-                        RoomMember{session.GetCurrentPlayer(), RoomTeam::A},
+                        RoomMember{session.GetCurrentPlayer(), RoomTeam::A, sf::Color::Transparent, 0, true},
                         {},
                         {},
-                        RoomMember{Player{2, "Random #1", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F},
+                        RoomMember{Player{2, "Random #1", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F, sf::Color::Transparent, 0, true},
                         {},
                         {},
                         {},
-                        RoomMember{Player{3, "Random #2", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G}
+                        RoomMember{Player{3, "Random #2", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G, sf::Color::Transparent, 0, false}
                     }
                 });
                 director.Present<StateWaiting7K>();

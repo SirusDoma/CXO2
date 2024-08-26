@@ -47,7 +47,7 @@ void StateWaiting7K::Initialize()
     const auto channelCategory = Instantiate<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
     switch (session.GetMusicHall())
     {
-        case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope");  break;
+        case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
         case MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
         case MusicHall::Philix:   channelCategory->SetFrame("Philix");   break;
         case MusicHall::Melpomin: channelCategory->SetFrame("Melpomin"); break;
@@ -161,6 +161,7 @@ void StateWaiting7K::Initialize()
         auto& member = room.Members[memberIndex];
         if (member.ID == 0)
         {
+            avatar->SetVisible(false);
             avatar->ClearEquipments();
             avatarInfo->Reset();
 
@@ -318,10 +319,6 @@ void StateWaiting7K::Initialize()
     instrumentSelector->AddInstrument(items.GetItem(412));
     instrumentSelector->AddInstrument(items.GetItem(1429));
 
-    const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
-    readyButton->SetVisible(false);
-    readyButton->SetEnabled(false);
-
     const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
@@ -379,7 +376,18 @@ void StateWaiting7K::Initialize()
         director.Present<StateRoom>();
     });
 
+    const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
+    readyButton->SetVisible(session.GetCurrentPlayer().ID != room.RoomMasterID);
+    readyButton->SetEnabled(readyButton->IsVisible());
+    readyButton->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
+    {
+        if (!sender->IsChecked())
+            return;
+    });
+
     const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START");
+    btnStart->SetVisible(session.GetCurrentPlayer().ID == room.RoomMasterID);
+    btnStart->SetEnabled(readyButton->IsVisible());
     btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
     {
         if (!sender->IsChecked())
