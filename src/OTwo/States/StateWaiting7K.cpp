@@ -71,7 +71,7 @@ void StateWaiting7K::Initialize()
     const auto level = Instantiate<Gx::Image>("IDC_IMAGE_ROOM_LEVEL");
     level->SetFrame(room.GetRoomLevelCode());
 
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_EMOTION"); dialog)
+    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_EMOTICON"); dialog)
     {
         const auto content     = dialog->FindChild<Gx::Image>("IDC_IMAGE_CONTENT");
         const auto currentPage = dialog->FindChild<Gx::Number>("IDC_NUMBER_CURRENT_PAGE");
@@ -101,8 +101,8 @@ void StateWaiting7K::Initialize()
             }
         });
 
-        const auto emotionButton = Instantiate<Gx::Button>("IDC_BUTTON_EMOTION");
-        emotionButton->SetClickCallback([=] (auto& sender, auto& ev)
+        const auto emoticonHelpButton = Instantiate<Gx::Button>("IDC_BUTTON_EMOTICON");
+        emoticonHelpButton->SetClickCallback([=] (auto& sender, auto& ev)
         {
             dialog->Show(this, std::string(), false);
         });
@@ -157,6 +157,12 @@ void StateWaiting7K::Initialize()
         if (!avatar)
             continue;
 
+        m_avatars.push_back(avatar);
+        const auto emoticonContainer = Create<Gx::UiContainer>();
+        emoticonContainer->SetName("IDC_CONTAINER_EMOTICON");
+        emoticonContainer->SetVisible(false);
+        avatar->AddChild(emoticonContainer);
+
         const auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
         auto& member = room.Members[memberIndex];
         if (member.ID == 0)
@@ -173,6 +179,7 @@ void StateWaiting7K::Initialize()
         {
             currentMember = member;
             currentAvatarInfo = avatarInfo;
+            m_playerAvatar = avatar;
         }
 
         avatar->SetGender(member.Gender);
@@ -387,7 +394,7 @@ void StateWaiting7K::Initialize()
 
     const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START");
     btnStart->SetVisible(session.GetCurrentPlayer().ID == room.RoomMasterID);
-    btnStart->SetEnabled(readyButton->IsVisible());
+    btnStart->SetEnabled(btnStart->IsVisible());
     btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
     {
         if (!sender->IsChecked())
@@ -417,5 +424,73 @@ void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent ev)
         if (const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START"))
             btnStart->SetCheckedState(true);
     }
+
+    if (ev.control)
+    {
+        if (ev.shift)
+        {
+            switch (ev.code)
+            {
+                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_HI");          break;
+                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_GO");          break;
+                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_READY");       break;
+                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_APPROVAL");    break;
+                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OBJECTION");   break;
+                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_SMILE");   break;
+                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_HAHA");    break;
+                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_VICTORY"); break;
+                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_LOSE");    break;
+                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_BY_DEGREES");  break;
+                default: break;
+            }
+        }
+        else
+        {
+            switch (ev.code)
+            {
+                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK");  break;
+                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_QUESTION");          break;
+                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_HEART");             break;
+                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_COUNT");             break;
+                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_NOTE");              break;
+                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2"); break;
+                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_BROKEN_HEART");      break;
+                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_CLOVER");            break;
+                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_FLOWER");            break;
+                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_IDEA");              break;
+                default: break;
+            }
+        }
+    }
+}
+
+void StateWaiting7K::OnKeyUp(const sf::Event::KeyEvent ev)
+{
+    State::OnKeyUp(ev);
+}
+
+void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoticonID)
+{
+    const auto container = avatar->FindChild<Gx::UiContainer>("IDC_CONTAINER_EMOTICON");
+    if (container->IsVisible())
+        return;
+
+    auto emoticon = container->FindChild<Gx::Animation>(emoticonID);
+    if (!emoticon)
+    {
+        emoticon = Create<Gx::Animation>(*FindResource<Gx::Animation>(emoticonID));
+        emoticon->SetName(emoticonID);
+        emoticon->SetAnimationCallback([=] (auto& sender)
+        {
+            container->SetVisible(
+                sender.GetState() == Gx::Animation::AnimationState::Initial ||
+                sender.GetState() == Gx::Animation::AnimationState::Playing
+            );
+            sender.SetVisible(container->IsVisible());
+        });
+        container->AddChild(emoticon);
+    }
+
+    emoticon->Reset();
 }
 

@@ -24,8 +24,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
     if (metadata == nullptr)
         return nullptr;
 
-    auto state     = std::make_unique<State>();
-    auto populator = ObjectPopulator::Decorate(state.get());
+    auto state = std::make_unique<State>();
     state->SetName(meta.Name);
 
     for (auto [key, value] : meta.Require)
@@ -35,6 +34,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
             continue;
 
         // Rewire resource manager to the local scene
+        auto populator = ObjectPopulator::Decorate(state.get(), true);
         auto name = meta.Name + "/" + key;
         auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
@@ -44,6 +44,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
     for (auto [key, object] : metadata->Objects)
     {
         // Rewire resource manager to the local scene
+        auto populator = ObjectPopulator::Decorate(state.get());
         auto name = meta.Name + "/" + key;
         auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 

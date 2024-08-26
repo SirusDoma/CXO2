@@ -3,6 +3,9 @@
 
 #include <OTwo/States/State.hpp>
 
+#include <vector>
+
+class Avatar;
 class StateWaiting7K : public State
 {
 public:
@@ -10,7 +13,16 @@ public:
 
     void Initialize() override;
 
+
+
+private:
     void OnKeyDown(const sf::Event::KeyEvent ev) override;
+    void OnKeyUp(const sf::Event::KeyEvent ev) override;
+
+    void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
+
+    Avatar* m_playerAvatar;
+    std::vector<Avatar*> m_avatars;
 };
 
 #endif
