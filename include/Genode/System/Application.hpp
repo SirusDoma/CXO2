@@ -43,6 +43,8 @@ namespace Gx
 
         void SetCursor(Cursor &cursor);
 
+        sf::View GetVirtualView() const;
+
         template<typename T>
         T &Provide();
 

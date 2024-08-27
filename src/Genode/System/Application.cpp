@@ -237,6 +237,14 @@ namespace Gx
         m_window->setMouseCursor(m_cursor->GetHandle());
     }
 
+    sf::View Application::GetVirtualView() const
+    {
+        return sf::View(
+            { m_virtualMode.size.x / 2.f, m_virtualMode.size.y / 2.f },
+            { static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y) }
+        );
+    }
+
     void Application::OnFocusChanged(bool focus)
     {
     }
@@ -308,12 +316,13 @@ namespace Gx
         m_window->setVerticalSyncEnabled(true);
 
         // Setup view
-        auto view = m_window->getDefaultView();
-        view.setSize(sf::Vector2f(static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)));
-        view.setCenter(sf::Vector2f(std::floor(m_virtualMode.size.x / 2.0f), std::floor(m_virtualMode.size.y / 2.0f)));
+        const auto view = sf::View(
+            {std::floor(m_virtualMode.size.x / 2.0f), std::floor(m_virtualMode.size.y / 2.0f)},
+            {static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)}
+        );
 
-        if (m_state == sf::State::Fullscreen)
-            view = GetLetterBoxView(view, m_window->getSize());
+        // if (m_state == sf::State::Fullscreen)
+        //     view = GetLetterBoxView(view, m_window->getSize());
 
         m_window->setView(view);
         m_adapter = RenderTargetAdapter(*this);

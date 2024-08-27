@@ -148,15 +148,16 @@ namespace Gx
         m_scene = scene;
         if (m_scene)
         {
-            auto screenSize = m_scene->GetView().getSize();
-            unsigned int x = static_cast<unsigned int>((screenSize.x / 2.f) - (GetLocalBounds().width / 2.f));
-            unsigned int y = static_cast<unsigned int>((screenSize.y / 2.f) - (GetLocalBounds().height / 2.f));
+            const auto view   = m_scene->GetVirtualView();
+            const auto center = view.getCenter();
+            const unsigned int x = static_cast<unsigned int>(center.x - (GetLocalBounds().width / 2.f));
+            const unsigned int y = static_cast<unsigned int>(center.y - (GetLocalBounds().height / 2.f));
 
             SetOrigin(0.f, 0.f);
             SetPosition(x, y);
             if (enableBackDrop)
             {
-                m_backdrop = Rectangle(screenSize);
+                m_backdrop = Rectangle(view.getSize());
                 m_backdrop.SetColor(sf::Color(0, 0, 0, 255 / 2));
             }
             else

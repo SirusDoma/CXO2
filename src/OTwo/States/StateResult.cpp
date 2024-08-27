@@ -35,7 +35,7 @@ void StateResult::Initialize()
         }
     }
 
-    auto const view = GetView();
+    auto const view = GetVirtualView();
     const auto background = Instantiate<Gx::Sprite>("IDC_IMAGE_STATE_RESULT");
     background->SetVisible(false);
 

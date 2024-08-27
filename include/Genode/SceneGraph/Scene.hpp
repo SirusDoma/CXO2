@@ -33,6 +33,7 @@ namespace Gx
         SceneDirector &GetDirector() const;
 
         sf::View GetView() const;
+        sf::View GetVirtualView() const;
         sf::View GetDefaultView() const;
 
         Node *GetCurrentOverlay() const;
