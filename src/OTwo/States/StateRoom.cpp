@@ -179,7 +179,7 @@ void StateRoom::Initialize()
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = session.GetInstalledMusic();
-                const auto music = selection.GetMetadata().ID != 0 ? selection.GetMetadata() : musicList[musicList.size() - 1];
+                const auto music = !selection.GetMetadata().Source.empty() ? selection.GetMetadata() : musicList[musicList.size() - 1];
                 session.SetCurrentRoom(Room{
                     4,
                     session.GetCurrentPlayer().ID,

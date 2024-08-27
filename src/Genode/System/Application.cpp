@@ -210,12 +210,18 @@ namespace Gx
         if (m_window)
             m_window->close();
 
-        auto mode = m_mode;
         if (state == sf::State::Fullscreen)
-            mode = sf::VideoMode::getDesktopMode();
+        {
+            if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
+                m_mode = fsModes.front();
+            else
+                m_mode = sf::VideoMode::getDesktopMode();
+        }
+        else
+            m_mode = m_virtualMode;
 
         m_window = std::make_unique<sf::RenderWindow>(
-            mode,
+            m_mode,
             m_title,
             state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
             sf::State::Windowed

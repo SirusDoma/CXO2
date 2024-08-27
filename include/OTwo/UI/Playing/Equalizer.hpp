@@ -4,7 +4,7 @@
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/List.hpp>
 
-class Equalizer : virtual Gx::List, public virtual Gx::Control
+class Equalizer : public virtual Gx::Control, virtual Gx::List
 {
 public:
     Equalizer();

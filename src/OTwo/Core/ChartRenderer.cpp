@@ -226,7 +226,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
 
                 Input(channel, true);
                 if (ev.Length == 0)
-                    m_autoDelays[channel] = Gx::Delay(sf::seconds(1.f / 60.f * 5.f), [this, channel] { Input(channel, false); });
+                    m_autoDelays[channel] = Gx::Delay(sf::seconds(1.f / 60.f * 5.f), [this, c = channel] { Input(c, false); });
             }
         }
     }
@@ -269,7 +269,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     bool updated = false;
-    for (unsigned int i = m_lastEventID; i < m_events.size(); i++)
+    for (unsigned int i = 0; i < m_events.size(); i++)
     {
         auto &ev = m_events[i];
         const double latency = ev->Position - GetRenderPosition();
@@ -432,8 +432,8 @@ int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const
     if (const auto it = m_speeds.find(channel); it != m_speeds.end())
         speed = it->second;
 
-    const unsigned int pixels = (position * (static_cast<float>(DefaultMeasureHeight) * speed));
-    return absolute ? pixels : m_settings.Viewport - pixels;
+    const int pixels = static_cast<int>(position * (static_cast<float>(DefaultMeasureHeight) * speed));
+    return absolute ? pixels : static_cast<int>(m_settings.Viewport) - pixels;
 }
 
 void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &group) const
