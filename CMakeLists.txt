@@ -1,6 +1,10 @@
 # CMake Config
 cmake_minimum_required(VERSION 3.27)
 project(O2Jam LANGUAGES C CXX)
+if (APPLE)
+    enable_language(OBJCXX)
+endif()
+
 include(CheckIncludeFiles)
 include(FetchContent)
 
