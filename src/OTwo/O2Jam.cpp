@@ -60,6 +60,7 @@
 #include <OTwo/States/StateAvi.hpp>
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StateResult.hpp>
@@ -208,6 +209,7 @@ void O2Jam::Boot()
     director.Register<StateAvi>("Interface/State/Avi.json");
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
+    director.Register<StateMyRoom>("Interface/State/MyRoom.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
     director.Register<StateResult>("Interface/State/Result.json");
