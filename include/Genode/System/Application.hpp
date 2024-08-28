@@ -44,6 +44,7 @@ namespace Gx
         void SetCursor(Cursor &cursor);
 
         sf::View GetVirtualView() const;
+        static sf::VideoMode GetDesktopVideoMode();
 
         template<typename T>
         T &Provide();

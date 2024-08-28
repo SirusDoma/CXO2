@@ -215,7 +215,7 @@ namespace Gx
             if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
                 m_mode = fsModes.front();
             else
-                m_mode = sf::VideoMode::getDesktopMode();
+                m_mode = GetDesktopVideoMode();
         }
         else
             m_mode = m_virtualMode;
@@ -316,9 +316,10 @@ namespace Gx
         m_window->setVerticalSyncEnabled(true);
 
         // Setup view
+        const auto size = sf::Vector2f{static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)};
         auto view = sf::View(
-            {std::floor(m_virtualMode.size.x / 2.0f), std::floor(m_virtualMode.size.y / 2.0f)},
-            {static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)}
+            {std::floor(size.x / 2.0f), std::floor(size.y / 2.0f)},
+            size
         );
 
          if (m_state == sf::State::Fullscreen)
@@ -374,6 +375,11 @@ namespace Gx
     void Application::SetClearColor(const sf::Color &clearColor)
     {
         m_clearColor = clearColor;
+    }
+
+    sf::VideoMode Application::GetDesktopVideoMode()
+    {
+        return sf::VideoMode::getDesktopMode();
     }
 
     Application::operator sf::RenderTarget&() const

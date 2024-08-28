@@ -4,5 +4,7 @@
     <dict>
         <key>NSHighResolutionCapable</key>
         <false/>
+        <key>LSUIPresentationMode</key>
+        <integer>4</integer>
     </dict>
 </plist>
