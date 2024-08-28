@@ -1,6 +1,7 @@
 #ifndef GENODE_SYSTEM_HPP
 #define GENODE_SYSTEM_HPP
 
+#include <Genode/System/Platform.hpp>
 #include <Genode/System/Exception.hpp>
 #include <Genode/System/Provider.hpp>
 #include <Genode/System/Primitives.hpp>
