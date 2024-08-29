@@ -23,8 +23,8 @@ namespace Gx
         {
             m_start = m_target->GetScale();
             m_diff = m_start - m_end;
-            m_diff.x = abs(m_diff.x);
-            m_diff.y = abs(m_diff.y);
+            m_diff.x = std::abs(m_diff.x);
+            m_diff.y = std::abs(m_diff.y);
         }
 
         float scale  = 0.0f;

@@ -22,7 +22,7 @@ namespace Gx
         if (state == TaskState::Initial)
         {
             m_start = m_target->GetRotation();
-            m_diff  = abs(m_start - m_end);
+            m_diff  = std::abs(m_start - m_end);
         }
 
         short rotation = 0;
