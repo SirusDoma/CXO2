@@ -4,6 +4,18 @@
 
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/Utilities/StringHelper.hpp>
+
+Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
+{
+    if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
+        return ResourceLoader::LoadFromFile(fileName, ctx);
+
+    auto metadata = MusicMetadata();
+    metadata.Source = fileName;
+
+    return LoadFromMetadata(metadata, ctx);
+}
 
 Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

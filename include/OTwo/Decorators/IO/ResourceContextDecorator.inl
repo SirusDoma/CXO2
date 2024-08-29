@@ -108,21 +108,33 @@ R* ResourceContextDecorator::Find(const ResourceMetadata &metadata, Gx::CacheMod
     if (require.empty())
         return nullptr;
 
+    auto resolve = [] (const std::any& resource) -> std::string
+    {
+        if (resource.type() == typeid(Gx::Json))
+            return std::any_cast<Gx::Json>(resource).get<std::string>();
+
+        if (resource.type() == typeid(std::string))
+            return std::any_cast<std::string>(resource);
+
+        return std::string();
+    };
+
     std::string id;
     if constexpr (std::is_base_of_v<R, sf::Texture>)
     {
-        if (const auto resource = require.find("texture"); resource != require.end() && resource->second.type() == typeid(Gx::Json))
-            id = std::any_cast<Gx::Json>(resource->second).get<std::string>();
+        if (const auto resource = require.find("texture"); resource != require.end())
+            id = resolve(resource->second);
+
     }
     else if constexpr (std::is_base_of_v<R, Gx::Font>)
     {
-        if (const auto resource = require.find("font"); resource != require.end() && resource->second.type() == typeid(Gx::Json))
-            id = std::any_cast<Gx::Json>(resource->second).get<std::string>();
+        if (const auto resource = require.find("font"); resource != require.end())
+            id = resolve(resource->second);
     }
     else if constexpr (std::is_base_of_v<R, sf::SoundBuffer>)
     {
-        if (const auto resource = require.find("sound"); resource != require.end() && resource->second.type() == typeid(Gx::Json))
-            id = std::any_cast<Gx::Json>(resource->second).get<std::string>();
+        if (const auto resource = require.find("sound"); resource != require.end())
+            id = resolve(resource->second);
     }
     else
     {

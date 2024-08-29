@@ -42,10 +42,10 @@ void StateRoom::Initialize()
     auto& selection      = Require<MusicSelectionContext>();
     const auto& items    = Require<ItemFactory>();
 
-    const auto bgm         = Instantiate<sf::Music>("IDC_MUSIC");
-    const auto sfxAccept   = Instantiate<sf::Sound>("IDC_SOUND_02");
-    const auto sfxNavigate = Instantiate<sf::Sound>("IDC_SOUND_07");
-    const auto sfxToggle   = Instantiate<sf::Sound>("IDC_SOUND_14");
+    const auto bgm         = Instantiate<sf::Music>("Event/bgEvent.ogg");
+    const auto sfxAccept   = Instantiate<sf::Sound>("bgEffect/02");
+    const auto sfxNavigate = Instantiate<sf::Sound>("bgEffect/07");
+    const auto sfxToggle   = Instantiate<sf::Sound>("bgEffect/14");
 
     const auto player = session.GetCurrentPlayer();
     const auto nicknameLabel = Instantiate<Gx::Label>("IDC_TEXT_NICKNAME");
