@@ -101,7 +101,8 @@ namespace Gx
         states.transform     *= GetTransform();
         states.coordinateType = sf::CoordinateType::Pixels;
 
-        if (m_texture)
+        const auto currentTexCoords = GetCurrentFrame().TexCoords;
+        if (m_texture && currentTexCoords.width > 0 && currentTexCoords.height > 0)
         {
             states.texture = m_texture;
             surface.Render(m_vertices.data(), m_vertices.size(), sf::PrimitiveType::TriangleStrip, states);
