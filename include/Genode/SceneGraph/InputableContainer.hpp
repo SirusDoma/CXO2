@@ -8,7 +8,7 @@
 
 namespace Gx
 {
-    class InputableContainer : public virtual Node, public Inputable
+    class InputableContainer : public virtual Node, public virtual Inputable
     {
     public:
         ~InputableContainer() override;
