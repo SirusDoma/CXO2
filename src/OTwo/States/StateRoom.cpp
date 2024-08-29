@@ -42,7 +42,7 @@ void StateRoom::Initialize()
     auto& selection      = Require<MusicSelectionContext>();
     const auto& items    = Require<ItemFactory>();
 
-    const auto bgm         = Instantiate<sf::Music>("Event/bgEvent.ogg");
+    const auto bgm         = Instantiate<sf::Music>("BGM/bgRoom.ogg");
     const auto sfxAccept   = Instantiate<sf::Sound>("bgEffect/02");
     const auto sfxNavigate = Instantiate<sf::Sound>("bgEffect/07");
     const auto sfxToggle   = Instantiate<sf::Sound>("bgEffect/14");
@@ -274,6 +274,7 @@ void StateRoom::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([&](auto &, auto &) { OnBackClicked(); });
 
+    bgm->setLoop(true);
     mixer.Play(bgm, "BGM");
 }
 

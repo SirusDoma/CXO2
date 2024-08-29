@@ -15,8 +15,10 @@ StateMyRoom::StateMyRoom(State &&state) :
 
 void StateMyRoom::Initialize()
 {
+    auto& mixer          = Require<Gx::Mixer>();
     const auto& session  = Require<SessionContext>();
     const auto& items    = Require<ItemFactory>();
+    const auto bgm       = Instantiate<sf::Music>("BGM/bgMyroom.ogg");
     const auto player = session.GetCurrentPlayer();
 
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
@@ -35,4 +37,7 @@ void StateMyRoom::Initialize()
     {
         GetDirector().Present<StateRoom>();
     });
+
+    bgm->setLoop(true);
+    mixer.Play(bgm, "BGM");
 }
