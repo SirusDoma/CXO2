@@ -227,6 +227,9 @@ namespace Gx
             sf::State::Windowed
         );
 
+        if (state == sf::State::Fullscreen)
+            m_window->setPosition(sf::Vector2i(0, 0));
+
         m_state = state;
         SetupWindow();
     }
@@ -256,47 +259,44 @@ namespace Gx
     void Application::OnInputReceived(sf::Event ev)
     {
         // Re-map mouse coordinate when using virtual mode
-        if (m_mode != m_virtualMode || m_state == sf::State::Fullscreen)
+        switch (ev.type)
         {
-            switch (ev.type)
+            case sf::Event::MouseMoved:
             {
-                case sf::Event::MouseMoved:
-                {
-                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
-                    ev.mouseMove = sf::Event::MouseMoveEvent{
-                        static_cast<int>(position.x),
-                        static_cast<int>(position.y)
-                    };
+                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
+                ev.mouseMove = sf::Event::MouseMoveEvent{
+                    static_cast<int>(position.x),
+                    static_cast<int>(position.y)
+                };
 
-                    break;
-                }
-                case sf::Event::MouseButtonPressed:
-                case sf::Event::MouseButtonReleased:
-                {
-                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
-                    ev.mouseButton = sf::Event::MouseButtonEvent{
-                        ev.mouseButton.button,
-                        static_cast<int>(position.x),
-                        static_cast<int>(position.y)
-                    };
-
-                    break;
-                }
-                case sf::Event::MouseWheelScrolled:
-                {
-                    auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
-                    ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
-                        ev.mouseWheelScroll.wheel,
-                        ev.mouseWheelScroll.delta,
-                        static_cast<int>(position.x),
-                        static_cast<int>(position.y)
-                    };
-
-                    break;
-                }
-                default:
-                    break;
+                break;
             }
+            case sf::Event::MouseButtonPressed:
+            case sf::Event::MouseButtonReleased:
+            {
+                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
+                ev.mouseButton = sf::Event::MouseButtonEvent{
+                    ev.mouseButton.button,
+                    static_cast<int>(position.x),
+                    static_cast<int>(position.y)
+                };
+
+                break;
+            }
+            case sf::Event::MouseWheelScrolled:
+            {
+                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
+                ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
+                    ev.mouseWheelScroll.wheel,
+                    ev.mouseWheelScroll.delta,
+                    static_cast<int>(position.x),
+                    static_cast<int>(position.y)
+                };
+
+                break;
+            }
+            default:
+                break;
         }
 
         // Pass input into active scene via director

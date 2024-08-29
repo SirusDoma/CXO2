@@ -106,15 +106,15 @@ public:
 
     struct NoteEvent : Event
     {
-        Gx::Uint16       ID;
-        float            Volume;
-        float            Pan;
-        NoteType         Type;
-        SampleType       SampleType;
-        sf::SoundBuffer *Sample;
-        double           Length;
+        Gx::Uint16        ID;
+        float             Volume;
+        float             Pan;
+        NoteType          Type;
+        Chart::SampleType SampleType;
+        sf::SoundBuffer  *Sample;
+        double            Length;
 
-        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum SampleType sampleType, sf::SoundBuffer *sample) :
+        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer *sample) :
             Event(ev),
             ID(id),
             Volume(volume),
