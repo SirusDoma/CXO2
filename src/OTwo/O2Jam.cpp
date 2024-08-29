@@ -210,10 +210,10 @@ void O2Jam::Boot()
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateMyRoom>("Interface/State/MyRoom.json");
-    director.Register<StateWaiting7K>("Interface/State/Waiting.json");
+    director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
     director.Register<StateResult>("Interface/State/Result.json");
-    director.Register<StatePlaying7K>("Interface/State/Playing.json");
+    director.Register<StatePlaying7K>("Playing/State/Playing7K.json");
 
     director.Present<StateAvi>();
 }

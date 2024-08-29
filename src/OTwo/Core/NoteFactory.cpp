@@ -33,7 +33,8 @@ NoteFactory::NoteFactory(Gx::ResourceManager &instantiationResources, Gx::Resour
 
 NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settings) const
 {
-    const auto container = &m_resources->Create<NoteContainer>("STATE_PLAYING/IDC_NOTE_CONTAINER");
+    auto state = "STATE_PLAYING_" + std::to_string(m_channels.size()) + "K";
+    const auto container = &m_resources->Create<NoteContainer>(state + "/IDC_NOTE_CONTAINER");
     auto tapNotePrefabs = PrefabMap();
     auto longNotePrefabs = PrefabMap();
     float x1 = 0, x2 = 0;
@@ -47,8 +48,8 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
         {
             const int subKey = static_cast<Gx::Uint8>(shape);
 
-            const auto tap   = m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_" + std::to_string(subKey));
-            const auto hold  = m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_" + std::to_string(subKey));
+            const auto tap   = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_" + std::to_string(subKey));
+            const auto hold  = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_" + std::to_string(subKey));
 
             container->RegisterPrefab(*tap);
             container->RegisterPrefab(*hold);
@@ -69,13 +70,13 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
         }
 
         tapNotePrefabs[channel]= {
-            { NoteShape::Square, m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_1") },
-            { NoteShape::Circle, m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_2") },
+            { NoteShape::Square, m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_1") },
+            { NoteShape::Circle, m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_2") },
         };
 
         longNotePrefabs[channel] = {
-            { NoteShape::Square, m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_1") },
-            { NoteShape::Circle, m_prefabResources->Find<Gx::Animation>("STATE_PLAYING/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_2") },
+            { NoteShape::Square, m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_1") },
+            { NoteShape::Circle, m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_2") },
         };
     }
 
@@ -100,8 +101,8 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
     // Prepare  measure prefabs
     auto measurePrefabs = PrefabMap();
     measurePrefabs[Chart::Channel::Background] = {
-        { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE1") },
-        { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>("STATE_PLAYING/IDC_IMAGE_NOTE_MEASURE2") }
+        { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>(state + "/IDC_IMAGE_NOTE_MEASURE1") },
+        { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>(state + "/IDC_IMAGE_NOTE_MEASURE2") }
     };
 
     container->RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);
@@ -132,7 +133,7 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
     {
         if (i < bufferSize / 2)
         {
-            auto& note = m_resources->Create<Note>("STATE_PLAYING/IDC_TAP_NOTE_" + std::to_string(i), 0, Chart::Channel::Note4);
+            auto& note = m_resources->Create<Note>(state + "/IDC_TAP_NOTE_" + std::to_string(i), 0, Chart::Channel::Note4);
             for (int v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
@@ -150,7 +151,7 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
         }
         else
         {
-            auto& longNote = m_resources->Create<LongNote>("STATE_PLAYING/IDC_LONG_NOTE_" + std::to_string(i), 0, 1, Chart::Channel::Note4);
+            auto& longNote = m_resources->Create<LongNote>(state + "/IDC_LONG_NOTE_" + std::to_string(i), 0, 1, Chart::Channel::Note4);
             for (int v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 

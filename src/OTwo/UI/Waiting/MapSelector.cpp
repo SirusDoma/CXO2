@@ -88,7 +88,7 @@ void MapSelector::SetMapID(int mapID, const bool silent)
     auto& app   = Gx::Application::Instance();
     auto& mixer = app.Require<Gx::Mixer>();
 
-    const auto sfxNavigate  = parent->Instantiate<sf::Sound>("STATE_WAITING/IDC_SOUND_07");
+    const auto sfxNavigate  = parent->Instantiate<sf::Sound>("bgEffect/07");
     const auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
     const auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
     const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
