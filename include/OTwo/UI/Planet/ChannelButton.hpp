@@ -43,7 +43,6 @@ private:
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
     void OnControlStateChanged(Control *sender, State state) override;
-    void Invalidate() override;
 
     Gx::Image  *m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
     Gx::Number *m_numberIndicator;

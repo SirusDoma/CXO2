@@ -3,23 +3,31 @@
 namespace Gx
 {
     Button::Button(const sf::Texture &texture) :
-        Sprite(texture)
+        m_vertices(),
+        m_texture(nullptr)
     {
-    }
-
-    Button::Button(const sf::Texture &texture, const sf::IntRect &rectangle) :
-        Sprite(texture, rectangle)
-    {
+        SetTexture(texture);
     }
 
     const sf::Color &Button::GetColor() const
     {
-        return Sprite::GetColor();
+        return m_vertices[0].color;
     }
 
     void Button::SetColor(const sf::Color &color)
     {
-        Sprite::SetColor(color);
+        for (auto &vertex : m_vertices)
+            vertex.color = color;
+    }
+
+    const sf::Texture* Button::GetTexture() const
+    {
+        return m_texture;
+    }
+
+    const sf::IntRect& Button::GetTextCoords() const
+    {
+        return m_stateData[GetControlState()].TexCoords;
     }
 
     sf::FloatRect Button::GetLocalBounds() const
@@ -49,14 +57,9 @@ namespace Gx
         );
     }
 
-    sf::FloatRect Button::GetGlobalBounds() const
-    {
-        return Control::GetGlobalBounds();
-    }
-
     void Button::SetTexture(const sf::Texture &texture)
     {
-        Sprite::SetTexture(texture);
+        m_texture = &texture;
     }
 
     Button::Frame Button::GetStateFrame(const Control::State state) const
@@ -68,12 +71,6 @@ namespace Gx
     {
         m_stateData[state] = frame;
         Invalidate();
-    }
-
-    void Button::ApplyFrame(const Button::Frame &frame)
-    {
-        SetTexCoords(frame.TexCoords);
-        SetColor(frame.Color);
     }
 
     void Button::PerformClick()
@@ -91,12 +88,49 @@ namespace Gx
         OnControlClick(this, sf::Event::MouseButtonEvent{});
     }
 
+    Button::Frame Button::GetCurrentFrame() const
+    {
+        return m_stateData[GetControlState()];
+    }
+
     RenderStates Button::Render(RenderSurface &surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
 
-        return Sprite::Render(surface, states);
+        states.transform     *= GetTransform();
+        states.coordinateType = sf::CoordinateType::Pixels;
+
+        if (m_texture)
+        {
+            states.texture = m_texture;
+            surface.Render(m_vertices.data(), m_vertices.size(), sf::PrimitiveType::TriangleStrip, states);
+        }
+
+        return RenderableContainer::Render(surface, states);
+    }
+
+    void Button::UpdatePositions()
+    {
+        const auto bounds = GetCurrentFrame().TexCoords;
+        m_vertices[0].position = sf::Vector2f(0, 0);
+        m_vertices[1].position = sf::Vector2f(0, bounds.height);
+        m_vertices[2].position = sf::Vector2f(bounds.width, 0);
+        m_vertices[3].position = sf::Vector2f(bounds.width, bounds.height);
+    }
+
+    void Button::UpdateTexCoords()
+    {
+        const auto bounds = GetCurrentFrame().TexCoords;
+        const auto left = static_cast<float>(bounds.left);
+        const float right = left + static_cast<float>(bounds.width);
+        const auto top = static_cast<float>(bounds.top);
+        const float bottom = top + static_cast<float>(bounds.height);
+
+        m_vertices[0].texCoords = sf::Vector2f(left, top);
+        m_vertices[1].texCoords = sf::Vector2f(left, bottom);
+        m_vertices[2].texCoords = sf::Vector2f(right, top);
+        m_vertices[3].texCoords = sf::Vector2f(right, bottom);
     }
 
     void Button::Invalidate()
@@ -104,7 +138,9 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        const auto frame = m_stateData[GetControlState()];
-        ApplyFrame(frame);
+        const auto frame = GetCurrentFrame();
+        SetColor(frame.Color);
+        UpdatePositions();
+        UpdateTexCoords();
     }
 }

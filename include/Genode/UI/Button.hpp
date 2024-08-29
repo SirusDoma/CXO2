@@ -12,7 +12,7 @@
 
 namespace Gx
 {
-    class Button : public virtual Control, public virtual Colorable, Sprite
+    class Button : public virtual Control, public virtual Colorable
     {
     public:
         struct Frame
@@ -23,16 +23,15 @@ namespace Gx
 
         Button() = default;
         explicit Button(const sf::Texture& texture);
-        Button(const sf::Texture& texture, const sf::IntRect& rectangle);
 
         ~Button() override = default;
 
         const sf::Color &GetColor() const override;
         void SetColor(const sf::Color &color) override;
 
+        const sf::Texture* GetTexture() const;
+        const sf::IntRect& GetTextCoords() const;
         sf::FloatRect GetLocalBounds() const override;
-        // ReSharper disable once CppHidingFunction
-        sf::FloatRect GetGlobalBounds() const;
 
         void SetTexture(const sf::Texture &texture);
         void SetStateFrame(Control::State state, const Frame &frame);
@@ -40,13 +39,18 @@ namespace Gx
         void PerformClick();
 
     protected:
-        Frame GetStateFrame(Control::State state) const;
-        void ApplyFrame(const Button::Frame& frame);
-
+        virtual Button::Frame GetCurrentFrame() const;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+
+        Frame GetStateFrame(Control::State state) const;
         void Invalidate() override;
 
-    private:
+     private:
+        void UpdatePositions();
+        void UpdateTexCoords();
+
+        std::array<sf::Vertex, 4> m_vertices;
+        const sf::Texture* m_texture;
         mutable std::unordered_map<Control::State, Frame> m_stateData;
     };
 }

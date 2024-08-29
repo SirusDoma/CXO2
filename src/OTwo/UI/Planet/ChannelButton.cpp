@@ -146,8 +146,3 @@ void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::Stat
 
     Control::OnControlStateChanged(sender, state);
 }
-
-void ChannelButton::Invalidate()
-{
-    Gx::RadioButton::Invalidate();
-}

@@ -34,19 +34,14 @@ namespace Gx
             SetCheckedState(!IsChecked());
     }
 
-    void CheckBox::Invalidate()
+    Button::Frame CheckBox::GetCurrentFrame() const
     {
-        if (!IsEnabled())
-            return;
-
-        Frame frame;
         if (IsChecked())
-            frame = GetStateFrame(CheckBox::State::Active);
-        else if (GetControlState() == CheckBox::State::Active)
-            frame = GetStateFrame(CheckBox::State::Hover);
-        else
-            frame = GetStateFrame(GetControlState());
+            return GetStateFrame(CheckBox::State::Active);
 
-        ApplyFrame(frame);
+        if (GetControlState() == CheckBox::State::Active)
+            return GetStateFrame(CheckBox::State::Hover);
+
+        return GetStateFrame(GetControlState());
     }
 }

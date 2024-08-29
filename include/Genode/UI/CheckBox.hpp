@@ -21,8 +21,7 @@ namespace Gx
 
     protected:
         void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
-
-        void Invalidate() override;
+        Frame GetCurrentFrame() const override;
 
     private:
         bool m_isChecked = false;
