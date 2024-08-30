@@ -24,10 +24,10 @@ include_directories(extlibs/headers)
 
 # Default flags
 if (NOT CMAKE_BUILD_TYPE)
-    message("[Warning] CMAKE_BUILD_TYPE is not set. Falling back to Release")
+    message("-- [Warning] CMAKE_BUILD_TYPE is not set. Falling back to Release")
     set(CMAKE_BUILD_TYPE "Release")
 endif()
-message("Build type: " ${CMAKE_BUILD_TYPE})
+message("-- Build type: " ${CMAKE_BUILD_TYPE})
 
 # External Libs Sources and Flags
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
@@ -72,7 +72,7 @@ check_include_files("gtk/gtk.h" GTK_AVAILABLE)
 set(USE_BOXER WIN32 OR APPLE OR GTK_AVAILABLE)
 if(USE_BOXER)
     # -- Boxer Flags
-    message("System message box: Boxer")
+    message("-- System message box: Boxer")
     add_compile_definitions(USE_BOXER)
     set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
     fetchcontent_declare(
@@ -83,7 +83,7 @@ if(USE_BOXER)
     fetchcontent_makeavailable(Boxer)
 else()
     # -- MessageBox-X11 Flags
-    message("System message box: MessageBox-X11")
+    message("-- System message box: MessageBox-X11")
     fetchcontent_declare(
         MessageBoxX11
         GIT_REPOSITORY https://github.com/Eleobert/MessageBox-X11.git
@@ -132,11 +132,11 @@ if(WIN32)
 elseif(APPLE)
     # App Arch
     if (NOT CMAKE_OSX_ARCHITECTURES)
-        message("[Warning] CMAKE_OSX_ARCHITECTURES is not set. Falling back to CMAKE_HOST_SYSTEM_PROCESSOR")
+        message("-- [Warning] CMAKE_OSX_ARCHITECTURES is not set. Falling back to CMAKE_HOST_SYSTEM_PROCESSOR")
         set(CMAKE_OSX_ARCHITECTURES ${CMAKE_HOST_SYSTEM_PROCESSOR})
     endif()
 
-    message("Architecture: " ${CMAKE_OSX_ARCHITECTURES})
+    message("-- Architecture: " ${CMAKE_OSX_ARCHITECTURES})
 
     # App Icon
     set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources/)
@@ -182,8 +182,8 @@ else()
 
     # Compiler Flags
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8)
-        message("FileSystem is not supported with your compiler version.")
-        message("Compiler Version: " ${CMAKE_CXX_COMPILER_VERSION})
+        message("-- FileSystem is not supported with your compiler version.")
+        message("-- Compiler Version: " ${CMAKE_CXX_COMPILER_VERSION})
     endif()
 
     # Output Directory
@@ -210,8 +210,7 @@ else()
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++fs)
 endif()
 
-message("Output Directory: " ${OUTPUT_DIR})
-message("")
+message("-- Output Directory: " ${OUTPUT_DIR})
 
 # Link JSON
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
