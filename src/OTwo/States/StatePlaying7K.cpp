@@ -67,9 +67,9 @@ void StatePlaying7K::Initialize()
     m_context = PrepareContext();
     m_config  = &Require<GameConfig>();
 
-    const auto& session = Require<SessionContext>();
-    auto& room    = session.GetCurrentRoom();
-    const auto& items   = Require<ItemFactory>();
+    auto& session     = Require<SessionContext>();
+    auto& room        = session.GetCurrentRoom();
+    const auto& items = Require<ItemFactory>();
 
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     chatPanel->Initialize();

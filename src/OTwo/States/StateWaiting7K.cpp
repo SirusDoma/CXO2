@@ -291,20 +291,7 @@ void StateWaiting7K::Initialize()
                     member.EquippedItemIDs.clear();
 
                     for (auto [_, equipedItem] : avatar->GetEquipedItems())
-                    {
-                        bool found = false;
-                        for (auto& [_, defaultItem] : defaultItems)
-                        {
-                            if (defaultItem->GetID() == equipedItem->GetID())
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                            member.EquippedItemIDs.push_back(equipedItem->GetID());
-                    }
+                        member.EquippedItemIDs.push_back(equipedItem->GetID());
                 }
 
                 session.SetCurrentRoom(data);

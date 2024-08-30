@@ -57,7 +57,13 @@ void Avatar::Equip(const Item *item, const bool reset)
 {
     if (item)
     {
-        if (const auto equipped = m_items[item->GetType()]; equipped && equipped->GetID() == item->GetID())
+        if (!item->IsEquipable())
+            return;
+
+        if (const auto equipped = m_items.find(item->GetType()); equipped != m_items.end() && equipped->second->GetID() == item->GetID())
+            return;
+
+        if (const auto equipped = m_items.find(EquipmentType::Costume); equipped != m_items.end())
             return;
 
         if (item->GetGender() != Gender::Any && item->GetGender() != m_gender)
@@ -68,6 +74,9 @@ void Avatar::Equip(const Item *item, const bool reset)
             for (const auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
                 Unequip(type);
         }
+
+        if (item->GetType() == EquipmentType::Costume)
+            ClearEquipments();
 
         m_items[item->GetType()] = item;
         switch (item->GetType())
@@ -113,7 +122,7 @@ void Avatar::Unequip(const Item *item)
     if (!item)
         return;
 
-    auto iterator = m_items.find(item->GetType());
+    const auto iterator = m_items.find(item->GetType());
     if (iterator == m_items.end())
         return;
 
@@ -131,16 +140,14 @@ void Avatar::Unequip(const Item *item)
         }
 
         m_items.erase(iterator);
-
-        iterator = m_defaultItems.find(item->GetType());
-        if (iterator != m_items.end())
-            Equip(iterator->second);
+        if (const auto defaultIterator = m_defaultItems.find(item->GetType()); defaultIterator != m_defaultItems.end())
+            Equip(defaultIterator->second);
     }
 }
 
 void Avatar::Unequip(const EquipmentType type)
 {
-    auto iterator = m_items.find(type);
+    const auto iterator = m_items.find(type);
     if (iterator == m_items.end())
         return;
 
@@ -156,9 +163,8 @@ void Avatar::Unequip(const EquipmentType type)
     }
 
     m_items.erase(iterator);
-    iterator = m_defaultItems.find(type);
-    if (iterator != m_defaultItems.end())
-        Equip(iterator->second);
+    if (const auto defaultIterator = m_defaultItems.find(type); defaultIterator != m_defaultItems.end())
+        Equip(defaultIterator->second);
 }
 
 bool Avatar::IsAlive() const
@@ -176,6 +182,22 @@ void Avatar::Revive()
     m_alive = true;
 }
 
+void Avatar::ResetRenderables()
+{
+    m_renderableStates.clear();
+    for (auto [_, item] : m_items)
+    {
+        for (const auto renderable : item->GetRenderables())
+            renderable->Reset();
+    }
+
+    for (auto [_, item] : m_defaultItems)
+    {
+        for (const auto renderable : item->GetRenderables())
+            renderable->Reset();
+    }
+}
+
 AvatarInfo* Avatar::GetAvatarInfo() const
 {
     return FindChild<AvatarInfo>("IDC_AVATAR_INFO");
@@ -186,9 +208,19 @@ const Instrument& Avatar::GetEquipedInstrumentType() const
     return m_instrument;
 }
 
-const std::unordered_map<EquipmentType, const Item*>& Avatar::GetEquipedItems() const
+std::unordered_map<EquipmentType, const Item*> Avatar::GetEquipedItems(const bool includeDefaultItems) const
 {
-    return m_items;
+    if (includeDefaultItems)
+        return m_items;
+
+    auto result = std::unordered_map<EquipmentType, const Item*>();
+    for (auto [type, item] : m_items)
+    {
+        if (auto it = m_defaultItems.find(type); it == m_defaultItems.end() || it->second != item)
+            result[type] = item;
+    }
+
+    return result;
 }
 
 void Avatar::Update(const double delta)
@@ -272,4 +304,7 @@ void Avatar::ClearEquipments()
 {
     m_items.clear();
     m_instrument = Instrument::None;
+
+    for (auto [_, item] : m_defaultItems)
+        Equip(item);
 }

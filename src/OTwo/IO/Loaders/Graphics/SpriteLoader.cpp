@@ -81,6 +81,8 @@ bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, 
         texCoords->at("height").get_to(h);
         metadata.TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
     }
+    else
+        metadata.TexCoords = sf::IntRect();
 
     return true;
 }

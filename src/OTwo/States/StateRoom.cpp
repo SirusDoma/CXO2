@@ -56,7 +56,7 @@ void StateRoom::Initialize()
     for (auto [_, item] : items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
-    for (const auto id : player.Inventory)
+    for (const auto id : player.EquippedItemIDs)
     {
         if (const auto item = items.GetItem(id); item)
             avatar->Equip(item);

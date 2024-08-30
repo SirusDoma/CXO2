@@ -10,7 +10,7 @@ SessionContext::SessionContext(const Player &player) :
 {
 }
 
-const Player &SessionContext::GetCurrentPlayer() const
+Player& SessionContext::GetCurrentPlayer()
 {
     return m_player;
 }

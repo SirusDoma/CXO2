@@ -135,8 +135,8 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     Initialize();
 
-    auto& app    = Gx::Application::Instance();
-    const auto session = app.Require<SessionContext>();
+    auto& app     = Gx::Application::Instance();
+    auto& session = app.Require<SessionContext>();
 
     const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
     const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");

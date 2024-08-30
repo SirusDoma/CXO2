@@ -13,6 +13,8 @@
 class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
+    using ItemMap = std::unordered_map<EquipmentType, const Item*>;
+
     Avatar();
     explicit Avatar(Gender gender);
 
@@ -31,17 +33,16 @@ public:
 
     AvatarInfo* GetAvatarInfo() const;
     const Instrument& GetEquipedInstrumentType() const;
-    const std::unordered_map<EquipmentType, const Item*> &GetEquipedItems() const;
+    std::unordered_map<EquipmentType, const Item*> GetEquipedItems(bool includeDefaultItems = false) const;
 
     bool IsAlive() const;
     void Die();
     void Revive();
 
+    void ResetRenderables();
 
 private:
-    using ItemMap            = std::unordered_map<EquipmentType, const Item*>;
-    using RenderableStateMap = std::unordered_map<const Gx::Updatable*, unsigned int>;
-
+     using RenderableStateMap = std::unordered_map<const Gx::Updatable*, unsigned int>;
      static constexpr std::array<std::pair<EquipmentType, RenderPart>, 100> RenderLayerOrder = {
          {
             { EquipmentType::Costume,            RenderPart::Cape },

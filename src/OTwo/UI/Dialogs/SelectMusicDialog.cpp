@@ -83,7 +83,7 @@ void SelectMusicDialog::Initialize()
                 return;
 
             const unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
-            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+            const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
             if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
                 return;
 
@@ -484,7 +484,7 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
         if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
             const auto children = list->GetChildren();
-            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+            const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
             for (int i = 0; i < children.size(); i++)
             {
                 const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
@@ -533,7 +533,7 @@ void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
         if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
             const auto children = list->GetChildren();
-            const unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
+            const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
 
             if (m_page == maxPage - 1)
                 return;
@@ -784,7 +784,7 @@ void SelectMusicDialog::Invalidate()
 
     auto elements = musicSelector->GetChildren();
     unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
-    unsigned int maxPage = ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+    unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
 
     if (!m_music.Source.empty())
     {
@@ -1071,7 +1071,7 @@ void SelectMusicDialog::Invalidate()
         if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
         {
             float seconds = metadata.Duration.asSeconds();
-            int minute    = floor(seconds / 60);
+            int minute    = std::floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
             duration->SetString("[" + std::to_string(minute) + ":" + Gx::StringHelper::ToString(remainder, 2) + "]");

@@ -22,8 +22,8 @@ void StateResult::Initialize()
     State::Initialize();
 
     auto& mixer              = Require<Gx::Mixer>();
+    auto& session            = Require<SessionContext>();
     const auto& scoreTracker = Require<ScoreTracker>();
-    const auto& session      = Require<SessionContext>();
 
     if (const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BACKGROUND"); container)
     {

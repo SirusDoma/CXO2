@@ -25,7 +25,7 @@ public:
     SessionContext() = default;
     explicit SessionContext(const Player &player);
 
-    const Player &GetCurrentPlayer() const;
+    Player& GetCurrentPlayer();
 
     Planet GetPlanet() const;
     void SetPlanet(Planet planet);

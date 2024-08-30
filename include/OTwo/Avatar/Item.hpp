@@ -28,6 +28,8 @@ public:
     EquipmentType GetType() const;
     void SetType(EquipmentType type);
 
+    bool IsEquipable() const;
+
     Instrument GetInstrument() const;
 
     Planet GetOrigin() const;

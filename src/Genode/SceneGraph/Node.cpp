@@ -131,6 +131,9 @@ namespace Gx
 
     void Node::ClearChildren()
     {
+        for (const auto child : m_children)
+            child->m_parent = nullptr;
+
         m_children.clear();
     }
 }

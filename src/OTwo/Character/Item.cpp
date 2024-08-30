@@ -24,6 +24,11 @@ void Item::SetType(const EquipmentType type)
     m_type = type;
 }
 
+bool Item::IsEquipable() const
+{
+    return m_type != EquipmentType::AttributiveItem;
+}
+
 Planet Item::GetOrigin() const
 {
     return m_origin;
