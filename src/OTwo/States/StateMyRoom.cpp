@@ -102,7 +102,7 @@ void StateMyRoom::Initialize()
     });
 
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
-    backButton->SetClickCallback([this, slots = bagSlots] (auto&, auto&)
+    backButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Present<StateRoom>();
     });

@@ -16,6 +16,5 @@
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 #include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
 #include <Genode/Graphics/SpriteBatch.hpp>
-#include <Genode/Graphics/Cursor.hpp>
 
 #endif

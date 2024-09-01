@@ -11,6 +11,7 @@
 #include <Genode/UI/ToolTip.hpp>
 
 #include <magic_enum.hpp>
+#include <Genode/UI/Cursor.hpp>
 
 OptionDialog::OptionDialog(const Gx::Dialog &copy) :
     Gx::Node(copy),
@@ -219,6 +220,12 @@ void OptionDialog::Initialize()
 
         auto& application = Gx::Application::Instance();
         application.Require<GameConfig>().Apply(m_config);
+
+        if (const auto cursor = application.GetCursor(); cursor)
+        {
+            cursor->SetEnabled(!m_config.UseWindowCursor);
+            application.InvalidateCursor();
+        }
 
         m_keyChannel = Chart::Channel::Note1;
         keySelect->SetFrame(0);

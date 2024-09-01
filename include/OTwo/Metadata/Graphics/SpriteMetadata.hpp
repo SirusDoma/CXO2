@@ -8,7 +8,6 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-
 struct SpriteMetadata : TransformMetadata
 {
     ~SpriteMetadata() override = default;

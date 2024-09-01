@@ -1,6 +1,7 @@
 #ifndef GENODE_UI_HPP
 #define GENODE_UI_HPP
 
+#include <Genode/UI/Cursor.hpp>
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>

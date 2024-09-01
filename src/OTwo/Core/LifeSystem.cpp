@@ -1,4 +1,5 @@
 #include <OTwo/Core/LifeSystem.hpp>
+#include <Genode/System/Exception.hpp>
 
 LifeSystem::LifeSystem(Difficulty diff) :
     m_difficulty(Difficulty::MX),

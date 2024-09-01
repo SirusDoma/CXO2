@@ -1,3 +1,4 @@
+#include <Genode/Graphics/Font.hpp>
 #include <Genode/UI/TextBox.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 

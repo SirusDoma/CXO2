@@ -25,20 +25,18 @@
 #ifndef GENODE_GRAPHICS_TEXT_HPP
 #define GENODE_GRAPHICS_TEXT_HPP
 
-#include <Genode/SceneGraph.hpp>
-#include <Genode/Entities.hpp>
+#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/SceneGraph/RenderableContainer.hpp>
+#include <Genode/SceneGraph/UpdatableContainer.hpp>
+#include <Genode/SceneGraph/InputableContainer.hpp>
+#include <Genode/Entities/Colorable.hpp>
 #include <Genode/System/Primitives.hpp>
 
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <SFML/Window/Event.hpp>
 #include <SFML/System.hpp>
 
-#include <string>
-#include <vector>
 #include <unordered_map>
 #include <memory>
 

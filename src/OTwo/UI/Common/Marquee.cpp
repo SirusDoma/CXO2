@@ -1,5 +1,8 @@
 #include <OTwo/UI/Common/Marquee.hpp>
 
+#include <Genode/System/Exception.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+
 Marquee::Marquee() :
     m_renderTexture(std::make_unique<sf::RenderTexture>()),
     m_speed()

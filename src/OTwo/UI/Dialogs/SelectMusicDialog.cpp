@@ -8,7 +8,14 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
 
-#include <Genode/UI.hpp>
+#include <Genode/System/Application.hpp>
+#include <Genode/SceneGraph/Scene.hpp>
+#include <Genode/UI/Image.hpp>
+#include <Genode/UI/Label.hpp>
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/RadioButton.hpp>
+#include <Genode/UI/List.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <magic_enum.hpp>

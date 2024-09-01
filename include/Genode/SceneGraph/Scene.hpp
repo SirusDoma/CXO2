@@ -14,7 +14,6 @@
 #include <Genode/Tasks/TaskContainer.hpp>
 
 #include <queue>
-#include <Genode/System/Application.hpp>
 
 namespace Gx
 {
@@ -29,27 +28,27 @@ namespace Gx
 
         ~Scene() override;
 
-        Application &GetApplication() const;
-        SceneDirector &GetDirector() const;
+        Application& GetApplication() const;
+        SceneDirector& GetDirector() const;
 
         sf::View GetView() const;
         sf::View GetVirtualView() const;
         sf::View GetDefaultView() const;
 
-        Node *GetCurrentOverlay() const;
-        void PushOverlay(Node *overlay);
+        Node* GetCurrentOverlay() const;
+        void PushOverlay(Node* overlay);
         void CloseOverlay();
 
         template<typename T>
-        T &Require() const;
+        T& Require() const;
 
-        void Queue(const std::function<void()> &evt);
+        void Queue(const std::function<void()>& evt);
 
     protected:
         void Initialize() override;
         virtual bool Close(bool quit);
 
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(sf::Event ev) override;
 
@@ -63,14 +62,14 @@ namespace Gx
 
         mutable sf::View m_view;
 
-        SceneDirector     *m_director;
+        SceneDirector*     m_director;
         std::vector<Node*> m_overlays;
 
         sf::Event m_lastInput;
         std::queue<std::function<void()>> m_events;
 
         void SetDirector(SceneDirector& director);
-        void SetView(const sf::View &view);
+        void SetView(const sf::View& view);
     };
 }
 

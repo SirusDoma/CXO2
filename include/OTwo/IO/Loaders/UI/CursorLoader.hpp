@@ -1,0 +1,16 @@
+#ifndef O2JAM_CURSOR_LOADER_HPP
+#define O2JAM_CURSOR_LOADER_HPP
+
+#include <OTwo/IO/ResourceLoader.hpp>
+#include <OTwo/Metadata/UI/CursorMetadata.hpp>
+
+class CursorLoader : public ResourceLoader<Gx::Cursor>
+{
+public :
+    CursorLoader() = default;
+
+    Gx::ResourcePtr<Gx::Cursor> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<Gx::Cursor> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+};
+
+#endif

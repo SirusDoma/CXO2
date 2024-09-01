@@ -11,6 +11,7 @@
 #include <OTwo/IO/Loaders/Audio/MusicLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
 
+#include <OTwo/IO/Loaders/UI/CursorLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ImageLoader.hpp>
 #include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ToolTipLoader.hpp>
@@ -69,8 +70,6 @@
 
 void O2Jam::Boot()
 {
-    Gx::Application::Boot();
-
     // Asset Path
     Gx::LocalFileSystem::AddAssetPath("./assets");
     Gx::LocalFileSystem::AddAssetPath("./assets/Music");
@@ -86,6 +85,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();
     // UI
+    Gx::ResourceLoaderFactory::Register<Gx::Cursor, CursorLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
@@ -165,6 +165,11 @@ void O2Jam::Boot()
         player.Name   = "CXO2";
         player.Level  = -1;
         player.Gender = Gender::Male;
+        player.Inventory = { 582,  1534, 342,  115,  255,
+                             312,  112,  811,  722,  821,
+                             1195, 1104, 1042, 1055, 1461,
+                             1481, 44,   1493, 1269, 1084,
+                             1494 };
 
         auto session  = std::make_unique<SessionContext>(player);
         return session;
@@ -179,6 +184,10 @@ void O2Jam::Boot()
     {
         return std::make_unique<ScoreTracker>();
     });
+
+    // Load cursor
+    auto& cursor = Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json");
+    SetCursor(cursor);
 
     // Force to load heavy providers during start-up
     auto _ = Require<SessionContext>().GetInstalledMusic();
@@ -218,37 +227,6 @@ void O2Jam::Boot()
     director.Present<StateAvi>();
 }
 
-Gx::RenderStates O2Jam::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
-{
-    return Application::Render(surface, states);
-}
-
-void O2Jam::Update(const double delta)
-{
-    Application::Update(delta);
-
-    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
-    {
-        m_switched = true;
-        SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
-    }
-    else if (m_switched && !isKeyPressed(sf::Keyboard::Key::Enter))
-        m_switched = false;
-}
-
-void O2Jam::Shutdown()
-{
-    Application::Shutdown();
-
-    auto& resources = Require<Gx::ResourceManager>();
-    auto& mixer     = Require<Gx::Mixer>();
-    auto& director  = GetSceneDirector();
-
-    mixer.Clear();
-    director.Unload();
-    resources.Clear();
-}
-
 void O2Jam::OnFocusChanged(const bool focus)
 {
     Application::OnFocusChanged(focus);
@@ -283,4 +261,37 @@ void O2Jam::OnFocusChanged(const bool focus)
 
         mixer.PauseAll();
     }
+}
+
+int O2Jam::Shutdown()
+{
+    Application::Shutdown();
+
+    auto& resources = Require<Gx::ResourceManager>();
+    auto& mixer     = Require<Gx::Mixer>();
+    auto& director  = GetSceneDirector();
+
+    mixer.Clear();
+    director.Unload();
+    resources.Clear();
+
+    return 0;
+}
+
+void O2Jam::Update(const double delta)
+{
+    Application::Update(delta);
+
+    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
+    {
+        m_switched = true;
+        SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
+    }
+    else if (m_switched && !isKeyPressed(sf::Keyboard::Key::Enter))
+        m_switched = false;
+}
+
+Gx::RenderStates O2Jam::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+{
+    return Application::Render(surface, states);
 }

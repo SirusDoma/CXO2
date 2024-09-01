@@ -4,6 +4,7 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
 
+#include <Genode/System/Provider.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 #include <map>

@@ -2,7 +2,6 @@
 #define GENODE_SYSTEM_APPLICATION_HPP
 
 #include <Genode/Audio/Mixer.hpp>
-#include <Genode/Graphics/Cursor.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <Genode/Graphics/RenderTargetAdapter.hpp>
 #include <Genode/IO/ResourceManager.hpp>
@@ -18,36 +17,39 @@ namespace Gx
 {
     class Scene;
     class Provider;
+    class Cursor;
     class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
-        static Application &Instance();
+        static Application& Instance();
 
-        explicit Application(const std::string &title, const sf::VideoMode &mode, bool fullScreen = false);
-        Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, bool fullScreen = false);
+        explicit Application(const std::string& title, const sf::VideoMode& mode, bool fullScreen = false);
+        Application(const std::string& title, const sf::VideoMode& mode, const sf::VideoMode& gameVideoMode, bool fullScreen = false);
 
         ~Application() override = default;
 
         int Start();
-        int Start(Scene &scene);
+        int Start(Scene& scene);
         void Close();
 
-        SceneDirector &GetSceneDirector() const;
+        SceneDirector& GetSceneDirector() const;
         unsigned int GetRenderFrequency() const;
 
         sf::State GetWindowState() const;
         void SetWindowState(const sf::State state);
 
         const sf::Color& GetClearColor() const;
-        void SetClearColor(const sf::Color &clearColor);
+        void SetClearColor(const sf::Color& clearColor);
 
-        void SetCursor(Cursor &cursor);
+        Cursor* GetCursor() const;
+        void SetCursor(Cursor& cursor);
+        void InvalidateCursor() const;
 
         sf::View GetVirtualView() const;
         static sf::VideoMode GetDesktopVideoMode();
 
         template<typename T>
-        T &Provide();
+        T& Provide();
 
         template<typename T>
         bool Provide(std::function<std::unique_ptr<T>(Application&)> builder);
@@ -56,30 +58,33 @@ namespace Gx
         bool Uninstall();
 
         template<typename T>
-        T &Require();
+        T& Require();
 
+        // ReSharper disable CppNonExplicitConversionOperator
         operator sf::RenderTarget&() const;
         operator sf::RenderWindow&() const;
         operator RenderSurface&() const;
+        // ReSharper restore CppNonExplicitConversionOperator
 
     protected:
-        sf::RenderWindow &GetRenderWindow() const;
+        sf::RenderWindow& GetRenderWindow() const;
 
         virtual void Boot();
-        virtual void Shutdown();
+        virtual int Shutdown();
 
         void Update(double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(sf::Event::SizeEvent ev);
-        virtual void OnInputReceived(sf::Event ev);
+        virtual void OnInputReceived(sf::Event& ev);
         virtual void OnClose();
 
     private:
         using ProviderMap        = std::unordered_map<std::type_index, std::unique_ptr<Provider>>;
         using ProviderFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Provider>(Application&)>>;
 
+        void UpdateCursor(const sf::Event &ev) const;
         void SetupWindow() const;
         void SetupTarget() const;
         static sf::View GetLetterBoxView(sf::View view, sf::Vector2u size);
@@ -93,8 +98,8 @@ namespace Gx
         sf::Event m_event;
         sf::State m_state;
 
-        sf::VideoMode m_mode;
-        sf::VideoMode m_virtualMode;
+        sf::VideoMode m_windowVideoMode;
+        sf::VideoMode m_gameVideoMode;
         Cursor* m_cursor;
 
         ProviderMap        m_providers;

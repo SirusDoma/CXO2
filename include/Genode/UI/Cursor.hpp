@@ -1,0 +1,75 @@
+#ifndef GENODE_GRAPHICS_CURSOR_HPP
+#define GENODE_GRAPHICS_CURSOR_HPP
+
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Image.hpp>
+#include <SFML/Window/Cursor.hpp>
+#include <SFML/Graphics/View.hpp>
+
+#include <unordered_map>
+
+namespace Gx 
+{
+    class Cursor
+    {
+    public:
+        enum class Type
+        {
+            Arrow,                  //!< Arrow cursor (default)
+            ArrowWait,              //!< Busy arrow cursor
+            Click,                  //!< Click cursor
+            Wait,                   //!< Busy cursor
+            Text,                   //!< I-beam, cursor when hovering over a field allowing text entry
+            Hand,                   //!< Pointing hand cursor
+            SizeHorizontal,         //!< Horizontal double arrow cursor
+            SizeVertical,           //!< Vertical double arrow cursor
+            SizeTopLeftBottomRight, //!< Double arrow cursor going from top-left to bottom-right
+            SizeBottomLeftTopRight, //!< Double arrow cursor going from bottom-left to top-right
+            SizeLeft,               //!< Left arrow cursor on Linux, same as SizeHorizontal on other platforms
+            SizeRight,              //!< Right arrow cursor on Linux, same as SizeHorizontal on other platforms
+            SizeTop,                //!< Up arrow cursor on Linux, same as SizeVertical on other platforms
+            SizeBottom,             //!< Down arrow cursor on Linux, same as SizeVertical on other platforms
+            SizeTopLeft,            //!< Top-left arrow cursor on Linux, same as SizeTopLeftBottomRight on other platforms
+            SizeBottomRight,        //!< Bottom-right arrow cursor on Linux, same as SizeTopLeftBottomRight on other platforms
+            SizeBottomLeft,         //!< Bottom-left arrow cursor on Linux, same as SizeBottomLeftTopRight on other platforms
+            SizeTopRight,           //!< Top-right arrow cursor on Linux, same as SizeBottomLeftTopRight on other platforms
+            SizeAll,                //!< Combination of SizeHorizontal and SizeVertical
+            Cross,                  //!< Crosshair cursor
+            Help,                   //!< Help cursor
+            NotAllowed              //!< Action not allowed cursor
+        };
+
+        Cursor();
+        explicit Cursor(const sf::Texture& texture, sf::Vector2u hotspot = sf::Vector2u());
+        explicit Cursor(const sf::Image& image, sf::Vector2u hotspot = sf::Vector2u());
+
+        bool IsEnabled() const;
+
+        void SetEnabled(const bool enabled);
+
+        void Register(Type type, const sf::Texture& texture, sf::Vector2u hotspot = sf::Vector2u());
+        void Register(Type type, const sf::Image& image, sf::Vector2u hotspot = sf::Vector2u());
+
+        const sf::Cursor& GetHandle(Type type = Type::Arrow) const;
+        Type GetLastRetrievedHandleType() const;
+
+        bool UpdateViewport(const sf::Vector2u& viewport);
+    private:
+        struct CursorHandle
+        {
+            sf::Cursor   Handle;
+            sf::Image    Source;
+            sf::Vector2u InitialSize;
+            sf::Vector2u Hotspot;
+        };
+
+        bool m_enabled;
+        mutable Type m_lastHandleType;
+        sf::Cursor m_defaultCursor;
+        std::unordered_map<Type, CursorHandle> m_cursors;
+        sf::Vector2u m_defaultViewSize;
+        sf::Vector2u m_lastViewport;
+    };
+}
+
+#endif

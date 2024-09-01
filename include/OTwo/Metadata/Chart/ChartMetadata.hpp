@@ -6,11 +6,9 @@
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/IO/ResourceLoader.hpp>
 #include <Genode/System/Primitives.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Time.hpp>
 
 enum class Genre

@@ -3,15 +3,16 @@
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/System/Provider.hpp>
+#include <Genode/UI/Cursor.hpp>
 
 namespace Gx
 {
-    Application::Application(const std::string &title, const sf::VideoMode &mode, const bool fullScreen)
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const bool fullScreen)
         : Application(title, mode, mode, fullScreen)
     {
     }
 
-    Application::Application(const std::string &title, const sf::VideoMode &mode, const sf::VideoMode &virtualMode, const bool fullScreen) :
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::VideoMode& gameVideoMode, const bool fullScreen) :
         m_target(std::make_unique<sf::RenderTexture>()),
         m_adapter(*this),
         m_director(SceneDirector(*this)),
@@ -23,15 +24,15 @@ namespace Gx
         m_frames(0),
         m_renderFreq(0)
     {
-        m_mode           = mode;
-        m_virtualMode    = virtualMode;
-        m_fullScreen     = fullScreen;
-        m_closeRequested = false;
+        m_windowVideoMode = mode;
+        m_gameVideoMode   = gameVideoMode;
+        m_fullScreen      = fullScreen;
+        m_closeRequested  = false;
 
         SetWindowState(fullScreen ? sf::State::Fullscreen : sf::State::Windowed);
     }
 
-    Application &Application::Instance()
+    Application& Application::Instance()
     {
         if (!m_instance)
             throw Exception("Application is not instantiated yet.");
@@ -53,6 +54,9 @@ namespace Gx
         // Bootstrap the game
         Boot();
 
+        // Update cursor viewport
+        UpdateCursor(sf::Event{});
+
         // Setup timer
         auto timer  = sf::Clock();
         double last = timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
@@ -67,11 +71,19 @@ namespace Gx
                 // Call window event handlers based on received event
                 switch (event.type)
                 {
-                    case sf::Event::Closed:      OnClose();              break;
-                    case sf::Event::GainedFocus: OnFocusChanged(true);   break;
-                    case sf::Event::LostFocus:   OnFocusChanged(false);  break;
-                    case sf::Event::Resized:     OnResized(event.size);  break;
-                    default:                     OnInputReceived(event); break;
+                    case sf::Event::Closed:              OnClose();              break;
+                    case sf::Event::GainedFocus:         OnFocusChanged(true);   break;
+                    case sf::Event::LostFocus:           OnFocusChanged(false);  break;
+                    case sf::Event::Resized:             OnResized(event.size);  break;
+                    case sf::Event::MouseButtonPressed:
+                    case sf::Event::MouseButtonReleased:
+                    {
+                        UpdateCursor(event);
+                        OnInputReceived(event);
+
+                        break;
+                    }
+                    default:                             OnInputReceived(event); break;
                 }
             }
 
@@ -146,11 +158,8 @@ namespace Gx
             m_frames++;
         }
 
-        // Clean up
-        Shutdown();
-
-        // Application exit code
-        return 0;
+        // Clean up with application exit code
+        return Shutdown();
     }
 
     int Application::Start(Scene &scene)
@@ -159,12 +168,12 @@ namespace Gx
         return Start();
     }
 
-    sf::RenderWindow &Application::GetRenderWindow() const
+    sf::RenderWindow& Application::GetRenderWindow() const
     {
         return *m_window;
     }
 
-    SceneDirector &Application::GetSceneDirector() const
+    SceneDirector& Application::GetSceneDirector() const
     {
         return m_director;
     }
@@ -173,8 +182,9 @@ namespace Gx
     {
     }
 
-    void Application::Shutdown()
+    int Application::Shutdown()
     {
+        return 0;
     }
 
     void Application::Update(const double delta)
@@ -182,7 +192,7 @@ namespace Gx
         m_director.Update(delta);
     }
 
-    RenderStates Application::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Application::Render(RenderSurface &surface, const RenderStates states) const
     {
         return m_director.Render(surface, states);
     }
@@ -213,15 +223,15 @@ namespace Gx
         if (state == sf::State::Fullscreen)
         {
             if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
-                m_mode = fsModes.front();
+                m_windowVideoMode = fsModes.front();
             else
-                m_mode = GetDesktopVideoMode();
+                m_windowVideoMode = GetDesktopVideoMode();
         }
         else
-            m_mode = m_virtualMode;
+            m_windowVideoMode = m_gameVideoMode;
 
         m_window = std::make_unique<sf::RenderWindow>(
-            m_mode,
+            m_windowVideoMode,
             m_title,
             state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
             sf::State::Windowed
@@ -234,17 +244,11 @@ namespace Gx
         SetupWindow();
     }
 
-    void Application::SetCursor(Cursor& cursor)
-    {
-        m_cursor = &cursor;
-        m_window->setMouseCursor(m_cursor->GetHandle());
-    }
-
     sf::View Application::GetVirtualView() const
     {
         return sf::View(
-            { m_virtualMode.size.x / 2.f, m_virtualMode.size.y / 2.f },
-            { static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y) }
+            { m_gameVideoMode.size.x / 2.f, m_gameVideoMode.size.y / 2.f },
+            { static_cast<float>(m_gameVideoMode.size.x), static_cast<float>(m_gameVideoMode.size.y) }
         );
     }
 
@@ -256,14 +260,14 @@ namespace Gx
     {
     }
 
-    void Application::OnInputReceived(sf::Event ev)
+    void Application::OnInputReceived(sf::Event& ev)
     {
-        // Re-map mouse coordinate when using virtual mode
+        // Re-map mouse coordinate
         switch (ev.type)
         {
             case sf::Event::MouseMoved:
             {
-                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
+                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
                 ev.mouseMove = sf::Event::MouseMoveEvent{
                     static_cast<int>(position.x),
                     static_cast<int>(position.y)
@@ -274,7 +278,7 @@ namespace Gx
             case sf::Event::MouseButtonPressed:
             case sf::Event::MouseButtonReleased:
             {
-                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
+                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
                 ev.mouseButton = sf::Event::MouseButtonEvent{
                     ev.mouseButton.button,
                     static_cast<int>(position.x),
@@ -285,7 +289,7 @@ namespace Gx
             }
             case sf::Event::MouseWheelScrolled:
             {
-                auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
+                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
                 ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
                     ev.mouseWheelScroll.wheel,
                     ev.mouseWheelScroll.delta,
@@ -310,13 +314,26 @@ namespace Gx
             m_closeRequested = true;
     }
 
+    void Application::UpdateCursor(const sf::Event &ev) const
+    {
+        if (!m_cursor)
+            return;
+
+        auto type = Cursor::Type::Arrow;
+        if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Button::Left)
+            type = Cursor::Type::Click;
+
+        if (m_cursor->UpdateViewport(m_window->getSize()) || m_cursor->GetLastRetrievedHandleType() != type)
+            m_window->setMouseCursor(m_cursor->GetHandle(type));
+    }
+
     void Application::SetupWindow() const
     {
         // Set render frequency
         m_window->setVerticalSyncEnabled(true);
 
         // Setup view
-        const auto size = sf::Vector2f{static_cast<float>(m_virtualMode.size.x), static_cast<float>(m_virtualMode.size.y)};
+        const auto size = sf::Vector2f{static_cast<float>(m_gameVideoMode.size.x), static_cast<float>(m_gameVideoMode.size.y)};
         auto view = sf::View(
             {std::floor(size.x / 2.0f), std::floor(size.y / 2.0f)},
             size
@@ -327,20 +344,22 @@ namespace Gx
 
         m_window->setView(view);
         m_adapter = RenderTargetAdapter(*this);
+
+        UpdateCursor(sf::Event{});
     }
 
     void Application::SetupTarget() const
     {
         if (m_target->getSize().x == 0 || m_target->getSize().y == 0)
         {
-            if (!m_target->create(m_mode.size))
+            if (!m_target->create(m_windowVideoMode.size))
                 return;
 
             m_target->setSmooth(true);
         }
     }
 
-    sf::View Application::GetLetterBoxView(sf::View view, sf::Vector2u size)
+    sf::View Application::GetLetterBoxView(sf::View view, const sf::Vector2u size)
     {
         const float windowRatio = static_cast<float>(size.x) / static_cast<float>(size.y);
         const float viewRatio = view.getSize().x / static_cast<float>(view.getSize().y);
@@ -375,6 +394,23 @@ namespace Gx
     void Application::SetClearColor(const sf::Color &clearColor)
     {
         m_clearColor = clearColor;
+    }
+
+    Cursor* Application::GetCursor() const
+    {
+        return m_cursor;
+    }
+
+    void Application::SetCursor(Cursor& cursor)
+    {
+        m_cursor = &cursor;
+        m_cursor->UpdateViewport(sf::Vector2u(m_window->getView().getSize().x, m_window->getView().getSize().y));
+        m_window->setMouseCursor(m_cursor->GetHandle());
+    }
+
+    void Application::InvalidateCursor() const
+    {
+        m_window->setMouseCursor(m_cursor->GetHandle());
     }
 
     sf::VideoMode Application::GetDesktopVideoMode()

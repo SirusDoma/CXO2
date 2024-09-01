@@ -1,4 +1,5 @@
 #include <OTwo/Core/Chart.hpp>
+#include <Genode/System/Exception.hpp>
 
 #include <vector>
 

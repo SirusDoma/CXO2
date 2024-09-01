@@ -292,10 +292,10 @@ namespace Gx
                     m_clicked = false;
                     if (m_deltaClickDuration <= DOUBLE_CLICK_THRESHOLD)
                     {
-                        m_doubleClicked = true;
                         if (m_onDoubleClick)
                         {
                             auto uiEvent = Event{false, GetControlState()};
+                            m_doubleClicked = true;
                             m_onDoubleClick(*this, uiEvent);
 
                             SetControlState(uiEvent.State);
