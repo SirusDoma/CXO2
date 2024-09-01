@@ -160,11 +160,17 @@ void O2Jam::Boot()
 
     Provide<SessionContext>([&](auto &app)
     {
-        auto player   = Player();
-        player.ID     = 1;
-        player.Name   = "CXO2";
-        player.Level  = -1;
-        player.Gender = Gender::Male;
+        auto player    = Player();
+        player.ID      = 1;
+        player.Name    = "CXO2";
+        player.Level   = -1;
+        player.Rank    = 7;
+        player.Exp     = 11200;
+        player.NextExp = 345500;
+        player.Wins    = 100;
+        player.Draws   = 10;
+        player.Loses   = 5;
+        player.Gender  = Gender::Male;
         player.Inventory = { 582,  1534, 342,  115,  255,
                              312,  112,  811,  722,  821,
                              1195, 1104, 1042, 1055, 1461,

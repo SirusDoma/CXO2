@@ -31,19 +31,40 @@ enum class SongMode
     Random
 };
 
+enum class Role : Gx::Uint8
+{
+    Normal        = 0,
+    Administrator = 1
+};
+
+struct Guild
+{
+    Gx::Uint32  ID;
+    std::string Name;
+    Gx::Uint16  Ranking;
+};
+
 struct Player
 {
     using ItemList = std::vector<Gx::Uint32>;
 
     Gx::Uint32   ID;
+    ::Role       Role;
     std::string  Name;
-    Gx::Int32    Level;
+    Gx::Int16    Level;
+    Gx::Uint32   Rank;
+    Gx::Uint32   Exp;
+    Gx::Uint32   NextExp;
+    Gx::Uint32   EventPoint;
     ::Gender     Gender;
     Gx::Uint32   Gem;
     Gx::Uint32   Cash;
-    Gx::Int8     Administrator;
+    Gx::Uint32   Wins;
+    Gx::Uint32   Draws;
+    Gx::Uint32   Loses;
     ItemList     EquippedItemIDs;
     ItemList     Inventory;
+    ::Guild      Guild;
 };
 
 struct ChatMessage

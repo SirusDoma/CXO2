@@ -241,7 +241,7 @@ void ChatWindow::Invalidate()
 
         if (m_textColor == sf::Color::White)
         {
-            if (chat.Sender.Administrator || chat.Sender.ID == 0)
+            if (chat.Sender.Role == Role::Administrator || chat.Sender.ID == 0)
                 m_labels[index]->SetColor(sf::Color(200, 155, 55));
             else
                 m_labels[index]->SetColor(sf::Color::White);

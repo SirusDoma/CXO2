@@ -97,7 +97,7 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::
             for (auto [priceKey, priceValue] : price->items())
             {
                 std::string currencyString = Gx::StringHelper::ToPascalCase(priceKey);
-                if (auto parse = magic_enum::enum_cast<Currency>(currencyString); parse.has_value())
+                if (auto parse = magic_enum::enum_cast<Currency>(currencyString, magic_enum::case_insensitive); parse.has_value())
                     metadata.Prices[parse.value()] = priceValue.get<unsigned int>();
             }
         }

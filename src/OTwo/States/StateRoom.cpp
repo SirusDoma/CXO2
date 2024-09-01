@@ -99,7 +99,7 @@ void StateRoom::Initialize()
     userList->AddUser(session.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
-        userList->AddUser(Player{i + 3, "Dummy " + std::to_string(i), static_cast<int>(i) });
+        userList->AddUser(Player{i + 3, Role::Normal, "Dummy " + std::to_string(i), static_cast<signed short>(i) });
 
     const auto roomContainer = Instantiate<RoomContainer>("IDC_ROOM_CONTAINER");
     roomContainer->Initialize();
@@ -207,11 +207,11 @@ void StateRoom::Initialize()
                         RoomMember{session.GetCurrentPlayer(), RoomTeam::A, sf::Color::Transparent, 0, true},
                         {},
                         {},
-                        RoomMember{Player{2, "Random #1", 82, Gender::Male, 0, 0, false, {221, 304}}, RoomTeam::F, sf::Color::Transparent, 0, true},
+                        RoomMember{Player{2, Role::Normal,"Random #1", 82, 0, 0, 0, 0, Gender::Male, 0, 0, 0, 0, 0, {221, 304}}, RoomTeam::F, sf::Color::Transparent, 0, true},
                         {},
                         {},
                         {},
-                        RoomMember{Player{3, "Random #2", 79, Gender::Male, 0, 0, false, {39}}, RoomTeam::G, sf::Color::Transparent, 0, false}
+                        RoomMember{Player{3, Role::Normal, "Random #2", 79, 0, 0, 0, 0, Gender::Male, 0, 0, 0, 0, 0, {39}}, RoomTeam::G, sf::Color::Transparent, 0, false}
                     }
                 });
                 director.Present<StateWaiting7K>();
