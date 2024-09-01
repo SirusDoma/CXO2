@@ -43,7 +43,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
         equips({
             "Avatar/default/male/Face.json",
             "Avatar/default/male/Hair.json",
-            "Avatar/default/male/Jacket.json",
+            "Avatar/default/male/Top.json",
             "Avatar/default/male/Pants.json",
             "Avatar/default/male/Shoes.json"
         });
@@ -53,7 +53,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
         equips({
             "Avatar/default/female/Face.json",
             "Avatar/default/female/Hair.json",
-            "Avatar/default/female/Jacket.json",
+            "Avatar/default/female/Top.json",
             "Avatar/default/female/Pants.json",
             "Avatar/default/female/Shoes.json"
         });

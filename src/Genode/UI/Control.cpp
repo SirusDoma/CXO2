@@ -8,6 +8,7 @@ namespace Gx
         m_enabled(true),
         m_focused(false),
         m_clicked(false),
+        m_doubleClicked(false),
         m_deltaClickDuration(),
         m_deltaHoldDuration(),
         m_onClick(),
@@ -291,6 +292,7 @@ namespace Gx
                     m_clicked = false;
                     if (m_deltaClickDuration <= DOUBLE_CLICK_THRESHOLD)
                     {
+                        m_doubleClicked = true;
                         if (m_onDoubleClick)
                         {
                             auto uiEvent = Event{false, GetControlState()};
@@ -322,7 +324,7 @@ namespace Gx
         {
             if (GetControlState() == Control::State::Active)
             {
-                if (m_onClick)
+                if (m_onClick && !m_doubleClicked)
                 {
                     auto uiEvent = Event{false, Control::State::Hover};
                     m_onClick(*this, uiEvent);
@@ -347,6 +349,7 @@ namespace Gx
             SetControlState(Control::State::Normal);
         }
 
+        m_doubleClicked = false;
         InputableContainer::OnMouseButtonUp(ev);
     }
 

@@ -82,9 +82,9 @@ void Avatar::Equip(const Item *item, const bool reset)
         switch (item->GetType())
         {
             case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard;  break;
-            case EquipmentType::Bass: m_instrument = Instrument::Bass;   break;
-            case EquipmentType::Drum: m_instrument = Instrument::Drum;   break;
-            case EquipmentType::Guitar: m_instrument = Instrument::Guitar; break;
+            case EquipmentType::Bass:     m_instrument = Instrument::Bass;   break;
+            case EquipmentType::Drum:     m_instrument = Instrument::Drum;   break;
+            case EquipmentType::Guitar:   m_instrument = Instrument::Guitar; break;
             default: break;
         }
 
@@ -93,7 +93,7 @@ void Avatar::Equip(const Item *item, const bool reset)
             for (const auto renderable: item->GetRenderables())
             {
                 renderable->Reset();
-                for (auto type : { EquipmentType::Body, EquipmentType::Jacket, EquipmentType::LeftArm, EquipmentType::RightArm, EquipmentType::LeftHand, EquipmentType::RightHand })
+                for (auto type : { EquipmentType::Body, EquipmentType::Top, EquipmentType::LeftArm, EquipmentType::RightArm, EquipmentType::LeftHand, EquipmentType::RightHand })
                 {
                     if (auto itemRef = m_items.find(type); itemRef != m_items.end())
                     {

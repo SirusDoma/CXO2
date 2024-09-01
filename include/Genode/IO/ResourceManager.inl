@@ -174,7 +174,7 @@ namespace Gx
     R &ResourceManager::Store(const std::string &id, ResourcePtr<R> resource, CacheMode mode)
     {
         if (!resource)
-            throw ResourceStoreException("[" + id + "] Cannot store empty resource.");
+            throw ResourceStoreException("[" + id + "]\nCannot store empty resource.");
 
         Register<R>();
 

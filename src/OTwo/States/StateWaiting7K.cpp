@@ -280,7 +280,7 @@ void StateWaiting7K::Initialize()
                     avatar->Unequip(EquipmentType::Drum);
                 }
                 else
-                    avatar->Equip(item);
+                    avatar->Equip(item, false);
 
                 for (auto& member : data.Members)
                 {

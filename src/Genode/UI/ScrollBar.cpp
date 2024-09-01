@@ -153,7 +153,10 @@ namespace Gx
         if (max != m_maxValue)
         {
             m_maxValue = max;
-            Invalidate();
+            if (m_value > m_maxValue)
+                SetValue(m_maxValue);
+            else
+                Invalidate();
         }
     }
 

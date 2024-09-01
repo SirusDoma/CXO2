@@ -94,7 +94,7 @@ namespace Gx
         constexpr static double HOLD_CLICK_THRESHOLD   = 50.f;
 
         State  m_state;
-        bool   m_enabled, m_focused, m_clicked;
+        bool   m_enabled, m_focused, m_clicked, m_doubleClicked;
         double m_deltaClickDuration, m_deltaHoldDuration;
 
         std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onScrollWheel, m_onFocusChanged, m_onGainFocus, m_onLostFocus;
