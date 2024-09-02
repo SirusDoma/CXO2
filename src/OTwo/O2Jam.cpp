@@ -67,6 +67,7 @@
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/Utilities/Console.hpp>
 
 void O2Jam::Boot()
 {
@@ -191,6 +192,13 @@ void O2Jam::Boot()
         return std::make_unique<ScoreTracker>();
     });
 
+    // Set-up console
+    Console::Instance().SetFont(Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
+    Console::Instance().SetCharacterSize(14);
+    Console::Instance().SetBounds({{0, 0}, {400, 165}});
+    Console::Instance().SetPosition({400, 0});
+    Console::Instance().SetMaximumLines(10);
+
     // Load and set cursor
     SetCursor(Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
 
@@ -268,6 +276,14 @@ void O2Jam::OnFocusChanged(const bool focus)
     }
 }
 
+void O2Jam::OnInputReceived(sf::Event& ev)
+{
+    Application::OnInputReceived(ev);
+
+    if (ev.type == sf::Event::KeyReleased && ev.key.code == sf::Keyboard::Key::F12)
+        Console::Instance().SetEnabled(!Console::Instance().IsEnabled());
+}
+
 int O2Jam::Shutdown()
 {
     Application::Shutdown();
@@ -298,5 +314,8 @@ void O2Jam::Update(const double delta)
 
 Gx::RenderStates O2Jam::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
-    return Application::Render(surface, states);
+    Application::Render(surface, states);
+    surface.Render(Console::Instance(), states);
+
+    return states;
 }
