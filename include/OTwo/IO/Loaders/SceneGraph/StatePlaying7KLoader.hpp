@@ -6,7 +6,7 @@
 
 struct StateMetadata;
 class PlayingResourceContext;
-class ObjectPopulator;
+class ObjectContainer;
 class StatePlaying7KLoader : public ResourceLoader<StatePlaying7K>
 {
 public :
@@ -16,7 +16,7 @@ public :
     Gx::ResourcePtr<StatePlaying7K> LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const override;
 
 private:
-    static void LoadRequiredResource(ObjectPopulator populator, const StateMetadata *metadata, const std::string &key, const std::string &suffix, const PlayingResourceContext &context, unsigned int count = 1);
+    static void LoadRequiredResource(ObjectContainer container, const StateMetadata *metadata, const std::string &key, const std::string &suffix, const PlayingResourceContext &context, unsigned int count = 1);
 };
 
 #endif

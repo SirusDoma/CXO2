@@ -226,7 +226,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
     shape->SetScale(metadata->Scale);
     shape->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(shape.get());
+    auto container = ObjectContainer::Decorate(shape.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -234,7 +234,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

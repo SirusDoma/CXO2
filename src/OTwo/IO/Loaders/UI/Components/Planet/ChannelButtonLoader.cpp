@@ -76,13 +76,13 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const Resou
     channelButton->SetScale(metadata->Scale);
     channelButton->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(channelButton.get());
+    auto container = ObjectContainer::Decorate(channelButton.get());
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
         auto ctx  = Gx::ResourceContext::Rebind(name, context);
 
-        ObjectLoader::Load(name, object, populator, ctx);
+        ObjectLoader::Load(name, object, container, ctx);
     }
 
     return channelButton;

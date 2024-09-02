@@ -1,14 +1,13 @@
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
-
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/States/State.hpp>
 
 template<typename R>
-void ObjectPopulator::Populate(const std::string &name, Gx::ResourcePtr<R> object, Gx::ResourceContext &ctx)
+void ObjectContainer::Add(const std::string &name, Gx::ResourcePtr<R> object, Gx::ResourceContext &ctx)
 {
-    if (!m_populator)
+    if (!m_container)
         return;
 
-    if (auto state = dynamic_cast<State*>(m_populator); state)
+    if (auto state = dynamic_cast<State*>(m_container); state)
     {
         auto result = state->Import<R>(name, std::move(object), ResourceScope::Local);
         if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
@@ -24,6 +23,6 @@ void ObjectPopulator::Populate(const std::string &name, Gx::ResourcePtr<R> objec
     if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
     {
         if (auto child = dynamic_cast<R*>(&resource); child)
-            m_populator->AddChild(child);
+            m_container->AddChild(child);
     }
 }

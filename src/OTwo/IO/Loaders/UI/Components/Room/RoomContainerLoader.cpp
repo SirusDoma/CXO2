@@ -1,7 +1,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Room/RoomContainerLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
 
@@ -25,7 +25,7 @@ Gx::ResourcePtr<RoomContainer> RoomContainerLoader::LoadFromMetadata(const Resou
         return nullptr;
 
     auto container = std::make_unique<RoomContainer>();
-    auto populator = ObjectPopulator::Decorate(container.get());
+    auto populator = ObjectContainer::Decorate(container.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     container->SetName(metadata->Name);
 

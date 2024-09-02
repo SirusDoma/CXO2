@@ -2,7 +2,7 @@
 #include <OTwo/Metadata/UI/Components/Playing/EqualizerMetadata.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <magic_enum.hpp>
@@ -52,13 +52,13 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
 
     if (context.Available())
     {
-        auto populator = ObjectPopulator::Decorate(equalizer.get());
+        auto container = ObjectContainer::Decorate(equalizer.get());
         for (int i = 0; i < metadata->Count; i++)
         {
             auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
             auto ctx  = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, metadata->ItemSource, populator, ctx);
+            ObjectLoader::Load(name, metadata->ItemSource, container, ctx);
         }
     }
 

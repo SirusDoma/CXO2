@@ -11,23 +11,17 @@
 namespace Gx
 {
     Cursor::Cursor() :
-        m_enabled(true),
         m_lastHandleType(Type::Arrow),
-        m_defaultCursor(),
-        m_cursors(),
-        m_defaultViewSize(),
-        m_lastViewport()
+        m_enabled(true),
+        m_scale(1.0f),
+        m_cursors()
     {
-        // ReSharper disable once CppNoDiscardExpression
-        m_defaultCursor.loadFromSystem(sf::Cursor::Type::Arrow);
         m_cursors[Type::Arrow] = CursorHandle{};
     }
 
     Cursor::Cursor(const sf::Texture& texture, const sf::Vector2u hotspot) :
         Cursor(texture.copyToImage(), hotspot)
     {
-        // ReSharper disable once CppNoDiscardExpression
-        m_defaultCursor.loadFromSystem(sf::Cursor::Type::Arrow);
     }
 
     Cursor::Cursor(const sf::Image& image, const sf::Vector2u hotspot) :
@@ -69,8 +63,15 @@ namespace Gx
     const sf::Cursor& Cursor::GetHandle(const Type type) const
     {
         m_lastHandleType = type;
+
+        static bool hasDefaultCursor = false;
+        static auto defaultCursor = sf::Cursor();
+
+        if (!hasDefaultCursor)
+            hasDefaultCursor = defaultCursor.loadFromSystem(sf::Cursor::Type::Arrow);
+
         if (!m_enabled)
-            return m_defaultCursor;
+            return defaultCursor;
 
         if (const auto it = m_cursors.find(type); it != m_cursors.end())
             return it->second.Handle;
@@ -78,7 +79,7 @@ namespace Gx
         if (const auto it = m_cursors.find(Type::Arrow); it != m_cursors.end())
             return it->second.Handle;
 
-        return m_defaultCursor;
+        return defaultCursor;
     }
 
     Cursor::Type Cursor::GetLastRetrievedHandleType() const
@@ -86,21 +87,12 @@ namespace Gx
         return m_lastHandleType;
     }
 
-    bool Cursor::UpdateViewport(const sf::Vector2u& viewport)
+    bool Cursor::Scale(const float scale)
     {
-        if (m_defaultViewSize == sf::Vector2u())
-        {
-            m_defaultViewSize = viewport;
-            return false;
-        }
-
-        if (m_lastViewport == viewport)
+        if (m_scale == scale)
             return false;
 
-        m_lastViewport = viewport;
-        float scale    = static_cast<float>(viewport.x) / m_defaultViewSize.x;
-        scale          = std::min(static_cast<float>(viewport.y) / m_defaultViewSize.y, scale);
-
+        m_scale = scale;
         auto target = sf::RenderTexture();
         for (auto& [type, cursor] : m_cursors)
         {

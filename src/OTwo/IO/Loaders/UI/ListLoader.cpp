@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/ListLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <magic_enum.hpp>
@@ -44,7 +44,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
 
     if (context.Available())
     {
-        auto populator = ObjectPopulator::Decorate(list.get());
+        auto container = ObjectContainer::Decorate(list.get());
         if (!metadata->ItemSource.empty())
         {
             list->SetBatchingEnabled(true);
@@ -53,7 +53,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
                 auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
                 auto ctx  = Gx::ResourceContext::Rebind(name, context);
 
-                ObjectLoader::Load(name, metadata->ItemSource, populator, ctx);
+                ObjectLoader::Load(name, metadata->ItemSource, container, ctx);
             }
         }
         else if (!metadata->Objects.empty())
@@ -64,7 +64,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
                 auto name = meta.Name + "/" + key;
                 auto ctx  = Gx::ResourceContext::Rebind(name, context);
 
-                ObjectLoader::Load(name, object, populator, ctx);
+                ObjectLoader::Load(name, object, container, ctx);
             }
         }
     }

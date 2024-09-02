@@ -63,7 +63,7 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
     checkBox->SetScale(metadata->Scale);
     checkBox->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(checkBox.get());
+    auto container = ObjectContainer::Decorate(checkBox.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -71,7 +71,7 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

@@ -63,7 +63,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
     for (const auto id : metadata->ItemIDs)
         avatar->Equip(items.GetItem(id));
 
-    auto populator = ObjectPopulator::Decorate(avatar.get());
+    auto container = ObjectContainer::Decorate(avatar.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -71,7 +71,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

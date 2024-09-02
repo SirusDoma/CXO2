@@ -62,7 +62,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
     radio->SetScale(metadata->Scale);
     radio->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(radio.get());
+    auto container = ObjectContainer::Decorate(radio.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -70,7 +70,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

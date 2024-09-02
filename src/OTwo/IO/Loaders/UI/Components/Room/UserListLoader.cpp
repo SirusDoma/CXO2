@@ -2,7 +2,7 @@
 #include <OTwo/Metadata/UI/Components/Room/UserListMetadata.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <Genode/UI/List.hpp>
@@ -28,12 +28,12 @@ Gx::ResourcePtr<UserList> UserListLoader::LoadFromMetadata(const ResourceMetadat
         return nullptr;
 
     auto userList  = std::make_unique<UserList>();
-    auto populator = ObjectPopulator::Decorate(userList.get());
+    auto container = ObjectContainer::Decorate(userList.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, populator, ctx);
+        ObjectLoader::Load(name, object, container, ctx);
     }
 
     userList->SetName(meta.Name);

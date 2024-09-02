@@ -1,23 +1,23 @@
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 
-ObjectPopulator::ObjectPopulator(Gx::Node *populator, const bool importOnly) :
-    m_populator(populator),
+ObjectContainer::ObjectContainer(Gx::Node* container, const bool importOnly) :
+    m_container(container),
     m_importOnly(importOnly)
 {
 }
 
-ObjectPopulator ObjectPopulator::Decorate(State *populator, const bool importOnly)
+ObjectContainer ObjectContainer::Decorate(State* container, const bool importOnly)
 {
-    return ObjectPopulator(populator, importOnly);
+    return ObjectContainer(container, importOnly);
 }
 
-ObjectPopulator ObjectPopulator::Decorate(Gx::Node *populator)
+ObjectContainer ObjectContainer::Decorate(Gx::Node* container)
 {
-    return ObjectPopulator(populator, false);
+    return ObjectContainer(container, false);
 }
 
-const std::string &ObjectPopulator::GetName() const
+const std::string &ObjectContainer::GetName() const
 {
-    return m_populator->GetName();
+    return m_container->GetName();
 }
 

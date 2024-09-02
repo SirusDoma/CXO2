@@ -142,7 +142,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
     number->SetAlignment(metadata->Alignment);
     number->SetBlendMode(metadata->BlendMode);
 
-    auto populator = ObjectPopulator::Decorate(number.get());
+    auto container = ObjectContainer::Decorate(number.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -150,7 +150,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

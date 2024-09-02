@@ -191,9 +191,8 @@ void O2Jam::Boot()
         return std::make_unique<ScoreTracker>();
     });
 
-    // Load cursor
-    auto& cursor = Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json");
-    SetCursor(cursor);
+    // Load and set cursor
+    SetCursor(Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
 
     // Force to load heavy providers during start-up
     auto _ = Require<SessionContext>().GetInstalledMusic();

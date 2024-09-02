@@ -84,7 +84,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
     window->SetScale(metadata->Scale);
     window->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(window.get());
+    auto container = ObjectContainer::Decorate(window.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -92,7 +92,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
     

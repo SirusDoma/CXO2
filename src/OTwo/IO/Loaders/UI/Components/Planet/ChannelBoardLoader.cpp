@@ -6,7 +6,7 @@
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <OTwo/Metadata/UI/Components/Planet/ChannelBoardMetadata.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 
 Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
@@ -74,13 +74,13 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     channelBoard->SetScale(metadata->Scale);
     channelBoard->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(channelBoard.get());
+    auto container = ObjectContainer::Decorate(channelBoard.get());
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
         auto ctx  = Gx::ResourceContext::Rebind(name, context);
 
-        ObjectLoader::Load(name, object, populator, ctx);
+        ObjectLoader::Load(name, object, container, ctx);
     }
 
     return channelBoard;

@@ -62,7 +62,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         dialog->SetTexture(*texture);
 
-    auto populator = ObjectPopulator::Decorate(dialog.get());
+    auto container = ObjectContainer::Decorate(dialog.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -70,7 +70,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

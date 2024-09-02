@@ -76,12 +76,6 @@ R *State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
 template<typename R>
 R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, const ResourceScope scope)
 {
-    static_assert(
-        std::is_base_of_v<Gx::Node, R> ||
-        std::is_base_of_v<sf::SoundSource, R>,
-        "Parameter must be a Gx::Node or sf::SoundSource"
-    );
-
     if (!resource)
         return nullptr;
 
@@ -114,12 +108,6 @@ R *State::Create(Args&&... args)
 template<typename R>
 R *State::FindResource(const std::string &id, const ResourceScope scope)
 {
-    static_assert(
-        std::is_base_of_v<Gx::Node, R> ||
-        std::is_base_of_v<sf::SoundSource, R>,
-        "Parameter must be a Gx::Node or sf::SoundSource"
-    );
-
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)
         resources = &Require<Gx::ResourceManager>();

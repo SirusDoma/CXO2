@@ -1,7 +1,7 @@
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 template<typename R>
-Gx::ResourcePtr<R> ObjectLoader::LoadResource(const std::string &name, const Gx::Json &json, const Gx::ResourceContext &context)
+Gx::ResourcePtr<R> ObjectLoader::LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context)
 {
     auto baseLoader = Gx::ResourceLoaderFactory::GetLoader<R>();
     if (!baseLoader)

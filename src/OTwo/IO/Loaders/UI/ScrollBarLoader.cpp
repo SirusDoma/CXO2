@@ -69,7 +69,7 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceM
     scrollBar->SetScale(metadata->Scale);
     scrollBar->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(scrollBar.get());
+    auto container = ObjectContainer::Decorate(scrollBar.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -77,7 +77,7 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceM
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

@@ -85,7 +85,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromMetadata(const ResourceMetad
     textBox->SetScale(metadata->Scale);
     textBox->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(textBox.get());
+    auto container = ObjectContainer::Decorate(textBox.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -93,7 +93,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromMetadata(const ResourceMetad
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

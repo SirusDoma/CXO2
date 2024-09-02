@@ -53,7 +53,8 @@ namespace Gx
         const sf::Cursor& GetHandle(Type type = Type::Arrow) const;
         Type GetLastRetrievedHandleType() const;
 
-        bool UpdateViewport(const sf::Vector2u& viewport);
+        bool Scale(float scale);
+
     private:
         struct CursorHandle
         {
@@ -63,12 +64,11 @@ namespace Gx
             sf::Vector2u Hotspot;
         };
 
-        bool m_enabled;
         mutable Type m_lastHandleType;
-        sf::Cursor m_defaultCursor;
+        bool m_enabled;
+        float m_scale;
+
         std::unordered_map<Type, CursorHandle> m_cursors;
-        sf::Vector2u m_defaultViewSize;
-        sf::Vector2u m_lastViewport;
     };
 }
 

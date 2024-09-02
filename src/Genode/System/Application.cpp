@@ -54,7 +54,7 @@ namespace Gx
         // Bootstrap the game
         Boot();
 
-        // Update cursor viewport
+        // Update cursor handle and scale
         UpdateCursor(sf::Event{});
 
         // Setup timer
@@ -323,7 +323,10 @@ namespace Gx
         if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Button::Left)
             type = Cursor::Type::Click;
 
-        if (m_cursor->UpdateViewport(m_window->getSize()) || m_cursor->GetLastRetrievedHandleType() != type)
+        float scale = static_cast<float>(m_window->getSize().x) / m_gameVideoMode.size.x;
+              scale = std::max(static_cast<float>(m_window->getSize().y) / m_gameVideoMode.size.y, scale);
+
+        if (m_cursor->Scale(scale) || m_cursor->GetLastRetrievedHandleType() != type)
             m_window->setMouseCursor(m_cursor->GetHandle(type));
     }
 
@@ -404,7 +407,6 @@ namespace Gx
     void Application::SetCursor(Cursor& cursor)
     {
         m_cursor = &cursor;
-        m_cursor->UpdateViewport(sf::Vector2u(m_window->getView().getSize().x, m_window->getView().getSize().y));
         m_window->setMouseCursor(m_cursor->GetHandle());
     }
 

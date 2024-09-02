@@ -32,6 +32,7 @@ struct ResourceMetadata
         Animation,
 
         // UI
+        Cursor,
         List,
         Label,
         Number,

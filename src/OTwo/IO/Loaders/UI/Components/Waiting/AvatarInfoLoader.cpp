@@ -1,7 +1,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/UI/Components/Waiting/AvatarInfoMetadata.hpp>
 
@@ -43,7 +43,7 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMet
         return nullptr;
 
     auto avatarinfo = std::make_unique<AvatarInfo>();
-    auto populator  = ObjectPopulator::Decorate(avatarinfo.get());
+    auto container  = ObjectContainer::Decorate(avatarinfo.get());
     auto ctx        = ResourceContextDecorator::Decorate(context);
     avatarinfo->SetName(metadata->Name);
 
@@ -58,13 +58,13 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMet
             continue;
 
         auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, reference, populator, ctx);
+        ObjectLoader::Load(name, reference, container, ctx);
     }
 
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, populator, ctx);
+        ObjectLoader::Load(name, object, container, ctx);
     }
 
     avatarinfo->SetOrigin(metadata->Origin);

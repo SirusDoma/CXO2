@@ -128,7 +128,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetad
     toolTip->SetScale(metadata->Scale);
     toolTip->SetRotation(metadata->Rotation);
 
-    auto populator = ObjectPopulator::Decorate(toolTip.get());
+    auto container = ObjectContainer::Decorate(toolTip.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -136,7 +136,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetad
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(name, context);
 
-            ObjectLoader::Load(name, object, populator, objectCtx);
+            ObjectLoader::Load(name, object, container, objectCtx);
         }
     }
 

@@ -2,7 +2,7 @@
 #include <OTwo/Metadata/UI/Components/Common/ChatPanelMetadata.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectPopulator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <Genode/UI/List.hpp>
@@ -27,12 +27,12 @@ Gx::ResourcePtr<ChatPanel> ChatPanelLoader::LoadFromMetadata(const ResourceMetad
         return nullptr;
 
     auto chatPanel = std::make_unique<ChatPanel>();
-    auto populator = ObjectPopulator::Decorate(chatPanel.get());
+    auto container = ObjectContainer::Decorate(chatPanel.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, populator, ctx);
+        ObjectLoader::Load(name, object, container, ctx);
     }
 
     chatPanel->SetName(meta.Name);
