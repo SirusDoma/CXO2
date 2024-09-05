@@ -1,22 +1,25 @@
 #ifndef GENODE_SCENEGRAPH_SCENE_HPP
 #define GENODE_SCENEGRAPH_SCENE_HPP
 
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
-#include <SFML/Window/Event.hpp>
+#include <Genode/System/Provider.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
+
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+
 #include <Genode/Tasks/TaskContainer.hpp>
+
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Window/Event.hpp>
 
 #include <queue>
 
 namespace Gx
 {
+    class Application;
     class SceneDirector;
     class Scene : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual TaskContainer
     {
@@ -29,6 +32,7 @@ namespace Gx
         ~Scene() override;
 
         Application& GetApplication() const;
+        Provider& GetContext() const;
         SceneDirector& GetDirector() const;
 
         sf::View GetView() const;
@@ -53,8 +57,6 @@ namespace Gx
         bool Input(sf::Event ev) override;
 
         virtual void ProcessSceneEvents();
-
-
 
     private:
         bool IsVisible() const override { return true; }

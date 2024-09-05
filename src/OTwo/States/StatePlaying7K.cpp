@@ -19,6 +19,7 @@
 #include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
 
+#include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Step.hpp>
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/Randomizer.hpp>

@@ -1,6 +1,8 @@
 ﻿#include <Genode/SceneGraph/SceneDirector.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 
+#include <Genode/System/Application.hpp>
+
 namespace Gx
 {
     SceneDirector::SceneDirector(SceneDirector &&director) noexcept :

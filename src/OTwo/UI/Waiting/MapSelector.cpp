@@ -85,9 +85,7 @@ void MapSelector::SetMapID(int mapID, const bool silent)
     if (!parent)
         return;
 
-    auto& app   = Gx::Application::Instance();
-    auto& mixer = app.Require<Gx::Mixer>();
-
+    auto& mixer             = parent->Require<Gx::Mixer>();
     const auto sfxNavigate  = parent->Instantiate<sf::Sound>("bgEffect/07");
     const auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
     const auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");

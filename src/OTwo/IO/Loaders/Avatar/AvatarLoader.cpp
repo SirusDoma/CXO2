@@ -1,12 +1,14 @@
-#include <magic_enum.hpp>
-#include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <OTwo/Metadata/Avatar/AvatarMetadata.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <Genode/System/Application.hpp>
+
+#include <magic_enum.hpp>
 
 Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {

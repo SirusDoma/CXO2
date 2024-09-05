@@ -21,6 +21,7 @@
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
+#include <OTwo/States/State.hpp>
 
 SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
     Gx::Node(copy),
@@ -45,9 +46,8 @@ void SelectMusicDialog::Initialize()
     if (m_initialized)
         return;
 
-    auto& app       = Gx::Application::Instance();
-    auto& session   = app.Require<SessionContext>();
-    auto& selection = app.Require<MusicSelectionContext>();
+    auto& session   = Gx::Application::Instance().Require<SessionContext>();
+    auto& selection = Gx::Application::Instance().Require<MusicSelectionContext>();
 
     m_page = 0;
     m_musicList = session.GetInstalledMusic();
@@ -557,9 +557,9 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
 {
     Dialog::OnShown(scene);
 
-    auto& app             = scene.GetApplication();
-    const auto& session   = app.Require<SessionContext>();
-    const auto& selection = app.Require<MusicSelectionContext>();
+    const auto parent     = GetParent<::State>();
+    const auto& session   = Gx::Application::Instance().Require<SessionContext>();
+    const auto& selection = Gx::Application::Instance().Require<MusicSelectionContext>();
 
     m_musicList = session.GetInstalledMusic(true);
     m_displayList.clear();
@@ -649,10 +649,10 @@ void SelectMusicDialog::OnAccepted()
 
     Dialog::OnAccepted();
 
-    auto& app       = Gx::Application::Instance();
-    auto& mixer     = app.Require<Gx::Mixer>();
-    auto& resources = app.Require<Gx::ResourceManager>();
-    auto& selection = app.Require<MusicSelectionContext>();
+    const auto parent = GetParent<::State>();
+    auto& mixer       = Gx::Application::Instance().Require<Gx::Mixer>();
+    auto& resources   = Gx::Application::Instance().Require<Gx::ResourceManager>();
+    auto& selection   = Gx::Application::Instance().Require<MusicSelectionContext>();
 
     selection.SetMetadata(m_music);
     selection.SetRandomLevel(m_random);
@@ -670,9 +670,9 @@ void SelectMusicDialog::OnCancelled()
 {
     Dialog::OnCancelled();
 
-    auto& app       = Gx::Application::Instance();
-    auto& mixer     = app.Require<Gx::Mixer>();
-    auto& resources = app.Require<Gx::ResourceManager>();
+    const auto parent = GetParent<::State>();
+    auto& mixer       = Gx::Application::Instance().Require<Gx::Mixer>();
+    auto& resources   = Gx::Application::Instance().Require<Gx::ResourceManager>();
 
     const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
     mixer.Play(sfx);
@@ -684,8 +684,8 @@ void SelectMusicDialog::CacheMusicCover() const
     if (m_music.Source.empty())
         return;
 
-    auto& app       = Gx::Application::Instance();
-    auto& resources = app.Require<Gx::ResourceManager>();
+    const auto parent = GetParent<::State>();
+    auto& resources   = Gx::Application::Instance().Require<Gx::ResourceManager>();
 
     try
     {

@@ -1,8 +1,6 @@
 #ifndef O2JAM_MUSIC_SELECTION_CONTEXT_HPP
 #define O2JAM_MUSIC_SELECTION_CONTEXT_HPP
 
-#include <Genode/System/Provider.hpp>
-
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
@@ -21,7 +19,7 @@ enum class MusicSortOrder
     Descending
 };
 
-class MusicSelectionContext : public Gx::Provider
+class MusicSelectionContext
 {
 public:
     MusicSelectionContext();

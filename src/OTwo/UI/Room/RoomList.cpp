@@ -14,16 +14,14 @@ RoomContainer::RoomContainer() :
 
 void RoomContainer::Initialize()
 {
-    auto parent = GetParent<::State>();
+    const auto parent = GetParent<::State>();
     if (!parent)
         return;
 
-    auto& app   = Gx::Application::Instance();
-    auto& mixer = app.Require<Gx::Mixer>();
-
-    auto sfxInvalid  = parent->Instantiate<sf::Sound>("STATE_ROOM/IDC_SOUND_15");
-    auto roomList    = FindChild<Gx::List>("IDC_LIST_ROOM");
-    for (auto child : roomList->GetChildren())
+    auto& mixer         = parent->Require<Gx::Mixer>();
+    auto sfxInvalid     = parent->Instantiate<sf::Sound>("STATE_ROOM/IDC_SOUND_15");
+    const auto roomList = FindChild<Gx::List>("IDC_LIST_ROOM");
+    for (const auto child : roomList->GetChildren())
     {
         auto roomButton = dynamic_cast<RoomButton*>(child);
         roomButton->Initialize();
@@ -78,16 +76,16 @@ void RoomContainer::PreviousPage()
 
 void RoomContainer::Invalidate()
 {
-    auto roomList = FindChild<Gx::List>("IDC_LIST_ROOM");
+    const auto roomList = FindChild<Gx::List>("IDC_LIST_ROOM");
     if (!roomList)
         return;
 
-    auto children = roomList->GetChildren();
+    const auto children = roomList->GetChildren();
     m_page = std::min(m_page, static_cast<unsigned int>(std::round(static_cast<float>(MAX_NUMBER_OF_ROOM) / children.size())));
     m_page = std::max(m_page, static_cast<unsigned int>(1));
     for (size_t i = 0; i < children.size(); i++)
     {
-        auto roomButton = dynamic_cast<RoomButton*>(children[i]);
+        const auto roomButton = dynamic_cast<RoomButton*>(children[i]);
         auto roomNumber = ((m_page - 1) * children.size()) + i;
         auto room = m_rooms.find(roomNumber);
 

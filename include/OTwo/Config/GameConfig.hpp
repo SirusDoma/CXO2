@@ -4,7 +4,6 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
 
-#include <Genode/System/Provider.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 #include <map>
@@ -15,7 +14,7 @@ enum class NoteShape : Gx::Uint8
     Circle = 2
 };
 
-struct GameConfig : Gx::Provider
+struct GameConfig
 {
     GameConfig()
     {

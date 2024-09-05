@@ -16,9 +16,8 @@
 namespace Gx
 {
     class Scene;
-    class Provider;
     class Cursor;
-    class Application : NonCopyable, public Renderable, public Updatable
+    class Application : NonCopyable, public Provider, public Renderable, public Updatable
     {
     public:
         static Application& Instance();
@@ -47,18 +46,6 @@ namespace Gx
 
         sf::View GetVirtualView() const;
         static sf::VideoMode GetDesktopVideoMode();
-
-        template<typename T>
-        T& Provide();
-
-        template<typename T>
-        bool Provide(std::function<std::unique_ptr<T>(Application&)> builder);
-
-        template<typename T>
-        bool Uninstall();
-
-        template<typename T>
-        T& Require();
 
         // ReSharper disable CppNonExplicitConversionOperator
         operator sf::RenderTarget&() const;
@@ -115,5 +102,4 @@ namespace Gx
     };
 }
 
-#include <Genode/System/Application.inl>
 #endif

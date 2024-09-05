@@ -5,8 +5,6 @@
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
-#include <Genode/System/Provider.hpp>
-
 struct ScoreResultItem
 {
     RoomMember   Member;
@@ -19,7 +17,7 @@ struct ScoreResultItem
     unsigned int ScorePoint;
 };
 
-class SessionContext : public Gx::Provider
+class SessionContext
 {
 public:
     SessionContext() = default;

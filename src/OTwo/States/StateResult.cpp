@@ -3,6 +3,7 @@
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StatePlaying7K.hpp>
 
+#include <OTwo/Core/ScoreTracker.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>

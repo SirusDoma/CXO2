@@ -4,13 +4,8 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <Genode/System/Provider.hpp>
-
-#include <functional>
-#include <unordered_map>
-
 class ScoreTracker;
-class LifeSystem : public Gx::Provider
+class LifeSystem
 {
 public:
     static constexpr unsigned int DefaultMaxLifePoint = 1000;

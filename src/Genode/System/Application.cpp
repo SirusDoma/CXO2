@@ -98,13 +98,6 @@ namespace Gx
             const double now   = timer.getElapsedTime().asMilliseconds();
             const double delta = now - last;
 
-            // Update installed modules
-            for (auto& [_, context] : m_providers)
-            {
-                if (const auto updatable = dynamic_cast<Updatable*>(context.get()))
-                    updatable->Update(delta);
-            }
-
             // Perform update before rendering objects
             Update(delta);
 

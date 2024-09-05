@@ -27,8 +27,7 @@ void ChannelBoard::Initialize()
     if (!parent)
         return;
 
-    auto& app            = Gx::Application::Instance();
-    auto& mixer          = app.Require<Gx::Mixer>();
+    auto& mixer          = parent->Require<Gx::Mixer>();
     auto sfxNavigate     = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_PAGE");
     auto sfxEnter        = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_ENTER");
     const auto container = parent->Create<Gx::UiContainer>();

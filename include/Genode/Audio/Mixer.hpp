@@ -1,12 +1,12 @@
 #ifndef GENODE_AUDIO_MIXER_HPP
 #define GENODE_AUDIO_MIXER_HPP
 
-#include <SFML/Audio.hpp>
-
-#include <Genode/System/Provider.hpp>
-#include <Genode/Entities/Updatable.hpp>
 #include <OTwo/Metadata/ResourceMetadata.hpp>
+
+#include <Genode/Entities/Updatable.hpp>
 #include <Genode/IO/ResourceManager.hpp>
+
+#include <SFML/Audio.hpp>
 
 #include <vector>
 #include <memory>
@@ -14,7 +14,7 @@
 namespace Gx
 {
     class SoundGroup;
-    class Mixer : public Provider, public Updatable
+    class Mixer : public Updatable
     {
     public:
         Mixer();

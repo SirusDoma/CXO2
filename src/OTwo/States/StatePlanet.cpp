@@ -5,6 +5,7 @@
 #include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
+#include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Fade.hpp>
 

@@ -1,5 +1,6 @@
 
 #include <OTwo/Core/ChartRenderer.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
 #include <OTwo/Core/LifeSystem.hpp>
 #include <OTwo/Core/Note.hpp>
 #include <OTwo/Core/NoteContainer.hpp>
@@ -442,7 +443,7 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &gr
         return;
 
     const auto parent = GetParent<State>();
-    auto& mixer = parent->GetApplication().Require<Gx::Mixer>();
+    auto& mixer = parent->Require<Gx::Mixer>();
     if (m_sounds.find(ev->ID) == m_sounds.end())
     {
         m_sounds[ev->ID] = parent->Create<sf::Sound>(*ev->Sample);

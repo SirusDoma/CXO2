@@ -21,9 +21,8 @@ void CreateRoomDialog::Initialize()
         return;
 
     const auto parent = GetParent<::State>();
-    auto& app    = parent->GetApplication();
-    auto& mixer  = app.Require<Gx::Mixer>();
-    auto session = app.Require<SessionContext>();
+    auto& mixer  = parent->Require<Gx::Mixer>();
+    auto session = parent->Require<SessionContext>();
 
     const auto sfxClick = parent->Instantiate<sf::Sound>("IDC_DIALOG_CREATE_ROOM/IDC_SOUND_CLICK");
 
@@ -135,8 +134,8 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     Initialize();
 
-    auto& app     = Gx::Application::Instance();
-    auto& session = app.Require<SessionContext>();
+    const auto parent = GetParent<::State>();
+    auto& session = parent->Require<SessionContext>();
 
     const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
     const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");

@@ -1,9 +1,12 @@
 #include <OTwo/UI/Dialogs/OptionDialog.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <Genode/System/Application.hpp>
+
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
 
+#include <Genode/UI/Cursor.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>
@@ -11,7 +14,6 @@
 #include <Genode/UI/ToolTip.hpp>
 
 #include <magic_enum.hpp>
-#include <Genode/UI/Cursor.hpp>
 
 OptionDialog::OptionDialog(const Gx::Dialog &copy) :
     Gx::Node(copy),

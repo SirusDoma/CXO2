@@ -4,17 +4,16 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <Genode/System/Provider.hpp>
-
 #include <functional>
 #include <unordered_map>
 
-class ScoreTracker : public Gx::Provider
+class ScoreTracker
 {
 public:
 
     ScoreTracker() = default;
     explicit ScoreTracker(Difficulty diff);
+    virtual ~ScoreTracker() = default;
 
     virtual Accuracy Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count = 1);
 

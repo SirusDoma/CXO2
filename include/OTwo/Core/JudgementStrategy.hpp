@@ -4,8 +4,6 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <Genode/System/Provider.hpp>
-
 #include <functional>
 #include <unordered_map>
 
@@ -16,13 +14,13 @@ struct Judgement
 };
 
 class ChartRenderer;
-class JudgementStrategy : public Gx::Provider
+class JudgementStrategy
 {
 public:
     using JudgementEvaluator = std::function<bool(const ChartRenderer&, const Chart::NoteEvent &ev)>;
 
     JudgementStrategy() = default;
-    ~JudgementStrategy() override = default;
+    virtual ~JudgementStrategy() = default;
 
     virtual void Initialize(const ChartRenderer &renderer);
     virtual Judgement Judge(const Chart::NoteEvent &ev) const;

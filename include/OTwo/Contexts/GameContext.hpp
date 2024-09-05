@@ -5,12 +5,10 @@
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
-#include <Genode/System/Provider.hpp>
 #include <OTwo/Config/GameConfig.hpp>
-#include <OTwo/Core/ScoreTracker.hpp>
 
 class Chart;
-class GameContext : public Gx::Provider
+class GameContext
 {
 public:
     GameContext() = default;

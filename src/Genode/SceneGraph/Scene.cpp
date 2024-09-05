@@ -9,7 +9,7 @@ namespace Gx
     {
     }
 
-    Scene::Scene(const std::string &name) :
+    Scene::Scene(const std::string& name) :
         Node(),
         RenderableContainer(),
         UpdatableContainer(),
@@ -36,12 +36,17 @@ namespace Gx
         return true;
     }
 
-    Application &Scene::GetApplication() const
+    Application& Scene::GetApplication() const
     {
         if (!m_director)
             return Application::Instance();
 
         return m_director->GetApplication();
+    }
+
+    Provider& Scene::GetContext() const
+    {
+        return GetApplication();
     }
 
     SceneDirector& Scene::GetDirector() const
@@ -54,12 +59,12 @@ namespace Gx
 
     void Scene::SetDirector(SceneDirector& director)
     {
-        m_director = &director;
+        m_director =& director;
     }
 
     sf::View Scene::GetView() const
     {
-        const sf::RenderTarget &target = GetApplication();
+        const sf::RenderTarget& target = GetApplication();
         return target.getView();
     }
 
@@ -70,13 +75,13 @@ namespace Gx
 
     sf::View Scene::GetDefaultView() const
     {
-        const sf::RenderTarget &target = GetApplication();
+        const sf::RenderTarget& target = GetApplication();
         return target.getDefaultView();
     }
 
-    void Scene::SetView(const sf::View &view)
+    void Scene::SetView(const sf::View& view)
     {
-        sf::RenderTarget &target = GetApplication();
+        sf::RenderTarget& target = GetApplication();
         target.setView(view);
     }
 
@@ -108,7 +113,7 @@ namespace Gx
         Input(m_lastInput);
     }
 
-    void Scene::Queue(const std::function<void()> &evt)
+    void Scene::Queue(const std::function<void()>& evt)
     {
         if (evt)
             m_events.push(evt);
@@ -130,7 +135,7 @@ namespace Gx
         }
     }
 
-    RenderStates Scene::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Scene::Render(RenderSurface& surface, RenderStates states) const
     {
         states = RenderableContainer::Render(surface, states);
         if (!m_overlays.empty())
