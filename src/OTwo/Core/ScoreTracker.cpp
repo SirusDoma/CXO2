@@ -68,8 +68,11 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
             m_jamCombo++;
             m_jams++;
 
-            if (m_jamComboCallback)
-                m_jamComboCallback(ev, acc, m_jamCombo);
+            for (auto callback : m_jamComboCallbacks)
+            {
+                if (callback)
+                    callback(ev, acc, count);
+            }
         }
     }
     else
@@ -83,8 +86,11 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
     m_maxCombo = m_maxCombo < GetCombo() ? GetCombo() : m_maxCombo;
     m_maxJamCombo = std::max(m_maxJamCombo, m_jamCombo);
 
-    if (m_incrementCallback)
-        m_incrementCallback(ev, acc, count);
+    for (auto callback : m_incrementCallbacks)
+    {
+        if (callback)
+            callback(ev, acc, count);
+    }
 
     return acc;
 }
@@ -96,14 +102,14 @@ void ScoreTracker::Initialize(const Difficulty diff)
     Reset();
 }
 
-void ScoreTracker::SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)>& callback)
+void ScoreTracker::AddIncrementListener(const ScoreCallback& callback)
 {
-    m_incrementCallback = std::move(callback);
+    m_incrementCallbacks.push_back(std::move(callback));
 }
 
-void ScoreTracker::SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)>& callback)
+void ScoreTracker::AddJamComboListener(const ScoreCallback& callback)
 {
-    m_jamComboCallback = callback;
+    m_jamComboCallbacks.push_back(std::move(callback));
 }
 
 bool ScoreTracker::IsEnabled() const
@@ -180,6 +186,8 @@ void ScoreTracker::Reset()
     m_buffer         = 0;
     m_bufferProgress = 0;
 
+    m_incrementCallbacks.clear();
+    m_jamComboCallbacks.clear();
     for (auto acc : { Accuracy::Cool, Accuracy::Good, Accuracy::Bad, Accuracy::Miss })
         m_points[acc] = 0;
 

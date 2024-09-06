@@ -10,6 +10,7 @@
 class ScoreTracker
 {
 public:
+    using ScoreCallback = std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>;
 
     ScoreTracker() = default;
     explicit ScoreTracker(Difficulty diff);
@@ -19,8 +20,8 @@ public:
 
     void Initialize(Difficulty diff = Difficulty::MX);
 
-    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
-    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& callback);
+    void AddIncrementListener(const ScoreCallback& callback);
+    void AddJamComboListener(const ScoreCallback& callback);
 
     bool IsEnabled() const;
 
@@ -43,8 +44,8 @@ public:
 
 private:
     Difficulty m_difficulty;
-    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_incrementCallback;
-    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_jamComboCallback;
+    std::vector<ScoreCallback> m_incrementCallbacks;
+    std::vector<ScoreCallback> m_jamComboCallbacks;
 
     mutable std::unordered_map<Accuracy, unsigned int> m_points;
 

@@ -79,13 +79,13 @@ void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &setting
     // Setup score tracker
     m_scores = &parent->Require<ScoreTracker>();
     m_scores->Initialize(settings.Difficulty);
-    m_scores->SetIncrementCallback([this] (auto ev, auto acc, auto count) {
+    m_scores->AddIncrementListener([this] (auto ev, auto acc, auto count) {
         m_life->Update(acc, count);
         if (m_incrementCallback)
             m_incrementCallback(ev, acc, count);
     });
 
-    m_scores->SetJamComboCallback([this] (auto ev, auto acc, auto count) {
+    m_scores->AddJamComboListener([this] (auto ev, auto acc, auto count) {
         if (m_jamComboCallback)
             m_jamComboCallback(ev, acc, count);
     });
