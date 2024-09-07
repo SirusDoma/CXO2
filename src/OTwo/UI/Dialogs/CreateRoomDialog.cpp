@@ -8,13 +8,6 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/ToolTip.hpp>
 
-CreateRoomDialog::CreateRoomDialog(const Gx::Dialog &copy) :
-    Gx::Node(copy),
-    Gx::Dialog(copy),
-    m_initialized(false)
-{
-}
-
 void CreateRoomDialog::Initialize()
 {
     if (m_initialized)

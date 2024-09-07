@@ -34,6 +34,7 @@ namespace Gx
     template<typename B, typename R>
     void ResourceLoaderFactory::RegisterDerived()
     {
+        static_assert(std::is_default_constructible_v<R>, "Parameter R must be default constructible");
         RegisterDerived<B, R>(std::function{[] { return std::make_unique<R>(); }});
     }
 
@@ -41,7 +42,6 @@ namespace Gx
     void ResourceLoaderFactory::RegisterDerived(const std::function<std::unique_ptr<R>(Args...)>& creator)
     {
         static_assert(std::is_base_of_v<B, R>, "Parameter R must be a B");
-        static_assert(std::is_default_constructible_v<R>, "Parameter R must be default constructible");
 
         Remove<R>();
 

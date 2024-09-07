@@ -14,7 +14,6 @@ class SelectMusicDialog : public Gx::Dialog
 {
 public:
     using Gx::Dialog::Dialog;
-    explicit SelectMusicDialog(const Gx::Dialog &copy);
 
     void Initialize() override;
 
@@ -38,19 +37,21 @@ protected:
     void Invalidate() override;
 
 private:
-    bool m_initialized;
-    unsigned int m_page;
+    bool         m_initialized = false;
+    unsigned int m_page = 0;
     unsigned int m_coverID;
-    float m_speed;
+    float        m_speed;
+
+    Difficulty     m_difficulty = Difficulty::EX;
+    MusicSortMode  m_sort       = static_cast<MusicSortMode>(-1);
+    MusicSortOrder m_order      = static_cast<MusicSortOrder>(-1);
+    Genre          m_genre      = static_cast<Genre>(-1);
+    LevelCategory  m_random     = static_cast<LevelCategory>(0);
+
+    ChartMetadata                m_music;
     Gx::ResourcePtr<sf::Texture> m_thumbnail;
-    Difficulty m_difficulty;
-    MusicSortMode m_sort;
-    MusicSortOrder m_order;
-    Genre m_genre;
-    LevelCategory m_random;
-    ChartMetadata m_music;
-    std::vector<ChartMetadata> m_musicList;
-    std::vector<ChartMetadata> m_displayList;
+    std::vector<ChartMetadata>   m_musicList;
+    std::vector<ChartMetadata>   m_displayList;
 };
 
 #endif

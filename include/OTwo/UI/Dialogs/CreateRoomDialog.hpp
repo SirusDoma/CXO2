@@ -8,8 +8,6 @@ class CreateRoomDialog : public Gx::Dialog
 {
 public:
     using Gx::Dialog::Dialog;
-    explicit CreateRoomDialog(const Gx::Dialog &copy);
-
     void Initialize() override;
 
     GameMode GetRoomMode() const;
@@ -23,7 +21,7 @@ protected:
     void OnAccepted() override;
 
 private:
-    bool m_initialized;
+    bool m_initialized = false;
 };
 
 #endif

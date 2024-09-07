@@ -12,8 +12,6 @@ class OptionDialog : public Gx::Dialog
 {
 public:
     using Gx::Dialog::Dialog;
-    explicit OptionDialog(const Gx::Dialog &copy);
-
     void Initialize() override;
 
 private:
@@ -33,11 +31,11 @@ private:
     ::State *m_parent;
     std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    GameConfig         m_config;
+    GameConfig     m_config;
     Chart::Channel m_keyChannel;
 
-    bool m_keyTestEnabled;
-    bool m_initialized;
+    bool m_initialized = false;
+    bool m_keyTestEnabled = false;
 };
 
 #endif

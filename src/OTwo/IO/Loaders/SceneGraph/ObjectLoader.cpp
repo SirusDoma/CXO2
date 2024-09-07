@@ -6,6 +6,9 @@
 #include <OTwo/UI/Common/Marquee.hpp>
 #include <OTwo/UI/Common/ChatPanel.hpp>
 #include <OTwo/UI/Common/ChatWindow.hpp>
+#include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
+#include <OTwo/UI/Dialogs/OptionDialog.hpp>
+#include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
 #include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/UI/Room/UserList.hpp>
@@ -128,6 +131,21 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         case ResourceMetadata::ResourceType::UiContainer:
         {
             container.Add(name, LoadResource<Gx::UiContainer>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::OptionDialog:
+        {
+            container.Add(name, LoadResource<Gx::Dialog, OptionDialog>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::CreateRoomDialog:
+        {
+            container.Add<CreateRoomDialog>(name, LoadResource<CreateRoomDialog>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::SelectMusicDialog:
+        {
+            container.Add(name, LoadResource<Gx::Dialog, SelectMusicDialog>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Marquee:

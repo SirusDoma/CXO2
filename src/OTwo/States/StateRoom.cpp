@@ -179,9 +179,8 @@ void StateRoom::Initialize()
         roomContainer->Add(room);
 
     const auto createRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_CREATE_ROOM");
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_CREATE_ROOM"); dialog)
+    if (const auto createRoomDialog = Instantiate<CreateRoomDialog>("IDC_DIALOG_CREATE_ROOM"); createRoomDialog)
     {
-        auto createRoomDialog = Create<CreateRoomDialog>(*dialog);
         createRoomButton->SetClickCallback([=, &mixer, &session, &director] (auto& sender, auto& ev) {
             mixer.Play(sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
@@ -261,9 +260,8 @@ void StateRoom::Initialize()
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
     myRoomButton->SetClickCallback([this](auto &, auto &) { OnMyRoomClicked(); });
 
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_OPTION"); dialog)
+    if (const auto optionDialog = Instantiate<OptionDialog>("IDC_DIALOG_OPTION"); optionDialog)
     {
-        const auto optionDialog = Create<OptionDialog>(*dialog);
         const auto optionButton = FindChild<Gx::Button>("IDC_BUTTON_OPTION");
         optionButton->SetClickCallback([=] (auto& sender, auto& ev) {
             optionDialog->Show(this, std::string(), false);

@@ -46,6 +46,11 @@ struct ResourceMetadata
         Dialog,
         UiContainer,
 
+        // Dialogs
+        OptionDialog,
+        CreateRoomDialog,
+        SelectMusicDialog,
+
         // Custom Components
         Marquee,
         ChatPanel,

@@ -16,7 +16,7 @@ private:
     static Gx::ResourcePtr<R> LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
 
     template<typename B, typename R>
-    static Gx::ResourcePtr<B> LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
+    static Gx::ResourcePtr<R> LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
 };
 
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.inl>

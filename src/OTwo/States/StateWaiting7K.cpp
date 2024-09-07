@@ -316,9 +316,8 @@ void StateWaiting7K::Initialize()
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_SELECT_MUSIC"); dialog)
+    if (const auto selectMusicDialog = Instantiate<SelectMusicDialog>("IDC_DIALOG_SELECT_MUSIC"); selectMusicDialog)
     {
-        const auto selectMusicDialog = Create<SelectMusicDialog>(*dialog);
         selectMusicDialog->Initialize();
         if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {

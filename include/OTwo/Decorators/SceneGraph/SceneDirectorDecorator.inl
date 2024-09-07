@@ -7,14 +7,13 @@ void SceneDirectorDecorator::Register(const std::string &fileName)
     {
         const auto stateLoader = Gx::ResourceLoaderFactory::CreateLoader<T>();
         if (!stateLoader)
-            throw Gx::Exception("Failed to find state loader");
+            throw Gx::Exception("Failed to create state loader");
 
         auto state = stateLoader->LoadFromFile(fileName, context);
         if (state == nullptr)
             throw Gx::Exception("Failed to load state data");
 
-        auto deleter = state.get_deleter();
-        return Gx::ResourcePtr<Gx::Scene>(state.release(), [deleter] (auto ptr) {
+        return Gx::ResourcePtr<Gx::Scene>(state.release(), [deleter = state.get_deleter()] (auto ptr) {
             deleter(dynamic_cast<T*>(ptr));
         });
     };

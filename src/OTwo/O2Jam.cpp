@@ -118,6 +118,10 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, MapSelector>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, InstrumentSelector>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, RoomButton>();
+    // O2Jam Dialogs
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, OptionDialog>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, CreateRoomDialog>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, SelectMusicDialog>();
     // O2Jam Core Resources
     Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();

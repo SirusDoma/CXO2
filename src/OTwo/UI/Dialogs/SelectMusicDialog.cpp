@@ -23,24 +23,6 @@
 #include <unordered_set>
 #include <OTwo/States/State.hpp>
 
-SelectMusicDialog::SelectMusicDialog(const Gx::Dialog &copy) :
-    Gx::Node(copy),
-    Gx::Dialog(copy),
-    m_initialized(false),
-    m_page(0),
-    m_coverID(),
-    m_speed(),
-    m_difficulty(Difficulty::EX),
-    m_sort(static_cast<MusicSortMode>(-1)),
-    m_order(static_cast<MusicSortOrder>(-1)),
-    m_genre(static_cast<Genre>(-1)),
-    m_random(static_cast<LevelCategory>(0)),
-    m_music(),
-    m_musicList(),
-    m_displayList()
-{
-}
-
 void SelectMusicDialog::Initialize()
 {
     if (m_initialized)

@@ -15,19 +15,6 @@
 
 #include <magic_enum.hpp>
 
-OptionDialog::OptionDialog(const Gx::Dialog &copy) :
-    Gx::Node(copy),
-    Gx::Dialog(copy),
-    m_parent(),
-    m_keyTexts(),
-    m_keyDowns(),
-    m_config(),
-    m_keyChannel(),
-    m_keyTestEnabled(false),
-    m_initialized(false)
-{
-}
-
 void OptionDialog::Initialize()
 {
     if (m_initialized)
