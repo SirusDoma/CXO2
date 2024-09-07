@@ -12,7 +12,6 @@ namespace Gx
     class Node : public Transformable
     {
     public:
-        Node(const Gx::Node &copy);
         ~Node() override = default;
 
         const std::string &GetName() const;
@@ -32,7 +31,7 @@ namespace Gx
         virtual void ClearChildren();
 
         template<typename T>
-        T *GetParent() const;
+        T* GetParent() const;
 
         template<typename T>
         T* FindChild(const std::string& name) const;

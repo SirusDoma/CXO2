@@ -10,22 +10,6 @@ namespace Gx
     {
     }
 
-    Node::Node(const Node &copy) :
-        Transformable(copy),
-        m_parent(copy.m_parent),
-        m_name(copy.m_name),
-        m_tag(copy.m_tag),
-        m_children(copy.m_children)
-    {
-        for (const auto child : m_children)
-        {
-            if (const auto parent = child->GetParent(); parent)
-                parent->RemoveChild(child);
-
-            child->SetParent(this);
-        }
-    }
-
     void Node::Initialize()
     {
     }
@@ -123,7 +107,7 @@ namespace Gx
             if (child->m_parent == this)
                 child->m_parent = nullptr;
 
-            auto iterator = std::find(m_children.begin(), m_children.end(), child);
+            const auto iterator = std::find(m_children.begin(), m_children.end(), child);
             if (iterator != m_children.end())
                 m_children.erase(iterator);
         }
