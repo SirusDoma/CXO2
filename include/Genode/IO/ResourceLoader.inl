@@ -4,6 +4,9 @@ namespace Gx
     template<class... Args>
     std::unique_ptr<T> ResourceLoader<T>::Create(Args&&... args) const
     {
+        if (!m_creator)
+            return std::make_unique<T>();
+
         return m_creator->Build(args...);
     };
 

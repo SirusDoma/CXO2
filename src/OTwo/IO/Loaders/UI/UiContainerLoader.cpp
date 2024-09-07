@@ -26,7 +26,7 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
     if (metadata == nullptr)
         return nullptr;
 
-    auto container = std::make_unique<Gx::UiContainer>();
+    auto container = Create();
     auto populator = ObjectContainer::Decorate(container.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     container->SetName(metadata->Name);

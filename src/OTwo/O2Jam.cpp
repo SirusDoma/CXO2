@@ -31,22 +31,23 @@
 #include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
 
 #include <OTwo/IO/Loaders/UI/Components/Common/MarqueeLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Common/ChatPanelLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Common/ChatWindowLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Planet/ChannelButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Planet/ChannelBoardLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Room/RoomContainerLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Room/RoomButtonLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Room/UserListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Waiting/MapSelectorLoader.hpp>
-#include <OTwo/IO/Loaders/UI/Components/Waiting/InstrumentSelectorLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
+
+#include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
+#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/UserList.hpp>
+#include <OTwo/UI/Waiting/InstrumentSelector.hpp>
+#include <OTwo/UI/Waiting/MapSelector.hpp>
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
@@ -66,7 +67,6 @@
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
-#include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/Utilities/Console.hpp>
 
 void O2Jam::Boot()
@@ -104,19 +104,20 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
     Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
-    // O2Jam Components
+    // O2Jam Exclusive Components
     Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
-    Gx::ResourceLoaderFactory::Register<ChatPanel, ChatPanelLoader>();
     Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
     Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
     Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
-    Gx::ResourceLoaderFactory::Register<RoomContainer, RoomContainerLoader>();
-    Gx::ResourceLoaderFactory::Register<RoomButton, RoomButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<UserList, UserListLoader>();
     Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
-    Gx::ResourceLoaderFactory::Register<MapSelector, MapSelectorLoader>();
-    Gx::ResourceLoaderFactory::Register<InstrumentSelector, InstrumentSelectorLoader>();
     Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
+    // O2Jam Derived Components
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, ChatPanel>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, RoomContainer>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, UserList>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, MapSelector>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, InstrumentSelector>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, RoomButton>();
     // O2Jam Core Resources
     Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();

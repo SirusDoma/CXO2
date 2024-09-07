@@ -137,7 +137,7 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::ChatPanel:
         {
-            container.Add(name, LoadResource<ChatPanel>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::UiContainer, ChatPanel>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::ChatWindow:
@@ -157,17 +157,17 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::UserList:
         {
-            container.Add(name, LoadResource<UserList>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::UiContainer, UserList>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::RoomContainer:
         {
-            container.Add(name, LoadResource<RoomContainer>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::UiContainer, RoomContainer>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::RoomButton:
         {
-            container.Add(name, LoadResource<RoomButton>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::Image, RoomButton>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::AvatarInfo:
@@ -177,12 +177,12 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::MapSelector:
         {
-            container.Add(name, LoadResource<MapSelector>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::UiContainer, MapSelector>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::InstrumentSelector:
         {
-            container.Add(name, LoadResource<InstrumentSelector>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::UiContainer, InstrumentSelector>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Equalizer:
