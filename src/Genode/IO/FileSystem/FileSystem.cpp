@@ -35,7 +35,7 @@ namespace Gx
                 return controller->Open(name);
         }
 
-        throw ResourceAccessException(fileName, "File is not exists or not supported.");
+        throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
     bool FileSystem::Contains(const std::string &fileName)
@@ -78,7 +78,7 @@ namespace Gx
                 return controller->GetFileInfo(fileName);
         }
 
-        throw ResourceAccessException(fileName, "File is not exists or not supported.");
+        throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
     Int64 FileSystem::ReadFile(const std::string &fileName, void *data, const Int64 size)
@@ -95,7 +95,7 @@ namespace Gx
                 return controller->ReadFile(name, data, size);
         }
 
-        throw ResourceAccessException(fileName, "File is not exists or not supported.");
+        throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
     std::size_t FileSystem::GetFileSize(const std::string &fileName)
@@ -112,7 +112,7 @@ namespace Gx
                 return controller->GetFileSize(name);
         }
 
-        throw ResourceAccessException(fileName, "File is not exists or not supported.");
+        throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
     void FileSystem::Mount(const FileSystemController &fileSystem)

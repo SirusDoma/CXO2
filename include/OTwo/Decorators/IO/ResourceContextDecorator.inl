@@ -17,11 +17,11 @@ Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string &id) 
 {
     auto stream = Gx::FileSystem::Open(id);
     if (!stream)
-        throw Gx::ResourceLoadException(id, "Failed to load resource.");
+        throw Gx::ResourceLoadException(id, "Failed to load resource");
 
-    const auto loader = Gx::ResourceLoaderFactory::GetLoader<R>();
+    const auto loader = Gx::ResourceLoaderFactory::CreateLoader<R>();
     if (!loader)
-        throw Gx::ResourceLoadException(id, "There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+        throw Gx::ResourceLoadException(id, "There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
     auto resource = loader->LoadFromStream(*stream, *this);
     if (!loader->IsStreaming())
@@ -42,7 +42,7 @@ R* ResourceContextDecorator::Instantiate(const ResourceMetadata &metadata, const
 {
     const auto resources = GetResourceManager();
     if (!resources)
-        throw Gx::ResourceAccessException(GetID(), "ResourceManager is not set within this context.");
+        throw Gx::ResourceAccessException(GetID(), "ResourceManager is not set within this context");
 
     auto require = metadata.Require;
     if (require.empty())
@@ -72,8 +72,8 @@ R* ResourceContextDecorator::Instantiate(const ResourceMetadata &metadata, const
         }
         else
         {
-            static_assert(TypeChecker<R>::value, "Resource type is not supported.");
-            throw Gx::NotSupportedException("Resource type is not supported.");
+            static_assert(TypeChecker<R>::value, "Resource type is not supported");
+            throw Gx::NotSupportedException("Resource type is not supported");
         }
 
         id += "_" + std::to_string(resources->Count<R>());

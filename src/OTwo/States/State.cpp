@@ -14,28 +14,6 @@ State::State() :
     LoadCommonResources();
 }
 
-State::State(State &&state) noexcept :
-    Scene(state)
-{
-    LoadCommonResources();
-
-    State::SetParent(state.GetParent());
-    SetName(state.GetName());
-    SetTag(state.GetTag());
-
-    SetOrigin(state.GetOrigin());
-    SetPosition(state.GetPosition());
-    SetScale(state.GetScale());
-    SetRotation(state.GetRotation());
-
-    m_tempResources = std::make_unique<Gx::ResourceManager>();
-    if (state.m_resources)
-        m_resources = std::move(state.m_resources);
-
-    for (const auto child : state.GetChildren())
-        State::AddChild(child);
-}
-
 State::State(const std::string &name) :
     Gx::Scene(name),
     m_resources(std::make_unique<Gx::ResourceManager>()),

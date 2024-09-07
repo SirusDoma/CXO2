@@ -42,7 +42,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
 {
     auto metadata = dynamic_cast<const RadioButtonMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto radio = std::make_unique<Gx::RadioButton>();
     auto ctx = ResourceContextDecorator::Decorate(context);

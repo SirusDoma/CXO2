@@ -7,7 +7,7 @@ namespace Gx
     R* ResourceContext::Find(const std::string &id) const
     {
         if (!m_resources)
-            throw ResourceAccessException(id, "ResourceManager is not set within this context.");
+            throw ResourceAccessException(id, "ResourceManager is not set within this context");
 
         return m_resources->Find<R>(id);
     }
@@ -16,7 +16,7 @@ namespace Gx
     R& ResourceContext::Acquire(const std::string &id) const
     {
         if (!m_resources)
-            throw ResourceAccessException(id, "ResourceManager is not set within this context.");
+            throw ResourceAccessException(id, "ResourceManager is not set within this context");
 
         auto resource = m_resources->Find<R>(id);
         if (resource)

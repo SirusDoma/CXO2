@@ -114,7 +114,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadat
 {
     const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto number = std::make_unique<Gx::Number>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

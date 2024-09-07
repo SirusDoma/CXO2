@@ -19,7 +19,7 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceM
 {
     const auto metadata = dynamic_cast<const TransformMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto transform = sf::Transform();
     transform.translate(metadata->Position);

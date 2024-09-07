@@ -32,7 +32,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
 {
     const auto it = m_entries.find(index);
     if (it == m_entries.end())
-        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive");
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
@@ -62,7 +62,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
         if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         {
             delete[] data;
-            throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file.");
+            throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file");
         }
 
         const auto stream = new sf::MemoryInputStream();
@@ -77,7 +77,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
         };
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 bool OmcArchive::Contains(const std::string &name) const
@@ -158,19 +158,19 @@ std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string &fileNam
             return std::make_unique<FileInfo>(header);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 size) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
-        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive");
 
     if (index < 1000)
     {
         if (m_fileStream.seek(m_header.FxStartOffset) == -1)
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header.");
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header");
 
         // We can't seek straight to desired sample because we need to calculate these counters
         int accKeyByte = 0xFF;
@@ -180,13 +180,13 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 s
         {
             auto waveHeader = OmcWaveHeader();
             if (!ReadStream(&waveHeader, sizeof(waveHeader)))
-                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header.");
+                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header");
 
             const auto encodedData = new Gx::Uint8[waveHeader.ChunkSize];
             if (!ReadStream(encodedData, waveHeader.ChunkSize))
             {
                 delete[] encodedData;
-                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the encoded WAV data.");
+                throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the encoded WAV data");
             }
 
             // Still need to decode even not desired sample to increment accKeyByte and accCounter
@@ -229,16 +229,16 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 s
             return read;
         }
 
-        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive.");
+        throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive");
     }
     else
     {
         if (m_fileStream.seek(static_cast<Gx::Int64>(iterator->second.GetOffset())) == -1)
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to seek into the OGG data.");
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to seek into the OGG data");
 
         auto oggHeader = OmcOggHeader();
         if (!ReadStream(&oggHeader, sizeof(oggHeader)))
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the OGG header.");
+            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the OGG header");
 
         if (size > oggHeader.Size)
             size = oggHeader.Size;
@@ -255,7 +255,7 @@ Gx::Int64 OmcArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
             return ReadFile(key, data, size);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 Gx::Int64 OmcArchive::GetFileSize(const std::string &fileName) const
@@ -266,7 +266,7 @@ Gx::Int64 OmcArchive::GetFileSize(const std::string &fileName) const
             return header.GetSize();
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 std::string OmcArchive::GetExtension(const std::string& name) const

@@ -9,9 +9,9 @@ void Gx::ResourceLoaderFactory::EnsureDefaultLoadersRegistered()
     static bool registered = false;
     if (!registered)
     {
-        Gx::ResourceLoaderFactory::Register<sf::Texture,     Gx::TextureLoader>();
-        Gx::ResourceLoaderFactory::Register<Font,            Gx::FontLoader>();
-        Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, Gx::SoundBufferLoader>();
+        Register<sf::Texture,     TextureLoader>();
+        Register<Font,            FontLoader>();
+        Register<sf::SoundBuffer, SoundBufferLoader>();
 
         registered = true;
     }

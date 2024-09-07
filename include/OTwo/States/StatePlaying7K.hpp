@@ -17,8 +17,6 @@ class StatePlaying7K : public State
 {
 public:
     StatePlaying7K();
-    explicit StatePlaying7K(State &&state);
-
     void Initialize() override;
 
     unsigned int GetViewport() const;

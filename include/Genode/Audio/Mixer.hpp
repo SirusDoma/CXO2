@@ -4,7 +4,7 @@
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
 #include <Genode/Entities/Updatable.hpp>
-#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/Resource.hpp>
 
 #include <SFML/Audio.hpp>
 

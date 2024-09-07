@@ -62,7 +62,7 @@ Gx::ResourcePtr<Gx::TextBox> TextBoxLoader::LoadFromMetadata(const ResourceMetad
 {
     const auto metadata = dynamic_cast<const TextBoxMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto textBox = std::make_unique<Gx::TextBox>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

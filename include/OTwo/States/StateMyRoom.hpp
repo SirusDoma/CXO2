@@ -12,8 +12,7 @@
 class StateMyRoom : public State
 {
 public:
-    StateMyRoom() = default;
-    explicit StateMyRoom(State &&state);
+    StateMyRoom();
 
     void Initialize() override;
 

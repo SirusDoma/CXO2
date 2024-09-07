@@ -9,11 +9,8 @@ class Avatar;
 class StateWaiting7K : public State
 {
 public:
-    explicit StateWaiting7K(State &&state);
-
+    StateWaiting7K() = default;
     void Initialize() override;
-
-
 
 private:
     void OnKeyDown(const sf::Event::KeyEvent ev) override;

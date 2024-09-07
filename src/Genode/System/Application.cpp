@@ -35,7 +35,7 @@ namespace Gx
     Application& Application::Instance()
     {
         if (!m_instance)
-            throw Exception("Application is not instantiated yet.");
+            throw Exception("Application is not instantiated yet");
 
         return *m_instance;
     }

@@ -6,6 +6,7 @@
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Entities.hpp>
+#include <Genode/IO/ResourceContext.hpp>
 
 #include <typeindex>
 
@@ -16,10 +17,10 @@ namespace Gx
     class SceneDirector : public Renderable, public Updatable, public Inputable
     {
     public:
-        using SceneFactory = std::function<std::unique_ptr<Scene>(const ResourceContext&)>;
+        using SceneFactory = std::function<ResourcePtr<Scene>(const ResourceContext&)>;
 
         SceneDirector(SceneDirector &&director) noexcept;
-        SceneDirector(Application &app);
+        explicit SceneDirector(Application &app);
         SceneDirector(Application &app, Scene &scene);
         ~SceneDirector() override;
 
@@ -52,18 +53,18 @@ namespace Gx
         void Register(const SceneFactory &factory);
 
     private:
-        using SceneCacheMap   = std::unordered_map<std::type_index, std::unique_ptr<Scene>>;
+        using SceneCacheMap   = std::unordered_map<std::type_index, ResourcePtr<Scene>>;
         using SceneFactoryMap = std::unordered_map<std::type_index, SceneFactory>;
 
         void Stage();
         void Unstage();
 
-        Application            *m_application;
-        SceneFactoryMap         m_factories;
-        SceneCacheMap           m_caches;
-        std::unique_ptr<Scene>  m_currentScene, m_nextScene;
-        bool                    m_cacheEnabled;
-        mutable bool            m_staged;
+        Application       *m_application;
+        SceneFactoryMap    m_factories;
+        SceneCacheMap      m_caches;
+        ResourcePtr<Scene> m_currentScene, m_nextScene;
+        bool               m_cacheEnabled;
+        mutable bool       m_staged;
     };
 }
 

@@ -16,7 +16,7 @@ namespace Gx
     Int64 Archive::ReadFile(const FileInfo &entry, void *data) const
     {
         if (&entry.GetParent() != this)
-            throw ResourceAccessException(entry.GetName(), "The specified file doesn't belong to this archive.");
+            throw ResourceAccessException(entry.GetName(), "The specified file doesn't belong to this archive");
 
         return ReadFile(entry.GetName(), data, entry.GetSize());
     }

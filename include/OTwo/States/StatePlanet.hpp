@@ -7,7 +7,7 @@
 class StatePlanet : public State
 {
 public:
-    explicit StatePlanet(State &&state);
+    StatePlanet();
     void Initialize() override;
 
 private:

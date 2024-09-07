@@ -75,7 +75,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
 {
     const auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto animation = std::make_unique<Gx::Animation>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

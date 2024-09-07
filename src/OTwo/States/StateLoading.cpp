@@ -3,18 +3,13 @@
 #include <OTwo/States/StatePlaying7K.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/IO/PlayingResourceContext.hpp>
 
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 #include <thread>
-
-StateLoading::StateLoading(State &&state) :
-    State(std::move(state))
-{
-}
 
 void StateLoading::Initialize()
 {
@@ -46,22 +41,21 @@ void StateLoading::Initialize()
 
     if (!game.GetChart() || std::to_string(game.GetChart()->GetMetadata().ID) != metadata.ID)
     {
-        auto loader  = ChartLoader();
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
         {
             OnCoverLoaded(image);
         }
         else
         {
-            loader.SetCoverLoadCallback([this] (auto cover)
+            m_loader.SetCoverLoadCallback([this] (auto cover)
             {
                 Queue([this, cover] () { OnCoverLoaded(cover); });
             });
         }
 
-        auto thread = std::thread([=, &game] ()
+        auto thread = std::thread([=, loader = &m_loader, &game] ()
         {
-            game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+            game.SetChart(loader->LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
             Queue([this, &game] { OnChartLoaded(game.GetChart()); });
         });
 

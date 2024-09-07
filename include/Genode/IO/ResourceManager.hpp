@@ -90,20 +90,20 @@ namespace Gx
         void Clear();
 
     private:
-        class BaseContainer
+        class ContainerBase
         {
         public:
-            virtual ~BaseContainer() = default;
+            virtual ~ContainerBase() = default;
         };
 
         template<typename R>
-        class ManagedContainer final : public BaseContainer
+        class ContainerWrapper final : public ContainerBase
         {
         public:
-            explicit ManagedContainer(std::unique_ptr<ResourceContainer<R>> container) : Container(std::move(container)) {};
+            explicit ContainerWrapper(std::unique_ptr<ResourceContainer<R>> container) : Container(std::move(container)) {};
             std::unique_ptr<ResourceContainer<R>> Container;
         };
-        using ContainerMap = std::unordered_map<std::type_index, std::unique_ptr<BaseContainer>>;
+        using ContainerMap = std::unordered_map<std::type_index, std::unique_ptr<ContainerBase>>;
 
         ContainerMap   m_containers;
         ContextBuilder m_contextBuilder;

@@ -43,7 +43,7 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
 {
     auto metadata = dynamic_cast<const CheckBoxMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto checkBox = std::make_unique<Gx::CheckBox>();
     auto ctx = ResourceContextDecorator::Decorate(context);

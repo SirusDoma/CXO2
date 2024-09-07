@@ -15,7 +15,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Jso
 {
     StatePlayingMetadata metadata;
     if (json.find("name") == json.end())
-        throw Gx::ResourceLoadException("State must have a name.");
+        throw Gx::ResourceLoadException("State must have a name");
 
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;

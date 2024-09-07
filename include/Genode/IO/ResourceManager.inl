@@ -9,7 +9,7 @@ namespace Gx
         if (m_containers.find(typeid(R)) != m_containers.end())
             return;
 
-        m_containers[typeid(R)] = std::make_unique<ManagedContainer<R>>(std::make_unique<ResourceContainer<R>>());
+        m_containers[typeid(R)] = std::make_unique<ContainerWrapper<R>>(std::make_unique<ResourceContainer<R>>());
     }
 
     template<typename R>
@@ -72,11 +72,11 @@ namespace Gx
     {
         Register<R>();
 
-        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        auto loader = ResourceLoaderFactory::CreateLoader<R>();
         if (!loader)
-            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(idOrFileName, *this, mode));
             return loader->LoadFromFile(idOrFileName, *ctx);
@@ -90,11 +90,11 @@ namespace Gx
     {
         Register<R>();
 
-        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        auto loader = ResourceLoaderFactory::CreateLoader<R>();
         if (!loader)
-            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromFile(fileName, *ctx);
@@ -108,11 +108,11 @@ namespace Gx
     {
         Register<R>();
 
-        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        auto loader = ResourceLoaderFactory::CreateLoader<R>();
         if (!loader)
-            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
+            throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromMemory(data, size, *ctx);
@@ -126,11 +126,11 @@ namespace Gx
     {
         Register<R>();
 
-        auto loader = ResourceLoaderFactory::GetLoader<R>();
+        auto loader = ResourceLoaderFactory::CreateLoader<R>();
         if (!loader)
             throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromStream(stream, *ctx);
@@ -144,7 +144,7 @@ namespace Gx
     {
         Register<R>();
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         auto &result = managed->Container->Store(id, deserializer, mode);
 
         return result;
@@ -157,7 +157,7 @@ namespace Gx
 
         ResourcePtr<R> resource = std::make_unique<R>(std::forward<Args>(args)...);
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::move(resource), CacheMode::None);
     }
 
@@ -166,7 +166,7 @@ namespace Gx
     {
         Register<R>();
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::make_unique<R>(resource), mode);
     }
 
@@ -178,7 +178,7 @@ namespace Gx
 
         Register<R>();
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::move(resource), mode);
     }
 
@@ -189,7 +189,7 @@ namespace Gx
         if (it == m_containers.end())
             return nullptr;
 
-        auto managed = dynamic_cast<ManagedContainer<R>*>(it->second.get());
+        auto managed = dynamic_cast<ContainerWrapper<R>*>(it->second.get());
         if (!managed)
             return nullptr;
 
@@ -203,7 +203,7 @@ namespace Gx
         if (it == m_containers.end())
             return;
 
-        auto managed = dynamic_cast<ManagedContainer<R>*>(it->second.get());
+        auto managed = dynamic_cast<ContainerWrapper<R>*>(it->second.get());
         if (!managed)
             return;
 
@@ -217,7 +217,7 @@ namespace Gx
         if (it == m_containers.end())
             return false;
 
-        auto managed = static_cast<ManagedContainer<R>*>(it->second.get());
+        auto managed = static_cast<ContainerWrapper<R>*>(it->second.get());
         return managed->Container->Destroy(resource);
     }
 
@@ -226,7 +226,7 @@ namespace Gx
     {
         Register<R>();
 
-        auto managed = static_cast<ManagedContainer<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
         return managed->Container->Destroy(id);
     }
 
@@ -235,7 +235,7 @@ namespace Gx
     {
         if (auto it = m_containers.find(typeid(R)); it != m_containers.end())
         {
-            auto managed = dynamic_cast<const ManagedContainer<R>*>(it->second.get());
+            auto managed = dynamic_cast<const ContainerWrapper<R>*>(it->second.get());
             return managed->Container->Count();
         }
 

@@ -18,13 +18,19 @@ namespace Gx
         static void Register();
 
         template<typename R>
-        static void Register(std::function<std::unique_ptr<ResourceLoader<R>>()> factory);
+        static void Register(std::function<std::unique_ptr<ResourceLoader<R>>()> loader);
+
+        template<typename B, typename R>
+        static void RegisterDerived();
+
+        template<typename B, typename R, typename ... Args>
+        static void RegisterDerived(const std::function<std::unique_ptr<R>(Args...)>& creator);
 
         template<typename R>
         static bool Remove();
 
         template<typename R>
-        static std::unique_ptr<ResourceLoader<R>> GetLoader();
+        static std::unique_ptr<ResourceLoader<R>> CreateLoader();
 
     private:
         static void EnsureDefaultLoadersRegistered();

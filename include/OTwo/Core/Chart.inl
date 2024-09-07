@@ -3,7 +3,7 @@
 template<typename T>
 T* Chart::AddEvent(const Difficulty diff, T &&ev)
 {
-    static_assert(std::is_base_of_v<Event, T>, "Parameter must be an Event.");
+    static_assert(std::is_base_of_v<Event, T>, "Parameter must be an Event");
 
     double position = ev.Position;
     if constexpr (std::is_same_v<NoteEvent, T>)

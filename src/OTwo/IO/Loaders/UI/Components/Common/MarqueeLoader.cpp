@@ -35,7 +35,7 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const MarqueeMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto marquee = std::make_unique<Marquee>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

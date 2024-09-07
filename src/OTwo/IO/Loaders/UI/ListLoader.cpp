@@ -22,7 +22,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
 {
     const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto list = std::make_unique<Gx::List>(
         metadata->VerticalCount,   metadata->VerticalSpacing,

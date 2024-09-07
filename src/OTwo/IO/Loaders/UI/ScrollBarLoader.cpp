@@ -50,7 +50,7 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceM
 {
     const auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto scrollBar = std::make_unique<Gx::ScrollBar>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

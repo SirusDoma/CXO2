@@ -10,7 +10,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json &json, const Gx:
 {
     StateMetadata metadata;
     if (json.find("name") == json.end())
-        throw Gx::ResourceLoadException("State must have a name.");
+        throw Gx::ResourceLoadException("State must have a name");
 
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
@@ -24,7 +24,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &met
     if (metadata == nullptr)
         return nullptr;
 
-    auto state = std::make_unique<State>();
+    auto state = Create();
     state->SetName(meta.Name);
 
     for (auto [key, value] : meta.Require)

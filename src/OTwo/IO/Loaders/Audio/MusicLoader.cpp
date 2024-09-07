@@ -39,7 +39,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const MusicMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     // "data" must be a pointer (or reference to somewhere else) because it need to be alive outside this method
     const auto size = Gx::FileSystem::GetFileSize(metadata->Source);

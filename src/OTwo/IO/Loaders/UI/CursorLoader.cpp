@@ -62,7 +62,7 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadat
 {
     const auto metadata = dynamic_cast<const CursorMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto cursor = std::make_unique<Gx::Cursor>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

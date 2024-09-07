@@ -55,7 +55,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
 {
     const auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto dialog = std::make_unique<Gx::Dialog>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

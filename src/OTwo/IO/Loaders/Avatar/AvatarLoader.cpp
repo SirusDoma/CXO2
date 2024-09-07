@@ -48,7 +48,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
     auto avatar = std::make_unique<Avatar>();
     const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     avatar->SetName(metadata->Name);
     avatar->SetGender(metadata->Gender);

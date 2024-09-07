@@ -24,7 +24,7 @@ Gx::ResourcePtr<RoomButton> RoomButtonLoader::LoadFromMetadata(const ResourceMet
 {
     const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto button = std::make_unique<RoomButton>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

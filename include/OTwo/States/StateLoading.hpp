@@ -2,13 +2,13 @@
 #define O2JAM_STATE_LOADING_HPP
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/IO/PlayingResourceContext.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/Core/Chart.hpp>
 
 class StateLoading : public State
 {
 public:
-    explicit StateLoading(State &&state);
+    StateLoading() = default;
     void Initialize() override;
 
 private:
@@ -17,6 +17,7 @@ private:
     void OnChartLoaded(const Chart *chart);
 
     sf::Texture m_texture;
+    ChartLoader m_loader;
 };
 
 #endif

@@ -31,7 +31,7 @@ namespace Gx
         if (auto instance = Require<T*>(); instance)
             return *instance;
 
-        throw Exception(std::string(typeid(T).name()) + " is not constructible and not provided within the current context.");
+        throw Exception(std::string(typeid(T).name()) + " is not constructible and not provided within the current context");
     }
 
     template<typename T>
@@ -85,15 +85,9 @@ namespace Gx
     }
 
     template<typename T>
-    std::enable_if_t<Constructible<T>::value, void> Provider::Provide(const Scope scope)
+    void Provider::Provide(const Scope scope)
     {
+        static_assert(Constructible<T>::value, "Use Provide<T>(Builder<T>, Scope) instead for interface or complex constructible type");
         Provide<T>(As<T>(), scope);
     }
-
-    template<typename T>
-    std::enable_if_t<!Constructible<T>::value, void> Provider::Provide(const Scope scope)
-    {
-        static_assert(Constructible<T>::value, "Use Provide<T>(Builder<T>, Scope) instead for interface or complex constructible type.");
-    }
-
 }

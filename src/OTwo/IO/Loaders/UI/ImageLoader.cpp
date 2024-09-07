@@ -26,7 +26,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto image = std::make_unique<Gx::Image>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

@@ -25,7 +25,7 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadat
     const auto ctx = ResourceContextDecorator::Decorate(context);
     const auto metadata = dynamic_cast<const SpriteMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto sprite = std::make_unique<Gx::Sprite>();
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)

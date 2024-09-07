@@ -5,7 +5,7 @@ namespace Gx
     template<typename T>
     void SceneDirector::Register(const SceneFactory &factory)
     {
-        static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene.");
+        static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene");
 
         m_factories[typeid(T)] = factory;
     }

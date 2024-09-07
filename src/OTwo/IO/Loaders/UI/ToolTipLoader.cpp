@@ -99,7 +99,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetad
 {
     const auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto toolTip = std::make_unique<Gx::ToolTip>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

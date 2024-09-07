@@ -66,7 +66,7 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
             if (const auto texture = container->GetTexture(shape); !texture)
                 container->SetTexture(shape, *tap->GetTexture());
             else if (texture != tap->GetTexture() || texture != hold->GetTexture())
-                throw Gx::NotSupportedException("Note and Measure prefab must share same texture.");
+                throw Gx::NotSupportedException("Note and Measure prefab must share same texture");
         }
 
         tapNotePrefabs[channel]= {

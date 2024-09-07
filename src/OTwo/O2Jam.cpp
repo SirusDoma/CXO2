@@ -57,7 +57,6 @@
 #include <OTwo/Core/Judgements/TimeJudgementStrategy.hpp>
 #include <OTwo/Core/ScoreTracker.hpp>
 
-#include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateAvi.hpp>
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
@@ -67,6 +66,7 @@
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/Utilities/Console.hpp>
 
 void O2Jam::Boot()
@@ -122,6 +122,13 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateAvi>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StatePlanet>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateRoom>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateMyRoom>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateWaiting7K>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateLoading>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
     // Render Settings
@@ -227,15 +234,14 @@ void O2Jam::Boot()
         Gx::FileSystem::Mount(bgPlanet);
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
-    director.Register<StateTest>("Interface/State/Test.json");
     director.Register<StateAvi>("Interface/State/Avi.json");
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateMyRoom>("Interface/State/MyRoom.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
-    director.Register<StateResult>("Interface/State/Result.json");
     director.Register<StatePlaying7K>("Playing/State/Playing7K.json");
+    director.Register<StateResult>("Interface/State/Result.json");
 
     director.Present<StateAvi>();
 }

@@ -64,7 +64,7 @@ namespace Gx
                             const float             level)
     {
         if (type != sf::PrimitiveType::TriangleFan && type != sf::PrimitiveType::TriangleStrip && type != sf::PrimitiveType::Triangles)
-           throw Exception("SpriteBatch supports only triangle-based primitive types.");
+           throw Exception("SpriteBatch supports only triangle-based primitive types");
 
         // Anything to batch?
         if (count == 0)
@@ -89,7 +89,7 @@ namespace Gx
 
                 break;
             default:
-                throw Exception("A non-triangle primitive type was encountered when decomposing into triangles.");
+                throw Exception("A non-triangle primitive type was encountered when decomposing into triangles");
         }
     }
 
@@ -151,28 +151,28 @@ namespace Gx
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Render(const sf::VertexBuffer &vertexBuffer, const RenderStates &states)
     {
-        throw NotSupportedException("Vertex Buffer is already live in GPU Memory.");
+        throw NotSupportedException("Vertex Buffer is already live in GPU Memory");
     }
 
     ////////////////////////////////////////////////////////////
     void SpriteBatch::Render(const sf::VertexBuffer &vertexBuffer, const std::size_t firstVertex, const std::size_t vertexCount, const RenderStates &states)
     {
-        throw NotSupportedException("Vertex Buffer is already live in GPU Memory.");
+        throw NotSupportedException("Vertex Buffer is already live in GPU Memory");
     }
 
     const sf::View & SpriteBatch::GetDefaultView() const
     {
-        throw NotSupportedException("SpriteBatch does not have a view.");
+        throw NotSupportedException("SpriteBatch does not have a view");
     }
 
     const sf::View & SpriteBatch::GetView() const
     {
-        throw NotSupportedException("SpriteBatch does not have a view.");
+        throw NotSupportedException("SpriteBatch does not have a view");
     }
 
     void SpriteBatch::SetView(const sf::View &view)
     {
-        throw NotSupportedException("SpriteBatch does not have a view.");
+        throw NotSupportedException("SpriteBatch does not have a view");
     }
 
     ////////////////////////////////////////////////////////////

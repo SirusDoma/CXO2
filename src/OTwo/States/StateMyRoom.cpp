@@ -14,8 +14,7 @@
 #include <Genode/UI/Number.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
-StateMyRoom::StateMyRoom(State &&state) :
-    State::State(std::move(state)),
+StateMyRoom::StateMyRoom() :
     m_selectedItem(nullptr),
     m_bagSelect(nullptr)
 {

@@ -180,7 +180,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     std::unique_ptr<Gx::Shape> shape;
     if (metadata->ShapeType == ShapeMetadata::Type::Circle)

@@ -24,7 +24,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto label = std::make_unique<Gx::Label>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

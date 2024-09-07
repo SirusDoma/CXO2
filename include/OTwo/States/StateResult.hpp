@@ -8,7 +8,7 @@
 class StateResult : public State
 {
 public:
-    explicit StateResult(State &&state);
+    StateResult() = default;
     void Initialize() override;
 
 private:

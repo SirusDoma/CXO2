@@ -40,7 +40,7 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
 {
     const auto metadata = dynamic_cast<const EqualizerMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
     auto equalizer = std::make_unique<Equalizer>(metadata->Count, metadata->Spacing);
 

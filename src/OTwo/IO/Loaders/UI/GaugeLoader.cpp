@@ -80,7 +80,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata 
 {
     const auto metadata = dynamic_cast<const GaugeMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto gauge = std::make_unique<Gx::Gauge>();
     const auto ctx = ResourceContextDecorator::Decorate(context);

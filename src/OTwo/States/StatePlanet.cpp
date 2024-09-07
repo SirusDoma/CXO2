@@ -2,15 +2,13 @@
 #include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
-#include <OTwo/States/StateTest.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
 #include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Fade.hpp>
 
-StatePlanet::StatePlanet(State &&state) :
-    State(std::move(state)),
+StatePlanet::StatePlanet() :
     m_connecting(false)
 {
 }

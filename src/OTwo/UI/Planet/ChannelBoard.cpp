@@ -147,7 +147,7 @@ void ChannelBoard::Initialize()
     m_noticeMaxPage   = notice->GetFrameCount();
 
     if (const auto bounds = GetLocalBounds(); !m_renderTexture.create(sf::Vector2u(bounds.width, bounds.height)))
-        throw Gx::Exception("Failed to create render texture.");
+        throw Gx::Exception("Failed to create render texture");
 
     m_renderTexture.setSmooth(true);
     m_duplicateImage.SetOrigin(GetOrigin());

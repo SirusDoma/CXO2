@@ -27,7 +27,7 @@ void Marquee::SetLocalBounds(const sf::FloatRect &bounds)
     m_bounds = bounds;
 
     if (!m_renderTexture->create(sf::Vector2u(static_cast<unsigned int>(m_bounds.width), static_cast<unsigned int>(m_bounds.height))))
-        throw Gx::Exception("Failed to create render texture.");
+        throw Gx::Exception("Failed to create render texture");
 
     m_renderTexture->setSmooth(true);
 

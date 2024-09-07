@@ -20,14 +20,14 @@ namespace Gx
         if (current)
         {
             if (mode == CacheMode::None)
-                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists.");
+                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists");
 
             if (mode == CacheMode::Reuse)
                 return *current;
         }
 
         if (!resource)
-            throw ResourceStoreException(id, "[" + id + "]\nCannot store empty resource.");
+            throw ResourceStoreException(id, "[" + id + "]\nCannot store empty resource");
 
         m_caches[id] = std::move(resource);
         return *m_caches[id];
@@ -40,7 +40,7 @@ namespace Gx
         if (current)
         {
             if (mode == CacheMode::None)
-                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists.");
+                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists");
 
             if (mode == CacheMode::Reuse)
                 return *current;

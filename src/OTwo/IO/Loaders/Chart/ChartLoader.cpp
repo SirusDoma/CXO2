@@ -72,7 +72,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
             if (entry->Read(&payload[0]) <= 0)
                 continue;
 
-            const auto loader = Gx::ResourceLoaderFactory::GetLoader<sf::SoundBuffer>();
+            const auto loader = Gx::ResourceLoaderFactory::CreateLoader<sf::SoundBuffer>();
             if (auto buffer = loader->LoadFromMemory(&payload[0], entry->GetSize(), Gx::ResourceContext::Default); buffer)
                 chart->AddSample(entry->GetIndex(), std::move(buffer));
         }
@@ -237,7 +237,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, c
 
     auto image  = std::make_unique<sf::Image>();
     if (!image->loadFromMemory(&data[0], metadata.ThumbnailSize))
-        throw Gx::ResourceLoadException("Failed to load image.");
+        throw Gx::ResourceLoadException("Failed to load image");
 
     return image;
 }
@@ -256,7 +256,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, co
 
     auto image = std::make_unique<sf::Image>();
     if (!image->loadFromMemory(&data[0], metadata.CoverSize))
-        throw Gx::ResourceLoadException("Failed to load image.");
+        throw Gx::ResourceLoadException("Failed to load image");
 
     return image;
 }

@@ -29,7 +29,7 @@ namespace Gx
         explicit ResourceStoreException(const std::string& id) : IOException("[" + id +"]\nFailed to store specified resource."), m_resourceID(id) {};
         ResourceStoreException(const std::string& id, const std::string& message) : IOException("[" + id +"]\n" + message), m_resourceID(id) {};
 
-        const std::string& GetResourceID() { return m_resourceID; }
+        const std::string& GetResourceID() const { return m_resourceID; }
 
     private:
         std::string m_resourceID;
@@ -41,7 +41,7 @@ namespace Gx
         explicit ResourceAccessException(const std::string& id) : IOException("[" + id +"]\nResource with specified id is not found."), m_resourceID(id) {};
         ResourceAccessException(const std::string& id, const std::string& message) : IOException("[" + id +"]\n" + message), m_resourceID(id) {};
 
-        const std::string& GetResourceID() { return m_resourceID; }
+        const std::string& GetResourceID() const { return m_resourceID; }
 
     private:
         std::string m_resourceID;

@@ -36,7 +36,7 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromMetadata(const ResourceMetadat
 {
     const auto metadata = dynamic_cast<const ItemData*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     return std::make_unique<ItemData>(*metadata);
 }

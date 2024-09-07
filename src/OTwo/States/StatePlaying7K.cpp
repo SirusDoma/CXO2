@@ -42,25 +42,6 @@ StatePlaying7K::StatePlaying7K() :
 {
 }
 
-StatePlaying7K::StatePlaying7K(State &&state) :
-    State(std::move(state)),
-    m_renderer(ChannelSet{
-        Chart::Channel::Note1,
-        Chart::Channel::Note2,
-        Chart::Channel::Note3,
-        Chart::Channel::Note4,
-        Chart::Channel::Note5,
-        Chart::Channel::Note6,
-        Chart::Channel::Note7
-    }),
-    m_self(),
-    m_context(),
-    m_config(),
-    m_chatBox(),
-    m_viewport()
-{
-}
-
 void StatePlaying7K::Initialize()
 {
     State::Initialize();

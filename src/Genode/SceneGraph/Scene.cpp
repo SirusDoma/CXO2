@@ -52,7 +52,7 @@ namespace Gx
     SceneDirector& Scene::GetDirector() const
     {
         if (!m_director)
-            throw Exception("SceneDirector is not ready yet.");
+            throw Exception("SceneDirector is not ready yet");
 
         return *m_director;
     }

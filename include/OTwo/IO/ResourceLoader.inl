@@ -53,7 +53,7 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream &stream, co
     if (stream.read(data, size) == -1)
     {
         delete[] data;
-        throw Gx::ResourceLoadException("Failed to load the resource.");
+        throw Gx::ResourceLoadException("Failed to load the resource");
     }
 
     auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(data), size));

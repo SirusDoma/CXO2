@@ -33,7 +33,7 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) c
 {
     const auto it = m_entries.find(fileName);
     if (it == m_entries.end())
-        throw Gx::ResourceAccessException(fileName, "The specified index is out of bound for this archive.");
+        throw Gx::ResourceAccessException(fileName, "The specified index is out of bound for this archive");
 
     const auto header = it->second;
     const auto data = new Gx::Uint8[header.GetSize()];
@@ -113,18 +113,18 @@ std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string &fileNam
             return std::make_unique<FileInfo>(header);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 Gx::Int64 OpiArchive::ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())
-        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     const FileInfo header = iterator->second;
     if (m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())) < 0)
-        throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive.");
+        throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive");
 
     if (size > header.GetSize())
         size = header.GetSize();
@@ -136,7 +136,7 @@ Gx::Int64 OpiArchive::GetFileSize(const std::string &fileName) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())
-        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     return iterator->second.GetSize();
 }

@@ -13,11 +13,6 @@
 #include <Genode/Fx/Move.hpp>
 #include <Genode/UI.hpp>
 
-StateResult::StateResult(State &&state) :
-    State(std::move(state))
-{
-}
-
 void StateResult::Initialize()
 {
     State::Initialize();

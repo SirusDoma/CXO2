@@ -27,7 +27,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string &fileName) c
 {
     const auto header = GetFileInfo(fileName);
     if (!header)
-        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     const auto data = new Gx::Uint8[header->GetSize()];
     if (const auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
@@ -77,7 +77,7 @@ std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::string &fileNam
             return std::make_unique<FileInfo>(header);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 Gx::Int64 M30Archive::ReadFile(const unsigned int index, void *data, const Gx::Int64 size) const
@@ -93,7 +93,7 @@ Gx::Int64 M30Archive::ReadFile(const std::string &fileName, void *data, const Gx
 {
     const auto header = GetFileInfo(fileName);
     if (!header)
-        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     return ReadFile(dynamic_cast<FileInfo&>(*header), data, size);
 }
@@ -111,7 +111,7 @@ Gx::Int64 M30Archive::GetFileSize(const std::string &fileName) const
             return header.GetSize();
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive.");
+    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
 std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const

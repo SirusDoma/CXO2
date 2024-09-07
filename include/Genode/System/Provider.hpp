@@ -27,10 +27,7 @@ namespace Gx
         virtual ~Provider() = default;
 
         template<typename T>
-        std::enable_if_t<Constructible<T>::value, void> Provide(Scope scope = Scope::Local);
-
-        template<typename T>
-        std::enable_if_t<!Constructible<T>::value, void> Provide(Scope scope = Scope::Local);
+        void Provide(Scope scope = Scope::Local);
 
         template<typename T>
         void Provide(Builder<T> builder, Scope scope = Scope::Singleton);
@@ -65,24 +62,23 @@ namespace Gx
             }
         }
 
-        // HACK: Ugly abstraction, but it works lol
-        struct Base
+        struct Scoppable
         {
-            explicit Base(const Scope scope) : Base::Scope(scope) {};
-            virtual ~Base() = default;
-            virtual std::unique_ptr<Base> Clone() = 0;
+            explicit Scoppable(const Scope scope) : Scoppable::Scope(scope) {};
+            virtual ~Scoppable() = default;
+            virtual std::unique_ptr<Scoppable> Clone() = 0;
 
             Provider::Scope Scope;
         };
-        using StorageMap = std::unordered_map<std::type_index, std::unique_ptr<Base>>;
+        using StorageMap = std::unordered_map<std::type_index, std::unique_ptr<Scoppable>>;
 
         template<typename T>
-        struct Instance final : Base
+        struct Instance final : Scoppable
         {
-            explicit Instance(std::unique_ptr<T> handle, const Provider::Scope scope) : Base(scope), Handle(std::move(handle)) {};
-            std::unique_ptr<Base> Clone() override
+            explicit Instance(std::unique_ptr<T> handle, const Provider::Scope scope) : Scoppable(scope), Handle(std::move(handle)) {};
+            std::unique_ptr<Scoppable> Clone() override
             {
-                if (Base::Scope == Scope::Local)
+                if (Scoppable::Scope == Scope::Local)
                     return nullptr;
 
                 return std::make_unique<Instance>(std::unique_ptr<T>(Handle.get()), Scope);
@@ -92,12 +88,12 @@ namespace Gx
         };
 
         template<typename T>
-        struct Factory final : Base
+        struct Factory final : Scoppable
         {
-            Factory(Provider::Builder<T> builder, Provider::Scope scope) : Base(std::move(scope)), Builder(std::move(builder)) {};
-            std::unique_ptr<Base> Clone() override
+            Factory(Provider::Builder<T> builder, Provider::Scope scope) : Scoppable(std::move(scope)), Builder(std::move(builder)) {};
+            std::unique_ptr<Scoppable> Clone() override
             {
-                if (Base::Scope == Scope::Singleton)
+                if (Scoppable::Scope == Scope::Singleton)
                     return nullptr;
 
                 return std::make_unique<Factory>(Builder, Scope);
@@ -115,7 +111,7 @@ namespace Gx
         template <typename Tuple>
         auto BuildParameters();
 
-        Provider*   m_parent;
+        Provider*  m_parent;
         StorageMap m_instances;
         StorageMap m_factories;
     };

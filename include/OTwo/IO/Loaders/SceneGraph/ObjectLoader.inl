@@ -3,7 +3,7 @@
 template<typename R>
 Gx::ResourcePtr<R> ObjectLoader::LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context)
 {
-    auto baseLoader = Gx::ResourceLoaderFactory::GetLoader<R>();
+    auto baseLoader = Gx::ResourceLoaderFactory::CreateLoader<R>();
     if (!baseLoader)
         return nullptr;
 

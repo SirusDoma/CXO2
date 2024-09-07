@@ -56,7 +56,7 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const Resou
 {
     const auto metadata = dynamic_cast<const ChannelButtonMetadata*>(&meta);
     if (!metadata)
-        throw Gx::ResourceLoadException("The specified metadata is incompatible.");
+        throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto channelButton = std::make_unique<ChannelButton>();
     const auto acquirer = ResourceContextDecorator::Decorate(context);

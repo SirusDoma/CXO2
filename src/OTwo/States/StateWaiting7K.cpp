@@ -22,11 +22,6 @@
 
 #include <magic_enum.hpp>
 
-StateWaiting7K::StateWaiting7K(State &&state) :
-    State(std::move(state))
-{
-}
-
 void StateWaiting7K::Initialize()
 {
     State::Initialize();

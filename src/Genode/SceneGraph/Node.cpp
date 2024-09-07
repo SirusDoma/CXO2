@@ -17,9 +17,9 @@ namespace Gx
         m_tag(copy.m_tag),
         m_children(copy.m_children)
     {
-        for (auto child : m_children)
+        for (const auto child : m_children)
         {
-            if (auto parent = child->GetParent(); parent)
+            if (const auto parent = child->GetParent(); parent)
                 parent->RemoveChild(child);
 
             child->SetParent(this);

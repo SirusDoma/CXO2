@@ -3,6 +3,7 @@
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Dialog.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 
 #include <memory>
 
@@ -24,7 +25,6 @@ class State : public virtual Gx::Scene
 {
 public:
     State();
-    State(State &&state) noexcept;
     explicit State(const std::string& name);
     State(const std::string& name, Gx::ResourceManager &resources);
 
