@@ -15,9 +15,6 @@ public:
 private:
     void OnMyRoomClicked() const;
     void OnBackClicked() const;
-
-    OptionDialog m_optionDialog;
-    CreateRoomDialog m_createRoomDialog;
 };
 
 #endif

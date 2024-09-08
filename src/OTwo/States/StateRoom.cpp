@@ -25,9 +25,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 
-StateRoom::StateRoom() :
-    m_optionDialog(),
-    m_createRoomDialog()
+StateRoom::StateRoom()
 {
 }
 
