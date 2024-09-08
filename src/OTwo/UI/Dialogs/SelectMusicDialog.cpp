@@ -23,6 +23,17 @@
 #include <unordered_set>
 #include <OTwo/States/State.hpp>
 
+SelectMusicDialog::SelectMusicDialog(SessionContext& session, MusicSelectionContext& selection, Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+    m_coverID(0),
+    m_speed(0),
+    m_session(session),
+    m_selection(selection),
+    m_mixer(mixer),
+    m_resources(resources),
+    m_music()
+{
+}
+
 void SelectMusicDialog::Initialize()
 {
     Gx::Dialog::Initialize();
@@ -30,22 +41,19 @@ void SelectMusicDialog::Initialize()
     if (m_initialized)
         return;
 
-    auto& session   = Gx::Application::Instance().GetContext().Require<SessionContext>();
-    auto& selection = Gx::Application::Instance().GetContext().Require<MusicSelectionContext>();
-
     m_page = 0;
-    m_musicList = session.GetInstalledMusic();
+    m_musicList = m_session.GetInstalledMusic();
 
     for (auto& metadata : m_musicList)
         m_displayList.push_back(metadata);
 
-    m_random = selection.GetRandomLevel();
-    m_difficulty = selection.GetDifficulty();
-    m_speed = selection.GetSpeed();
+    m_random = m_selection.GetRandomLevel();
+    m_difficulty = m_selection.GetDifficulty();
+    m_speed = m_selection.GetSpeed();
     if (!m_displayList.empty())
     {
-        if (selection.GetMetadata().ID != 0)
-            m_music = selection.GetMetadata();
+        if (m_selection.GetMetadata().ID != 0)
+            m_music = m_selection.GetMetadata();
         else
             m_music = m_displayList[m_displayList.size() - 1];
     }
@@ -417,7 +425,7 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    Sort(selection.GetSortMode(), selection.GetSortOrder());
+    Sort(m_selection.GetSortMode(), m_selection.GetSortOrder());
     CacheMusicCover();
 }
 
@@ -542,10 +550,8 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
     Dialog::OnShown(scene);
 
     const auto parent     = GetParent<::State>();
-    const auto& session   = parent->Require<SessionContext>();
-    const auto& selection = parent->Require<MusicSelectionContext>();
 
-    m_musicList = session.GetInstalledMusic(true);
+    m_musicList = m_session.GetInstalledMusic(true);
     m_displayList.clear();
     for (auto& metadata : m_musicList)
     {
@@ -553,13 +559,13 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
             m_displayList.push_back(metadata);
     }
 
-    if (!selection.GetMetadata().Source.empty())
-        m_music = selection.GetMetadata();
+    if (!m_selection.GetMetadata().Source.empty())
+        m_music = m_selection.GetMetadata();
     else
         m_music = m_musicList[m_musicList.size() - 1];
 
-    m_random = selection.GetRandomLevel();
-    m_difficulty = selection.GetDifficulty();
+    m_random = m_selection.GetRandomLevel();
+    m_difficulty = m_selection.GetDifficulty();
     if (const auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
     {
         std::unordered_map<std::string, Difficulty> diffMap = {
@@ -575,7 +581,7 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
         }
     }
 
-    m_speed = selection.GetSpeed();
+    m_speed = m_selection.GetSpeed();
     if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
     {
         for (auto child : speedSelector->GetChildren())
@@ -622,7 +628,7 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
         }
     }
 
-    Sort(selection.GetSortMode(), selection.GetSortOrder());
+    Sort(m_selection.GetSortMode(), m_selection.GetSortOrder());
 }
 
 void SelectMusicDialog::OnAccepted()
@@ -634,20 +640,17 @@ void SelectMusicDialog::OnAccepted()
     Dialog::OnAccepted();
 
     const auto parent = GetParent<::State>();
-    auto& mixer       = parent->Require<Gx::Mixer>();
-    auto& resources   = parent->Require<Gx::ResourceManager>();
-    auto& selection   = parent->Require<MusicSelectionContext>();
 
-    selection.SetMetadata(m_music);
-    selection.SetRandomLevel(m_random);
-    selection.SetSortMode(m_sort);
-    selection.SetSortOrder(m_order);
-    selection.SetDifficulty(m_difficulty);
-    selection.SetSpeed(m_speed);
+    m_selection.SetMetadata(m_music);
+    m_selection.SetRandomLevel(m_random);
+    m_selection.SetSortMode(m_sort);
+    m_selection.SetSortOrder(m_order);
+    m_selection.SetDifficulty(m_difficulty);
+    m_selection.SetSpeed(m_speed);
     CacheMusicCover();
 
-    const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
-    mixer.Play(sfx);
+    const auto sfx = &m_resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
+    m_mixer.Play(sfx);
 }
 
 void SelectMusicDialog::OnCancelled()
@@ -655,32 +658,26 @@ void SelectMusicDialog::OnCancelled()
     Dialog::OnCancelled();
 
     const auto parent = GetParent<::State>();
-    auto& mixer       = parent->Require<Gx::Mixer>();
-    auto& resources   = parent->Require<Gx::ResourceManager>();
 
-    const auto sfx = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
-    mixer.Play(sfx);
+    const auto sfx = &m_resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
+    m_mixer.Play(sfx);
 }
 
 void SelectMusicDialog::CacheMusicCover() const
 {
-
     if (m_music.Source.empty())
         return;
-
-    const auto parent = GetParent<::State>();
-    auto& resources   = parent->Require<Gx::ResourceManager>();
 
     try
     {
         if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
-            resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+            m_resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
         else
-            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+            m_resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
     }
     catch (Gx::Exception)
     {
-        resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+        m_resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
     }
 }
 

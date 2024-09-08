@@ -11,7 +11,7 @@
 class OptionDialog : public Gx::Dialog
 {
 public:
-    using Gx::Dialog::Dialog;
+    OptionDialog(Gx::Mixer& mixer, GameConfig& config);
     void Initialize() override;
 
 private:
@@ -31,7 +31,9 @@ private:
     ::State *m_parent;
     std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    GameConfig     m_config;
+    Gx::Mixer&     m_mixer;
+    GameConfig&    m_appConfig;
+    GameConfig     m_tempConfig;
     Chart::Channel m_keyChannel;
 
     bool m_initialized = false;

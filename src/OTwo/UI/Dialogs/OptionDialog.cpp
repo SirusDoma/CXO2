@@ -15,6 +15,14 @@
 
 #include <magic_enum.hpp>
 
+OptionDialog::OptionDialog(Gx::Mixer& mixer, GameConfig& config) :
+    m_parent(),
+    m_mixer(mixer),
+    m_appConfig(config),
+    m_keyChannel(Chart::Channel::Note1)
+{
+}
+
 void OptionDialog::Initialize()
 {
     Gx::Dialog::Initialize();
@@ -22,10 +30,7 @@ void OptionDialog::Initialize()
     if (m_initialized)
         return;
 
-    auto& app   = Gx::Application::Instance();
-    auto& mixer = app.GetContext().Require<Gx::Mixer>();
-    m_parent    = GetParent<::State>();
-
+    m_parent                 = GetParent<::State>();
     const auto bgAllTest     = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
     const auto bgTest        = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
     const auto sfxTest       = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
@@ -43,9 +48,9 @@ void OptionDialog::Initialize()
     keySelect->AddChild(keyBar);
 
     const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseFx = sender->IsChecked(); });
+    gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseFx = sender->IsChecked(); });
     const auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
-    cursorCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseWindowCursor = sender->IsChecked(); });
+    cursorCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseWindowCursor = sender->IsChecked(); });
     const auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
     keyTestCheckBox->SetCheckStateChangeCallback([=] (auto sender)
     {
@@ -81,126 +86,126 @@ void OptionDialog::Initialize()
     }
 
     const auto bgmCheckBox           = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
-    bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_config.UseBGM = sender->IsChecked(); });
+    bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseBGM = sender->IsChecked(); });
     const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
     const auto btnMasterVolumeUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_UP");
     const auto btnMasterVolumeDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_DOWN");
-    btnMasterVolumeUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnMasterVolumeUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() + 1);
         musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
         effectVolumeGauge->SetValue(masterVolumeGauge->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_tempConfig.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_tempConfig.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (bgAllTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
-            mixer.Play(bgAllTest, "BGTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
+            m_mixer.Play(bgAllTest, "BGTest");
         }
 
-        mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
-        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.Play(sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
     });
-    btnMasterVolumeDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnMasterVolumeDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() - 1);
         musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
         effectVolumeGauge->SetValue(masterVolumeGauge->GetValue());
 
-        m_config.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
-        m_config.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_tempConfig.MusicVolume  = static_cast<unsigned int>(masterVolumeGauge->GetValue());
+        m_tempConfig.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (bgAllTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
-            mixer.Play(bgAllTest, "BGTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
+            m_mixer.Play(bgAllTest, "BGTest");
         }
 
-        mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
-        mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.Play(sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
     });
 
     const auto btnMusicUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_UP");
     const auto btnMusicDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_DOWN");
 
-    btnMusicUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnMusicUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() + 1);
-        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
+        m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (bgTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
-            mixer.Play(bgTest, "BGTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
+            m_mixer.Play(bgTest, "BGTest");
         }
 
-        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
     });
-    btnMusicDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnMusicDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() - 1);
-        m_config.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
+        m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (bgTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
-            mixer.Play(bgTest, "BGTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
+            m_mixer.Play(bgTest, "BGTest");
         }
 
-        mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
     });
 
     const auto btnSoundEffectUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_UP");
     const auto btnSoundEffectDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_DOWN");
 
-    btnSoundEffectUp->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnSoundEffectUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() + 1);
-        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
+        m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (sfxTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
         }
 
-        mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
+        m_mixer.Play(sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
     });
-    btnSoundEffectDown->SetHoldClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnSoundEffectDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
     {
         effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() - 1);
-        m_config.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
+        m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
-        mixer.Pause("BGM");
+        m_mixer.Pause("BGM");
         if (sfxTest->getStatus() != sf::SoundSource::Playing)
         {
-            mixer.Stop("BGTest");
-            mixer.Stop("EFTest");
+            m_mixer.Stop("BGTest");
+            m_mixer.Stop("EFTest");
         }
 
-        mixer.Play(sfxTest, "EFTest");
-        mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
+        m_mixer.Play(sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
     });
 
     const auto btnSave = FindChild<Gx::Button>("IDC_BUTTON_SAVE");
-    btnSave->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
+    btnSave->SetClickCallback([=] (auto &sender, auto &ev)
     {
         if (!ValidateConfig())
         {
@@ -209,26 +214,26 @@ void OptionDialog::Initialize()
             return;
         }
 
-        auto& application = Gx::Application::Instance();
-        application.GetContext().Require<GameConfig>().Apply(m_config);
+        const auto& application = Gx::Application::Instance();
+        m_appConfig.Apply(m_tempConfig);
 
         if (const auto cursor = application.GetCursor(); cursor)
         {
-            cursor->SetEnabled(!m_config.UseWindowCursor);
+            cursor->SetEnabled(!m_tempConfig.UseWindowCursor);
             application.InvalidateCursor();
         }
 
         m_keyChannel = Chart::Channel::Note1;
         keySelect->SetFrame(0);
 
-        if (const auto bgGroup = mixer.GetSoundGroup("BGM"); bgGroup)
+        if (const auto bgGroup = m_mixer.GetSoundGroup("BGM"); bgGroup)
         {
-            bgGroup->SetVolume(m_config.MusicVolume);
-            bgGroup->SetEnabled(m_config.UseBGM);
+            bgGroup->SetVolume(m_tempConfig.MusicVolume);
+            bgGroup->SetEnabled(m_tempConfig.UseBGM);
         }
 
-        if (const auto sfxGroup = mixer.GetSoundGroup("SFX"); sfxGroup)
-            sfxGroup->SetVolume(m_config.EffectVolume);
+        if (const auto sfxGroup = m_mixer.GetSoundGroup("SFX"); sfxGroup)
+            sfxGroup->SetVolume(m_tempConfig.EffectVolume);
 
         toolTip->SetString("Setting has been saved.");
         toolTip->Show(this);
@@ -238,7 +243,7 @@ void OptionDialog::Initialize()
     const auto btnDefault = FindChild<Gx::Button>("IDC_BUTTON_DEFAULT");
     btnDefault->SetClickCallback([=] (auto &sender, auto &ev)
     {
-        m_config.Reset();
+        m_tempConfig.Reset();
         btnSave->PerformClick();
 
         toolTip->SetString("Setting has reset to default.");
@@ -248,28 +253,28 @@ void OptionDialog::Initialize()
     const auto keyTab   = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto soundTab = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
 
-    keyTab->SetCheckStateChangeCallback([=, &mixer] (auto sender)
+    keyTab->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
             return;
 
-        const auto bgGroup = mixer.GetSoundGroup("BGTest");
-        const auto efGroup = mixer.GetSoundGroup("EFTest");
-        mixer.Play(sfxNavigation, "SFX");
+        const auto bgGroup = m_mixer.GetSoundGroup("BGTest");
+        const auto efGroup = m_mixer.GetSoundGroup("EFTest");
+        m_mixer.Play(sfxNavigation, "SFX");
 
         if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Playing))
-            mixer.Play("BGM");
+            m_mixer.Play("BGM");
         else
-            mixer.Resume("BGM");
+            m_mixer.Resume("BGM");
 
-        mixer.Stop(bgGroup);
-        mixer.Stop(efGroup);
+        m_mixer.Stop(bgGroup);
+        m_mixer.Stop(efGroup);
 
         if (bgGroup)
-            bgGroup->SetVolume(m_config.MusicVolume);
+            bgGroup->SetVolume(m_tempConfig.MusicVolume);
 
         if (efGroup)
-            efGroup->SetVolume(m_config.EffectVolume);
+            efGroup->SetVolume(m_tempConfig.EffectVolume);
 
         background->SetFrame("KeyOption");
         //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
@@ -280,18 +285,18 @@ void OptionDialog::Initialize()
         musicOption->SetEnabled(false);
         musicOption->SetVisible(false);
     });
-    soundTab->SetCheckStateChangeCallback([=, &mixer] (auto sender)
+    soundTab->SetCheckStateChangeCallback([=] (auto sender)
     {
         if (!sender->IsChecked())
             return;
 
-        mixer.Play(sfxNavigation, "SFX");
-        mixer.Pause("BGM");
-        mixer.Stop("BGTest");
-        mixer.Stop("EFTest");
+        m_mixer.Play(sfxNavigation, "SFX");
+        m_mixer.Pause("BGM");
+        m_mixer.Stop("BGTest");
+        m_mixer.Stop("EFTest");
 
-        mixer.Play(bgAllTest, "BGTest");
-        mixer.GetSoundGroup("BGTest")->SetVolume(m_config.MusicVolume);
+        m_mixer.Play(bgAllTest, "BGTest");
+        m_mixer.GetSoundGroup("BGTest")->SetVolume(m_tempConfig.MusicVolume);
 
         background->SetFrame("SoundOption");
         //SetTexCoords(background->GetFrame("SoundOption")->TexCoords);
@@ -311,11 +316,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     Dialog::OnShown(scene);
     Initialize();
 
-    auto& app    = scene.GetApplication();
-    auto& mixer  = app.GetContext().Require<Gx::Mixer>();
-    auto& config = app.GetContext().Require<GameConfig>();
-    m_config     = GameConfig(config);
-
+    m_tempConfig             = GameConfig(m_appConfig);
     const auto background    = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto soundTab      = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
@@ -330,7 +331,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 
 
     keyTab->SetCheckedState(true);
-    mixer.Stop(sfxNavigation);
+    m_mixer.Stop(sfxNavigation);
 
     soundTab->SetCheckedState(false);
     gameOption->SetEnabled(true);
@@ -346,20 +347,17 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 
 void OptionDialog::OnClose()
 {
-    auto& app   = Gx::Application::Instance();
-    auto& mixer = app.GetContext().Require<Gx::Mixer>();
-
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
 
-    mixer.Stop("BGTest");
-    mixer.Stop("EFTest");
+    m_mixer.Stop("BGTest");
+    m_mixer.Stop("EFTest");
     if (keyTab->IsChecked())
-        mixer.Resume("BGM");
+        m_mixer.Resume("BGM");
     else
-        mixer.Play("BGM");
+        m_mixer.Play("BGM");
 
-    mixer.Play(sfxNavigation, "SFX");
+    m_mixer.Play(sfxNavigation, "SFX");
 }
 
 void OptionDialog::Update(const double delta)
@@ -384,7 +382,7 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
             if (!keytext || !keytext->ContainsFrame(keyStr))
                 return;
 
-            m_config.KeyBindings[KeyMode::Seven][m_keyChannel] = ev.code;
+            m_tempConfig.KeyBindings[KeyMode::Seven][m_keyChannel] = ev.code;
             keytext->SetFrame(keyStr);
 
             int index = static_cast<int>(m_keyChannel);
@@ -402,7 +400,7 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
             keySelect->SetVisible(false);
             for (auto [channel, keyDown] : m_keyDowns)
             {
-                if (m_config.KeyBindings[KeyMode::Seven][channel] == ev.code)
+                if (m_tempConfig.KeyBindings[KeyMode::Seven][channel] == ev.code)
                     keyDown->SetVisible(true);
             }
         }
@@ -421,7 +419,7 @@ void OptionDialog::OnKeyUp(const sf::Event::KeyEvent ev)
         keySelect->SetVisible(false);
         for (auto [channel, keyDown] : m_keyDowns)
         {
-            if (m_config.KeyBindings[KeyMode::Seven][channel] == ev.code)
+            if (m_tempConfig.KeyBindings[KeyMode::Seven][channel] == ev.code)
                 keyDown->SetVisible(false);
         }
     }
@@ -434,9 +432,9 @@ void OptionDialog::OnKeyType(const sf::Event::TextEvent ev)
 
 bool OptionDialog::ValidateConfig()
 {
-    for (auto [channel, key] : m_config.KeyBindings[KeyMode::Seven])
+    for (auto [channel, key] : m_tempConfig.KeyBindings[KeyMode::Seven])
     {
-        for (auto [pairChannel, pairKey] : m_config.KeyBindings[KeyMode::Seven])
+        for (auto [pairChannel, pairKey] : m_tempConfig.KeyBindings[KeyMode::Seven])
         {
             if (channel != pairChannel && key == pairKey)
                 return false;
@@ -465,17 +463,17 @@ void OptionDialog::Invalidate()
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
-    gfxCheckBox->SetCheckedState(m_config.UseFx);
-    cursorCheckBox->SetCheckedState(m_config.UseWindowCursor);
+    gfxCheckBox->SetCheckedState(m_tempConfig.UseFx);
+    cursorCheckBox->SetCheckedState(m_tempConfig.UseWindowCursor);
     keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
-    bgmCheckBox->SetCheckedState(m_config.UseBGM);
+    bgmCheckBox->SetCheckedState(m_tempConfig.UseBGM);
 
-    masterVolumeGauge->SetValue(m_config.MusicVolume == m_config.EffectVolume ? m_config.MusicVolume : masterVolumeGauge->GetValue());
-    musicVolumeGauge->SetValue(m_config.MusicVolume);
-    effectVolumeGauge->SetValue(m_config.EffectVolume);
+    masterVolumeGauge->SetValue(m_tempConfig.MusicVolume == m_tempConfig.EffectVolume ? m_tempConfig.MusicVolume : masterVolumeGauge->GetValue());
+    musicVolumeGauge->SetValue(m_tempConfig.MusicVolume);
+    effectVolumeGauge->SetValue(m_tempConfig.EffectVolume);
 
     for (auto [channel, keytext] : m_keyTexts)
-        keytext->SetFrame(std::string(magic_enum::enum_name(m_config.KeyBindings[KeyMode::Seven][channel])));
+        keytext->SetFrame(std::string(magic_enum::enum_name(m_tempConfig.KeyBindings[KeyMode::Seven][channel])));
 
     if (!m_keyTestEnabled)
     {

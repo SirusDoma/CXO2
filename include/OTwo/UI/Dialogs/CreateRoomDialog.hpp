@@ -1,13 +1,15 @@
 #ifndef O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
 #define O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
 
-#include <OTwo/Models/Room.hpp>
 #include <Genode/UI/Dialog.hpp>
+#include <OTwo/Models/Room.hpp>
 
+namespace Gx { class Mixer; }
+class SessionContext;
 class CreateRoomDialog : public Gx::Dialog
 {
 public:
-    using Gx::Dialog::Dialog;
+    CreateRoomDialog(SessionContext& session, Gx::Mixer& mixer);
     void Initialize() override;
 
     GameMode GetRoomMode() const;
@@ -22,6 +24,8 @@ protected:
 
 private:
     bool m_initialized = false;
+    SessionContext& m_session;
+    Gx::Mixer& m_mixer;
 };
 
 #endif

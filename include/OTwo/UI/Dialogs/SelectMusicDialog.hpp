@@ -10,10 +10,17 @@
 
 #include <vector>
 
+namespace Gx
+{
+    class Mixer;
+    class ResourceManager;
+}
+
+class SessionContext;
 class SelectMusicDialog : public Gx::Dialog
 {
 public:
-    using Gx::Dialog::Dialog;
+    SelectMusicDialog(SessionContext& session, MusicSelectionContext& selection, Gx::Mixer& mixer, Gx::ResourceManager& resources);
 
     void Initialize() override;
 
@@ -41,6 +48,11 @@ private:
     unsigned int m_page = 0;
     unsigned int m_coverID;
     float        m_speed;
+
+    SessionContext&        m_session;
+    MusicSelectionContext& m_selection;
+    Gx::Mixer&             m_mixer;
+    Gx::ResourceManager&   m_resources;
 
     Difficulty     m_difficulty = Difficulty::EX;
     MusicSortMode  m_sort       = static_cast<MusicSortMode>(-1);

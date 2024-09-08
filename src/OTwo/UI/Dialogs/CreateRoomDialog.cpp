@@ -8,6 +8,12 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/ToolTip.hpp>
 
+CreateRoomDialog::CreateRoomDialog(SessionContext& session, Gx::Mixer& mixer) :
+    m_session(session),
+    m_mixer(mixer)
+{
+}
+
 void CreateRoomDialog::Initialize()
 {
     Dialog::Initialize();
@@ -16,9 +22,6 @@ void CreateRoomDialog::Initialize()
         return;
 
     const auto parent = GetParent<::State>();
-    auto& mixer  = parent->Require<Gx::Mixer>();
-    auto session = parent->Require<SessionContext>();
-
     const auto sfxClick = parent->Instantiate<sf::Sound>("IDC_DIALOG_CREATE_ROOM/IDC_SOUND_CLICK");
 
     const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
@@ -58,8 +61,8 @@ void CreateRoomDialog::Initialize()
     minLevelLimitTextBox->SetNumericModeEnabled(true);
     maxLevelLimitTextBox->SetNumericModeEnabled(true);
 
-    jamModeButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
-        mixer.Play(sfxClick, "SFX");
+    jamModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
+        m_mixer.Play(sfxClick, "SFX");
     });
 
     jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
@@ -84,8 +87,8 @@ void CreateRoomDialog::Initialize()
         jamAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
     });
 
-    versusModeButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
-        mixer.Play(sfxClick, "SFX");
+    versusModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
+        m_mixer.Play(sfxClick, "SFX");
     });
 
     versusModeButton->SetCheckStateChangeCallback([=] (auto sender)
@@ -98,8 +101,8 @@ void CreateRoomDialog::Initialize()
         versusAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
     });
 
-    singleModeButton->SetClickCallback([=, &mixer] (auto& sender, auto& ev) {
-        mixer.Play(sfxClick, "SFX");
+    singleModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
+        m_mixer.Play(sfxClick, "SFX");
     });
 
     singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
@@ -129,9 +132,6 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     Initialize();
 
-    const auto parent = GetParent<::State>();
-    auto& session = parent->Require<SessionContext>();
-
     const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
     const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");
 
@@ -149,7 +149,7 @@ void CreateRoomDialog::OnShown(Gx::Scene &scene)
 
     const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
 
-    titleTextBox->SetString(session.GetCurrentPlayer().Name + "'s Room");
+    titleTextBox->SetString(m_session.GetCurrentPlayer().Name + "'s Room");
     titleTextBox->SelectAll();
     passwordTextBox->SetString("");
 
