@@ -15,7 +15,7 @@ namespace Gx
     {
     public:
         template<typename T>
-        using Builder = std::function<std::unique_ptr<T>(Context&)>;
+        using Builder = std::function<std::unique_ptr<T>(const Context&)>;
 
         enum class Scope
         {
@@ -30,24 +30,26 @@ namespace Gx
         void Provide(Scope scope = Scope::Local);
 
         template<typename T>
-        void Provide(Builder<T> builder, Scope scope = Scope::Singleton);
+        void Provide(Builder<T> builder, Scope scope = Scope::Local);
 
         template<typename T>
-        Builder<T> As();
+        Builder<T> As() const;
 
         template<typename T>
-        std::enable_if_t<!std::is_pointer_v<T>, T&> Require();
+        std::enable_if_t<!std::is_pointer_v<T>, T&> Require() const;
 
         template<typename T>
-        std::enable_if_t<std::is_pointer_v<T>, T> Require();
+        std::enable_if_t<std::is_pointer_v<T>, T> Require() const;
 
-        Context CreateScope() { return Context(*this); }
+        template<typename T>
+        std::unique_ptr<T> Create() const;
+
+        Context CreateScope() const { return Context(*this); }
 
     private:
-        Context(Context& other) :
-            m_parent(&other),
-            m_instances(),
-            m_factories()
+        Context(const Context& other) :
+            m_factories(),
+            m_instances()
         {
             for (auto& [type, factory] : other.m_factories)
             {
@@ -70,7 +72,7 @@ namespace Gx
 
             Context::Scope Scope;
         };
-        using StorageMap = std::unordered_map<std::type_index, std::unique_ptr<Scoppable>>;
+        using ScoppableMap = std::unordered_map<std::type_index, std::unique_ptr<Scoppable>>;
 
         template<typename T>
         struct Instance final : Scoppable
@@ -90,30 +92,29 @@ namespace Gx
         template<typename T>
         struct Factory final : Scoppable
         {
-            Factory(Context::Builder<T> builder, Context::Scope scope) : Scoppable(std::move(scope)), Builder(std::move(builder)) {};
+            Factory(Builder<T> builder, Context::Scope scope) : Scoppable(std::move(scope)), Create(std::move(builder)) {};
             std::unique_ptr<Scoppable> Clone() override
             {
                 if (Scoppable::Scope == Scope::Singleton)
                     return nullptr;
 
-                return std::make_unique<Factory>(Builder, Scope);
+                return std::make_unique<Factory>(Create, Scope);
             }
 
-            Context::Builder<T> Builder;
+            Context::Builder<T> Create;
         };
 
         template <typename T>
-        decltype(auto) BuildParameter();
+        decltype(auto) BuildParameter() const;
 
         template <typename Tuple, std::size_t... Is>
-        auto BuildParameters(std::index_sequence<Is...>);
+        auto BuildParameters(std::index_sequence<Is...>) const;
 
         template <typename Tuple>
-        auto BuildParameters();
+        auto BuildParameters() const;
 
-        Context*  m_parent;
-        StorageMap m_instances;
-        StorageMap m_factories;
+        mutable ScoppableMap m_factories;
+        mutable ScoppableMap m_instances;
     };
 }
 
