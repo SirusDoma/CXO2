@@ -32,6 +32,16 @@ namespace Gx
             constexpr friend int cloophole(tag<T, N>);
         };
 
+        // Helper class to temporarily initializes instance of U.
+        template <typename U, typename = void>
+        struct activator;
+
+        template <typename U>
+        struct activator<U, std::enable_if_t<std::is_default_constructible_v<U>>>;
+
+        template <typename U>
+        struct activator<U, std::enable_if_t<!std::is_default_constructible_v<U>>>;
+
         // The definitions of friend functions.
         template <typename T, typename U, int N, bool B,
                   typename = typename std::enable_if_t<
@@ -39,7 +49,7 @@ namespace Gx
                       std::remove_cv_t<std::remove_reference_t<T>>,
                       std::remove_cv_t<std::remove_reference_t<U>>>>>
         struct fn_def {
-            friend auto loophole(tag<T, N>) { return *static_cast<U*>(nullptr); }
+            friend auto loophole(tag<T, N>) { return activator<U>::activate(); }
             constexpr friend int cloophole(tag<T, N>) { return 0; }
         };
 
@@ -110,6 +120,25 @@ namespace Gx
         // Use this as an advantage to determine whether the class can be publicly constructible by setting a depth limit to the recursive.
         static constexpr bool value = !std::is_abstract_v<T> && (std::is_default_constructible_v<T> || GetConstructorParameterCount<T>(0) < priv::MaxParameterCount);
     };
+
+    namespace priv
+    {
+        template <typename U>
+        struct activator<U, std::enable_if_t<std::is_default_constructible_v<U>>>
+        {
+            static U activate() { return U(); }
+        };
+
+        template <typename U>
+        struct activator<U, std::enable_if_t<!std::is_default_constructible_v<U>>>
+        {
+            static U activate()
+            {
+                auto parameters = ConstructorDescriptor<U>(); // temp reference, will be invalid but not used anyway
+                return std::apply([](auto&... args) -> U { return U(std::forward<decltype(args)>(args)...); }, parameters);
+            }
+        };
+    }
 }
 
 #endif
