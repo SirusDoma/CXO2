@@ -1,8 +1,9 @@
-﻿#include <Genode/Graphics/Sprite.hpp>
-#include <Genode/System/Application.hpp>
+﻿#include <Genode/System/Application.hpp>
+#include <Genode/System/Context.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/System/Context.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Cursor.hpp>
 
 namespace Gx
@@ -16,6 +17,7 @@ namespace Gx
         m_target(std::make_unique<sf::RenderTexture>()),
         m_adapter(*this),
         m_director(SceneDirector(*this)),
+        m_context(std::make_unique<Context>()),
         m_event(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
         m_cursor(),
@@ -30,6 +32,7 @@ namespace Gx
         m_closeRequested  = false;
 
         SetWindowState(fullScreen ? sf::State::Fullscreen : sf::State::Windowed);
+        ResourceLoaderFactory::SetApplicationContext(*m_context);
     }
 
     Application& Application::Instance()
@@ -197,7 +200,7 @@ namespace Gx
 
     Context& Application::GetContext()
     {
-        return m_context;
+        return *m_context;
     }
 
     unsigned int Application::GetRenderFrequency() const

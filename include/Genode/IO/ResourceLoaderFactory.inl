@@ -1,5 +1,6 @@
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/IO/Resource.hpp>
+#include <Genode/System/Context.hpp>
 
 #include <Genode/Graphics/Font.hpp>
 #include <Genode/System/Exception.hpp>
@@ -15,18 +16,45 @@ namespace Gx
         Remove<R>();
 
         auto factory = std::make_unique<LoaderFactory<R>>();
-        factory->Create = [] { return std::make_unique<L>(); };
+        factory->Create = []
+        {
+            if constexpr (!std::is_default_constructible_v<L>)
+            {
+                if (m_context)
+                {
+                    auto loader = m_context->Create<L>();
+                    loader->SetResourceCreator(std::function{[]
+                    {
+                        if constexpr (!std::is_default_constructible_v<R>)
+                        {
+                            if (m_context)
+                                return m_context->Create<R>();
+
+                            throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
+                        }
+                        else
+                            return std::make_unique<R>();
+                    }});
+
+                    return loader;
+                }
+
+                throw Exception(std::string(typeid(L).name()) + " is not constructible without application context");
+            }
+            else
+                return std::make_unique<L>();
+        };
 
         m_loaders[typeid(R)] = std::move(factory);
     }
 
     template<typename R>
-    void ResourceLoaderFactory::Register(std::function<std::unique_ptr<ResourceLoader<R>>()> loader)
+    void ResourceLoaderFactory::Register(std::function<std::unique_ptr<ResourceLoader<R>>()> builder)
     {
         Remove<R>();
 
         auto factory = std::make_unique<LoaderFactory<R>>();
-        factory->Create = loader;
+        factory->Create = builder;
 
         m_loaders[typeid(R)] = std::move(factory);
     }
@@ -34,8 +62,18 @@ namespace Gx
     template<typename B, typename R>
     void ResourceLoaderFactory::RegisterDerived()
     {
-        static_assert(std::is_default_constructible_v<R>, "Parameter R must be default constructible");
-        RegisterDerived<B, R>(std::function{[] { return std::make_unique<R>(); }});
+        RegisterDerived<B, R>(std::function{[]
+        {
+            if constexpr (!std::is_default_constructible_v<R>)
+            {
+                if (m_context)
+                    return m_context->Create<R>();
+
+                throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
+            }
+            else
+                return std::make_unique<R>();
+        }});
     }
 
     template<typename B, typename R, typename ... Args>

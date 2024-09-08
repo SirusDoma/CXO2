@@ -15,6 +15,10 @@ namespace Gx
         using ResourceCreator = std::function<std::unique_ptr<R>(Args...)>;
 
         ResourceLoader() = default;
+        ResourceLoader(ResourceLoader& copy) :
+            m_type(copy.m_type),
+            m_creator(copy.m_creator ? copy.m_creator->Clone() : nullptr) {}
+
         virtual ~ResourceLoader() = default;
 
         virtual bool IsStreaming() const { return false; }
@@ -43,6 +47,8 @@ namespace Gx
 
             template<typename... Args>
             std::unique_ptr<T> Build(Args&&... args) const;
+
+            virtual std::unique_ptr<ResourceBuilderBase> Clone() = 0;
         };
 
         template <typename... Args>
@@ -52,6 +58,8 @@ namespace Gx
 
             explicit ResourceBuilder(const std::type_index& type, ResourceCreator<T, Args...> builder) :
                 ResourceBuilderBase(type), Create(builder) { };
+
+            std::unique_ptr<ResourceBuilderBase> Clone() override { return std::make_unique<ResourceBuilder>(*this); }
         };
 
         std::type_index m_type = typeid(T);

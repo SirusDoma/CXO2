@@ -71,6 +71,11 @@
 
 void O2Jam::Boot()
 {
+    // Render Settings
+    auto& window = GetRenderWindow();
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(0);
+
     // Asset Path
     Gx::LocalFileSystem::AddAssetPath("./assets");
     Gx::LocalFileSystem::AddAssetPath("./assets/Music");
@@ -136,19 +141,14 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
-    // Render Settings
-    auto& window = GetRenderWindow();
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(0);
-
-    // Setup Providers
+    // Initialize providers
     auto& context = GetContext();
     context.Provide<GameConfig>([] (auto& ctx)
     {
         // TODO: Load game config from file
         auto config = std::make_unique<GameConfig>();
         return config;
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<Gx::ResourceManager>([](auto& ctx)
     {
@@ -158,19 +158,19 @@ void O2Jam::Boot()
         resources->Register<ItemData>();
 
         return resources;
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<Gx::Mixer>([](auto& ctx)
     {
         auto mixer = std::make_unique<Gx::Mixer>();
         return mixer;
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<ItemFactory>([&](auto& ctx)
     {
         auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
         return factory;
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<SessionContext>([&](auto& ctx)
     {
@@ -193,17 +193,17 @@ void O2Jam::Boot()
 
         auto session  = std::make_unique<SessionContext>(player);
         return session;
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<JudgementStrategy>([] (auto& ctx)
     {
         return std::make_unique<RenderPositionJudgementStrategy>();
-    });
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<ScoreTracker>([] (auto& ctx)
     {
         return std::make_unique<ScoreTracker>();
-    });
+    }, Gx::Context::Scope::Singleton);
 
     // Set-up console
     Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));

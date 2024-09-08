@@ -11,14 +11,18 @@ namespace Gx
 {
     template<typename T>
     class ResourceLoader;
+    class Context;
     class ResourceLoaderFactory
     {
     public:
+        static const Context* GetApplicationContext();
+        static void SetApplicationContext(const Context& context);
+
         template<typename R, typename L>
         static void Register();
 
         template<typename R>
-        static void Register(std::function<std::unique_ptr<ResourceLoader<R>>()> loader);
+        static void Register(std::function<std::unique_ptr<ResourceLoader<R>>()> builder);
 
         template<typename B, typename R>
         static void RegisterDerived();
@@ -43,7 +47,8 @@ namespace Gx
         };
         using LoaderMap = std::unordered_map<std::type_index, std::unique_ptr<BaseLoaderFactory>>;
 
-        inline static LoaderMap m_loaders;
+        inline static const Context* m_context;
+        inline static LoaderMap      m_loaders;
     };
 }
 

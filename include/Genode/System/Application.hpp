@@ -4,9 +4,7 @@
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <Genode/Graphics/RenderTargetAdapter.hpp>
-#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/System/Context.hpp>
 
 #include <SFML/Window.hpp>
 
@@ -17,6 +15,7 @@ namespace Gx
 {
     class Scene;
     class Cursor;
+    class Context;
     class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
@@ -82,7 +81,7 @@ namespace Gx
         mutable RenderTargetAdapter m_adapter;
         mutable SceneDirector m_director;
 
-        Context m_context;
+        std::unique_ptr<Context> m_context;
         sf::Event m_event;
         sf::State m_state;
 
