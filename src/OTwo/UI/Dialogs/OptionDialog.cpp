@@ -23,7 +23,7 @@ void OptionDialog::Initialize()
         return;
 
     auto& app   = Gx::Application::Instance();
-    auto& mixer = app.Require<Gx::Mixer>();
+    auto& mixer = app.GetContext().Require<Gx::Mixer>();
     m_parent    = GetParent<::State>();
 
     const auto bgAllTest     = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
@@ -210,7 +210,7 @@ void OptionDialog::Initialize()
         }
 
         auto& application = Gx::Application::Instance();
-        application.Require<GameConfig>().Apply(m_config);
+        application.GetContext().Require<GameConfig>().Apply(m_config);
 
         if (const auto cursor = application.GetCursor(); cursor)
         {
@@ -312,8 +312,8 @@ void OptionDialog::OnShown(Gx::Scene &scene)
     Initialize();
 
     auto& app    = scene.GetApplication();
-    auto& mixer  = app.Require<Gx::Mixer>();
-    auto& config = app.Require<GameConfig>();
+    auto& mixer  = app.GetContext().Require<Gx::Mixer>();
+    auto& config = app.GetContext().Require<GameConfig>();
     m_config     = GameConfig(config);
 
     const auto background    = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
@@ -347,7 +347,7 @@ void OptionDialog::OnShown(Gx::Scene &scene)
 void OptionDialog::OnClose()
 {
     auto& app   = Gx::Application::Instance();
-    auto& mixer = app.Require<Gx::Mixer>();
+    auto& mixer = app.GetContext().Require<Gx::Mixer>();
 
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");

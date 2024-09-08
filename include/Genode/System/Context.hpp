@@ -1,5 +1,5 @@
-#ifndef GENODE_SYSTEM_PROVIDER_HPP
-#define GENODE_SYSTEM_PROVIDER_HPP
+#ifndef GENODE_SYSTEM_CONTEXT_HPP
+#define GENODE_SYSTEM_CONTEXT_HPP
 
 #include <Genode/Utilities/Reflection.hpp>
 
@@ -11,11 +11,11 @@
 
 namespace Gx
 {
-    class Provider
+    class Context
     {
     public:
         template<typename T>
-        using Builder = std::function<std::unique_ptr<T>(Provider&)>;
+        using Builder = std::function<std::unique_ptr<T>(Context&)>;
 
         enum class Scope
         {
@@ -23,8 +23,8 @@ namespace Gx
             Singleton
         };
 
-        Provider() = default;
-        virtual ~Provider() = default;
+        Context() = default;
+        virtual ~Context() = default;
 
         template<typename T>
         void Provide(Scope scope = Scope::Local);
@@ -41,10 +41,10 @@ namespace Gx
         template<typename T>
         std::enable_if_t<std::is_pointer_v<T>, T> Require();
 
-        Provider CreateScope() { return Provider(*this); }
+        Context CreateScope() { return Context(*this); }
 
     private:
-        Provider(Provider& other) :
+        Context(Context& other) :
             m_parent(&other),
             m_instances(),
             m_factories()
@@ -68,14 +68,14 @@ namespace Gx
             virtual ~Scoppable() = default;
             virtual std::unique_ptr<Scoppable> Clone() = 0;
 
-            Provider::Scope Scope;
+            Context::Scope Scope;
         };
         using StorageMap = std::unordered_map<std::type_index, std::unique_ptr<Scoppable>>;
 
         template<typename T>
         struct Instance final : Scoppable
         {
-            explicit Instance(std::unique_ptr<T> handle, const Provider::Scope scope) : Scoppable(scope), Handle(std::move(handle)) {};
+            explicit Instance(std::unique_ptr<T> handle, const Context::Scope scope) : Scoppable(scope), Handle(std::move(handle)) {};
             std::unique_ptr<Scoppable> Clone() override
             {
                 if (Scoppable::Scope == Scope::Local)
@@ -90,7 +90,7 @@ namespace Gx
         template<typename T>
         struct Factory final : Scoppable
         {
-            Factory(Provider::Builder<T> builder, Provider::Scope scope) : Scoppable(std::move(scope)), Builder(std::move(builder)) {};
+            Factory(Context::Builder<T> builder, Context::Scope scope) : Scoppable(std::move(scope)), Builder(std::move(builder)) {};
             std::unique_ptr<Scoppable> Clone() override
             {
                 if (Scoppable::Scope == Scope::Singleton)
@@ -99,7 +99,7 @@ namespace Gx
                 return std::make_unique<Factory>(Builder, Scope);
             }
 
-            Provider::Builder<T> Builder;
+            Context::Builder<T> Builder;
         };
 
         template <typename T>
@@ -111,11 +111,11 @@ namespace Gx
         template <typename Tuple>
         auto BuildParameters();
 
-        Provider*  m_parent;
+        Context*  m_parent;
         StorageMap m_instances;
         StorageMap m_factories;
     };
 }
 
-#include <Genode/System/Provider.inl>
+#include <Genode/System/Context.inl>
 #endif

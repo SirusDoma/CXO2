@@ -3,7 +3,7 @@
 namespace Gx
 {
     template<typename T>
-    void Provider::Provide(Builder<T> builder, const Scope scope)
+    void Context::Provide(Builder<T> builder, const Scope scope)
     {
         const std::type_index type = typeid(T);
         std::unique_ptr<Factory<T>> factory = std::make_unique<Factory<T>>(builder, scope);
@@ -13,9 +13,9 @@ namespace Gx
     }
 
     template<typename T>
-    Provider::Builder<T> Provider::As()
+    Context::Builder<T> Context::As()
     {
-        return Provider::Builder<T>([this] (Provider& ctx) -> std::unique_ptr<T>
+        return Context::Builder<T>([this] (Context& ctx) -> std::unique_ptr<T>
         {
             if constexpr(Gx::GetConstructorParameterCount<T>(0) == 0)
                 return std::make_unique<T>();
@@ -26,7 +26,7 @@ namespace Gx
 
     template<typename T>
     std::enable_if_t<!std::is_pointer_v<T>, T&>
-    Provider::Require()
+    Context::Require()
     {
         if (auto instance = Require<T*>(); instance)
             return *instance;
@@ -36,7 +36,7 @@ namespace Gx
 
     template<typename T>
     std::enable_if_t<std::is_pointer_v<T>, T>
-    Provider::Require()
+    Context::Require()
     {
         using R = std::remove_pointer_t<T>;
         const std::type_index type = typeid(R);
@@ -63,7 +63,7 @@ namespace Gx
     }
 
     template <typename T>
-    decltype(auto) Provider::BuildParameter()
+    decltype(auto) Context::BuildParameter()
     {
         if constexpr (std::is_pointer_v<T>)
             return std::tuple { Require<T>() };
@@ -72,20 +72,20 @@ namespace Gx
     }
 
     template <typename Tuple, std::size_t... Is>
-    auto Provider::BuildParameters(std::index_sequence<Is...>)
+    auto Context::BuildParameters(std::index_sequence<Is...>)
     {
         return std::tuple_cat(BuildParameter<std::tuple_element_t<Is, Tuple>>()...);
     }
 
     template <typename Tuple>
-    auto Provider::BuildParameters()
+    auto Context::BuildParameters()
     {
         constexpr std::size_t N = std::tuple_size_v<Tuple>;
         return BuildParameters<Tuple>(std::make_index_sequence<N>{});
     }
 
     template<typename T>
-    void Provider::Provide(const Scope scope)
+    void Context::Provide(const Scope scope)
     {
         static_assert(Constructible<T>::value, "Use Provide<T>(Builder<T>, Scope) instead for interface or complex constructible type");
         Provide<T>(As<T>(), scope);

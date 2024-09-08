@@ -65,7 +65,7 @@ void State::LoadCommonResources()
 
         m_exitDialog->SetCancelCallback([&]
         {
-            auto &mixer = Gx::Application::Instance().Require<Gx::Mixer>();
+            auto &mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
             mixer.Play(m_cancelSound, "SFX");
 
             m_prompted = false;

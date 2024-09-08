@@ -21,8 +21,8 @@ void InstrumentSelector::Initialize()
     Node::Initialize();
 
     auto& app        = Gx::Application::Instance();
-    auto& resources  = app.Require<Gx::ResourceManager>();
-    auto& mixer      = app.Require<Gx::Mixer>();
+    auto& resources  = app.GetContext().Require<Gx::ResourceManager>();
+    auto& mixer      = app.GetContext().Require<Gx::Mixer>();
 
     auto sfxNavigate = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/07.json");
     if (auto previousButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_LEFT"); previousButton)

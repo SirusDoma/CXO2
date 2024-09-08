@@ -45,9 +45,9 @@ namespace Gx
         return m_director->GetApplication();
     }
 
-    Provider& Scene::GetContext() const
+    Context& Scene::GetContext() const
     {
-        return GetApplication();
+        return GetApplication().GetContext();
     }
 
     SceneDirector& Scene::GetDirector() const

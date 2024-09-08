@@ -6,7 +6,7 @@
 #include <Genode/Graphics/RenderTargetAdapter.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/System/Provider.hpp>
+#include <Genode/System/Context.hpp>
 
 #include <SFML/Window.hpp>
 
@@ -17,7 +17,7 @@ namespace Gx
 {
     class Scene;
     class Cursor;
-    class Application : NonCopyable, public Provider, public Renderable, public Updatable
+    class Application : NonCopyable, public Renderable, public Updatable
     {
     public:
         static Application& Instance();
@@ -30,6 +30,8 @@ namespace Gx
         int Start();
         int Start(Scene& scene);
         void Close();
+
+        Context& GetContext();
 
         SceneDirector& GetSceneDirector() const;
         unsigned int GetRenderFrequency() const;
@@ -68,9 +70,6 @@ namespace Gx
         virtual void OnClose();
 
     private:
-        using ProviderMap        = std::unordered_map<std::type_index, std::unique_ptr<Provider>>;
-        using ProviderFactoryMap = std::unordered_map<std::type_index, std::function<std::unique_ptr<Provider>(Application&)>>;
-
         void UpdateCursor(const sf::Event &ev) const;
         void SetupWindow() const;
         void SetupTarget() const;
@@ -82,15 +81,14 @@ namespace Gx
         mutable std::unique_ptr<sf::RenderTexture> m_target;
         mutable RenderTargetAdapter m_adapter;
         mutable SceneDirector m_director;
+
+        Context m_context;
         sf::Event m_event;
         sf::State m_state;
 
         sf::VideoMode m_windowVideoMode;
         sf::VideoMode m_gameVideoMode;
         Cursor* m_cursor;
-
-        ProviderMap        m_providers;
-        ProviderFactoryMap m_factories;
 
         const std::string m_title;
         unsigned int m_frameID;

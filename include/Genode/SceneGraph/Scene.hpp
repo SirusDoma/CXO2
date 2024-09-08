@@ -1,7 +1,7 @@
 #ifndef GENODE_SCENEGRAPH_SCENE_HPP
 #define GENODE_SCENEGRAPH_SCENE_HPP
 
-#include <Genode/System/Provider.hpp>
+#include <Genode/System/Context.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
 
@@ -32,7 +32,7 @@ namespace Gx
         ~Scene() override;
 
         Application& GetApplication() const;
-        Provider& GetContext() const;
+        Context& GetContext() const;
         SceneDirector& GetDirector() const;
 
         sf::View GetView() const;

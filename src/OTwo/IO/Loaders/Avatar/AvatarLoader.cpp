@@ -58,7 +58,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
     avatar->SetRotation(metadata->Rotation);
 
     auto& app         = Gx::Application::Instance();
-    const auto& items = app.Require<ItemFactory>();
+    const auto& items = app.GetContext().Require<ItemFactory>();
     for (const auto [_, item] : items.GetDefaultItems(avatar->GetGender()))
         avatar->Equip(item);
 

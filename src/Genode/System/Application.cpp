@@ -2,7 +2,7 @@
 #include <Genode/System/Application.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
-#include <Genode/System/Provider.hpp>
+#include <Genode/System/Context.hpp>
 #include <Genode/UI/Cursor.hpp>
 
 namespace Gx
@@ -193,6 +193,11 @@ namespace Gx
     void Application::Close()
     {
         OnClose();
+    }
+
+    Context& Application::GetContext()
+    {
+        return m_context;
     }
 
     unsigned int Application::GetRenderFrequency() const

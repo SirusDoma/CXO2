@@ -142,14 +142,15 @@ void O2Jam::Boot()
     window.setFramerateLimit(0);
 
     // Setup Providers
-    Provide<GameConfig>([] (auto &app)
+    auto& context = GetContext();
+    context.Provide<GameConfig>([] (auto& ctx)
     {
         // TODO: Load game config from file
         auto config = std::make_unique<GameConfig>();
         return config;
     });
 
-    Provide<Gx::ResourceManager>([](auto &app)
+    context.Provide<Gx::ResourceManager>([](auto& ctx)
     {
         // Register shared resource container
         auto resources = std::make_unique<Gx::ResourceManager>();
@@ -159,19 +160,19 @@ void O2Jam::Boot()
         return resources;
     });
 
-    Provide<Gx::Mixer>([](auto &app)
+    context.Provide<Gx::Mixer>([](auto& ctx)
     {
         auto mixer = std::make_unique<Gx::Mixer>();
         return mixer;
     });
 
-    Provide<ItemFactory>([&](auto &app)
+    context.Provide<ItemFactory>([&](auto& ctx)
     {
-        auto factory = std::make_unique<ItemFactory>(Require<Gx::ResourceManager>());
+        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
         return factory;
     });
 
-    Provide<SessionContext>([&](auto &app)
+    context.Provide<SessionContext>([&](auto& ctx)
     {
         auto player    = Player();
         player.ID      = 1;
@@ -194,33 +195,33 @@ void O2Jam::Boot()
         return session;
     });
 
-    Provide<JudgementStrategy>([] (auto &app)
+    context.Provide<JudgementStrategy>([] (auto& ctx)
     {
         return std::make_unique<RenderPositionJudgementStrategy>();
     });
 
-    Provide<ScoreTracker>([] (auto &app)
+    context.Provide<ScoreTracker>([] (auto& ctx)
     {
         return std::make_unique<ScoreTracker>();
     });
 
     // Set-up console
-    Console::Instance().SetFont(Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
+    Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
     Console::Instance().SetCharacterSize(14);
     Console::Instance().SetBounds({{0, 0}, {400, 165}});
     Console::Instance().SetPosition({400, 0});
     Console::Instance().SetMaximumLines(10);
 
     // Load and set cursor
-    SetCursor(Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
+    SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
 
     // Force to load heavy providers during start-up
-    auto _ = Require<SessionContext>().GetInstalledMusic();
+    auto _ = context.Require<SessionContext>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
-        auto __ = Require<ItemFactory>().GetDefaultItems(gender);
+        auto __ = context.Require<ItemFactory>().GetDefaultItems(gender);
 
     // Load global assets
-    auto& resources = Require<Gx::ResourceManager>();
+    auto& resources = context.Require<Gx::ResourceManager>();
     auto& bgm       = resources.Create<OjmArchive>("BGM");
     auto& bgEvent   = resources.Create<OjmArchive>("Event");
     auto& bgEffect  = resources.Create<OjmArchive>("BgEffect");
@@ -255,8 +256,9 @@ void O2Jam::OnFocusChanged(const bool focus)
 {
     Application::OnFocusChanged(focus);
 
-    const auto& config = Require<GameConfig>();
-    auto& mixer        = Require<Gx::Mixer>();
+    auto& context      = GetContext();
+    const auto& config = context.Require<GameConfig>();
+    auto& mixer        = context.Require<Gx::Mixer>();
 
     const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
                          GetSceneDirector().IsPresenting<StatePlaying7K>() ||
@@ -299,8 +301,9 @@ int O2Jam::Shutdown()
 {
     Application::Shutdown();
 
-    auto& resources = Require<Gx::ResourceManager>();
-    auto& mixer     = Require<Gx::Mixer>();
+    auto& context   = GetContext();
+    auto& resources = context.Require<Gx::ResourceManager>();
+    auto& mixer     = context.Require<Gx::Mixer>();
     auto& director  = GetSceneDirector();
 
     mixer.Clear();
