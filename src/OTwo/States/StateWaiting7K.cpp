@@ -236,7 +236,6 @@ void StateWaiting7K::Initialize()
     }
 
     const auto mapSelector = Instantiate<MapSelector>("IDC_CONTAINER_MAP_SELECTOR");
-    mapSelector->Initialize();
     mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
     {
         auto data = Room(*r);
@@ -257,8 +256,6 @@ void StateWaiting7K::Initialize()
     mapSelector->SetEffectID(room.EffectID);
 
     const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
-    instrumentSelector->Initialize();
-
     if (currentAvatarInfo)
     {
         instrumentSelector->SetInstrumentSelectCallack([=, &session, &room] (const Item *item)
@@ -309,7 +306,6 @@ void StateWaiting7K::Initialize()
     instrumentSelector->AddInstrument(items.GetItem(1429));
 
     const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
-    chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
 
     const auto chatWindow = chatPanel->GetChatWindow();
@@ -318,7 +314,6 @@ void StateWaiting7K::Initialize()
 
     if (const auto selectMusicDialog = Instantiate<SelectMusicDialog>("IDC_DIALOG_SELECT_MUSIC"); selectMusicDialog)
     {
-        selectMusicDialog->Initialize();
         if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
             selectMusicButton->SetClickCallback([=, &mixer] (auto &sender, auto &ev)

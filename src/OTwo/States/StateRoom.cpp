@@ -80,7 +80,6 @@ void StateRoom::Initialize()
     channelNumber->SetValue(session.GetChannelID());
 
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
-    chatPanel->Initialize();
     chatPanel->SetMaximumTextLength(50);
 
     const auto chatWindow = chatPanel->GetChatWindow();
@@ -92,8 +91,6 @@ void StateRoom::Initialize()
     chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
 
     const auto userList = Instantiate<UserList>("IDC_USER_LIST");
-    userList->Initialize();
-
     auto users = std::vector<Player>();
     userList->AddUser(session.GetCurrentPlayer());
 
@@ -101,7 +98,6 @@ void StateRoom::Initialize()
         userList->AddUser(Player{i + 3, Role::Normal, "Dummy " + std::to_string(i), static_cast<signed short>(i) });
 
     const auto roomContainer = Instantiate<RoomContainer>("IDC_ROOM_CONTAINER");
-    roomContainer->Initialize();
     Room rooms[] = {
         Room{
             /* .ID           = */ 0,

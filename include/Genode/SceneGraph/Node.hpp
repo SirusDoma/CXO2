@@ -52,6 +52,8 @@ namespace Gx
             std::string m_name;
             std::string m_tag;
             std::vector<Node*> m_children;
+            bool m_initialized;
+            mutable bool m_pristine;
     };
 }
 

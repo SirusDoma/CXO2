@@ -17,6 +17,8 @@
 
 void OptionDialog::Initialize()
 {
+    Gx::Dialog::Initialize();
+
     if (m_initialized)
         return;
 

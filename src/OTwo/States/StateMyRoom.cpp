@@ -22,6 +22,8 @@ StateMyRoom::StateMyRoom() :
 
 void StateMyRoom::Initialize()
 {
+    State::Initialize();
+
     auto& mixer       = Require<Gx::Mixer>();
     auto& session     = Require<SessionContext>();
     const auto& items = Require<ItemFactory>();

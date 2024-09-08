@@ -13,6 +13,8 @@ ChatPanel::ChatPanel()
 
 void ChatPanel::Initialize()
 {
+    Gx::UiContainer::Initialize();
+
     const auto chatWindow = GetChatWindow();
     const auto scrollChat = FindChild<Gx::ScrollBar>("IDC_SCROLL_BAR_CHAT");
     // scrollChat->SetValueChangedCallback([=] (auto& sender, float value) { chatWindow->SetScrollOffset(static_cast<unsigned int>(value)); });

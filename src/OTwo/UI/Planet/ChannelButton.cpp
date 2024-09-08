@@ -20,6 +20,8 @@ ChannelButton::ChannelButton() :
 
 void ChannelButton::Initialize()
 {
+    Gx::RadioButton::Initialize();
+
     if (!GetParent<::State>() || m_initialized)
         return;
 

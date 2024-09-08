@@ -31,10 +31,6 @@ void StatePlanet::Initialize()
     auto kleo     = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_INTERMEDIATE_01");
     auto philix   = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PREMIUM_01");
 
-    auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
-    channelBoard->Initialize();
-    channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
-
     const auto exitButton = Instantiate<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([&] (auto& sender, auto& ev) { GetApplication().Close(); });
 
@@ -42,6 +38,9 @@ void StatePlanet::Initialize()
     container->SetName("STATE_PLANET/IDC_CONTAINER_MUSIC_HALL");
     container->AddChild(philix, kleo, kalliope, euta, thalo, melpomin);
     AddChild(container);
+
+    auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
 
     std::unordered_map<MusicHall, Gx::RadioButton*> planets =
     {

@@ -7,7 +7,7 @@
 
 void AvatarInfo::Initialize()
 {
-    Node::Initialize();
+    Gx::Node::Initialize();
     Invalidate();
 }
 

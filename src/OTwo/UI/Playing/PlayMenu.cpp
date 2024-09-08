@@ -5,6 +5,8 @@
 
 void PlayMenu::Initialize()
 {
+    Gx::UiContainer::Initialize();
+
     const auto parent = GetParent<::State>();
     if (!parent)
         return;

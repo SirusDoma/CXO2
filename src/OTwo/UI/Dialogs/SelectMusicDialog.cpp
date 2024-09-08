@@ -25,6 +25,8 @@
 
 void SelectMusicDialog::Initialize()
 {
+    Gx::Dialog::Initialize();
+
     if (m_initialized)
         return;
 

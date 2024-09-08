@@ -24,7 +24,7 @@ Avatar::Avatar(const Gender gender) :
 
 void Avatar::Initialize()
 {
-    Node::Initialize();
+    Gx::Node::Initialize();
 }
 
 Gender Avatar::GetGender() const

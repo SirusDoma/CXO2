@@ -14,6 +14,8 @@ RoomContainer::RoomContainer() :
 
 void RoomContainer::Initialize()
 {
+    Gx::UiContainer::Initialize();
+
     const auto parent = GetParent<::State>();
     if (!parent)
         return;
@@ -24,7 +26,6 @@ void RoomContainer::Initialize()
     for (const auto child : roomList->GetChildren())
     {
         auto roomButton = dynamic_cast<RoomButton*>(child);
-        roomButton->Initialize();
         roomButton->SetClickCallback([&, sfx = sfxInvalid, button = roomButton] (auto& sender, auto& ev)
         {
            if (!button->IsActive())

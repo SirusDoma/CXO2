@@ -6,12 +6,16 @@ namespace Gx
 {
     Node::Node() :
         Transformable(),
-        m_parent(nullptr)
+        m_parent(nullptr),
+        m_initialized(false),
+        m_pristine(true)
     {
     }
 
     void Node::Initialize()
     {
+        m_pristine    = m_initialized;
+        m_initialized = true;
     }
 
     const std::string &Node::GetName() const
@@ -34,7 +38,7 @@ namespace Gx
         m_tag = tag;
     }
 
-    Node *Node::GetParent() const
+    Node* Node::GetParent() const
     {
         return m_parent;
     }
@@ -46,6 +50,20 @@ namespace Gx
 
     std::vector<Node*> Node::GetChildren() const
     {
+        if (m_initialized && !m_pristine)
+        {
+            for (const auto n : m_children)
+            {
+                if (n->m_initialized)
+                    continue;
+
+                n->Initialize();
+                n->m_initialized = true;
+            }
+
+            m_pristine = true;
+        }
+
         return m_children;
     }
 
@@ -55,29 +73,53 @@ namespace Gx
         for (auto& node : m_children)
         {
             if (node->m_tag == tag)
+            {
+                if (m_initialized && !node->m_initialized)
+                {
+                    node->Initialize();
+                    node->m_initialized = true;
+                }
+
                 nodes.push_back(node);
+            }
         }
 
         return nodes;
     }
 
-    Node *Node::GetChildByName(const std::string &name) const
+    Node* Node::GetChildByName(const std::string &name) const
     {
-        for (auto& node : m_children)
+        for (const auto& node : m_children)
         {
             if (node->m_name == name)
+            {
+                if (m_initialized && !node->m_initialized)
+                {
+                    node->Initialize();
+                    node->m_initialized = true;
+                }
+
                 return node;
+            }
         }
 
         return nullptr;
     }
 
-    Node *Node::GetChildByTag(const std::string &tag) const
+    Node* Node::GetChildByTag(const std::string &tag) const
     {
-        for (auto& node : m_children)
+        for (const auto& node : m_children)
         {
             if (node->m_tag == tag)
+            {
+                if (m_initialized && !node->m_initialized)
+                {
+                    node->Initialize();
+                    node->m_initialized = true;
+                }
+
                 return node;
+            }
         }
 
         return nullptr;
@@ -97,10 +139,18 @@ namespace Gx
             }
             else
                 child->SetParent(this);
+
+            if (m_initialized && !child->m_initialized)
+            {
+                child->Initialize();
+                child->m_initialized = true;
+            }
+            else
+                m_pristine = child->m_initialized;
         }
     }
 
-    void Node::RemoveChild(Node *child)
+    void Node::RemoveChild(Node* child)
     {
         if (child)
         {

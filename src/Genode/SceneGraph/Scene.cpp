@@ -29,6 +29,7 @@ namespace Gx
 
     void Scene::Initialize()
     {
+        Node::Initialize();
     }
 
     bool Scene::Close(bool quit)

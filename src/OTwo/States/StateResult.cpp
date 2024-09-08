@@ -50,7 +50,6 @@ void StateResult::Initialize()
 
     if (const auto container = top->FindChild<Gx::UiContainer>("IDC_CONTAINER_PLAYER_SCORE"); container)
     {
-
         if (const auto cool = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_COOL"); cool)
             cool->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Cool)));
 

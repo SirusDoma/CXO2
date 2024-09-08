@@ -14,6 +14,8 @@ UserList::UserList() :
 
 void UserList::Initialize()
 {
+    Gx::UiContainer::Initialize();
+
     auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
     auto listChildren = list->GetChildren();
     for (int i = 0; i < listChildren.size(); i++)

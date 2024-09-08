@@ -17,12 +17,15 @@ ChannelBoard::ChannelBoard() :
     m_noticePageIndex(),
     m_noticeMaxPage(),
     m_channelButton(),
+    m_duplicateImage(),
     m_selectedChannel()
 {
 }
 
 void ChannelBoard::Initialize()
 {
+    Image::Initialize();
+
     const auto parent = GetParent<::State>();
     if (!parent)
         return;
@@ -102,8 +105,6 @@ void ChannelBoard::Initialize()
                 enterButton->PerformClick();
             }
         );
-
-        channelButton->Initialize();
     }
 
     const auto leftButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_LEFT");

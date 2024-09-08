@@ -6,7 +6,7 @@
 
 void ComboCounter::Initialize()
 {
-    Node::Initialize();
+    Gx::Node::Initialize();
 
     const auto parent = GetParent<State>();
     if (!parent)

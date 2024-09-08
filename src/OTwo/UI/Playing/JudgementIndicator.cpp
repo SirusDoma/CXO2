@@ -10,7 +10,7 @@ JudgementIndicator::JudgementIndicator(const bool useFx) :
 
 void JudgementIndicator::Initialize()
 {
-    Node::Initialize();
+    Gx::Node::Initialize();
 
     const auto parent = GetParent<State>();
     if (!parent)

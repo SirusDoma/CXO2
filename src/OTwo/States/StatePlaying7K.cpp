@@ -53,8 +53,7 @@ void StatePlaying7K::Initialize()
     auto& room        = session.GetCurrentRoom();
     const auto& items = Require<ItemFactory>();
 
-    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
-    chatPanel->Initialize();
+    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");;
     chatPanel->SetMaximumTextLength(50);
     m_chatBox = chatPanel->FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
     m_chatBox->SetPermanentFocusEnabled(true);
@@ -212,7 +211,6 @@ void StatePlaying7K::Initialize()
     const auto playMenu = Create<PlayMenu>();
     playMenu->SetName("IDC_PLAY_MENU");
     AddChild(playMenu);
-    playMenu->Initialize();
     playMenu->SetMetadata(m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty()), m_context->GetDifficulty());
     playMenu->SetScoreTracker(*scoreTracker);
 
@@ -249,13 +247,11 @@ void StatePlaying7K::Initialize()
     const auto comboCounter = Create<ComboCounter>();
     comboCounter->SetName("IDC_CONTAINER_COMBO");
     AddChild(comboCounter);
-    comboCounter->Initialize();
 
     // Setup Judgement Indicator
     const auto judgementIndicator = Create<JudgementIndicator>(m_config->UseFx);
     judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
     AddChild(judgementIndicator);
-    judgementIndicator->Initialize();
 
     // Setup Key Effects
     m_renderer.SetInputCallback([=] (auto channel, bool state)

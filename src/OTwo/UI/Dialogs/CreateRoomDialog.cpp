@@ -10,6 +10,8 @@
 
 void CreateRoomDialog::Initialize()
 {
+    Dialog::Initialize();
+
     if (m_initialized)
         return;
 

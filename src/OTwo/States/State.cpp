@@ -37,6 +37,7 @@ State::~State()
 
 void State::Initialize()
 {
+    Gx::Scene::Initialize();
     m_tempResources->Clear();
 }
 
