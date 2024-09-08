@@ -10,6 +10,11 @@
 
 #include <magic_enum.hpp>
 
+AvatarLoader::AvatarLoader(ItemFactory& items) :
+    m_items(&items)
+{
+}
+
 Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
 {
     AvatarMetadata metadata;
@@ -57,13 +62,11 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &m
     avatar->SetScale(metadata->Scale);
     avatar->SetRotation(metadata->Rotation);
 
-    auto& app         = Gx::Application::Instance();
-    const auto& items = app.GetContext().Require<ItemFactory>();
-    for (const auto [_, item] : items.GetDefaultItems(avatar->GetGender()))
+    for (const auto [_, item] : m_items->GetDefaultItems(avatar->GetGender()))
         avatar->Equip(item);
 
     for (const auto id : metadata->ItemIDs)
-        avatar->Equip(items.GetItem(id));
+        avatar->Equip(m_items->GetItem(id));
 
     auto container = ObjectContainer::Decorate(avatar.get());
     if (!metadata->Objects.empty())
