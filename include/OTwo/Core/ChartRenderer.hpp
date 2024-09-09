@@ -3,6 +3,8 @@
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
+#include <OTwo/Core/LifeSystem.hpp>
+#include <OTwo/Core/ScoreTracker.hpp>
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
@@ -18,8 +20,6 @@ using ChannelSet = std::unordered_set<Chart::Channel>;
 using SpeedMap = std::unordered_map<Chart::Channel, float>;
 
 class NoteContainer;
-class LifeSystem;
-class ScoreTracker;
 class ChartRenderer : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
@@ -71,29 +71,8 @@ private:
         Judgement    Tap     = {Accuracy::None, 0.f};
         Judgement    Release = {Accuracy::None, 0};
 
-        bool IsRenderable(const double position) const
-        {
-            if (!Event)
-                return false;
-
-            if (!Event->IsPlayable() && Tap.Accuracy != Accuracy::None)
-                return false;
-
-            const auto note = static_cast<Chart::NoteEvent*>(Event);
-            return Tap.Accuracy == Accuracy::None || (note->Length > 0 & note->Position + note->Length > position);
-        }
-
-        bool IsRegistered() const
-        {
-            if (!Event)
-                return true;
-
-            if (!Event->IsPlayable() && Tap.Accuracy != Accuracy::None)
-                return true;
-
-            const auto note = static_cast<Chart::NoteEvent*>(Event);
-            return Tap.Accuracy != Accuracy::None && (note->Length == 0 || Release.Accuracy != Accuracy::None);
-        }
+        bool IsRenderable(const double position) const;
+        bool IsRegistered() const;
 
         Chart::Event *operator->() const { return Event; }
     };

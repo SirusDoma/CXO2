@@ -6,10 +6,13 @@
 #include <vector>
 
 class Avatar;
+class ItemFactory;
+class SessionContext;
+class MusicSelectionContext;
 class StateWaiting7K : public State
 {
 public:
-    StateWaiting7K() = default;
+    StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -17,6 +20,10 @@ private:
     void OnKeyUp(const sf::Event::KeyEvent ev) override;
 
     void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
+
+    Gx::Mixer& m_mixer;
+    SessionContext& m_session;
+    ItemFactory& m_items;
 
     Avatar* m_playerAvatar;
     std::vector<Avatar*> m_avatars;

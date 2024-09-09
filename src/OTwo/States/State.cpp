@@ -14,7 +14,7 @@ State::State() :
     LoadCommonResources();
 }
 
-State::State(const std::string &name) :
+State::State(const std::string& name) :
     Gx::Scene(name),
     m_resources(std::make_unique<Gx::ResourceManager>()),
     m_tempResources(std::make_unique<Gx::ResourceManager>())
@@ -22,7 +22,7 @@ State::State(const std::string &name) :
     LoadCommonResources();
 }
 
-State::State(const std::string &name, Gx::ResourceManager &resources) :
+State::State(const std::string& name, Gx::ResourceManager& resources) :
     Gx::Scene(name),
     m_resources(&resources),
     m_tempResources(std::make_unique<Gx::ResourceManager>())
@@ -65,16 +65,16 @@ void State::LoadCommonResources()
 
         m_exitDialog->SetCancelCallback([&]
         {
-            auto &mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
-            mixer.Play(m_cancelSound, "SFX");
+            auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
 
+            mixer.Play(m_cancelSound, "SFX");
             m_prompted = false;
         });
     }
     loaded = true;
 }
 
-void State::ShowDialog(const std::string &content, const DialogStyle style, const bool backdrop, const std::function<void(bool)> &callback)
+void State::ShowDialog(const std::string& content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
@@ -91,7 +91,7 @@ void State::ShowDialog(const std::string &content, const DialogStyle style, cons
     dialog->Show(this, content, backdrop);
 }
 
-void State::ShowDialog(Gx::Node *content, const DialogStyle style, const bool backdrop, const std::function<void(bool)> &callback)
+void State::ShowDialog(Gx::Node *content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
@@ -119,7 +119,7 @@ bool State::Close(const bool quit)
     {
         if (m_popupSound)
         {
-            auto &mixer = Require<Gx::Mixer>();
+            auto& mixer = Require<Gx::Mixer>();
             mixer.Play(m_popupSound, "SFX");
         }
 
@@ -130,7 +130,7 @@ bool State::Close(const bool quit)
     return Scene::Close(quit);
 }
 
-Gx::ResourceManager &State::GetResources(const ResourceScope scope) const
+Gx::ResourceManager& State::GetResources(const ResourceScope scope) const
 {
     switch (scope)
     {

@@ -22,17 +22,22 @@
 
 #include <magic_enum.hpp>
 
+StateWaiting7K::StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
+    m_mixer(mixer),
+    m_session(session),
+    m_items(items),
+    m_playerAvatar(nullptr),
+    m_avatars()
+{
+}
+
 void StateWaiting7K::Initialize()
 {
     State::Initialize();
 
     auto& director  = GetDirector();
-    auto& items     = Require<ItemFactory>();
-    auto& mixer     = Require<Gx::Mixer>();
-    auto& session   = Require<SessionContext>();
-    auto& selection = Require<MusicSelectionContext>();
-    auto& player    = session.GetCurrentPlayer();
-    auto& room      = session.GetCurrentRoom();
+    auto& player    = m_session.GetCurrentPlayer();
+    auto& room      = m_session.GetCurrentRoom();
 
     const auto bgm            = Instantiate<sf::Music>("IDC_MUSIC");
     const auto sfxStart       = Instantiate<sf::Sound>("IDC_SOUND_33");
@@ -40,7 +45,7 @@ void StateWaiting7K::Initialize()
     const auto sfxSelectMusic = Instantiate<sf::Sound>("IDC_SOUND_35");
 
     const auto channelCategory = Instantiate<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
-    switch (session.GetMusicHall())
+    switch (m_session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
         case MusicHall::Kleo:     channelCategory->SetFrame("Kleo");     break;
@@ -52,7 +57,7 @@ void StateWaiting7K::Initialize()
     }
 
     const auto channelNumber = Instantiate<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
-    channelNumber->SetValue(session.GetChannelID());
+    channelNumber->SetValue(m_session.GetChannelID());
 
     const auto roomNumber = Instantiate<Gx::Number>("IDC_NUMBER_ROOM_ID");
     roomNumber->SetValue(room.ID);
@@ -107,7 +112,7 @@ void StateWaiting7K::Initialize()
     {
         const auto titleBox = dialog->FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
         titleBox->SetMaximumTextLength(21);
-        dialog->SetAcceptCallback([=, r = &room, s = &session]
+        dialog->SetAcceptCallback([=, r = &room, s = &m_session]
         {
             if (titleBox->GetString().isEmpty())
                 return;
@@ -120,7 +125,7 @@ void StateWaiting7K::Initialize()
         });
 
         const auto changeTitleButton = Instantiate<Gx::Button>("IDC_BUTTON_CHANGE_TITLE");
-        changeTitleButton->SetClickCallback([=, r = &room, s = &session] (auto& sender, auto& ev)
+        changeTitleButton->SetClickCallback([=, r = &room, s = &m_session] (auto& sender, auto& ev)
         {
             if (r->RoomMasterID != s->GetCurrentPlayer().ID)
             {
@@ -170,7 +175,7 @@ void StateWaiting7K::Initialize()
             continue;
         }
 
-        if (member.ID == session.GetCurrentPlayer().ID)
+        if (member.ID == m_session.GetCurrentPlayer().ID)
         {
             currentMember = member;
             currentAvatarInfo = avatarInfo;
@@ -180,12 +185,12 @@ void StateWaiting7K::Initialize()
         avatar->SetGender(member.Gender);
         avatarInfo->SetMember(const_cast<RoomMember&>(member));
 
-        for (auto [_, item]: items.GetDefaultItems(member.Gender))
+        for (auto [_, item]: m_items.GetDefaultItems(member.Gender))
             avatar->SetDefaultItem(item);
 
         for (const auto itemID : member.EquippedItemIDs)
         {
-            if (const auto item = items.GetItem(itemID); item)
+            if (const auto item = m_items.GetItem(itemID); item)
                 avatar->Equip(item);
         }
 
@@ -219,7 +224,7 @@ void StateWaiting7K::Initialize()
         if (!teamButton)
             continue;
 
-        teamButton->SetCheckStateChangeCallback([=, &mixer] (auto sender)
+        teamButton->SetCheckStateChangeCallback([=] (auto sender)
         {
             if (!sender->IsChecked())
                 return;
@@ -230,13 +235,13 @@ void StateWaiting7K::Initialize()
                     member->Team = team;
 
                 currentAvatarInfo->Invalidate();
-                mixer.Play(sfxTeam);
+                m_mixer.Play(sfxTeam);
             }
         });
     }
 
     const auto mapSelector = Instantiate<MapSelector>("IDC_CONTAINER_MAP_SELECTOR");
-    mapSelector->SetMapChangedCallback([=, s = &session, r = &room] (const unsigned int mapID)
+    mapSelector->SetMapChangedCallback([=, s = &m_session, r = &room] (const unsigned int mapID)
     {
         auto data = Room(*r);
         data.MapID = mapID;
@@ -244,7 +249,7 @@ void StateWaiting7K::Initialize()
         s->SetCurrentRoom(data);
     });
 
-    mapSelector->SetEffectChangedCallback([=, s = &session, r = &room] (const unsigned int effectID)
+    mapSelector->SetEffectChangedCallback([=, s = &m_session, r = &room] (const unsigned int effectID)
     {
         auto data = Room(*r);
         data.EffectID = effectID;
@@ -258,7 +263,7 @@ void StateWaiting7K::Initialize()
     const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
     if (currentAvatarInfo)
     {
-        instrumentSelector->SetInstrumentSelectCallack([=, &session, &room] (const Item *item)
+        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const Item *item)
         {
 
             if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)
@@ -279,31 +284,31 @@ void StateWaiting7K::Initialize()
                     if (member.ID != currentAvatarInfo->GetMember()->ID)
                         continue;
 
-                    const auto defaultItems = items.GetDefaultItems(member.Gender);
+                    const auto defaultItems = m_items.GetDefaultItems(member.Gender);
                     member.EquippedItemIDs.clear();
 
                     for (auto [_, equipedItem] : avatar->GetEquipedItems())
                         member.EquippedItemIDs.push_back(equipedItem->GetID());
                 }
 
-                session.SetCurrentRoom(data);
+                m_session.SetCurrentRoom(data);
             }
         });
     }
 
-    instrumentSelector->AddInstrument(items.GetItem(232));
-    instrumentSelector->AddInstrument(items.GetItem(233));
-    instrumentSelector->AddInstrument(items.GetItem(234));
-    instrumentSelector->AddInstrument(items.GetItem(39));
-    instrumentSelector->AddInstrument(items.GetItem(238));
-    instrumentSelector->AddInstrument(items.GetItem(255));
-    instrumentSelector->AddInstrument(items.GetItem(256));
-    instrumentSelector->AddInstrument(items.GetItem(257));
-    instrumentSelector->AddInstrument(items.GetItem(304));
-    instrumentSelector->AddInstrument(items.GetItem(410));
-    instrumentSelector->AddInstrument(items.GetItem(411));
-    instrumentSelector->AddInstrument(items.GetItem(412));
-    instrumentSelector->AddInstrument(items.GetItem(1429));
+    instrumentSelector->AddInstrument(m_items.GetItem(232));
+    instrumentSelector->AddInstrument(m_items.GetItem(233));
+    instrumentSelector->AddInstrument(m_items.GetItem(234));
+    instrumentSelector->AddInstrument(m_items.GetItem(39));
+    instrumentSelector->AddInstrument(m_items.GetItem(238));
+    instrumentSelector->AddInstrument(m_items.GetItem(255));
+    instrumentSelector->AddInstrument(m_items.GetItem(256));
+    instrumentSelector->AddInstrument(m_items.GetItem(257));
+    instrumentSelector->AddInstrument(m_items.GetItem(304));
+    instrumentSelector->AddInstrument(m_items.GetItem(410));
+    instrumentSelector->AddInstrument(m_items.GetItem(411));
+    instrumentSelector->AddInstrument(m_items.GetItem(412));
+    instrumentSelector->AddInstrument(m_items.GetItem(1429));
 
     const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     chatPanel->SetMaximumTextLength(50);
@@ -316,14 +321,14 @@ void StateWaiting7K::Initialize()
     {
         if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
-            selectMusicButton->SetClickCallback([=, &mixer] (auto &sender, auto &ev)
+            selectMusicButton->SetClickCallback([=] (auto &sender, auto &ev)
             {
-                mixer.Play(sfxSelectMusic);
+                m_mixer.Play(sfxSelectMusic);
                 selectMusicDialog->Show(this, std::string(), false);
             });
         }
 
-        selectMusicDialog->SetAcceptCallback([=, &session, &room] ()
+        selectMusicDialog->SetAcceptCallback([=, &room] ()
         {
             auto data = Room(room);
             data.Difficulty = selectMusicDialog->GetSelectedDifficulty();
@@ -348,7 +353,7 @@ void StateWaiting7K::Initialize()
                 musicName->SetString("Random");
             }
 
-            session.SetCurrentRoom(data);
+            m_session.SetCurrentRoom(data);
             level->SetFrame(data.GetRoomLevelCode());
         });
     }
@@ -360,25 +365,25 @@ void StateWaiting7K::Initialize()
     });
 
     const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
-    readyButton->SetVisible(session.GetCurrentPlayer().ID != room.RoomMasterID);
+    readyButton->SetVisible(m_session.GetCurrentPlayer().ID != room.RoomMasterID);
     readyButton->SetEnabled(readyButton->IsVisible());
-    readyButton->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
+    readyButton->SetCheckStateChangeCallback([=, &director] (auto sender)
     {
         if (!sender->IsChecked())
             return;
     });
 
     const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START");
-    btnStart->SetVisible(session.GetCurrentPlayer().ID == room.RoomMasterID);
+    btnStart->SetVisible(m_session.GetCurrentPlayer().ID == room.RoomMasterID);
     btnStart->SetEnabled(btnStart->IsVisible());
-    btnStart->SetCheckStateChangeCallback([=, &mixer, &director] (auto sender)
+    btnStart->SetCheckStateChangeCallback([=, &director] (auto sender)
     {
         if (!sender->IsChecked())
             return;
 
         sender->SetEnabled(false);
         btnBack->SetEnabled(false);
-        mixer.Play(sfxStart, "SFX");
+        m_mixer.Play(sfxStart, "SFX");
 
         Run(Create<Gx::Sequence>([&director]
             {
@@ -388,7 +393,7 @@ void StateWaiting7K::Initialize()
         ));
     });
 
-    mixer.Play(bgm, "BGM");
+    m_mixer.Play(bgm, "BGM");
 }
 
 void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent ev)

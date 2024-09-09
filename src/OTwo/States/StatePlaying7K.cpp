@@ -3,9 +3,9 @@
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateResult.hpp>
 
-#include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/Core/LifeSystem.hpp>
 #include <OTwo/Core/ScoreTracker.hpp>
+#include <OTwo/Core/ChartRenderer.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
@@ -24,34 +24,36 @@
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-StatePlaying7K::StatePlaying7K() :
+StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, GameConfig& config, ScoreTracker& scoreTracker, LifeSystem& lifeSystem, ItemFactory& items) :
+    m_session(session),
+    m_context(context),
+    m_config(config),
+    m_scoreTracker(scoreTracker),
+    m_lifeSystem(lifeSystem),
+    m_items(items),
     m_renderer(ChannelSet{
-        Chart::Channel::Note1,
-        Chart::Channel::Note2,
-        Chart::Channel::Note3,
-        Chart::Channel::Note4,
-        Chart::Channel::Note5,
-        Chart::Channel::Note6,
-        Chart::Channel::Note7
-    }),
-    m_self(),
-    m_context(),
-    m_config(),
-    m_chatBox(),
-    m_viewport()
+       Chart::Channel::Note1,
+       Chart::Channel::Note2,
+       Chart::Channel::Note3,
+       Chart::Channel::Note4,
+       Chart::Channel::Note5,
+       Chart::Channel::Note6,
+       Chart::Channel::Note7
+   }),
+   m_self(),
+   m_chatBox(),
+   m_viewport()
 {
 }
 
 void StatePlaying7K::Initialize()
 {
     State::Initialize();
-
-    m_context = PrepareContext();
-    m_config  = &Require<GameConfig>();
-
-    auto& session     = Require<SessionContext>();
-    auto& room        = session.GetCurrentRoom();
-    const auto& items = Require<ItemFactory>();
+    
+    auto& room = m_session.GetCurrentRoom();
+    m_context.SetViewport(GetViewport());
+    if (!m_context.GetConfig())
+        m_context.SetConfig(m_config);
 
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");;
     chatPanel->SetMaximumTextLength(50);
@@ -59,12 +61,8 @@ void StatePlaying7K::Initialize()
     m_chatBox->SetPermanentFocusEnabled(true);
     m_chatBox->SetEnabled(false);
 
-    // IMPORTANT: Don't use callback of these systems, it is being used by chart renderer
-    // TODO: Implement multiple listeners for the callback
-    const auto scoreTracker = &Require<ScoreTracker>();
-    const auto lifeSystem   = &Require<LifeSystem>();
-    scoreTracker->Initialize(m_context->GetDifficulty());
-    lifeSystem->Initialize(m_context->GetDifficulty());
+    m_scoreTracker.Initialize(m_context.GetDifficulty());
+    m_lifeSystem.Initialize(m_context.GetDifficulty());
 
     const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     jam->SetValue(0);
@@ -88,7 +86,7 @@ void StatePlaying7K::Initialize()
 
         const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
         for (const auto id : member.EquippedItemIDs)
-            avatar->Equip(items.GetItem(id));
+            avatar->Equip(m_items.GetItem(id));
 
         const auto effectContainer = Create<Gx::UiContainer>();
         effectContainer->SetName("IDC_CONTAINER_EFFECT_JAM");
@@ -128,10 +126,10 @@ void StatePlaying7K::Initialize()
         info->SetMember(member);
 
         const auto playerLifeBar = info->GetLifeBar();
-        playerLifeBar->SetMaximumValue(lifeSystem->GetMaxLifePoint());
-        playerLifeBar->SetValue(lifeSystem->GetMaxLifePoint());
+        playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+        playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
 
-        if (session.GetCurrentPlayer().ID == member.ID)
+        if (m_session.GetCurrentPlayer().ID == member.ID)
             m_self = avatar;
 
         m_avatars[i] = avatar;
@@ -139,7 +137,7 @@ void StatePlaying7K::Initialize()
 
     const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
     const auto keyDownContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
-    for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
+    for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
     {
         const int id = static_cast<int>(channel) - 1;
         if (id < 1 || id > 7)
@@ -158,7 +156,7 @@ void StatePlaying7K::Initialize()
 
     m_renderer.SetName("IDC_CHART_RENDERER");
     AddChild(&m_renderer);
-    m_renderer.Initialize(*m_context->GetChart(), *m_context, [this] () {
+    m_renderer.Initialize(*m_context.GetChart(), m_context, [this] () {
         OnRenderComplete();
     });
 
@@ -172,7 +170,7 @@ void StatePlaying7K::Initialize()
     // Setup Long Note effects
     if (const auto longNoteEffectList = FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
     {
-        for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
+        for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
             const int id = static_cast<int>(channel) - 1;
             if (id < 1 || id > 7)
@@ -189,7 +187,7 @@ void StatePlaying7K::Initialize()
     // Setup Note Clicks
     if (const auto noteClickList = FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
     {
-        for (auto [channel, _] : m_config->KeyBindings.at(KeyMode::Seven))
+        for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
             const int id = static_cast<int>(channel) - 1;
             if (id < 1 || id > 7)
@@ -211,8 +209,8 @@ void StatePlaying7K::Initialize()
     const auto playMenu = Create<PlayMenu>();
     playMenu->SetName("IDC_PLAY_MENU");
     AddChild(playMenu);
-    playMenu->SetMetadata(m_context->GetChart()->GetMetadata().ToChartMetadataView(m_context->GetDifficulty()), m_context->GetDifficulty());
-    playMenu->SetScoreTracker(*scoreTracker);
+    playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
+    playMenu->SetScoreTracker(m_scoreTracker);
 
     // Setup Score Counter
     const auto scoreNumber = Instantiate<Gx::Number>("IDC_NUMBER_POINT_NUMBER");
@@ -228,7 +226,7 @@ void StatePlaying7K::Initialize()
     // Setup Life Bar
     const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
     lifeBar->SetSlanted(true);
-    lifeBar->SetMaximumValue(lifeSystem->GetMaxLifePoint());
+    lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
     lifeBar->SetValue(0);
 
     // Setup Jam Combo
@@ -249,7 +247,7 @@ void StatePlaying7K::Initialize()
     AddChild(comboCounter);
 
     // Setup Judgement Indicator
-    const auto judgementIndicator = Create<JudgementIndicator>(m_config->UseFx);
+    const auto judgementIndicator = Create<JudgementIndicator>(m_config.UseFx);
     judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
     AddChild(judgementIndicator);
 
@@ -264,14 +262,14 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup Score changes
-    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto jamCombo)
+    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto count)
     {
         // Life System
-        lifeBar->SetValue(lifeSystem->GetCurrentLifePoint());
+        lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
         m_self->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
-        if (lifeSystem->GetCurrentLifePoint() == 0)
+        if (m_lifeSystem.GetCurrentLifePoint() == 0)
         {
-            if (m_context->GetDifficulty() != Difficulty::EX && m_self->IsAlive())
+            if (m_context.GetDifficulty() != Difficulty::EX && m_self->IsAlive())
             {
                 Run(Create<Gx::Delay>(sf::milliseconds(2000),
                     [this] {
@@ -280,7 +278,7 @@ void StatePlaying7K::Initialize()
                 );
             }
 
-            scoreTracker->SetEnabled(false);
+            m_scoreTracker.SetEnabled(false);
             m_self->Die();
 
             return;
@@ -292,28 +290,28 @@ void StatePlaying7K::Initialize()
         if (acc == Accuracy::Bad || acc == Accuracy::Miss)
         {
             m_noteClicks[ev.Channel]->Stop();
-            if (m_config->UseFx)
+            if (m_config.UseFx)
                 m_longNoteEffects[ev.Channel]->SetVisible(false);
         }
-        else if (ev.Type == Chart::NoteType::Hold && m_config->UseFx)
+        else if (ev.Type == Chart::NoteType::Hold && m_config.UseFx)
         {
             m_longNoteEffects[ev.Channel]->Reset();
             m_longNoteEffects[ev.Channel]->SetVisible(true);
         }
 
         // Combo
-        comboCounter->SetCombo(scoreTracker->GetCombo());
+        comboCounter->SetCombo(m_scoreTracker.GetCombo());
         judgementIndicator->Play(acc);
 
         // Score and Jam Combo
-        scoreNumber->SetValue(scoreTracker->GetScorePoint());
-        jamGauge->SetValue(scoreTracker->GetJamProgress());
+        scoreNumber->SetValue(m_scoreTracker.GetScorePoint());
+        jamGauge->SetValue(m_scoreTracker.GetJamProgress());
 
         // Buffer
         for (int i = 0; i < buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
-            renderable->SetVisible(i < scoreTracker->GetBufferCount());
+            renderable->SetVisible(i < m_scoreTracker.GetBufferCount());
         }
     });
 
@@ -349,17 +347,17 @@ void StatePlaying7K::Initialize()
 
     Run(Create<Gx::Step>
     (
-        sf::seconds((lifeSystem->GetMaxLifePoint() / (lifeSystem->GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
+        sf::seconds((m_lifeSystem.GetMaxLifePoint() / (m_lifeSystem.GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
         sf::seconds(1.f / 60.f),
-        [this, lifeSystem, lifeBar] (const auto& step, auto const delta)
+        [this, lifeBar] (const auto& step, auto const delta)
         {
-            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(lifeSystem->GetMaxLifePoint() * 0.01f));
+            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * 0.01f));
             for (auto [_, avatar] : m_avatars)
                 avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
             if (step.GetState() == Gx::TaskState::Completed)
             {
-                lifeBar->SetValue(lifeSystem->GetMaxLifePoint());
+                lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
 
                 // TODO: There's no need to animate avatar life bar?
                 for (auto [_, avatar] : m_avatars)
@@ -373,24 +371,21 @@ void StatePlaying7K::Initialize()
 
 void StatePlaying7K::OnRenderComplete()
 {
-    auto& session = Require<SessionContext>();
-    const auto& scoreTracker = Require<ScoreTracker>();
-
     auto items = std::array<ScoreResultItem, 8>();
     for (int i = 0; i < items.size(); i++)
     {
-        auto& member = session.GetCurrentRoom().Members[i];
-        if (member.ID == session.GetCurrentPlayer().ID)
+        auto& member = m_session.GetCurrentRoom().Members[i];
+        if (member.ID == m_session.GetCurrentPlayer().ID)
         {
             items[i] = ScoreResultItem{
                 member,
-                scoreTracker.GetPoint(Accuracy::Cool),
-                scoreTracker.GetPoint(Accuracy::Good),
-                scoreTracker.GetPoint(Accuracy::Bad),
-                scoreTracker.GetPoint(Accuracy::Miss),
-                scoreTracker.GetMaxCombo(),
-                scoreTracker.GetMaxJamCombo(),
-                scoreTracker.GetScorePoint()
+                m_scoreTracker.GetPoint(Accuracy::Cool),
+                m_scoreTracker.GetPoint(Accuracy::Good),
+                m_scoreTracker.GetPoint(Accuracy::Bad),
+                m_scoreTracker.GetPoint(Accuracy::Miss),
+                m_scoreTracker.GetMaxCombo(),
+                m_scoreTracker.GetMaxJamCombo(),
+                m_scoreTracker.GetScorePoint()
             };
         }
         else if (member.ID != 0)
@@ -410,7 +405,7 @@ void StatePlaying7K::OnRenderComplete()
             items[i] = ScoreResultItem{};
     }
 
-    session.SetLatestScoreResults(items);
+    m_session.SetLatestScoreResults(items);
 
     CaptureScreen();
     GetDirector().Present<StateResult>();
@@ -442,18 +437,18 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
 
     if (ev.code == sf::Keyboard::Key::F5)
     {
-        if (m_config->NoteShapeType == NoteShape::Square)
-            m_config->NoteShapeType = NoteShape::Circle;
+        if (m_config.NoteShapeType == NoteShape::Square)
+            m_config.NoteShapeType = NoteShape::Circle;
         else
-            m_config->NoteShapeType = NoteShape::Square;
+            m_config.NoteShapeType = NoteShape::Square;
     }
 
     if (ev.code == sf::Keyboard::Key::F6)
     {
-        if (m_config->NoteGuideLength == 3)
-            m_config->NoteGuideLength = 0;
+        if (m_config.NoteGuideLength == 3)
+            m_config.NoteGuideLength = 0;
         else
-            m_config->NoteGuideLength++;
+            m_config.NoteGuideLength++;
     }
 
     if (ev.code == sf::Keyboard::Key::Enter)
@@ -463,17 +458,6 @@ void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
 Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
 {
     return State::Render(surface, states);
-}
-
-const GameContext *StatePlaying7K::PrepareContext() const
-{
-    const auto context = &Require<GameContext>();
-    context->SetViewport(GetViewport());
-
-    if (!context->GetConfig())
-        context->SetConfig(Require<GameConfig>());
-
-    return context;
 }
 
 void StatePlaying7K::CaptureScreen()

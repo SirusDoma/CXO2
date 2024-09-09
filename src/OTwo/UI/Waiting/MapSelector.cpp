@@ -4,13 +4,11 @@
 #include <OTwo/States/State.hpp>
 #include <Genode/Graphics/Animation.hpp>
 
-MapSelector::MapSelector(Gx::UiContainer &&copy) noexcept :
-    Gx::UiContainer(copy),
-    Gx::Node(copy),
-    m_mapID(),
-    m_effectID(),
-    m_mapCallback(nullptr),
-    m_effectCallback(nullptr)
+MapSelector::MapSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :
+    m_mixer(mixer),
+    m_resources(resources),
+    m_mapID(mapId),
+    m_effectID(effectId)
 {
 }
 
@@ -81,12 +79,7 @@ unsigned int MapSelector::GetEffectID() const
 
 void MapSelector::SetMapID(int mapID, const bool silent)
 {
-    const auto parent = GetParent<::State>();
-    if (!parent)
-        return;
-
-    auto& mixer             = parent->Require<Gx::Mixer>();
-    const auto sfxNavigate  = parent->Instantiate<sf::Sound>("bgEffect/07");
+    const auto sfxNavigate  = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
     const auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
     const auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
     const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
@@ -132,7 +125,7 @@ void MapSelector::SetMapID(int mapID, const bool silent)
         animation->SetVisible(true);
 
     if (!silent)
-        mixer.Play(sfxNavigate, "SFX");
+        m_mixer.Play(sfxNavigate, "SFX");
 
     if (m_mapCallback)
         m_mapCallback(m_mapID);

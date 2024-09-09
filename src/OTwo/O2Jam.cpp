@@ -43,6 +43,8 @@
 #include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
+#include <OTwo/UI/Dialogs/OptionDialog.hpp>
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 #include <OTwo/UI/Room/RoomContainer.hpp>
 #include <OTwo/UI/Room/UserList.hpp>

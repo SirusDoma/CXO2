@@ -13,14 +13,16 @@
 #include <Genode/Fx/Move.hpp>
 #include <Genode/UI.hpp>
 
+StateResult::StateResult(Gx::Mixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :
+    m_mixer(mixer),
+    m_session(session),
+    m_scoreTracker(scoreTracker)
+{
+}
+
 void StateResult::Initialize()
 {
     State::Initialize();
-
-    auto& mixer              = Require<Gx::Mixer>();
-    auto& session            = Require<SessionContext>();
-    const auto& scoreTracker = Require<ScoreTracker>();
-
     if (const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BACKGROUND"); container)
     {
         const auto& resources = GetResources(ResourceScope::Shared);
@@ -78,7 +80,7 @@ void StateResult::Initialize()
     if (const auto list = bottom->FindChild<Gx::List>("IDC_LIST_RANK_SCORE"); list)
     {
         const auto listItems  = list->GetChildren();
-        const auto scoreItems = session.GetLatestScoreResults();
+        const auto scoreItems = m_session.GetLatestScoreResults();
         for (int i = 0; i < listItems.size(); i++)
         {
             const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
@@ -117,12 +119,12 @@ void StateResult::Initialize()
                 { RoomTeam::H, sf::Color(90, 36, 25, 50) },
             });
 
-            if (scoreItems[i].Member.ID == session.GetCurrentPlayer().ID)
+            if (scoreItems[i].Member.ID == m_session.GetCurrentPlayer().ID)
                 banner->SetFrame(i == 0 ? "win" : "lose");
 
             if (const auto highlighter = item->FindChild<Gx::Rectangle>("IDC_RECTANGLE_HIGHLIGHT"); highlighter)
             {
-                if (scoreItems[i].Member.ID == session.GetCurrentPlayer().ID)
+                if (scoreItems[i].Member.ID == m_session.GetCurrentPlayer().ID)
                     highlighter->SetColor(primaryTeamColor[scoreItems[i].Member.Team]);
                 else
                     highlighter->SetColor(secondaryTeamColor[scoreItems[i].Member.Team]);
@@ -159,11 +161,11 @@ void StateResult::Initialize()
 
     const auto btnRetry = bottom->FindChild<Gx::Button>("IDC_BUTTON_PLAY_RETRY");
     btnRetry->SetEnabled(false);
-    btnRetry->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
+    btnRetry->SetClickCallback([this] (auto &sender, const auto &ev)
     {
         sender.SetEnabled(false);
 
-        mixer.StopAll();
+        m_mixer.StopAll();
         GetDirector().Present<StateLoading>();
     });
 
@@ -174,11 +176,11 @@ void StateResult::Initialize()
         btnRetry->SetFocus(sender.IsFocused() ? false : btnRetry->IsFocused());
         btnRetry->SetEnabled(!sender.IsFocused());
     });
-    btnBack->SetClickCallback([this, &mixer] (auto &sender, const auto &ev)
+    btnBack->SetClickCallback([this] (auto &sender, const auto &ev)
     {
         sender.SetEnabled(false);
 
-        mixer.StopAll();
+        m_mixer.StopAll();
         GetDirector().Present<StateWaiting7K>();
     });
 
@@ -197,7 +199,7 @@ void StateResult::Initialize()
     );
 
     if (const auto bgm = Instantiate<sf::Music>("IDC_MUSIC"); bgm)
-        mixer.Play(bgm, "BGM");
+        m_mixer.Play(bgm, "BGM");
 
     Run(topFx, bottomFx);
     Run(Create<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); }));

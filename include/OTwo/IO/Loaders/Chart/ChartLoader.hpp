@@ -6,10 +6,11 @@
 
 #include <SFML/Graphics/Image.hpp>
 
+class GameContext;
 class ChartLoader : public Gx::ResourceLoader<Chart>
 {
 public:
-    ChartLoader() = default;
+    explicit ChartLoader(const GameContext& context);
 
     Gx::ResourcePtr<Chart> LoadFromMetadata(const ChartMetadata &meta, const Gx::ResourceContext& ctx) const;
     Gx::ResourcePtr<Chart> LoadFromFile(const std::string &fileName, const Gx::ResourceContext& ctx) const override;
@@ -41,6 +42,8 @@ private:
 
     std::function<void(const sf::Image*)> m_onCoverLoaded;
     std::function<void(const sf::Image*)> m_onThumbnailLoaded;
+    GameMode m_mode;
+    Difficulty m_difficulty;
 };
 
 #endif

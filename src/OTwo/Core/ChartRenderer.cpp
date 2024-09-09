@@ -1,4 +1,3 @@
-
 #include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/Core/ScoreTracker.hpp>
 #include <OTwo/Core/LifeSystem.hpp>
@@ -47,7 +46,7 @@ void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, c
         throw Gx::Exception("GameConfig cannot be null");
 
     Initialize(chart, RenderSettings{
-        false,
+        true,
         context.GetConfig(),
         context.GetViewport(),
         context.GetSpeed(),
@@ -196,7 +195,6 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
     else
     {
-
         for (auto& [channel, state] : m_frontBuffers)
         {
             static_cast<Gx::Updatable*>(&m_autoDelays[channel])->Update(states.Delta);
@@ -270,7 +268,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     }
 
     bool updated = false;
-    for (unsigned int i = 0; i < m_events.size(); i++)
+    for (unsigned int i = m_lastEventID; i < m_events.size(); i++)
     {
         auto &ev = m_events[i];
         const double latency = ev->Position - GetRenderPosition();
@@ -278,7 +276,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         if (!ev.IsRenderable(GetRenderPosition()))
             continue;
 
-        if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 5.f && frontBuffersFilled)
+        if ((i == m_events.size() - 1 || m_events[i + 1]->Position > ev->Position) && latency >= 3.f && frontBuffersFilled)
             break;
 
         if (!updated)
@@ -297,6 +295,11 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
                 m_frontBuffers[ev->Channel] = &ev;
                 if (front)
                    ev.LastEvent = front->Event;
+
+                frontBuffersFilled = frontBuffersFilled || std::all_of(m_frontBuffers.begin(), m_frontBuffers.end(), [this] (const auto& b)
+                {
+                    return m_instantiables.find(b.first) == m_instantiables.end() || b.second;
+                });
             }
 
             m_container->Render(note, states.Delta);
@@ -417,12 +420,12 @@ void ChartRenderer::SetInputCallback(const std::function<void(Chart::Channel, bo
     m_inputCallback = inputCallback;
 }
 
-void ChartRenderer::SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& incrementCallback)
+void ChartRenderer::SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned long long)>& incrementCallback)
 {
     m_incrementCallback = incrementCallback;
 }
 
-void ChartRenderer::SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>& jamComboCallback)
+void ChartRenderer::SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned long long)>& jamComboCallback)
 {
     m_jamComboCallback = jamComboCallback;
 }
@@ -451,4 +454,30 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &gr
     }
 
     mixer.Play(m_sounds[ev->ID], group);
+}
+
+bool ChartRenderer::EventState::IsRenderable(const double position) const
+{
+    if (!Event)
+        return false;
+
+    if (!Event->IsPlayable())
+        return Tap.Accuracy == Accuracy::None;
+
+    const auto note = static_cast<Chart::NoteEvent*>(Event);
+    const double threshold = position - 0.25f;
+    return (note->Length == 0 && note->Position > threshold && Tap.Accuracy == Accuracy::None) ||
+           (note->Length > 0  && note->Position + note->Length > threshold);
+}
+
+bool ChartRenderer::EventState::IsRegistered() const
+{
+    if (!Event)
+        return true;
+
+    if (!Event->IsPlayable() && Tap.Accuracy != Accuracy::None)
+        return true;
+
+    const auto note = static_cast<Chart::NoteEvent*>(Event);
+    return Tap.Accuracy != Accuracy::None && (note->Length == 0 || Release.Accuracy != Accuracy::None);
 }

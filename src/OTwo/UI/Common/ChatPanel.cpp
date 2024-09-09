@@ -7,7 +7,8 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/TextBox.hpp>
 
-ChatPanel::ChatPanel()
+ChatPanel::ChatPanel(SessionContext& session) :
+    m_session(session)
 {
 }
 
@@ -31,8 +32,7 @@ void ChatPanel::Initialize()
     chatBox->SetPermanentFocusEnabled(true);
     chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String &text)
     {
-        const auto parent = GetParent<::State>();
-        chatWindow->PushMessage(parent->Require<SessionContext>().GetCurrentPlayer(), text);
+        chatWindow->PushMessage(m_session.GetCurrentPlayer(), text);
     });
 
     if (const auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON"))

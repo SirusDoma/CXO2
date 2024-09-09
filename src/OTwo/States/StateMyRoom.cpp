@@ -14,7 +14,10 @@
 #include <Genode/UI/Number.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
-StateMyRoom::StateMyRoom() :
+StateMyRoom::StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
+    m_mixer(mixer),
+    m_session(session),
+    m_items(items),
     m_selectedItem(nullptr),
     m_bagSelect(nullptr)
 {
@@ -23,12 +26,8 @@ StateMyRoom::StateMyRoom() :
 void StateMyRoom::Initialize()
 {
     State::Initialize();
-
-    auto& mixer       = Require<Gx::Mixer>();
-    auto& session     = Require<SessionContext>();
-    const auto& items = Require<ItemFactory>();
-    auto& player      = session.GetCurrentPlayer();
-
+    
+    auto& player         = m_session.GetCurrentPlayer();
     const auto bgm       = Instantiate<sf::Music>("BGM/bgMyroom.ogg");
     const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
     const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
@@ -37,18 +36,18 @@ void StateMyRoom::Initialize()
 
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
     avatar->SetGender(player.Gender);
-    for (auto [_, item] : items.GetDefaultItems(player.Gender))
+    for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(item);
 
     for (const auto id : player.EquippedItemIDs)
     {
-        if (const auto item = items.GetItem(id); item)
+        if (const auto item = m_items.GetItem(id); item)
             avatar->Equip(item);
     }
 
     for (const auto id : player.Inventory)
     {
-        if (const auto item = items.GetItem(id); item)
+        if (const auto item = m_items.GetItem(id); item)
             m_inventory.push_back(item);
     }
 
@@ -70,12 +69,12 @@ void StateMyRoom::Initialize()
 
     const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MY_BAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(m_inventory.size()) / 2.f));
-    bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext, &mixer] (auto&, const float value)
+    bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_bagCurrentPage)
-            mixer.Play(sfxPrev, "SFX");
+            m_mixer.Play(sfxPrev, "SFX");
         else
-            mixer.Play(sfxNext, "SFX");
+            m_mixer.Play(sfxNext, "SFX");
 
         m_bagCurrentPage = static_cast<unsigned int>(value);
         Invalidate();
@@ -122,13 +121,13 @@ void StateMyRoom::Initialize()
     guild->SetString(player.Guild.Name);
 
     const auto albumButton = statusPanel->FindChild<Gx::Button>("IDC_BUTTON_MY_ALBUM");
-    albumButton->SetClickCallback([=, &mixer] (auto&, auto&)
+    albumButton->SetClickCallback([=] (auto&, auto&)
     {
-        ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=, &mixer] (auto) { mixer.Play(sfxAccept); });
+        ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=] (auto) { m_mixer.Play(sfxAccept); });
     });
 
     const auto sellButton = Instantiate<Gx::Button>("IDC_BUTTON_SELL");
-    sellButton->SetClickCallback([=, &player, &mixer] (auto&, auto&)
+    sellButton->SetClickCallback([=, &player] (auto&, auto&)
     {
         if (statusPanel->IsVisible())
             return;
@@ -160,11 +159,11 @@ void StateMyRoom::Initialize()
             "\nPrice: " + std::to_string(price) + " " + std::string(magic_enum::enum_name(currency)) +
             "\n\nAre you sure about selling the item?";
 
-        ShowDialog(message, DialogStyle::OkCancel, false, [=, &player, &mixer] (auto accepted)
+        ShowDialog(message, DialogStyle::OkCancel, false, [=, &player] (auto accepted)
         {
             if (!accepted)
             {
-                mixer.Play(sfxCancel, "SFX");
+                m_mixer.Play(sfxCancel, "SFX");
                 return;
             }
 
@@ -184,7 +183,7 @@ void StateMyRoom::Initialize()
             else
                 player.Cash += price;
 
-            mixer.Play(sfxAccept, "SFX");
+            m_mixer.Play(sfxAccept, "SFX");
             Invalidate();
         });
     });
@@ -205,16 +204,14 @@ void StateMyRoom::Initialize()
     });
 
     bgm->setLoop(true);
-    mixer.Play(bgm, "BGM");
+    m_mixer.Play(bgm, "BGM");
 
     Invalidate();
 }
 
 void StateMyRoom::Invalidate()
 {
-    auto& session        = Require<SessionContext>();
-    auto& mixer          = Require<Gx::Mixer>();
-    const auto player    = &session.GetCurrentPlayer();
+    const auto player    = &m_session.GetCurrentPlayer();
     const auto avatar    = Instantiate<Avatar>("IDC_AVATAR");
     const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_EQUIPMENTS");
     const auto sfxClick  = Instantiate<sf::Sound>("bgEffect/25");
@@ -255,7 +252,7 @@ void StateMyRoom::Invalidate()
             slot->SetTexture(*item->GetSmallPreview()->GetTexture(), true);
 
         slot->SetVisible(true);
-        slot->SetClickCallback([=, &mixer] (auto&, auto&)
+        slot->SetClickCallback([=] (auto&, auto&)
         {
             if (m_selectedItem == item)
                 return;
@@ -264,7 +261,7 @@ void StateMyRoom::Invalidate()
             m_bagSelect->SetVisible(true);
 
             slot->AddChild(m_bagSelect);
-            mixer.Play(sfxClick, "SFX");
+            m_mixer.Play(sfxClick, "SFX");
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
@@ -342,12 +339,10 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
     if (!slot)
         return;
 
-    if (preview != RenderPart::LargePreview && preview != RenderPart::SmallPreview)
+    if (preview != RenderPart::SmallPreview)
         preview = RenderPart::LargePreview;
 
-    auto& session       = Require<SessionContext>();
-    auto& mixer         = Require<Gx::Mixer>();
-    const auto player   = &session.GetCurrentPlayer();
+    const auto player   = &m_session.GetCurrentPlayer();
     const auto sfxDress = Instantiate<sf::Sound>("bgEffect/27_dress");
 
     const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
@@ -365,14 +360,14 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
         else
             slot->SetTexture(*it->second->GetSmallPreview()->GetTexture(), true);
 
-        slot->SetDoubleClickCallback([=, &mixer] (auto&, auto&)
+        slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
             avatar->Unequip(item);
             player->EquippedItemIDs.clear();
             for (auto [_, item] : avatar->GetEquipedItems())
                 player->EquippedItemIDs.push_back(item->GetID());
 
-            mixer.Play(sfxDress, "SFX");
+            m_mixer.Play(sfxDress, "SFX");
             Invalidate();
         });
     }

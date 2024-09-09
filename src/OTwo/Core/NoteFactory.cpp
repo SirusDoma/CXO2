@@ -90,9 +90,9 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
     auto& guideLineVertices = container->GetGuideLineVertices();
 
     // Resize the vertices to buffer size
-    constexpr int bufferSize = 192 * 20 * 2;                    // Notes + LNs worth of 5 measures
-    vertices.resize((bufferSize * 6 * 3) + (20 * 6)); // LN = 3 objects (head, tail, and body) + 5 measures
-    guideLineVertices.resize(bufferSize * 2 * 4);     // 4 objects (head (left + right), tail (left + right))
+    constexpr int bufferSize = 192 * 20 * 2;
+    vertices.resize((bufferSize * 6 * 3) + (20 * 6));
+    guideLineVertices.resize(bufferSize * 2 * 4);
 
     // TODO: Better vertices index tracking and allocation
     unsigned int vi = 0;
@@ -100,7 +100,8 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
 
     // Prepare  measure prefabs
     auto measurePrefabs = PrefabMap();
-    measurePrefabs[Chart::Channel::Background] = {
+    measurePrefabs[Chart::Channel::Background] =
+    {
         { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>(state + "/IDC_IMAGE_NOTE_MEASURE1") },
         { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>(state + "/IDC_IMAGE_NOTE_MEASURE2") }
     };

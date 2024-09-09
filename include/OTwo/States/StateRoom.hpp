@@ -3,18 +3,24 @@
 
 #include <OTwo/States/State.hpp>
 
-#include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
-#include <OTwo/UI/Dialogs/OptionDialog.hpp>
+class ItemFactory;
+class MusicSelectionContext;
+class SessionContext;
 
 class StateRoom : public State
 {
 public:
-    StateRoom();
+    StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items);
     void Initialize() override;
 
 private:
     void OnMyRoomClicked() const;
     void OnBackClicked() const;
+
+    Gx::Mixer& m_mixer;
+    SessionContext& m_session;
+    MusicSelectionContext& m_selection;
+    ItemFactory& m_items;
 };
 
 #endif

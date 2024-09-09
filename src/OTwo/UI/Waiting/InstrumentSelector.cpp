@@ -6,13 +6,12 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
 
-InstrumentSelector::InstrumentSelector(Gx::UiContainer &&copy) noexcept :
-    Gx::UiContainer(copy),
-    Gx::Node(copy),
-    m_currentItem(),
-    m_currentIndex(0),
-    m_currentInstrument(Instrument::None),
-    m_items()
+InstrumentSelector::InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+    m_mixer(mixer),
+    m_resources(resources),
+    m_currentItem(nullptr),
+    m_currentInstrument(),
+    m_currentIndex(0)
 {
 }
 
@@ -20,16 +19,12 @@ void InstrumentSelector::Initialize()
 {
     Node::Initialize();
 
-    auto& app        = Gx::Application::Instance();
-    auto& resources  = app.GetContext().Require<Gx::ResourceManager>();
-    auto& mixer      = app.GetContext().Require<Gx::Mixer>();
-
-    auto sfxNavigate = &resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/07.json");
-    if (auto previousButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_LEFT"); previousButton)
+    const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
+    if (const auto previousButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_LEFT"); previousButton)
     {
-        previousButton->SetClickCallback([this, &mixer, sound = sfxNavigate] (auto &sender, auto &ev)
+        previousButton->SetClickCallback([this, sound = sfxNavigate] (auto &sender, auto &ev)
         {
-            mixer.Play(sound);
+            m_mixer.Play(sound);
             if (m_currentInstrument == Instrument::None)
                 return;
 
@@ -38,11 +33,11 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (auto nextButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_RIGHT"); nextButton)
+    if (const auto nextButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_RIGHT"); nextButton)
     {
-        nextButton->SetClickCallback([this, &mixer, sound = sfxNavigate] (auto &sender, auto &ev)
+        nextButton->SetClickCallback([this, sound = sfxNavigate] (auto &sender, auto &ev)
         {
-            mixer.Play(sound);
+            m_mixer.Play(sound);
             if (m_currentInstrument == Instrument::None)
                 return;
 
@@ -51,7 +46,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (auto guitar = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); guitar)
+    if (const auto guitar = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); guitar)
     {
         guitar->SetEnabled(false);
         guitar->SetCheckStateChangeCallback([this] (auto sender)
@@ -65,7 +60,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (auto bass = FindChild<Gx::RadioButton>("IDC_RADIO_BASS"); bass)
+    if (const auto bass = FindChild<Gx::RadioButton>("IDC_RADIO_BASS"); bass)
     {
         bass->SetEnabled(false);
         bass->SetCheckStateChangeCallback([this] (auto sender)
@@ -79,7 +74,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (auto keyboard = FindChild<Gx::RadioButton>("IDC_RADIO_KEYBOARD"); keyboard)
+    if (const auto keyboard = FindChild<Gx::RadioButton>("IDC_RADIO_KEYBOARD"); keyboard)
     {
         keyboard->SetEnabled(false);
         keyboard->SetCheckStateChangeCallback([this] (auto sender)
@@ -93,7 +88,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (auto drum = FindChild<Gx::RadioButton>("IDC_RADIO_DRUM"); drum)
+    if (const auto drum = FindChild<Gx::RadioButton>("IDC_RADIO_DRUM"); drum)
     {
         drum->SetEnabled(false);
         drum->SetCheckStateChangeCallback([this] (auto sender)
@@ -116,11 +111,11 @@ void InstrumentSelector::AddInstrument(Item *item)
     if (!item || item->GetInstrument() == Instrument::None)
         return;
 
-    auto key = item->GetInstrument();
-    if (auto it = m_items.find(key); it == m_items.end())
+    const auto key = item->GetInstrument();
+    if (const auto it = m_items.find(key); it == m_items.end())
         m_items[key] = std::vector<Item*>();
 
-    for (auto i : m_items[key])
+    for (const auto i : m_items[key])
     {
         if (i->GetID() == item->GetID())
             return;
@@ -142,9 +137,9 @@ void InstrumentSelector::AddInstrument(Item *item)
         button->SetEnabled(true);
 
         bool init = false;
-        for (auto child : GetChildren())
+        for (const auto child : GetChildren())
         {
-            if (auto radio = dynamic_cast<Gx::RadioButton*>(child); radio && radio->IsChecked())
+            if (const auto radio = dynamic_cast<Gx::RadioButton*>(child); radio && radio->IsChecked())
             {
                 init = true;
                 break;
@@ -169,7 +164,7 @@ void InstrumentSelector::SetInstrument(int itemID)
     for (auto& [_, items] : m_items)
     {
         m_currentIndex = 0;
-        for (auto item : items)
+        for (const auto item : items)
         {
             m_currentIndex++;
             if (item->GetID() == itemID)
@@ -189,7 +184,7 @@ void InstrumentSelector::SetInstrument(int itemID)
 
 void InstrumentSelector::SetInstrumentSelectCallack(const std::function<void(Item *)>& callback)
 {
-    if (auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
+    if (const auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
         selectButton->SetClickCallback([this, callback] (auto &sender, auto &ev) { callback(m_currentItem); });
 }
 
@@ -197,12 +192,12 @@ void InstrumentSelector::Invalidate()
 {
     UiContainer::Invalidate();
 
-    auto items = m_items[m_currentInstrument];
-    auto instrumentPreview = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
+    const auto items = m_items[m_currentInstrument];
+    const auto instrumentPreview = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
     if (!instrumentPreview)
         return;
 
-    auto instrumentLabel = FindChild<Gx::Label>("IDC_TEXT_INSTRUMENT_NAME");
+    const auto instrumentLabel = FindChild<Gx::Label>("IDC_TEXT_INSTRUMENT_NAME");
     if (m_currentIndex >= static_cast<int>(items.size()))
         m_currentIndex = 0;
 
@@ -220,7 +215,7 @@ void InstrumentSelector::Invalidate()
     }
 
     m_currentItem = items[m_currentIndex];
-    if (auto texture = m_currentItem->GetLargePreview()->GetTexture(); texture)
+    if (const auto texture = m_currentItem->GetLargePreview()->GetTexture(); texture)
     {
         instrumentPreview->SetVisible(true);
         instrumentPreview->SetTexture(*texture);

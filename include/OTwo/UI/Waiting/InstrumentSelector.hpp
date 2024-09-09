@@ -7,11 +7,16 @@
 
 #include <unordered_map>
 
+namespace Gx
+{
+    class Mixer;
+    class ResourceManager;
+}
+
 class  InstrumentSelector : public Gx::UiContainer
 {
 public:
-    InstrumentSelector() = default;
-    explicit InstrumentSelector(Gx::UiContainer &&copy) noexcept;
+    InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources);
 
     void Initialize() override;
 
@@ -25,6 +30,9 @@ public:
     void Invalidate() override;
 
 private:
+    Gx::Mixer& m_mixer;
+    Gx::ResourceManager& m_resources;
+
     Item *m_currentItem;
     Instrument m_currentInstrument;
     int m_currentIndex;

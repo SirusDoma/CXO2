@@ -1,7 +1,14 @@
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
+#include <OTwo/Contexts/GameContext.hpp>
 
 #include <magic_enum.hpp>
+
+ChartLoader::ChartLoader(const GameContext& context) :
+    m_mode(context.GetMode()),
+    m_difficulty(context.GetDifficulty())
+{
+}
 
 Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata &meta, const Gx::ResourceContext &ctx) const
 {
@@ -96,6 +103,8 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
     for (int diff = 0; diff < 3; diff++)
     {
         const auto difficulty = static_cast<Difficulty>(diff);
+        if (difficulty != m_difficulty)
+            continue;
 
         Gx::Uint32 offset = 0;
         Gx::Uint32 blockCount = 0;

@@ -8,7 +8,9 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Fx/Fade.hpp>
 
-StatePlanet::StatePlanet() :
+StatePlanet::StatePlanet(Gx::Mixer& mixer, SessionContext& session) :
+    m_mixer(mixer),
+    m_session(session),
     m_connecting(false)
 {
 }
@@ -16,9 +18,6 @@ StatePlanet::StatePlanet() :
 void StatePlanet::Initialize()
 {
     State::Initialize();
-
-    const auto& session = Require<SessionContext>();
-    auto& mixer         = Require<Gx::Mixer>();
 
     const auto bgm = Instantiate<sf::Music>("STATE_PLANET/IDC_MUSIC");
     auto clickSfx  = Instantiate<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
@@ -59,7 +58,7 @@ void StatePlanet::Initialize()
             if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;
 
-            mixer.Play(hoverSfx, "SFX");
+            m_mixer.Play(hoverSfx, "SFX");
         });
 
         radio->SetClickCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender, auto& ev)
@@ -74,12 +73,12 @@ void StatePlanet::Initialize()
                 return;
             }
 
-            mixer.Play(clickSfx, "SFX");
+            m_mixer.Play(clickSfx, "SFX");
             channelBoard->Show(hall, [=] { OnMusicHallSelected(hall); });
         });
     }
 
-    if (session.GetMusicHall() == MusicHall::None)
+    if (m_session.GetMusicHall() == MusicHall::None)
     {
         auto overlay = Create<Gx::Rectangle>(GetView().getSize());
         overlay->SetFillColor(sf::Color::Black);
@@ -96,7 +95,7 @@ void StatePlanet::Initialize()
         Run(splash);
     }
 
-    mixer.Play(bgm, "BGM");
+    m_mixer.Play(bgm, "BGM");
 }
 
 bool StatePlanet::IsConnecting() const
@@ -128,7 +127,7 @@ void StatePlanet::OnMusicHallSelected(MusicHall hall)
     channelBoard->UpdateChannelList(planetInfo);
 }
 
-void StatePlanet::OnChannelEnter(MusicHall hall, ServerChannel channel)
+void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& channel)
 {
     if (channel.Population >= channel.MaxPopulation)
     {
@@ -136,9 +135,8 @@ void StatePlanet::OnChannelEnter(MusicHall hall, ServerChannel channel)
         return;
     }
 
-    auto& session = Require<SessionContext>();
-    session.SetMusicHall(hall);
-    session.SetChannelID(channel.ID);
+    m_session.SetMusicHall(hall);
+    m_session.SetChannelID(channel.ID);
 
     m_connecting = true;
     const auto sequence = Create<Gx::Sequence>([&] ()

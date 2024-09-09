@@ -7,14 +7,14 @@
 
 struct ScoreResultItem
 {
-    RoomMember   Member;
-    unsigned int Cool;
-    unsigned int Good;
-    unsigned int Bad;
-    unsigned int Miss;
-    unsigned int MaxCombo;
-    unsigned int MaxJamCombo;
-    unsigned int ScorePoint;
+    RoomMember Member;
+    unsigned long long Cool;
+    unsigned long long Good;
+    unsigned long long Bad;
+    unsigned long long Miss;
+    unsigned long long MaxCombo;
+    unsigned long long MaxJamCombo;
+    unsigned long long ScorePoint;
 };
 
 class SessionContext

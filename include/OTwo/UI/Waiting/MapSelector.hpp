@@ -3,11 +3,16 @@
 
 #include <Genode/UI/UiContainer.hpp>
 
+namespace Gx
+{
+    class Mixer;
+    class ResourceManager;
+}
+
 class MapSelector : public Gx::UiContainer
 {
 public:
-    MapSelector() = default;
-    explicit MapSelector(Gx::UiContainer &&copy) noexcept;
+    MapSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId);
 
     void Initialize() override;
 
@@ -21,6 +26,9 @@ public:
     void SetEffectChangedCallback(const std::function<void(unsigned int)> &callback);
 
 private:
+    Gx::Mixer& m_mixer;
+    Gx::ResourceManager& m_resources;
+
     unsigned int m_mapID;
     unsigned int m_effectID;
 

@@ -8,15 +8,18 @@
 
 #include <OTwo/States/StatePlanet.hpp>
 
+StateAvi::StateAvi(Gx::Mixer& mixer) :
+    m_mixer(mixer)
+{
+}
+
 void StateAvi::Initialize()
 {
     State::Initialize();
 
-    auto& director  = GetDirector();
-    auto& mixer     = Require<Gx::Mixer>();
-    auto background = Instantiate<Gx::Sprite>("STATE_AVI/IDC_IMAGE_STATE_AVI");
-    auto bgm        = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
-    mixer.Play(bgm, "BGM");
+    auto& director = GetDirector();
+    const auto bgm = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
+    m_mixer.Play(bgm, "BGM");
 
     auto overlay = Create<Gx::Rectangle>(GetView().getSize());
     overlay->SetColor(sf::Color(0, 0, 0, 255));

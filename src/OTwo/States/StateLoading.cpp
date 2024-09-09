@@ -11,15 +11,19 @@
 
 #include <thread>
 
+StateLoading::StateLoading(const SessionContext& session, GameContext& game, GameConfig& config) :
+    m_session(session),
+    m_game(game),
+    m_config(config)
+{
+}
+
 void StateLoading::Initialize()
 {
     State::Initialize();
-
-    auto& session   = Require<SessionContext>();
-    auto& config    = Require<GameConfig>();
-    auto& room      = session.GetCurrentRoom();
-    auto& game      = Require<GameContext>();
-    auto& resources = Require<Gx::ResourceManager>();
+    
+    const auto& room      = m_session.GetCurrentRoom();
+    const auto& resources = GetResources(ResourceScope::Shared);
 
     std::size_t index = 0;
     const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
@@ -34,29 +38,30 @@ void StateLoading::Initialize()
     }
 
     const auto metadata = room.ChartMetadata;
-    game.SetConfig(config);
-    game.SetMode(room.GameMode);
-    game.SetDifficulty(room.Difficulty);
-    game.SetSpeed(room.Speed);
+    m_game.SetConfig(m_config);
+    m_game.SetMode(room.GameMode);
+    m_game.SetDifficulty(room.Difficulty);
+    m_game.SetSpeed(room.Speed);
 
-    if (!game.GetChart() || std::to_string(game.GetChart()->GetMetadata().ID) != metadata.ID)
+    if (!m_game.GetChart() || std::to_string(m_game.GetChart()->GetMetadata().ID) != metadata.ID)
     {
+        auto loader = ChartLoader(m_game);
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
         {
             OnCoverLoaded(image);
         }
         else
         {
-            m_loader.SetCoverLoadCallback([this] (auto cover)
+            loader.SetCoverLoadCallback([this] (auto cover)
             {
                 Queue([this, cover] () { OnCoverLoaded(cover); });
             });
         }
 
-        auto thread = std::thread([=, loader = &m_loader, &game] ()
+        auto thread = std::thread([=] ()
         {
-            game.SetChart(loader->LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
-            Queue([this, &game] { OnChartLoaded(game.GetChart()); });
+            m_game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+            Queue([this] { OnChartLoaded(m_game.GetChart()); });
         });
 
         thread.detach();
@@ -66,7 +71,7 @@ void StateLoading::Initialize()
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
             OnCoverLoaded(image);
 
-        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this, &game] { OnChartLoaded(game.GetChart()); }));
+        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this] { OnChartLoaded(m_game.GetChart()); }));
     }
 }
 
@@ -91,14 +96,11 @@ void StateLoading::OnChartLoaded(const Chart *chart)
 {
     const auto transition = Create<Gx::Sequence>([this, chart]
         {
-            auto &app      = GetApplication();
             auto &director = GetDirector();
-            auto &session  = Require<SessionContext>();
-            auto &config   = Require<GameConfig>();
-            auto &room     = session.GetCurrentRoom();
+            auto &room     = m_session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
-            ctx.SetFxEnabled(config.UseFx);
+            ctx.SetFxEnabled(m_config.UseFx);
             ctx.SetMapID(room.MapID);
             ctx.SetEffectID(room.EffectID);
 
