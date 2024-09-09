@@ -4,8 +4,14 @@ namespace Gx
     template<class... Args>
     std::unique_ptr<T> ResourceLoader<T>::Create(Args&&... args) const
     {
+        if constexpr (std::is_default_constructible_v<T>)
+        {
+            if (!m_creator)
+                return std::make_unique<T>();
+        }
+
         if (!m_creator)
-            return std::make_unique<T>();
+            throw NotSupportedException("Insufficient information to construct the resource of " + std::string(m_type.name()));
 
         return m_creator->Build(args...);
     };

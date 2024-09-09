@@ -18,31 +18,31 @@ namespace Gx
         auto factory = std::make_unique<LoaderFactory<R>>();
         factory->Create = []
         {
+            std::unique_ptr<L> loader;
             if constexpr (!std::is_default_constructible_v<L>)
             {
                 if (m_context)
-                {
-                    auto loader = m_context->Create<L>();
-                    loader->SetResourceCreator(std::function{[]
-                    {
-                        if constexpr (!std::is_default_constructible_v<R>)
-                        {
-                            if (m_context)
-                                return m_context->Create<R>();
-
-                            throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
-                        }
-                        else
-                            return std::make_unique<R>();
-                    }});
-
-                    return loader;
-                }
-
-                throw Exception(std::string(typeid(L).name()) + " is not constructible without application context");
+                    loader = m_context->Create<L>();
+                else
+                    throw Exception(std::string(typeid(L).name()) + " is not constructible without application context");
             }
             else
-                return std::make_unique<L>();
+                loader = std::make_unique<L>();
+
+            loader->SetResourceCreator(std::function{[]
+            {
+                if constexpr (!std::is_default_constructible_v<R>)
+                {
+                    if (m_context)
+                        return m_context->Create<R>();
+
+                    throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
+                }
+                else
+                    return std::make_unique<R>();
+            }});
+
+            return loader;
         };
 
         m_loaders[typeid(R)] = std::move(factory);
