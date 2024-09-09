@@ -10,7 +10,7 @@
 class ScoreTracker
 {
 public:
-    using ScoreCallback = std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)>;
+    using ScoreCallback = std::function<void(const Chart::NoteEvent&, Accuracy, unsigned long long)>;
 
     ScoreTracker() = default;
     explicit ScoreTracker(Difficulty diff);
@@ -27,14 +27,14 @@ public:
 
     void SetEnabled(const bool enabled);
 
-    virtual unsigned int GetScorePoint() const;
-    unsigned int GetPoint(Accuracy acc) const;
+    virtual unsigned long long GetScorePoint() const;
+    unsigned long long GetPoint(Accuracy acc) const;
 
-    unsigned int GetMaxCombo() const;
-    unsigned int GetCombo() const;
+    unsigned long long GetMaxCombo() const;
+    unsigned long long GetCombo() const;
 
-    unsigned int GetMaxJamCombo() const;
-    unsigned int GetJamCombo() const;
+    unsigned long long GetMaxJamCombo() const;
+    unsigned long long GetJamCombo() const;
     virtual unsigned int GetJamProgress() const;
 
     unsigned int GetBufferCount() const;
@@ -50,12 +50,11 @@ private:
     mutable std::unordered_map<Accuracy, unsigned int> m_points;
 
     bool m_enabled;
-    unsigned int m_score;
-    unsigned int m_maxCombo;
-    unsigned int m_combo;
-    unsigned int m_jams;
-    unsigned int m_maxJamCombo;
-    unsigned int m_jamCombo;
+    unsigned long long m_maxCombo;
+    unsigned long long m_combo;
+    unsigned long long m_jams;
+    unsigned long long m_maxJamCombo;
+    unsigned long long m_jamCombo;
     unsigned int m_jamProgress;
     unsigned int m_buffer;
     unsigned int m_bufferProgress;

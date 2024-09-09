@@ -55,8 +55,8 @@ public:
     double GetCurrentBPM() const;
 
     void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
-    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &incrementCallback);
-    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned int)> &jamComboCallback);
+    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned long long)> &incrementCallback);
+    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned long long)> &jamComboCallback);
 
     int MapRenderPositionToPixels(Chart::Channel channel, double position, bool absolute = false) const;
 

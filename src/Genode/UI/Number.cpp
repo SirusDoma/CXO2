@@ -128,12 +128,12 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    unsigned int Number::GetValue() const
+    unsigned long long Number::GetValue() const
     {
         return m_value;
     }
 
-    void Number::SetValue(const unsigned int value)
+    void Number::SetValue(const unsigned long long value)
     {
         m_value = value;
         m_needUpdate = true;

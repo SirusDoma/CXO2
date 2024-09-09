@@ -3,7 +3,6 @@
 ScoreTracker::ScoreTracker(const Difficulty diff) :
     m_difficulty(diff),
     m_enabled(true),
-    m_score(0),
     m_maxCombo(0),
     m_combo(0),
     m_jams(0),
@@ -122,17 +121,17 @@ void ScoreTracker::SetEnabled(const bool enabled)
     m_enabled = enabled;
 }
 
-unsigned int ScoreTracker::GetScorePoint() const
+unsigned long long ScoreTracker::GetScorePoint() const
 {
-    const int score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
-                      m_points[Accuracy::Good] * (100 + 5  * m_jams) +
-                      m_points[Accuracy::Bad]  * 4 -
-                      m_points[Accuracy::Miss] * 10;
+    const long long score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
+                            m_points[Accuracy::Good] * (100 + 5  * m_jams) +
+                            m_points[Accuracy::Bad]  * 4 -
+                            m_points[Accuracy::Miss] * 10;
 
-    return std::max(score, 0);
+    return std::max<unsigned long long>(score, 0);
 }
 
-unsigned int ScoreTracker::GetPoint(Accuracy acc) const
+unsigned long long ScoreTracker::GetPoint(const Accuracy acc) const
 {
     if (const auto it = m_points.find(acc); it != m_points.end())
         return it->second;
@@ -140,22 +139,22 @@ unsigned int ScoreTracker::GetPoint(Accuracy acc) const
     return 0;
 }
 
-unsigned int ScoreTracker::GetMaxCombo() const
+unsigned long long ScoreTracker::GetMaxCombo() const
 {
     return m_maxCombo;
 }
 
-unsigned int ScoreTracker::GetCombo() const
+unsigned long long ScoreTracker::GetCombo() const
 {
     return m_combo > 0 ? m_combo - 1 : m_combo;
 }
 
-unsigned int ScoreTracker::GetMaxJamCombo() const
+unsigned long long ScoreTracker::GetMaxJamCombo() const
 {
     return m_maxJamCombo;
 }
 
-unsigned int ScoreTracker::GetJamCombo() const
+unsigned long long ScoreTracker::GetJamCombo() const
 {
     return m_jamCombo;
 }
@@ -177,7 +176,6 @@ unsigned int ScoreTracker::GetBufferProgress() const
 
 void ScoreTracker::Reset()
 {
-    m_score          = 0;
     m_maxCombo       = 0;
     m_combo          = 0;
     m_maxJamCombo    = 0;

@@ -43,8 +43,8 @@ namespace Gx
         void SetDigitFrame(unsigned int digit, sf::IntRect texCoords);
         void SetDigitsSize(sf::Vector2u size);
 
-        unsigned int GetValue() const;
-        void SetValue(unsigned int value);
+        unsigned long long GetValue() const;
+        void SetValue(unsigned long long value);
 
         Alignment GetAlignment() const;
         void SetAlignment(Alignment alignment);
@@ -70,7 +70,8 @@ namespace Gx
         Alignment         m_alignment;
 
         Animation::AnimationState m_state;
-        unsigned int m_value, m_digitCount;
+        unsigned long long m_value;
+        unsigned int m_digitCount;
         float m_width, m_height, m_kerning;
         bool m_needUpdate;
 

@@ -51,26 +51,26 @@ void StateResult::Initialize()
     if (const auto container = top->FindChild<Gx::UiContainer>("IDC_CONTAINER_PLAYER_SCORE"); container)
     {
         if (const auto cool = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_COOL"); cool)
-            cool->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Cool)));
+            cool->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Cool)));
 
         if (const auto good = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_GOOD"); good)
-            good->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Good)));
+            good->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Good)));
 
         if (const auto bad = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_BAD"); bad)
-            bad->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Bad)));
+            bad->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Bad)));
 
         if (const auto miss = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_MISS"); miss)
-            miss->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Miss)));
+            miss->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Miss)));
 
         if (const auto maxCombo = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_MAX_COMBO"); maxCombo)
-            maxCombo->SetString(std::to_string(scoreTracker.GetMaxCombo()));
+            maxCombo->SetString(std::to_string(m_scoreTracker.GetMaxCombo()));
 
         if (const auto maxJamCombo = container->FindChild<Gx::Label>("IDC_TEXT_PLAYER_MAX_JAM_COMBO"); maxJamCombo)
-            maxJamCombo->SetString(std::to_string(scoreTracker.GetMaxJamCombo()));
+            maxJamCombo->SetString(std::to_string(m_scoreTracker.GetMaxJamCombo()));
     }
 
     if (const auto point = top->FindChild<Gx::Number>("IDC_NUMBER_POINT"); point)
-        point->SetValue(scoreTracker.GetScorePoint());
+        point->SetValue(m_scoreTracker.GetScorePoint());
 
     if (const auto gem = top->FindChild<Gx::Label>("IDC_TEXT_GEM"); gem)
         gem->SetString(std::to_string(100));
