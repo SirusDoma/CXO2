@@ -71,7 +71,7 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
             for (auto callback : m_jamComboCallbacks)
             {
                 if (callback)
-                    callback(ev, acc, count);
+                    callback(ev, acc, m_jamCombo);
             }
         }
     }
