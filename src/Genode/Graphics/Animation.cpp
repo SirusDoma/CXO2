@@ -110,7 +110,7 @@ namespace Gx
 
         if (const auto frameTime = sf::milliseconds( static_cast<int>(m_duration.asMilliseconds() / m_speed) / static_cast<int>(m_frames.size())); m_elapsed >= frameTime)
         {
-            m_elapsed %= frameTime;
+            m_elapsed = frameTime == sf::Time::Zero ? sf::Time::Zero : m_elapsed % frameTime;
             m_currentFrame++;
             if (m_currentFrame >= m_frames.size())
             {
