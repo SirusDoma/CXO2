@@ -23,13 +23,13 @@
 #include <unordered_set>
 #include <OTwo/States/State.hpp>
 
-SelectMusicDialog::SelectMusicDialog(SessionContext& session, MusicSelectionContext& selection, Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+SelectMusicDialog::SelectMusicDialog(Gx::Mixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection) :
     m_coverID(0),
     m_speed(0),
-    m_session(session),
-    m_selection(selection),
     m_mixer(mixer),
     m_resources(resources),
+    m_session(session),
+    m_selection(selection),
     m_music()
 {
 }

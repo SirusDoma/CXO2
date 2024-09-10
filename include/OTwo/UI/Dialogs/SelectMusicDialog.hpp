@@ -20,7 +20,7 @@ class SessionContext;
 class SelectMusicDialog : public Gx::Dialog
 {
 public:
-    SelectMusicDialog(SessionContext& session, MusicSelectionContext& selection, Gx::Mixer& mixer, Gx::ResourceManager& resources);
+    SelectMusicDialog(Gx::Mixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection);
 
     void Initialize() override;
 
@@ -49,10 +49,10 @@ private:
     unsigned int m_coverID;
     float        m_speed;
 
-    SessionContext&        m_session;
-    MusicSelectionContext& m_selection;
     Gx::Mixer&             m_mixer;
     Gx::ResourceManager&   m_resources;
+    SessionContext&        m_session;
+    MusicSelectionContext& m_selection;
 
     Difficulty     m_difficulty = Difficulty::EX;
     MusicSortMode  m_sort       = static_cast<MusicSortMode>(-1);
