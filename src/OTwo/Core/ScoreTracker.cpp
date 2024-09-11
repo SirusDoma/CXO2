@@ -123,6 +123,9 @@ void ScoreTracker::SetEnabled(const bool enabled)
 
 unsigned long long ScoreTracker::GetScorePoint() const
 {
+    if (std::all_of(m_points.begin(), m_points.end(), [this] (const auto& p) { return p.first == Accuracy::Miss || p.second == 0; }))
+        return 0;
+
     const long long score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
                             m_points[Accuracy::Good] * (100 + 5  * m_jams) +
                             m_points[Accuracy::Bad]  * 4 -
