@@ -17,6 +17,10 @@ namespace Gx
     public:
         virtual ~RenderSurface() = default;
 
+        virtual void Clear() { Clear(sf::Color::Black); }
+        virtual void Clear(const sf::Color clearColor) = 0;
+        virtual void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) = 0;
+
         virtual void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) = 0;
 
         void Render(const sf::VertexArray& vertices, const RenderStates& states = RenderStates::Default)

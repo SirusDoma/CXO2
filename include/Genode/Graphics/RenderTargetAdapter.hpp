@@ -4,6 +4,8 @@
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <functional>
+
 namespace Gx
 {
     class RenderTargetAdapter : public RenderSurface
@@ -11,6 +13,12 @@ namespace Gx
     public:
         explicit RenderTargetAdapter(sf::RenderTarget &target);
         ~RenderTargetAdapter() override = default;
+
+        void SetClearColorResolver(const std::function<sf::Color()>& resolver);
+
+        void Clear() override;
+        void Clear(const sf::Color clearColor) override;
+        void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
 
         void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) override;
         void Render(const sf::Vertex*       vertices,
@@ -32,6 +40,7 @@ namespace Gx
 
     private:
         sf::RenderTarget *m_target = nullptr;
+        std::function<sf::Color()> m_clearColorResolver;
     };
 }
 

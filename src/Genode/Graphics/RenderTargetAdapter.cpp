@@ -2,9 +2,33 @@
 #include <Genode/Entities/Renderable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
-Gx::RenderTargetAdapter::RenderTargetAdapter(sf::RenderTarget &target)
-    : m_target(&target)
+Gx::RenderTargetAdapter::RenderTargetAdapter(sf::RenderTarget &target) :
+    m_target(&target),
+    m_clearColorResolver()
 {
+}
+
+void Gx::RenderTargetAdapter::SetClearColorResolver(const std::function<sf::Color()>& resolver)
+{
+    m_clearColorResolver = resolver;
+}
+
+void Gx::RenderTargetAdapter::Clear()
+{
+    if (m_clearColorResolver)
+        Clear(m_clearColorResolver());
+    else
+        RenderSurface::Clear();
+}
+
+void Gx::RenderTargetAdapter::Clear(const sf::Color clearColor)
+{
+    m_target->clear(clearColor);
+}
+
+void Gx::RenderTargetAdapter::Clear(const sf::Color clearColor, const sf::StencilValue stencilValue)
+{
+    m_target->clear(clearColor, stencilValue);
 }
 
 void Gx::RenderTargetAdapter::Render(const Renderable& renderable, const RenderStates &states)

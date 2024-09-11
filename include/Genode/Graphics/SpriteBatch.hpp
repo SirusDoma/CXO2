@@ -126,6 +126,9 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
+        void Clear(const sf::Color clearColor) override;
+        void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
+
         void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) override;
         void Render(const sf::Vertex*       vertices,
                     const std::size_t       vertexCount,
@@ -149,7 +152,7 @@ namespace Gx
         ///        added
         ///
         ////////////////////////////////////////////////////////////
-        void Clear(bool force = false);
+        void ClearBatch(bool force = false);
 
         ////////////////////////////////////////////////////////////
         /// \brief If true, Sprite Batch is empty

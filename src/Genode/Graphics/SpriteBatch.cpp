@@ -126,8 +126,18 @@ namespace Gx
         }
 
         // Signal clear is required in next render/update
-        batcher.Clear(true); // HACK: Call non-const in Render
+        batcher.ClearBatch(true); // HACK: Call non-const in Render
         return states;
+    }
+
+    void SpriteBatch::Clear(const sf::Color)
+    {
+        ClearBatch();
+    }
+
+    void SpriteBatch::Clear(const sf::Color, sf::StencilValue)
+    {
+        ClearBatch();
     }
 
     ////////////////////////////////////////////////////////////
@@ -142,7 +152,7 @@ namespace Gx
         if (m_blendMode.has_value() && m_blendMode != states.blendMode)
             throw NotSupportedException("Multiple blending mode usage within single batch is not supported");
 
-        Clear();
+        ClearBatch();
 
         m_blendMode = states.blendMode;
         Batch(vertices, vertexCount, type, states.texture, states.transform, states.Layer);
@@ -289,7 +299,7 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Clear(const bool force)
+    void SpriteBatch::ClearBatch(const bool force)
     {
         if (!force && !m_clearRequired)
             return;

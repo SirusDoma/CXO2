@@ -117,6 +117,8 @@ namespace Gx
                     m_target->clear(m_clearColor);
                     {
                         auto surface = RenderTargetAdapter(*m_target);
+                        surface.SetClearColorResolver([this] { return m_clearColor; });
+
                         Render(surface, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
                     }
                     m_target->display();
