@@ -46,7 +46,7 @@ void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, c
         throw Gx::Exception("GameConfig cannot be null");
 
     Initialize(chart, RenderSettings{
-        true,
+        false,
         context.GetConfig(),
         context.GetViewport(),
         context.GetSpeed(),
