@@ -72,12 +72,12 @@ namespace Gx
 
         void Update(const double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
-        bool Input(sf::Event ev) override;
+        bool Input(const sf::Event& ev) override;
 
-        void OnMouseMove(const sf::Event::MouseMoveEvent ev) override;
-        void OnMouseButtonDown(const sf::Event::MouseButtonEvent ev) override;
-        void OnMouseButtonUp(const sf::Event::MouseButtonEvent ev) override;
-        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev) override;
+        void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
+        void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev) override;
+        void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev) override;
+        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev) override;
 
         virtual void OnControlChildAdded(Control *control);
         virtual void OnControlChildRemove(Control *control);

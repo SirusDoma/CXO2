@@ -42,7 +42,7 @@ public:
 
 private:
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
-    void OnMouseWheelScrolled(sf::Event::MouseWheelScrollEvent ev) override;
+    void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev) override;
     void Invalidate() override;
 
     const Gx::Font *m_font;

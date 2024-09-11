@@ -114,13 +114,13 @@ namespace Gx
         Input(m_lastInput);
     }
 
-    void Scene::Queue(const std::function<void()>& evt)
+    void Scene::QueueEvent(const std::function<void()>& evt)
     {
         if (evt)
             m_events.push(evt);
     }
 
-    void Scene::ProcessSceneEvents()
+    void Scene::ProcessEvents()
     {
         const auto& director = GetDirector();
         while (!m_events.empty())
@@ -157,7 +157,7 @@ namespace Gx
         TaskContainer::Update(delta);
     }
 
-    bool Scene::Input(const sf::Event ev)
+    bool Scene::Input(const sf::Event& ev)
     {
         m_lastInput = ev;
         if (!m_overlays.empty())

@@ -424,12 +424,12 @@ void StatePlaying7K::Update(const double delta)
     State::Update(delta);
 }
 
-void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent ev)
+void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent& ev)
 {
     Inputable::OnKeyDown(ev);
 }
 
-void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent ev)
+void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent& ev)
 {
     Inputable::OnKeyUp(ev);
 

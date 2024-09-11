@@ -68,8 +68,7 @@ namespace Gx
         while (m_window->isOpen())
         {
             // Poll window event
-            auto event = sf::Event();
-            while (m_window->pollEvent(event))
+            for (auto event = sf::Event(); m_window->pollEvent(event);)
             {
                 // Call window event handlers based on received event
                 switch (event.type)
@@ -78,15 +77,14 @@ namespace Gx
                     case sf::Event::GainedFocus:         OnFocusChanged(true);   break;
                     case sf::Event::LostFocus:           OnFocusChanged(false);  break;
                     case sf::Event::Resized:             OnResized(event.size);  break;
-                    case sf::Event::MouseButtonPressed:
-                    case sf::Event::MouseButtonReleased:
+                    default:
                     {
-                        UpdateCursor(event);
-                        OnInputReceived(event);
+                        if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased)
+                            UpdateCursor(event);
 
+                        OnInputReceived(event);
                         break;
                     }
-                    default:                             OnInputReceived(event); break;
                 }
             }
 
@@ -259,7 +257,7 @@ namespace Gx
     {
     }
 
-    void Application::OnResized(sf::Event::SizeEvent ev)
+    void Application::OnResized(const sf::Event::SizeEvent& ev)
     {
     }
 

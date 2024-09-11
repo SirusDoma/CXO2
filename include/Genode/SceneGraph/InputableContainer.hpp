@@ -15,7 +15,7 @@ namespace Gx
 
     protected:
         InputableContainer();
-        bool Input(const sf::Event ev) override;
+        bool Input(const sf::Event& ev) override;
     };
 }
 

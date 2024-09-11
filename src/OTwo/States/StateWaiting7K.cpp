@@ -396,7 +396,7 @@ void StateWaiting7K::Initialize()
     m_mixer.Play(bgm, "BGM");
 }
 
-void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent ev)
+void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent& ev)
 {
     State::OnKeyDown(ev);
 
@@ -445,7 +445,7 @@ void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent ev)
     }
 }
 
-void StateWaiting7K::OnKeyUp(const sf::Event::KeyEvent ev)
+void StateWaiting7K::OnKeyUp(const sf::Event::KeyEvent& ev)
 {
     State::OnKeyUp(ev);
 }

@@ -54,14 +54,14 @@ void StateLoading::Initialize()
         {
             loader.SetCoverLoadCallback([this] (auto cover)
             {
-                Queue([this, cover] () { OnCoverLoaded(cover); });
+                QueueEvent([this, cover] () { OnCoverLoaded(cover); });
             });
         }
 
         auto thread = std::thread([=] ()
         {
             m_game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
-            Queue([this] { OnChartLoaded(m_game.GetChart()); });
+            QueueEvent([this] { OnChartLoaded(m_game.GetChart()); });
         });
 
         thread.detach();

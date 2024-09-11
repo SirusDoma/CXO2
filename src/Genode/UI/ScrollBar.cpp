@@ -200,7 +200,7 @@ namespace Gx
         return states;
     }
 
-    void ScrollBar::OnMouseMove(const sf::Event::MouseMoveEvent ev)
+    void ScrollBar::OnMouseMove(const sf::Event::MouseMoveEvent& ev)
     {
         Control::OnMouseMove(ev);
 
@@ -255,7 +255,7 @@ namespace Gx
         }
     }
 
-    void ScrollBar::OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)
+    void ScrollBar::OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)
     {
         Control::OnMouseButtonDown(ev);
 
@@ -270,13 +270,13 @@ namespace Gx
         }
     }
 
-    void ScrollBar::OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)
+    void ScrollBar::OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)
     {
         Control::OnMouseButtonUp(ev);
         m_dragging = false;
     }
 
-    void ScrollBar::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev)
+    void ScrollBar::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev)
     {
         Control::OnMouseWheelScrolled(ev);
 

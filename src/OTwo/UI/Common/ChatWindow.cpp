@@ -172,7 +172,7 @@ Gx::RenderStates ChatWindow::Render(Gx::RenderSurface &surface, Gx::RenderStates
     return states;
 }
 
-void ChatWindow::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent ev)
+void ChatWindow::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev)
 {
     Control::OnMouseWheelScrolled(ev);
 

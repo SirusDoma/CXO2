@@ -16,8 +16,8 @@ public:
     void Initialize() override;
 
 private:
-    void OnKeyDown(const sf::Event::KeyEvent ev) override;
-    void OnKeyUp(const sf::Event::KeyEvent ev) override;
+    void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+    void OnKeyUp(const sf::Event::KeyEvent& ev) override;
 
     void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
 

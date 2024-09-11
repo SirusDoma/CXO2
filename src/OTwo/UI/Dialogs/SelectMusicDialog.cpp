@@ -429,7 +429,7 @@ void SelectMusicDialog::Initialize()
     CacheMusicCover();
 }
 
-void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent ev)
+void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent& ev)
 {
     Dialog::OnKeyDown(ev);
 

@@ -30,10 +30,10 @@ namespace Gx
     protected:
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Update(double delta) override;
-        bool Input(sf::Event ev) override;
+        bool Input(const sf::Event& ev) override;
 
         void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
-        void OnKeyDown(sf::Event::KeyEvent ev) override;
+        void OnKeyDown(const sf::Event::KeyEvent& ev) override;
 
         void Invalidate() override;
 

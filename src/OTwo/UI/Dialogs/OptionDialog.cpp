@@ -365,7 +365,7 @@ void OptionDialog::Update(const double delta)
     UiContainer::Update(delta);
 }
 
-void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
+void OptionDialog::OnKeyDown(const sf::Event::KeyEvent& ev)
 {
     Dialog::OnKeyDown(ev);
 
@@ -407,7 +407,7 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent ev)
     }
 }
 
-void OptionDialog::OnKeyUp(const sf::Event::KeyEvent ev)
+void OptionDialog::OnKeyUp(const sf::Event::KeyEvent& ev)
 {
     Inputable::OnKeyUp(ev);
 
@@ -425,7 +425,7 @@ void OptionDialog::OnKeyUp(const sf::Event::KeyEvent ev)
     }
 }
 
-void OptionDialog::OnKeyType(const sf::Event::TextEvent ev)
+void OptionDialog::OnKeyType(const sf::Event::TextEvent& ev)
 {
     Inputable::OnKeyType(ev);
 }

@@ -22,9 +22,9 @@ private:
 
     void Update(double delta) override;
 
-    void OnKeyDown(sf::Event::KeyEvent ev) override;
-    void OnKeyUp(sf::Event::KeyEvent ev) override;
-    void OnKeyType(sf::Event::TextEvent ev) override;
+    void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+    void OnKeyUp(const sf::Event::KeyEvent& ev) override;
+    void OnKeyType(const sf::Event::TextEvent& ev) override;
 
     void Invalidate() override;
 

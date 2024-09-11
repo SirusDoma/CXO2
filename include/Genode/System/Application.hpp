@@ -64,7 +64,7 @@ namespace Gx
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         virtual void OnFocusChanged(bool focus);
-        virtual void OnResized(sf::Event::SizeEvent ev);
+        virtual void OnResized(const sf::Event::SizeEvent& ev);
         virtual void OnInputReceived(sf::Event& ev);
         virtual void OnClose();
 

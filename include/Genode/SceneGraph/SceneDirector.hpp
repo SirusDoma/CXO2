@@ -26,7 +26,7 @@ namespace Gx
 
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         void Update(double delta) override;
-        bool Input(sf::Event ev) override;
+        bool Input(const sf::Event& ev) override;
 
         virtual void ProcessEvents();
         bool Close();

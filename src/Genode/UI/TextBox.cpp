@@ -408,17 +408,17 @@ namespace Gx
         Control::OnControlClick(sender, ev);
     }
 
-    void TextBox::OnMouseMove(const sf::Event::MouseMoveEvent ev)
+    void TextBox::OnMouseMove(const sf::Event::MouseMoveEvent& ev)
     {
         Control::OnMouseMove(ev);
     }
 
-    void TextBox::OnMouseButtonDown(const sf::Event::MouseButtonEvent ev)
+    void TextBox::OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)
     {
         Control::OnMouseButtonDown(ev);
     }
 
-    void TextBox::OnMouseButtonUp(const sf::Event::MouseButtonEvent ev)
+    void TextBox::OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)
     {
         Control::OnMouseButtonUp(ev);
 
@@ -429,7 +429,7 @@ namespace Gx
         }
     }
 
-    void TextBox::OnKeyDown(const sf::Event::KeyEvent ev)
+    void TextBox::OnKeyDown(const sf::Event::KeyEvent& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -531,7 +531,7 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::OnKeyType(const sf::Event::TextEvent ev)
+    void TextBox::OnKeyType(const sf::Event::TextEvent& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;

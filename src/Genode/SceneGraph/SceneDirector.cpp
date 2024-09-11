@@ -102,7 +102,7 @@ namespace Gx
             m_currentScene->Update(delta);
     }
 
-    bool SceneDirector::Input(sf::Event ev)
+    bool SceneDirector::Input(const sf::Event& ev)
     {
         Stage();
 
@@ -115,7 +115,7 @@ namespace Gx
     void SceneDirector::ProcessEvents()
     {
         if (m_currentScene)
-            m_currentScene->ProcessSceneEvents();
+            m_currentScene->ProcessEvents();
     }
 
     bool SceneDirector::Close()

@@ -215,7 +215,7 @@ Gx::RenderStates StateResult::Render(Gx::RenderSurface &surface, Gx::RenderState
     return State::Render(surface, states);
 }
 
-void StateResult::OnKeyDown(const sf::Event::KeyEvent ev)
+void StateResult::OnKeyDown(const sf::Event::KeyEvent& ev)
 {
     State::OnKeyDown(ev);
 

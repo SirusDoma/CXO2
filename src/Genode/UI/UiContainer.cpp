@@ -45,7 +45,7 @@ namespace Gx
         m_activeRadio = radio;
     }
 
-    void UiContainer::OnKeyDown(const sf::Event::KeyEvent ev)
+    void UiContainer::OnKeyDown(const sf::Event::KeyEvent& ev)
     {
         Inputable::OnKeyDown(ev);
 
@@ -104,7 +104,7 @@ namespace Gx
             Control::Update(delta);
     }
 
-    bool UiContainer::Input(sf::Event ev)
+    bool UiContainer::Input(const sf::Event& ev)
     {
         const bool input = Control::Input(ev);
         if (!m_activeRadio)

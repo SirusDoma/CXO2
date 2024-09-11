@@ -10,7 +10,7 @@ namespace Gx
     {
     }
 
-    bool InputableContainer::Input(const sf::Event ev)
+    bool InputableContainer::Input(const sf::Event& ev)
     {
         if (Inputable::Input(ev))
         {

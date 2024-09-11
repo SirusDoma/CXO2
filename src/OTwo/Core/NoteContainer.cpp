@@ -197,6 +197,7 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         surface.SetView(currentView);
 
         // HACK: Fix SFML Scissor view bug with render texture
+        // More Info: https://github.com/SFML/SFML/issues/3220
         constexpr auto temp = std::array<sf::Vertex, 1>({sf::Vertex{{}, sf::Color::Transparent, {}}});
         surface.Render(&temp[0], temp.size(), sf::PrimitiveType::Points);
     }

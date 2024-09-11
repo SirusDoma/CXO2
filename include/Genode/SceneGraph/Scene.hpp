@@ -46,7 +46,7 @@ namespace Gx
         template<typename T>
         T& Require() const;
 
-        void Queue(const std::function<void()>& evt);
+        void QueueEvent(const std::function<void()>& evt);
 
     protected:
         void Initialize() override;
@@ -54,9 +54,9 @@ namespace Gx
 
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
-        bool Input(sf::Event ev) override;
+        bool Input(const sf::Event& ev) override;
 
-        virtual void ProcessSceneEvents();
+        virtual void ProcessEvents();
 
     private:
         bool IsVisible() const override { return true; }

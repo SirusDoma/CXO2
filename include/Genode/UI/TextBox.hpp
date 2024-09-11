@@ -80,11 +80,11 @@ namespace Gx
 
         void OnControlStateChanged(Control *sender, State state) override;
         void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
-        void OnMouseMove(sf::Event::MouseMoveEvent ev) override;
-        void OnMouseButtonDown(sf::Event::MouseButtonEvent ev) override;
-        void OnMouseButtonUp(sf::Event::MouseButtonEvent ev) override;
-        void OnKeyDown(sf::Event::KeyEvent ev) override;
-        void OnKeyType(sf::Event::TextEvent ev) override;
+        void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
+        void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev) override;
+        void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev) override;
+        void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+        void OnKeyType(const sf::Event::TextEvent& ev) override;
 
         void Invalidate() override;
 

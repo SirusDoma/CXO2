@@ -24,8 +24,8 @@ public:
     unsigned int GetViewport() const;
     void SetViewport(unsigned int viewport);
 
-    void OnKeyDown(const sf::Event::KeyEvent ev) override;
-    void OnKeyUp(const sf::Event::KeyEvent ev) override;
+    void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+    void OnKeyUp(const sf::Event::KeyEvent& ev) override;
 
 private:
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
