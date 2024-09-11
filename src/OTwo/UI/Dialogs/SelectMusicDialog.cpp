@@ -278,9 +278,9 @@ void SelectMusicDialog::Initialize()
                         if (genre != m_genre)
                             continue;
 
-                        if (const auto button = genreSelector->FindChild<Gx::RadioButton>(key); button)
+                        if (const auto genreButton = genreSelector->FindChild<Gx::RadioButton>(key); genreButton)
                         {
-                            button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
+                            genreButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
                         }
                     }
@@ -299,9 +299,9 @@ void SelectMusicDialog::Initialize()
                         if (diff != m_difficulty)
                             continue;
 
-                        if (const auto button = levelSelector->FindChild<Gx::RadioButton>(key); button)
+                        if (const auto diffButton = levelSelector->FindChild<Gx::RadioButton>(key); diffButton)
                         {
-                            button->SetCheckedState(m_random == static_cast<LevelCategory>(0));
+                            diffButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
                             break;
                         }
                     }
@@ -549,8 +549,6 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
 {
     Dialog::OnShown(scene);
 
-    const auto parent     = GetParent<::State>();
-
     m_musicList = m_session.GetInstalledMusic(true);
     m_displayList.clear();
     for (auto& metadata : m_musicList)
@@ -582,16 +580,16 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
     }
 
     m_speed = m_selection.GetSpeed();
-    if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
+    if (const auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
     {
-        for (auto child : speedSelector->GetChildren())
+        for (const auto child : speedSelector->GetChildren())
         {
-            auto button = dynamic_cast<Gx::RadioButton*>(child);
+            const auto button = dynamic_cast<Gx::RadioButton*>(child);
             if (!button)
                 continue;
 
             auto name = button->GetName();
-            if (auto index = name.find_last_of('/'); index != -1)
+            if (const auto index = name.find_last_of('/'); index != -1)
                 name = name.substr(index + 1);
 
             auto prefix = std::string("IDC_RADIO_SPEED_");
@@ -611,7 +609,7 @@ void SelectMusicDialog::OnShown(Gx::Scene &scene)
             if (speed != XrSpeed && speed != TdSpeed)
             {
                 bool supported = false;
-                for (float s : SupportedHiSpeeds)
+                for (const float s : SupportedHiSpeeds)
                 {
                     if (speed == s)
                     {
@@ -639,8 +637,6 @@ void SelectMusicDialog::OnAccepted()
 
     Dialog::OnAccepted();
 
-    const auto parent = GetParent<::State>();
-
     m_selection.SetMetadata(m_music);
     m_selection.SetRandomLevel(m_random);
     m_selection.SetSortMode(m_sort);
@@ -649,7 +645,7 @@ void SelectMusicDialog::OnAccepted()
     m_selection.SetSpeed(m_speed);
     CacheMusicCover();
 
-    const auto sfx = &m_resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/02.json");
+    const auto sfx = &m_resources.AddFromFile<sf::Sound>("bgEffect/02");
     m_mixer.Play(sfx);
 }
 
@@ -657,19 +653,20 @@ void SelectMusicDialog::OnCancelled()
 {
     Dialog::OnCancelled();
 
-    const auto parent = GetParent<::State>();
-
-    const auto sfx = &m_resources.AddFromFile<sf::Sound>("Interface/Sound/Effect/03.json");
+    const auto sfx = &m_resources.AddFromFile<sf::Sound>("bgEffect/03");
     m_mixer.Play(sfx);
 }
 
-void SelectMusicDialog::CacheMusicCover() const
+void SelectMusicDialog::CacheMusicCover(const bool refresh) const
 {
     if (m_music.Source.empty())
         return;
 
     try
     {
+        if (!refresh && m_resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"))
+            return;
+
         if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
             m_resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
         else

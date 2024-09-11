@@ -319,6 +319,7 @@ void StateWaiting7K::Initialize()
 
     if (const auto selectMusicDialog = Instantiate<SelectMusicDialog>("IDC_DIALOG_SELECT_MUSIC"); selectMusicDialog)
     {
+        selectMusicDialog->Initialize(); // force load the cover art
         if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
             selectMusicButton->SetClickCallback([=] (auto &sender, auto &ev)
