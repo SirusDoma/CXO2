@@ -15,12 +15,18 @@ void Chart::SetMetadata(const ChartMetadata &metadata)
 
 const Chart::EventList& Chart::GetEvents(const Difficulty diff) const
 {
-    auto events = EventList();
-    const auto source = m_events.find(diff);
-    if (source != m_events.end())
+    if (const auto source = m_events.find(diff); source != m_events.end())
         return source->second;
 
     throw Gx::Exception("Chart events not found");
+}
+
+std::size_t Chart::GetEventCount(const Difficulty diff) const
+{
+    if (const auto source = m_events.find(diff); source != m_events.end())
+        return source->second.size();
+
+    return 0;
 }
 
 void Chart::SortEvents()

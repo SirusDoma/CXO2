@@ -43,7 +43,8 @@ void StateLoading::Initialize()
     m_game.SetDifficulty(room.Difficulty);
     m_game.SetSpeed(room.Speed);
 
-    if (!m_game.GetChart() || std::to_string(m_game.GetChart()->GetMetadata().ID) != metadata.ID)
+    const auto chart = m_game.GetChart();
+    if (!chart || std::to_string(chart->GetMetadata().ID) != metadata.ID || chart->GetEventCount(m_game.GetDifficulty()) == 0)
     {
         auto loader = ChartLoader(m_game);
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)

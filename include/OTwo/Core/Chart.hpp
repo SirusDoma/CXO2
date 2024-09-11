@@ -137,6 +137,7 @@ public:
     template<typename T>
     T* AddEvent(Difficulty diff, T &&ev);
     const EventList& GetEvents(Difficulty diff) const;
+    std::size_t GetEventCount(Difficulty diff) const;
     void SortEvents();
 
     void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
