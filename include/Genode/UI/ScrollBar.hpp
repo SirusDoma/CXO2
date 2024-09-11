@@ -50,10 +50,10 @@ namespace Gx
 
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
-        void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
-        void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev) override;
-        void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev) override;
-        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev) override;
+        void OnMouseMoved(const sf::Event::MouseMoved& ev) override;
+        void OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev) override;
+        void OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev) override;
+        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev) override;
 
         void Invalidate() override;
 

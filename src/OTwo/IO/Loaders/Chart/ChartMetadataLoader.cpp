@@ -1,6 +1,6 @@
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
-Gx::ResourcePtr <ChartMetadata> ChartMetadataLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<ChartMetadata> ChartMetadataLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
 {
     const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
@@ -14,15 +14,13 @@ Gx::ResourcePtr <ChartMetadata> ChartMetadataLoader::LoadFromFile(const std::str
     return metadata;
 }
 
-Gx::ResourcePtr <ChartMetadata> ChartMetadataLoader::LoadFromMemory(void *data, std::size_t size, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<ChartMetadata> ChartMetadataLoader::LoadFromMemory(void *data, const std::size_t size, const Gx::ResourceContext &ctx) const
 {
-    auto stream = sf::MemoryInputStream();
-    stream.open(data, size);
-
+    auto stream = sf::MemoryInputStream(data, size);
     return LoadFromStream(stream, ctx);
 }
 
-Gx::ResourcePtr <ChartMetadata> ChartMetadataLoader::LoadFromStream(sf::InputStream &stream, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<ChartMetadata> ChartMetadataLoader::LoadFromStream(sf::InputStream &stream, const Gx::ResourceContext &ctx) const
 {
     auto metadata = std::make_unique<ChartMetadata>();
     if (stream.read(metadata.get(), ChartMetadata::Size) != ChartMetadata::Size)

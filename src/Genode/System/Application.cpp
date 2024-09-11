@@ -18,7 +18,6 @@ namespace Gx
         m_adapter(*this),
         m_director(SceneDirector(*this)),
         m_context(std::make_unique<Context>()),
-        m_event(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
         m_cursor(),
         m_title(title),
@@ -58,7 +57,7 @@ namespace Gx
         Boot();
 
         // Update cursor handle and scale
-        UpdateCursor(sf::Event{});
+        UpdateCursor(sf::Event::Closed());
 
         // Setup timer
         auto timer  = sf::Clock();
@@ -68,21 +67,23 @@ namespace Gx
         while (m_window->isOpen())
         {
             // Poll window event
-            for (auto event = sf::Event(); m_window->pollEvent(event);)
+            while (const auto event = m_window->pollEvent())
             {
                 // Call window event handlers based on received event
-                switch (event.type)
+                if (event.has_value() && !event->is<sf::Event::MouseMovedRaw>())
                 {
-                    case sf::Event::Closed:              OnClose();              break;
-                    case sf::Event::GainedFocus:         OnFocusChanged(true);   break;
-                    case sf::Event::LostFocus:           OnFocusChanged(false);  break;
-                    case sf::Event::Resized:             OnResized(event.size);  break;
-                    default:
+                    if      (event->is<sf::Event::Closed>())                    { OnClose(); }
+                    else if (event->is<sf::Event::FocusGained>())               { OnFocusChanged(true); }
+                    else if (event->is<sf::Event::FocusLost>())                 { OnFocusChanged(false); }
+                    else if (const auto e = event->getIf<sf::Event::Resized>()) { OnResized(*e); }
+                    else
                     {
-                        if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased)
-                            UpdateCursor(event);
+                        if (event->is<sf::Event::MouseButtonPressed>() || event->is<sf::Event::MouseButtonReleased>())
+                            UpdateCursor(event.value());
 
-                        OnInputReceived(event);
+                        auto ev = event.value();
+                        OnInputReceived(ev);
+
                         break;
                     }
                 }
@@ -257,51 +258,60 @@ namespace Gx
     {
     }
 
-    void Application::OnResized(const sf::Event::SizeEvent& ev)
+    void Application::OnResized(const sf::Event::Resized& ev)
     {
     }
 
     void Application::OnInputReceived(sf::Event& ev)
     {
         // Re-map mouse coordinate
-        switch (ev.type)
+        if (const auto mv = ev.getIf<sf::Event::MouseMoved>())
         {
-            case sf::Event::MouseMoved:
+            const auto position = m_window->mapPixelToCoords(mv->position);
+            ev = sf::Event::MouseMoved
             {
-                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseMove.x, ev.mouseMove.y));
-                ev.mouseMove = sf::Event::MouseMoveEvent{
+                {
                     static_cast<int>(position.x),
                     static_cast<int>(position.y)
-                };
-
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
-            case sf::Event::MouseButtonReleased:
+                }
+            };
+        }
+        else if (const auto mp = ev.getIf<sf::Event::MouseButtonPressed>())
+        {
+            const auto position = m_window->mapPixelToCoords(mp->position);
+            ev = sf::Event::MouseButtonPressed
             {
-                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y));
-                ev.mouseButton = sf::Event::MouseButtonEvent{
-                    ev.mouseButton.button,
+                mp->button,
+                {
                     static_cast<int>(position.x),
                     static_cast<int>(position.y)
-                };
-
-                break;
-            }
-            case sf::Event::MouseWheelScrolled:
+                }
+            };
+        }
+        else if (const auto mr = ev.getIf<sf::Event::MouseButtonReleased>())
+        {
+            const auto position = m_window->mapPixelToCoords(mr->position);
+            ev = sf::Event::MouseButtonReleased
             {
-                const auto position = m_window->mapPixelToCoords(sf::Vector2i(ev.mouseWheelScroll.x, ev.mouseWheelScroll.y));
-                ev.mouseWheelScroll = sf::Event::MouseWheelScrollEvent{
-                    ev.mouseWheelScroll.wheel,
-                    ev.mouseWheelScroll.delta,
+                mr->button,
+                {
                     static_cast<int>(position.x),
                     static_cast<int>(position.y)
-                };
-
-                break;
-            }
-            default:
-                break;
+                }
+            };
+        }
+        else if (const auto mw = ev.getIf<sf::Event::MouseWheelScrolled>())
+        {
+            const auto position = m_window->mapPixelToCoords(mw->position);
+            ev = sf::Event::MouseWheelScrolled
+            {
+                mw->wheel,
+                mw->delta,
+                {
+                    static_cast<int>(position.x),
+                    static_cast<int>(position.y)
+                }
+            };
         }
 
         // Pass input into active scene via director
@@ -321,7 +331,7 @@ namespace Gx
             return;
 
         auto type = Cursor::Type::Arrow;
-        if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Button::Left)
+        if (const auto mp = ev.getIf<sf::Event::MouseButtonPressed>(); mp && mp->button == sf::Mouse::Button::Left)
             type = Cursor::Type::Click;
 
         float scale = static_cast<float>(m_window->getSize().x) / m_gameVideoMode.size.x;
@@ -349,16 +359,14 @@ namespace Gx
         m_window->setView(view);
         m_adapter = RenderTargetAdapter(*this);
 
-        UpdateCursor(sf::Event{});
+        UpdateCursor(sf::Event::Closed());
     }
 
     void Application::SetupTarget() const
     {
         if (m_target->getSize().x == 0 || m_target->getSize().y == 0)
         {
-            if (!m_target->create(m_windowVideoMode.size))
-                return;
-
+            m_target = std::make_unique<sf::RenderTexture>(m_windowVideoMode.size);
             m_target->setSmooth(true);
         }
     }

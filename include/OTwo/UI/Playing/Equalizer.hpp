@@ -10,8 +10,8 @@ public:
     Equalizer();
     Equalizer(int count, float spacing);
 
-    void OnControlChildAdded(Gx::Control *control) override;
-    void OnControlChildRemove(Gx::Control *control) override;
+    void OnControlChildAdded(Gx::Control& control) override;
+    void OnControlChildRemove(Gx::Control& control) override;
 
 private:
     std::vector<Gx::Gauge*> m_gauges;

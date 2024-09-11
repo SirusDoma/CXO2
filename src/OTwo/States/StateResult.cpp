@@ -43,11 +43,11 @@ void StateResult::Initialize()
     const auto banner = Instantiate<Gx::Image>("IDC_IMAGE_WINLOSE");
     banner->SetVisible(false);
 
-    auto height = bottom->GetLocalBounds().height;
-    if (height < top->GetLocalBounds().height)
-        height = top->GetLocalBounds().height;
+    auto height = bottom->GetLocalBounds().size.y;
+    if (height < top->GetLocalBounds().size.y)
+        height = top->GetLocalBounds().size.y;
 
-    top->SetPosition(0.f, -height + -top->GetLocalBounds().height);
+    top->SetPosition(0.f, -height + -top->GetLocalBounds().size.y);
     bottom->SetPosition(0.f, view.getSize().y + height);
 
     if (const auto container = top->FindChild<Gx::UiContainer>("IDC_CONTAINER_PLAYER_SCORE"); container)
@@ -194,7 +194,7 @@ void StateResult::Initialize()
         },
         Gx::Sequence::ListOf(
         {
-            Create<Gx::Move>(bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().height), sf::seconds(2.f)),
+            Create<Gx::Move>(bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f)),
         })
     );
 
@@ -215,9 +215,9 @@ Gx::RenderStates StateResult::Render(Gx::RenderSurface &surface, Gx::RenderState
     return State::Render(surface, states);
 }
 
-void StateResult::OnKeyDown(const sf::Event::KeyEvent& ev)
+void StateResult::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
-    State::OnKeyDown(ev);
+    State::OnKeyPressed(ev);
 
     if (ev.code == sf::Keyboard::Key::Enter)
     {

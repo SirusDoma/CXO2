@@ -64,7 +64,7 @@ namespace Gx
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         virtual void OnFocusChanged(bool focus);
-        virtual void OnResized(const sf::Event::SizeEvent& ev);
+        virtual void OnResized(const sf::Event::Resized& ev);
         virtual void OnInputReceived(sf::Event& ev);
         virtual void OnClose();
 
@@ -82,7 +82,6 @@ namespace Gx
         mutable SceneDirector m_director;
 
         std::unique_ptr<Context> m_context;
-        sf::Event m_event;
         sf::State m_state;
 
         sf::VideoMode m_windowVideoMode;

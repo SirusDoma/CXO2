@@ -37,7 +37,7 @@ set(SFML_STATIC_LIBRARIES TRUE)
 fetchcontent_declare(
     SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 5da286487ae79703c4b918c00f9542be67d8e660
+    GIT_TAG 7fdce1235e509242bfb9b3532be76830485e2a5e
 )
 fetchcontent_makeavailable(SFML)
 
@@ -231,9 +231,9 @@ else()
 endif()
 
 # Link SFML
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-audio sfml-graphics sfml-system sfml-window)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE SFML::Audio SFML::Graphics SFML::System SFML::Window)
 if(WIN32)
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE sfml-main)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE SFML::Main)
 endif()
 
 # Include FreeType

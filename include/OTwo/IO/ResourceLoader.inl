@@ -12,11 +12,11 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string &fileName, 
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {
-        if (auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
+        if (const auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
             return LoadFromMetadata(*metadata, ctx);
     }
 
-    auto stream = Gx::FileSystem::Open(fileName);
+    const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
         throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
 
@@ -29,13 +29,11 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromMemory(void *data, std::size_t siz
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {
-        if (auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
+        if (const auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
             return LoadFromMetadata(*metadata, ctx);
     }
 
-    auto stream = sf::MemoryInputStream();
-    stream.open(data, size);
-
+    auto stream = sf::MemoryInputStream(data, size);
     return LoadFromStream(stream, ctx);
 }
 
@@ -44,19 +42,19 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream &stream, co
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {
-        if (auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
+        if (const auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
             return LoadFromMetadata(*metadata, ctx);
     }
 
-    auto size = stream.getSize() - stream.tell();
-    auto data = new Gx::Uint8[size];
+    const auto size = stream.getSize().value_or(0) - stream.tell().value_or(0);
+    const auto data = new Gx::Uint8[size];
     if (stream.read(data, size) == -1)
     {
         delete[] data;
         throw Gx::ResourceLoadException("Failed to load the resource");
     }
 
-    auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(data), size));
+    const auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(data), size));
     delete[] data;
 
     return LoadFromJson(json, ctx);

@@ -54,11 +54,11 @@ namespace Gx
         auto origin = GetOrigin();
 
         if (m_alignment == Alignment::Left)
-            SetOrigin(bounds.left, origin.y);
+            SetOrigin(bounds.position.x, origin.y);
         else if (m_alignment == Alignment::Center)
-            SetOrigin(std::floor(bounds.left + (bounds.width / 2.f)), origin.y);
+            SetOrigin(std::floor(bounds.position.x + (bounds.size.x / 2.f)), origin.y);
         else if (m_alignment == Alignment::Right)
-            SetOrigin((bounds.left + bounds.width), origin.y);
+            SetOrigin((bounds.position.x + bounds.size.x), origin.y);
 
         m_alignmentUpdated = true;
     }

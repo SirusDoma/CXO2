@@ -297,7 +297,7 @@ void O2Jam::OnInputReceived(sf::Event& ev)
 {
     Application::OnInputReceived(ev);
 
-    if (ev.type == sf::Event::KeyReleased && ev.key.code == sf::Keyboard::Key::F12)
+    if (const auto key = ev.getIf<sf::Event::KeyReleased>(); key && key->code == sf::Keyboard::Key::F12)
         Console::Instance().SetEnabled(!Console::Instance().IsEnabled());
 }
 

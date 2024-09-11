@@ -141,7 +141,7 @@ Gx::RenderStates ChannelButton::Render(Gx::RenderSurface &surface, Gx::RenderSta
     return CheckBox::Render(surface, states);
 }
 
-void ChannelButton::OnControlStateChanged(Gx::Control *sender, Gx::Control::State state)
+void ChannelButton::OnControlStateChanged(Control& sender, Gx::Control::State state)
 {
     if (m_focusIndicator)
         m_focusIndicator->SetVisible(state == Gx::Control::State::Hover || state == Gx::Control::State::Active);

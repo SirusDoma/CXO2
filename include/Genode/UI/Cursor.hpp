@@ -58,7 +58,7 @@ namespace Gx
     private:
         struct CursorHandle
         {
-            sf::Cursor   Handle;
+            sf::Cursor   Handle = sf::Cursor(sf::Cursor::Type::Arrow);
             sf::Image    Source;
             sf::Vector2u InitialSize;
             sf::Vector2u Hotspot;

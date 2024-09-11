@@ -34,13 +34,13 @@ namespace Gx
     {
         // Use frame for active state first before looking for other frames
         auto bounds = m_stateData[GetControlState()].TexCoords;
-        if (bounds.width <= 0 || bounds.height <= 0)
+        if (bounds.size.x <= 0 || bounds.size.y <= 0)
         {
             // There's no frame for active state, look for valid frame
             for (auto [_, frame] : m_stateData)
             {
                 bounds = frame.TexCoords;
-                if (bounds.width > 0 && bounds.height > 0)
+                if (bounds.size.x > 0 && bounds.size.y > 0)
                     break;
             }
         }
@@ -51,8 +51,8 @@ namespace Gx
                 0.f
             },
             {
-                static_cast<float>(bounds.width),
-                static_cast<float>(bounds.height)
+                static_cast<float>(bounds.size.x),
+                static_cast<float>(bounds.size.y)
             }
         );
     }
@@ -85,7 +85,7 @@ namespace Gx
                 return;
         }
 
-        OnControlClick(this, sf::Event::MouseButtonEvent{});
+        OnControlClick(*this, sf::Event::MouseButtonReleased());
     }
 
     Button::Frame Button::GetCurrentFrame() const
@@ -102,7 +102,7 @@ namespace Gx
         states.coordinateType = sf::CoordinateType::Pixels;
 
         const auto currentTexCoords = GetCurrentFrame().TexCoords;
-        if (m_texture && currentTexCoords.width > 0 && currentTexCoords.height > 0)
+        if (m_texture && currentTexCoords.size.x > 0 && currentTexCoords.size.y > 0)
         {
             states.texture = m_texture;
             surface.Render(m_vertices.data(), m_vertices.size(), sf::PrimitiveType::TriangleStrip, states);
@@ -115,18 +115,18 @@ namespace Gx
     {
         const auto bounds = GetCurrentFrame().TexCoords;
         m_vertices[0].position = sf::Vector2f(0, 0);
-        m_vertices[1].position = sf::Vector2f(0, bounds.height);
-        m_vertices[2].position = sf::Vector2f(bounds.width, 0);
-        m_vertices[3].position = sf::Vector2f(bounds.width, bounds.height);
+        m_vertices[1].position = sf::Vector2f(0, bounds.size.y);
+        m_vertices[2].position = sf::Vector2f(bounds.size.x, 0);
+        m_vertices[3].position = sf::Vector2f(bounds.size.x, bounds.size.y);
     }
 
     void Button::UpdateTexCoords()
     {
         const auto bounds = GetCurrentFrame().TexCoords;
-        const auto left = static_cast<float>(bounds.left);
-        const float right = left + static_cast<float>(bounds.width);
-        const auto top = static_cast<float>(bounds.top);
-        const float bottom = top + static_cast<float>(bounds.height);
+        const auto left = static_cast<float>(bounds.position.x);
+        const float right = left + static_cast<float>(bounds.size.x);
+        const auto top = static_cast<float>(bounds.position.y);
+        const float bottom = top + static_cast<float>(bounds.size.y);
 
         m_vertices[0].texCoords = sf::Vector2f(left, top);
         m_vertices[1].texCoords = sf::Vector2f(left, bottom);

@@ -26,15 +26,15 @@ void Marquee::SetLocalBounds(const sf::FloatRect &bounds)
 {
     m_bounds = bounds;
 
-    if (!m_renderTexture->create(sf::Vector2u(static_cast<unsigned int>(m_bounds.width), static_cast<unsigned int>(m_bounds.height))))
+    if (!m_renderTexture->resize(sf::Vector2u(static_cast<unsigned int>(m_bounds.size.x), static_cast<unsigned int>(m_bounds.size.y))))
         throw Gx::Exception("Failed to create render texture");
 
     m_renderTexture->setSmooth(true);
 
     m_sprite.SetTexture(m_renderTexture->getTexture(), true);
-    m_sprite.SetPosition(sf::Vector2f(m_bounds.left, m_bounds.top));
+    m_sprite.SetPosition(sf::Vector2f(m_bounds.position.x, m_bounds.position.y));
 
-    SetPosition(sf::Vector2f(m_bounds.width, GetPosition().y));
+    SetPosition(sf::Vector2f(m_bounds.size.x, GetPosition().y));
 }
 
 double Marquee::GetSpeed() const
@@ -56,8 +56,8 @@ void Marquee::Update(const double delta)
     SetPosition(position);
 
     const auto textBounds = Label::GetLocalBounds();
-    if (const float x = GetPosition().x + textBounds.width; x <= 0)
-        SetPosition(sf::Vector2f(m_bounds.width, GetPosition().y));
+    if (const float x = GetPosition().x + textBounds.size.x; x <= 0)
+        SetPosition(sf::Vector2f(m_bounds.size.x, GetPosition().y));
 
     m_renderTexture->clear(sf::Color::Transparent);
     {

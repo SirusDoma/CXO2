@@ -31,23 +31,23 @@ namespace Gx
         m_useBatching = batchingEnabled;
     }
 
-    void UiContainer::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void UiContainer::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         if (!IsEnabled())
             return;
 
         Control::OnControlClick(sender, ev);
 
-        const auto radio = dynamic_cast<RadioButton *>(sender);
+        const auto radio = dynamic_cast<RadioButton *>(&sender);
         if (!radio || radio->IsChecked())
             return;
 
         m_activeRadio = radio;
     }
 
-    void UiContainer::OnKeyDown(const sf::Event::KeyEvent& ev)
+    void UiContainer::OnKeyPressed(const sf::Event::KeyPressed& ev)
     {
-        Inputable::OnKeyDown(ev);
+        Inputable::OnKeyPressed(ev);
 
         if (!IsEnabled() || ev.code != sf::Keyboard::Key::Tab)
             return;
@@ -144,22 +144,22 @@ namespace Gx
             const auto bounds = control->GetGlobalBounds();
             if (first)
             {
-                result.left = bounds.left;
-                result.top  = bounds.top;
+                result.position.x = bounds.position.x;
+                result.position.y  = bounds.position.y;
                 first = false;
             }
 
-            if (result.left > bounds.left)
-                result.left = bounds.left;
-            if (result.top  > bounds.top)
-                result.top  = bounds.top;
+            if (result.position.x > bounds.position.x)
+                result.position.x = bounds.position.x;
+            if (result.position.y  > bounds.position.y)
+                result.position.y  = bounds.position.y;
 
-            if (result.width  < bounds.left + bounds.width)
-                result.width  = bounds.left + bounds.width;
-            if (result.height < bounds.top  + bounds.height)
-                result.height = bounds.top  + bounds.height;
+            if (result.size.x  < bounds.position.x + bounds.size.x)
+                result.size.x  = bounds.position.x + bounds.size.x;
+            if (result.size.y < bounds.position.y  + bounds.size.y)
+                result.size.y = bounds.position.y  + bounds.size.y;
         }
 
-        m_localBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.width - result.left, result.height - result.top));
+        m_localBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.size.x - result.position.x, result.size.y - result.position.y));
     }
 }

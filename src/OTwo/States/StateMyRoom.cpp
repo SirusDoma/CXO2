@@ -203,7 +203,7 @@ void StateMyRoom::Initialize()
         GetDirector().Present<StateRoom>();
     });
 
-    bgm->setLoop(true);
+    bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 
     Invalidate();

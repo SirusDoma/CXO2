@@ -59,8 +59,13 @@ namespace
         if (stream->seek(convertedOffset) == convertedOffset)
         {
             if (count > 0)
-                return static_cast<unsigned long>(
-                    stream->read(reinterpret_cast<char*>(buffer), static_cast<std::int64_t>(count)));
+            {
+                const auto read = stream->read(reinterpret_cast<char*>(buffer), static_cast<std::int64_t>(count));
+                if (!read)
+                    return 0;
+
+                return *read;
+            }
             else
                 return 0;
         }
@@ -264,7 +269,7 @@ namespace Gx
 
         // Prepare a wrapper for our stream, that we'll pass to FreeType callbacks
         fontHandles->streamRec.base               = nullptr;
-        fontHandles->streamRec.size               = static_cast<unsigned long>(stream.getSize());
+        fontHandles->streamRec.size               = static_cast<unsigned long>(*stream.getSize());
         fontHandles->streamRec.pos                = 0;
         fontHandles->streamRec.descriptor.pointer = &stream;
         fontHandles->streamRec.read               = &read;
@@ -595,16 +600,16 @@ namespace Gx
 
             // Make sure the texture data is positioned in the center
             // of the allocated texture rectangle
-            glyph.textureRect.left += static_cast<int>(padding);
-            glyph.textureRect.top += static_cast<int>(padding);
-            glyph.textureRect.width -= static_cast<int>(2 * padding);
-            glyph.textureRect.height -= static_cast<int>(2 * padding);
+            glyph.textureRect.position.x += static_cast<int>(padding);
+            glyph.textureRect.position.y += static_cast<int>(padding);
+            glyph.textureRect.size.x -= static_cast<int>(2 * padding);
+            glyph.textureRect.size.y -= static_cast<int>(2 * padding);
 
             // Compute the glyph's bounding box
-            glyph.bounds.left   = static_cast<float>(bitmapGlyph->left);
-            glyph.bounds.top    = static_cast<float>(-bitmapGlyph->top);
-            glyph.bounds.width  = static_cast<float>(bitmap.width);
-            glyph.bounds.height = static_cast<float>(bitmap.rows);
+            glyph.bounds.position.x = static_cast<float>(bitmapGlyph->left);
+            glyph.bounds.position.y = static_cast<float>(-bitmapGlyph->top);
+            glyph.bounds.size.x = static_cast<float>(bitmap.width);
+            glyph.bounds.size.y = static_cast<float>(bitmap.rows);
 
             // Resize the pixel buffer to the new size and fill it with transparent white pixels
             m_pixelBuffer.resize(static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 4);
@@ -652,10 +657,10 @@ namespace Gx
             }
 
             // Write the pixels to the texture
-            const unsigned int x = static_cast<unsigned int>(glyph.textureRect.left) - padding;
-            const unsigned int y = static_cast<unsigned int>(glyph.textureRect.top) - padding;
-            const unsigned int w = static_cast<unsigned int>(glyph.textureRect.width) + 2 * padding;
-            const unsigned int h = static_cast<unsigned int>(glyph.textureRect.height) + 2 * padding;
+            const unsigned int x = static_cast<unsigned int>(glyph.textureRect.position.x) - padding;
+            const unsigned int y = static_cast<unsigned int>(glyph.textureRect.position.y) - padding;
+            const unsigned int w = static_cast<unsigned int>(glyph.textureRect.size.x) + 2 * padding;
+            const unsigned int h = static_cast<unsigned int>(glyph.textureRect.size.y) + 2 * padding;
             page.texture.update(m_pixelBuffer.data(), {w, h}, {x, y});
         }
 
@@ -705,13 +710,7 @@ namespace Gx
                 if ((textureSize.x * 2 <= sf::Texture::getMaximumSize()) && (textureSize.y * 2 <= sf::Texture::getMaximumSize()))
                 {
                     // Make the texture 2 times bigger
-                    sf::Texture newTexture;
-                    if (!newTexture.create(textureSize * 2u))
-                    {
-                        sf::err() << "Failed to create new page texture" << std::endl;
-                        return {{0, 0}, {2, 2}};
-                    }
-
+                    sf::Texture newTexture(textureSize * 2u);
                     newTexture.setSmooth(m_isSmooth);
                     newTexture.update(page.texture);
                     page.texture.swap(newTexture);
@@ -787,8 +786,7 @@ namespace Gx
     Font::Page::Page(const bool smooth)
     {
         // Make sure that the texture is initialized by default
-        sf::Image image;
-        image.create({128, 128}, sf::Color::Transparent);
+        sf::Image image({128, 128}, sf::Color::Transparent);
 
         // Reserve a 2x2 white square for texturing underlines
         for (unsigned int x = 0; x < 2; ++x)

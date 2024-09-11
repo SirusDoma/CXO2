@@ -139,7 +139,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
                 {
                     auto &frame = animation->GetFrame(i);
                     frame.Position = animation->GetPosition();
-                    if (frame.TexCoords.width == animation->GetOrigin().x * 2 && frame.TexCoords.height == animation->GetOrigin().y * 2)
+                    if (frame.TexCoords.size.x == animation->GetOrigin().x * 2 && frame.TexCoords.size.y == animation->GetOrigin().y * 2)
                         frame.Origin = animation->GetOrigin();
                 }
             }

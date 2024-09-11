@@ -150,8 +150,8 @@ namespace Gx
         {
             const auto view   = m_scene->GetVirtualView();
             const auto center = view.getCenter();
-            const unsigned int x = static_cast<unsigned int>(center.x - (GetLocalBounds().width / 2.f));
-            const unsigned int y = static_cast<unsigned int>(center.y - (GetLocalBounds().height / 2.f));
+            const unsigned int x = static_cast<unsigned int>(center.x - (GetLocalBounds().size.x / 2.f));
+            const unsigned int y = static_cast<unsigned int>(center.y - (GetLocalBounds().size.y / 2.f));
 
             SetOrigin(0.f, 0.f);
             SetPosition(x, y);
@@ -208,9 +208,9 @@ namespace Gx
         return RenderableContainer::Render(surface, states);
     }
 
-    void Dialog::OnKeyDown(const sf::Event::KeyEvent& ev)
+    void Dialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
     {
-        UiContainer::OnKeyDown(ev);
+        UiContainer::OnKeyPressed(ev);
 
         if (ev.code == sf::Keyboard::Key::Enter)
             OnAccepted();

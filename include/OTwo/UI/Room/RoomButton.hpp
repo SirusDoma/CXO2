@@ -24,7 +24,7 @@ public:
     void Reset();
 
 private:
-    void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
+    void OnMouseMoved(const sf::Event::MouseMoved& ev) override;
     void Invalidate() override;
 
     Room m_room;

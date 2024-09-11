@@ -173,16 +173,16 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     {
         // Use scissor test to mask the playable area
         const auto currentView = surface.GetView();
-        if (m_viewport.width > 0 && m_viewport.height > 0)
+        if (m_viewport.size.x > 0 && m_viewport.size.y > 0)
         {
             auto scissorView = surface.GetView();
             auto area  = sf::FloatRect({
-                { scissorView.getViewport().left + (m_viewport.left / scissorView.getSize().x), 0.f },
-                { m_viewport.width / scissorView.getSize().x, m_viewport.height / scissorView.getSize().y }
+                { scissorView.getViewport().position.x + (m_viewport.position.x / scissorView.getSize().x), 0.f },
+                { m_viewport.size.x / scissorView.getSize().x, m_viewport.size.y / scissorView.getSize().y }
             });
 
-            if (area.left < -1.f || area.left > 1.f)
-                area.left = scissorView.getViewport().left;
+            if (area.position.x < -1.f || area.position.x > 1.f)
+                area.position.x = scissorView.getViewport().position.x;
 
             scissorView.setScissor(area);
             surface.SetView(scissorView);

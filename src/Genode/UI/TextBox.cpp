@@ -220,7 +220,7 @@ namespace Gx
         auto newString = m_text.GetString();
         newString.insert(index, " ");
         m_text.SetString(newString);
-        bool fit = m_text.GetLocalBounds().width <= m_bounds.width;
+        bool fit = m_text.GetLocalBounds().size.x <= m_bounds.size.x;
 
         m_text.SetString(string);
         return fit;
@@ -356,7 +356,7 @@ namespace Gx
         {
             m_state = state;
             if (IsEnabled())
-                OnControlStateChanged(this, m_state);
+                OnControlStateChanged(*this, m_state);
         }
     }
 
@@ -382,11 +382,11 @@ namespace Gx
         return Control::Render(surface, states);
     }
 
-    void TextBox::OnControlStateChanged(Control *sender, Control::State state)
+    void TextBox::OnControlStateChanged(Control& sender, Control::State state)
     {
     }
 
-    void TextBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void TextBox::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         float minDistance  = -1;
         size_t selectIndex = m_caret.Index;
@@ -394,7 +394,7 @@ namespace Gx
         auto bounds = GetGlobalBounds();
         for (size_t index = 0; index <= m_text.GetString().getSize(); index++)
         {
-            float distance = std::abs((FindCharacterPosition(index).x + bounds.left) - static_cast<float>(ev.x));
+            float distance = std::abs((FindCharacterPosition(index).x + bounds.position.x) - static_cast<float>(ev.position.x));
             if (minDistance == -1 || distance < minDistance)
             {
                 selectIndex = index;
@@ -408,19 +408,19 @@ namespace Gx
         Control::OnControlClick(sender, ev);
     }
 
-    void TextBox::OnMouseMove(const sf::Event::MouseMoveEvent& ev)
+    void TextBox::OnMouseMoved(const sf::Event::MouseMoved& ev)
     {
-        Control::OnMouseMove(ev);
+        Control::OnMouseMoved(ev);
     }
 
-    void TextBox::OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)
+    void TextBox::OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)
     {
-        Control::OnMouseButtonDown(ev);
+        Control::OnMouseButtonPressed(ev);
     }
 
-    void TextBox::OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)
+    void TextBox::OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev)
     {
-        Control::OnMouseButtonUp(ev);
+        Control::OnMouseButtonReleased(ev);
 
         if (GetControlState() == Control::State::Normal)
         {
@@ -429,7 +429,7 @@ namespace Gx
         }
     }
 
-    void TextBox::OnKeyDown(const sf::Event::KeyEvent& ev)
+    void TextBox::OnKeyPressed(const sf::Event::KeyPressed& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -531,7 +531,7 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::OnKeyType(const sf::Event::TextEvent& ev)
+    void TextBox::OnTextEntered(const sf::Event::TextEntered& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -638,7 +638,7 @@ namespace Gx
         if (Instance.GetFont())
         {
             auto glyph = Instance.GetFont()->GetGlyph('|', Instance.GetCharacterSize(), false);
-            m_cursor.SetSize(sf::Vector2f(glyph.bounds.width * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
+            m_cursor.SetSize(sf::Vector2f(glyph.bounds.size.x * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
         }
 
         m_cursor.SetPosition(Instance.FindCharacterPosition(Index) + sf::Vector2f(0.f, 1.5f));

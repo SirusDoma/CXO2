@@ -188,7 +188,7 @@ namespace Gx
     {
         Int64 size = -1;
         if (auto fileStream = sf::FileInputStream(); fileStream.open(GetFullName(fileName)))
-            size = fileStream.getSize();
+            size = fileStream.getSize().value_or(-1);
 
         return size;
     }
@@ -251,12 +251,12 @@ namespace Gx
             return -1;
 
         if (size < 0)
-            size = fs.getSize();
+            size = fs.getSize().value_or(0);
 
         if (size <= 0)
             return size;
 
-        return fs.read(data, size);
+        return fs.read(data, size).value_or(-1);
     }
 
     void LocalFileSystem::WriteFile(const std::string &fileName, void *data, const Int64 size)

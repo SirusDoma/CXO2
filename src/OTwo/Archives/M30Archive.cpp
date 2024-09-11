@@ -33,9 +33,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string &fileName) c
     if (const auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
         delete[] data;
 
-    const auto stream = new sf::MemoryInputStream();
-    stream->open(data, header->GetSize());
-
+    const auto stream = new sf::MemoryInputStream(data, header->GetSize());
     return {
         stream,
         [data] (const sf::InputStream *ms) {
@@ -57,9 +55,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(unsigned int index) const
     if (const auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
         delete[] data;
 
-    const auto stream = new sf::MemoryInputStream();
-    stream->open(data, header->GetSize());
-
+    const auto stream = new sf::MemoryInputStream(data, header->GetSize());
     return {
         stream,
         [data] (const sf::InputStream *ms) {
@@ -119,20 +115,20 @@ std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const
     std::vector<std::unique_ptr<Gx::FileInfo>> result;
 
     m_entries.clear();
-    if (m_fileStream.seek(m_header.SampleOffset) == -1)
+    if (!m_fileStream.seek(m_header.SampleOffset).has_value())
         return result;
 
     for (unsigned int i = 0; i < m_header.SampleCount; i++)
     {
         const auto offset = m_fileStream.tell();
-        if (offset == -1)
+        if (!offset.has_value())
             continue;
 
         auto sampleHeader = M30SampleHeader();
         if (!ReadStream(&sampleHeader, sizeof(sampleHeader)))
             continue;
 
-        if (m_fileStream.seek(m_fileStream.tell() + sampleHeader.Size) == -1)
+        if (!m_fileStream.seek(m_fileStream.tell().value() + sampleHeader.Size).has_value())
             continue;
 
         unsigned int reference = sampleHeader.Reference + (sampleHeader.CodecCode == 0 ? 1000 : 0);
@@ -141,7 +137,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const
             Gx::StringHelper::Trim(std::string(sampleHeader.Name, sizeof(sampleHeader.Name))),
             sampleHeader.Size,
             reference,
-            offset
+            offset.value()
         );
 
         m_entries[reference] = entry;
@@ -169,16 +165,16 @@ Gx::Int64 M30Archive::ReadFile(const FileInfo &entry, void *data, Gx::Int64 size
     auto sampleData = std::vector<Gx::Uint8>(sampleHeader.Size);
     const auto read = m_fileStream.read(&sampleData[0], sampleHeader.Size);
 
-    if (read <= 0)
+    if (!read.has_value())
         return -1;
 
     if (size > read)
-        size = read;
+        size = read.value();
 
     DecodeSample(sampleData, m_header.EncodingCode);
     memcpy(data, &sampleData[0], size);
 
-    return read;
+    return read.value();
 }
 
 void M30Archive::DecodeSample(std::vector<Gx::Uint8> &data, const int encodingCode)

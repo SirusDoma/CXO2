@@ -429,9 +429,9 @@ void SelectMusicDialog::Initialize()
     CacheMusicCover();
 }
 
-void SelectMusicDialog::OnKeyDown(const sf::Event::KeyEvent& ev)
+void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
-    Dialog::OnKeyDown(ev);
+    Dialog::OnKeyPressed(ev);
 
     if (ev.code == sf::Keyboard::Key::Up)
     {

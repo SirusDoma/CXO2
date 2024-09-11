@@ -51,7 +51,7 @@ namespace Gx
         const auto data  = const_cast<unsigned char*>(image.getPixelsPtr());
 
         auto handle = CursorHandle{};
-        if (!handle.Handle.loadFromPixels(&data[0], size, hotspot))
+        if (!handle.Handle.createFromPixels(&data[0], size, hotspot))
             throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to load cursor");
 
         handle.Source      = image;
@@ -64,12 +64,7 @@ namespace Gx
     {
         m_lastHandleType = type;
 
-        static bool hasDefaultCursor = false;
-        static auto defaultCursor = sf::Cursor();
-
-        if (!hasDefaultCursor)
-            hasDefaultCursor = defaultCursor.loadFromSystem(sf::Cursor::Type::Arrow);
-
+        static auto defaultCursor = sf::Cursor(sf::Cursor::Type::Arrow);
         if (!m_enabled)
             return defaultCursor;
 
@@ -96,8 +91,8 @@ namespace Gx
         auto target = sf::RenderTexture();
         for (auto& [type, cursor] : m_cursors)
         {
-            auto targetSize = sf::Vector2u(cursor.InitialSize.x * scale, cursor.InitialSize.y * scale);
-            if (!target.create(targetSize))
+            const auto targetSize = sf::Vector2u(cursor.InitialSize.x * scale, cursor.InitialSize.y * scale);
+            if (!target.resize(targetSize))
                 throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to create render texture");
 
             auto texture = sf::Texture();
@@ -116,7 +111,7 @@ namespace Gx
             const auto size = result.getSize();
             const auto data = const_cast<unsigned char*>(result.getPixelsPtr());
 
-            if (!cursor.Handle.loadFromPixels(&data[0], size, sf::Vector2u(cursor.Hotspot.x * scale, cursor.Hotspot.y * scale)))
+            if (!cursor.Handle.createFromPixels(&data[0], size, sf::Vector2u(cursor.Hotspot.x * scale, cursor.Hotspot.y * scale)))
                 throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to load cursor");
         }
 

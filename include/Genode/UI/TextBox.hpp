@@ -78,13 +78,13 @@ namespace Gx
         void Update(double delta) override;
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
 
-        void OnControlStateChanged(Control *sender, State state) override;
-        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
-        void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
-        void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev) override;
-        void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev) override;
-        void OnKeyDown(const sf::Event::KeyEvent& ev) override;
-        void OnKeyType(const sf::Event::TextEvent& ev) override;
+        void OnControlStateChanged(Control& sender, State state) override;
+        void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
+        void OnMouseMoved(const sf::Event::MouseMoved& ev) override;
+        void OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev) override;
+        void OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev) override;
+        void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
+        void OnTextEntered(const sf::Event::TextEntered& ev) override;
 
         void Invalidate() override;
 

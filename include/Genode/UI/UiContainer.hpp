@@ -32,8 +32,8 @@ namespace Gx
         void Update(double delta) override;
         bool Input(const sf::Event& ev) override;
 
-        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
-        void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+        void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
+        void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
         void Invalidate() override;
 

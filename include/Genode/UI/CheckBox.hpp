@@ -20,7 +20,7 @@ namespace Gx
         virtual void SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback);
 
     protected:
-        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
+        void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
         Frame GetCurrentFrame() const override;
 
     private:

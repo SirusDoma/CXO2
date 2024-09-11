@@ -13,28 +13,35 @@ namespace Gx
 
         virtual ~Inputable() = default;
 
-        virtual void OnMouseMove(const sf::Event::MouseMoveEvent& ev)                 {}
-        virtual void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)         {}
-        virtual void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)           {}
-        virtual void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev) {}
+        virtual void OnMouseMoved(const sf::Event::MouseMoved& ev)                   {}
+        virtual void OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)   {}
+        virtual void OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev) {}
+        virtual void OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev)   {}
 
-        virtual void OnKeyDown(const sf::Event::KeyEvent& ev)  {}
-        virtual void OnKeyUp(const sf::Event::KeyEvent& ev)    {}
-        virtual void OnKeyType(const sf::Event::TextEvent& ev) {}
+        virtual void OnKeyPressed(const sf::Event::KeyPressed& ev)   {}
+        virtual void OnKeyReleased(const sf::Event::KeyReleased& ev) {}
+        virtual void OnTextEntered(const sf::Event::TextEntered& ev) {}
+
+        virtual void OnJoystickConnected(const sf::Event::JoystickConnected& ev)           {}
+        virtual void OnJoystickDisconnected(const sf::Event::JoystickDisconnected& ev)     {}
+        virtual void OnJoystickMoved(const sf::Event::JoystickMoved& ev)                   {}
+        virtual void OnJoystickButtonPressed(const sf::Event::JoystickButtonPressed& ev)   {}
+        virtual void OnJoystickButtonReleased(const sf::Event::JoystickButtonReleased& ev) {}
 
         virtual bool Input(const sf::Event& ev)
         {
-            switch (ev.type)
-            {
-                case sf::Event::MouseMoved:          OnMouseMove(ev.mouseMove);                 return true;
-                case sf::Event::MouseButtonPressed:  OnMouseButtonDown(ev.mouseButton);         return true;
-                case sf::Event::MouseButtonReleased: OnMouseButtonUp(ev.mouseButton);           return true;
-                case sf::Event::MouseWheelScrolled:  OnMouseWheelScrolled(ev.mouseWheelScroll); return true;
-                case sf::Event::KeyPressed:          OnKeyDown(ev.key);                         return true;
-                case sf::Event::KeyReleased:         OnKeyUp(ev.key);                           return true;
-                case sf::Event::TextEntered:         OnKeyType(ev.text);                        return true;
-                default: break;
-            }
+            if (const auto e = ev.getIf<sf::Event::MouseMoved>())             { OnMouseMoved(*e);             return true; }
+            if (const auto e = ev.getIf<sf::Event::MouseButtonPressed>())     { OnMouseButtonPressed(*e);     return true; }
+            if (const auto e = ev.getIf<sf::Event::MouseButtonReleased>())    { OnMouseButtonReleased(*e);    return true; }
+            if (const auto e = ev.getIf<sf::Event::MouseWheelScrolled>())     { OnMouseWheelScrolled(*e);     return true; }
+            if (const auto e = ev.getIf<sf::Event::KeyPressed>())             { OnKeyPressed(*e);             return true; }
+            if (const auto e = ev.getIf<sf::Event::KeyReleased>())            { OnKeyReleased(*e);            return true; }
+            if (const auto e = ev.getIf<sf::Event::TextEntered>())            { OnTextEntered(*e);            return true; }
+            if (const auto e = ev.getIf<sf::Event::JoystickConnected>())      { OnJoystickConnected(*e);      return true; }
+            if (const auto e = ev.getIf<sf::Event::JoystickDisconnected>())   { OnJoystickDisconnected(*e);   return true; }
+            if (const auto e = ev.getIf<sf::Event::JoystickMoved>())          { OnJoystickMoved(*e);          return true; }
+            if (const auto e = ev.getIf<sf::Event::JoystickButtonPressed>())  { OnJoystickButtonPressed(*e);  return true; }
+            if (const auto e = ev.getIf<sf::Event::JoystickButtonReleased>()) { OnJoystickButtonReleased(*e); return true; }
 
             return false;
         }

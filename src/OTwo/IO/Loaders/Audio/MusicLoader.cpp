@@ -56,7 +56,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata 
             return nullptr;
         }
 
-        music->setLoop(metadata->IsLoop);
+        music->setLooping(metadata->IsLoop);
         return music;
     }
 

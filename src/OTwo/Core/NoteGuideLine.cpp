@@ -127,8 +127,8 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
 
     const auto transform = prefab ? prefab->GetTransform() : sf::Transform::Identity;
     const auto texCoords = prefab ? prefab->GetTexCoords() : sf::IntRect();
-    const auto width     = prefab ? prefab->GetLocalBounds().width  : 0.f;
-    const auto height    = prefab ? prefab->GetLocalBounds().height : 0.f;
+    const auto width     = prefab ? prefab->GetLocalBounds().size.x  : 0.f;
+    const auto height    = prefab ? prefab->GetLocalBounds().size.y : 0.f;
 
     for (int i = 0; i < 4; i += 2)
     {
@@ -147,10 +147,10 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
         const auto position = transform.transformPoint(sf::Vector2f(1.f, pixels));
 
         m_vertices[i + 0]->position = sf::Vector2f(position.x, position.y);
-        m_vertices[i + 1]->position = sf::Vector2f(position.x, position.y + bounds.height);
+        m_vertices[i + 1]->position = sf::Vector2f(position.x, position.y + bounds.size.y);
 
-        m_vertices[i + 0]->texCoords = sf::Vector2f(texCoords.left, texCoords.top);
-        m_vertices[i + 1]->texCoords = sf::Vector2f(texCoords.left, texCoords.top);
+        m_vertices[i + 0]->texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        m_vertices[i + 1]->texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
 
         m_vertices[i + 0]->color = sf::Color(153, 153, 153, 230);
         m_vertices[i + 1]->color = sf::Color::Black;
@@ -160,8 +160,8 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
     {
         m_vertices[i]->position    = m_vertices[i - 4]->position;
         m_vertices[i]->position.x += width - 1; // let the grid occupy 1px of the note
-        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.left, texCoords.top);
-        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.left, texCoords.top);
+        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
         m_vertices[i]->color       = m_vertices[i - 4]->color;
     }
 }

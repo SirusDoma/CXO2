@@ -111,7 +111,7 @@ namespace Gx
             m_overlays.pop_back();
         }
 
-        Input(m_lastInput);
+        Input(m_lastInput.value());
     }
 
     void Scene::QueueEvent(const std::function<void()>& evt)

@@ -172,14 +172,14 @@ Gx::RenderStates ChatWindow::Render(Gx::RenderSurface &surface, Gx::RenderStates
     return states;
 }
 
-void ChatWindow::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev)
+void ChatWindow::OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev)
 {
     Control::OnMouseWheelScrolled(ev);
 
     if (!IsEnabled() || !m_scroll)
         return;
 
-    const auto position = sf::Vector2f(ev.x, ev.y);
+    const auto position = sf::Vector2f(ev.position.x, ev.position.y);
     float delta         = ev.delta;
     if (m_scroll->GetScrollOrientation() == Gx::ScrollBar::ScrollOrientation::Vertical)
         delta *= -1;

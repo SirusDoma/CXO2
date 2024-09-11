@@ -60,8 +60,8 @@ NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settin
             x1 = std::max(std::min(tap->GetPosition().x, x1), 0.f);
             x1 = std::max(std::min(hold->GetPosition().x, x1), 0.f);
 
-            x2 = std::max(tap->GetPosition().x + tap->GetLocalBounds().width, x2);
-            x2 = std::max(hold->GetPosition().x + hold->GetLocalBounds().width, x2);
+            x2 = std::max(tap->GetPosition().x + tap->GetLocalBounds().size.x, x2);
+            x2 = std::max(hold->GetPosition().x + hold->GetLocalBounds().size.x, x2);
 
             if (const auto texture = container->GetTexture(shape); !texture)
                 container->SetTexture(shape, *tap->GetTexture());

@@ -54,10 +54,10 @@ namespace Gx
         if (m_bounds != bounds)
         {
             m_bounds = bounds;
-            if (m_orientation == ScrollOrientation::Horizontal && m_bounds.height == 0)
-                m_bounds.height = m_sprite.GetLocalBounds().height;
-            else if (m_orientation == ScrollOrientation::Vertical && m_bounds.width == 0)
-                m_bounds.width = m_sprite.GetLocalBounds().width;
+            if (m_orientation == ScrollOrientation::Horizontal && m_bounds.size.y == 0)
+                m_bounds.size.y = m_sprite.GetLocalBounds().size.y;
+            else if (m_orientation == ScrollOrientation::Vertical && m_bounds.size.x == 0)
+                m_bounds.size.x = m_sprite.GetLocalBounds().size.x;
 
             Invalidate();
         }
@@ -200,9 +200,9 @@ namespace Gx
         return states;
     }
 
-    void ScrollBar::OnMouseMove(const sf::Event::MouseMoveEvent& ev)
+    void ScrollBar::OnMouseMoved(const sf::Event::MouseMoved& ev)
     {
-        Control::OnMouseMove(ev);
+        Control::OnMouseMoved(ev);
 
         if (!IsEnabled())
             return;
@@ -210,12 +210,12 @@ namespace Gx
         if (m_dragging)
         {
             auto bounds   = GetGlobalBounds();
-            auto mpos     = sf::Vector2f(ev.x, ev.y);
+            auto mpos     = sf::Vector2f(ev.position.x, ev.position.y);
             auto position = m_sprite.GetPosition();
             float value   = 0.f;
             if (m_orientation == ScrollOrientation::Horizontal)
             {
-                position.x = mpos.x - bounds.left - m_anchorPoint.x;
+                position.x = mpos.x - bounds.position.x - m_anchorPoint.x;
                 position.x = std::min(position.x, m_maxBounds.x);
                 position.x = std::max(position.x, 0.f);
 
@@ -223,7 +223,7 @@ namespace Gx
             }
             else
             {
-                position.y = mpos.y - bounds.top - m_anchorPoint.y;
+                position.y = mpos.y - bounds.position.y - m_anchorPoint.y;
                 position.y = std::min(position.y, m_maxBounds.y);
                 position.y = std::max(position.y, 0.f);
 
@@ -255,35 +255,35 @@ namespace Gx
         }
     }
 
-    void ScrollBar::OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)
+    void ScrollBar::OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)
     {
-        Control::OnMouseButtonDown(ev);
+        Control::OnMouseButtonPressed(ev);
 
         if (!IsEnabled())
             return;
 
-        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
+        if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
             auto bounds   = GetScrollBarGlobalBounds();
             m_dragging    = true;
-            m_anchorPoint = sf::Vector2f(ev.x - bounds.left, ev.y - bounds.top);
+            m_anchorPoint = sf::Vector2f(ev.position.x - bounds.position.x, ev.position.y - bounds.position.y);
         }
     }
 
-    void ScrollBar::OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)
+    void ScrollBar::OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev)
     {
-        Control::OnMouseButtonUp(ev);
+        Control::OnMouseButtonReleased(ev);
         m_dragging = false;
     }
 
-    void ScrollBar::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev)
+    void ScrollBar::OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev)
     {
         Control::OnMouseWheelScrolled(ev);
 
         if (!IsEnabled())
             return;
 
-        auto position = sf::Vector2f(ev.x, ev.y);
+        auto position = sf::Vector2f(ev.position.x, ev.position.y);
         float delta   = ev.delta;
         if (m_orientation == ScrollOrientation::Vertical)
             delta *= -1;
@@ -313,8 +313,8 @@ namespace Gx
 
         auto barBounds = m_sprite.GetLocalBounds();
         m_maxBounds    = sf::Vector2f(
-          std::abs(m_bounds.width  - barBounds.width),
-          std::abs(m_bounds.height - barBounds.height)
+          std::abs(m_bounds.size.x  - barBounds.size.x),
+          std::abs(m_bounds.size.y - barBounds.size.y)
         );
 
         if (m_orientation == ScrollOrientation::Horizontal)

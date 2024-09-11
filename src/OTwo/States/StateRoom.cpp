@@ -265,7 +265,7 @@ void StateRoom::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([&](auto &, auto &) { OnBackClicked(); });
 
-    bgm->setLoop(true);
+    bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 }
 

@@ -131,19 +131,19 @@ void Note::Render(const ChartRenderer &renderer, const double delta)
 void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &position, const sf::FloatRect &bounds)
 {
     vertices[0]->position = sf::Vector2f(position.x, position.y);
-    vertices[1]->position = sf::Vector2f(position.x + bounds.width, position.y);
-    vertices[2]->position = sf::Vector2f(position.x + bounds.width, position.y + bounds.height);
+    vertices[1]->position = sf::Vector2f(position.x + bounds.size.x, position.y);
+    vertices[2]->position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
     vertices[3]->position = sf::Vector2f(position.x, position.y);
-    vertices[4]->position = sf::Vector2f(position.x + bounds.width, position.y + bounds.height);
-    vertices[5]->position = sf::Vector2f(position.x, position.y + bounds.height);
+    vertices[4]->position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
+    vertices[5]->position = sf::Vector2f(position.x, position.y + bounds.size.y);
 }
 
 void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texcoords)
 {
-    const float left     = static_cast<float>(texcoords.left);
-    const float right    = left + static_cast<float>(texcoords.width);
-    const float top      = static_cast<float>(texcoords.top);
-    const float bottom   = top + static_cast<float>(texcoords.height);
+    const float left     = static_cast<float>(texcoords.position.x);
+    const float right    = left + static_cast<float>(texcoords.size.x);
+    const float top      = static_cast<float>(texcoords.position.y);
+    const float bottom   = top + static_cast<float>(texcoords.size.y);
 
     vertices[0]->texCoords = sf::Vector2f(left, top);
     vertices[1]->texCoords = sf::Vector2f(right, top);

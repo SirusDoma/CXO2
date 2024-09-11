@@ -147,7 +147,7 @@ void ChannelBoard::Initialize()
     m_noticePageIndex = 1;
     m_noticeMaxPage   = notice->GetFrameCount();
 
-    if (const auto bounds = GetLocalBounds(); !m_renderTexture.create(sf::Vector2u(bounds.width, bounds.height)))
+    if (const auto bounds = GetLocalBounds(); !m_renderTexture.resize(sf::Vector2u(bounds.size.x, bounds.size.y)))
         throw Gx::Exception("Failed to create render texture");
 
     m_renderTexture.setSmooth(true);
@@ -299,7 +299,7 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     {
         m_transitioning = true;
         auto position = GetPosition();
-        SetPosition(800 + GetLocalBounds().width, GetPosition().y);
+        SetPosition(800 + GetLocalBounds().size.x, GetPosition().y);
 
         const auto sequence = parent->Create<Gx::Sequence>([&, callback]
         {

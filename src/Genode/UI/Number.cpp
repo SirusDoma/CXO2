@@ -253,7 +253,7 @@ namespace Gx
 
     void Number::Invalidate()
     {
-        auto color = GetColor();
+        const auto color = GetColor();
         m_vertices = sf::VertexArray(sf::PrimitiveType::Triangles, 6 * 10);
         m_width    = 0;
 
@@ -282,7 +282,7 @@ namespace Gx
             if (d > 0)
                 m_width += m_kerning;
 
-            bool isLeading = leadingCount > 0 && d > digitCount - leadingCount;
+            const bool isLeading = leadingCount > 0 && d > digitCount - leadingCount;
             if (isLeading)
                 digit = 0;
             else
@@ -292,13 +292,13 @@ namespace Gx
                 value /= 10;
 
             auto texCoords = m_texCoords[digit];
-            m_width += texCoords[m_frames[digit]].width;
+            m_width += texCoords[m_frames[digit]].size.x;
 
             digits.push(digit);
         }
 
         auto position = sf::Vector2f();
-        auto size = digits.size();
+        const auto size = digits.size();
         auto texCoords = sf::IntRect();
         for (unsigned int i = 0; i < size; i++)
         {
@@ -306,20 +306,20 @@ namespace Gx
             digits.pop();
 
             if (i > 0)
-                position += sf::Vector2f(texCoords.width + m_kerning, 0);
+                position += sf::Vector2f(texCoords.size.x + m_kerning, 0);
 
             texCoords = m_texCoords[digit][m_frames[digit]];
-            float x = position.x;
-            float y = position.y;
-            float w = position.x + texCoords.width;
-            float h = position.y + texCoords.height;
+            const float x = position.x;
+            const float y = position.y;
+            const float w = position.x + texCoords.size.x;
+            const float h = position.y + texCoords.size.y;
 
-            float left   = texCoords.left;
-            float top    = texCoords.top;
-            float right  = texCoords.left + texCoords.width;
-            float bottom = texCoords.top  + texCoords.height;
+            const float left   = texCoords.position.x;
+            const float top    = texCoords.position.y;
+            const float right  = texCoords.position.x + texCoords.size.x;
+            const float bottom = texCoords.position.y  + texCoords.size.y;
 
-            int index = i * 6;
+            const int index = i * 6;
             m_vertices[index + 0] = {sf::Vector2f(x, y), color, sf::Vector2f(left , top)};
             m_vertices[index + 1] = {sf::Vector2f(w, y), color, sf::Vector2f(right , top)};
             m_vertices[index + 2] = {sf::Vector2f(x, h), color, sf::Vector2f(left , bottom)};
@@ -327,7 +327,7 @@ namespace Gx
             m_vertices[index + 4] = {sf::Vector2f(w, y), color, sf::Vector2f(right , top)};
             m_vertices[index + 5] = {sf::Vector2f(w, h), color, sf::Vector2f(right , bottom)};
 
-            m_height = m_height < texCoords.height ? texCoords.height : m_height;
+            m_height = m_height < texCoords.size.y ? texCoords.size.y : m_height;
         }
 
         if (m_alignment != Alignment::None)

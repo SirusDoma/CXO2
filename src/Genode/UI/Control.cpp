@@ -25,7 +25,7 @@ namespace Gx
         return m_focused;
     }
 
-    void Control::SetFocus(bool focus)
+    void Control::SetFocus(const bool focus)
     {
         if (m_focused == focus || m_state == Control::State::Active)
             return;
@@ -43,7 +43,7 @@ namespace Gx
         SetControlState(uiEvent.State);
     }
 
-    void Control::SetEnabled(bool enabled)
+    void Control::SetEnabled(const bool enabled)
     {
         if (m_enabled != enabled)
         {
@@ -78,7 +78,7 @@ namespace Gx
             m_state = state;
             SetFocus(m_state == Control::State::Hover || m_state == Control::State::Active);
             if (IsEnabled())
-                OnControlStateChanged(this, m_state);
+                OnControlStateChanged(*this, m_state);
         }
     }
 
@@ -172,14 +172,14 @@ namespace Gx
             return;
 
         Node::AddChild(node);
-        OnControlChildAdded(node);
+        OnControlChildAdded(*node);
 
         Invalidate();
     }
 
     void Control::AddChild(Gx::Node *node)
     {
-        if (auto control = dynamic_cast<Gx::Control*>(node); control)
+        if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             AddChild(control);
         else
             Node::AddChild(node);
@@ -190,14 +190,14 @@ namespace Gx
         if (!node)
             return;
 
-        OnControlChildRemove(node);
+        OnControlChildRemove(*node);
         Node::RemoveChild(node);
         Invalidate();
     }
 
     void Control::RemoveChild(Gx::Node *node)
     {
-        if (auto control = dynamic_cast<Gx::Control*>(node); control)
+        if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             RemoveChild(control);
         else
             Node::RemoveChild(node);
@@ -248,9 +248,9 @@ namespace Gx
     {
         if (!IsEnabled())
         {
-            if (ev.type == sf::Event::MouseMoved)
+            if (const auto mouseMove = ev.getIf<sf::Event::MouseMoved>())
             {
-                OnMouseMove(ev.mouseMove);
+                OnMouseMoved(*mouseMove);
                 return true;
             }
 
@@ -260,11 +260,11 @@ namespace Gx
         return InputableContainer::Input(ev);
     }
 
-    void Control::OnMouseMove(const sf::Event::MouseMoveEvent& ev)
+    void Control::OnMouseMoved(const sf::Event::MouseMoved& ev)
     {
         if (GetControlState() != Control::State::Active)
         {
-            bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y));
+            const bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y));
             if (intersect && GetControlState() == Control::State::Normal)
                 SetControlState(Control::State::Hover);
             else if (!intersect && GetControlState() == Control::State::Hover)
@@ -274,18 +274,17 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        InputableContainer::OnMouseMove(ev);
+        InputableContainer::OnMouseMoved(ev);
     }
 
-    void Control::OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev)
+    void Control::OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)
     {
-        bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y));
-        if (intersect)
+        if (GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
             if (GetControlState() == Control::State::Hover)
             {
                 SetControlState(Control::State::Active);
-                OnControlPress(this, ev);
+                OnControlPress(*this, ev);
 
                 if (m_clicked)
                 {
@@ -303,7 +302,7 @@ namespace Gx
                                 return;
                         }
 
-                        OnControlDoubleClick(this, ev);
+                        OnControlDoubleClick(*this, ev);
                     }
                 }
                 else
@@ -315,12 +314,12 @@ namespace Gx
                 SetControlState(Control::State::Hover);
         }
 
-        InputableContainer::OnMouseButtonDown(ev);
+        InputableContainer::OnMouseButtonPressed(ev);
     }
 
-    void Control::OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev)
+    void Control::OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev)
     {
-        if (GetGlobalBounds().contains(sf::Vector2f(ev.x, ev.y)))
+        if (GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
             if (GetControlState() == Control::State::Active)
             {
@@ -336,7 +335,7 @@ namespace Gx
                 else
                     SetControlState(Control::State::Hover);
 
-                OnControlClick(this, ev);
+                OnControlClick(*this, ev);
             }
             else
                 SetControlState(Control::State::Hover);
@@ -350,53 +349,49 @@ namespace Gx
         }
 
         m_doubleClicked = false;
-        InputableContainer::OnMouseButtonUp(ev);
+        InputableContainer::OnMouseButtonReleased(ev);
     }
 
-    void Control::OnControlChildAdded(Control *control)
+    void Control::OnControlChildAdded(Control& control)
     {
     }
 
-    void Control::OnControlChildRemove(Control *control)
+    void Control::OnControlChildRemove(Control& control)
     {
     }
 
-    void Control::OnControlStateChanged(Control *sender, Control::State state)
+    void Control::OnControlStateChanged(Control& sender, const Control::State state)
     {
         Invalidate();
 
-        auto parent = dynamic_cast<Control*>(GetParent());
-        if (parent)
+        if (const auto parent = dynamic_cast<Control*>(GetParent()))
             parent->OnControlStateChanged(sender, state);
     }
 
-    void Control::OnControlPress(Control *sender, sf::Event::MouseButtonEvent ev)
+    void Control::OnControlPress(Control& sender, const sf::Event::MouseButtonPressed& ev)
     {
-        auto parent = dynamic_cast<Control*>(GetParent());
-        if (parent)
+        if (const auto parent = dynamic_cast<Control*>(GetParent()))
             parent->OnControlPress(sender, ev);
     }
 
-    void Control::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void Control::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
-        auto parent = dynamic_cast<Control*>(GetParent());
-        if (parent)
+        if (const auto parent = dynamic_cast<Control*>(GetParent()))
             parent->OnControlClick(sender, ev);
     }
 
-    void Control::OnControlDoubleClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void Control::OnControlDoubleClick(Control& sender, const sf::Event::MouseButtonPressed& ev)
     {
-        auto parent = dynamic_cast<Control*>(GetParent());
-        if (parent)
+        if (const auto parent = dynamic_cast<Control*>(GetParent()))
             parent->OnControlDoubleClick(sender, ev);
     }
 
-    void Control::OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev)
+    void Control::OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev)
     {
         if (!IsEnabled())
             return;
 
-        auto state = GetControlState();
+        const auto state = GetControlState();
         if (state == Control::State::Hover || state == Control::State::Active)
         {
             auto uiEvent = Event{false, state, ev.delta};

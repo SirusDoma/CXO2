@@ -104,7 +104,7 @@ Gx::RenderStates Console::Render(Gx::RenderSurface& surface, Gx::RenderStates st
     if (!m_enabled || !m_text.GetFont())
         return states;
 
-    auto backdrop = Gx::Rectangle(m_bounds.getSize());
+    auto backdrop = Gx::Rectangle(m_bounds.size);
     backdrop.SetColor(sf::Color(0, 0, 0, 127));
 
     states.transform *= GetTransform();

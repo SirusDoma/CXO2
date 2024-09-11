@@ -18,16 +18,16 @@ namespace Gx
         virtual void SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback);
 
         void SetCheckedState(bool checked) override;
-        virtual void Pair(RadioButton *radio);
-        virtual void Unpair(RadioButton *radio);
+        virtual void Pair(RadioButton& radio);
+        virtual void Unpair(RadioButton& radio);
 
         template<typename... Args>
-        void Pair(RadioButton *first, Args... args);
+        void Pair(RadioButton& first, Args... args);
 
         void UnpairAll();
 
     protected:
-        void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev) override;
+        void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
 
     private:
         std::vector<RadioButton*> m_pairs;

@@ -50,14 +50,14 @@ namespace
     {
         constexpr sf::Vector2f padding(1.f, 1.f);
 
-        const sf::Vector2f p1 = glyph.bounds.getPosition() - padding;
-        sf::Vector2f p2 = glyph.bounds.getPosition() + glyph.bounds.getSize() + padding;
+        const sf::Vector2f p1 = glyph.bounds.position - padding;
+        sf::Vector2f p2 = glyph.bounds.position + glyph.bounds.size + padding;
 
         if (addExtra)
             p2.y += 1.f;
 
-        const auto uv1 = sf::Vector2f(glyph.textureRect.getPosition()) - padding;
-        const auto uv2 = sf::Vector2f(glyph.textureRect.getPosition() + glyph.textureRect.getSize()) + padding;
+        const auto uv1 = sf::Vector2f(glyph.textureRect.position) - padding;
+        const auto uv2 = sf::Vector2f(glyph.textureRect.position + glyph.textureRect.size) + padding;
 
         vertices.append({position + sf::Vector2f(p1.x - italicShear * p1.y, p1.y), color, {uv1.x, uv1.y}});
         vertices.append({position + sf::Vector2f(p2.x - italicShear * p1.y, p1.y), color, {uv2.x, uv1.y}});
@@ -440,7 +440,7 @@ namespace Gx
         // We use the center point of the lowercase 'x' glyph as the reference
         // We reuse the underline thickness as the thickness of the strike through as well
         const sf::FloatRect xBounds = m_font->GetGlyph(U'x', m_characterSize, isBold, 0, m_characterWidth).bounds;
-        const float strikeThroughOffset = xBounds.top + xBounds.height / 2.f;
+        const float strikeThroughOffset = xBounds.position.y + xBounds.size.y / 2.f;
 
         // Precompute the variables needed by the algorithm
         float whitespaceWidth     = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
@@ -532,10 +532,10 @@ namespace Gx
             AddGlyphQuad(m_vertices, sf::Vector2f(x, y), fillColor, glyph, italicShear);
 
             // Update the current bounds
-            const float left   = glyph.bounds.left;
-            const float top    = glyph.bounds.top;
-            const float right  = glyph.bounds.left + glyph.bounds.width;
-            const float bottom = glyph.bounds.top + glyph.bounds.height;
+            const float left   = glyph.bounds.position.x;
+            const float top    = glyph.bounds.position.y;
+            const float right  = glyph.bounds.position.x + glyph.bounds.size.x;
+            const float bottom = glyph.bounds.position.y + glyph.bounds.size.y;
 
             minX = std::min(minX, x + left - italicShear * bottom);
             maxX = std::max(maxX, x + right - italicShear * top);
@@ -575,10 +575,10 @@ namespace Gx
         }
 
         // Update the bounding rectangle
-        m_bounds.left   = minX;
-        m_bounds.top    = minY;
-        m_bounds.width  = maxX - minX;
-        m_bounds.height = maxY - minY;
+        m_bounds.position.x   = minX;
+        m_bounds.position.y    = minY;
+        m_bounds.size.x  = maxX - minX;
+        m_bounds.size.y = maxY - minY;
 
         OnGeometryUpdated();
     }

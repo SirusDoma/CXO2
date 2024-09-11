@@ -31,11 +31,9 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string &fileName, co
     return chart;
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromMemory(void *data, std::size_t size, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromMemory(void *data, const std::size_t size, const Gx::ResourceContext &ctx) const
 {
-    auto stream = sf::MemoryInputStream();
-    stream.open(data, size);
-
+    auto stream = sf::MemoryInputStream(data, size);
     return LoadFromStream(stream, ctx);
 }
 
@@ -241,7 +239,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, c
         return nullptr;
 
     auto data = std::vector<Gx::Uint8>(metadata.ThumbnailSize);
-    if (const auto read = stream.read(&data[0], metadata.ThumbnailSize); std::abs(read - metadata.ThumbnailSize) > 4)
+    if (const auto read = stream.read(&data[0], metadata.ThumbnailSize); !read.has_value())
         return nullptr;
 
     auto image  = std::make_unique<sf::Image>();

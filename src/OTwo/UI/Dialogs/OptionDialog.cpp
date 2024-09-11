@@ -103,7 +103,7 @@ void OptionDialog::Initialize()
         m_tempConfig.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (bgAllTest->getStatus() != sf::SoundSource::Playing)
+        if (bgAllTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -124,7 +124,7 @@ void OptionDialog::Initialize()
         m_tempConfig.EffectVolume = static_cast<unsigned int>(masterVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (bgAllTest->getStatus() != sf::SoundSource::Playing)
+        if (bgAllTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -145,7 +145,7 @@ void OptionDialog::Initialize()
         m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (bgTest->getStatus() != sf::SoundSource::Playing)
+        if (bgTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -160,7 +160,7 @@ void OptionDialog::Initialize()
         m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (bgTest->getStatus() != sf::SoundSource::Playing)
+        if (bgTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -179,7 +179,7 @@ void OptionDialog::Initialize()
         m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (sfxTest->getStatus() != sf::SoundSource::Playing)
+        if (sfxTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -194,7 +194,7 @@ void OptionDialog::Initialize()
         m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
 
         m_mixer.Pause("BGM");
-        if (sfxTest->getStatus() != sf::SoundSource::Playing)
+        if (sfxTest->getStatus() != sf::SoundSource::Status::Playing)
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
@@ -262,7 +262,7 @@ void OptionDialog::Initialize()
         const auto efGroup = m_mixer.GetSoundGroup("EFTest");
         m_mixer.Play(sfxNavigation, "SFX");
 
-        if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Playing))
+        if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Status::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Status::Playing))
             m_mixer.Play("BGM");
         else
             m_mixer.Resume("BGM");
@@ -365,9 +365,9 @@ void OptionDialog::Update(const double delta)
     UiContainer::Update(delta);
 }
 
-void OptionDialog::OnKeyDown(const sf::Event::KeyEvent& ev)
+void OptionDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
-    Dialog::OnKeyDown(ev);
+    Dialog::OnKeyPressed(ev);
 
     const auto gameOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
     const auto keySelect  = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
@@ -407,9 +407,9 @@ void OptionDialog::OnKeyDown(const sf::Event::KeyEvent& ev)
     }
 }
 
-void OptionDialog::OnKeyUp(const sf::Event::KeyEvent& ev)
+void OptionDialog::OnKeyReleased(const sf::Event::KeyReleased& ev)
 {
-    Inputable::OnKeyUp(ev);
+    Inputable::OnKeyReleased(ev);
 
     if (m_keyTestEnabled)
     {
@@ -425,9 +425,9 @@ void OptionDialog::OnKeyUp(const sf::Event::KeyEvent& ev)
     }
 }
 
-void OptionDialog::OnKeyType(const sf::Event::TextEvent& ev)
+void OptionDialog::OnTextEntered(const sf::Event::TextEntered& ev)
 {
-    Inputable::OnKeyType(ev);
+    Inputable::OnTextEntered(ev);
 }
 
 bool OptionDialog::ValidateConfig()

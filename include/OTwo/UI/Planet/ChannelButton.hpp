@@ -42,7 +42,7 @@ private:
     using StateMap = std::unordered_map<Mode, std::unordered_map<Gx::RadioButton::State, sf::IntRect>>;
 
     Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
-    void OnControlStateChanged(Control *sender, State state) override;
+    void OnControlStateChanged(Control& sender, State state) override;
 
     Gx::Image  *m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
     Gx::Number *m_numberIndicator;

@@ -129,7 +129,7 @@ namespace Gx
 
     void Mixer::Resume(sf::SoundSource *source)
     {
-        if (source && source->getStatus() == sf::SoundSource::Paused)
+        if (source && source->getStatus() == sf::SoundSource::Status::Paused)
             source->play();
     }
 

@@ -40,9 +40,7 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) c
     if (const auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
         delete[] data;
 
-    const auto stream = new sf::MemoryInputStream();
-    stream->open(data, header.GetSize());
-
+    const auto stream = new sf::MemoryInputStream(data, header.GetSize());
     return {
         stream,
         [data] (const sf::InputStream *ms) {
@@ -63,7 +61,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OpiArchive::GetFileEntries() const
     std::vector<std::unique_ptr<Gx::FileInfo>> result;
 
     // Go to first item header offset
-    if (const auto offset = m_count * ITEM_HEADER_SIZE; m_fileStream.seek(m_fileStream.getSize() - offset) == -1)
+    if (const auto offset = m_count * ITEM_HEADER_SIZE; m_fileStream.seek(m_fileStream.getSize().value_or(0) - offset) == -1)
         return result;
 
     // Traverse the header
@@ -123,13 +121,13 @@ Gx::Int64 OpiArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     const FileInfo header = iterator->second;
-    if (m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())) < 0)
+    if (!m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())).has_value())
         throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive");
 
     if (size > header.GetSize())
         size = header.GetSize();
 
-    return m_fileStream.read(data, size);
+    return m_fileStream.read(data, size).value_or(-1);
 }
 
 Gx::Int64 OpiArchive::GetFileSize(const std::string &fileName) const

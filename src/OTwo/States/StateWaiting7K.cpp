@@ -396,9 +396,9 @@ void StateWaiting7K::Initialize()
     m_mixer.Play(bgm, "BGM");
 }
 
-void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent& ev)
+void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
-    State::OnKeyDown(ev);
+    State::OnKeyPressed(ev);
 
     if (ev.code == sf::Keyboard::Key::F3)
     {
@@ -445,9 +445,9 @@ void StateWaiting7K::OnKeyDown(const sf::Event::KeyEvent& ev)
     }
 }
 
-void StateWaiting7K::OnKeyUp(const sf::Event::KeyEvent& ev)
+void StateWaiting7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
 {
-    State::OnKeyUp(ev);
+    State::OnKeyReleased(ev);
 }
 
 void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoticonID)

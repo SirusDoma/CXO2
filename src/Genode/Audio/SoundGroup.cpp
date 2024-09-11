@@ -34,16 +34,16 @@ namespace Gx
         bool paused = false;
         for (const auto source : m_sources)
         {
-            if (source->getStatus() == sf::SoundSource::Playing)
-                return sf::SoundSource::Playing;
-            else if (source->getStatus() == sf::SoundSource::Paused)
+            if (source->getStatus() == sf::SoundSource::Status::Playing)
+                return sf::SoundSource::Status::Playing;
+            else if (source->getStatus() == sf::SoundSource::Status::Paused)
                 paused = true;
         }
 
         if (paused)
-            return sf::SoundSource::Paused;
+            return sf::SoundSource::Status::Paused;
 
-        return sf::SoundSource::Stopped;
+        return sf::SoundSource::Status::Stopped;
     }
 
     void SoundGroup::Play()
@@ -72,7 +72,7 @@ namespace Gx
 
         for (const auto source : m_sources)
         {
-            if (source->getStatus() == sf::SoundSource::Paused)
+            if (source->getStatus() == sf::SoundSource::Status::Paused)
                 source->play();
         }
     }
@@ -181,7 +181,7 @@ namespace Gx
     {
         m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource *src)
         {
-            return !src || src->getStatus() == sf::SoundSource::Stopped;
+            return !src || src->getStatus() == sf::SoundSource::Status::Stopped;
         }), m_sources.end());
     }
 

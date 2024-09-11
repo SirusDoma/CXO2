@@ -23,27 +23,24 @@ namespace Gx
         }
     }
 
-    void RadioButton::Pair(RadioButton *radio)
+    void RadioButton::Pair(RadioButton& radio)
     {
-        if (!radio)
-            return;
-
-        m_pairs.push_back(radio);
-        radio->m_pairs.push_back(this);
+        m_pairs.push_back(&radio);
+        radio.m_pairs.push_back(this);
     }
 
-    void RadioButton::Unpair(RadioButton *radio)
+    void RadioButton::Unpair(RadioButton& radio)
     {
         for (const auto pair : m_pairs)
         {
             pair->m_pairs.erase(
-                std::remove_if(pair->m_pairs.begin(), pair->m_pairs.end(), [radio](auto r) { return radio == r; }),
+                std::remove_if(pair->m_pairs.begin(), pair->m_pairs.end(), [src = &radio](auto r) { return src == r; }),
                 pair->m_pairs.end()
             );
         }
 
         m_pairs.erase(
-            std::remove_if(m_pairs.begin(), m_pairs.end(), [radio](auto r) { return radio == r; }),
+            std::remove_if(m_pairs.begin(), m_pairs.end(), [src = &radio](auto r) { return src == r; }),
            m_pairs.end()
         );
     }
@@ -56,13 +53,13 @@ namespace Gx
         m_pairs.clear();
     }
 
-    void RadioButton::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void RadioButton::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         if (!IsEnabled())
             return;
 
         Control::OnControlClick(sender, ev);
-        if (!IsChecked() && sender == this)
+        if (!IsChecked() && &sender == this)
             SetCheckedState(true);
     }
 

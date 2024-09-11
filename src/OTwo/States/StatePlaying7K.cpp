@@ -424,14 +424,14 @@ void StatePlaying7K::Update(const double delta)
     State::Update(delta);
 }
 
-void StatePlaying7K::OnKeyDown(const sf::Event::KeyEvent& ev)
+void StatePlaying7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
-    Inputable::OnKeyDown(ev);
+    Inputable::OnKeyPressed(ev);
 }
 
-void StatePlaying7K::OnKeyUp(const sf::Event::KeyEvent& ev)
+void StatePlaying7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
 {
-    Inputable::OnKeyUp(ev);
+    Inputable::OnKeyReleased(ev);
 
     if (ev.code == sf::Keyboard::Key::F5)
     {
@@ -463,18 +463,16 @@ void StatePlaying7K::CaptureScreen()
     const auto resources = &GetResources(ResourceScope::Shared);
     const sf::RenderTarget& window = GetApplication();
 
-    if (auto target = sf::RenderTexture(); target.create(window.getSize()))
+    auto target = sf::RenderTexture(window.getSize());
+    target.clear(GetApplication().GetClearColor());
     {
-        target.clear(GetApplication().GetClearColor());
-        {
-            auto surface = Gx::RenderTargetAdapter(target);
+        auto surface = Gx::RenderTargetAdapter(target);
 
-            Update(0);
-            surface.Render(*this, Gx::RenderStates::Default);
-        }
-        target.display();
-
-        auto texture = std::make_unique<sf::Texture>(target.getTexture());
-        resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
+        Update(0);
+        surface.Render(*this, Gx::RenderStates::Default);
     }
+    target.display();
+
+    auto texture = std::make_unique<sf::Texture>(target.getTexture());
+    resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
 }

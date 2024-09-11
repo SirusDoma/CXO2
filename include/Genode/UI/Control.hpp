@@ -74,18 +74,18 @@ namespace Gx
         RenderStates Render(RenderSurface &surface, RenderStates states) const override;
         bool Input(const sf::Event& ev) override;
 
-        void OnMouseMove(const sf::Event::MouseMoveEvent& ev) override;
-        void OnMouseButtonDown(const sf::Event::MouseButtonEvent& ev) override;
-        void OnMouseButtonUp(const sf::Event::MouseButtonEvent& ev) override;
-        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrollEvent& ev) override;
+        void OnMouseMoved(const sf::Event::MouseMoved& ev) override;
+        void OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev) override;
+        void OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev) override;
+        void OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev) override;
 
-        virtual void OnControlChildAdded(Control *control);
-        virtual void OnControlChildRemove(Control *control);
+        virtual void OnControlChildAdded(Control& control);
+        virtual void OnControlChildRemove(Control& control);
 
-        virtual void OnControlStateChanged(Control *sender, State state);
-        virtual void OnControlPress(Control *sender, sf::Event::MouseButtonEvent ev);
-        virtual void OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev);
-        virtual void OnControlDoubleClick(Control *sender, sf::Event::MouseButtonEvent ev);
+        virtual void OnControlStateChanged(Control& sender, const State state);
+        virtual void OnControlPress(Control& sender, const sf::Event::MouseButtonPressed& ev);
+        virtual void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev);
+        virtual void OnControlDoubleClick(Control& sender, const sf::Event::MouseButtonPressed& ev);
 
         virtual void Invalidate() = 0;
 

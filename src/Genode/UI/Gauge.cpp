@@ -32,7 +32,7 @@ namespace Gx
 
     sf::FloatRect Gauge::GetLocalBounds() const
     {
-        return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.width, m_texCoords.height));
+        return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_texCoords.size.x, m_texCoords.size.y));
     }
 
     bool Gauge::IsFlickering() const
@@ -226,21 +226,21 @@ namespace Gx
 
         const auto color  = GetColor();
         const auto bounds = GetLocalBounds();
-        const int x   = bounds.left;
-        int y         = bounds.top;
-        float w       = bounds.width;
-        const float h = bounds.height;
+        const int x   = bounds.position.x;
+        int y         = bounds.position.y;
+        float w       = bounds.size.x;
+        const float h = bounds.size.y;
 
-        const float left   = static_cast<float>(m_texCoords.left);
+        const float left   = static_cast<float>(m_texCoords.position.x);
         float right        = left + w;
-        float top          = static_cast<float>(m_texCoords.top);
+        float top          = static_cast<float>(m_texCoords.position.y);
         const float bottom = top + h;
 
         if (m_value < m_maximum)
         {
             if (m_orientation == Orientation::Horizontal)
             {
-                const float progress = bounds.width * (m_value / m_maximum);
+                const float progress = bounds.size.x * (m_value / m_maximum);
                 w     = progress;
                 right = left + w;
 
@@ -252,7 +252,7 @@ namespace Gx
             }
             else
             {
-                const float progress = bounds.height * (1.f - (m_value / m_maximum));
+                const float progress = bounds.size.y * (1.f - (m_value / m_maximum));
                 y   = progress;
                 top = progress;
 

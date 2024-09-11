@@ -33,7 +33,7 @@ public:
     void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
 
 protected:
-    void OnKeyDown(const sf::Event::KeyEvent& ev) override;
+    void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
     void OnShown(Gx::Scene &scene) override;
     void OnAccepted() override;

@@ -113,8 +113,8 @@ namespace Gx
 
     sf::FloatRect Sprite::GetLocalBounds() const
     {
-        const auto width = static_cast<float>(std::abs(m_texcoords.width));
-        const auto height = static_cast<float>(std::abs(m_texcoords.height));
+        const auto width = static_cast<float>(std::abs(m_texcoords.size.x));
+        const auto height = static_cast<float>(std::abs(m_texcoords.size.y));
 
         return {{0.f, 0.f}, {width, height}};
     }
@@ -165,17 +165,17 @@ namespace Gx
         const sf::FloatRect bounds = Sprite::GetLocalBounds();
 
         m_vertices[0].position = sf::Vector2f(0, 0);
-        m_vertices[1].position = sf::Vector2f(0, bounds.height);
-        m_vertices[2].position = sf::Vector2f(bounds.width, 0);
-        m_vertices[3].position = sf::Vector2f(bounds.width, bounds.height);
+        m_vertices[1].position = sf::Vector2f(0, bounds.size.y);
+        m_vertices[2].position = sf::Vector2f(bounds.size.x, 0);
+        m_vertices[3].position = sf::Vector2f(bounds.size.x, bounds.size.y);
     }
 
     void Sprite::UpdateTexCoords()
     {
-        const auto left = static_cast<float>(m_texcoords.left);
-        const float right = left + static_cast<float>(m_texcoords.width);
-        const auto top = static_cast<float>(m_texcoords.top);
-        const float bottom = top + static_cast<float>(m_texcoords.height);
+        const auto left = static_cast<float>(m_texcoords.position.x);
+        const float right = left + static_cast<float>(m_texcoords.size.x);
+        const auto top = static_cast<float>(m_texcoords.position.y);
+        const float bottom = top + static_cast<float>(m_texcoords.size.y);
 
         m_vertices[0].texCoords = sf::Vector2f(left, top);
         m_vertices[1].texCoords = sf::Vector2f(left, bottom);

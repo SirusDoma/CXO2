@@ -24,13 +24,13 @@ namespace Gx
         m_onCheckStateChanged = std::move(callback);
     }
 
-    void CheckBox::OnControlClick(Control *sender, sf::Event::MouseButtonEvent ev)
+    void CheckBox::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         if (!IsEnabled())
             return;
 
         Control::OnControlClick(sender, ev);
-        if (sender == this)
+        if (&sender == this)
             SetCheckedState(!IsChecked());
     }
 

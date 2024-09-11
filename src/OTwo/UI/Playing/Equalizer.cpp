@@ -12,17 +12,17 @@ Equalizer::Equalizer(const int count, const float spacing) :
     Gx::List::SetBatchingEnabled(true);
 }
 
-void Equalizer::OnControlChildAdded(Gx::Control *control)
+void Equalizer::OnControlChildAdded(Control& control)
 {
-    if (const auto gauge = dynamic_cast<Gx::Gauge*>(control); gauge)
+    if (const auto gauge = dynamic_cast<Gx::Gauge*>(&control); gauge)
     {
         gauge->SetValue(1);
         m_gauges.push_back(gauge);
     }
 }
 
-void Equalizer::OnControlChildRemove(Gx::Control *control)
+void Equalizer::OnControlChildRemove(Control& control)
 {
-    if (const auto gauge = dynamic_cast<Gx::Gauge*>(control); gauge)
+    if (const auto gauge = dynamic_cast<Gx::Gauge*>(&control); gauge)
         m_gauges.erase(std::remove(m_gauges.begin(), m_gauges.end(), gauge), m_gauges.end());
 }

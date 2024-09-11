@@ -124,7 +124,7 @@ void LongNote::Render(const ChartRenderer &renderer, const double delta)
     auto transform  = sprite->GetTransform();
     auto position   = transform.transformPoint(sf::Vector2f(0, renderer.MapRenderPositionToPixels(GetChannel(), distance + GetLength()) - 1));
     auto bounds     = transform.transformRect(sprite->GetLocalBounds());
-    bounds.height   = renderer.MapRenderPositionToPixels(GetChannel(), GetLength(), true);
+    bounds.size.y   = renderer.MapRenderPositionToPixels(GetChannel(), GetLength(), true);
 
     UpdatePositions(GetVertices(), position, bounds);
     UpdateTexCoords(GetVertices(), sprite->GetTexCoords());
