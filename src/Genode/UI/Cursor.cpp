@@ -45,19 +45,17 @@ namespace Gx
         Register(type, texture.copyToImage(), hotspot);
     }
 
-    auto Cursor::Register(const Type type, const sf::Image &image, const sf::Vector2u hotspot) -> void
+    void Cursor::Register(const Type type, const sf::Image &image, const sf::Vector2u hotspot)
     {
         const auto size  = image.getSize();
         const auto data  = const_cast<unsigned char*>(image.getPixelsPtr());
 
-        auto handle = CursorHandle{};
-        if (!handle.Handle.createFromPixels(&data[0], size, hotspot))
-            throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to load cursor");
-
-        handle.Source      = image;
-        handle.Hotspot     = hotspot;
-        handle.InitialSize = image.getSize();
-        m_cursors[type]    = std::move(handle);
+        m_cursors[type] = CursorHandle{
+            sf::Cursor(&data[0], size, hotspot),
+            image,
+            image.getSize(),
+            hotspot
+        };
     }
 
     const sf::Cursor& Cursor::GetHandle(const Type type) const
@@ -111,8 +109,7 @@ namespace Gx
             const auto size = result.getSize();
             const auto data = const_cast<unsigned char*>(result.getPixelsPtr());
 
-            if (!cursor.Handle.createFromPixels(&data[0], size, sf::Vector2u(cursor.Hotspot.x * scale, cursor.Hotspot.y * scale)))
-                throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to load cursor");
+            cursor.Handle = sf::Cursor(&data[0], size, sf::Vector2u(cursor.Hotspot.x * scale, cursor.Hotspot.y * scale));
         }
 
         return true;
