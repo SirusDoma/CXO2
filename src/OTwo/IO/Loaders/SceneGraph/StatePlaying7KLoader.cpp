@@ -56,7 +56,6 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_PLAYING_MENU",   std::string(), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_NOTE_CLICK",      std::string(), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_LONG_NOTE_EFFECT",std::string(), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1",  std::string(), ctx, 1);
@@ -86,7 +85,6 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_NUMBER_EFFECT_JAM", std::string(), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_CONTAINER_NOTE_JAM", std::string(), ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_BUTTON_EXIT", std::string(), ctx);
 
     auto container = ObjectContainer::Decorate(state.get());
     for (auto [key, object] : metadata->Objects)

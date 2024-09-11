@@ -7,10 +7,11 @@
 #include <Genode/UI.hpp>
 
 class ChartRenderer;
-class PlayMenu : public virtual Gx::UiContainer
+class GameContext;
+class PlayMenu : public Gx::Image
 {
 public:
-    PlayMenu() = default;
+    explicit PlayMenu(const GameContext& context);
 
     void Initialize() override;
 
@@ -23,7 +24,9 @@ public:
 
 private:
     void Update(const double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
+
+    const GameContext& m_context;
 
     ChartMetadataView m_metadata;
     Difficulty m_difficulty;

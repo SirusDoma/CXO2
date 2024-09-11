@@ -206,9 +206,7 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Play Menu
-    const auto playMenu = Create<PlayMenu>();
-    playMenu->SetName("IDC_PLAY_MENU");
-    AddChild(playMenu);
+    const auto playMenu = Instantiate<PlayMenu>("IDC_PLAY_MENU");
     playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
     playMenu->SetScoreTracker(m_scoreTracker);
 

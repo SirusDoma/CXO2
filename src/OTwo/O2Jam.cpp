@@ -50,6 +50,7 @@
 #include <OTwo/UI/Room/UserList.hpp>
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Waiting/MapSelector.hpp>
+#include <OTwo/UI/Playing/PlayMenu.hpp>
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
@@ -125,6 +126,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, MapSelector>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, InstrumentSelector>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, RoomButton>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, PlayMenu>();
     // O2Jam Dialogs
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, OptionDialog>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, CreateRoomDialog>();

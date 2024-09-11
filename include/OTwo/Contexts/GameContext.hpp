@@ -35,7 +35,7 @@ public:
 
 private:
     Gx::ResourcePtr<Chart> m_chart;
-    GameConfig *m_config;
+    GameConfig* m_config;
     Difficulty m_difficulty;
     GameMode m_mode;
     float m_speed;

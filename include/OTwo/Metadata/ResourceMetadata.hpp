@@ -63,6 +63,7 @@ struct ResourceMetadata
         AvatarInfo,
         MapSelector,
         InstrumentSelector,
+        PlayMenu,
         Equalizer,
 
         // Avatar

@@ -3,28 +3,36 @@
 
 #include <OTwo/States/State.hpp>
 
+PlayMenu::PlayMenu(const GameContext& context) :
+    m_context(context),
+    m_difficulty(Difficulty::EX), m_scoreTracker(),
+    m_renderer(nullptr),
+    m_title(nullptr),
+    m_playIcon(nullptr),
+    m_level(nullptr),
+    m_minutes(nullptr),
+    m_seconds(nullptr),
+    m_wave(nullptr),
+    m_bgmVol(nullptr),
+    m_sfxVol(nullptr)
+{
+}
+
 void PlayMenu::Initialize()
 {
-    Gx::UiContainer::Initialize();
+    Gx::Image::Initialize();
 
-    const auto parent = GetParent<::State>();
-    if (!parent)
-        return;
+    m_renderer = GetParent<::State>()->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
+    m_title    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
+    m_playIcon = FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
+    m_level    = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
+    m_wave     = FindChild<Gx::Gauge>("IDC_GAUGE_WAVE");
+    m_minutes  = FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_MINUTE");
+    m_seconds  = FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_SECOND");
+    m_bgmVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
+    m_sfxVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
 
-    const auto menu = parent->FindResource<Gx::Image>("IDC_IMAGE_PLAYING_MENU");
-    AddChild(menu);
-
-    m_renderer = parent->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
-    m_title    = menu->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
-    m_playIcon = menu->FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
-    m_level    = menu->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
-    m_wave     = menu->FindChild<Gx::Gauge>("IDC_GAUGE_WAVE");
-    m_minutes  = menu->FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_MINUTE");
-    m_seconds  = menu->FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_SECOND");
-    m_bgmVol   = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
-    m_sfxVol   = menu->FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
-
-    if (const auto pointList = menu->FindChild<Gx::List>("IDC_LIST_NOTE_POINT_NUMBER"); pointList)
+    if (const auto pointList = FindChild<Gx::List>("IDC_LIST_NOTE_POINT_NUMBER"); pointList)
     {
         const auto children = pointList->GetChildren();
         for (int i = 0; i < children.size(); i++)
@@ -33,8 +41,6 @@ void PlayMenu::Initialize()
             m_counters[acc] = dynamic_cast<Gx::Number*>(children[i]);
         }
     }
-
-    SetBatchingEnabled(true);
 }
 
 ChartMetadataView PlayMenu::GetMetadata() const
@@ -58,11 +64,9 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
     if (m_wave)
         m_wave->SetMaximumValue(metadata.Duration.asSeconds());
 
-    const auto  state   = GetParent<::State>();
-    const auto& context = state->Require<GameContext>();
     if (m_level)
     {
-        const auto  speed = context.GetSpeed();
+        const auto  speed = m_context.GetSpeed();
         std::string speedStr(4, '\0');
         if (speed > 0)
         {
@@ -87,10 +91,10 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
     }
 
     if (m_bgmVol)
-        m_bgmVol->SetValue(context.GetConfig()->MusicVolume);
+        m_bgmVol->SetValue(m_context.GetConfig()->MusicVolume);
 
     if (m_sfxVol)
-        m_sfxVol->SetValue(context.GetConfig()->EffectVolume);
+        m_sfxVol->SetValue(m_context.GetConfig()->EffectVolume);
 }
 
 void PlayMenu::SetScoreTracker(const ScoreTracker &scores)
@@ -136,10 +140,10 @@ void PlayMenu::Update(const double delta)
             number->SetValue(acc == Accuracy::None ? m_scoreTracker->GetMaxCombo() : m_scoreTracker->GetPoint(acc));
     }
 
-    UpdatableContainer::Update(delta);
+    Gx::Image::Update(delta);
 }
 
-Gx::RenderStates PlayMenu::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates PlayMenu::Render(Gx::RenderSurface& surface, const Gx::RenderStates states) const
 {
-    return RenderableContainer::Render(surface, states);
+    return Image::Render(surface, states);
 }

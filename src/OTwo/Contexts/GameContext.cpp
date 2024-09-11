@@ -10,12 +10,12 @@ void GameContext::SetChart(Gx::ResourcePtr<Chart> chart)
     m_chart = std::move(chart);
 }
 
-GameConfig *GameContext::GetConfig() const
+GameConfig* GameContext::GetConfig() const
 {
     return m_config;
 }
 
-void GameContext::SetConfig(GameConfig &config)
+void GameContext::SetConfig(GameConfig& config)
 {
     m_config = &config;
 }

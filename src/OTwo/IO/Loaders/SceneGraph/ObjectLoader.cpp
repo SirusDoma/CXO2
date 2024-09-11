@@ -17,6 +17,7 @@
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
 #include <OTwo/UI/Waiting/MapSelector.hpp>
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
+#include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <Genode/Graphics.hpp>
@@ -201,6 +202,11 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         case ResourceMetadata::ResourceType::InstrumentSelector:
         {
             container.Add(name, LoadResource<Gx::UiContainer, InstrumentSelector>(name, json, ctx), ctx);
+            break;
+        }
+        case ResourceMetadata::ResourceType::PlayMenu:
+        {
+            container.Add(name, LoadResource<Gx::Image, PlayMenu>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Equalizer:
