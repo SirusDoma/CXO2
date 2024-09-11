@@ -172,17 +172,17 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     if (const auto it = m_textures.find(m_shape); it != m_textures.end())
     {
         // Use scissor test to mask the playable area
-        const auto view = surface.GetView();
+        const auto currentView = surface.GetView();
         if (m_viewport.width > 0 && m_viewport.height > 0)
         {
             auto scissorView = surface.GetView();
             auto area  = sf::FloatRect({
-                { view.getViewport().left + (m_viewport.left / view.getSize().x), 0.f },
-                { m_viewport.width / view.getSize().x, m_viewport.height / view.getSize().y }
+                { scissorView.getViewport().left + (m_viewport.left / scissorView.getSize().x), 0.f },
+                { m_viewport.width / scissorView.getSize().x, m_viewport.height / scissorView.getSize().y }
             });
 
             if (area.left < -1.f || area.left > 1.f)
-                area.left = view.getViewport().left;
+                area.left = scissorView.getViewport().left;
 
             scissorView.setScissor(area);
             surface.SetView(scissorView);
@@ -194,7 +194,11 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderSta
         states.texture = nullptr;
         surface.Render(m_guideLineVertices, states);
 
-        surface.SetView(view);
+        surface.SetView(currentView);
+
+        // HACK: Fix SFML Scissor view bug with render texture
+        constexpr auto temp = std::array<sf::Vertex, 1>({sf::Vertex{{}, sf::Color::Transparent, {}}});
+        surface.Render(&temp[0], temp.size(), sf::PrimitiveType::Points);
     }
 
     return RenderableContainer::Render(surface, states);
