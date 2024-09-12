@@ -10,7 +10,7 @@ public :
     ImageLoader() = default;
 
     Gx::ResourcePtr<Gx::Image> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-    Gx::ResourcePtr<Gx::Image> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::Image> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
     static bool ParseMetadata(const Gx::Json& attributes, ImageMetadata& metadata, const Gx::ResourceContext& context);
 };

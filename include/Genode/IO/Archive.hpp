@@ -31,10 +31,10 @@ namespace Gx
 
         std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override = 0;
 
-        std::int64_t ReadFile(const std::string& name, void* data, std::int64_t size) const override = 0;
-        virtual std::int64_t ReadFile(const FileInfo& entry, void* data) const;
+        std::optional<std::size_t> ReadFile(const std::string& name, void* data, std::size_t size) const override = 0;
+        virtual std::optional<std::size_t> ReadFile(const FileInfo& entry, void* data) const;
 
-        std::int64_t GetFileSize(const std::string& fileName) const override = 0;
+        std::optional<std::size_t> GetFileSize(const std::string& fileName) const override = 0;
 
     private:
         std::string m_filename;

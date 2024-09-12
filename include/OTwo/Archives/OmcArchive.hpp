@@ -11,31 +11,31 @@
 
 struct OmcHeader
 {
-    char  Signature[4]; // "OMC" or "OJM"
-    short FxCount;
-    short BgCount;
-    int   FxStartOffset;
-    int   BgStartOffset;
-    int   FileSize;
+    char Signature[4]; // "OMC" or "OJM"
+    std::uint16_t FxCount;
+    std::uint16_t BgCount;
+    std::uint32_t FxStartOffset;
+    std::uint32_t BgStartOffset;
+    std::uint32_t FileSize;
 };
 
 struct OmcWaveHeader
 {
-    char  Name[32];
-    short AudioFormat;
-    short ChannelCount;
-    int   SampleRate;
-    int   BitRate;
-    short BlockAlign;
-    short BitsPerSample;
-    int   UnkData;
-    int   ChunkSize;
+    char Name[32];
+    std::uint16_t AudioFormat;
+    std::uint16_t ChannelCount;
+    std::uint32_t SampleRate;
+    std::uint32_t BitRate;
+    std::uint16_t BlockAlign;
+    std::uint16_t BitsPerSample;
+    std::uint32_t UnkData;
+    std::uint32_t ChunkSize;
 };
 
 struct OmcOggHeader
 {
     char Name[32];
-    int  Size;
+    std::uint32_t Size;
 };
 
 class OmcArchive : public virtual Gx::Archive
@@ -53,12 +53,12 @@ public:
     std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
     std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
 
-    std::int64_t ReadFile(unsigned int index, void* data, std::int64_t size) const;
+    std::optional<std::size_t> ReadFile(unsigned int index, void* data, std::size_t size) const;
+    std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const override;
 
-    std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const override;
-    void WriteFile(const std::string& fileName, void* data, std::int64_t size) override { throw Gx::NotSupportedException(); }
+    void WriteFile(const std::string& fileName, void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
 
-    std::int64_t GetFileSize(const std::string& fileName) const override;
+    std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
     std::string GetExtension(const std::string& name) const;
 
 private:

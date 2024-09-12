@@ -10,7 +10,7 @@ public :
     NumberLoader() = default;
 
     Gx::ResourcePtr<Gx::Number> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-    Gx::ResourcePtr<Gx::Number> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::Number> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
 
 

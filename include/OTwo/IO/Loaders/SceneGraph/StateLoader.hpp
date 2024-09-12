@@ -14,7 +14,7 @@ public :
     StateLoader() = default;
 
     Gx::ResourcePtr<State> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const override;
-    Gx::ResourcePtr<State> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& ctx) const override;
+    Gx::ResourcePtr<State> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
 
 #endif

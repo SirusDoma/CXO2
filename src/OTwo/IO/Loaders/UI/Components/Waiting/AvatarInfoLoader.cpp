@@ -7,15 +7,15 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     AvatarInfoMetadata metadata;
-    if (!MetadataLoader::Parse(json, metadata, ctx))
+    if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
     auto attributes = json.at("attributes");
     if (auto transform = attributes.find("transform"); transform != attributes.end())
-        TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+        TransformLoader::ParseMetadata(transform.value(), metadata, context);
 
     if (auto teamColors = attributes.find("teamColors"); teamColors != attributes.end())
     {
@@ -33,7 +33,7 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json,
         }
     }
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const

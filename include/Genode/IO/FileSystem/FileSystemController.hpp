@@ -6,6 +6,7 @@
 
 #include <SFML/System/InputStream.hpp>
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <memory>
@@ -25,10 +26,10 @@ namespace Gx
         virtual std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName) const = 0;
         virtual std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const = 0;
 
-        virtual std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const = 0;
-        virtual void WriteFile(const std::string& fileName, void* data, std::int64_t size) = 0;
+        virtual std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const = 0;
+        virtual void WriteFile(const std::string& fileName, void* data, std::size_t size) = 0;
 
-        virtual std::int64_t GetFileSize(const std::string& fileName) const = 0;
+        virtual std::optional<std::size_t> GetFileSize(const std::string& fileName) const = 0;
 
         const std::string& GetPrefix() const;
         void SetPathPrefix(const std::string& prefix);

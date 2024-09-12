@@ -27,10 +27,10 @@ public:
     std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
     std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
 
-    std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const override;
-    void WriteFile(const std::string& fileName, void* data, std::int64_t size) override { throw Gx::NotSupportedException(); }
+    std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const override;
+    void WriteFile(const std::string& fileName, void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
 
-    std::int64_t GetFileSize(const std::string& fileName) const override;
+    std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
 
 private:
     enum class ArchiveType

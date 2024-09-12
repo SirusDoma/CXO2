@@ -13,7 +13,7 @@ namespace Gx
         return true;
     }
 
-    std::int64_t Archive::ReadFile(const FileInfo& entry, void* data) const
+    std::optional<std::size_t> Archive::ReadFile(const FileInfo& entry, void* data) const
     {
         if (&entry.GetParent() != this)
             throw ResourceAccessException(entry.GetName(), "The specified file doesn't belong to this archive");
@@ -32,7 +32,7 @@ namespace Gx
         for (const auto& entry : GetFileEntries())
         {
             if (auto fileName = entry->GetName(); StringHelper::IsGlobMatch(fileName, pattern))
-                files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName)));
+                files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName).value_or(0)));
         }
 
         return files;

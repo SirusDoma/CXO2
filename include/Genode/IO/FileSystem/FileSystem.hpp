@@ -26,8 +26,8 @@ namespace Gx
             static bool Contains(const std::string& fileName);
             static std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName);
 
-            static std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size);
-            static std::size_t GetFileSize(const std::string& fileName);
+            static std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size);
+            static std::optional<std::size_t> GetFileSize(const std::string& fileName);
 
             static void Mount(const FileSystemController& fileSystem);
             static void Dismount(const FileSystemController& fileSystem);

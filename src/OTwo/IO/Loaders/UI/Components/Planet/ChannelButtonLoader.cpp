@@ -6,17 +6,17 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = ChannelButtonMetadata();
-    if (!MetadataLoader::Parse(json, metadata, ctx))
+    if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
     auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, ctx))
+    if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    if (auto modeAttributes = attributes.find("mode"); modeAttributes != attributes.end())
+    if (const auto modeAttributes = attributes.find("mode"); modeAttributes != attributes.end())
     {
         for (auto [key, data]: modeAttributes->items())
         {
@@ -41,7 +41,7 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json&
                     continue;
 
                 SpriteMetadata stateMeta;
-                if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, ctx))
+                if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, context))
                     continue;
 
                 metadata.States[mode][state] = stateMeta.TexCoords;
@@ -49,7 +49,7 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json&
         }
     }
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const

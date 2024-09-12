@@ -68,7 +68,7 @@ namespace Gx
         return files;
     }
 
-    std::unique_ptr<Gx::FileInfo> FileSystem::GetFileInfo(const std::string& fileName)
+    std::unique_ptr<FileInfo> FileSystem::GetFileInfo(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -81,7 +81,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    std::int64_t FileSystem::ReadFile(const std::string& fileName, void* data, std::int64_t size)
+    std::optional<std::size_t> FileSystem::ReadFile(const std::string& fileName, void* data, std::size_t size)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -98,7 +98,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    std::size_t FileSystem::GetFileSize(const std::string& fileName)
+    std::optional<std::size_t> FileSystem::GetFileSize(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 

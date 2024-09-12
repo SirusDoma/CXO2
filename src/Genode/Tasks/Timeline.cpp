@@ -19,9 +19,9 @@ namespace Gx
         m_frames.clear();
     }
 
-    Timeline::KeyFrame::KeyFrame(const sf::Time& offset, Gx::Task* task) :
-        Offset(offset),
-        KeyTask(task)
+    Timeline::KeyFrame::KeyFrame(const sf::Time& offset, Task* task) :
+        KeyTask(task),
+        Offset(offset)
     {
     }
 

@@ -43,7 +43,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
     chart->Source = ctx.GetID();
 
     auto metadata = chart->GetMetadata();
-    if (stream.seek(0) == -1)
+    if (!stream.seek(0).has_value())
         throw Gx::ResourceLoadException("Failed to open the stream");
 
     if (stream.read(&metadata, ChartMetadata::Size) != ChartMetadata::Size)
@@ -74,7 +74,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
                 continue;
 
             auto payload = std::vector<std::uint8_t>(entry->GetSize());
-            if (entry->Read(&payload[0]) <= 0)
+            if (!entry->Read(&payload[0]).has_value())
                 continue;
 
             const auto loader = Gx::ResourceLoaderFactory::CreateLoader<sf::SoundBuffer>();
@@ -132,7 +132,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
         if (offset == 0 || blockCount == 0)
             continue;
 
-        if (stream.seek(offset) == -1)
+        if (!stream.seek(offset).has_value())
             continue;
 
         for (int p = 0; p < blockCount; p++)
@@ -235,7 +235,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream& stream, c
     if (metadata.ThumbnailSize == 0)
         return nullptr;
 
-    if (stream.seek(metadata.CoverOffset + metadata.CoverSize) == -1)
+    if (!stream.seek(metadata.CoverOffset + metadata.CoverSize).has_value())
         return nullptr;
 
     auto data = std::vector<std::uint8_t>(metadata.ThumbnailSize);
@@ -254,7 +254,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, co
     if (metadata.CoverSize == 0)
         return nullptr;
 
-    if (stream.seek(metadata.CoverOffset) == -1)
+    if (!stream.seek(metadata.CoverOffset).has_value())
         return nullptr;
 
     auto data = std::vector<std::uint8_t>(metadata.CoverSize);

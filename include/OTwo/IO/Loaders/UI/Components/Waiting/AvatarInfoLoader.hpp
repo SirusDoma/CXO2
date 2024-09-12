@@ -10,7 +10,7 @@ public :
     AvatarInfoLoader() = default;
 
     Gx::ResourcePtr<AvatarInfo> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-    Gx::ResourcePtr<AvatarInfo> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<AvatarInfo> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
 
 #endif

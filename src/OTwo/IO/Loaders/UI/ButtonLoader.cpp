@@ -77,10 +77,10 @@ bool ButtonLoader::ParseMetadata(const Gx::Json& attributes, ButtonMetadata& met
         { "click", Gx::Button::State::Active },
     };
 
-    if (auto it = attributes.find("enabled"); it != attributes.end())
+    if (const auto it = attributes.find("enabled"); it != attributes.end())
         metadata.Enabled = it->get<bool>();
 
-    if (auto it = attributes.find("visible"); it != attributes.end())
+    if (const auto it = attributes.find("visible"); it != attributes.end())
         metadata.Visible = it->get<bool>();
 
     auto spriteLoader = SpriteLoader();

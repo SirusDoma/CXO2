@@ -30,7 +30,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const
     else
         metadata.Maximum = 100.0f;
 
-    if (auto frames = attributes.find("frames"); frames != attributes.end())
+    if (const auto frames = attributes.find("frames"); frames != attributes.end())
     {
         for (const auto& frame : frames->items())
         {
@@ -62,12 +62,12 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const
         }
     }
 
-    if (auto duration = attributes.find("duration"); duration != attributes.end())
+    if (const auto duration = attributes.find("duration"); duration != attributes.end())
         metadata.AnimationDuration = sf::milliseconds(duration->get<unsigned int>());
     else
         metadata.AnimationDuration = sf::milliseconds(metadata.AnimationFrames.size() * 60);
 
-    if (auto flicker = attributes.find("flicker"); flicker != attributes.end())
+    if (const auto flicker = attributes.find("flicker"); flicker != attributes.end())
         metadata.Flicker = flicker->get<bool>();
     else
         metadata.Flicker = false;

@@ -261,7 +261,7 @@ namespace Gx
         }
 
         // Make sure that the stream's reading position is at the beginning
-        if (stream.seek(0) == -1)
+        if (!stream.seek(0).has_value())
         {
             sf::err() << "Failed to seek font stream" << std::endl;
             return false;

@@ -41,26 +41,31 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata&
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    // "data" must be a pointer (or reference to somewhere else) because it need to be alive outside this method
     const auto size = Gx::FileSystem::GetFileSize(metadata->Source);
-    if (auto data = new std::uint8_t[size]; Gx::FileSystem::ReadFile(metadata->Source, data, size))
+    if (!size.has_value())
+        throw Gx::ResourceLoadException("Failed to determine resource size.");
+
+    auto data = new std::uint8_t[size.value()];
+    if (!Gx::FileSystem::ReadFile(metadata->Source, data, size.value()).has_value())
     {
-        auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto music) {
-            delete music;
-            delete[] data;
-        });
-
-        if (!music->openFromMemory(data, size))
-        {
-            delete[] data;
-            return nullptr;
-        }
-
-        music->setLooping(metadata->IsLoop);
-        return music;
+        delete[] data;
+        return nullptr;
     }
 
-    return nullptr;
+    auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto ptr)
+    {
+        delete ptr;
+        delete[] data;
+    });
+
+    if (!music->openFromMemory(data, size.value()))
+    {
+        delete[] data;
+        return nullptr;
+    }
+
+    music->setLooping(metadata->IsLoop);
+    return music;
 }
 
 bool MusicLoader::IsStreaming() const

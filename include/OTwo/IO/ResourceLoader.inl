@@ -48,7 +48,7 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream& stream, co
 
     const auto size = stream.getSize().value_or(0) - stream.tell().value_or(0);
     const auto data = new std::uint8_t[size];
-    if (stream.read(data, size) == -1)
+    if (!stream.read(data, size).has_value())
     {
         delete[] data;
         throw Gx::ResourceLoadException("Failed to load the resource");

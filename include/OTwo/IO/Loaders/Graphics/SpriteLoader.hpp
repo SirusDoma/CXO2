@@ -13,7 +13,7 @@ public :
     Gx::ResourcePtr<Gx::Sprite> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const override;
     Gx::ResourcePtr<Gx::Sprite> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& ctx) const override;
 
-    static bool ParseMetadata(Gx::Json json, SpriteMetadata& metadata, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
+    static bool ParseMetadata(Gx::Json json, SpriteMetadata& meta, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
 };
 
 #endif

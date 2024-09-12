@@ -14,7 +14,7 @@ bool OmcArchive::LoadFromFile(const std::string& fileName)
     if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
         return false;
 
-    if (m_fileStream.seek(0) == -1)
+    if (!m_fileStream.seek(0).has_value())
         return false;
 
     if (!ReadStream(&m_header, sizeof(m_header)))
@@ -36,17 +36,14 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const unsigned int index) cons
 
     const auto header = it->second;
     const auto data = new std::uint8_t[header.GetSize()];
-    if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+    if (!ReadFile(index, data, header.GetSize()).has_value())
         delete[] data;
 
-    const auto stream = new sf::MemoryInputStream(data, header.GetSize());
-    return {
-        stream,
-        [data] (const sf::InputStream* ms) {
-            delete[] data;
-            delete ms;
-        }
-    };
+    return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
+    {
+        delete[] data;
+        delete ms;
+    });
 }
 
 Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) const
@@ -57,20 +54,17 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) c
             continue;
 
         const auto data = new std::uint8_t[header.GetSize()];
-        if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
+        if (!ReadFile(index, data, header.GetSize()).has_value())
         {
             delete[] data;
             throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file");
         }
 
-        const auto stream = new sf::MemoryInputStream(data, header.GetSize());
-        return {
-            stream,
-            [data] (const sf::InputStream* ms) {
-                delete[] data;
-                delete ms;
-            }
-        };
+        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
+        {
+            delete[] data;
+            delete ms;
+        });
     }
 
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
@@ -86,7 +80,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
     std::vector<std::unique_ptr<Gx::FileInfo>> result;
     m_entries.clear();
 
-    if (m_fileStream.seek(m_header.FxStartOffset) == -1)
+    if (!m_fileStream.seek(m_header.FxStartOffset).has_value())
         return result;
 
     for (unsigned int i = 0; i < m_header.FxCount; i++)
@@ -99,22 +93,16 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
         if (!ReadStream(&waveHeader, sizeof(waveHeader)))
             continue;
 
-        if (m_fileStream.seek(m_fileStream.tell().value() + waveHeader.ChunkSize) == -1)
+        if (!m_fileStream.seek(m_fileStream.tell().value() + waveHeader.ChunkSize).has_value())
             continue;
 
-        auto entry = FileInfo(
-            *this,
-            Gx::StringHelper::Trim(std::string(waveHeader.Name, sizeof(waveHeader.Name))),
-            waveHeader.ChunkSize + 44, // wav header
-            i,
-            offset.value()
-        );
-
+        auto entry = FileInfo(*this, Gx::StringHelper::Trim(waveHeader.Name), waveHeader.ChunkSize + 44, i, offset.value());
         m_entries[i] = entry;
+
         result.push_back(std::make_unique<FileInfo>(entry));
     }
 
-    if (m_fileStream.seek(m_header.BgStartOffset) == -1)
+    if (!m_fileStream.seek(m_header.BgStartOffset).has_value())
         return result;
 
     for (unsigned int i = 0; i < m_header.BgCount; i++)
@@ -127,18 +115,12 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
         if (!ReadStream(&oggHeader, sizeof(oggHeader)))
             continue;
 
-        if (m_fileStream.seek(m_fileStream.tell().value() + oggHeader.Size) == -1)
+        if (!m_fileStream.seek(m_fileStream.tell().value() + oggHeader.Size).has_value())
             continue;
 
-        auto entry = FileInfo(
-            *this,
-            Gx::StringHelper::Trim(std::string(oggHeader.Name, sizeof(oggHeader.Name))),
-            oggHeader.Size,
-            i + 1000,
-            offset.value()
-        );
-
+        auto entry = FileInfo(*this, Gx::StringHelper::Trim(oggHeader.Name), oggHeader.Size, i + 1000, offset.value());
         m_entries[i + 1000] = entry;
+
         result.push_back(std::make_unique<FileInfo>(entry));
     }
 
@@ -157,7 +139,7 @@ std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string& fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-std::int64_t OmcArchive::ReadFile(const unsigned int index, void* data, std::int64_t size) const
+std::optional<std::size_t> OmcArchive::ReadFile(const unsigned int index, void* data, std::size_t size) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
@@ -165,8 +147,8 @@ std::int64_t OmcArchive::ReadFile(const unsigned int index, void* data, std::int
 
     if (index < 1000)
     {
-        if (m_fileStream.seek(m_header.FxStartOffset) == -1)
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header");
+        if (!m_fileStream.seek(m_header.FxStartOffset).has_value())
+            return std::nullopt;
 
         // We can't seek straight to desired sample because we need to calculate these counters
         int accKeyByte = 0xFF;
@@ -229,21 +211,21 @@ std::int64_t OmcArchive::ReadFile(const unsigned int index, void* data, std::int
     }
     else
     {
-        if (m_fileStream.seek(static_cast<std::int64_t>(iterator->second.GetOffset())) == -1)
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to seek into the OGG data");
+        if (!m_fileStream.seek(static_cast<std::int64_t>(iterator->second.GetOffset())).has_value())
+            return std::nullopt;
 
         auto oggHeader = OmcOggHeader();
         if (!ReadStream(&oggHeader, sizeof(oggHeader)))
-            throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the OGG header");
+            return std::nullopt;
 
         if (size > oggHeader.Size)
             size = oggHeader.Size;
 
-        return m_fileStream.read(data, size).value_or(-1);
+        return m_fileStream.read(data, size);
     }
 }
 
-std::int64_t OmcArchive::ReadFile(const std::string& fileName, void* data, const std::int64_t size) const
+std::optional<std::size_t> OmcArchive::ReadFile(const std::string& fileName, void* data, const std::size_t size) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -254,7 +236,7 @@ std::int64_t OmcArchive::ReadFile(const std::string& fileName, void* data, const
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-std::int64_t OmcArchive::GetFileSize(const std::string& fileName) const
+std::optional<std::size_t> OmcArchive::GetFileSize(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -329,7 +311,7 @@ std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *ac
     const int blockSize = length / 17;
 
     memcpy(out, in, length);
-    for(int block = 0; block < 17; block++)
+    for (int block = 0; block < 17; block++)
     {
         const int inOffset = blockSize * block;
         const int outOffset = blockSize * WAVE_REARRANGE_TABLE[key];
@@ -338,7 +320,7 @@ std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *ac
         key++;
     }
 
-    for(int i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
     {
         std::uint8_t currentByte = out[i], temp = out[i];
         if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)

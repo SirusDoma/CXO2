@@ -176,21 +176,20 @@ namespace Gx
         return nullptr;
     }
 
-    std::unique_ptr<Gx::FileInfo> LocalFileSystem::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<FileInfo> LocalFileSystem::GetFileInfo(const std::string& fileName) const
     {
         const auto fullName = GetFullName(fileName);
-        const auto size = GetFileSize(fullName);
+        const auto size = GetFileSize(fullName).value_or(0);
 
         return std::make_unique<FileInfo>(FileInfo(*this, fullName, size));
     }
 
-    std::int64_t LocalFileSystem::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> LocalFileSystem::GetFileSize(const std::string& fileName) const
     {
-        std::int64_t size = -1;
         if (auto fileStream = sf::FileInputStream(); fileStream.open(GetFullName(fileName)))
-            size = fileStream.getSize().value_or(-1);
+            return fileStream.getSize();
 
-        return size;
+        return std::nullopt;
     }
 
     bool LocalFileSystem::Contains(const std::string& fileName) const
@@ -244,7 +243,7 @@ namespace Gx
         return "";
     }
 
-    std::int64_t LocalFileSystem::ReadFile(const std::string& fileName, void* data, std::int64_t size) const
+    std::optional<std::size_t> LocalFileSystem::ReadFile(const std::string& fileName, void* data, std::size_t size) const
     {
         sf::FileInputStream fs;
         if (!fs.open(GetFullName(fileName)))
@@ -254,18 +253,18 @@ namespace Gx
             size = fs.getSize().value_or(0);
 
         if (size <= 0)
-            return size;
+            return std::nullopt;
 
-        return fs.read(data, size).value_or(-1);
+        return fs.read(data, size);
     }
 
-    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, std::int64_t size)
+    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, const std::size_t size)
     {
         if (size <= 0)
             return;
 
         std::ofstream fs(fileName.c_str(), std::ios::out | std::ios::binary);
-        fs.write(reinterpret_cast<const char*>(data), size);
+        fs.write(static_cast<const char*>(data), size);
 
         fs.close();
     }
@@ -297,7 +296,7 @@ namespace Gx
                     continue;
 
                 if (StringHelper::IsGlobMatch(entry.path().filename().string(), pattern))
-                    files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName)));
+                    files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName).value_or(0)));
             }
         }
 

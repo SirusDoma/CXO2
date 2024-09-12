@@ -36,7 +36,7 @@ namespace Gx
         m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
-        m_blendMode(Gx::BlendMode::Auto)
+        m_blendMode(BlendMode::Auto)
     {
     }
 
@@ -44,7 +44,7 @@ namespace Gx
         m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
-        m_blendMode(Gx::BlendMode::Auto)
+        m_blendMode(BlendMode::Auto)
     {
         SetTexture(texture);
     }
@@ -53,7 +53,7 @@ namespace Gx
         m_vertices(),
         m_texture(nullptr),
         m_texcoords(),
-        m_blendMode(Gx::BlendMode::Auto)
+        m_blendMode(BlendMode::Auto)
     {
         SetTexture(texture);
         SetTexCoords(rectangle);
@@ -106,7 +106,7 @@ namespace Gx
         return m_blendMode;
     }
 
-    void Sprite::SetBlendMode(const Gx::BlendMode blendMode)
+    void Sprite::SetBlendMode(const BlendMode blendMode)
     {
         m_blendMode = blendMode;
     }

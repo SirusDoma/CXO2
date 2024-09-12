@@ -177,7 +177,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Control::AddChild(Gx::Node* node)
+    void Control::AddChild(Node* node)
     {
         if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             AddChild(control);
@@ -195,7 +195,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Control::RemoveChild(Gx::Node* node)
+    void Control::RemoveChild(Node* node)
     {
         if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             RemoveChild(control);

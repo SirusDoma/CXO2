@@ -7,15 +7,15 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = EqualizerMetadata();
-    if (!MetadataLoader::Parse(json, metadata, ctx))
+    if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
     auto attributes = json.at("attributes");
     if (auto transform = attributes.find("transform"); transform != attributes.end())
-        TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+        TransformLoader::ParseMetadata(transform.value(), metadata, context);
 
     if (auto count = attributes.find("count"); count != attributes.end())
         metadata.Count = count->get<int>();
@@ -33,7 +33,7 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json& json, c
             metadata.ItemSource = data.value();
     }
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const

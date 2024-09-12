@@ -6,15 +6,15 @@
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
-Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& context) const
 {
     if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
-        return ResourceLoader::LoadFromFile(fileName, ctx);
+        return ResourceLoader::LoadFromFile(fileName, context);
 
     auto metadata = SoundMetadata();
     metadata.Require["sound"] = fileName;
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const

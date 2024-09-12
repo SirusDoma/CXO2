@@ -11,7 +11,7 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json&
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
 
-    if (auto attributes = json.find("attributes"); attributes != json.end())
+    if (const auto attributes = json.find("attributes"); attributes != json.end())
     {
         if (const auto transform = attributes->find("transform"); transform != attributes->end())
             TransformLoader::ParseMetadata(transform.value(), metadata, ctx);

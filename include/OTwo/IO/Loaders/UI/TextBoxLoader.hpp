@@ -11,7 +11,7 @@ public :
     TextBoxLoader() = default;
 
     Gx::ResourcePtr<Gx::TextBox> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-    Gx::ResourcePtr<Gx::TextBox> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::TextBox> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
 
 #endif

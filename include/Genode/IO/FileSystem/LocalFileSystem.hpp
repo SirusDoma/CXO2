@@ -34,10 +34,10 @@ namespace Gx
 
         std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override { throw Gx::NotSupportedException(); }
 
-        std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const override;
-        void WriteFile(const std::string& fileName, void* data, std::int64_t size) override;
+        std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const override;
+        void WriteFile(const std::string& fileName, void* data, std::size_t size) override;
 
-        std::int64_t GetFileSize(const std::string& fileName) const override;
+        std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
 
         std::vector<std::unique_ptr<FileInfo>> Scan(const std::string& pattern, bool recursive) const override;
 

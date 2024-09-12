@@ -129,7 +129,7 @@ namespace Gx
                 else
                 {
                     // Render objects
-                    Render(*this, Gx::RenderStates(sf::RenderStates::Default, m_frameID++, delta));
+                    Render(*this, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
                 }
             }
             m_window->display();
