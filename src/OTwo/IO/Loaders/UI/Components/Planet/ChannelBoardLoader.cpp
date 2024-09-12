@@ -33,7 +33,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto channelBoard = std::make_unique<ChannelBoard>();
+    auto channelBoard = Create();
     if (metadata->Frames.size() > 0)
     {
         for (const auto& frame : metadata->Frames)

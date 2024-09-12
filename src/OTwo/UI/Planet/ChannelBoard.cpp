@@ -7,18 +7,23 @@
 
 #include <cmath>
 
-ChannelBoard::ChannelBoard() :
+ChannelBoard::ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+    m_mixer(mixer),
+    m_resources(resources),
+    m_channelButton(),
+    m_captureImage(),
     m_tab(ChannelBoard::Tab::Notice),
+    m_sequence(),
+    m_moveIn(this, {}, sf::Time::Zero),
+    m_moveOut(this, {}, sf::Time::Zero),
     m_transitioning(false),
     m_animationEnabled(true),
+    m_selectedChannel(),
     m_channelsPerPage(),
     m_channelPageIndex(),
     m_channelMaxPage(),
     m_noticePageIndex(),
-    m_noticeMaxPage(),
-    m_channelButton(),
-    m_duplicateImage(),
-    m_selectedChannel()
+    m_noticeMaxPage()
 {
 }
 
@@ -26,24 +31,14 @@ void ChannelBoard::Initialize()
 {
     Image::Initialize();
 
-    const auto parent = GetParent<::State>();
-    if (!parent)
-        return;
+    auto sfxNavigate     = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
+    auto sfxEnter        = &m_resources.AddFromFile<sf::Sound>("bgEffect/10");
+    const auto container = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
 
-    auto& mixer          = parent->Require<Gx::Mixer>();
-    auto sfxNavigate     = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_PAGE");
-    auto sfxEnter        = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_ENTER");
-    const auto container = parent->Create<Gx::UiContainer>();
-    container->SetName("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
-    AddChild(container);
-
-    const auto category  = parent->Instantiate<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_CATEGORY");
-    container->AddChild(category);
-
-    const auto channelTabButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_TAB");
+    const auto channelTabButton = FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_TAB");
     channelTabButton->SetEnabled(false);
     channelTabButton->SetClickCallback(
-        [=] (auto& sender, auto& ev)
+        [=] (auto&, auto& ev)
         {
             if (m_tab == Tab::ChannelList || m_transitioning || m_planetInfo.Hall == MusicHall::None)
             {
@@ -55,9 +50,9 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto noticeTabButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_NOTICE_TAB");
+    const auto noticeTabButton = FindChild<Gx::Button>("IDC_BUTTON_NOTICE_TAB");
     noticeTabButton->SetClickCallback(
-        [=] (auto& sender, auto& ev)
+        [=] (auto&, auto& ev)
         {
             if (m_tab == Tab::Notice || m_transitioning)
             {
@@ -69,20 +64,17 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto channelList = parent->Instantiate<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
-    container->AddChild(channelList);
-
-    const auto currentPageNumber = parent->Instantiate<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto maxPageNumber     = parent->Instantiate<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto channelList       = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
+    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto maxPageNumber     = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
     currentPageNumber->SetDigitCount(2);
     maxPageNumber->SetDigitCount(2);
 
-    const auto enterButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_ENTER");
-    container->AddChild(enterButton);
+    const auto enterButton = container->FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_ENTER");
     enterButton->SetClickCallback(
-        [&, sfxEnter] (auto& sender, auto& ev)
+        [this, sfxEnter] (auto&, auto&)
         {
-            mixer.Play(sfxEnter, "SFX");
+            m_mixer.Play(sfxEnter, "SFX");
             if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
                 m_callback(m_planetInfo.Hall, m_planetInfo.Channels[m_selectedChannel]);
         }
@@ -94,24 +86,24 @@ void ChannelBoard::Initialize()
         auto channelButton = dynamic_cast<ChannelButton*>(channelButtons[i]);
         channelButton->SetChannelNumber(i + 1);
         channelButton->SetClickCallback(
-            [&] (auto& sender, auto& ev)
+            [&] (auto&, auto&)
             {
                 m_selectedChannel = channelButton->GetChannelNumber() - 1;
             }
         );
         channelButton->SetDoubleClickCallback(
-            [=] (auto& sender, auto& ev)
+            [=] (auto&, auto&)
             {
                 enterButton->PerformClick();
             }
         );
     }
 
-    const auto leftButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_LEFT");
+    const auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_LEFT");
     leftButton->SetClickCallback(
-        [&, sfxNavigate] (auto& sender, auto& ev)
+        [this, sfxNavigate] (auto&, auto&)
         {
-            mixer.Play(sfxNavigate, "SFX");
+            m_mixer.Play(sfxNavigate, "SFX");
             if (m_tab == Tab::ChannelList)
             {
                 if (m_channelPageIndex > 1)
@@ -125,11 +117,11 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto rightButton = parent->Instantiate<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_RIGHT");
+    const auto rightButton = FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_RIGHT");
     rightButton->SetClickCallback(
-        [&, sfxNavigate] (auto& sender, auto& ev)
+        [this, sfxNavigate] (auto&, auto&)
         {
-            mixer.Play(sfxNavigate, "SFX");
+            m_mixer.Play(sfxNavigate, "SFX");
             if (m_tab == Tab::ChannelList)
             {
                 if (m_channelPageIndex < m_channelMaxPage)
@@ -143,7 +135,7 @@ void ChannelBoard::Initialize()
         }
     );
 
-    const auto notice = parent->Instantiate<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_NOTICE");
+    const auto notice = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NOTICE");
     m_noticePageIndex = 1;
     m_noticeMaxPage   = notice->GetFrameCount();
 
@@ -151,9 +143,9 @@ void ChannelBoard::Initialize()
         throw Gx::Exception("Failed to create render texture");
 
     m_renderTexture.setSmooth(true);
-    m_duplicateImage.SetOrigin(GetOrigin());
-    m_duplicateImage.SetPosition(GetPosition());
-    m_duplicateImage.SetVisible(false);
+    m_captureImage.SetOrigin(GetOrigin());
+    m_captureImage.SetPosition(GetPosition());
+    m_captureImage.SetVisible(false);
 
     AddChild(notice, channelTabButton, noticeTabButton, currentPageNumber, maxPageNumber, leftButton, rightButton);
     SwitchTab(Tab::Notice);
@@ -209,20 +201,20 @@ void ChannelBoard::CaptureCurrentState()
     }
     m_renderTexture.display();
 
-    m_duplicateImage.SetTexture(m_renderTexture.getTexture());
-    m_duplicateImage.SetVisible(true);
+    m_captureImage.SetTexture(m_renderTexture.getTexture());
+    m_captureImage.SetVisible(true);
 }
 
 void ChannelBoard::SwitchTab(const ChannelBoard::Tab tab)
 {
     m_tab = tab;
 
-    const auto notice            = FindChild<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_NOTICE");
-    const auto channelTabButton  = FindChild<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_CHANNEL_TAB");
-    const auto noticeTabButton   = FindChild<Gx::Button>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_BUTTON_NOTICE_TAB");
-    const auto container         = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
-    const auto currentPageNumber = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto maxPageNumber     = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto notice            = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NOTICE");
+    const auto channelTabButton  = FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_TAB");
+    const auto noticeTabButton   = FindChild<Gx::Button>("IDC_BUTTON_NOTICE_TAB");
+    const auto container         = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
+    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto maxPageNumber     = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
 
     if (m_tab == Tab::ChannelList)
     {
@@ -271,11 +263,10 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     if (m_transitioning || m_planetInfo.Hall == hall)
         return;
 
-    const auto parent = GetParent<::State>();
-    const auto sfxPopup    = parent->Instantiate<sf::Sound>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_SOUND_CHANNEL_OPEN");
-    const auto container   = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
-    const auto category    = container->FindChild<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_CATEGORY");
-    const auto channelList = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
+    const auto sfxPopup    = &m_resources.AddFromFile<sf::Sound>("Planet/openChannel");
+    const auto container   = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
+    const auto category    = container->FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelList = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
 
     if (m_animationEnabled)
         CaptureCurrentState();
@@ -298,23 +289,28 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     if (m_animationEnabled)
     {
         m_transitioning = true;
-        auto position = GetPosition();
-        SetPosition(800 + GetLocalBounds().size.x, GetPosition().y);
+        const auto position = GetPosition();
+        SetPosition(800 + GetLocalBounds().size.x, position.y);
+        Stop(&m_sequence);
 
-        const auto sequence = parent->Create<Gx::Sequence>([&, callback]
+        m_moveIn  = Gx::Move(this, position - sf::Vector2f(30, 0), sf::milliseconds(200));
+        m_moveOut = Gx::Move(this, position, sf::milliseconds(200));
+
+        m_sequence = Gx::Sequence([&, callback]
         {
             m_transitioning = false;
-            m_duplicateImage.SetVisible(false);
+            m_captureImage.SetVisible(false);
             if (callback)
                 callback();
         },
-        Gx::Sequence::ListOf({
+        Gx::Sequence::ListOf(
+        {
             //parent->Create<Gx::Action>([&, sfxPopup] { mixer.Play(sfxPopup, "SFX"); }),
-            parent->Create<Gx::Move>(this, position - sf::Vector2f(30, 0), sf::milliseconds(200)),
-            parent->Create<Gx::Move>(this, position, sf::milliseconds(200))
+            &m_moveIn,
+            &m_moveOut
         }));
 
-        Run(sequence);
+        Run(&m_sequence);
     }
     else
     {
@@ -326,13 +322,13 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
 
 void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
 {
-    const auto container   = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
-    const auto channelList = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
+    const auto container   = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
+    const auto channelList = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
 
     m_planetInfo = planet;
     m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildren().size()));
 
-    const auto maxPageNumber = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto maxPageNumber = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
     maxPageNumber->SetValue(m_channelMaxPage);
 
     m_selectedChannel = 0;
@@ -347,9 +343,9 @@ void ChannelBoard::ShowChannelList(unsigned int page)
     if (page > m_channelMaxPage)
         page = m_channelMaxPage;
 
-    const auto currentPageNumber = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto container         = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
-    const auto channelList       = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
+    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto container         = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
+    const auto channelList       = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
 
     m_channelPageIndex = page;
     currentPageNumber->SetValue(m_channelPageIndex);
@@ -397,8 +393,8 @@ void ChannelBoard::ShowNotice(unsigned int page)
     if (page > m_noticeMaxPage)
         page = m_noticeMaxPage;
 
-    auto currentPageNumber = FindChild<Gx::Number>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    auto notice            = FindChild<Gx::Image>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_IMAGE_CHANNEL_NOTICE");
+    auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    auto notice            = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NOTICE");
 
     m_noticePageIndex = page;
     currentPageNumber->SetValue(m_noticePageIndex);
@@ -414,7 +410,7 @@ void ChannelBoard::Update(const double delta)
 Gx::RenderStates ChannelBoard::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     if (m_animationEnabled)
-        surface.Render(m_duplicateImage, states);
+        surface.Render(m_captureImage, states);
 
     return Image::Render(surface, states);
 }

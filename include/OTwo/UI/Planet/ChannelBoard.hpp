@@ -1,21 +1,23 @@
 #ifndef O2JAM_PLANET_CHANNELBOARD_HPP
 #define O2JAM_PLANET_CHANNELBOARD_HPP
 
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Audio/SoundBuffer.hpp>
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/UI/Planet/ChannelButton.hpp>
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/SceneGraph.hpp>
+#include <Genode/Fx/Move.hpp>
+#include <Genode/Tasks/Sequence.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Number.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/List.hpp>
 
-#include <OTwo/Models/Planet.hpp>
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 #include <functional>
-#include "ChannelButton.hpp"
 
 class ChannelBoard : public Gx::Image, public Gx::TaskContainer
 {
@@ -26,7 +28,7 @@ public:
         ChannelList
     };
 
-    ChannelBoard();
+    ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources);
 
     void Initialize() override;
     sf::FloatRect GetLocalBounds() const override;
@@ -57,13 +59,19 @@ private:
 
     void Invalidate() override;
 
+    Gx::Mixer& m_mixer;
+    Gx::ResourceManager& m_resources;
+
     ChannelButton* m_channelButton;
-    Gx::Image m_duplicateImage;
+    Gx::Image m_captureImage;
     sf::RenderTexture m_renderTexture;
 
     PlanetInfo m_planetInfo;
     ChannelBoard::Tab m_tab;
     std::function<void(MusicHall, ServerChannel)> m_callback;
+
+    Gx::Sequence m_sequence;
+    Gx::Move m_moveIn, m_moveOut;
 
     bool m_transitioning, m_animationEnabled;
     int m_selectedChannel;
