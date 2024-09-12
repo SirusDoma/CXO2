@@ -1,7 +1,7 @@
 #include <OTwo/Core/Note.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-Note::Note(const Chart::NoteEvent &ev) :
+Note::Note(const Chart::NoteEvent& ev) :
     Note(ev.Position, ev.Channel)
 {
 }
@@ -62,7 +62,7 @@ const Gx::Sprite* Note::GetPrefab(const NoteShape shape) const
     return nullptr;
 }
 
-void Note::SetPrefabs(const PrefabMap &prefabs)
+void Note::SetPrefabs(const PrefabMap& prefabs)
 {
     m_prefabs = prefabs;
 }
@@ -94,7 +94,7 @@ void Note::SetVisible(const bool visible)
     }
 }
 
-void Note::Render(const ChartRenderer &renderer, const double delta)
+void Note::Render(const ChartRenderer& renderer, const double delta)
 {
     if (!m_vertices[0])
         return;
@@ -128,7 +128,7 @@ void Note::Render(const ChartRenderer &renderer, const double delta)
     UpdateTexCoords(m_vertices, sprite->GetTexCoords());
 }
 
-void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &position, const sf::FloatRect &bounds)
+void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f& position, const sf::FloatRect& bounds)
 {
     vertices[0]->position = sf::Vector2f(position.x, position.y);
     vertices[1]->position = sf::Vector2f(position.x + bounds.size.x, position.y);
@@ -138,7 +138,7 @@ void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f &posi
     vertices[5]->position = sf::Vector2f(position.x, position.y + bounds.size.y);
 }
 
-void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texcoords)
+void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect& texcoords)
 {
     const float left     = static_cast<float>(texcoords.position.x);
     const float right    = left + static_cast<float>(texcoords.size.x);
@@ -153,7 +153,7 @@ void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect &texco
     vertices[5]->texCoords = sf::Vector2f(left, bottom);
 }
 
-Gx::RenderStates Note::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates Note::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     for (const auto v : m_vertices)
     {

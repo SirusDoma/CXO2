@@ -1,7 +1,7 @@
 #include <Genode/Utilities/StringHelper.hpp>
 
 template<typename R>
-R* State::Instantiate(const std::string &source, const ResourceScope scope)
+R* State::Instantiate(const std::string& source, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R> ||
@@ -60,7 +60,7 @@ R* State::Instantiate(const R& prefab, const ResourceScope scope)
 }
 
 template<typename R>
-R *State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
+R* State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
 {
     static_assert(
         std::is_base_of_v<Gx::Node, R>,
@@ -74,7 +74,7 @@ R *State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
 }
 
 template<typename R>
-R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, const ResourceScope scope)
+R* State::Import(const std::string& id, Gx::ResourcePtr<R> resource, const ResourceScope scope)
 {
     if (!resource)
         return nullptr;
@@ -91,7 +91,7 @@ R *State::Import(const std::string &id, Gx::ResourcePtr<R> resource, const Resou
 }
 
 template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int>>
-R *State::Create(Args&&... args)
+R* State::Create(Args&&... args)
 {
     auto resources = m_tempResources.get();
     if (!resources)
@@ -106,7 +106,7 @@ R *State::Create(Args&&... args)
 }
 
 template<typename R>
-R *State::FindResource(const std::string &id, const ResourceScope scope)
+R* State::FindResource(const std::string& id, const ResourceScope scope)
 {
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)

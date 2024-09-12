@@ -1,7 +1,7 @@
 #include <OTwo/Core/LongNote.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-LongNote::LongNote(const Chart::NoteEvent &ev) :
+LongNote::LongNote(const Chart::NoteEvent& ev) :
     LongNote(ev.Position, ev.Length, ev.Channel)
 {
 }
@@ -96,7 +96,7 @@ void LongNote::SetEdgePrefabs(const PrefabMap& prefabs)
     m_edgePrefabs = prefabs;
 }
 
-void LongNote::Render(const ChartRenderer &renderer, const double delta)
+void LongNote::Render(const ChartRenderer& renderer, const double delta)
 {
     const double distance = GetRenderPosition() - renderer.GetRenderPosition();
     if (distance > 5.f || GetRenderPosition() + GetLength() - renderer.GetRenderPosition() < -0.5f)

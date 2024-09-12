@@ -10,8 +10,8 @@ class ShapeLoader : public ResourceLoader<Gx::Shape>
 public :
     ShapeLoader() = default;
 
-    Gx::ResourcePtr<Gx::Shape> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
-    Gx::ResourcePtr<Gx::Shape> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<Gx::Shape> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::Shape> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
 
 #endif

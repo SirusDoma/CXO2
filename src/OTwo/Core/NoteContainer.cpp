@@ -20,7 +20,7 @@ NoteContainer::NoteContainer() :
 {
 }
 
-void NoteContainer::Initialize(const ChartRenderer &renderer, const Chart& chart, const Difficulty difficulty)
+void NoteContainer::Initialize(const ChartRenderer& renderer, const Chart& chart, const Difficulty difficulty)
 {
     m_renderer = &renderer;
     m_chart = &chart;
@@ -38,7 +38,7 @@ void NoteContainer::AddNote(Note& note)
         m_lastMeasure = position;
 }
 
-void NoteContainer::AddMeasure(Measure &measure)
+void NoteContainer::AddMeasure(Measure& measure)
 {
     m_measures.push_back(&measure);
 }
@@ -59,7 +59,7 @@ sf::FloatRect NoteContainer::GetViewport() const
     return m_viewport;
 }
 
-void NoteContainer::SetViewport(const sf::FloatRect &viewport)
+void NoteContainer::SetViewport(const sf::FloatRect& viewport)
 {
     m_viewport = viewport;
 }
@@ -79,7 +79,7 @@ sf::VertexArray& NoteContainer::GetGuideLineVertices()
     return m_guideLineVertices;
 }
 
-const sf::Texture * NoteContainer::GetTexture(NoteShape shape)
+const sf::Texture* NoteContainer::GetTexture(NoteShape shape)
 {
     if (const auto it = m_textures.find(shape); it == m_textures.end())
         m_textures[shape] = nullptr;
@@ -87,12 +87,12 @@ const sf::Texture * NoteContainer::GetTexture(NoteShape shape)
     return m_textures[shape];
 }
 
-void NoteContainer::SetTexture(const NoteShape shape, const sf::Texture &texture)
+void NoteContainer::SetTexture(const NoteShape shape, const sf::Texture& texture)
 {
     m_textures[shape] = &texture;
 }
 
-void NoteContainer::RegisterPrefab(Gx::Updatable &prefab)
+void NoteContainer::RegisterPrefab(Gx::Updatable& prefab)
 {
     m_prefabs.insert(&prefab);
 }
@@ -107,7 +107,7 @@ unsigned int NoteContainer::GetLastMeasure() const
     return m_lastMeasure;
 }
 
-void NoteContainer::Render(const Chart::NoteEvent &ev, const double delta) const
+void NoteContainer::Render(const Chart::NoteEvent& ev, const double delta) const
 {
     RenderMeasures(delta);
 
@@ -158,7 +158,7 @@ void NoteContainer::Update(const double delta)
 }
 
 
-Gx::RenderStates NoteContainer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates NoteContainer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     RenderMeasures(states.Delta);
     for (int i = m_tapCounter; i < m_notes.size(); i++)

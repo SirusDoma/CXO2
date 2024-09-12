@@ -17,7 +17,7 @@ public:
     void SetChart(Gx::ResourcePtr<Chart> chart);
 
     GameConfig* GetConfig() const;
-    void SetConfig(GameConfig &config);
+    void SetConfig(GameConfig& config);
 
     Difficulty GetDifficulty() const;
     void SetDifficulty(Difficulty difficulty);

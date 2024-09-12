@@ -24,7 +24,7 @@ namespace Gx
         ~Task() override = default;
 
         TaskState GetState() const;
-        virtual const sf::Time &GetElapsed() const;
+        virtual const sf::Time& GetElapsed() const;
 
         void OnStart(std::function<void()> callback);
         void OnStopped(std::function<void()> callback);
@@ -39,7 +39,7 @@ namespace Gx
     protected:
         Task();
 
-        void SetState(const TaskState &state);
+        void SetState(const TaskState& state);
 
     private:
         TaskState m_state;

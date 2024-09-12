@@ -61,7 +61,7 @@ namespace Gx
         sf::FloatRect GetGlobalBounds() const;
 
     protected:
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
     private:
         void UpdatePositions();

@@ -5,7 +5,7 @@
 
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
 
-Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     UiContainerMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -20,7 +20,7 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json 
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const UiContainerMetadata*>(&meta);
     if (metadata == nullptr)

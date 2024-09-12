@@ -67,7 +67,7 @@ namespace Gx
     {
     }
 
-    void Shape::SetTexture(const sf::Texture &texture, const bool resetRect)
+    void Shape::SetTexture(const sf::Texture& texture, const bool resetRect)
     {
         // Recompute the texture area if requested, or if there was no texture & rect before
         if (resetRect || (!m_texture && (m_textureRect == sf::IntRect())))
@@ -206,7 +206,7 @@ namespace Gx
         UpdateOutline();
     }
 
-    RenderStates Shape::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Shape::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

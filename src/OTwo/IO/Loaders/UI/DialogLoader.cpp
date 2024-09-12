@@ -6,7 +6,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = DialogMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -30,7 +30,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json &json, con
             if (button == buttons->end())
                 continue;
 
-            ButtonMetadata *target = nullptr;
+            ButtonMetadata* target = nullptr;
             std::string name;
             if (type == "accept")
             {
@@ -51,7 +51,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json &json, con
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
     if (!metadata)

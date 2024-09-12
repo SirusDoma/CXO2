@@ -11,34 +11,34 @@ void AvatarInfo::Initialize()
     Invalidate();
 }
 
-Avatar *AvatarInfo::GetAvatar() const
+Avatar* AvatarInfo::GetAvatar() const
 {
     return GetParent<Avatar>();
 }
 
-Gx::Gauge *AvatarInfo::GetLifeBar() const
+Gx::Gauge* AvatarInfo::GetLifeBar() const
 {
     return FindChild<Gx::Gauge>("IDC_GAUGE_AVATAR_INFO_LIFE");
 }
 
 
-RoomMember *AvatarInfo::GetMember() const
+RoomMember* AvatarInfo::GetMember() const
 {
     return m_member;
 }
 
-const sf::Color &AvatarInfo::GetTeamColor(RoomTeam team)
+const sf::Color& AvatarInfo::GetTeamColor(RoomTeam team)
 {
     return m_teamColors[team];
 }
 
-void AvatarInfo::SetMember(RoomMember &member)
+void AvatarInfo::SetMember(RoomMember& member)
 {
     m_member = &member;
     Invalidate();
 }
 
-void AvatarInfo::RegisterTeamColor(RoomTeam team, const sf::Color &color)
+void AvatarInfo::RegisterTeamColor(RoomTeam team, const sf::Color& color)
 {
     m_teamColors[team] = color;
 }

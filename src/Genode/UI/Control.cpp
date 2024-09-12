@@ -71,7 +71,7 @@ namespace Gx
         return m_state;
     }
 
-    void Control::SetControlState(const Control::State &state)
+    void Control::SetControlState(const Control::State& state)
     {
         if (m_state != state)
         {
@@ -166,7 +166,7 @@ namespace Gx
         return m_onScrollWheel;
     }
 
-    void Control::AddChild(Control *node)
+    void Control::AddChild(Control* node)
     {
         if (!node)
             return;
@@ -177,7 +177,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Control::AddChild(Gx::Node *node)
+    void Control::AddChild(Gx::Node* node)
     {
         if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             AddChild(control);
@@ -185,7 +185,7 @@ namespace Gx
             Node::AddChild(node);
     }
 
-    void Control::RemoveChild(Control *node)
+    void Control::RemoveChild(Control* node)
     {
         if (!node)
             return;
@@ -195,7 +195,7 @@ namespace Gx
         Invalidate();
     }
 
-    void Control::RemoveChild(Gx::Node *node)
+    void Control::RemoveChild(Gx::Node* node)
     {
         if (const auto control = dynamic_cast<Gx::Control*>(node); control)
             RemoveChild(control);
@@ -203,7 +203,7 @@ namespace Gx
             Node::RemoveChild(node);
     }
 
-    RenderStates Control::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Control::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

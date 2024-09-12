@@ -25,7 +25,7 @@ public:
     MusicSelectionContext();
 
     ChartMetadata GetMetadata() const;
-    void SetMetadata(const ChartMetadata &metadata);
+    void SetMetadata(const ChartMetadata& metadata);
 
     LevelCategory GetRandomLevel() const;
     void SetRandomLevel(const LevelCategory random);

@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     AvatarInfoMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -36,7 +36,7 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json &json,
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const AvatarInfoMetadata*>(&meta);
     if (metadata == nullptr)

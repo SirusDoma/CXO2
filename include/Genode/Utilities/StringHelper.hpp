@@ -13,7 +13,7 @@ namespace Gx
     class StringHelper
     {
     public:
-        static sf::String ToPascalCase(const sf::String &input)
+        static sf::String ToPascalCase(const sf::String& input)
         {
             sf::String result = "";
             bool transform = true;
@@ -34,7 +34,7 @@ namespace Gx
             return result;
         }
 
-        static sf::String TrimStart(const sf::String &input)
+        static sf::String TrimStart(const sf::String& input)
         {
             sf::String result = input;
             for (size_t i = 0; i < result.getSize(); i++)
@@ -49,7 +49,7 @@ namespace Gx
             return result;
         }
 
-        static sf::String TrimEnd(const sf::String &input)
+        static sf::String TrimEnd(const sf::String& input)
         {
             sf::String result = input;
             for (size_t i = result.getSize() - 1; i > 0 && i < result.getSize(); i--)
@@ -64,12 +64,12 @@ namespace Gx
             return result;
         }
 
-        static sf::String Trim(const sf::String &input)
+        static sf::String Trim(const sf::String& input)
         {
             return TrimEnd(TrimStart(input));
         }
 
-        static bool IsGlobMatch(const std::string &input, const sf::String &pattern)
+        static bool IsGlobMatch(const std::string& input, const sf::String& pattern)
         {
             std::string regexPattern;
             for (char c : pattern)

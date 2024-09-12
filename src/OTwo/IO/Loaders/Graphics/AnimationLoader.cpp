@@ -4,7 +4,7 @@
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/Metadata/Graphics/AnimationMetadata.hpp>
 
-Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     AnimationMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -71,7 +71,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json &jso
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
     if (!metadata)

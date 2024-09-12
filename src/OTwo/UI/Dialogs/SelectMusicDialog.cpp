@@ -61,7 +61,7 @@ void SelectMusicDialog::Initialize()
     auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
     if (leftButton)
     {
-        leftButton->SetClickCallback([this] (auto &sender, auto &ev)
+        leftButton->SetClickCallback([this] (auto& sender, auto& ev)
         {
             if (m_random != static_cast<LevelCategory>(0) || m_page == 0)
                 return;
@@ -75,7 +75,7 @@ void SelectMusicDialog::Initialize()
     auto rightButton = FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
     if (rightButton)
     {
-        rightButton->SetClickCallback([this] (auto &sender, auto &ev)
+        rightButton->SetClickCallback([this] (auto& sender, auto& ev)
         {
             const auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
             if (!musicSelector)
@@ -107,7 +107,7 @@ void SelectMusicDialog::Initialize()
             if (auto focusHighlighter = button->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
                 focusHighlighter->SetVisible(false);
 
-            button->SetFocusChangedCallback([] (auto &sender, auto &ev)
+            button->SetFocusChangedCallback([] (auto& sender, auto& ev)
             {
                 if (auto focusHighlighter = sender.template FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
                     focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
@@ -138,7 +138,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        list->SetScrollWheelCallback([=] (auto &sender, auto &ev)
+        list->SetScrollWheelCallback([=] (auto& sender, auto& ev)
         {
             if (leftButton && ev.Delta > 0)
                 leftButton->PerformClick();
@@ -151,7 +151,7 @@ void SelectMusicDialog::Initialize()
     {
         if (auto newButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_NEW"); newButton)
         {
-            newButton->SetClickCallback([this] (auto &sender, auto &ev)
+            newButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
                 Sort(MusicSortMode::ID, m_sort != MusicSortMode::ID || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
             });
@@ -159,7 +159,7 @@ void SelectMusicDialog::Initialize()
 
         if (auto titleButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TITLE"); titleButton)
         {
-            titleButton->SetClickCallback([this] (auto &sender, auto &ev)
+            titleButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
                 Sort(MusicSortMode::Title, m_sort != MusicSortMode::Title || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
             });
@@ -167,7 +167,7 @@ void SelectMusicDialog::Initialize()
 
         if (auto levelButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_DIFF"); levelButton)
         {
-            levelButton->SetClickCallback([this] (auto &sender, auto &ev)
+            levelButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
                 Sort(MusicSortMode::Level, m_sort != MusicSortMode::Level || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
             });
@@ -175,7 +175,7 @@ void SelectMusicDialog::Initialize()
 
         if (auto durationButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TIME"); durationButton)
         {
-            durationButton->SetClickCallback([this] (auto &sender, auto &ev)
+            durationButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
                 Sort(MusicSortMode::Duration, m_sort != MusicSortMode::Duration || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
             });
@@ -438,7 +438,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
         if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
         {
             const auto children = list->GetChildren();
-            Gx::RadioButton *previous = nullptr;
+            Gx::RadioButton* previous = nullptr;
             for (int i = 0; i < children.size(); i++)
             {
                 const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
@@ -545,7 +545,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
     }
 }
 
-void SelectMusicDialog::OnShown(Gx::Scene &scene)
+void SelectMusicDialog::OnShown(Gx::Scene& scene)
 {
     Dialog::OnShown(scene);
 
@@ -816,7 +816,7 @@ void SelectMusicDialog::Invalidate()
                     if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                         activeHighlighter->SetVisible(false);
 
-                    Gx::Label *infoLabel = nullptr;
+                    Gx::Label* infoLabel = nullptr;
                     if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildren().size())
                         infoLabel = dynamic_cast<Gx::Label*>(infoList->GetChildren()[r - 1]);
 
@@ -830,7 +830,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 1 - 5");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
@@ -851,7 +851,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 5 - 9");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -875,7 +875,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 9 - 13");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -899,7 +899,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 13 higher");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata &m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
@@ -981,7 +981,7 @@ void SelectMusicDialog::Invalidate()
         return;
     }
 
-    Gx::Label *lastTitle = nullptr;
+    Gx::Label* lastTitle = nullptr;
     for (int i = static_cast<int>(elements.size()) - 1; i >= 0; i--)
     {
         auto button = dynamic_cast<Gx::RadioButton*>(elements[i]);

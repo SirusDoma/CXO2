@@ -15,7 +15,7 @@ namespace Gx
 
         Gauge();
         explicit Gauge(const sf::Texture& texture);
-        Gauge(const sf::Texture& texture, const sf::IntRect &texCoords);
+        Gauge(const sf::Texture& texture, const sf::IntRect& texCoords);
 
         sf::FloatRect GetLocalBounds() const override;
 
@@ -28,8 +28,8 @@ namespace Gx
         Animation::AnimationState GetAnimationState() const;
 
         template<typename... Args>
-        void AddAnimationFrame(const Animation::Frame &first, Args... args);
-        void AddAnimationFrame(const Animation::Frame &frame);
+        void AddAnimationFrame(const Animation::Frame& first, Args... args);
+        void AddAnimationFrame(const Animation::Frame& frame);
         unsigned int GetAnimationFrameCount() const;
 
         const sf::Time& GetAnimationDuration() const;
@@ -39,13 +39,13 @@ namespace Gx
         void SetTexture(const sf::Texture& texture);
 
         const sf::IntRect& GetTexCoords() const;
-        void SetTexCoords(const sf::IntRect &texCoords);
+        void SetTexCoords(const sf::IntRect& texCoords);
 
         const sf::Color& GetColor() const override;
-        void SetColor(const sf::Color &color) override;
+        void SetColor(const sf::Color& color) override;
 
         Orientation GetOrientation() const;
-        void SetOrientation(const Orientation &orientation);
+        void SetOrientation(const Orientation& orientation);
 
         float GetMaximumValue() const;
         void SetMaximumValue(float max);
@@ -55,7 +55,7 @@ namespace Gx
 
     protected:
         void Update(const double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void Invalidate() override;
 

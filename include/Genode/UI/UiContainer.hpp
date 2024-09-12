@@ -28,7 +28,7 @@ namespace Gx
         virtual void SetBatchingEnabled(bool batchingEnabled);
 
     protected:
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(const sf::Event& ev) override;
 
@@ -39,7 +39,7 @@ namespace Gx
 
     private:
         sf::FloatRect m_localBounds;
-        RadioButton *m_activeRadio;
+        RadioButton* m_activeRadio;
         bool m_radioHandled, m_useBatching{false};
         std::function<void(RadioButton*)> m_radioCallback;
     };

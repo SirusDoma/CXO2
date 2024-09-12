@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-bool OmcArchive::LoadFromFile(const std::string &fileName)
+bool OmcArchive::LoadFromFile(const std::string& fileName)
 {
     if (!Archive::LoadFromFile(fileName))
         return false;
@@ -42,14 +42,14 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
     const auto stream = new sf::MemoryInputStream(data, header.GetSize());
     return {
         stream,
-        [data] (const sf::InputStream *ms) {
+        [data] (const sf::InputStream* ms) {
             delete[] data;
             delete ms;
         }
     };
 }
 
-Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) const
+Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) const
 {
     for (auto const& [index, header] : m_entries)
     {
@@ -66,7 +66,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
         const auto stream = new sf::MemoryInputStream(data, header.GetSize());
         return {
             stream,
-            [data] (const sf::InputStream *ms) {
+            [data] (const sf::InputStream* ms) {
                 delete[] data;
                 delete ms;
             }
@@ -76,7 +76,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string &fileName) c
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-bool OmcArchive::Contains(const std::string &name) const
+bool OmcArchive::Contains(const std::string& name) const
 {
     return std::any_of(m_entries.begin(), m_entries.end(), [name] (auto pair) { return pair.second.GetName() == name; });
 }
@@ -146,7 +146,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
 }
 
 
-std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string &fileName) const
+std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -157,7 +157,7 @@ std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string &fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 size) const
+Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void* data, Gx::Int64 size) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
@@ -243,7 +243,7 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void *data, Gx::Int64 s
     }
 }
 
-Gx::Int64 OmcArchive::ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const
+Gx::Int64 OmcArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -254,7 +254,7 @@ Gx::Int64 OmcArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OmcArchive::GetFileSize(const std::string &fileName) const
+Gx::Int64 OmcArchive::GetFileSize(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -276,7 +276,7 @@ std::string OmcArchive::GetExtension(const std::string& name) const
     return "";
 }
 
-bool OmcArchive::ReadStream(void *data, Gx::Uint64 size) const
+bool OmcArchive::ReadStream(void* data, Gx::Uint64 size) const
 {
     const auto read = m_fileStream.read(data, static_cast<Gx::Int64>(size));
     return read == size;
@@ -324,7 +324,7 @@ static const Gx::Uint8 WAVE_REARRANGE_TABLE[] = {
 
 Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, int *accCounter)
 {
-    auto *out = new Gx::Uint8[length];
+    auto* out = new Gx::Uint8[length];
     int key = ((length % 17) << 4) + (length % 17);
     const int blockSize = length / 17;
 

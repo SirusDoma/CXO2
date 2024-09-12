@@ -126,7 +126,7 @@ void CreateRoomDialog::Initialize()
     m_initialized = true;
 }
 
-void CreateRoomDialog::OnShown(Gx::Scene &scene)
+void CreateRoomDialog::OnShown(Gx::Scene& scene)
 {
     Dialog::OnShown(scene);
 

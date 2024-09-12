@@ -6,7 +6,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     ImageMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -22,7 +22,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
     if (!metadata)
@@ -64,7 +64,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata 
     return image;
 }
 
-bool ImageLoader::ParseMetadata(const Gx::Json &attributes, ImageMetadata &metadata, const Gx::ResourceContext &context)
+bool ImageLoader::ParseMetadata(const Gx::Json& attributes, ImageMetadata& metadata, const Gx::ResourceContext& context)
 {
     if (attributes.empty())
         return false;

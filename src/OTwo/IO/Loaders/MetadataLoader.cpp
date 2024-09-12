@@ -2,7 +2,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     ResourceMetadata metadata;
     Parse(json, metadata, ctx);
@@ -10,12 +10,12 @@ Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromJson(const Gx::Json &j
     return std::make_unique<ResourceMetadata>(metadata);
 }
 
-Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const
 {
     return std::make_unique<ResourceMetadata>(metadata);
 }
 
-bool MetadataLoader::Parse(const Gx::Json &json, ResourceMetadata &metadata, const Gx::ResourceContext &ctx)
+bool MetadataLoader::Parse(const Gx::Json& json, ResourceMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (json.empty())
         return false;

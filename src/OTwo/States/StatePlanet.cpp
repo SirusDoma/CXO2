@@ -53,7 +53,7 @@ void StatePlanet::Initialize()
 
     for (auto [musicHall, radio] : planets)
     {
-        radio->SetFocusChangedCallback([&, hoverSfx] (auto &sender, auto &ev)
+        radio->SetFocusChangedCallback([&, hoverSfx] (auto& sender, auto& ev)
         {
             if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;

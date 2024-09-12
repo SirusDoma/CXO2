@@ -23,7 +23,7 @@ public:
     Gender GetGender() const;
     void SetGender(Gender gender);
 
-    void SetDefaultItem(const Item *item);
+    void SetDefaultItem(const Item* item);
 
     bool IsEquiped(const Item* item) const;
     void Equip(const Item* item, bool reset = true);
@@ -149,7 +149,7 @@ private:
      };
 
     void Update(double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     Gender     m_gender;
     Instrument m_instrument;

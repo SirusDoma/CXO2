@@ -40,12 +40,12 @@ namespace Gx
         m_enabled = enabled;
     }
 
-    void Cursor::Register(const Type type, const sf::Texture &texture, const sf::Vector2u hotspot)
+    void Cursor::Register(const Type type, const sf::Texture& texture, const sf::Vector2u hotspot)
     {
         Register(type, texture.copyToImage(), hotspot);
     }
 
-    void Cursor::Register(const Type type, const sf::Image &image, const sf::Vector2u hotspot)
+    void Cursor::Register(const Type type, const sf::Image& image, const sf::Vector2u hotspot)
     {
         const auto size  = image.getSize();
         const auto data  = const_cast<unsigned char*>(image.getPixelsPtr());

@@ -2,7 +2,7 @@
 #include <OTwo/States/State.hpp>
 
 template<typename R>
-void ObjectContainer::Add(const std::string &name, Gx::ResourcePtr<R> object, Gx::ResourceContext &ctx)
+void ObjectContainer::Add(const std::string& name, Gx::ResourcePtr<R> object, Gx::ResourceContext& ctx)
 {
     if (!m_container)
         return;
@@ -19,7 +19,7 @@ void ObjectContainer::Add(const std::string &name, Gx::ResourcePtr<R> object, Gx
         return;
     }
 
-    auto &resource = ctx.Store<R>(name, std::move(object));
+    auto& resource = ctx.Store<R>(name, std::move(object));
     if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
     {
         if (auto child = dynamic_cast<R*>(&resource); child)

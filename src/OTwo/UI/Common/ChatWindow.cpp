@@ -28,7 +28,7 @@ ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
 }
 
 
-ChatWindow::ChatWindow(const Gx::Font &font, const sf::FloatRect &localBounds, const unsigned int characterSize) :
+ChatWindow::ChatWindow(const Gx::Font& font, const sf::FloatRect& localBounds, const unsigned int characterSize) :
     m_font(&font),
     m_textColor(sf::Color::White),
     m_scroll(),
@@ -44,12 +44,12 @@ sf::FloatRect ChatWindow::GetLocalBounds() const
     return m_bounds;
 }
 
-void ChatWindow::SetLocalBounds(const sf::FloatRect &bounds)
+void ChatWindow::SetLocalBounds(const sf::FloatRect& bounds)
 {
     m_bounds = bounds;
 }
 
-const Gx::Font *ChatWindow::GetFont() const
+const Gx::Font* ChatWindow::GetFont() const
 {
     return m_font;
 }
@@ -59,7 +59,7 @@ sf::Color ChatWindow::GetTextColor() const
     return m_textColor;
 }
 
-void ChatWindow::SetFont(const Gx::Font &font)
+void ChatWindow::SetFont(const Gx::Font& font)
 {
     if (m_font != &font)
     {
@@ -96,7 +96,7 @@ void ChatWindow::SetScrollOffset(const unsigned int offset)
     }
 }
 
-void ChatWindow::SetTextColor(const sf::Color &textColor)
+void ChatWindow::SetTextColor(const sf::Color& textColor)
 {
     if (m_textColor != textColor)
     {
@@ -105,7 +105,7 @@ void ChatWindow::SetTextColor(const sf::Color &textColor)
     }
 }
 
-void ChatWindow::SetScrollBar(Gx::ScrollBar &scrollBar)
+void ChatWindow::SetScrollBar(Gx::ScrollBar& scrollBar)
 {
     if (m_scroll != &scrollBar)
     {
@@ -146,7 +146,7 @@ void ChatWindow::SetLineSpacing(const float lineSpacing)
     }
 }
 
-void ChatWindow::PushMessage(const Player &player, const sf::String &chat)
+void ChatWindow::PushMessage(const Player& player, const sf::String& chat)
 {
     const auto chatData = ChatMessage{ player, chat };
     // Do something if player is self
@@ -158,12 +158,12 @@ void ChatWindow::PushMessage(const Player &player, const sf::String &chat)
     Invalidate();
 }
 
-void ChatWindow::PushSystemMessage(const sf::String &chat)
+void ChatWindow::PushSystemMessage(const sf::String& chat)
 {
     PushMessage(Player{0}, chat);
 }
 
-Gx::RenderStates ChatWindow::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates ChatWindow::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     states = UiContainer::Render(surface, states);
     for (auto& label : m_labels)

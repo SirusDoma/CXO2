@@ -3,7 +3,7 @@
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
-Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     TransformMetadata metadata;
     MetadataLoader::Parse(json, metadata, ctx);
@@ -15,7 +15,7 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromJson(const Gx::Json &jso
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const TransformMetadata*>(&meta);
     if (!metadata)
@@ -29,7 +29,7 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceM
     return std::make_unique<sf::Transform>(transform);
 }
 
-bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata &metadata, const Gx::ResourceContext &ctx)
+bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (transform.empty())
         return false;

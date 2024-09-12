@@ -14,12 +14,12 @@ namespace Gx
     class LocalFileSystem : public FileSystemController
     {
     public:
-        static LocalFileSystem &Instance();
+        static LocalFileSystem& Instance();
 
         static std::string GetApplicationDirectoryPath();
 
         static std::string GetWorkingDirectory();
-        static void SetWorkingDirectory(const std::string &inputPath);
+        static void SetWorkingDirectory(const std::string& inputPath);
 
         static std::vector<std::string> GetAssetPaths();
         static void AddAssetPath(const std::string& path);
@@ -27,20 +27,20 @@ namespace Gx
         std::string GetFileName(const std::string& fullPath, bool withExtension = true) const;
         std::string GetFullName(const std::string& fileName, bool withExtension = true) const;
 
-        ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
+        ResourcePtr<sf::InputStream> Open(const std::string& fileName) const override;
 
-        bool Contains(const std::string &fileName) const override;
+        bool Contains(const std::string& fileName) const override;
 
-        std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName) const override;
+        std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName) const override;
 
         std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override { throw Gx::NotSupportedException(); }
 
-        Int64 ReadFile(const std::string &fileName, void *data, Int64 size) const override;
-        void WriteFile(const std::string &fileName, void *data, Int64 size) override;
+        Int64 ReadFile(const std::string& fileName, void* data, Int64 size) const override;
+        void WriteFile(const std::string& fileName, void* data, Int64 size) override;
 
-        Int64 GetFileSize(const std::string &fileName) const override;
+        Int64 GetFileSize(const std::string& fileName) const override;
 
-        std::vector<std::unique_ptr<FileInfo>> Scan(const std::string &pattern, bool recursive) const override;
+        std::vector<std::unique_ptr<FileInfo>> Scan(const std::string& pattern, bool recursive) const override;
 
     private:
         LocalFileSystem() = default;

@@ -52,8 +52,8 @@ namespace Gx
         if (!IsEnabled() || ev.code != sf::Keyboard::Key::Tab)
             return;
 
-        TextBox *first   = nullptr;
-        TextBox *current = nullptr;
+        TextBox* first   = nullptr;
+        TextBox* current = nullptr;
 
         for (const auto child : GetChildren())
         {
@@ -82,7 +82,7 @@ namespace Gx
         }
     }
 
-    RenderStates UiContainer::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates UiContainer::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

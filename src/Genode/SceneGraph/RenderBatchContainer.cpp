@@ -13,7 +13,7 @@ namespace Gx
         UpdatableContainer::Update(delta);
     }
 
-    RenderStates RenderBatchContainer::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates RenderBatchContainer::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

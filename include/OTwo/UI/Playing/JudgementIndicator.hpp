@@ -21,7 +21,7 @@ public:
 
 private:
     void Update(const double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     bool m_useFx;
     double m_elapsed;

@@ -69,12 +69,12 @@ namespace Gx
         virtual void OnClose();
 
     private:
-        void UpdateCursor(const sf::Event &ev) const;
+        void UpdateCursor(const sf::Event& ev) const;
         void SetupWindow() const;
         void SetupTarget() const;
         static sf::View GetLetterBoxView(sf::View view, sf::Vector2u size);
 
-        inline static Application *m_instance = nullptr;
+        inline static Application* m_instance = nullptr;
 
         mutable std::unique_ptr<sf::RenderWindow> m_window;
         mutable std::unique_ptr<sf::RenderTexture> m_target;

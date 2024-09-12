@@ -5,7 +5,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     ScrollBarMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -46,7 +46,7 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json &jso
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
     if (!metadata)

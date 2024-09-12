@@ -11,8 +11,8 @@ class DialogLoader : public ResourceLoader<Gx::Dialog>
 public :
     DialogLoader() = default;
 
-    Gx::ResourcePtr<Gx::Dialog> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
-    Gx::ResourcePtr<Gx::Dialog> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<Gx::Dialog> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::Dialog> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
 
 #endif

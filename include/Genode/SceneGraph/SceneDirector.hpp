@@ -20,37 +20,37 @@ namespace Gx
         using SceneFactory = std::function<ResourcePtr<Scene>(const ResourceContext&)>;
 
         SceneDirector(SceneDirector &&director) noexcept;
-        explicit SceneDirector(Application &app);
-        SceneDirector(Application &app, Scene &scene);
+        explicit SceneDirector(Application& app);
+        SceneDirector(Application& app, Scene& scene);
         ~SceneDirector() override;
 
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(const sf::Event& ev) override;
 
         virtual void ProcessEvents();
         bool Close();
 
-        Scene &GetPresentedScene() const;
+        Scene& GetPresentedScene() const;
 
         template<typename T>
         bool IsPresenting();
 
         template<typename T>
-        void Present(T &scene);
+        void Present(T& scene);
 
         template<typename T>
-        void Present(const ResourceContext &context = Gx::ResourceContext(typeid(T).name()));
+        void Present(const ResourceContext& context = Gx::ResourceContext(typeid(T).name()));
 
         void Unload();
 
         bool IsCacheEnabled() const;
         void SetCacheEnabled(bool cacheEnabled);
 
-        Application &GetApplication() const;
+        Application& GetApplication() const;
 
         template<typename T>
-        void Register(const SceneFactory &factory);
+        void Register(const SceneFactory& factory);
 
     private:
         using SceneCacheMap   = std::unordered_map<std::type_index, ResourcePtr<Scene>>;
@@ -59,7 +59,7 @@ namespace Gx
         void Stage();
         void Unstage();
 
-        Application       *m_application;
+        Application* m_application;
         SceneFactoryMap    m_factories;
         SceneCacheMap      m_caches;
         ResourcePtr<Scene> m_currentScene, m_nextScene;

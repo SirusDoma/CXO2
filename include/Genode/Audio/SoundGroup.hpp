@@ -13,11 +13,11 @@ namespace Gx
     class SoundGroup : public Updatable
     {
     public:
-        explicit SoundGroup(const std::string &name);
+        explicit SoundGroup(const std::string& name);
         ~SoundGroup() override;
 
-        const std::string &GetName() const;
-        void SetName(const std::string &name);
+        const std::string& GetName() const;
+        void SetName(const std::string& name);
 
         sf::SoundSource::Status GetStatus() const;
 
@@ -40,8 +40,8 @@ namespace Gx
         friend class Mixer;
 
 
-        sf::SoundSource* Play(sf::SoundSource *source);
-        bool Remove(sf::SoundSource *source);
+        sf::SoundSource* Play(sf::SoundSource* source);
+        bool Remove(sf::SoundSource* source);
 
         void Update(double delta) override;
 

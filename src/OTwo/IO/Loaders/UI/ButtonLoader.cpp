@@ -4,7 +4,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     auto metadata = ButtonMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -20,7 +20,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json &json, con
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const ButtonMetadata*>(&meta);
     if (!metadata)
@@ -63,7 +63,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadat
     return button;
 }
 
-bool ButtonLoader::ParseMetadata(const Gx::Json &attributes, ButtonMetadata &metadata, const Gx::ResourceContext &context)
+bool ButtonLoader::ParseMetadata(const Gx::Json& attributes, ButtonMetadata& metadata, const Gx::ResourceContext& context)
 {
     if (attributes.empty())
         return false;

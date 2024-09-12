@@ -3,7 +3,7 @@
 namespace Gx
 {
     template<typename T>
-    void SceneDirector::Register(const SceneFactory &factory)
+    void SceneDirector::Register(const SceneFactory& factory)
     {
         static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene");
 
@@ -11,7 +11,7 @@ namespace Gx
     }
 
     template<typename T>
-    void SceneDirector::Present(T &scene)
+    void SceneDirector::Present(T& scene)
     {
         static_assert(std::is_base_of_v<Scene, T>, "Parameter must be a Gx::Scene.");
 
@@ -22,7 +22,7 @@ namespace Gx
     }
 
     template<typename T>
-    void SceneDirector::Present(const ResourceContext &context)
+    void SceneDirector::Present(const ResourceContext& context)
     {
         static_assert(std::is_base_of_v<Gx::Scene, T>, "Parameter must be a Gx::Scene.");
 

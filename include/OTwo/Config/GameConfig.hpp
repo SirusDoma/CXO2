@@ -21,7 +21,7 @@ struct GameConfig
         Reset();
     }
 
-    void Apply(const GameConfig &src)
+    void Apply(const GameConfig& src)
     {
         UseFx           = src.UseFx;
         UseBGM          = src.UseBGM;

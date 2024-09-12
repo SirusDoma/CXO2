@@ -10,7 +10,7 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
+ChartRenderer::ChartRenderer(const ChannelSet& instantiables) :
     m_container(),
     m_rendering(false),
     m_endPosition(),
@@ -40,7 +40,7 @@ ChartRenderer::ChartRenderer(const ChannelSet &instantiables) :
 {
 }
 
-void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& completeCallback)
+void ChartRenderer::Initialize(const Chart& chart, const GameContext& context, const std::function<void()>& completeCallback)
 {
     if (!context.GetConfig())
         throw Gx::Exception("GameConfig cannot be null");
@@ -54,7 +54,7 @@ void ChartRenderer::Initialize(const Chart &chart, const GameContext &context, c
     }, completeCallback);
 }
 
-void ChartRenderer::Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback)
+void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& settings, const std::function<void()>& callback)
 {
     const auto parent = GetParent<State>();
     if (!parent)
@@ -151,7 +151,7 @@ bool ChartRenderer::IsStarted() const
     return m_rendering;
 }
 
-Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     if (!m_chart || !m_rendering)
     {
@@ -270,7 +270,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface &surface, Gx::RenderSta
     bool updated = false;
     for (unsigned int i = m_lastEventID; i < m_events.size(); i++)
     {
-        auto &ev = m_events[i];
+        auto& ev = m_events[i];
         const double latency = ev->Position - GetRenderPosition();
 
         if (!ev.IsRenderable(GetRenderPosition()))
@@ -387,7 +387,7 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
         m_inputCallback(channel, pressed);
 }
 
-const ChartRenderer::RenderSettings &ChartRenderer::GetRenderSettings() const
+const ChartRenderer::RenderSettings& ChartRenderer::GetRenderSettings() const
 {
     return m_settings;
 }
@@ -407,7 +407,7 @@ double ChartRenderer::GetCurrentTime() const
 
 double ChartRenderer::GetRenderPosition() const
 {
-    return ((m_currentTime - m_refTime) / TickSignature * m_bpm) + m_refPosition;
+    return ((m_currentTime - m_refTime) / TickSignature* m_bpm) + m_refPosition;
 }
 
 double ChartRenderer::GetCurrentBPM() const
@@ -440,7 +440,7 @@ int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const
     return absolute ? pixels : static_cast<int>(m_settings.Viewport) - pixels;
 }
 
-void ChartRenderer::PlaySample(const Chart::NoteEvent *ev, const std::string &group) const
+void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& group) const
 {
     if (!ev || !ev->Sample)
         return;

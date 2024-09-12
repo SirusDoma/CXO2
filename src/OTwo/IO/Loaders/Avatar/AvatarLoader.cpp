@@ -15,7 +15,7 @@ AvatarLoader::AvatarLoader(ItemFactory& items) :
 {
 }
 
-Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     AvatarMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -48,7 +48,7 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json &json, const G
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto avatar = std::make_unique<Avatar>();
     const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);

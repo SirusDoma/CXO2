@@ -19,7 +19,7 @@ namespace Gx
     }
 
     template<typename T>
-    T* Node::FindChild(const std::string &name) const
+    T* Node::FindChild(const std::string& name) const
     {
         auto child = GetChildByName(name);
         if (!child)

@@ -1,7 +1,7 @@
 namespace Gx
 {
 //    template<typename R>
-//    R *Mixer::Create(const std::string &source)
+//    R* Mixer::Create(const std::string& source)
 //    {
 //        static_assert(std::is_base_of<sf::SoundSource, R>::value, "Parameter must be a sf::SoundSource");
 //

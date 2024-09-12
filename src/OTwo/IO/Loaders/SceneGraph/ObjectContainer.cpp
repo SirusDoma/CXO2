@@ -16,7 +16,7 @@ ObjectContainer ObjectContainer::Decorate(Gx::Node* container)
     return ObjectContainer(container, false);
 }
 
-const std::string &ObjectContainer::GetName() const
+const std::string& ObjectContainer::GetName() const
 {
     return m_container->GetName();
 }

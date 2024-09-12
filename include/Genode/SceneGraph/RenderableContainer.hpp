@@ -14,7 +14,7 @@ namespace Gx
     protected:
         RenderableContainer() = default;
 
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
     };
 }
 

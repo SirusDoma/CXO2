@@ -1,6 +1,6 @@
 #include <OTwo/Contexts/GameContext.hpp>
 
-const Chart *GameContext::GetChart() const
+const Chart* GameContext::GetChart() const
 {
     return m_chart.get();
 }

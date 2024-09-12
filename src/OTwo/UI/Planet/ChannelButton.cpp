@@ -82,7 +82,7 @@ MusicHall ChannelButton::GetPlanet() const
     return m_hall;
 }
 
-void ChannelButton::AddStateFrame(const ChannelButton::Mode mode, const Gx::Control::State state, const sf::IntRect &frame)
+void ChannelButton::AddStateFrame(const ChannelButton::Mode mode, const Gx::Control::State state, const sf::IntRect& frame)
 {
     if (const auto it = m_states.find(mode); it == m_states.end())
         m_states[mode] = std::unordered_map<State, sf::IntRect>();
@@ -136,7 +136,7 @@ void ChannelButton::SetMusicHall(const MusicHall hall)
     }
 }
 
-Gx::RenderStates ChannelButton::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates ChannelButton::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     return CheckBox::Render(surface, states);
 }

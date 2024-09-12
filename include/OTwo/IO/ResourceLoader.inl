@@ -8,7 +8,7 @@
 #include <string>
 
 template<typename R>
-Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {
@@ -25,7 +25,7 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string &fileName, 
 }
 
 template<typename R>
-Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromMemory(void *data, std::size_t size, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {
@@ -38,7 +38,7 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromMemory(void *data, std::size_t siz
 }
 
 template<typename R>
-Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream &stream, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const
 {
     if (ctx.GetCacheMode() == Gx::CacheMode::Reuse)
     {

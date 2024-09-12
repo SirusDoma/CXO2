@@ -9,8 +9,8 @@ class ChannelBoardLoader : public ResourceLoader<ChannelBoard>
 public :
     ChannelBoardLoader() = default;
 
-    Gx::ResourcePtr<ChannelBoard> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
-    Gx::ResourcePtr<ChannelBoard> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<ChannelBoard> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<ChannelBoard> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
 
 #endif

@@ -17,8 +17,8 @@ public:
 
 private:
     void Update(double delta) override;
-    void OnCoverLoaded(const sf::Image *cover);
-    void OnChartLoaded(const Chart *chart);
+    void OnCoverLoaded(const sf::Image* cover);
+    void OnChartLoaded(const Chart* chart);
 
     sf::Texture m_texture;
     const SessionContext& m_session;

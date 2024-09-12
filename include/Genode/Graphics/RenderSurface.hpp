@@ -44,7 +44,7 @@ namespace Gx
 
         virtual const sf::View& GetDefaultView() const = 0;
         virtual const sf::View& GetView() const = 0;
-        virtual void SetView(const sf::View &view) = 0;
+        virtual void SetView(const sf::View& view) = 0;
     };
 }
 

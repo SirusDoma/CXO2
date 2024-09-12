@@ -48,21 +48,21 @@ public:
     bool LoadFromFile(const std::string& fileName) override;
 
     virtual Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
-    Gx::ResourcePtr<sf::InputStream> Open(const std::string &fileName) const override;
+    Gx::ResourcePtr<sf::InputStream> Open(const std::string& fileName) const override;
 
     bool Contains(const std::string& name) const override;
     std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
-    std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string &fileName) const override;
+    std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
 
-    Gx::Int64 ReadFile(unsigned int index, void *data, Gx::Int64 size) const;
-    Gx::Int64 ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const override;
-    void WriteFile(const std::string &fileName, void *data, Gx::Int64 size) override { throw Gx::NotSupportedException(); }
+    Gx::Int64 ReadFile(unsigned int index, void* data, Gx::Int64 size) const;
+    Gx::Int64 ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const override;
+    void WriteFile(const std::string& fileName, void* data, Gx::Int64 size) override { throw Gx::NotSupportedException(); }
 
-    Gx::Int64 GetFileSize(const std::string &fileName) const override;
+    Gx::Int64 GetFileSize(const std::string& fileName) const override;
     std::string GetExtension(const std::string& name) const;
 
 private:
-    static Gx::Uint8* DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, int *accCounter);
+    static Gx::Uint8* DecodeWave(Gx::Uint8* in, int length, int* accKeyByte, int* accCounter);
 
     bool ReadStream(void* data, Gx::Uint64 size) const;
 

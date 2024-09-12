@@ -11,7 +11,7 @@
 #include <magic_enum.hpp>
 #include <random>
 
-Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     StatePlayingMetadata metadata;
     if (json.find("name") == json.end())
@@ -26,7 +26,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Jso
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const StatePlayingMetadata*>(&meta);
     if (metadata == nullptr)
@@ -112,7 +112,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
             {
                 for (auto i = 0; i < animation->GetFrameCount(); i++)
                 {
-                    auto &frame    = animation->GetFrame(i);
+                    auto& frame    = animation->GetFrame(i);
                     frame.Position = animation->GetPosition();
                     frame.Origin   = animation->GetOrigin();
                 }
@@ -137,7 +137,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
             {
                 for (auto i = 0; i < animation->GetFrameCount(); i++)
                 {
-                    auto &frame = animation->GetFrame(i);
+                    auto& frame = animation->GetFrame(i);
                     frame.Position = animation->GetPosition();
                     if (frame.TexCoords.size.x == animation->GetOrigin().x * 2 && frame.TexCoords.size.y == animation->GetOrigin().y * 2)
                         frame.Origin = animation->GetOrigin();
@@ -153,7 +153,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     return state;
 }
 
-void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const StateMetadata *metadata, const std::string &key, const std::string &suffix, const PlayingResourceContext &context, const unsigned int count)
+void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const StateMetadata* metadata, const std::string& key, const std::string& suffix, const PlayingResourceContext& context, const unsigned int count)
 {
     if (const auto it = metadata->Require.find(key + suffix); it != metadata->Require.end())
     {

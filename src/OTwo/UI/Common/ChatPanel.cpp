@@ -30,7 +30,7 @@ void ChatPanel::Initialize()
 
     const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
     chatBox->SetPermanentFocusEnabled(true);
-    chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String &text)
+    chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String& text)
     {
         chatWindow->PushMessage(m_session.GetCurrentPlayer(), text);
     });
@@ -42,7 +42,7 @@ void ChatPanel::Initialize()
     }
 }
 
-ChatWindow *ChatPanel::GetChatWindow() const
+ChatWindow* ChatPanel::GetChatWindow() const
 {
     return FindChild<ChatWindow>("IDC_CHAT_WINDOW");
 }

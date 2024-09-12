@@ -14,10 +14,10 @@ namespace Gx
     public:
         ~Node() override = default;
 
-        const std::string &GetName() const;
+        const std::string& GetName() const;
         void SetName(const std::string& name);
 
-        const std::string &GetTag() const;
+        const std::string& GetTag() const;
         void SetTag(const std::string& tag);
 
         Node* GetParent() const;

@@ -11,14 +11,14 @@ namespace Gx
         m_masterGroup = std::make_unique<SoundGroup>("master");
     }
 
-    Mixer::Mixer(Mixer &&right) noexcept:
+    Mixer::Mixer(Mixer&& right) noexcept:
         m_masterGroup(std::move(right.m_masterGroup)),
         m_groups(std::move(right.m_groups)),
         m_sources(std::move(right.m_sources))
     {
     }
 
-    Mixer &Mixer::operator=(Mixer &&right) noexcept
+    Mixer& Mixer::operator=(Mixer &&right) noexcept
     {
         m_masterGroup = std::move(right.m_masterGroup);
         m_groups      = std::move(right.m_groups);
@@ -27,12 +27,12 @@ namespace Gx
         return *this;
     }
 
-    SoundGroup *Mixer::GetMasterSoundGroup() const
+    SoundGroup* Mixer::GetMasterSoundGroup() const
     {
         return m_masterGroup.get();
     }
 
-    SoundGroup *Mixer::GetSoundGroup(const std::string &groupName)
+    SoundGroup* Mixer::GetSoundGroup(const std::string& groupName)
     {
         if (const auto iterator = m_groups.find(groupName); iterator == m_groups.end())
             m_groups[groupName] = ResourcePtr<SoundGroup>(new SoundGroup(groupName), [] (auto ptr) { delete ptr; });
@@ -40,12 +40,12 @@ namespace Gx
         return m_groups[groupName].get();
     }
 
-    sf::SoundSource* Mixer::Play(sf::SoundSource *source)
+    sf::SoundSource* Mixer::Play(sf::SoundSource* source)
     {
         return Play(source, m_masterGroup.get());
     }
 
-    sf::SoundSource *Mixer::Play(sf::SoundSource *source, const std::string &group)
+    sf::SoundSource* Mixer::Play(sf::SoundSource* source, const std::string& group)
     {
         if (source)
         {
@@ -61,7 +61,7 @@ namespace Gx
         return nullptr;
     }
 
-    sf::SoundSource *Mixer::Play(sf::SoundSource *source, SoundGroup *group)
+    sf::SoundSource* Mixer::Play(sf::SoundSource* source, SoundGroup* group)
     {
         if (source)
         {
@@ -71,7 +71,7 @@ namespace Gx
             if (group != m_masterGroup.get())
                 m_masterGroup->Remove(source);
 
-            for (auto &[_, ptr] : m_groups)
+            for (auto& [_, ptr] : m_groups)
             {
                 if (ptr.get() != group)
                     ptr->Remove(source);
@@ -83,11 +83,11 @@ namespace Gx
         return nullptr;
     }
 
-    void Mixer::Play(const std::string &groupName)
+    void Mixer::Play(const std::string& groupName)
     {
         if (!groupName.empty())
         {
-            SoundGroup *group = nullptr;
+            SoundGroup* group = nullptr;
             if (groupName != "master")
             {
                 if (const auto iterator = m_groups.find(groupName); iterator != m_groups.end())
@@ -103,49 +103,49 @@ namespace Gx
         }
     }
 
-    void Mixer::Play(SoundGroup *group)
+    void Mixer::Play(SoundGroup* group)
     {
         if (group)
             group->Play();
     }
 
-    void Mixer::Pause(const std::string &group)
+    void Mixer::Pause(const std::string& group)
     {
         if (m_groups.find(group) != m_groups.end())
             Pause(m_groups[group].get());
     }
 
-    void Mixer::Pause(sf::SoundSource *source)
+    void Mixer::Pause(sf::SoundSource* source)
     {
         if (source)
             source->pause();
     }
 
-    void Mixer::Pause(SoundGroup *group)
+    void Mixer::Pause(SoundGroup* group)
     {
         if (group)
             group->Pause();
     }
 
-    void Mixer::Resume(sf::SoundSource *source)
+    void Mixer::Resume(sf::SoundSource* source)
     {
         if (source && source->getStatus() == sf::SoundSource::Status::Paused)
             source->play();
     }
 
-    void Mixer::Resume(const std::string &group)
+    void Mixer::Resume(const std::string& group)
     {
         if (m_groups.find(group) != m_groups.end())
             Resume(m_groups[group].get());
     }
 
-    void Mixer::Resume(SoundGroup *group)
+    void Mixer::Resume(SoundGroup* group)
     {
         if (group)
             group->Resume();
     }
 
-    void Mixer::Stop(sf::SoundSource *source)
+    void Mixer::Stop(sf::SoundSource* source)
     {
         if (source)
         {
@@ -154,7 +154,7 @@ namespace Gx
         }
     }
 
-    void Mixer::Stop(const std::string &group)
+    void Mixer::Stop(const std::string& group)
     {
         if (const auto iterator = m_groups.find(group); iterator != m_groups.end())
         {
@@ -163,7 +163,7 @@ namespace Gx
         }
     }
 
-    void Mixer::Stop(SoundGroup *group)
+    void Mixer::Stop(SoundGroup* group)
     {
         if (group)
         {

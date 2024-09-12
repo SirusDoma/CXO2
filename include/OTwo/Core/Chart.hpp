@@ -97,7 +97,7 @@ public:
     {
         float Value;
 
-        TimeEvent(const Event &ev, const float value) :
+        TimeEvent(const Event& ev, const float value) :
            Event(ev),
            Value(value)
         {
@@ -111,10 +111,10 @@ public:
         float             Pan;
         NoteType          Type;
         Chart::SampleType SampleType;
-        sf::SoundBuffer  *Sample;
+        sf::SoundBuffer* Sample;
         double            Length;
 
-        NoteEvent(const Event &ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer *sample) :
+        NoteEvent(const Event& ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer* sample) :
             Event(ev),
             ID(id),
             Volume(volume),
@@ -131,8 +131,8 @@ public:
 
     Chart() = default;
 
-    const ChartMetadata &GetMetadata() const;
-    void SetMetadata(const ChartMetadata &metadata);
+    const ChartMetadata& GetMetadata() const;
+    void SetMetadata(const ChartMetadata& metadata);
 
     template<typename T>
     T* AddEvent(Difficulty diff, T &&ev);
@@ -141,13 +141,13 @@ public:
     void SortEvents();
 
     void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
-    sf::SoundBuffer *GetSample(Gx::Uint16 id) const;
+    sf::SoundBuffer* GetSample(Gx::Uint16 id) const;
     unsigned int GetSampleCount() const;
 
-    const sf::Image *GetCover() const;
+    const sf::Image* GetCover() const;
     void SetCover(Gx::ResourcePtr<sf::Image> cover);
 
-    const sf::Image *GetThumbnail() const;
+    const sf::Image* GetThumbnail() const;
     void SetThumbnail(Gx::ResourcePtr<sf::Image> thumbnail);
 
     std::map<int, float> GetMeasureFractions(Difficulty diff) const;

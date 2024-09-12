@@ -15,7 +15,7 @@ namespace Gx
         m_smooth = smooth;
     }
 
-    ResourcePtr<Font> FontLoader::LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const
+    ResourcePtr<Font> FontLoader::LoadFromFile(const std::string& fileName, const ResourceContext& ctx) const
     {
         auto resource = std::make_unique<Font>();
         if (!resource->LoadFromFile(LocalFileSystem::Instance().GetFullName(fileName)))
@@ -25,7 +25,7 @@ namespace Gx
         return resource;
     }
 
-    ResourcePtr<Font> FontLoader::LoadFromMemory(void *data, const std::size_t size, const ResourceContext &ctx) const
+    ResourcePtr<Font> FontLoader::LoadFromMemory(void* data, const std::size_t size, const ResourceContext& ctx) const
     {
         auto resource = std::make_unique<Font>();
         if (!resource->LoadFromMemory(data, size))
@@ -35,7 +35,7 @@ namespace Gx
         return resource;
     }
 
-    ResourcePtr<Font> FontLoader::LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const
+    ResourcePtr<Font> FontLoader::LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const
     {
         auto resource = std::make_unique<Font>();
         if (!resource->LoadFromStream(stream))

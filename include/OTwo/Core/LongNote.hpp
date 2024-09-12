@@ -21,10 +21,10 @@ public:
     VerticesPtr GetTailVertices() const;
     void SetTailVertices(const std::array<sf::Vertex*, 6> &vertices);
 
-    const Gx::Sprite *GetEdgePrefab(NoteShape) const;
+    const Gx::Sprite* GetEdgePrefab(NoteShape) const;
     void SetEdgePrefabs(const PrefabMap& prefabs);
 
-    void Render(const ChartRenderer &renderer, double delta) override;
+    void Render(const ChartRenderer& renderer, double delta) override;
 
 private:
     VerticesPtr m_headVertices;

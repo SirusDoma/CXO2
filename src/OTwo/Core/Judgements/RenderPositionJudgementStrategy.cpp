@@ -15,7 +15,7 @@ RenderPositionJudgementStrategy::RenderPositionJudgementStrategy()
 
     constexpr double MaxNotesPerMeasure = 192.f;
 
-    auto evaluator = [=] (const ChartRenderer& renderer, const Chart::NoteEvent &ev, double tolerance)
+    auto evaluator = [=] (const ChartRenderer& renderer, const Chart::NoteEvent& ev, double tolerance)
     {
         const double inputPosition = renderer.GetRenderPosition();
         const double latency       = ev.Position - inputPosition;

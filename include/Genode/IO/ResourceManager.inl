@@ -19,7 +19,7 @@ namespace Gx
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id)
     {
         Register<R>();
 
@@ -31,7 +31,7 @@ namespace Gx
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, const std::string &fileName)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, const std::string& fileName)
     {
         Register<R>();
 
@@ -40,7 +40,7 @@ namespace Gx
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, void *data, std::size_t size)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, void* data, std::size_t size)
     {
         Register<R>();
 
@@ -49,7 +49,7 @@ namespace Gx
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, sf::InputStream &stream)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, sf::InputStream& stream)
     {
         Register<R>();
 
@@ -58,7 +58,7 @@ namespace Gx
     }
 
     template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string &id, std::function<ResourcePtr<R>()> deserializer)
+    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, std::function<ResourcePtr<R>()> deserializer)
     {
         Register<R>();
 
@@ -68,7 +68,7 @@ namespace Gx
 
 
     template<typename R>
-    R &ResourceManager::AddFromFile(const std::string &idOrFileName, CacheMode mode)
+    R& ResourceManager::AddFromFile(const std::string& idOrFileName, CacheMode mode)
     {
         Register<R>();
 
@@ -86,7 +86,7 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::AddFromFile(const std::string &id, const std::string &fileName, CacheMode mode)
+    R& ResourceManager::AddFromFile(const std::string& id, const std::string& fileName, CacheMode mode)
     {
         Register<R>();
 
@@ -104,7 +104,7 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::AddFromMemory(const std::string &id, void *data, std::size_t size, CacheMode mode)
+    R& ResourceManager::AddFromMemory(const std::string& id, void* data, std::size_t size, CacheMode mode)
     {
         Register<R>();
 
@@ -122,7 +122,7 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::AddFromStream(const std::string &id, sf::InputStream &stream, CacheMode mode)
+    R& ResourceManager::AddFromStream(const std::string& id, sf::InputStream& stream, CacheMode mode)
     {
         Register<R>();
 
@@ -140,18 +140,18 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::AddFromDeserializer(const std::string &id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode)
+    R& ResourceManager::AddFromDeserializer(const std::string& id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode)
     {
         Register<R>();
 
         auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
-        auto &result = managed->Container->Store(id, deserializer, mode);
+        auto& result = managed->Container->Store(id, deserializer, mode);
 
         return result;
     }
 
     template<typename R, class... Args>
-    R &ResourceManager::Create(const std::string &id, Args&&... args)
+    R& ResourceManager::Create(const std::string& id, Args&&... args)
     {
         Register<R>();
 
@@ -162,7 +162,7 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::Store(const std::string &id, R &resource, CacheMode mode)
+    R& ResourceManager::Store(const std::string& id, R& resource, CacheMode mode)
     {
         Register<R>();
 
@@ -171,7 +171,7 @@ namespace Gx
     }
 
     template<typename R>
-    R &ResourceManager::Store(const std::string &id, ResourcePtr<R> resource, CacheMode mode)
+    R& ResourceManager::Store(const std::string& id, ResourcePtr<R> resource, CacheMode mode)
     {
         if (!resource)
             throw ResourceStoreException("[" + id + "]\nCannot store empty resource.");
@@ -183,7 +183,7 @@ namespace Gx
     }
 
     template<typename R>
-    R *ResourceManager::Find(const std::string &id) const
+    R* ResourceManager::Find(const std::string& id) const
     {
         const auto it = m_containers.find(typeid(R));
         if (it == m_containers.end())
@@ -197,7 +197,7 @@ namespace Gx
     }
 
     template<typename R>
-    void ResourceManager::Each(const std::function<void(const std::string &, R&)> &callback)
+    void ResourceManager::Each(const std::function<void(const std::string& , R&)> &callback)
     {
         const auto it = m_containers.find(typeid(R));
         if (it == m_containers.end())
@@ -211,7 +211,7 @@ namespace Gx
     }
 
     template<typename R>
-    bool ResourceManager::Destroy(const R &resource)
+    bool ResourceManager::Destroy(const R& resource)
     {
         const auto it = m_containers.find(typeid(R));
         if (it == m_containers.end())
@@ -222,7 +222,7 @@ namespace Gx
     }
 
     template<typename R>
-    bool ResourceManager::Destroy(const std::string &id)
+    bool ResourceManager::Destroy(const std::string& id)
     {
         Register<R>();
 

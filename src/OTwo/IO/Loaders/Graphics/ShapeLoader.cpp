@@ -13,7 +13,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = std::make_unique<ShapeMetadata>();
 
@@ -176,7 +176,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(*metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
     if (!metadata)

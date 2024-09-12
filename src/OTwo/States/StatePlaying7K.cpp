@@ -196,7 +196,7 @@ void StatePlaying7K::Initialize()
             const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
             noteClick->SetVisible(false);
             noteClick->Stop();
-            noteClick->SetAnimationCallback([] (auto &animation) {
+            noteClick->SetAnimationCallback([] (auto& animation) {
                 animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
             });
 
@@ -338,7 +338,7 @@ void StatePlaying7K::Initialize()
     });
 
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
-    exitButton->SetClickCallback([this] (const auto &sender, const auto &ev)
+    exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
         GetDirector().Present<StateWaiting7K>();
     });
@@ -453,7 +453,7 @@ void StatePlaying7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
         m_chatBox->SetEnabled(true);
 }
 
-Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     return State::Render(surface, states);
 }

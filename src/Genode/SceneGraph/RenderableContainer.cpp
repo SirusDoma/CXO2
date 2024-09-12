@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    RenderStates RenderableContainer::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates RenderableContainer::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

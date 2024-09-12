@@ -43,10 +43,10 @@ namespace Gx
         float GetVerticalSpacing() const;
         float GetHorizontalSpacing() const;
 
-        void AddLayout(const LayoutItem &layout);
+        void AddLayout(const LayoutItem& layout);
         void ClearLayouts();
 
-        void AddChild(Gx::Node *node) override;
+        void AddChild(Gx::Node* node) override;
 
         using Control::AddChild;
         using Control::RemoveChild;
@@ -62,7 +62,7 @@ namespace Gx
         void IncreaseSpacingCounter();
 
         void Update(const double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void Invalidate() override;
 

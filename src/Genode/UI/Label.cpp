@@ -14,7 +14,7 @@ namespace Gx
         Invalidate();
     }
 
-    RenderStates Label::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Label::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

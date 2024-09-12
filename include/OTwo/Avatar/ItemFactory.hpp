@@ -15,14 +15,14 @@ class ItemFactory
 {
 public:
     ItemFactory() = default;
-    explicit ItemFactory(Gx::ResourceManager &sharedResources);
+    explicit ItemFactory(Gx::ResourceManager& sharedResources);
 
-    std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender &gender) const;
-    Item *GetItem(unsigned int id) const;
+    std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender& gender) const;
+    Item* GetItem(unsigned int id) const;
 
 private:
-    ItemData            *m_itemData;
-    Gx::ResourceManager *m_resources;
+    ItemData* m_itemData;
+    Gx::ResourceManager* m_resources;
 };
 
 #endif

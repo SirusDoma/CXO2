@@ -21,7 +21,7 @@ class SessionContext
 {
 public:
     SessionContext() = default;
-    explicit SessionContext(const Player &player);
+    explicit SessionContext(const Player& player);
 
     Player& GetCurrentPlayer();
 
@@ -34,8 +34,8 @@ public:
     unsigned int GetChannelID() const;
     void SetChannelID(unsigned int channelId);
 
-    const Room &GetCurrentRoom() const;
-    void SetCurrentRoom(const Room &room);
+    const Room& GetCurrentRoom() const;
+    void SetCurrentRoom(const Room& room);
 
     const std::array<ScoreResultItem, 8>& GetLatestScoreResults() const;
     void SetLatestScoreResults(const std::array<ScoreResultItem, 8>& result);

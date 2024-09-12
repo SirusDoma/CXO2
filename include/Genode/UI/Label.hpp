@@ -21,7 +21,7 @@ namespace Gx
 
     protected:
         void Update(double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void OnGeometryUpdated() const override;
         void Invalidate() override;

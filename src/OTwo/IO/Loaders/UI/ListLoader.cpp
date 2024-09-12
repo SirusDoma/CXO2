@@ -6,7 +6,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     auto metadata = ListMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -18,7 +18,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json &json, const G
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
     if (!metadata)
@@ -38,7 +38,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
 
     if (!metadata->Layouts.empty())
     {
-        for (const auto &layout : metadata->Layouts)
+        for (const auto& layout : metadata->Layouts)
             list->AddLayout({ layout.Origin, layout.Position, layout.Rotation, layout.Scale });
     }
 
@@ -72,7 +72,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata &m
     return list;
 }
 
-bool ListLoader::ParseMetadata(Gx::Json attributes, ListMetadata &metadata, const Gx::ResourceContext &ctx)
+bool ListLoader::ParseMetadata(Gx::Json attributes, ListMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (attributes.empty())
         return false;
@@ -82,7 +82,7 @@ bool ListLoader::ParseMetadata(Gx::Json attributes, ListMetadata &metadata, cons
 
     if (auto layouts = attributes.find("layouts"); layouts != attributes.end())
     {
-        for (auto &transform : layouts->items())
+        for (auto& transform : layouts->items())
         {
             if (auto layout = TransformMetadata(); TransformLoader::ParseMetadata(transform.value(), layout, ctx))
                 metadata.Layouts.push_back(layout);

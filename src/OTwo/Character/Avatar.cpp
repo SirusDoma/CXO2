@@ -37,7 +37,7 @@ void Avatar::SetGender(const Gender gender)
     m_gender = gender;
 }
 
-void Avatar::SetDefaultItem(const Item *item)
+void Avatar::SetDefaultItem(const Item* item)
 {
     if (item)
     {
@@ -47,13 +47,13 @@ void Avatar::SetDefaultItem(const Item *item)
     }
 }
 
-bool Avatar::IsEquiped(const Item *item) const
+bool Avatar::IsEquiped(const Item* item) const
 {
     const auto iterator = m_items.find(item->GetType());
     return iterator != m_items.end() && iterator->second->GetID() == item->GetID();
 }
 
-void Avatar::Equip(const Item *item, const bool reset)
+void Avatar::Equip(const Item* item, const bool reset)
 {
     if (item)
     {
@@ -117,7 +117,7 @@ void Avatar::Equip(const Item *item, const bool reset)
     }
 }
 
-void Avatar::Unequip(const Item *item)
+void Avatar::Unequip(const Item* item)
 {
     if (!item)
         return;
@@ -261,7 +261,7 @@ void Avatar::Update(const double delta)
     UpdatableContainer::Update(delta);
 }
 
-Gx::RenderStates Avatar::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates Avatar::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     states.transform *= GetTransform();
     if (!m_alive)

@@ -13,7 +13,7 @@ public:
 
 private:
     void Update(double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
     Gx::Mixer& m_mixer;

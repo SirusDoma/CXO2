@@ -8,7 +8,7 @@
 #include <OTwo/Metadata/UI/Components/Planet/ChannelBoardMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 
-Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     ChannelBoardMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -27,7 +27,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json &j
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const ChannelBoardMetadata*>(&meta);
     if (!metadata)

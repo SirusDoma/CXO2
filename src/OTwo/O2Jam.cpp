@@ -330,7 +330,7 @@ void O2Jam::Update(const double delta)
         m_switched = false;
 }
 
-Gx::RenderStates O2Jam::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     Application::Render(surface, states);
     surface.Render(Console::Instance(), states);

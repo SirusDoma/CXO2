@@ -4,7 +4,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     ToolTipMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -95,7 +95,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json &json, c
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
     if (!metadata)

@@ -161,7 +161,7 @@ void StateResult::Initialize()
 
     const auto btnRetry = bottom->FindChild<Gx::Button>("IDC_BUTTON_PLAY_RETRY");
     btnRetry->SetEnabled(false);
-    btnRetry->SetClickCallback([this] (auto &sender, const auto &ev)
+    btnRetry->SetClickCallback([this] (auto& sender, const auto& ev)
     {
         sender.SetEnabled(false);
 
@@ -171,12 +171,12 @@ void StateResult::Initialize()
 
     const auto btnBack = bottom->FindChild<Gx::Button>("IDC_BUTTON_BACK");
     btnBack->SetEnabled(false);
-    btnBack->SetFocusChangedCallback([btnRetry] (auto &sender, const auto &ev)
+    btnBack->SetFocusChangedCallback([btnRetry] (auto& sender, const auto& ev)
     {
         btnRetry->SetFocus(sender.IsFocused() ? false : btnRetry->IsFocused());
         btnRetry->SetEnabled(!sender.IsFocused());
     });
-    btnBack->SetClickCallback([this] (auto &sender, const auto &ev)
+    btnBack->SetClickCallback([this] (auto& sender, const auto& ev)
     {
         sender.SetEnabled(false);
 
@@ -210,7 +210,7 @@ void StateResult::Update(const double delta)
     State::Update(delta);
 }
 
-Gx::RenderStates StateResult::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates StateResult::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     return State::Render(surface, states);
 }

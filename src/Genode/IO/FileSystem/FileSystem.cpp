@@ -21,7 +21,7 @@ namespace
 namespace Gx
 {
 
-    ResourcePtr<sf::InputStream> FileSystem::Open(const std::string &fileName)
+    ResourcePtr<sf::InputStream> FileSystem::Open(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -38,7 +38,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    bool FileSystem::Contains(const std::string &fileName)
+    bool FileSystem::Contains(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -51,7 +51,7 @@ namespace Gx
         return false;
     }
 
-    std::vector<std::unique_ptr<FileInfo>> FileSystem::Scan(const std::string &pattern)
+    std::vector<std::unique_ptr<FileInfo>> FileSystem::Scan(const std::string& pattern)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -68,7 +68,7 @@ namespace Gx
         return files;
     }
 
-    std::unique_ptr<Gx::FileInfo> FileSystem::GetFileInfo(const std::string &fileName)
+    std::unique_ptr<Gx::FileInfo> FileSystem::GetFileInfo(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -81,7 +81,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    Int64 FileSystem::ReadFile(const std::string &fileName, void *data, const Int64 size)
+    Int64 FileSystem::ReadFile(const std::string& fileName, void* data, const Int64 size)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -98,7 +98,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    std::size_t FileSystem::GetFileSize(const std::string &fileName)
+    std::size_t FileSystem::GetFileSize(const std::string& fileName)
     {
         EnsureDefaultFileSystemsRegistered();
 
@@ -115,12 +115,12 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    void FileSystem::Mount(const FileSystemController &fileSystem)
+    void FileSystem::Mount(const FileSystemController& fileSystem)
     {
         m_controllers.push_back(&fileSystem);
     }
 
-    void FileSystem::Dismount(const FileSystemController &fileSystem)
+    void FileSystem::Dismount(const FileSystemController& fileSystem)
     {
         if (const auto it = std::find(m_controllers.begin(), m_controllers.end(), &fileSystem); it != m_controllers.end())
             m_controllers.erase(it);

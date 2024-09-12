@@ -5,16 +5,16 @@
 #include <OTwo/Core/LongNote.hpp>
 #include <OTwo/Core/NoteGuideLine.hpp>
 
-NoteFactory::NoteFactory(Gx::ResourceManager &resources, const ChannelSet &instantiables) :
+NoteFactory::NoteFactory(Gx::ResourceManager& resources, const ChannelSet& instantiables) :
     NoteFactory(resources, resources, instantiables)
 {
 }
 
-NoteFactory::NoteFactory(Gx::ResourceManager &instantiationResources, Gx::ResourceManager &prefabResources, const ChannelSet &instantiables) :
+NoteFactory::NoteFactory(Gx::ResourceManager& instantiationResources, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
     m_resources(&instantiationResources),
     m_prefabResources(&prefabResources)
 {
-    const auto registerChannel = [this] (const Chart::Channel &channel) {
+    const auto registerChannel = [this] (const Chart::Channel& channel) {
         if (channel != Chart::Channel::Measure && channel != Chart::Channel::BPM && channel != Chart::Channel::Background)
             m_channels.insert(channel);
     };
@@ -31,7 +31,7 @@ NoteFactory::NoteFactory(Gx::ResourceManager &instantiationResources, Gx::Resour
     }
 }
 
-NoteContainer *NoteFactory::Generate(const ChartRenderer::RenderSettings &settings) const
+NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settings) const
 {
     auto state = "STATE_PLAYING_" + std::to_string(m_channels.size()) + "K";
     const auto container = &m_resources->Create<NoteContainer>(state + "/IDC_NOTE_CONTAINER");

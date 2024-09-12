@@ -12,14 +12,14 @@ namespace Gx
     {
     public:
         FileInfo() = default;
-        FileInfo(const FileSystemController &parent, const std::string &name, Int64 size);
+        FileInfo(const FileSystemController& parent, const std::string& name, Int64 size);
         virtual ~FileInfo() = default;
 
-        const FileSystemController &GetParent() const;
+        const FileSystemController& GetParent() const;
         std::string GetName() const;
         Uint32 GetSize() const;
 
-        virtual Int64 Read(void *data) const;
+        virtual Int64 Read(void* data) const;
 
     private:
         const FileSystemController* m_parent = nullptr;

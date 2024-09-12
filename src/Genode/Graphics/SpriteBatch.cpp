@@ -50,7 +50,7 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Batch(const sf::VertexArray &vertices, const sf::Texture *texture, const sf::Transform &transform, const float layer)
+    void SpriteBatch::Batch(const sf::VertexArray& vertices, const sf::Texture* texture, const sf::Transform& transform, const float layer)
     {
         Batch(&vertices[0], vertices.getVertexCount(), vertices.getPrimitiveType(), texture, transform, layer);
     }
@@ -61,7 +61,7 @@ namespace Gx
                             const sf::PrimitiveType type,
                             const sf::Texture*      texture,
                             const sf::Transform&    transform,
-                            const float             level)
+                            const float             layer)
     {
         if (type != sf::PrimitiveType::TriangleFan && type != sf::PrimitiveType::TriangleStrip && type != sf::PrimitiveType::Triangles)
            throw Exception("SpriteBatch supports only triangle-based primitive types");
@@ -75,17 +75,17 @@ namespace Gx
         {
             case sf::PrimitiveType::TriangleStrip:
                 for (std::size_t i = 2; i < count; i++)
-                    PushTriangle(vertices[i - 2], vertices[i - 1], vertices[i], transform, texture, level);
+                    PushTriangle(vertices[i - 2], vertices[i - 1], vertices[i], transform, texture, layer);
 
                 break;
             case sf::PrimitiveType::TriangleFan:
                 for (std::size_t i = 2; i < count; i++)
-                    PushTriangle(vertices[0], vertices[i - 1], vertices[i], transform, texture, level);
+                    PushTriangle(vertices[0], vertices[i - 1], vertices[i], transform, texture, layer);
 
                 break;
             case sf::PrimitiveType::Triangles:
                 for (std::size_t i = 2; i < count; i += 3)
-                    PushTriangle(vertices[i - 2], vertices[i - 1], vertices[i], transform, texture, level);
+                    PushTriangle(vertices[i - 2], vertices[i - 1], vertices[i], transform, texture, layer);
 
                 break;
             default:
@@ -100,7 +100,7 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    RenderStates SpriteBatch::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates SpriteBatch::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -110,7 +110,7 @@ namespace Gx
         states.blendMode  = m_blendMode.value_or(states.blendMode);
 
         // Calculate and populate the vertices to render
-        auto &batcher = const_cast<SpriteBatch&>(*this);
+        auto& batcher = const_cast<SpriteBatch&>(*this);
         RenderableContainer::Render(batcher, states);
         UpdateBatch();
 
@@ -141,13 +141,13 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Render(const Renderable &renderable, const RenderStates &states)
+    void SpriteBatch::Render(const Renderable& renderable, const RenderStates& states)
     {
         renderable.Render(*this, states);
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Render(const sf::Vertex *vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates &states)
+    void SpriteBatch::Render(const sf::Vertex* vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates& states)
     {
         if (m_blendMode.has_value() && m_blendMode != states.blendMode)
             throw NotSupportedException("Multiple blending mode usage within single batch is not supported");
@@ -159,28 +159,28 @@ namespace Gx
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Render(const sf::VertexBuffer &vertexBuffer, const RenderStates &states)
+    void SpriteBatch::Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states)
     {
         throw NotSupportedException("Vertex Buffer is already live in GPU Memory");
     }
 
     ////////////////////////////////////////////////////////////
-    void SpriteBatch::Render(const sf::VertexBuffer &vertexBuffer, const std::size_t firstVertex, const std::size_t vertexCount, const RenderStates &states)
+    void SpriteBatch::Render(const sf::VertexBuffer& vertexBuffer, const std::size_t firstVertex, const std::size_t vertexCount, const RenderStates& states)
     {
         throw NotSupportedException("Vertex Buffer is already live in GPU Memory");
     }
 
-    const sf::View & SpriteBatch::GetDefaultView() const
+    const sf::View& SpriteBatch::GetDefaultView() const
     {
         throw NotSupportedException("SpriteBatch does not have a view");
     }
 
-    const sf::View & SpriteBatch::GetView() const
+    const sf::View& SpriteBatch::GetView() const
     {
         throw NotSupportedException("SpriteBatch does not have a view");
     }
 
-    void SpriteBatch::SetView(const sf::View &view)
+    void SpriteBatch::SetView(const sf::View& view)
     {
         throw NotSupportedException("SpriteBatch does not have a view");
     }

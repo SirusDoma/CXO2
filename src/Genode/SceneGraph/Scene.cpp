@@ -86,7 +86,7 @@ namespace Gx
         target.setView(view);
     }
 
-    Node *Scene::GetCurrentOverlay() const
+    Node* Scene::GetCurrentOverlay() const
     {
         if (m_overlays.size() > 0)
             return m_overlays.back();
@@ -94,7 +94,7 @@ namespace Gx
         return nullptr;
     }
 
-    void Scene::PushOverlay(Node *overlay)
+    void Scene::PushOverlay(Node* overlay)
     {
         if (overlay)
         {

@@ -11,7 +11,7 @@ namespace Gx
     class RenderTargetAdapter : public RenderSurface
     {
     public:
-        explicit RenderTargetAdapter(sf::RenderTarget &target);
+        explicit RenderTargetAdapter(sf::RenderTarget& target);
         ~RenderTargetAdapter() override = default;
 
         void SetClearColorResolver(const std::function<sf::Color()>& resolver);
@@ -36,10 +36,10 @@ namespace Gx
 
         const sf::View& GetDefaultView() const override;
         const sf::View& GetView() const override;
-        void SetView(const sf::View &view) override;
+        void SetView(const sf::View& view) override;
 
     private:
-        sf::RenderTarget *m_target = nullptr;
+        sf::RenderTarget* m_target = nullptr;
         std::function<sf::Color()> m_clearColorResolver;
     };
 }

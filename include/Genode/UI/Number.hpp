@@ -26,8 +26,8 @@ namespace Gx
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
 
-        const sf::Color & GetColor() const override;
-        void SetColor(const sf::Color &color) override;
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color& color) override;
 
         float GetKerning() const;
         void SetKerning(const float value);
@@ -60,12 +60,12 @@ namespace Gx
 
     protected:
         void Update(double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Invalidate() override;
 
     private:
         sf::VertexArray   m_vertices;
-        const sf::Texture *m_texture;
+        const sf::Texture* m_texture;
         BlendMode         m_blendMode;
         Alignment         m_alignment;
 

@@ -4,7 +4,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Avatar/Item.hpp>
 
-Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     if (json.empty())
         return nullptr;
@@ -32,7 +32,7 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromJson(const Gx::Json &json, con
     return std::make_unique<ItemData>(metadata);
 }
 
-Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ItemData*>(&meta);
     if (!metadata)

@@ -36,7 +36,7 @@ public:
 protected:
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
-    void OnShown(Gx::Scene &scene) override;
+    void OnShown(Gx::Scene& scene) override;
     void OnAccepted() override;
     void OnCancelled() override;
 

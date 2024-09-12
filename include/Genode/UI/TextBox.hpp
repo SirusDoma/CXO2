@@ -72,11 +72,11 @@ namespace Gx
     private:
         bool IsNextCharacterFit();
 
-        void SetControlState(const State &state) override;
+        void SetControlState(const State& state) override;
         State GetControlState() const override;
 
         void Update(double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void OnControlStateChanged(Control& sender, State state) override;
         void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
@@ -95,13 +95,13 @@ namespace Gx
             int Index;
             int SelectionLength;
 
-            explicit Caret(TextBox &instance);
+            explicit Caret(TextBox& instance);
             void Reset(bool visible = false);
-            const Rectangle &GetHighlight() const;
+            const Rectangle& GetHighlight() const;
             void SetHighlightColor(sf::Color color);
 
             void Update(double delta) override;
-            RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+            RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
             void Invalidate();
 

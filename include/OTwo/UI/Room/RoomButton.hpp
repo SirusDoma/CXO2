@@ -19,7 +19,7 @@ public:
 
     bool IsActive() const;
 
-    const Room &GetRoomInfo() const;
+    const Room& GetRoomInfo() const;
     void SetRoomInfo(const Room& data);
     void Reset();
 
@@ -28,7 +28,7 @@ private:
     void Invalidate() override;
 
     Room m_room;
-    Gx::Image *m_hover;
+    Gx::Image* m_hover;
     bool m_active;
 };
 

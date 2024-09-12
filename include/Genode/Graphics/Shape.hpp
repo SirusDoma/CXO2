@@ -42,7 +42,7 @@ namespace Gx
     public:
         ~Shape() override = default;
 
-        void SetTexture(const sf::Texture &texture, bool resetRect = false);
+        void SetTexture(const sf::Texture& texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rect);
 
         void SetFillColor(const sf::Color& color);
@@ -75,7 +75,7 @@ namespace Gx
 
     private:
         using ColorMap = std::unordered_map<unsigned int, sf::Color>;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void UpdateFillColors();
         void UpdateTexCoords();

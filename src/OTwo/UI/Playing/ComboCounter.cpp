@@ -81,7 +81,7 @@ void ComboCounter::Update(const double delta)
 
 }
 
-Gx::RenderStates ComboCounter::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates ComboCounter::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     if (!IsVisible())
         return states;

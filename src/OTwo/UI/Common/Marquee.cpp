@@ -9,7 +9,7 @@ Marquee::Marquee() :
 {
 }
 
-Marquee::Marquee(const Marquee &copy) :
+Marquee::Marquee(const Marquee& copy) :
     Gx::Label(copy),
     m_renderTexture(std::move(copy.m_renderTexture)),
     m_bounds(copy.m_bounds),
@@ -22,7 +22,7 @@ sf::FloatRect Marquee::GetLocalBounds() const
     return m_bounds;
 }
 
-void Marquee::SetLocalBounds(const sf::FloatRect &bounds)
+void Marquee::SetLocalBounds(const sf::FloatRect& bounds)
 {
     m_bounds = bounds;
 
@@ -67,7 +67,7 @@ void Marquee::Update(const double delta)
     m_renderTexture->display();
 }
 
-Gx::RenderStates Marquee::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates Marquee::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     auto transform = GetTransform();
     states.transform *= transform.translate(-GetPosition());

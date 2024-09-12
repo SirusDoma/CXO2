@@ -8,7 +8,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     SpriteMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -20,7 +20,7 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json &json, con
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto ctx = ResourceContextDecorator::Decorate(context);
     const auto metadata = dynamic_cast<const SpriteMetadata*>(&meta);
@@ -43,7 +43,7 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadat
     return sprite;
 }
 
-bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata &metadata, const Gx::ResourceContext &ctx)
+bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (attributes.empty())
         return false;

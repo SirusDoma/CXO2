@@ -1,9 +1,9 @@
 template<typename T>
-void SceneDirectorDecorator::Register(const std::string &fileName)
+void SceneDirectorDecorator::Register(const std::string& fileName)
 {
     static_assert(std::is_base_of_v<State, T>, "Parameter must be a State");
 
-    const Gx::SceneDirector::SceneFactory deserializer = [&, fileName] (const Gx::ResourceContext &context)
+    const Gx::SceneDirector::SceneFactory deserializer = [&, fileName] (const Gx::ResourceContext& context)
     {
         const auto stateLoader = Gx::ResourceLoaderFactory::CreateLoader<T>();
         if (!stateLoader)
@@ -22,7 +22,7 @@ void SceneDirectorDecorator::Register(const std::string &fileName)
 }
 
 template<typename T>
-void SceneDirectorDecorator::Register(State &state)
+void SceneDirectorDecorator::Register(State& state)
 {
     static_assert(std::is_base_of_v<State, T>, "Parameter must be a State");
 
@@ -30,7 +30,7 @@ void SceneDirectorDecorator::Register(State &state)
 }
 
 template<typename T>
-void SceneDirectorDecorator::Present(const Gx::ResourceContext &context) const
+void SceneDirectorDecorator::Present(const Gx::ResourceContext& context) const
 {
     m_director->Present<T>(context);
 }

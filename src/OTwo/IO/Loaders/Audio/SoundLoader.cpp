@@ -6,7 +6,7 @@
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
-Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
     if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
         return ResourceLoader::LoadFromFile(fileName, ctx);
@@ -17,7 +17,7 @@ Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string &fileName
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = SoundMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -26,7 +26,7 @@ Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const
 {
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto buffer = ctx.Find<sf::SoundBuffer>(metadata); buffer)

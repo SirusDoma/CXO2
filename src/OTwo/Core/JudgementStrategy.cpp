@@ -1,12 +1,12 @@
 #include <OTwo/Core/JudgementStrategy.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-void JudgementStrategy::Initialize(const ChartRenderer &renderer)
+void JudgementStrategy::Initialize(const ChartRenderer& renderer)
 {
     m_renderer = &renderer;
 }
 
-Judgement JudgementStrategy::Judge(const Chart::NoteEvent &ev) const
+Judgement JudgementStrategy::Judge(const Chart::NoteEvent& ev) const
 {
     if (!m_renderer)
         throw Gx::Exception("JudgementStrategy is not initialized!");
@@ -24,7 +24,7 @@ Judgement JudgementStrategy::Judge(const Chart::NoteEvent &ev) const
     return Judgement{Accuracy::Miss, latency};
 }
 
-void JudgementStrategy::Register(const Accuracy accuracy, const JudgementEvaluator &evaluator)
+void JudgementStrategy::Register(const Accuracy accuracy, const JudgementEvaluator& evaluator)
 {
     if (accuracy == Accuracy::None)
         return;

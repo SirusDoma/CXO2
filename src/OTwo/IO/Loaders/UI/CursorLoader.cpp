@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     CursorMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -58,7 +58,7 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromJson(const Gx::Json &json, con
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const CursorMetadata*>(&meta);
     if (!metadata)

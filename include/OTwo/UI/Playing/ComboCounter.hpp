@@ -19,7 +19,7 @@ public:
 
 private:
     void Update(const double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     Gx::Animation* m_header;
     Gx::Number*    m_counter;

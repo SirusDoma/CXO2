@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    TextBox::TextBox(const sf::String &string, const Font &font, unsigned int characterSize, sf::FloatRect bounds) :
+    TextBox::TextBox(const sf::String& string, const Font& font, unsigned int characterSize, sf::FloatRect bounds) :
         m_text(string, font, characterSize),
         m_caret(*this),
         m_bounds(bounds),
@@ -50,12 +50,12 @@ namespace Gx
         return m_text.FindCharacterPosition(index);
     }
 
-    void TextBox::SetString(const sf::String &string)
+    void TextBox::SetString(const sf::String& string)
     {
         m_text.SetString(string);
     }
 
-    void TextBox::SetFont(const Font &font)
+    void TextBox::SetFont(const Font& font)
     {
         m_text.SetFont(font);
     }
@@ -95,27 +95,27 @@ namespace Gx
         m_text.SetStyle(style);
     }
 
-    void TextBox::SetColor(const sf::Color &color)
+    void TextBox::SetColor(const sf::Color& color)
     {
         m_text.SetColor(color);
     }
 
-    void TextBox::SetFillColor(const sf::Color &color)
+    void TextBox::SetFillColor(const sf::Color& color)
     {
         m_text.SetFillColor(color);
     }
 
-    void TextBox::SetHighlightBackColor(const sf::Color &color)
+    void TextBox::SetHighlightBackColor(const sf::Color& color)
     {
         m_caret.SetHighlightColor(color);
     }
 
-    void TextBox::SetHighlightTextColor(const sf::Color &color)
+    void TextBox::SetHighlightTextColor(const sf::Color& color)
     {
         m_highlightColor = color;
     }
 
-    void TextBox::SetOutlineColor(const sf::Color &color)
+    void TextBox::SetOutlineColor(const sf::Color& color)
     {
         m_text.SetOutlineColor(color);
     }
@@ -125,12 +125,12 @@ namespace Gx
         m_text.SetOutlineThickness(thickness);
     }
 
-    const sf::String &TextBox::GetString() const
+    const sf::String& TextBox::GetString() const
     {
         return m_text.GetString();
     }
 
-    const Font *TextBox::GetFont() const
+    const Font* TextBox::GetFont() const
     {
         return m_text.GetFont();
     }
@@ -165,26 +165,26 @@ namespace Gx
         return m_text.GetStyle();
     }
 
-    const sf::Color &TextBox::GetColor() const
+    const sf::Color& TextBox::GetColor() const
     {
         return m_text.GetColor();
     }
 
-    const sf::Color &TextBox::GetFillColor() const
+    const sf::Color& TextBox::GetFillColor() const
     {
         return m_text.GetFillColor();
     }
-    const sf::Color &TextBox::GetHighlightBackColor() const
+    const sf::Color& TextBox::GetHighlightBackColor() const
     {
         return m_caret.GetHighlight().GetColor();
     }
 
-    const sf::Color &TextBox::GetHighlightTextColor() const
+    const sf::Color& TextBox::GetHighlightTextColor() const
     {
         return m_highlightColor;
     }
 
-    const sf::Color &TextBox::GetOutlineColor() const
+    const sf::Color& TextBox::GetOutlineColor() const
     {
         return m_text.GetOutlineColor();
     }
@@ -262,7 +262,7 @@ namespace Gx
             return index;
 
         // Max length validation
-        if (m_maxLength > 0 && selectionLength == 0 &&  m_text.GetString().getSize() >= m_maxLength)
+        if (m_maxLength > 0 && selectionLength == 0 && m_text.GetString().getSize() >= m_maxLength)
             return index;
 
         // Max visual bounds validation
@@ -350,7 +350,7 @@ namespace Gx
         return m_state;
     }
 
-    void TextBox::SetControlState(const Control::State &state)
+    void TextBox::SetControlState(const Control::State& state)
     {
         if (m_state != state)
         {
@@ -366,7 +366,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates TextBox::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates TextBox::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -579,7 +579,7 @@ namespace Gx
 
 namespace Gx
 {
-    TextBox::Caret::Caret(TextBox &instance) :
+    TextBox::Caret::Caret(TextBox& instance) :
         Instance(instance),
         Index(),
         SelectionLength(),
@@ -598,7 +598,7 @@ namespace Gx
         m_visible = visible;
     }
 
-    const Rectangle &TextBox::Caret::GetHighlight() const
+    const Rectangle& TextBox::Caret::GetHighlight() const
     {
         return m_highlight;
     }
@@ -608,7 +608,7 @@ namespace Gx
         m_highlight.SetColor(color);
     }
 
-    RenderStates TextBox::Caret::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates TextBox::Caret::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!m_visible)
             return states;

@@ -19,12 +19,12 @@ using namespace std::filesystem;
 #include <sys/sysctl.h>
 
 typedef OSStatus (*SecTranslocateIsTranslocatedURLFunc)(CFURLRef url, Boolean* isTranslocated);
-typedef CFURLRef __nullable (*SecTranslocateCreateOriginalPathForURLFunc)(CFURLRef translocatedPath, CFErrorRef * __nullable error);
+typedef CFURLRef __nullable (*SecTranslocateCreateOriginalPathForURLFunc)(CFURLRef translocatedPath, CFErrorRef* __nullable error);
 #endif
 
 namespace Gx
 {
-    LocalFileSystem &LocalFileSystem::Instance()
+    LocalFileSystem& LocalFileSystem::Instance()
     {
         static ResourcePtr<LocalFileSystem> instance;
         if (!instance)
@@ -137,7 +137,7 @@ namespace Gx
         return std::filesystem::current_path().string();
     }
 
-    void LocalFileSystem::SetWorkingDirectory(const std::string &inputPath)
+    void LocalFileSystem::SetWorkingDirectory(const std::string& inputPath)
     {
         auto workingDir = path(inputPath);
 
@@ -166,7 +166,7 @@ namespace Gx
         m_paths.push_back(path);
     }
 
-    ResourcePtr<sf::InputStream> LocalFileSystem::Open(const std::string &fileName) const
+    ResourcePtr<sf::InputStream> LocalFileSystem::Open(const std::string& fileName) const
     {
         const auto fileStream = new sf::FileInputStream();
         auto stream = ResourcePtr<sf::InputStream>(fileStream, [] (auto fs) { delete fs; });
@@ -176,7 +176,7 @@ namespace Gx
         return nullptr;
     }
 
-    std::unique_ptr<Gx::FileInfo> LocalFileSystem::GetFileInfo(const std::string &fileName) const
+    std::unique_ptr<Gx::FileInfo> LocalFileSystem::GetFileInfo(const std::string& fileName) const
     {
         const auto fullName = GetFullName(fileName);
         const auto size = GetFileSize(fullName);
@@ -184,7 +184,7 @@ namespace Gx
         return std::make_unique<FileInfo>(FileInfo(*this, fullName, size));
     }
 
-    Int64 LocalFileSystem::GetFileSize(const std::string &fileName) const
+    Int64 LocalFileSystem::GetFileSize(const std::string& fileName) const
     {
         Int64 size = -1;
         if (auto fileStream = sf::FileInputStream(); fileStream.open(GetFullName(fileName)))
@@ -230,7 +230,7 @@ namespace Gx
             return path(fileName).replace_extension().string();
         }
 
-        for (std::string &dir : m_paths)
+        for (std::string& dir : m_paths)
         {
             if (std::string fullPath = std::string(dir).append("/").append(fileName); exists(fullPath))
             {
@@ -259,7 +259,7 @@ namespace Gx
         return fs.read(data, size).value_or(-1);
     }
 
-    void LocalFileSystem::WriteFile(const std::string &fileName, void *data, const Int64 size)
+    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, const Int64 size)
     {
         if (size <= 0)
             return;
@@ -270,7 +270,7 @@ namespace Gx
         fs.close();
     }
 
-    std::vector<std::unique_ptr<FileInfo>> LocalFileSystem::Scan(const std::string &pattern, const bool recursive) const
+    std::vector<std::unique_ptr<FileInfo>> LocalFileSystem::Scan(const std::string& pattern, const bool recursive) const
     {
         std::vector<std::unique_ptr<FileInfo>> files;
         std::unordered_set<std::string> scanned;
@@ -281,7 +281,7 @@ namespace Gx
             if (!exists(dir))
                 continue;
 
-            for (const auto &entry : directory_iterator(dir))
+            for (const auto& entry : directory_iterator(dir))
             {
                 if (is_directory(entry) && recursive)
                 {

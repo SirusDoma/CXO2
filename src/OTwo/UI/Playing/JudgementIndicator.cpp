@@ -81,7 +81,7 @@ void JudgementIndicator::Update(const double delta)
         m_target->Update(delta);
 }
 
-Gx::RenderStates JudgementIndicator::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates JudgementIndicator::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     if (m_useFx && m_elapsed >= 750)
         m_target->SetVisible(false);

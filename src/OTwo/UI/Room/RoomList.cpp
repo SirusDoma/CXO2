@@ -39,7 +39,7 @@ void RoomContainer::Initialize()
     AddChild(roomList);
 }
 
-void RoomContainer::Add(const Room &room)
+void RoomContainer::Add(const Room& room)
 {
     m_rooms[room.ID] = room;
     Invalidate();

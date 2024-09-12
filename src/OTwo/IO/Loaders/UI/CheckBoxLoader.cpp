@@ -6,7 +6,7 @@
 #include <OTwo/Metadata/UI/CheckBoxMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     auto metadata = CheckBoxMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -39,7 +39,7 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json &json,
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const CheckBoxMetadata*>(&meta);
     if (!metadata)

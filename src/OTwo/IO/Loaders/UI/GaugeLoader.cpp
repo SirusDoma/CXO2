@@ -7,7 +7,7 @@
 
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
-Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     GaugeMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -76,7 +76,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const GaugeMetadata*>(&meta);
     if (!metadata)

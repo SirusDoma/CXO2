@@ -14,20 +14,20 @@ namespace Gx
         ScrollBar();
         ~ScrollBar() override = default;
 
-        ScrollBar(const sf::Texture &texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
-        ScrollBar(const sf::Texture &texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
+        ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
+        ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
 
         sf::FloatRect GetLocalBounds() const override;
-        void SetLocalBounds(const sf::FloatRect &bounds);
+        void SetLocalBounds(const sf::FloatRect& bounds);
 
-        const sf::Texture *GetTexture() const;
-        void SetTexture(const sf::Texture &texture, bool resetRect = false);
+        const sf::Texture* GetTexture() const;
+        void SetTexture(const sf::Texture& texture, bool resetRect = false);
 
-        const sf::IntRect &GetTexCoords() const;
-        void SetTexCoords(const sf::IntRect &rectangle);
+        const sf::IntRect& GetTexCoords() const;
+        void SetTexCoords(const sf::IntRect& rectangle);
 
-        const sf::Color &GetColor() const override;
-        void SetColor(const sf::Color &color) override;
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color& color) override;
         
         ScrollOrientation GetScrollOrientation() const;
         void SetScrollOrientation(ScrollOrientation orientation);
@@ -48,7 +48,7 @@ namespace Gx
     private:
         sf::FloatRect GetScrollBarGlobalBounds() const;
 
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void OnMouseMoved(const sf::Event::MouseMoved& ev) override;
         void OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev) override;

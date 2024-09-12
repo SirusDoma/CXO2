@@ -14,12 +14,12 @@ namespace Gx
         return m_state;
     }
 
-    void Task::SetState(const TaskState &state)
+    void Task::SetState(const TaskState& state)
     {
         m_state = state;
     }
 
-    const sf::Time &Task::GetElapsed() const
+    const sf::Time& Task::GetElapsed() const
     {
         return m_elapsed;
     }

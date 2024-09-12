@@ -15,7 +15,7 @@ namespace Gx
 
     protected:
         void Update(const double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
     private:
         // Batcher is kept separate so it doesn't interfere with SceneGraph hierarchy

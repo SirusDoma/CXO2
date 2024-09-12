@@ -66,7 +66,7 @@ void OptionDialog::Initialize()
     {
         auto channel = static_cast<Chart::Channel>(i + 1);
         const auto keytext = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_TEXT_" + std::to_string(i));
-        keytext->SetClickCallback([=] (auto &sender, auto &ev)
+        keytext->SetClickCallback([=] (auto& sender, auto& ev)
         {
             m_keyChannel = channel;
             keySelect->SetFrame(i - 1);
@@ -93,7 +93,7 @@ void OptionDialog::Initialize()
 
     const auto btnMasterVolumeUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_UP");
     const auto btnMasterVolumeDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MASTER_DOWN");
-    btnMasterVolumeUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnMasterVolumeUp->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() + 1);
         musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
@@ -114,7 +114,7 @@ void OptionDialog::Initialize()
         m_mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
         m_mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
     });
-    btnMasterVolumeDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnMasterVolumeDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         masterVolumeGauge->SetValue(masterVolumeGauge->GetValue() - 1);
         musicVolumeGauge->SetValue(masterVolumeGauge->GetValue());
@@ -139,7 +139,7 @@ void OptionDialog::Initialize()
     const auto btnMusicUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_UP");
     const auto btnMusicDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_DOWN");
 
-    btnMusicUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnMusicUp->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() + 1);
         m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
@@ -154,7 +154,7 @@ void OptionDialog::Initialize()
 
         m_mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
     });
-    btnMusicDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnMusicDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         musicVolumeGauge->SetValue(musicVolumeGauge->GetValue() - 1);
         m_tempConfig.MusicVolume = static_cast<unsigned int>(musicVolumeGauge->GetValue());
@@ -173,7 +173,7 @@ void OptionDialog::Initialize()
     const auto btnSoundEffectUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_UP");
     const auto btnSoundEffectDown = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_DOWN");
 
-    btnSoundEffectUp->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnSoundEffectUp->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() + 1);
         m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
@@ -188,7 +188,7 @@ void OptionDialog::Initialize()
         m_mixer.Play(sfxTest, "EFTest");
         m_mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
     });
-    btnSoundEffectDown->SetHoldClickCallback([=] (auto &sender, auto &ev)
+    btnSoundEffectDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
         effectVolumeGauge->SetValue(effectVolumeGauge->GetValue() - 1);
         m_tempConfig.EffectVolume = static_cast<unsigned int>(effectVolumeGauge->GetValue());
@@ -205,7 +205,7 @@ void OptionDialog::Initialize()
     });
 
     const auto btnSave = FindChild<Gx::Button>("IDC_BUTTON_SAVE");
-    btnSave->SetClickCallback([=] (auto &sender, auto &ev)
+    btnSave->SetClickCallback([=] (auto& sender, auto& ev)
     {
         if (!ValidateConfig())
         {
@@ -241,7 +241,7 @@ void OptionDialog::Initialize()
     });
 
     const auto btnDefault = FindChild<Gx::Button>("IDC_BUTTON_DEFAULT");
-    btnDefault->SetClickCallback([=] (auto &sender, auto &ev)
+    btnDefault->SetClickCallback([=] (auto& sender, auto& ev)
     {
         m_tempConfig.Reset();
         btnSave->PerformClick();
@@ -311,7 +311,7 @@ void OptionDialog::Initialize()
     m_initialized = true;
 }
 
-void OptionDialog::OnShown(Gx::Scene &scene)
+void OptionDialog::OnShown(Gx::Scene& scene)
 {
     Dialog::OnShown(scene);
     Initialize();

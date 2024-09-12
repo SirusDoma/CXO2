@@ -32,7 +32,7 @@ public:
     sf::FloatRect GetLocalBounds() const override;
 
     void Show(MusicHall hall, std::function<void()> callback);
-    void UpdateChannelList(const PlanetInfo &planet);
+    void UpdateChannelList(const PlanetInfo& planet);
     void ShowChannelList(unsigned int page);
     void ShowNotice(unsigned int page);
     void SwitchTab(Tab tab);
@@ -47,17 +47,17 @@ public:
     unsigned int GetChannelsPerPage() const;
     void SetChannelsPerPage(unsigned int channelsPerPage);
 
-    void SetChannelButton(ChannelButton &button);
+    void SetChannelButton(ChannelButton& button);
 
 private:
     void CaptureCurrentState();
 
     void Update(double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     void Invalidate() override;
 
-    ChannelButton *m_channelButton;
+    ChannelButton* m_channelButton;
     Gx::Image m_duplicateImage;
     sf::RenderTexture m_renderTexture;
 

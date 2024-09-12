@@ -6,7 +6,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     auto metadata = ChannelButtonMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -52,7 +52,7 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json 
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ChannelButtonMetadata*>(&meta);
     if (!metadata)

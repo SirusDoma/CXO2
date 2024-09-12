@@ -4,7 +4,7 @@
 namespace Gx
 {
     template<typename R>
-    R* ResourceContext::Find(const std::string &id) const
+    R* ResourceContext::Find(const std::string& id) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not set within this context");
@@ -13,7 +13,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContext::Acquire(const std::string &id) const
+    R& ResourceContext::Acquire(const std::string& id) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not set within this context");
@@ -26,7 +26,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContext::Acquire(const std::string &id, const std::string &path) const
+    R& ResourceContext::Acquire(const std::string& id, const std::string& path) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not available within this context.");
@@ -35,7 +35,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContext::Acquire(const std::string &id, const void *data, std::size_t dataSize) const
+    R& ResourceContext::Acquire(const std::string& id, const void* data, std::size_t dataSize) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not available within this context.");
@@ -44,7 +44,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContext::Acquire(const std::string &id, sf::InputStream &stream) const
+    R& ResourceContext::Acquire(const std::string& id, sf::InputStream& stream) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not available within this context.");
@@ -53,7 +53,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContext::Store(const std::string &id, R &resource) const
+    R& ResourceContext::Store(const std::string& id, R& resource) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not available within this context.");
@@ -63,7 +63,7 @@ namespace Gx
 
 
     template<typename R>
-    R &ResourceContext::Store(const std::string &id, ResourcePtr<R> resource) const
+    R& ResourceContext::Store(const std::string& id, ResourcePtr<R> resource) const
     {
         if (!m_resources)
             throw ResourceAccessException(id, "ResourceManager is not available within this context.");

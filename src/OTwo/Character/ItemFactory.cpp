@@ -3,13 +3,13 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
-ItemFactory::ItemFactory(Gx::ResourceManager &sharedResources)
+ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources)
 {
     m_resources = &sharedResources;
     m_itemData  = &m_resources->AddFromFile<ItemData>("Avatar/Itemdata.json");
 }
 
-std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gender &gender) const
+std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gender& gender) const
 {
     auto items = std::unordered_map<EquipmentType, Item*>();
     if (!m_resources)
@@ -62,7 +62,7 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
     return items;
 }
 
-Item *ItemFactory::GetItem(const unsigned int id) const
+Item* ItemFactory::GetItem(const unsigned int id) const
 {
     if (!m_resources || !m_itemData)
         return nullptr;

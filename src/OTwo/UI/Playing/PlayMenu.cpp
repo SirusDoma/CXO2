@@ -53,7 +53,7 @@ Difficulty PlayMenu::GetDifficulty() const
     return m_difficulty;
 }
 
-void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty diff)
+void PlayMenu::SetMetadata(const ChartMetadataView& metadata, const Difficulty diff)
 {
     m_metadata   = metadata;
     m_difficulty = diff;
@@ -97,7 +97,7 @@ void PlayMenu::SetMetadata(const ChartMetadataView &metadata, const Difficulty d
         m_sfxVol->SetValue(m_context.GetConfig()->EffectVolume);
 }
 
-void PlayMenu::SetScoreTracker(const ScoreTracker &scores)
+void PlayMenu::SetScoreTracker(const ScoreTracker& scores)
 {
     m_scoreTracker = &scores;
 }

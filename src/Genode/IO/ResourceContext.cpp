@@ -12,28 +12,28 @@ namespace Gx
     {
     }
 
-    ResourceContext::ResourceContext(const std::string &id) :
+    ResourceContext::ResourceContext(const std::string& id) :
         m_id(id),
         m_cacheMode(CacheMode::None),
         m_resources(nullptr)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string &id, ResourceManager &resources, const CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string& id, ResourceManager& resources, const CacheMode mode) :
         m_id(id),
         m_cacheMode(mode),
         m_resources(&resources)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string &id, ResourceManager *resources, const CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string& id, ResourceManager* resources, const CacheMode mode) :
         m_id(id),
         m_cacheMode(mode),
         m_resources(resources)
     {
     }
 
-    ResourceContext ResourceContext::Rebind(const std::string &id, const ResourceContext &ctx)
+    ResourceContext ResourceContext::Rebind(const std::string& id, const ResourceContext& ctx)
     {
         if (!ctx.Available())
             return ResourceContext(id);
@@ -41,7 +41,7 @@ namespace Gx
         return {id, ctx.m_resources, ctx.m_cacheMode};
     }
 
-    const ResourceContext &ResourceContext::MakeAvailable(const ResourceContext &ctx, ResourceManager &resources)
+    const ResourceContext& ResourceContext::MakeAvailable(const ResourceContext& ctx, ResourceManager& resources)
     {
         if (ctx.Available())
             throw NotSupportedException("The specified context is already available");
@@ -50,7 +50,7 @@ namespace Gx
         return ctx;
     }
 
-    const std::string &ResourceContext::GetID() const
+    const std::string& ResourceContext::GetID() const
     {
         return m_id;
     }

@@ -27,19 +27,19 @@
 
 namespace Gx
 {
-    RoundedRectangle::RoundedRectangle(const sf::Vector2f &size, const float cornerRadius, const unsigned int cornerPointCount) :
+    RoundedRectangle::RoundedRectangle(const sf::Vector2f& size, const float cornerRadius, const unsigned int cornerPointCount) :
         m_size(size),
         m_cornerRadius(cornerRadius),
         m_cornerPointCount(cornerPointCount)
     {
     }
 
-    void RoundedRectangle::SetSize(const sf::Vector2f &size)
+    void RoundedRectangle::SetSize(const sf::Vector2f& size)
     {
         m_size = size;
     }
 
-    const sf::Vector2f &RoundedRectangle::GetSize() const
+    const sf::Vector2f& RoundedRectangle::GetSize() const
     {
         return m_size;
     }

@@ -12,7 +12,7 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Models/Character.hpp>
 
-Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     if (json.empty())
         return nullptr;
@@ -27,7 +27,7 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json &json, const Gx::R
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ItemMetadata*>(&meta);
     if (!metadata)
@@ -66,7 +66,7 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata &meta,
     return item;
 }
 
-bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata &metadata, const Gx::ResourceContext &context)
+bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata& metadata, const Gx::ResourceContext& context)
 {
     if (json.empty())
         return false;

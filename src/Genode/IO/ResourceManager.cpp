@@ -7,7 +7,7 @@ namespace Gx
         m_containers(),
         m_contextBuilder()
     {
-        m_contextBuilder = [] (const std::string &id, ResourceManager &manager, const CacheMode mode) {
+        m_contextBuilder = [] (const std::string& id, ResourceManager& manager, const CacheMode mode) {
             return std::make_unique<ResourceContext>(id, manager);
         };
     }
@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    ResourceManager &ResourceManager::operator=(ResourceManager &&right) noexcept
+    ResourceManager& ResourceManager::operator=(ResourceManager &&right) noexcept
     {
         m_containers     = std::move(right.m_containers);
         m_contextBuilder = std::move(right.m_contextBuilder);
@@ -26,7 +26,7 @@ namespace Gx
         return *this;
     }
 
-    void ResourceManager::ConfigureContextBuilder(const ContextBuilder &builder)
+    void ResourceManager::ConfigureContextBuilder(const ContextBuilder& builder)
     {
         m_contextBuilder = builder;
     }

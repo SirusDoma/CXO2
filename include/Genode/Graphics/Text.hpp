@@ -116,7 +116,7 @@ namespace Gx
         void EnsureGeometryUpdate() const;
         virtual void OnGeometryUpdated() const {};
 
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
     private:
         using ColorMap = std::unordered_map<size_t, sf::Color>;

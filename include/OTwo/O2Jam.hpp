@@ -18,7 +18,7 @@ protected:
     void OnInputReceived(sf::Event& ev) override;
 
     void Update(const double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
 private:
     bool m_switched;

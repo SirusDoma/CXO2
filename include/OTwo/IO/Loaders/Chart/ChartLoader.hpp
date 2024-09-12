@@ -12,9 +12,9 @@ class ChartLoader : public Gx::ResourceLoader<Chart>
 public:
     explicit ChartLoader(const GameContext& context);
 
-    Gx::ResourcePtr<Chart> LoadFromMetadata(const ChartMetadata &meta, const Gx::ResourceContext& ctx) const;
-    Gx::ResourcePtr<Chart> LoadFromFile(const std::string &fileName, const Gx::ResourceContext& ctx) const override;
-    Gx::ResourcePtr<Chart> LoadFromMemory(void *data, std::size_t size, const Gx::ResourceContext& ctx) const override;
+    Gx::ResourcePtr<Chart> LoadFromMetadata(const ChartMetadata& meta, const Gx::ResourceContext& ctx) const;
+    Gx::ResourcePtr<Chart> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const override;
+    Gx::ResourcePtr<Chart> LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const override;
     Gx::ResourcePtr<Chart> LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const override;
 
     void SetCoverLoadCallback(const std::function<void(const sf::Image *)> &onCoverLoaded);

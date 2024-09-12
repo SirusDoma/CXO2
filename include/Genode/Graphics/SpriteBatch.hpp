@@ -124,7 +124,7 @@ namespace Gx
         /// \param states The RenderStates to use. The texture is ignored
         ///
         ////////////////////////////////////////////////////////////
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void Clear(const sf::Color clearColor) override;
         void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
@@ -143,9 +143,9 @@ namespace Gx
                     const RenderStates&     states = RenderStates::Default
         ) override;
 
-        const sf::View &GetDefaultView() const override;
-        const sf::View &GetView() const override;
-        void SetView(const sf::View &view) override;
+        const sf::View& GetDefaultView() const override;
+        const sf::View& GetView() const override;
+        void SetView(const sf::View& view) override;
 
         ////////////////////////////////////////////////////////////
         /// \brief Clears the batch, removing all drawables that were

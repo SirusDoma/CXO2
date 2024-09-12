@@ -3,7 +3,7 @@
 #include <OTwo/Core/LongNote.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-NoteGuideLine::NoteGuideLine(const NoteGuideLine &copy) :
+NoteGuideLine::NoteGuideLine(const NoteGuideLine& copy) :
     m_parent(copy.m_parent),
     m_guideLength(),
     m_delta(),
@@ -11,7 +11,7 @@ NoteGuideLine::NoteGuideLine(const NoteGuideLine &copy) :
 {
 }
 
-NoteGuideLine::NoteGuideLine(const Note &parent) :
+NoteGuideLine::NoteGuideLine(const Note& parent) :
     m_parent(&parent),
     m_guideLength(),
     m_delta(),
@@ -19,7 +19,7 @@ NoteGuideLine::NoteGuideLine(const Note &parent) :
 {
 }
 
-NoteGuideLine::NoteGuideLine(const LongNote &parent) :
+NoteGuideLine::NoteGuideLine(const LongNote& parent) :
     m_parent(&parent),
     m_guideLength(),
     m_delta(),
@@ -56,7 +56,7 @@ void NoteGuideLine::SetVertices(const std::array<sf::Vertex*, 8> &vertices)
     m_vertices = vertices;
 }
 
-void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
+void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
 {
     if (!m_vertices[0] || !m_parent->IsVisible())
     {
@@ -166,7 +166,7 @@ void NoteGuideLine::Render(const ChartRenderer &renderer, const double delta)
     }
 }
 
-Gx::RenderStates NoteGuideLine::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates NoteGuideLine::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     std::size_t count = 0;
     for (const auto v : m_vertices)

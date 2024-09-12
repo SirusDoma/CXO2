@@ -20,18 +20,18 @@ namespace Gx
             FileSystem() = delete;
             ~FileSystem() = delete;
 
-            static ResourcePtr<sf::InputStream> Open(const std::string &fileName);
+            static ResourcePtr<sf::InputStream> Open(const std::string& fileName);
 
-            static std::vector<std::unique_ptr<FileInfo>> Scan(const std::string &pattern);
+            static std::vector<std::unique_ptr<FileInfo>> Scan(const std::string& pattern);
 
-            static bool Contains(const std::string &fileName);
-            static std::unique_ptr<FileInfo> GetFileInfo(const std::string &fileName);
+            static bool Contains(const std::string& fileName);
+            static std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName);
 
-            static Int64 ReadFile(const std::string &fileName, void *data, Int64 size);
-            static std::size_t GetFileSize(const std::string &fileName);
+            static Int64 ReadFile(const std::string& fileName, void* data, Int64 size);
+            static std::size_t GetFileSize(const std::string& fileName);
 
-            static void Mount(const FileSystemController &fileSystem);
-            static void Dismount(const FileSystemController &fileSystem);
+            static void Mount(const FileSystemController& fileSystem);
+            static void Dismount(const FileSystemController& fileSystem);
 
         private:
             using FileSystemMap = std::vector<const FileSystemController*>;

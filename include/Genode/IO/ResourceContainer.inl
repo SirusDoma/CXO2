@@ -34,7 +34,7 @@ namespace Gx
     }
 
     template<typename R>
-    R& ResourceContainer<R>::Store(const std::string &id, std::function<ResourcePtr<R>()> deserializer, const CacheMode mode)
+    R& ResourceContainer<R>::Store(const std::string& id, std::function<ResourcePtr<R>()> deserializer, const CacheMode mode)
     {
         auto current = Find(id);
         if (current)
@@ -55,7 +55,7 @@ namespace Gx
     }
 
     template<typename R>
-    bool ResourceContainer<R>::Destroy(R *resource)
+    bool ResourceContainer<R>::Destroy(R* resource)
     {
         if (!resource)
             return false;
@@ -89,7 +89,7 @@ namespace Gx
     }
 
     template<typename R>
-    void ResourceContainer<R>::Each(const std::function<void(const std::string &, R &)> &callback)
+    void ResourceContainer<R>::Each(const std::function<void(const std::string& , R &)> &callback)
     {
         if (!callback)
             return;

@@ -17,7 +17,7 @@ namespace Gx
     {
     }
 
-    Animation::Animation(const sf::Texture& texture, const sf::Time &duration, const std::initializer_list<Frame> frames) :
+    Animation::Animation(const sf::Texture& texture, const sf::Time& duration, const std::initializer_list<Frame> frames) :
         Gx::Sprite(texture),
         m_state(AnimationState::Initial),
         m_duration(duration),
@@ -32,7 +32,7 @@ namespace Gx
     {
     }
 
-    void Animation::AddFrame(const Frame &frame)
+    void Animation::AddFrame(const Frame& frame)
     {
         m_frames.push_back(frame);
         if (m_frames.size() == 1)
@@ -42,7 +42,7 @@ namespace Gx
         }
     }
 
-    void Animation::SetDuration(const sf::Time &duration)
+    void Animation::SetDuration(const sf::Time& duration)
     {
         m_duration = duration;
     }
@@ -137,7 +137,7 @@ namespace Gx
         UpdatableContainer::Update(delta);
     }
 
-    RenderStates Animation::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Animation::Render(RenderSurface& surface, RenderStates states) const
     {
         return Sprite::Render(surface, states);
     }
@@ -164,16 +164,16 @@ namespace Gx
         SetFrame(m_currentFrame);
     }
 
-    void Animation::SetFrame(const unsigned int frame)
+    void Animation::SetFrame(const unsigned int index)
     {
-        if (frame < m_frames.size())
+        if (index < m_frames.size())
         {
-            SetTexCoords(m_frames[frame].TexCoords);
+            SetTexCoords(m_frames[index].TexCoords);
 
-            SetOrigin(m_frames[frame].Origin);
-            SetPosition(m_frames[frame].Position);
-            SetRotation(m_frames[frame].Rotation);
-            SetScale(m_frames[frame].Scale);
+            SetOrigin(m_frames[index].Origin);
+            SetPosition(m_frames[index].Position);
+            SetRotation(m_frames[index].Rotation);
+            SetScale(m_frames[index].Scale);
         }
     }
 
@@ -182,7 +182,7 @@ namespace Gx
         return m_frames.size();
     }
 
-    Animation::Frame &Animation::GetFrame(const unsigned int index)
+    Animation::Frame& Animation::GetFrame(const unsigned int index)
     {
         return m_frames[index];
     }

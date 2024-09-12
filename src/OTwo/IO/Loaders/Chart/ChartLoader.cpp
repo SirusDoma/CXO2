@@ -10,7 +10,7 @@ ChartLoader::ChartLoader(const GameContext& context) :
 {
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata &meta, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata& meta, const Gx::ResourceContext& ctx) const
 {
     auto chart = LoadFromFile(meta.Source, ctx);
     chart->Source = meta.Source;
@@ -18,7 +18,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata &meta, 
     return chart;
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& context) const
 {
     const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
@@ -31,13 +31,13 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string &fileName, co
     return chart;
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromMemory(void *data, const std::size_t size, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromMemory(void* data, const std::size_t size, const Gx::ResourceContext& ctx) const
 {
     auto stream = sf::MemoryInputStream(data, size);
     return LoadFromStream(stream, ctx);
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const
 {
     auto chart = std::make_unique<Chart>();
     chart->Source = ctx.GetID();
@@ -218,19 +218,19 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream &stream, cons
     return chart;
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(const ChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadThumbnail(*fs, metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(const ChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     const auto fs = Gx::FileSystem::Open(metadata.Source);
     return LoadCoverArt(*fs, metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream& stream, const ChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (metadata.ThumbnailSize == 0)
         return nullptr;
@@ -249,7 +249,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream &stream, c
     return image;
 }
 
-Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, const ChartMetadata& metadata, const Gx::ResourceContext &ctx)
+Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, const ChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (metadata.CoverSize == 0)
         return nullptr;

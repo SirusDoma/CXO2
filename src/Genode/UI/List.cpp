@@ -73,7 +73,7 @@ namespace Gx
         return m_horizontalSpacing;
     }
 
-    void List::AddLayout(const LayoutItem &layout)
+    void List::AddLayout(const LayoutItem& layout)
     {
         m_layouts.push_back(layout);
     }
@@ -97,7 +97,7 @@ namespace Gx
 
     bool List::IsSpaceAvailable() const
     {
-        return m_verticalCounter <= m_verticalCount &&  m_horizontalCounter <= m_horizontalCount;
+        return m_verticalCounter <= m_verticalCount && m_horizontalCounter <= m_horizontalCount;
     }
 
     sf::Vector2f List::GetNextItemPosition() const
@@ -138,7 +138,7 @@ namespace Gx
         UiContainer::Update(delta);
     }
 
-    RenderStates List::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates List::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -146,7 +146,7 @@ namespace Gx
         return UiContainer::Render(surface, states);
     }
 
-    void List::AddChild(Node *node)
+    void List::AddChild(Node* node)
     {
         if (!node || (!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
             return;
@@ -158,7 +158,7 @@ namespace Gx
         }
         else
         {
-            const auto &[origin, position, rotation, scale] = m_layouts[GetChildren().size()];
+            const auto& [origin, position, rotation, scale] = m_layouts[GetChildren().size()];
             node->SetOrigin(origin);
             node->SetPosition(position);
             node->SetRotation(rotation);

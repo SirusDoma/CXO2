@@ -25,9 +25,9 @@ namespace Gx
 
         std::type_index GetResourceType() const { return m_type; }
 
-        virtual ResourcePtr<T> LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const = 0;
-        virtual ResourcePtr<T> LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const = 0;
-        virtual ResourcePtr<T> LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const = 0;
+        virtual ResourcePtr<T> LoadFromFile(const std::string& fileName, const ResourceContext& ctx) const = 0;
+        virtual ResourcePtr<T> LoadFromMemory(void* data, std::size_t size, const ResourceContext& ctx) const = 0;
+        virtual ResourcePtr<T> LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const = 0;
 
     protected:
         template<class... Args>

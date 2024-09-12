@@ -38,10 +38,10 @@ namespace Gx
         ~Animation() override = default;
 
         template<typename... Args>
-        void AddFrame(const Frame &first, Args... args);
-        void AddFrame(const Frame &frame);
+        void AddFrame(const Frame& first, Args... args);
+        void AddFrame(const Frame& frame);
         unsigned int GetFrameCount() const;
-        Frame &GetFrame(unsigned int index);
+        Frame& GetFrame(unsigned int index);
 
         const sf::Time& GetDuration() const;
         void SetDuration(const sf::Time& duration);
@@ -62,7 +62,7 @@ namespace Gx
         virtual void Reset();
 
         void Update(double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
     private:
         void SetFrame(unsigned int index);
@@ -77,7 +77,7 @@ namespace Gx
         bool m_loop;
         std::vector<Frame> m_frames;
 
-        std::function<void(Animation &sender)> m_animationCallback;
+        std::function<void(Animation& sender)> m_animationCallback;
     };
 }
 

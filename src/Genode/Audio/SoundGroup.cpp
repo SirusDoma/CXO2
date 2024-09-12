@@ -5,7 +5,7 @@
 
 namespace Gx
 {
-    SoundGroup::SoundGroup(const std::string &name) :
+    SoundGroup::SoundGroup(const std::string& name) :
         m_sources(),
         m_volume(100.f),
         m_pan(0.f),
@@ -19,12 +19,12 @@ namespace Gx
         m_sources.clear();
     }
 
-    const std::string &SoundGroup::GetName() const
+    const std::string& SoundGroup::GetName() const
     {
         return m_name;
     }
 
-    void SoundGroup::SetName(const std::string &name)
+    void SoundGroup::SetName(const std::string& name)
     {
         m_name = name;
     }
@@ -146,7 +146,7 @@ namespace Gx
         m_enabled = enable;
     }
 
-    sf::SoundSource* SoundGroup::Play(sf::SoundSource *source)
+    sf::SoundSource* SoundGroup::Play(sf::SoundSource* source)
     {
         if (source && m_enabled)
         {
@@ -165,7 +165,7 @@ namespace Gx
         return nullptr;
     }
 
-    bool SoundGroup::Remove(sf::SoundSource *source)
+    bool SoundGroup::Remove(sf::SoundSource* source)
     {
         if (source && m_enabled)
         {
@@ -179,7 +179,7 @@ namespace Gx
 
     void SoundGroup::Update(const double delta)
     {
-        m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource *src)
+        m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource* src)
         {
             return !src || src->getStatus() == sf::SoundSource::Status::Stopped;
         }), m_sources.end());

@@ -159,7 +159,7 @@ namespace Gx
         return Shutdown();
     }
 
-    int Application::Start(Scene &scene)
+    int Application::Start(Scene& scene)
     {
         m_director.Present(scene);
         return Start();
@@ -189,7 +189,7 @@ namespace Gx
         m_director.Update(delta);
     }
 
-    RenderStates Application::Render(RenderSurface &surface, const RenderStates states) const
+    RenderStates Application::Render(RenderSurface& surface, const RenderStates states) const
     {
         return m_director.Render(surface, states);
     }
@@ -325,7 +325,7 @@ namespace Gx
             m_closeRequested = true;
     }
 
-    void Application::UpdateCursor(const sf::Event &ev) const
+    void Application::UpdateCursor(const sf::Event& ev) const
     {
         if (!m_cursor)
             return;
@@ -403,7 +403,7 @@ namespace Gx
         return m_clearColor;
     }
 
-    void Application::SetClearColor(const sf::Color &clearColor)
+    void Application::SetClearColor(const sf::Color& clearColor)
     {
         m_clearColor = clearColor;
     }

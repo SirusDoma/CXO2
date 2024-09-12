@@ -13,7 +13,7 @@ struct TypeChecker : std::false_type
 { };
 
 template<typename R>
-Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string &id) const
+Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string& id) const
 {
     auto stream = Gx::FileSystem::Open(id);
     if (!stream)
@@ -38,7 +38,7 @@ Gx::ResourcePtr<R> ResourceContextDecorator::Deserialize(const std::string &id) 
 }
 
 template<typename R>
-R* ResourceContextDecorator::Instantiate(const ResourceMetadata &metadata, const std::string &newID) const
+R* ResourceContextDecorator::Instantiate(const ResourceMetadata& metadata, const std::string& newID) const
 {
     const auto resources = GetResourceManager();
     if (!resources)
@@ -98,7 +98,7 @@ R* ResourceContextDecorator::Find() const
 }
 
 template<typename R>
-R* ResourceContextDecorator::Find(const ResourceMetadata &metadata, Gx::CacheMode cacheMode) const
+R* ResourceContextDecorator::Find(const ResourceMetadata& metadata, Gx::CacheMode cacheMode) const
 {
     const auto resources = GetResourceManager();
     if (!resources)

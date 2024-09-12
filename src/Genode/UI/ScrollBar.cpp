@@ -16,7 +16,7 @@ namespace Gx
     {
     }
 
-    ScrollBar::ScrollBar(const sf::Texture &texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
         m_sprite(texture),
         m_bounds(),
         m_step(1.f),
@@ -30,7 +30,7 @@ namespace Gx
         SetLocalBounds(bounds);
     }
 
-    ScrollBar::ScrollBar(const sf::Texture &texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
         m_sprite(texture, texCoords),
         m_bounds(),
         m_step(1.f),
@@ -49,7 +49,7 @@ namespace Gx
         return m_bounds;
     }
 
-    void ScrollBar::SetLocalBounds(const sf::FloatRect &bounds)
+    void ScrollBar::SetLocalBounds(const sf::FloatRect& bounds)
     {
         if (m_bounds != bounds)
         {
@@ -63,23 +63,23 @@ namespace Gx
         }
     }
 
-    const sf::Texture *ScrollBar::GetTexture() const
+    const sf::Texture* ScrollBar::GetTexture() const
     {
         return m_sprite.GetTexture();
     }
 
-    void ScrollBar::SetTexture(const sf::Texture &texture, bool resetRect)
+    void ScrollBar::SetTexture(const sf::Texture& texture, bool resetRect)
     {
         m_sprite.SetTexture(texture, resetRect);
         Invalidate();
     }
 
-    const sf::IntRect &ScrollBar::GetTexCoords() const
+    const sf::IntRect& ScrollBar::GetTexCoords() const
     {
         return m_sprite.GetTexCoords();
     }
 
-    void ScrollBar::SetTexCoords(const sf::IntRect &rectangle)
+    void ScrollBar::SetTexCoords(const sf::IntRect& rectangle)
     {
         if (m_sprite.GetTexCoords() != rectangle)
         {
@@ -88,12 +88,12 @@ namespace Gx
         }
     }
 
-    const sf::Color &ScrollBar::GetColor() const
+    const sf::Color& ScrollBar::GetColor() const
     {
         return m_sprite.GetColor();
     }
 
-    void ScrollBar::SetColor(const sf::Color &color)
+    void ScrollBar::SetColor(const sf::Color& color)
     {
         m_sprite.SetColor(color);
     }
@@ -186,7 +186,7 @@ namespace Gx
         SetValue(m_value - (m_step == 0 ? 1 : m_step));
     }
 
-    RenderStates ScrollBar::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates ScrollBar::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

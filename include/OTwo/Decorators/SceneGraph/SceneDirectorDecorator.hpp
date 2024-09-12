@@ -9,21 +9,21 @@
 class SceneDirectorDecorator
 {
 public:
-    static SceneDirectorDecorator Decorate(Gx::SceneDirector &director);
+    static SceneDirectorDecorator Decorate(Gx::SceneDirector& director);
 
     template<typename T>
-    void Register(const std::string &fileName);
+    void Register(const std::string& fileName);
 
     template<typename T>
-    void Register(State &state);
+    void Register(State& state);
 
     template<typename T>
-    void Present(const Gx::ResourceContext &context = Gx::ResourceContext(typeid(T).name())) const;
+    void Present(const Gx::ResourceContext& context = Gx::ResourceContext(typeid(T).name())) const;
 
 private:
-    explicit SceneDirectorDecorator(Gx::SceneDirector &director);
+    explicit SceneDirectorDecorator(Gx::SceneDirector& director);
 
-    Gx::SceneDirector   *m_director;
+    Gx::SceneDirector* m_director;
 };
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.inl>

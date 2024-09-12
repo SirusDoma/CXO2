@@ -160,7 +160,7 @@ void ChannelBoard::Initialize()
 }
 
 
-void ChannelBoard::SetChannelButton(ChannelButton &button)
+void ChannelBoard::SetChannelButton(ChannelButton& button)
 {
     m_channelButton = &button;
 }
@@ -324,7 +324,7 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     }
 }
 
-void ChannelBoard::UpdateChannelList(const PlanetInfo &planet)
+void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
 {
     const auto container   = FindChild<Gx::UiContainer>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_CONTAINER_CONTROLS");
     const auto channelList = container->FindChild<Gx::List>("STATE_PLANET/IDC_CHANNEL_BOARD/IDC_LIST_CHANNEL");
@@ -411,7 +411,7 @@ void ChannelBoard::Update(const double delta)
     TaskContainer::Update(delta);
 }
 
-Gx::RenderStates ChannelBoard::Render(Gx::RenderSurface &surface, Gx::RenderStates states) const
+Gx::RenderStates ChannelBoard::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     if (m_animationEnabled)
         surface.Render(m_duplicateImage, states);

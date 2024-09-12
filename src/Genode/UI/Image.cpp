@@ -12,7 +12,7 @@ namespace Gx
         return !m_frames.empty() ? m_frames.size() : 1;
     }
 
-    const Image::Frame *Image::GetFrame(const std::string &name) const
+    const Image::Frame* Image::GetFrame(const std::string& name) const
     {
         if (const auto it = m_frames.find(name); it != m_frames.end())
             return &it->second;
@@ -20,7 +20,7 @@ namespace Gx
         return nullptr;
     }
 
-    const Image::Frame *Image::GetFrame(unsigned int index) const
+    const Image::Frame* Image::GetFrame(unsigned int index) const
     {
         if (index < 0 || index >= m_frames.size())
             return nullptr;
@@ -28,12 +28,12 @@ namespace Gx
         return GetFrame(m_indices[index]);
     }
 
-    const Image::Frame *Image::GetCurrentFrame() const
+    const Image::Frame* Image::GetCurrentFrame() const
     {
         return m_currentFrame;
     }
 
-    const std::string &Image::GetCurrentFrameName() const
+    const std::string& Image::GetCurrentFrameName() const
     {
         return m_frameName;
     }
@@ -43,7 +43,7 @@ namespace Gx
         return m_frameIndex;
     }
 
-    bool Image::ContainsFrame(const std::string &name) const
+    bool Image::ContainsFrame(const std::string& name) const
     {
         const auto it = m_frames.find(name);
         return it != m_frames.end();
@@ -54,7 +54,7 @@ namespace Gx
         return index >= 0 && index < m_frames.size();
     }
 
-    void Image::AddFrame(const std::string &name, const sf::IntRect &texCoords)
+    void Image::AddFrame(const std::string& name, const sf::IntRect& texCoords)
     {
         if (m_frames.find(name) == m_frames.end())
             m_indices.push_back(name);
@@ -64,7 +64,7 @@ namespace Gx
             SetFrame(name);
     }
 
-    void Image::AddFrame(const std::string &name, const Image::Frame &frame)
+    void Image::AddFrame(const std::string& name, const Image::Frame& frame)
     {
         if (m_frames.find(name) == m_frames.end())
             m_indices.push_back(name);
@@ -74,7 +74,7 @@ namespace Gx
             SetFrame(name);
     }
 
-    void Image::SetFrame(const std::string &name)
+    void Image::SetFrame(const std::string& name)
     {
         for (int i = 0; i < m_indices.size(); i++)
         {
@@ -99,7 +99,7 @@ namespace Gx
         }
     }
 
-    void Image::ApplyFrame(const Image::Frame &frame)
+    void Image::ApplyFrame(const Image::Frame& frame)
     {
         m_currentFrame = &frame;
 
@@ -118,7 +118,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Image::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Image::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

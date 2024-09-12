@@ -17,7 +17,7 @@ public:
 private:
     bool ValidateConfig();
 
-    void OnShown(Gx::Scene &scene) override;
+    void OnShown(Gx::Scene& scene) override;
     void OnClose() override;
 
     void Update(double delta) override;
@@ -28,7 +28,7 @@ private:
 
     void Invalidate() override;
 
-    ::State *m_parent;
+    ::State* m_parent;
     std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
     Gx::Mixer&     m_mixer;

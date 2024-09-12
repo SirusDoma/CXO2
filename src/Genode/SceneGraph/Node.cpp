@@ -18,22 +18,22 @@ namespace Gx
         m_initialized = true;
     }
 
-    const std::string &Node::GetName() const
+    const std::string& Node::GetName() const
     {
         return m_name;
     }
 
-    void Node::SetName(const std::string &name)
+    void Node::SetName(const std::string& name)
     {
         m_name = name;
     }
 
-    const std::string &Node::GetTag() const
+    const std::string& Node::GetTag() const
     {
         return m_tag;
     }
 
-    void Node::SetTag(const std::string &tag)
+    void Node::SetTag(const std::string& tag)
     {
         m_tag = tag;
     }
@@ -67,7 +67,7 @@ namespace Gx
         return m_children;
     }
 
-    std::vector<Node*> Node::GetChildrenByTag(const std::string &tag) const
+    std::vector<Node*> Node::GetChildrenByTag(const std::string& tag) const
     {
         auto nodes = std::vector<Node*>();
         for (auto& node : m_children)
@@ -87,7 +87,7 @@ namespace Gx
         return nodes;
     }
 
-    Node* Node::GetChildByName(const std::string &name) const
+    Node* Node::GetChildByName(const std::string& name) const
     {
         for (const auto& node : m_children)
         {
@@ -106,7 +106,7 @@ namespace Gx
         return nullptr;
     }
 
-    Node* Node::GetChildByTag(const std::string &tag) const
+    Node* Node::GetChildByTag(const std::string& tag) const
     {
         for (const auto& node : m_children)
         {

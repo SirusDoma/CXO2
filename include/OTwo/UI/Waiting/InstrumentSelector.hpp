@@ -20,9 +20,9 @@ public:
 
     void Initialize() override;
 
-    void AddInstrument(Item *item);
+    void AddInstrument(Item* item);
 
-    Item *GetInstrument() const;
+    Item* GetInstrument() const;
     void SetInstrument(int itemID);
 
     void SetInstrumentSelectCallack(const std::function<void(Item*)>& callback);
@@ -33,7 +33,7 @@ private:
     Gx::Mixer& m_mixer;
     Gx::ResourceManager& m_resources;
 
-    Item *m_currentItem;
+    Item* m_currentItem;
     Instrument m_currentInstrument;
     int m_currentIndex;
     std::unordered_map<Instrument, std::vector<Item*>> m_items;

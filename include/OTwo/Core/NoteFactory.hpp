@@ -10,7 +10,7 @@ using PrefabMap = std::unordered_map<Chart::Channel, std::unordered_map<NoteShap
 class NoteFactory
 {
 public:
-    explicit NoteFactory(Gx::ResourceManager &resources, const ChannelSet &instantiables = {
+    explicit NoteFactory(Gx::ResourceManager& resources, const ChannelSet& instantiables = {
         Chart::Channel::Note1,
         Chart::Channel::Note2,
         Chart::Channel::Note3,
@@ -20,12 +20,12 @@ public:
         Chart::Channel::Note7
     });
 
-    NoteFactory(Gx::ResourceManager &instantiationResources, Gx::ResourceManager &prefabResources, const ChannelSet &instantiables);
+    NoteFactory(Gx::ResourceManager& instantiationResources, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables);
 
-    NoteContainer *Generate(const ChartRenderer::RenderSettings &settings) const;
+    NoteContainer* Generate(const ChartRenderer::RenderSettings& settings) const;
 
 private:
-    Gx::ResourceManager *m_resources, *m_prefabResources;
+    Gx::ResourceManager* m_resources, *m_prefabResources;
     ChannelSet           m_channels;
 };
 

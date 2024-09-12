@@ -144,7 +144,7 @@ void StateWaiting7K::Initialize()
 
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
 
-    AvatarInfo *currentAvatarInfo = nullptr;
+    AvatarInfo* currentAvatarInfo = nullptr;
     auto currentMember = RoomMember();
     int memberIndex = 0;
 
@@ -263,7 +263,7 @@ void StateWaiting7K::Initialize()
     const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
     if (currentAvatarInfo)
     {
-        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const Item *item)
+        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const Item* item)
         {
 
             if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)
@@ -322,7 +322,7 @@ void StateWaiting7K::Initialize()
         selectMusicDialog->Initialize(); // force load the cover art
         if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
         {
-            selectMusicButton->SetClickCallback([=] (auto &sender, auto &ev)
+            selectMusicButton->SetClickCallback([=] (auto& sender, auto& ev)
             {
                 m_mixer.Play(sfxSelectMusic);
                 selectMusicDialog->Show(this, std::string(), false);

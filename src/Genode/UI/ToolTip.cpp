@@ -14,7 +14,7 @@ namespace Gx
     {
     }
 
-    ToolTip::ToolTip(const sf::String &string, const Font &font, unsigned int characterSize) :
+    ToolTip::ToolTip(const sf::String& string, const Font& font, unsigned int characterSize) :
         Text(string, font, characterSize),
         m_rectangle(),
         m_padding(characterSize * (10.f / 100.f), characterSize * (10.f / 100.f)),
@@ -31,7 +31,7 @@ namespace Gx
         return m_rectangle.GetLocalBounds();
     }
 
-    void ToolTip::Show(Control *parent)
+    void ToolTip::Show(Control* parent)
     {
         auto position = sf::Vector2f();
         auto alignment = Alignment::Left;
@@ -73,12 +73,12 @@ namespace Gx
         m_elapsed = m_duration;
     }
 
-    const sf::Time &ToolTip::GetDuration() const
+    const sf::Time& ToolTip::GetDuration() const
     {
         return m_duration;
     }
 
-    void ToolTip::SetDuration(const sf::Time &duration)
+    void ToolTip::SetDuration(const sf::Time& duration)
     {
         if (m_duration != duration)
         {
@@ -93,7 +93,7 @@ namespace Gx
         return m_padding;
     }
 
-    void ToolTip::SetPadding(const sf::Vector2f &padding)
+    void ToolTip::SetPadding(const sf::Vector2f& padding)
     {
         if (m_padding != padding)
         {
@@ -102,12 +102,12 @@ namespace Gx
         }
     }
 
-    const sf::Color &ToolTip::GetContainerFillColor() const
+    const sf::Color& ToolTip::GetContainerFillColor() const
     {
         return m_fillColor;
     }
 
-    void ToolTip::SetContainerFillColor(const sf::Color &fillColor)
+    void ToolTip::SetContainerFillColor(const sf::Color& fillColor)
     {
         if (m_fillColor != fillColor)
         {
@@ -116,12 +116,12 @@ namespace Gx
         }
     }
 
-    const sf::Color &ToolTip::GetContainerOutlineColor() const
+    const sf::Color& ToolTip::GetContainerOutlineColor() const
     {
         return m_outlineColor;
     }
 
-    void ToolTip::SetContainerOutlineColor(const sf::Color &outlineColor)
+    void ToolTip::SetContainerOutlineColor(const sf::Color& outlineColor)
     {
         if (m_outlineColor != outlineColor)
         {
@@ -144,7 +144,7 @@ namespace Gx
         }
     }
 
-    RenderStates ToolTip::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates ToolTip::Render(RenderSurface& surface, RenderStates states) const
     {
         if (IsVisible() && !GetString().isEmpty())
         {

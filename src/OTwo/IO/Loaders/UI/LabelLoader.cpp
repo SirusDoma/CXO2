@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     LabelMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -20,7 +20,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
     if (!metadata)
@@ -73,7 +73,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata 
     return label;
 }
 
-bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, const Gx::ResourceContext &context)
+bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, const Gx::ResourceContext& context)
 {
     if (attributes.empty())
         return false;

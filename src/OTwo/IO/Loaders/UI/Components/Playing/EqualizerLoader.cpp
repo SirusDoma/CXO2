@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     auto metadata = EqualizerMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
@@ -36,7 +36,7 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json &json, c
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const EqualizerMetadata*>(&meta);
     if (!metadata)

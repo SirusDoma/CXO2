@@ -82,7 +82,7 @@ namespace Gx
     void Sprite::SetColor(const sf::Color& color)
     {
         // Update the vertices' color
-        for (auto &vertex : m_vertices)
+        for (auto& vertex : m_vertices)
             vertex.color = color;
     }
 
@@ -133,7 +133,7 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    RenderStates Sprite::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Sprite::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

@@ -17,9 +17,9 @@ public:
 
     ChartMetadataView GetMetadata() const;
     Difficulty GetDifficulty() const;
-    void SetMetadata(const ChartMetadataView &metadata, const Difficulty diff);
+    void SetMetadata(const ChartMetadataView& metadata, const Difficulty diff);
 
-    void SetScoreTracker(const ScoreTracker &scores);
+    void SetScoreTracker(const ScoreTracker& scores);
     const ScoreTracker* GetScoreTracker() const;
 
 private:

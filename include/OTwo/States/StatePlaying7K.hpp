@@ -28,7 +28,7 @@ public:
     void OnKeyReleased(const sf::Event::KeyReleased& ev) override;
 
 private:
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
     void Update(const double delta) override;
 
     void OnRenderComplete();

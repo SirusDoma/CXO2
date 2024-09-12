@@ -20,7 +20,7 @@ namespace Gx
     {
     }
 
-    Dialog::Dialog(const Dialog &copy) :
+    Dialog::Dialog(const Dialog& copy) :
         UiContainer(copy),
         Node(copy),
         m_sprite(copy.m_sprite),
@@ -39,13 +39,13 @@ namespace Gx
             SetCancelButton(*m_cancelButton);
     }
 
-    Dialog::Dialog(const sf::Texture &texture) :
+    Dialog::Dialog(const sf::Texture& texture) :
         Dialog()
     {
         m_sprite = Sprite(texture);
     }
 
-    Dialog::Dialog(const sf::Texture &texture, const sf::IntRect &rectangle) :
+    Dialog::Dialog(const sf::Texture& texture, const sf::IntRect& rectangle) :
         Dialog()
     {
         m_sprite = Sprite(texture, rectangle);
@@ -56,22 +56,22 @@ namespace Gx
         return m_sprite.GetLocalBounds();
     }
 
-    const sf::Texture *Dialog::GetTexture() const
+    const sf::Texture* Dialog::GetTexture() const
     {
         return m_sprite.GetTexture();
     }
 
-    void Dialog::SetTexture(const sf::Texture &texture)
+    void Dialog::SetTexture(const sf::Texture& texture)
     {
         m_sprite.SetTexture(texture);
     }
 
-    const sf::IntRect &Dialog::GetTexCoords() const
+    const sf::IntRect& Dialog::GetTexCoords() const
     {
         return m_sprite.GetTexCoords();
     }
 
-    void Dialog::SetTexCoords(const sf::IntRect &rectangle)
+    void Dialog::SetTexCoords(const sf::IntRect& rectangle)
     {
         m_sprite.SetTexCoords(rectangle);
     }
@@ -86,7 +86,7 @@ namespace Gx
         return m_shown;
     }
 
-    void Dialog::SetLabel(Label &label)
+    void Dialog::SetLabel(Label& label)
     {
         if (m_promptText)
             RemoveChild(m_promptText);
@@ -95,7 +95,7 @@ namespace Gx
         AddChild(m_promptText);
     }
 
-    void Dialog::SetPromptString(const std::string &prompt)
+    void Dialog::SetPromptString(const std::string& prompt)
     {
         if (!m_promptText)
             return;
@@ -103,7 +103,7 @@ namespace Gx
         m_promptText->SetString(prompt);
     }
 
-    void Dialog::SetAcceptButton(Button &acceptButton)
+    void Dialog::SetAcceptButton(Button& acceptButton)
     {
         if (m_acceptButton)
             RemoveChild(m_acceptButton);
@@ -114,7 +114,7 @@ namespace Gx
         AddChild(m_acceptButton);
     }
 
-    void Dialog::SetCancelButton(Button &cancelButton)
+    void Dialog::SetCancelButton(Button& cancelButton)
     {
         if (m_cancelButton)
             RemoveChild(m_cancelButton);
@@ -135,12 +135,12 @@ namespace Gx
         m_onCancelled = std::move(callback);
     }
 
-    void Dialog::Show(Scene *scene)
+    void Dialog::Show(Scene* scene)
     {
         Show(scene, std::string(), true);
     }
 
-    void Dialog::Show(Scene *scene, const std::string& prompt, bool enableBackDrop)
+    void Dialog::Show(Scene* scene, const std::string& prompt, bool enableBackDrop)
     {
         if (m_shown)
             return;
@@ -194,7 +194,7 @@ namespace Gx
         OnClose();
     }
 
-    RenderStates Dialog::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Dialog::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -218,7 +218,7 @@ namespace Gx
             OnCancelled();
     }
 
-    void Dialog::OnShown(Scene &scene)
+    void Dialog::OnShown(Scene& scene)
     {
     }
 
@@ -244,22 +244,22 @@ namespace Gx
         Close();
     }
 
-    const Scene *Dialog::GetScene()
+    const Scene* Dialog::GetScene()
     {
         return m_scene;
     }
 
-    Label *Dialog::GetLabel() const
+    Label* Dialog::GetLabel() const
     {
         return m_promptText;
     }
 
-    Button *Dialog::GetAcceptButton() const
+    Button* Dialog::GetAcceptButton() const
     {
         return m_acceptButton;
     }
 
-    Button *Dialog::GetCancelButton() const
+    Button* Dialog::GetCancelButton() const
     {
         return m_cancelButton;
     }

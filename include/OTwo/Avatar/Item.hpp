@@ -41,25 +41,25 @@ public:
     bool IsNew() const;
     void SetIsNew(bool isNew);
 
-    const sf::String &GetName() const;
-    void SetName(const sf::String &name);
+    const sf::String& GetName() const;
+    void SetName(const sf::String& name);
 
-    const sf::String &GetDescription() const;
-    void SetDescription(const sf::String &description);
+    const sf::String& GetDescription() const;
+    void SetDescription(const sf::String& description);
 
-    bool IsBuyableWith(const Currency &currency) const;
+    bool IsBuyableWith(const Currency& currency) const;
 
-    unsigned int GetPrice(const Currency &currency) const;
-    void SetPrice(const Currency &currency, unsigned int price);
+    unsigned int GetPrice(const Currency& currency) const;
+    void SetPrice(const Currency& currency, unsigned int price);
 
-    const Gx::Sprite *GetSmallPreview() const;
+    const Gx::Sprite* GetSmallPreview() const;
     void SetSmallPreview(Gx::ResourcePtr<Gx::Sprite> smallPreview);
 
-    const Gx::Sprite *GetLargePreview() const;
+    const Gx::Sprite* GetLargePreview() const;
     void SetLargePreview(Gx::ResourcePtr<Gx::Sprite> largePreview);
 
     void SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation);
-    Gx::Animation *GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const;
+    Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const;
     std::vector<Gx::Animation*> GetRenderables() const;
 
     void ResetRenderables();

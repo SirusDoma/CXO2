@@ -44,11 +44,11 @@ namespace Gx
 
         void SetVisible(bool visible) override;
 
-        virtual void AddChild(Control *node);
-        virtual void RemoveChild(Control *node);
+        virtual void AddChild(Control* node);
+        virtual void RemoveChild(Control* node);
 
-        void AddChild(Gx::Node *node) override;
-        void RemoveChild(Gx::Node *node) override;
+        void AddChild(Gx::Node* node) override;
+        void RemoveChild(Gx::Node* node) override;
 
         template<typename... Args>
         void AddChild(Control* first, Args... args);
@@ -60,7 +60,7 @@ namespace Gx
         Control();
 
         virtual State GetControlState() const;
-        virtual void SetControlState(const State &state);
+        virtual void SetControlState(const State& state);
 
         const std::function<void(Control&, Event&)>& GetFocusChangedCallback();
         const std::function<void(Control&, Event&)>& GetGainFocusCallback();
@@ -71,7 +71,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetScrollWheelCallback();
 
         void Update(const double delta) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         bool Input(const sf::Event& ev) override;
 
         void OnMouseMoved(const sf::Event::MouseMoved& ev) override;

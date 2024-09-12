@@ -15,7 +15,7 @@ public:
 
     void Initialize() override;
 
-    void Add(const Room &room);
+    void Add(const Room& room);
     void Clear();
 
     void ShowAll();

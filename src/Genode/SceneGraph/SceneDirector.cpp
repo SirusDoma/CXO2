@@ -16,7 +16,7 @@ namespace Gx
     {
     }
 
-    SceneDirector::SceneDirector(Application &app, Scene &scene) :
+    SceneDirector::SceneDirector(Application& app, Scene& scene) :
         m_application(&app),
         m_factories(),
         m_caches(),
@@ -26,7 +26,7 @@ namespace Gx
     {
     }
 
-    SceneDirector::SceneDirector(Application &app) :
+    SceneDirector::SceneDirector(Application& app) :
         m_application(&app),
         m_factories(),
         m_caches(),
@@ -73,12 +73,12 @@ namespace Gx
         m_cacheEnabled = cacheEnabled;
     }
 
-    Scene &SceneDirector::GetPresentedScene() const
+    Scene& SceneDirector::GetPresentedScene() const
     {
         return *m_currentScene;
     }
 
-    Application &SceneDirector::GetApplication() const
+    Application& SceneDirector::GetApplication() const
     {
         if (!m_application)
             return Application::Instance();
@@ -86,7 +86,7 @@ namespace Gx
         return *m_application;
     }
 
-    RenderStates SceneDirector::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates SceneDirector::Render(RenderSurface& surface, RenderStates states) const
     {
         if (m_currentScene)
             return m_currentScene->Render(surface, states);

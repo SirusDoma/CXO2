@@ -12,9 +12,9 @@ namespace Gx
         TextureLoader() = default;
         void UseSmooth(bool smooth);
 
-        ResourcePtr<sf::Texture> LoadFromFile(const std::string &fileName, const ResourceContext &ctx) const override;
-        ResourcePtr<sf::Texture> LoadFromMemory(void *data, std::size_t size, const ResourceContext &ctx) const override;
-        ResourcePtr<sf::Texture> LoadFromStream(sf::InputStream &stream, const ResourceContext &ctx) const override;
+        ResourcePtr<sf::Texture> LoadFromFile(const std::string& fileName, const ResourceContext& ctx) const override;
+        ResourcePtr<sf::Texture> LoadFromMemory(void* data, std::size_t size, const ResourceContext& ctx) const override;
+        ResourcePtr<sf::Texture> LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const override;
 
     private:
         bool m_smooth = true;

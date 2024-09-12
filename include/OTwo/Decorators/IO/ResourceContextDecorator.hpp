@@ -12,22 +12,22 @@
 class ResourceContextDecorator : public Gx::ResourceContext
 {
 public:
-    static ResourceContextDecorator Decorate(const Gx::ResourceContext &ctx);
+    static ResourceContextDecorator Decorate(const Gx::ResourceContext& ctx);
 
     template<typename R>
-    R* Instantiate(const ResourceMetadata &metadata, const std::string& newID) const;
+    R* Instantiate(const ResourceMetadata& metadata, const std::string& newID) const;
 
     template<typename R>
     R* Find() const;
 
     template<typename R>
-    R* Find(const ResourceMetadata &metadata, Gx::CacheMode cacheMode = Gx::CacheMode::Reuse) const;
+    R* Find(const ResourceMetadata& metadata, Gx::CacheMode cacheMode = Gx::CacheMode::Reuse) const;
 
 private:
-    explicit ResourceContextDecorator(const Gx::ResourceContext &ctx);
+    explicit ResourceContextDecorator(const Gx::ResourceContext& ctx);
 
     template<typename R>
-    Gx::ResourcePtr<R> Deserialize(const std::string &id) const;
+    Gx::ResourcePtr<R> Deserialize(const std::string& id) const;
 };
 
 #include <OTwo/Decorators/IO/ResourceContextDecorator.inl>

@@ -81,7 +81,7 @@ void StateLoading::Update(const double delta)
     State::Update(delta);
 }
 
-void StateLoading::OnCoverLoaded(const sf::Image *cover)
+void StateLoading::OnCoverLoaded(const sf::Image* cover)
 {
     for (const auto child : GetChildren())
     {
@@ -93,12 +93,12 @@ void StateLoading::OnCoverLoaded(const sf::Image *cover)
     }
 }
 
-void StateLoading::OnChartLoaded(const Chart *chart)
+void StateLoading::OnChartLoaded(const Chart* chart)
 {
     const auto transition = Create<Gx::Sequence>([this, chart]
         {
-            auto &director = GetDirector();
-            auto &room     = m_session.GetCurrentRoom();
+            auto& director = GetDirector();
+            auto& room     = m_session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
             ctx.SetFxEnabled(m_config.UseFx);

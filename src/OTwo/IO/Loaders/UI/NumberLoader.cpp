@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = NumberMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -110,7 +110,7 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json &json, con
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
     if (!metadata)

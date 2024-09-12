@@ -3,7 +3,7 @@
 
 #include <string>
 
-bool OjmArchive::LoadFromFile(const std::string &fileName)
+bool OjmArchive::LoadFromFile(const std::string& fileName)
 {
     auto fs = Gx::FileSystem::Open(fileName);
     char sign[3];
@@ -39,7 +39,7 @@ Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(unsigned int index) const
 }
 
 
-Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(const std::string &fileName) const
+Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(const std::string& fileName) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::Open(fileName);
@@ -49,7 +49,7 @@ Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(const std::string &fileName) c
     return nullptr;
 }
 
-bool OjmArchive::Contains(const std::string &name) const
+bool OjmArchive::Contains(const std::string& name) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::Contains(name);
@@ -69,7 +69,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OjmArchive::GetFileEntries() const
     return {};
 }
 
-std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::string &fileName) const
+std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::string& fileName) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::GetFileInfo(fileName);
@@ -79,7 +79,7 @@ std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::string &fileNam
     return {};
 }
 
-Gx::Int64 OjmArchive::ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const
+Gx::Int64 OjmArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::ReadFile(fileName, data, size);
@@ -89,7 +89,7 @@ Gx::Int64 OjmArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
     return -1;
 }
 
-Gx::Int64 OjmArchive::GetFileSize(const std::string &fileName) const
+Gx::Int64 OjmArchive::GetFileSize(const std::string& fileName) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::GetFileSize(fileName);

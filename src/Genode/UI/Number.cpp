@@ -47,7 +47,7 @@ namespace Gx
         return m_vertices[0].color;
     }
 
-    void Number::SetColor(const sf::Color &color)
+    void Number::SetColor(const sf::Color& color)
     {
         for (unsigned int i = 0; i < m_vertices.getVertexCount(); i++)
             m_vertices[i].color = color;
@@ -83,13 +83,13 @@ namespace Gx
         return sf::Time::Zero;
     }
 
-    void Number::SetAnimationDuration(const sf::Time &duration)
+    void Number::SetAnimationDuration(const sf::Time& duration)
     {
         for (unsigned int digit = 0; digit < 10; digit++)
             m_durations[digit] = duration;
     }
 
-    void Number::SetAnimationDuration(const unsigned int digit, const sf::Time &duration)
+    void Number::SetAnimationDuration(const unsigned int digit, const sf::Time& duration)
     {
         m_durations[digit % 10] = duration;
     }
@@ -229,7 +229,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Number::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Number::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

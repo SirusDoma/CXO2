@@ -14,23 +14,23 @@ class NoteContainer : public virtual Gx::Node, public Gx::RenderableContainer, p
 {
 public:
     NoteContainer();
-    void Initialize(const ChartRenderer &renderer, const Chart& chart, Difficulty difficulty);
+    void Initialize(const ChartRenderer& renderer, const Chart& chart, Difficulty difficulty);
 
     void AddNote(Note& note);
     void AddMeasure(Measure& measure);
     Note* GetNote(Chart::Channel channel, Chart::NoteType type, double position) const;
 
     sf::FloatRect GetViewport() const;
-    void SetViewport(const sf::FloatRect &viewport);
+    void SetViewport(const sf::FloatRect& viewport);
 
     sf::VertexArray& GetNoteVertices();
     sf::VertexArray& GetMeasureVertices();
     sf::VertexArray& GetGuideLineVertices();
 
     const sf::Texture* GetTexture(NoteShape shape);
-    void SetTexture(NoteShape shape, const sf::Texture &texture);
+    void SetTexture(NoteShape shape, const sf::Texture& texture);
 
-    void RegisterPrefab(Gx::Updatable &prefab);
+    void RegisterPrefab(Gx::Updatable& prefab);
     std::unordered_set<Gx::Updatable*> GetRegisteredPrefabs();
 
     unsigned int GetLastMeasure() const;
@@ -42,7 +42,7 @@ private:
     using TextureMap = std::unordered_map<NoteShape, const sf::Texture*>;
 
     void Update(const double delta) override;
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     const ChartRenderer*  m_renderer;
     const Chart*          m_chart;

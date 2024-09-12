@@ -59,32 +59,32 @@ void Item::SetIsNew(const bool isNew)
     m_isNew = isNew;
 }
 
-const sf::String &Item::GetName() const
+const sf::String& Item::GetName() const
 {
     return m_name;
 }
 
-void Item::SetName(const sf::String &name)
+void Item::SetName(const sf::String& name)
 {
     m_name = name;
 }
 
-const sf::String &Item::GetDescription() const
+const sf::String& Item::GetDescription() const
 {
     return m_description;
 }
 
-void Item::SetDescription(const sf::String &description)
+void Item::SetDescription(const sf::String& description)
 {
     m_description = description;
 }
 
-bool Item::IsBuyableWith(const Currency &currency) const
+bool Item::IsBuyableWith(const Currency& currency) const
 {
     return m_prices.find(currency) != m_prices.end();
 }
 
-unsigned int Item::GetPrice(const Currency &currency) const
+unsigned int Item::GetPrice(const Currency& currency) const
 {
     const auto iterator = m_prices.find(currency);
     if (iterator != m_prices.end())
@@ -93,12 +93,12 @@ unsigned int Item::GetPrice(const Currency &currency) const
     return 0;
 }
 
-void Item::SetPrice(const Currency &currency, const unsigned int price)
+void Item::SetPrice(const Currency& currency, const unsigned int price)
 {
     m_prices[currency] = price;
 }
 
-const Gx::Sprite *Item::GetSmallPreview() const
+const Gx::Sprite* Item::GetSmallPreview() const
 {
     return m_smallPreview.get();
 }
@@ -109,7 +109,7 @@ void Item::SetSmallPreview(Gx::ResourcePtr<Gx::Sprite> smallPreview)
         m_smallPreview = std::move(smallPreview);
 }
 
-const Gx::Sprite *Item::GetLargePreview() const
+const Gx::Sprite* Item::GetLargePreview() const
 {
     return m_largePreview.get();
 }
@@ -126,7 +126,7 @@ void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument in
         m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
 }
 
-Gx::Animation *Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const
+Gx::Animation* Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const
 {
     const auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
     if (find != m_renderables.end())

@@ -12,8 +12,8 @@ class RadioButtonLoader : public ResourceLoader<Gx::RadioButton>
 public:
     RadioButtonLoader() = default;
 
-    Gx::ResourcePtr<Gx::RadioButton> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
-    Gx::ResourcePtr<Gx::RadioButton> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<Gx::RadioButton> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Gx::RadioButton> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
 
 #endif

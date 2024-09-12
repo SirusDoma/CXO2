@@ -6,7 +6,7 @@
 #include <Genode/UI.hpp>
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     StateMetadata metadata;
     if (json.find("name") == json.end())
@@ -18,7 +18,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json &json, const Gx:
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     auto metadata = dynamic_cast<const StateMetadata*>(&meta);
     if (metadata == nullptr)

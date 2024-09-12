@@ -26,7 +26,7 @@ public:
     struct RenderSettings
     {
         bool          Autoplay;
-        GameConfig   *Config;
+        GameConfig* Config;
         unsigned int  Viewport;
         float         Speed;
         ::Difficulty  Difficulty;
@@ -36,19 +36,19 @@ public:
 
     static constexpr unsigned int DefaultMeasureHeight = 384;
 
-    explicit ChartRenderer(const ChannelSet &instantiables);
+    explicit ChartRenderer(const ChannelSet& instantiables);
 
-    void Initialize(const Chart &chart, const GameContext &context, const std::function<void()>& completeCallback);
-    void Initialize(const Chart &chart, const RenderSettings &settings, const std::function<void()>& callback);
+    void Initialize(const Chart& chart, const GameContext& context, const std::function<void()>& completeCallback);
+    void Initialize(const Chart& chart, const RenderSettings& settings, const std::function<void()>& callback);
 
     void StartRender();
 
     bool IsStarted() const;
 
-    Gx::RenderStates Render(Gx::RenderSurface &surface, Gx::RenderStates states) const override;
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
     void Input(Chart::Channel channel, bool pressed) const ;
 
-    const RenderSettings &GetRenderSettings() const;
+    const RenderSettings& GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
     double GetCurrentTime() const;
     double GetRenderPosition() const;
@@ -66,18 +66,18 @@ private:
 
     struct EventState
     {
-        Chart::Event *Event;
-        Chart::Event *LastEvent;
+        Chart::Event* Event;
+        Chart::Event* LastEvent;
         Judgement    Tap     = {Accuracy::None, 0.f};
         Judgement    Release = {Accuracy::None, 0};
 
         bool IsRenderable(const double position) const;
         bool IsRegistered() const;
 
-        Chart::Event *operator->() const { return Event; }
+        Chart::Event* operator->() const { return Event; }
     };
 
-    void PlaySample(const Chart::NoteEvent* ev, const std::string &group = "BGM") const;
+    void PlaySample(const Chart::NoteEvent* ev, const std::string& group = "BGM") const;
 
     using AnimationMap   = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using EventStateList = std::vector<EventState>;

@@ -38,12 +38,12 @@ sf::FloatRect RoomButton::GetLocalBounds() const
     return Gx::Image::GetLocalBounds();
 }
 
-const Room &RoomButton::GetRoomInfo() const
+const Room& RoomButton::GetRoomInfo() const
 {
     return m_room;
 }
 
-void RoomButton::SetRoomInfo(const Room &data)
+void RoomButton::SetRoomInfo(const Room& data)
 {
     m_room = data;
     m_active = true;

@@ -11,39 +11,39 @@ namespace Gx
             sf::BlendMode::Factor::OneMinusSrcAlpha,
             sf::BlendMode::Equation::Add)));
 
-    RenderStates::RenderStates(const sf::BlendMode &blendMode) :
+    RenderStates::RenderStates(const sf::BlendMode& blendMode) :
         sf::RenderStates(blendMode)
     {
     }
 
-    RenderStates::RenderStates(const sf::StencilMode &stencilMode) :
+    RenderStates::RenderStates(const sf::StencilMode& stencilMode) :
         sf::RenderStates(stencilMode)
     {
     }
 
-    RenderStates::RenderStates(const sf::Transform &transform) :
+    RenderStates::RenderStates(const sf::Transform& transform) :
         sf::RenderStates(transform)
     {
     }
 
-    RenderStates::RenderStates(const sf::Texture *texture) :
+    RenderStates::RenderStates(const sf::Texture* texture) :
         sf::RenderStates(texture)
     {
     }
 
-    RenderStates::RenderStates(const sf::Shader *shader) :
+    RenderStates::RenderStates(const sf::Shader* shader) :
         sf::RenderStates(shader)
     {
     }
 
-    RenderStates::RenderStates(const sf::RenderStates &states, const unsigned int frameID, const double delta) :
+    RenderStates::RenderStates(const sf::RenderStates& states, const unsigned int frameID, const double delta) :
         sf::RenderStates(states),
         FrameID(frameID),
         Delta(delta)
     {
     }
 
-    RenderStates &RenderStates::operator=(const RenderStates &states)
+    RenderStates& RenderStates::operator=(const RenderStates& states)
     {
         sf::RenderStates::operator=(states);
         return *this;

@@ -18,12 +18,12 @@ namespace Gx
     {
     }
 
-    Gauge::Gauge(const sf::Texture &texture) :
+    Gauge::Gauge(const sf::Texture& texture) :
         Gauge(texture, sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)))
     {
     }
 
-    Gauge::Gauge(const sf::Texture &texture, const sf::IntRect &texCoords) :
+    Gauge::Gauge(const sf::Texture& texture, const sf::IntRect& texCoords) :
         Gauge()
     {
         SetTexture(texture);
@@ -64,7 +64,7 @@ namespace Gx
         return m_animationState;
     }
 
-    void Gauge::AddAnimationFrame(const Animation::Frame &frame)
+    void Gauge::AddAnimationFrame(const Animation::Frame& frame)
     {
         m_frames.push_back(frame);
         if (m_frames.size() == 1)
@@ -79,22 +79,22 @@ namespace Gx
         return m_frames.size();
     }
 
-    const sf::Time & Gauge::GetAnimationDuration() const
+    const sf::Time& Gauge::GetAnimationDuration() const
     {
         return m_animationDuration;
     }
 
-    void Gauge::SetAnimationDuration(const sf::Time &duration)
+    void Gauge::SetAnimationDuration(const sf::Time& duration)
     {
         m_animationDuration = duration;
     }
 
-    const sf::Texture *Gauge::GetTexture() const
+    const sf::Texture* Gauge::GetTexture() const
     {
         return m_texture;
     }
 
-    void Gauge::SetTexture(const sf::Texture &texture)
+    void Gauge::SetTexture(const sf::Texture& texture)
     {
         m_texture = &texture;
     }
@@ -104,7 +104,7 @@ namespace Gx
         return m_texCoords;
     }
 
-    void Gauge::SetTexCoords(const sf::IntRect &texCoords)
+    void Gauge::SetTexCoords(const sf::IntRect& texCoords)
     {
         if (texCoords != m_texCoords)
         {
@@ -113,12 +113,12 @@ namespace Gx
         }
     }
 
-    const sf::Color &Gauge::GetColor() const
+    const sf::Color& Gauge::GetColor() const
     {
         return m_vertices[0].color;
     }
 
-    void Gauge::SetColor(const sf::Color &color)
+    void Gauge::SetColor(const sf::Color& color)
     {
         // Update the vertices' color
         m_vertices[0].color = color;
@@ -132,7 +132,7 @@ namespace Gx
         return m_orientation;
     }
 
-    void Gauge::SetOrientation(const Orientation &orientation)
+    void Gauge::SetOrientation(const Orientation& orientation)
     {
         if (m_orientation != orientation)
         {
@@ -197,7 +197,7 @@ namespace Gx
 
     }
 
-    RenderStates Gauge::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Gauge::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -216,7 +216,7 @@ namespace Gx
     {
         if (m_currentFrame < m_frames.size())
         {
-            const auto &frame = m_frames[m_currentFrame];
+            const auto& frame = m_frames[m_currentFrame];
             m_texCoords = frame.TexCoords;
             SetOrigin(frame.Origin);
             SetPosition(frame.Position);

@@ -22,7 +22,7 @@ void InstrumentSelector::Initialize()
     const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
     if (const auto previousButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_LEFT"); previousButton)
     {
-        previousButton->SetClickCallback([this, sound = sfxNavigate] (auto &sender, auto &ev)
+        previousButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
             m_mixer.Play(sound);
             if (m_currentInstrument == Instrument::None)
@@ -35,7 +35,7 @@ void InstrumentSelector::Initialize()
 
     if (const auto nextButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_RIGHT"); nextButton)
     {
-        nextButton->SetClickCallback([this, sound = sfxNavigate] (auto &sender, auto &ev)
+        nextButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
             m_mixer.Play(sound);
             if (m_currentInstrument == Instrument::None)
@@ -106,7 +106,7 @@ void InstrumentSelector::Initialize()
     Invalidate();
 }
 
-void InstrumentSelector::AddInstrument(Item *item)
+void InstrumentSelector::AddInstrument(Item* item)
 {
     if (!item || item->GetInstrument() == Instrument::None)
         return;
@@ -122,7 +122,7 @@ void InstrumentSelector::AddInstrument(Item *item)
     }
 
     m_items[key].push_back(item);
-    Gx::RadioButton *button = nullptr;
+    Gx::RadioButton* button = nullptr;
     switch (key)
     {
         case Instrument::Guitar:   button = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); break;
@@ -154,7 +154,7 @@ void InstrumentSelector::AddInstrument(Item *item)
     }
 }
 
-Item *InstrumentSelector::GetInstrument() const
+Item* InstrumentSelector::GetInstrument() const
 {
     return m_currentItem;
 }
@@ -185,7 +185,7 @@ void InstrumentSelector::SetInstrument(int itemID)
 void InstrumentSelector::SetInstrumentSelectCallack(const std::function<void(Item *)>& callback)
 {
     if (const auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
-        selectButton->SetClickCallback([this, callback] (auto &sender, auto &ev) { callback(m_currentItem); });
+        selectButton->SetClickCallback([this, callback] (auto& sender, auto& ev) { callback(m_currentItem); });
 }
 
 void InstrumentSelector::Invalidate()

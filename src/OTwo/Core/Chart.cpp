@@ -3,12 +3,12 @@
 
 #include <vector>
 
-const ChartMetadata &Chart::GetMetadata() const
+const ChartMetadata& Chart::GetMetadata() const
 {
     return m_metadata;
 }
 
-void Chart::SetMetadata(const ChartMetadata &metadata)
+void Chart::SetMetadata(const ChartMetadata& metadata)
 {
     m_metadata = metadata;
 }
@@ -100,7 +100,7 @@ void Chart::AddSample(const Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> samp
     m_samples[id] = std::move(sample);
 }
 
-sf::SoundBuffer *Chart::GetSample(const Gx::Uint16 id) const
+sf::SoundBuffer* Chart::GetSample(const Gx::Uint16 id) const
 {
     if (const auto it = m_samples.find(id); it != m_samples.end())
         return it->second.get();
@@ -113,7 +113,7 @@ unsigned int Chart::GetSampleCount() const
     return m_samples.size();
 }
 
-const sf::Image *Chart::GetCover() const
+const sf::Image* Chart::GetCover() const
 {
     return m_cover.get();
 }
@@ -123,7 +123,7 @@ void Chart::SetCover(Gx::ResourcePtr<sf::Image> cover)
     m_cover = std::move(cover);
 }
 
-const sf::Image *Chart::GetThumbnail() const
+const sf::Image* Chart::GetThumbnail() const
 {
     return m_thumbnail.get();
 }

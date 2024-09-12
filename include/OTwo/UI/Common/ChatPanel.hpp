@@ -15,7 +15,7 @@ public:
     void SetInputEnabled(bool enabled);
     void SetMaximumTextLength(unsigned int length);
 
-    ChatWindow *GetChatWindow() const;
+    ChatWindow* GetChatWindow() const;
 
 private:
     SessionContext& m_session;

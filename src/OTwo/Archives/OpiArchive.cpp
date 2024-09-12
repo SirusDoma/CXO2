@@ -29,7 +29,7 @@ bool OpiArchive::LoadFromFile(const std::string& fileName)
     return ReadStream(&m_count, sizeof(m_count));
 }
 
-Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) const
+Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string& fileName) const
 {
     const auto it = m_entries.find(fileName);
     if (it == m_entries.end())
@@ -43,7 +43,7 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string &fileName) c
     const auto stream = new sf::MemoryInputStream(data, header.GetSize());
     return {
         stream,
-        [data] (const sf::InputStream *ms) {
+        [data] (const sf::InputStream* ms) {
             delete ms;
             delete[] data;
         }
@@ -103,7 +103,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OpiArchive::GetFileEntries() const
     return result;
 }
 
-std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string &fileName) const
+std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -114,7 +114,7 @@ std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string &fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OpiArchive::ReadFile(const std::string &fileName, void *data, Gx::Int64 size) const
+Gx::Int64 OpiArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())
@@ -130,7 +130,7 @@ Gx::Int64 OpiArchive::ReadFile(const std::string &fileName, void *data, Gx::Int6
     return m_fileStream.read(data, size).value_or(-1);
 }
 
-Gx::Int64 OpiArchive::GetFileSize(const std::string &fileName) const
+Gx::Int64 OpiArchive::GetFileSize(const std::string& fileName) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())

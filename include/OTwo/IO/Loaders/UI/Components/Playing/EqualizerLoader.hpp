@@ -9,8 +9,8 @@ class EqualizerLoader : public ResourceLoader<Equalizer>
 public:
     EqualizerLoader() = default;
 
-    Gx::ResourcePtr<Equalizer> LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const override;
-    Gx::ResourcePtr<Equalizer> LoadFromMetadata(const ResourceMetadata &metadata, const Gx::ResourceContext &context) const override;
+    Gx::ResourcePtr<Equalizer> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+    Gx::ResourcePtr<Equalizer> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
 
 

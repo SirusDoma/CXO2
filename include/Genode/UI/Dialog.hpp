@@ -15,7 +15,7 @@ namespace Gx
     {
     public:
         Dialog();
-        explicit Dialog(const Dialog &copy);
+        explicit Dialog(const Dialog& copy);
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
@@ -30,45 +30,45 @@ namespace Gx
         bool IsAccepted() const;
         sf::FloatRect GetLocalBounds() const override;
 
-        Label *GetLabel() const;
-        Button *GetAcceptButton() const;
-        Button *GetCancelButton() const;
+        Label* GetLabel() const;
+        Button* GetAcceptButton() const;
+        Button* GetCancelButton() const;
 
-        void SetLabel(Label &label);
+        void SetLabel(Label& label);
         void SetPromptString(const std::string& prompt);
-        void SetAcceptButton(Button &acceptButton);
-        void SetCancelButton(Button &cancelButton);
+        void SetAcceptButton(Button& acceptButton);
+        void SetCancelButton(Button& cancelButton);
 
         void SetAcceptCallback(std::function<void()> callback);
         void SetCancelCallback(std::function<void()> callback);
 
-        void Show(Scene *scene);
-        void Show(Scene *scene, const std::string& prompt = std::string(), bool enableBackdrop = true);
+        void Show(Scene* scene);
+        void Show(Scene* scene, const std::string& prompt = std::string(), bool enableBackdrop = true);
         bool IsShown() const;
 
         void Close();
 
     protected:
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
-        virtual void OnShown(Scene &scene);
+        virtual void OnShown(Scene& scene);
         virtual void OnClose();
 
         virtual void OnAccepted();
         virtual void OnCancelled();
 
-        const Scene *GetScene();
+        const Scene* GetScene();
 
         void Invalidate() override;
 
     private:
         mutable Gx::Sprite m_sprite;
 
-        Button *m_acceptButton, *m_cancelButton;
-        Label  *m_promptText;
+        Button* m_acceptButton, *m_cancelButton;
+        Label* m_promptText;
 
-        Scene *m_scene;
+        Scene* m_scene;
         Rectangle m_backdrop;
 
         bool m_accepted, m_shown;

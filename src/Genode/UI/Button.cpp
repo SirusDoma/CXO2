@@ -2,21 +2,21 @@
 
 namespace Gx
 {
-    Button::Button(const sf::Texture &texture) :
+    Button::Button(const sf::Texture& texture) :
         m_vertices(),
         m_texture(nullptr)
     {
         SetTexture(texture);
     }
 
-    const sf::Color &Button::GetColor() const
+    const sf::Color& Button::GetColor() const
     {
         return m_vertices[0].color;
     }
 
-    void Button::SetColor(const sf::Color &color)
+    void Button::SetColor(const sf::Color& color)
     {
-        for (auto &vertex : m_vertices)
+        for (auto& vertex : m_vertices)
             vertex.color = color;
     }
 
@@ -57,7 +57,7 @@ namespace Gx
         );
     }
 
-    void Button::SetTexture(const sf::Texture &texture)
+    void Button::SetTexture(const sf::Texture& texture)
     {
         m_texture = &texture;
     }
@@ -67,7 +67,7 @@ namespace Gx
         return m_stateData[state];
     }
 
-    void Button::SetStateFrame(const Control::State state, const Button::Frame &frame)
+    void Button::SetStateFrame(const Control::State state, const Button::Frame& frame)
     {
         m_stateData[state] = frame;
         Invalidate();
@@ -93,7 +93,7 @@ namespace Gx
         return m_stateData[GetControlState()];
     }
 
-    RenderStates Button::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Button::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

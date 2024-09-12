@@ -26,21 +26,21 @@ namespace Gx
 
         ~Button() override = default;
 
-        const sf::Color &GetColor() const override;
-        void SetColor(const sf::Color &color) override;
+        const sf::Color& GetColor() const override;
+        void SetColor(const sf::Color& color) override;
 
         const sf::Texture* GetTexture() const;
         const sf::IntRect& GetTextCoords() const;
         sf::FloatRect GetLocalBounds() const override;
 
-        void SetTexture(const sf::Texture &texture);
-        void SetStateFrame(Control::State state, const Frame &frame);
+        void SetTexture(const sf::Texture& texture);
+        void SetStateFrame(Control::State state, const Frame& frame);
 
         void PerformClick();
 
     protected:
         virtual Button::Frame GetCurrentFrame() const;
-        RenderStates Render(RenderSurface &surface, RenderStates states) const override;
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         Frame GetStateFrame(Control::State state) const;
         void Invalidate() override;

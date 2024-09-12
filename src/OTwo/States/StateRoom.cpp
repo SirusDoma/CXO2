@@ -252,7 +252,7 @@ void StateRoom::Initialize()
     });
 
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
-    myRoomButton->SetClickCallback([this](auto &, auto &) { OnMyRoomClicked(); });
+    myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomClicked(); });
 
     if (const auto optionDialog = Instantiate<OptionDialog>("IDC_DIALOG_OPTION"); optionDialog)
     {
@@ -263,7 +263,7 @@ void StateRoom::Initialize()
     }
 
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
-    backButton->SetClickCallback([&](auto &, auto &) { OnBackClicked(); });
+    backButton->SetClickCallback([&](auto& , auto& ) { OnBackClicked(); });
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");

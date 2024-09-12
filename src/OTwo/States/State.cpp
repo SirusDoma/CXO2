@@ -91,7 +91,7 @@ void State::ShowDialog(const std::string& content, const DialogStyle style, cons
     dialog->Show(this, content, backdrop);
 }
 
-void State::ShowDialog(Gx::Node *content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
+void State::ShowDialog(Gx::Node* content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)

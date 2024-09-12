@@ -15,7 +15,7 @@ ChartMetadata MusicSelectionContext::GetMetadata() const
     return m_metadata;
 }
 
-void MusicSelectionContext::SetMetadata(const ChartMetadata &metadata)
+void MusicSelectionContext::SetMetadata(const ChartMetadata& metadata)
 {
     m_metadata = metadata;
 }

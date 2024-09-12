@@ -13,51 +13,51 @@ namespace Gx
     public:
         static const ResourceContext Default;
 
-        explicit ResourceContext(const std::string &id);
-        ResourceContext(const std::string &id, ResourceManager &resources, CacheMode mode = CacheMode::None);
+        explicit ResourceContext(const std::string& id);
+        ResourceContext(const std::string& id, ResourceManager& resources, CacheMode mode = CacheMode::None);
 
         virtual ~ResourceContext() = default;
 
-        static ResourceContext Rebind(const std::string &id, const ResourceContext &ctx);
-        static const ResourceContext &MakeAvailable(const ResourceContext &ctx, ResourceManager &resources);
+        static ResourceContext Rebind(const std::string& id, const ResourceContext& ctx);
+        static const ResourceContext& MakeAvailable(const ResourceContext& ctx, ResourceManager& resources);
 
-        const std::string &GetID() const;
+        const std::string& GetID() const;
         bool Available() const;
 
         template<typename R>
-        R* Find(const std::string &id) const;
+        R* Find(const std::string& id) const;
 
         template<typename R>
-        R& Acquire(const std::string &id) const;
+        R& Acquire(const std::string& id) const;
 
         template<typename R>
-        R& Acquire(const std::string &id, const std::string &path) const;
+        R& Acquire(const std::string& id, const std::string& path) const;
 
         template<typename R>
-        R& Acquire(const std::string &id, const void* data, std::size_t dataSize) const;
+        R& Acquire(const std::string& id, const void* data, std::size_t dataSize) const;
 
         template<typename R>
-        R& Acquire(const std::string &id, sf::InputStream &stream) const;
+        R& Acquire(const std::string& id, sf::InputStream& stream) const;
 
         template<typename R>
-        R& Store(const std::string &id, R& resource) const;
+        R& Store(const std::string& id, R& resource) const;
 
         template<typename R>
-        R& Store(const std::string &id, ResourcePtr<R> resource) const;
+        R& Store(const std::string& id, ResourcePtr<R> resource) const;
 
         CacheMode GetCacheMode() const;
 
     protected:
         ResourceContext();
 
-        ResourceManager *GetResourceManager() const;
+        ResourceManager* GetResourceManager() const;
 
     private:
-        ResourceContext(const std::string &id, ResourceManager *resources, CacheMode mode = CacheMode::None);
+        ResourceContext(const std::string& id, ResourceManager* resources, CacheMode mode = CacheMode::None);
 
         const std::string m_id;
         const CacheMode m_cacheMode = CacheMode::None;
-        mutable ResourceManager *m_resources;
+        mutable ResourceManager* m_resources;
     };
 }
 

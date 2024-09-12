@@ -21,29 +21,29 @@ namespace Gx
         Mixer(Mixer&& right) noexcept;
         ~Mixer() override = default;
 
-        Mixer &operator=(Mixer&& right) noexcept;
+        Mixer& operator=(Mixer&& right) noexcept;
 
-        SoundGroup *GetMasterSoundGroup() const;
-        SoundGroup *GetSoundGroup(const std::string &groupName);
+        SoundGroup* GetMasterSoundGroup() const;
+        SoundGroup* GetSoundGroup(const std::string& groupName);
 
-        sf::SoundSource *Play(sf::SoundSource *source);
-        sf::SoundSource *Play(sf::SoundSource *source, const std::string &group);
-        sf::SoundSource *Play(sf::SoundSource *source, SoundGroup *group);
+        sf::SoundSource* Play(sf::SoundSource* source);
+        sf::SoundSource* Play(sf::SoundSource* source, const std::string& group);
+        sf::SoundSource* Play(sf::SoundSource* source, SoundGroup* group);
 
-        void Play(const std::string &groupName);
-        void Play(SoundGroup *group);
+        void Play(const std::string& groupName);
+        void Play(SoundGroup* group);
 
-        void Pause(sf::SoundSource *source);
-        void Pause(const std::string &group);
-        void Pause(SoundGroup *group);
+        void Pause(sf::SoundSource* source);
+        void Pause(const std::string& group);
+        void Pause(SoundGroup* group);
 
-        void Resume(sf::SoundSource *source);
-        void Resume(const std::string &group);
-        void Resume(SoundGroup *group);
+        void Resume(sf::SoundSource* source);
+        void Resume(const std::string& group);
+        void Resume(SoundGroup* group);
 
-        void Stop(sf::SoundSource *source);
-        void Stop(const std::string &group);
-        void Stop(SoundGroup *group);
+        void Stop(sf::SoundSource* source);
+        void Stop(const std::string& group);
+        void Stop(SoundGroup* group);
 
         void PlayAll();
         void ResumeAll();

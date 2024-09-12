@@ -6,7 +6,7 @@
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string &fileName, const Gx::ResourceContext &ctx) const
+Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
     if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
         return ResourceLoader::LoadFromFile(fileName, ctx);
@@ -17,7 +17,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string &fileName
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     MusicMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -35,7 +35,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json &json, const
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const MusicMetadata*>(&meta);
     if (!metadata)

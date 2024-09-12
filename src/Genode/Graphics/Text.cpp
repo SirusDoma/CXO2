@@ -204,7 +204,7 @@ namespace Gx
         }
     }
 
-    void Text::SetFillColor(const sf::Color &color, const size_t index)
+    void Text::SetFillColor(const sf::Color& color, const size_t index)
     {
         if (const auto iterator = m_colorMap.find(index); iterator == m_colorMap.end() || (iterator != m_colorMap.end() && iterator->second != color))
         {
@@ -381,7 +381,7 @@ namespace Gx
         return GetTransform().transformRect(GetLocalBounds());
     }
 
-    RenderStates Text::Render(RenderSurface &surface, RenderStates states) const
+    RenderStates Text::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;

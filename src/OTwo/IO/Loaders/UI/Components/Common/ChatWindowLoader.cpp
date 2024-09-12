@@ -6,7 +6,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     ChatWindowMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -59,7 +59,7 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromJson(const Gx::Json &json,
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMetadata &meta, const Gx::ResourceContext &context) const
+Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const ChatWindowMetadata*>(&meta);
     if (!metadata)
