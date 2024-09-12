@@ -1,7 +1,6 @@
 #ifndef GENODE_IO_ARCHIVE_HPP
 #define GENODE_IO_ARCHIVE_HPP
 
-#include <Genode/System/Primitives.hpp>
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/FileSystem/FileSystemController.hpp>
 
@@ -12,7 +11,7 @@
 
 namespace Gx
 {
-    class Archive : public virtual FileSystemController
+    class Archive : public FileSystemController
     {
     public:
 
@@ -32,10 +31,10 @@ namespace Gx
 
         std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override = 0;
 
-        Int64 ReadFile(const std::string& name, void* data, Int64 size) const override = 0;
-        virtual Int64 ReadFile(const FileInfo& entry, void* data) const;
+        std::int64_t ReadFile(const std::string& name, void* data, std::int64_t size) const override = 0;
+        virtual std::int64_t ReadFile(const FileInfo& entry, void* data) const;
 
-        Int64 GetFileSize(const std::string& fileName) const override = 0;
+        std::int64_t GetFileSize(const std::string& fileName) const override = 0;
 
     private:
         std::string m_filename;

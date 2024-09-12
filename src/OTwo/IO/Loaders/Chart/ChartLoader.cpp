@@ -73,7 +73,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
             if (!entry)
                 continue;
 
-            auto payload = std::vector<Gx::Uint8>(entry->GetSize());
+            auto payload = std::vector<std::uint8_t>(entry->GetSize());
             if (entry->Read(&payload[0]) <= 0)
                 continue;
 
@@ -104,9 +104,9 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
         if (difficulty != m_difficulty)
             continue;
 
-        Gx::Uint32 offset = 0;
-        Gx::Uint32 blockCount = 0;
-        Gx::Uint32 size = 0;
+        std::uint32_t offset = 0;
+        std::uint32_t blockCount = 0;
+        std::uint32_t size = 0;
 
         switch (difficulty)
         {
@@ -238,7 +238,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadThumbnail(sf::InputStream& stream, c
     if (stream.seek(metadata.CoverOffset + metadata.CoverSize) == -1)
         return nullptr;
 
-    auto data = std::vector<Gx::Uint8>(metadata.ThumbnailSize);
+    auto data = std::vector<std::uint8_t>(metadata.ThumbnailSize);
     if (const auto read = stream.read(&data[0], metadata.ThumbnailSize); !read.has_value())
         return nullptr;
 
@@ -257,7 +257,7 @@ Gx::ResourcePtr<sf::Image> ChartLoader::LoadCoverArt(sf::InputStream& stream, co
     if (stream.seek(metadata.CoverOffset) == -1)
         return nullptr;
 
-    auto data = std::vector<Gx::Uint8>(metadata.CoverSize);
+    auto data = std::vector<std::uint8_t>(metadata.CoverSize);
     if (stream.read(&data[0], metadata.CoverSize) != metadata.CoverSize)
         return nullptr;
 

@@ -28,16 +28,16 @@ public:
 private:
     struct NoteBlockHeader
     {
-        Gx::Uint32 Measure;
-        Gx::Uint16 Channel;
-        Gx::Uint16 EventCount;
+        std::uint32_t Measure;
+        std::uint16_t Channel;
+        std::uint16_t EventCount;
     };
 
     struct NoteEventHeader
     {
-        Gx::Uint16 ID;
-        Gx::Int8   Audio;
-        Gx::Int8   Type;
+        std::uint16_t ID;
+        std::int8_t   Audio;
+        std::int8_t   Type;
     };
 
     std::function<void(const sf::Image*)> m_onCoverLoaded;

@@ -28,14 +28,14 @@ bool OmcArchive::LoadFromFile(const std::string& fileName)
     return !entries.empty(); // == m_header.FxCount + m_header.BgCount;
 }
 
-Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(unsigned int index) const
+Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const unsigned int index) const
 {
     const auto it = m_entries.find(index);
     if (it == m_entries.end())
         throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive");
 
     const auto header = it->second;
-    const auto data = new Gx::Uint8[header.GetSize()];
+    const auto data = new std::uint8_t[header.GetSize()];
     if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         delete[] data;
 
@@ -56,7 +56,7 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) c
         if (header.GetName() != fileName)
             continue;
 
-        const auto data = new Gx::Uint8[header.GetSize()];
+        const auto data = new std::uint8_t[header.GetSize()];
         if (const auto read = ReadFile(index, data, header.GetSize()); read <= 0)
         {
             delete[] data;
@@ -157,7 +157,7 @@ std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string& fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void* data, Gx::Int64 size) const
+std::int64_t OmcArchive::ReadFile(const unsigned int index, void* data, std::int64_t size) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
@@ -178,7 +178,7 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void* data, Gx::Int64 s
             if (!ReadStream(&waveHeader, sizeof(waveHeader)))
                 throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header");
 
-            const auto encodedData = new Gx::Uint8[waveHeader.ChunkSize];
+            const auto encodedData = new std::uint8_t[waveHeader.ChunkSize];
             if (!ReadStream(encodedData, waveHeader.ChunkSize))
             {
                 delete[] encodedData;
@@ -229,7 +229,7 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void* data, Gx::Int64 s
     }
     else
     {
-        if (m_fileStream.seek(static_cast<Gx::Int64>(iterator->second.GetOffset())) == -1)
+        if (m_fileStream.seek(static_cast<std::int64_t>(iterator->second.GetOffset())) == -1)
             throw Gx::ResourceLoadException(std::to_string(index), "Failed to seek into the OGG data");
 
         auto oggHeader = OmcOggHeader();
@@ -243,7 +243,7 @@ Gx::Int64 OmcArchive::ReadFile(const unsigned int index, void* data, Gx::Int64 s
     }
 }
 
-Gx::Int64 OmcArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
+std::int64_t OmcArchive::ReadFile(const std::string& fileName, void* data, const std::int64_t size) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -254,7 +254,7 @@ Gx::Int64 OmcArchive::ReadFile(const std::string& fileName, void* data, Gx::Int6
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OmcArchive::GetFileSize(const std::string& fileName) const
+std::int64_t OmcArchive::GetFileSize(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -276,13 +276,13 @@ std::string OmcArchive::GetExtension(const std::string& name) const
     return "";
 }
 
-bool OmcArchive::ReadStream(void* data, Gx::Uint64 size) const
+bool OmcArchive::ReadStream(void* data, const std::uint64_t size) const
 {
-    const auto read = m_fileStream.read(data, static_cast<Gx::Int64>(size));
+    const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
     return read == size;
 }
 
-static const Gx::Uint8 WAVE_REARRANGE_TABLE[] = {
+static const std::uint8_t WAVE_REARRANGE_TABLE[] = {
     0x10, 0x0E, 0x02, 0x09, 0x04, 0x00, 0x07, 0x01,
     0x06, 0x08, 0x0F, 0x0A, 0x05, 0x0C, 0x03, 0x0D,
     0x0B, 0x07, 0x02, 0x0A, 0x0B, 0x03, 0x05, 0x0D,
@@ -322,9 +322,9 @@ static const Gx::Uint8 WAVE_REARRANGE_TABLE[] = {
     0x04, 0x00
 };
 
-Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, int *accCounter)
+std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *accKeyByte, int *accCounter)
 {
-    auto* out = new Gx::Uint8[length];
+    auto* out = new std::uint8_t[length];
     int key = ((length % 17) << 4) + (length % 17);
     const int blockSize = length / 17;
 
@@ -340,9 +340,9 @@ Gx::Uint8* OmcArchive::DecodeWave(Gx::Uint8* in, int length, int *accKeyByte, in
 
     for(int i = 0; i < length; i++)
     {
-        Gx::Uint8 currentByte = out[i], temp = out[i];
+        std::uint8_t currentByte = out[i], temp = out[i];
         if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)
-            currentByte = static_cast<Gx::Uint8>(~currentByte);
+            currentByte = static_cast<std::uint8_t>(~currentByte);
 
         out[i] = currentByte;
         *accCounter += 1;

@@ -1,8 +1,6 @@
 #ifndef GENODE_IO_FILESYSTEM_CONTROLLER_HPP
 #define GENODE_IO_FILESYSTEM_CONTROLLER_HPP
 
-#include <Genode/System/NonCopyable.hpp>
-#include <Genode/System/Primitives.hpp>
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/FileSystem/FileInfo.hpp>
 
@@ -27,10 +25,10 @@ namespace Gx
         virtual std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName) const = 0;
         virtual std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const = 0;
 
-        virtual Int64 ReadFile(const std::string& fileName, void* data, Int64 size) const = 0;
-        virtual void WriteFile(const std::string& fileName, void* data, Int64 size) = 0;
+        virtual std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const = 0;
+        virtual void WriteFile(const std::string& fileName, void* data, std::int64_t size) = 0;
 
-        virtual Int64 GetFileSize(const std::string& fileName) const = 0;
+        virtual std::int64_t GetFileSize(const std::string& fileName) const = 0;
 
         const std::string& GetPrefix() const;
         void SetPathPrefix(const std::string& prefix);

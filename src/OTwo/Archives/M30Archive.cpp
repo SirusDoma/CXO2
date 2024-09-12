@@ -29,7 +29,7 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string& fileName) c
     if (!header)
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
-    const auto data = new Gx::Uint8[header->GetSize()];
+    const auto data = new std::uint8_t[header->GetSize()];
     if (const auto read = ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()); read <= 0)
         delete[] data;
 
@@ -43,14 +43,14 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string& fileName) c
     };
 }
 
-Gx::ResourcePtr<sf::InputStream> M30Archive::Open(unsigned int index) const
+Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const unsigned int index) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
         throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bounds for this archive");
 
     const auto header = &iterator->second;
-    const auto data = new Gx::Uint8[header->GetSize()];
+    const auto data = new std::uint8_t[header->GetSize()];
 
     if (const auto read = ReadFile(*header, data, header->GetSize()); read <= 0)
         delete[] data;
@@ -76,7 +76,7 @@ std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::string& fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 M30Archive::ReadFile(const unsigned int index, void* data, const Gx::Int64 size) const
+std::int64_t M30Archive::ReadFile(const unsigned int index, void* data, const std::int64_t size) const
 {
     const auto iterator = m_entries.find(index);
     if (iterator == m_entries.end())
@@ -85,7 +85,7 @@ Gx::Int64 M30Archive::ReadFile(const unsigned int index, void* data, const Gx::I
     return ReadFile(iterator->second, data, size);
 }
 
-Gx::Int64 M30Archive::ReadFile(const std::string& fileName, void* data, const Gx::Int64 size) const
+std::int64_t M30Archive::ReadFile(const std::string& fileName, void* data, const std::int64_t size) const
 {
     const auto header = GetFileInfo(fileName);
     if (!header)
@@ -99,7 +99,7 @@ bool M30Archive::Contains(const std::string& name) const
     return std::any_of(m_entries.begin(), m_entries.end(), [name] (auto pair) { return pair.second.GetName() == name; });
 }
 
-Gx::Int64 M30Archive::GetFileSize(const std::string& fileName) const
+std::int64_t M30Archive::GetFileSize(const std::string& fileName) const
 {
     for (auto const& [key, header] : m_entries)
     {
@@ -147,22 +147,22 @@ std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const
     return result;
 }
 
-bool M30Archive::ReadStream(void* data, const Gx::Uint64 size) const
+bool M30Archive::ReadStream(void* data, const std::uint64_t size) const
 {
     const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
     return read == size;
 }
 
-Gx::Int64 M30Archive::ReadFile(const FileInfo& entry, void* data, Gx::Int64 size) const
+std::int64_t M30Archive::ReadFile(const FileInfo& entry, void* data, std::int64_t size) const
 {
     auto sampleHeader = M30SampleHeader();
-    if (m_fileStream.seek(static_cast<Gx::Int64>(entry.GetOffset())) == -1)
+    if (m_fileStream.seek(static_cast<std::int64_t>(entry.GetOffset())) == -1)
         return -1;
 
     if (!ReadStream(&sampleHeader, sizeof(sampleHeader)))
         return -1;
 
-    auto sampleData = std::vector<Gx::Uint8>(sampleHeader.Size);
+    auto sampleData = std::vector<std::uint8_t>(sampleHeader.Size);
     const auto read = m_fileStream.read(&sampleData[0], sampleHeader.Size);
 
     if (!read.has_value())
@@ -177,7 +177,7 @@ Gx::Int64 M30Archive::ReadFile(const FileInfo& entry, void* data, Gx::Int64 size
     return read.value();
 }
 
-void M30Archive::DecodeSample(std::vector<Gx::Uint8> &data, const int encodingCode)
+void M30Archive::DecodeSample(std::vector<std::uint8_t> &data, const int encodingCode)
 {
     if (encodingCode == 16) // nami
     {

@@ -4,9 +4,6 @@
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/IOException.hpp>
 
-#include <Genode/System/Primitives.hpp>
-#include <Genode/System/NonCopyable.hpp>
-
 #include <functional>
 #include <unordered_map>
 #include <string>
@@ -21,10 +18,13 @@ namespace Gx
     };
 
     template<typename R>
-    class ResourceContainer final : NonCopyable
+    class ResourceContainer final
     {
     public:
         ResourceContainer();
+        ResourceContainer(const ResourceContainer&) = delete;
+        ResourceContainer& operator=(const ResourceContainer&) = delete;
+
         ~ResourceContainer();
 
         R& Store(const std::string& id, ResourcePtr<R> resource, CacheMode mode = CacheMode::Reuse);
@@ -37,10 +37,9 @@ namespace Gx
         R& Get(const std::string& id) const;
         void Each(const std::function<void(const std::string&, R&)> &callback);
 
-        bool   Contains(const std::string& id) const;
-        Uint64 Count() const;
-
-        void   Clear();
+        bool Contains(const std::string& id) const;
+        std::uint64_t Count() const;
+        void Clear();
 
     private:
         using ResourceMap = std::unordered_map<std::string, ResourcePtr<R>>;

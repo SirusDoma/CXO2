@@ -40,13 +40,13 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     float x1 = 0, x2 = 0;
     for (auto channel : m_channels)
     {
-        const int key = static_cast<Gx::Uint16>(channel) - 1;
+        const int key = static_cast<std::uint16_t>(channel) - 1;
         tapNotePrefabs[channel] = {};
         longNotePrefabs[channel] = {};
 
         for (auto shape : { NoteShape::Square, NoteShape::Circle })
         {
-            const int subKey = static_cast<Gx::Uint8>(shape);
+            const int subKey = static_cast<std::uint8_t>(shape);
 
             const auto tap   = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_" + std::to_string(subKey));
             const auto hold  = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_" + std::to_string(subKey));

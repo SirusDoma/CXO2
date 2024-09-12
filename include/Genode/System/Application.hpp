@@ -16,7 +16,7 @@ namespace Gx
     class Scene;
     class Cursor;
     class Context;
-    class Application : NonCopyable, public Renderable, public Updatable
+    class Application : public Renderable, public Updatable
     {
     public:
         static Application& Instance();

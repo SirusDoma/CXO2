@@ -6,7 +6,6 @@
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/System/Primitives.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <SFML/System/Time.hpp>
@@ -28,46 +27,46 @@ enum class Genre
 
 struct ChartMetadata
 {
-    static constexpr Gx::Uint32 Size = 300;
+    static constexpr std::uint32_t Size = 300;
 
-    Gx::Uint32 ID;
+    std::uint32_t ID;
     char Signature[4];
     float EncodingVersion;
     ::Genre Genre;
     float BPM;
-    Gx::Uint16 LevelEx;
-    Gx::Uint16 LevelNx;
-    Gx::Uint16 LevelHx;
-    Gx::Int16 Unk1;
-    Gx::Uint32 EventCountEx;
-    Gx::Uint32 EventCountNx;
-    Gx::Uint32 EventCountHx;
-    Gx::Uint32 NoteCountEx;
-    Gx::Uint32 NoteCountNx;
-    Gx::Uint32 NoteCountHx;
-    Gx::Uint32 MeasureCountEx;
-    Gx::Uint32 MeasureCountNx;
-    Gx::Uint32 MeasureCountHx;
-    Gx::Uint32 BlockCountEx;
-    Gx::Uint32 BlockCountNx;
-    Gx::Uint32 BlockCountHx;
-    Gx::Int16 OldEncodingVersion;
-    Gx::Int16 OldSongID;
+    std::uint16_t LevelEx;
+    std::uint16_t LevelNx;
+    std::uint16_t LevelHx;
+    std::int16_t Unk1;
+    std::uint32_t EventCountEx;
+    std::uint32_t EventCountNx;
+    std::uint32_t EventCountHx;
+    std::uint32_t NoteCountEx;
+    std::uint32_t NoteCountNx;
+    std::uint32_t NoteCountHx;
+    std::uint32_t MeasureCountEx;
+    std::uint32_t MeasureCountNx;
+    std::uint32_t MeasureCountHx;
+    std::uint32_t BlockCountEx;
+    std::uint32_t BlockCountNx;
+    std::uint32_t BlockCountHx;
+    std::int16_t OldEncodingVersion;
+    std::int16_t OldSongID;
     char OldGenre[20];
-    Gx::Uint32 ThumbnailSize;
-    Gx::Uint32 FileVersion;
+    std::uint32_t ThumbnailSize;
+    std::uint32_t FileVersion;
     char Title[64];
     char Artist[32];
     char NoteArranger[32];
     char OJM[32];
-    Gx::Uint32 CoverSize;
-    Gx::Uint32 DurationEx;
-    Gx::Uint32 DurationNx;
-    Gx::Uint32 DurationHx;
-    Gx::Uint32 BlockOffsetEx;
-    Gx::Uint32 BlockOffsetNx;
-    Gx::Uint32 BlockOffsetHx;
-    Gx::Uint32 CoverOffset;
+    std::uint32_t CoverSize;
+    std::uint32_t DurationEx;
+    std::uint32_t DurationNx;
+    std::uint32_t DurationHx;
+    std::uint32_t BlockOffsetEx;
+    std::uint32_t BlockOffsetNx;
+    std::uint32_t BlockOffsetHx;
+    std::uint32_t CoverOffset;
 
     std::string Source;
 

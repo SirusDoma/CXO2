@@ -79,7 +79,7 @@ std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::string& fileNam
     return {};
 }
 
-Gx::Int64 OjmArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
+std::int64_t OjmArchive::ReadFile(const std::string& fileName, void* data, std::int64_t size) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::ReadFile(fileName, data, size);
@@ -89,7 +89,7 @@ Gx::Int64 OjmArchive::ReadFile(const std::string& fileName, void* data, Gx::Int6
     return -1;
 }
 
-Gx::Int64 OjmArchive::GetFileSize(const std::string& fileName) const
+std::int64_t OjmArchive::GetFileSize(const std::string& fileName) const
 {
     if (m_type == ArchiveType::M30)
         return M30Archive::GetFileSize(fileName);

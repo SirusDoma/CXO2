@@ -31,7 +31,7 @@ enum class SongMode
     Random
 };
 
-enum class Role : Gx::Uint8
+enum class Role : std::uint8_t
 {
     Normal        = 0,
     Administrator = 1
@@ -39,32 +39,32 @@ enum class Role : Gx::Uint8
 
 struct Guild
 {
-    Gx::Uint32  ID;
-    std::string Name;
-    Gx::Uint16  Ranking;
+    std::uint32_t ID;
+    std::string   Name;
+    std::uint16_t Ranking;
 };
 
 struct Player
 {
-    using ItemList = std::vector<Gx::Uint32>;
+    using ItemList = std::vector<std::uint32_t>;
 
-    Gx::Uint32   ID;
-    ::Role       Role;
-    std::string  Name;
-    Gx::Int16    Level;
-    Gx::Uint32   Rank;
-    Gx::Uint32   Exp;
-    Gx::Uint32   NextExp;
-    Gx::Uint32   EventPoint;
-    ::Gender     Gender;
-    Gx::Uint32   Gem;
-    Gx::Uint32   Cash;
-    Gx::Uint32   Wins;
-    Gx::Uint32   Draws;
-    Gx::Uint32   Loses;
-    ItemList     EquippedItemIDs;
-    ItemList     Inventory;
-    ::Guild      Guild;
+    std::uint32_t ID;
+    ::Role        Role;
+    std::string   Name;
+    std::int16_t  Level;
+    std::uint32_t Rank;
+    std::uint32_t Exp;
+    std::uint32_t NextExp;
+    std::uint32_t EventPoint;
+    ::Gender      Gender;
+    std::uint32_t Gem;
+    std::uint32_t Cash;
+    std::uint32_t Wins;
+    std::uint32_t Draws;
+    std::uint32_t Loses;
+    ItemList      EquippedItemIDs;
+    ItemList      Inventory;
+    ::Guild       Guild;
 };
 
 struct ChatMessage
@@ -94,14 +94,14 @@ struct RoomMember : Player
     
     RoomTeam  Team  = static_cast<RoomTeam>(-1);
     sf::Color Color = sf::Color::Transparent;
-    Gx::Uint8 Index = 0;
+    std::uint8_t Index = 0;
     bool      Ready = false;
 };
 
 struct Room
 {
-    Gx::Uint32        ID;
-    Gx::Uint32        RoomMasterID  = 0;
+    std::uint32_t     ID;
+    std::uint32_t     RoomMasterID  = 0;
     std::string       Title;
     ChartMetadataView ChartMetadata;
     ::Difficulty      Difficulty;
@@ -109,13 +109,13 @@ struct Room
     ::SongMode        SongMode;
     RoomState         State;
     float             Speed;
-    Gx::Int8          Locked;
-    Gx::Uint32        Capacity      = 8;
-    Gx::Uint32        MinLevelLimit = 0;
-    Gx::Uint32        MaxLevelLimit = 0;
+    std::int8_t       Locked;
+    std::uint32_t     Capacity      = 8;
+    std::uint32_t     MinLevelLimit = 0;
+    std::uint32_t     MaxLevelLimit = 0;
     RoomMember        Members[8]    = {{},{},{},{},{},{},{},{}};
-    Gx::Uint32        MapID         = 0;
-    Gx::Uint32        EffectID      = 1;
+    std::uint32_t     MapID         = 0;
+    std::uint32_t     EffectID      = 1;
 
     static constexpr std::size_t MaxCapacity = sizeof(Members) / sizeof(RoomMember);
 

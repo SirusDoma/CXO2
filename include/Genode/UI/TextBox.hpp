@@ -26,7 +26,7 @@ namespace Gx
         void SetCharacterSize(unsigned int size);
         void SetLineSpacing(float spacingFactor);
         void SetLetterSpacing(float spacingFactor);
-        void SetStyle(Uint32 style);
+        void SetStyle(std::uint32_t style);
 
         void SetColor(const sf::Color& color) override;
         void SetFillColor(const sf::Color& color);
@@ -43,7 +43,7 @@ namespace Gx
         unsigned int GetCharacterSize() const;
         float GetLetterSpacing() const;
         float GetLineSpacing() const;
-        Uint32 GetStyle() const;
+        std::uint32_t GetStyle() const;
 
         const sf::Color& GetColor() const override;
         const sf::Color& GetFillColor() const;
@@ -66,7 +66,7 @@ namespace Gx
         void SelectAll();
         sf::String GetSelectedText() const;
 
-        size_t Insert(size_t index, Uint32 unicode, int selectionLength = 0);
+        size_t Insert(size_t index, std::uint32_t unicode, int selectionLength = 0);
         size_t Erase(size_t index, int length);
 
     private:

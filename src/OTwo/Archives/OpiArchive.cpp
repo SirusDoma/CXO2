@@ -36,7 +36,7 @@ Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string& fileName) c
         throw Gx::ResourceAccessException(fileName, "The specified index is out of bound for this archive");
 
     const auto header = it->second;
-    const auto data = new Gx::Uint8[header.GetSize()];
+    const auto data = new std::uint8_t[header.GetSize()];
     if (const auto read = ReadFile(fileName, data, header.GetSize()); read <= 0)
         delete[] data;
 
@@ -68,7 +68,7 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OpiArchive::GetFileEntries() const
     m_entries.clear();
     for (unsigned int i = 0; i < m_count; i++)
     {
-        Gx::Uint32 sign;
+        std::uint32_t sign;
         if (!ReadStream(&sign, sizeof(sign)) && sign != 01)
             continue;
 
@@ -76,15 +76,15 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OpiArchive::GetFileEntries() const
         if (!ReadStream(&bytes, sizeof(bytes)))
             continue;
 
-        Gx::Uint32 ref;
+        std::uint32_t ref;
         if (!ReadStream(&ref, sizeof(ref)))
             continue;
 
-        Gx::Uint32 size1;
+        std::uint32_t size1;
         if (!ReadStream(&size1, sizeof(size1)))
             continue;
 
-        Gx::Uint32 size2;
+        std::uint32_t size2;
         if (!ReadStream(&size2, sizeof(size2)))
             continue;
 
@@ -114,7 +114,7 @@ std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string& fileNam
     throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 }
 
-Gx::Int64 OpiArchive::ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const
+std::int64_t OpiArchive::ReadFile(const std::string& fileName, void* data, std::int64_t size) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())
@@ -130,7 +130,7 @@ Gx::Int64 OpiArchive::ReadFile(const std::string& fileName, void* data, Gx::Int6
     return m_fileStream.read(data, size).value_or(-1);
 }
 
-Gx::Int64 OpiArchive::GetFileSize(const std::string& fileName) const
+std::int64_t OpiArchive::GetFileSize(const std::string& fileName) const
 {
     const auto iterator = m_entries.find(fileName);
     if (iterator == m_entries.end())
@@ -139,7 +139,7 @@ Gx::Int64 OpiArchive::GetFileSize(const std::string& fileName) const
     return iterator->second.GetSize();
 }
 
-bool OpiArchive::ReadStream(void* data, Gx::Uint64 size) const
+bool OpiArchive::ReadStream(void* data, std::uint64_t size) const
 {
     const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
     return read == size;

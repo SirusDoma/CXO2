@@ -95,12 +95,12 @@ void Chart::SortEvents()
     }
 }
 
-void Chart::AddSample(const Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample)
+void Chart::AddSample(const std::uint16_t id, Gx::ResourcePtr<sf::SoundBuffer> sample)
 {
     m_samples[id] = std::move(sample);
 }
 
-sf::SoundBuffer* Chart::GetSample(const Gx::Uint16 id) const
+sf::SoundBuffer* Chart::GetSample(const std::uint16_t id) const
 {
     if (const auto it = m_samples.find(id); it != m_samples.end())
         return it->second.get();

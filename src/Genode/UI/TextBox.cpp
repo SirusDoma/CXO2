@@ -90,7 +90,7 @@ namespace Gx
         m_text.SetLetterSpacing(spacingFactor);
     }
 
-    void TextBox::SetStyle(Uint32 style)
+    void TextBox::SetStyle(std::uint32_t style)
     {
         m_text.SetStyle(style);
     }
@@ -160,7 +160,7 @@ namespace Gx
         return m_text.GetLineSpacing();
     }
 
-    Uint32 TextBox::GetStyle() const
+    std::uint32_t TextBox::GetStyle() const
     {
         return m_text.GetStyle();
     }
@@ -255,7 +255,7 @@ namespace Gx
         return m_text.GetString().substring(index, std::abs(length));
     }
 
-    size_t TextBox::Insert(size_t index, Uint32 unicode, int selectionLength)
+    size_t TextBox::Insert(size_t index, std::uint32_t unicode, int selectionLength)
     {
         // backspace, tab, enter, etc
         if (unicode <= 31)

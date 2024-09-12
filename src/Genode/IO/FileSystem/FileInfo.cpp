@@ -4,7 +4,7 @@
 
 namespace Gx
 {
-    FileInfo::FileInfo(const FileSystemController& parent, const std::string& name, const Int64 size) :
+    FileInfo::FileInfo(const FileSystemController& parent, const std::string& name, const std::int64_t size) :
         m_parent(&parent),
         m_name(name),
         m_size(size)
@@ -21,12 +21,12 @@ namespace Gx
         return m_name;
     }
 
-    Uint32 FileInfo::GetSize() const
+    std::uint32_t FileInfo::GetSize() const
     {
         return m_size;
     }
 
-    Int64 FileInfo::Read(void* data) const
+    std::int64_t FileInfo::Read(void* data) const
     {
         return m_parent->ReadFile(m_name, data, m_size);
     }

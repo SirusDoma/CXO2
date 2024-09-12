@@ -43,7 +43,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata&
 
     // "data" must be a pointer (or reference to somewhere else) because it need to be alive outside this method
     const auto size = Gx::FileSystem::GetFileSize(metadata->Source);
-    if (auto data = new Gx::Uint8[size]; Gx::FileSystem::ReadFile(metadata->Source, data, size))
+    if (auto data = new std::uint8_t[size]; Gx::FileSystem::ReadFile(metadata->Source, data, size))
     {
         auto music = Gx::ResourcePtr<sf::Music>(new sf::Music(), [data] (auto music) {
             delete music;

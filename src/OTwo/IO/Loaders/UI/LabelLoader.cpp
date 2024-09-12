@@ -31,15 +31,15 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
     if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
         label->SetFont(*font);
 
-    Gx::Uint32 style = 0;
+    std::uint32_t style = 0;
     if (metadata->Bold)
-        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Bold);
+        style |= static_cast<std::uint32_t>(Gx::Label::Style::Bold);
 
     if (metadata->Italic)
-        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Italic);
+        style |= static_cast<std::uint32_t>(Gx::Label::Style::Italic);
 
     if (metadata->Underlined)
-        style |= static_cast<Gx::Uint32>(Gx::Label::Style::Underlined);
+        style |= static_cast<std::uint32_t>(Gx::Label::Style::Underlined);
 
     label->SetName(metadata->Name);
     label->SetStyle(style);

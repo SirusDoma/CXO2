@@ -10,7 +10,7 @@
 namespace Gx
 {
     class ResourceContext;
-    class ResourceManager : NonCopyable
+    class ResourceManager final
     {
     public:
         using ContextBuilder = std::function<std::unique_ptr<ResourceContext>(const std::string&, ResourceManager&, const CacheMode)>;

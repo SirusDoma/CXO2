@@ -184,9 +184,9 @@ namespace Gx
         return std::make_unique<FileInfo>(FileInfo(*this, fullName, size));
     }
 
-    Int64 LocalFileSystem::GetFileSize(const std::string& fileName) const
+    std::int64_t LocalFileSystem::GetFileSize(const std::string& fileName) const
     {
-        Int64 size = -1;
+        std::int64_t size = -1;
         if (auto fileStream = sf::FileInputStream(); fileStream.open(GetFullName(fileName)))
             size = fileStream.getSize().value_or(-1);
 
@@ -244,7 +244,7 @@ namespace Gx
         return "";
     }
 
-    Int64 LocalFileSystem::ReadFile(const std::string& fileName, void* data, Int64 size) const
+    std::int64_t LocalFileSystem::ReadFile(const std::string& fileName, void* data, std::int64_t size) const
     {
         sf::FileInputStream fs;
         if (!fs.open(GetFullName(fileName)))
@@ -259,7 +259,7 @@ namespace Gx
         return fs.read(data, size).value_or(-1);
     }
 
-    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, const Int64 size)
+    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, std::int64_t size)
     {
         if (size <= 0)
             return;

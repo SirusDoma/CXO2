@@ -11,7 +11,7 @@
 class OpiArchive final : public virtual Gx::Archive
 {
 public:
-    enum class Signature : Gx::Uint32
+    enum class Signature : std::uint32_t
     {
         Unknown,
         OPA = 01,
@@ -30,18 +30,18 @@ public:
     std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
     std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
 
-    Gx::Int64 ReadFile(const std::string& fileName, void* data, Gx::Int64 size) const override;
-    void WriteFile(const std::string& fileName, void* data, Gx::Int64 size) override { throw Gx::NotSupportedException(); }
+    std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const override;
+    void WriteFile(const std::string& fileName, void* data, std::int64_t size) override { throw Gx::NotSupportedException(); }
 
-    Gx::Int64 GetFileSize(const std::string& fileName) const override;
+    std::int64_t GetFileSize(const std::string& fileName) const override;
 
 private:
     const unsigned int ITEM_HEADER_SIZE = 152;
 
-    bool ReadStream(void* data, Gx::Uint64 size) const;
+    bool ReadStream(void* data, std::uint64_t size) const;
  
     Signature m_signature;
-    Gx::Uint32 m_count;
+    std::uint32_t m_count;
 
     mutable std::unordered_map<std::string, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;

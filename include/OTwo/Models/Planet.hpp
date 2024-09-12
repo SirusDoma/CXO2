@@ -2,9 +2,8 @@
 #define O2JAM_MODELS_PLANET_HPP
 
 #include <vector>
-#include <Genode/System/Primitives.hpp>
 
-enum class Planet : Gx::Uint8
+enum class Planet : std::uint8_t
 {
     Unknown,
     O2Planet,
@@ -20,7 +19,7 @@ enum class Planet : Gx::Uint8
     Event
 };
 
-enum class MusicHall : Gx::Uint8
+enum class MusicHall : std::uint8_t
 {
     None,
     Melpomin,

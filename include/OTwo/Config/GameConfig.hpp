@@ -8,7 +8,7 @@
 
 #include <map>
 
-enum class NoteShape : Gx::Uint8
+enum class NoteShape : std::uint8_t
 {
     Square = 1,
     Circle = 2

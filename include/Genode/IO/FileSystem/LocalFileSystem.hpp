@@ -3,7 +3,6 @@
 
 #include <Genode/IO/FileSystem/FileSystemController.hpp>
 
-#include <Genode/System/Primitives.hpp>
 #include <Genode/System/Exception.hpp>
 
 #include <vector>
@@ -35,10 +34,10 @@ namespace Gx
 
         std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const override { throw Gx::NotSupportedException(); }
 
-        Int64 ReadFile(const std::string& fileName, void* data, Int64 size) const override;
-        void WriteFile(const std::string& fileName, void* data, Int64 size) override;
+        std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size) const override;
+        void WriteFile(const std::string& fileName, void* data, std::int64_t size) override;
 
-        Int64 GetFileSize(const std::string& fileName) const override;
+        std::int64_t GetFileSize(const std::string& fileName) const override;
 
         std::vector<std::unique_ptr<FileInfo>> Scan(const std::string& pattern, bool recursive) const override;
 

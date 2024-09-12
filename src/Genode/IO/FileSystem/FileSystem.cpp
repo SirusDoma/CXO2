@@ -81,7 +81,7 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
-    Int64 FileSystem::ReadFile(const std::string& fileName, void* data, const Int64 size)
+    std::int64_t FileSystem::ReadFile(const std::string& fileName, void* data, std::int64_t size)
     {
         EnsureDefaultFileSystemsRegistered();
 

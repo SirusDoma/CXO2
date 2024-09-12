@@ -4,7 +4,6 @@
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <Genode/System/Primitives.hpp>
 
 #include <SFML/Audio/SoundBuffer.hpp>
 
@@ -17,7 +16,7 @@
 class Chart
 {
 public:
-    enum class Channel : Gx::Uint16
+    enum class Channel : std::uint16_t
     {
         Measure     = 0,
         BPM         = 1,
@@ -33,14 +32,14 @@ public:
         Background
     };
 
-    enum class NoteType : Gx::Uint8
+    enum class NoteType : std::uint8_t
     {
         Tap     = 0,
         Hold    = 2,
         Release = 3
     };
 
-    enum class SampleType : Gx::Uint8
+    enum class SampleType : std::uint8_t
     {
         KeySound   = 0,
         Background = 4
@@ -106,7 +105,7 @@ public:
 
     struct NoteEvent : Event
     {
-        Gx::Uint16        ID;
+        std::uint16_t     ID;
         float             Volume;
         float             Pan;
         NoteType          Type;
@@ -114,7 +113,7 @@ public:
         sf::SoundBuffer* Sample;
         double            Length;
 
-        NoteEvent(const Event& ev, const Gx::Uint16 id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer* sample) :
+        NoteEvent(const Event& ev, const std::uint16_t id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer* sample) :
             Event(ev),
             ID(id),
             Volume(volume),
@@ -140,8 +139,8 @@ public:
     std::size_t GetEventCount(Difficulty diff) const;
     void SortEvents();
 
-    void AddSample(Gx::Uint16 id, Gx::ResourcePtr<sf::SoundBuffer> sample);
-    sf::SoundBuffer* GetSample(Gx::Uint16 id) const;
+    void AddSample(std::uint16_t id, Gx::ResourcePtr<sf::SoundBuffer> sample);
+    sf::SoundBuffer* GetSample(std::uint16_t id) const;
     unsigned int GetSampleCount() const;
 
     const sf::Image* GetCover() const;
@@ -162,7 +161,7 @@ public:
     std::string Source;
 private:
     using EventMap    = std::unordered_map<Difficulty, EventList>;
-    using SampleMap   = std::unordered_map<Gx::Uint16, Gx::ResourcePtr<sf::SoundBuffer>>;
+    using SampleMap   = std::unordered_map<std::uint16_t, Gx::ResourcePtr<sf::SoundBuffer>>;
     using FractionMap = std::unordered_map<Difficulty, std::map<int, float>>;
     using PositionMap = std::unordered_map<Difficulty, double>;
 

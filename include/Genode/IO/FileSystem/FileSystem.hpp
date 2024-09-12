@@ -1,7 +1,6 @@
 #ifndef GENODE_IO_FILESYSTEM_HPP
 #define GENODE_IO_FILESYSTEM_HPP
 
-#include <Genode/System/Primitives.hpp>
 #include <Genode/IO/Resource.hpp>
 
 #include <SFML/System/InputStream.hpp>
@@ -14,7 +13,7 @@ namespace Gx
 {
     class FileInfo;
     class FileSystemController;
-    class FileSystem
+    class FileSystem final
     {
         public:
             FileSystem() = delete;
@@ -27,7 +26,7 @@ namespace Gx
             static bool Contains(const std::string& fileName);
             static std::unique_ptr<FileInfo> GetFileInfo(const std::string& fileName);
 
-            static Int64 ReadFile(const std::string& fileName, void* data, Int64 size);
+            static std::int64_t ReadFile(const std::string& fileName, void* data, std::int64_t size);
             static std::size_t GetFileSize(const std::string& fileName);
 
             static void Mount(const FileSystemController& fileSystem);

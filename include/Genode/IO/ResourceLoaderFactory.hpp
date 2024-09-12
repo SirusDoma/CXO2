@@ -12,9 +12,12 @@ namespace Gx
     template<typename T>
     class ResourceLoader;
     class Context;
-    class ResourceLoaderFactory
+    class ResourceLoaderFactory final
     {
     public:
+        ResourceLoaderFactory() = delete;
+        ~ResourceLoaderFactory() = delete;
+
         static const Context* GetApplicationContext();
         static void SetApplicationContext(const Context& context);
 

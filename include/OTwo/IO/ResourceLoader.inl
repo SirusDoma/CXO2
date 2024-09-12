@@ -47,7 +47,7 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream& stream, co
     }
 
     const auto size = stream.getSize().value_or(0) - stream.tell().value_or(0);
-    const auto data = new Gx::Uint8[size];
+    const auto data = new std::uint8_t[size];
     if (stream.read(data, size) == -1)
     {
         delete[] data;

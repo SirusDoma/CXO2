@@ -3,7 +3,6 @@
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>
-#include <Genode/System/Primitives.hpp>
 
 namespace Gx
 {

@@ -78,7 +78,7 @@ namespace Gx
         m_characterWidth     (0),
         m_letterSpacingFactor(1.f),
         m_lineSpacingFactor  (1.f),
-        m_style              (static_cast<Gx::Uint32>(Style::Regular)),
+        m_style              (static_cast<std::uint32_t>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_colorMap(),
@@ -99,7 +99,7 @@ namespace Gx
         m_characterSize      (characterSize),
         m_letterSpacingFactor(1.f),
         m_lineSpacingFactor  (1.f),
-        m_style              (static_cast<Gx::Uint32>(Style::Regular)),
+        m_style              (static_cast<std::uint32_t>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
         m_colorMap(),
@@ -173,7 +173,7 @@ namespace Gx
         }
     }
 
-    void Text::SetStyle(const Uint32 style)
+    void Text::SetStyle(const std::uint32_t style)
     {
         if (m_style != style)
         {
@@ -295,7 +295,7 @@ namespace Gx
         return m_lineSpacingFactor;
     }
 
-    Uint32 Text::GetStyle() const
+    std::uint32_t Text::GetStyle() const
     {
         return m_style;
     }
@@ -331,7 +331,7 @@ namespace Gx
             index = m_string.getSize();
 
         // Precompute the variables needed by the algorithm
-        const bool  isBold         = m_style & static_cast<Gx::Uint32>(Style::Bold);
+        const bool  isBold         = m_style & static_cast<std::uint32_t>(Style::Bold);
         float whitespaceWidth      = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
         const float letterSpacing  = ( whitespaceWidth / 3.f ) * ( m_letterSpacingFactor - 1.f );
         whitespaceWidth           += letterSpacing;
@@ -339,10 +339,10 @@ namespace Gx
 
         // Compute the position
         sf::Vector2f position;
-        Uint32 prevChar = 0;
+        std::uint32_t prevChar = 0;
         for (std::size_t i = 0; i < index; ++i)
         {
-            Uint32 curChar = m_string[i];
+            std::uint32_t curChar = m_string[i];
             if (m_masked)
                 curChar = U'\u25CF';
 
@@ -429,10 +429,10 @@ namespace Gx
             return;
 
         // Compute values related to the text style
-        const bool  isBold             = m_style & static_cast<Uint32>(Style::Bold);
-        const bool  isUnderlined       = m_style & static_cast<Uint32>(Style::Underlined);
-        const bool  isStrikeThrough    = m_style & static_cast<Uint32>(Style::StrikeThrough);
-        const float italicShear        = m_style & static_cast<Uint32>(Style::Italic) ? sf::degrees(12).asRadians() : 0.f;
+        const bool  isBold             = m_style & static_cast<std::uint32_t>(Style::Bold);
+        const bool  isUnderlined       = m_style & static_cast<std::uint32_t>(Style::Underlined);
+        const bool  isStrikeThrough    = m_style & static_cast<std::uint32_t>(Style::StrikeThrough);
+        const float italicShear        = m_style & static_cast<std::uint32_t>(Style::Italic) ? sf::degrees(12).asRadians() : 0.f;
         const float underlineOffset    = m_font->GetUnderlinePosition(m_characterSize, m_characterWidth);
         const float underlineThickness = m_font->GetUnderlineThickness(m_characterSize, m_characterWidth);
 
@@ -455,10 +455,10 @@ namespace Gx
         float minY = static_cast<float>(m_characterSize);
         float maxX = 0.f;
         float maxY = 0.f;
-        Uint32 prevChar = 0;
+        std::uint32_t prevChar = 0;
         for (std::size_t i = 0; i < m_string.getSize(); ++i)
         {
-            Uint32 curChar = m_string[i];
+            std::uint32_t curChar = m_string[i];
             if (m_masked)
                 curChar = U'\u25CF';
 

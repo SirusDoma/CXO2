@@ -30,7 +30,6 @@
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
 #include <Genode/Entities/Colorable.hpp>
-#include <Genode/System/Primitives.hpp>
 
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -43,7 +42,7 @@
 namespace
 {
     struct CacheStorage {
-        typedef Gx::Uint64 sf::Texture::* type;
+        typedef std::uint64_t sf::Texture::* type;
         friend type Get(CacheStorage);
     };
 
@@ -85,7 +84,7 @@ namespace Gx
         void SetCharacterWidth(const unsigned int characterWidth);
         void SetLineSpacing(float spacingFactor);
         void SetLetterSpacing(float spacingFactor);
-        void SetStyle(Uint32 style);
+        void SetStyle(std::uint32_t style);
 
         void SetColor(const sf::Color& color) override;
         void SetFillColor(const sf::Color& color);
@@ -101,7 +100,7 @@ namespace Gx
         unsigned int GetCharacterWidth() const;
         float GetLetterSpacing() const;
         float GetLineSpacing() const;
-        Uint32 GetStyle() const;
+        std::uint32_t GetStyle() const;
 
         const sf::Color& GetColor() const override;
         const sf::Color& GetFillColor() const;
@@ -127,7 +126,7 @@ namespace Gx
         unsigned int            m_characterWidth;
         float                   m_letterSpacingFactor;
         float                   m_lineSpacingFactor;
-        Uint32                  m_style;
+        std::uint32_t           m_style;
         sf::Color               m_fillColor;
         sf::Color               m_outlineColor;
         ColorMap                m_colorMap;
@@ -137,7 +136,7 @@ namespace Gx
         mutable sf::VertexArray m_outlineVertices;
         mutable sf::FloatRect   m_bounds;
         mutable bool            m_geometryNeedUpdate; 
-        mutable Uint64          m_fontTextureId;
+        mutable std::uint64_t   m_fontTextureId;
     };
 
 }

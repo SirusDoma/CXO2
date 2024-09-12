@@ -105,7 +105,7 @@ namespace Gx
     }
 
     template<typename R>
-    Uint64 ResourceContainer<R>::Count() const
+    std::uint64_t ResourceContainer<R>::Count() const
     {
         return m_caches.size();
     }

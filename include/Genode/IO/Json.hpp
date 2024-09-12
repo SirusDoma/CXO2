@@ -6,7 +6,7 @@
 
 namespace Gx
 {
-    typedef nlohmann::ordered_json Json;
+    using Json = nlohmann::ordered_json;
 }
 
 #endif

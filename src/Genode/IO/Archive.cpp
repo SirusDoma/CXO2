@@ -13,7 +13,7 @@ namespace Gx
         return true;
     }
 
-    Int64 Archive::ReadFile(const FileInfo& entry, void* data) const
+    std::int64_t Archive::ReadFile(const FileInfo& entry, void* data) const
     {
         if (&entry.GetParent() != this)
             throw ResourceAccessException(entry.GetName(), "The specified file doesn't belong to this archive");
