@@ -348,13 +348,7 @@ namespace Gx
 
         // Setup view
         const auto size = sf::Vector2f{static_cast<float>(m_gameVideoMode.size.x), static_cast<float>(m_gameVideoMode.size.y)};
-        auto view = sf::View(
-            {std::floor(size.x / 2.0f), std::floor(size.y / 2.0f)},
-            size
-        );
-
-         if (m_state == sf::State::Fullscreen)
-             view = GetLetterBoxView(view, m_window->getSize());
+        const auto view = sf::View({std::floor(size.x / 2.0f), std::floor(size.y / 2.0f)}, size);
 
         m_window->setView(view);
         m_adapter = RenderTargetAdapter(*this);
@@ -369,33 +363,6 @@ namespace Gx
             m_target = std::make_unique<sf::RenderTexture>(m_windowVideoMode.size);
             m_target->setSmooth(true);
         }
-    }
-
-    sf::View Application::GetLetterBoxView(sf::View view, const sf::Vector2u size)
-    {
-        const float windowRatio = static_cast<float>(size.x) / static_cast<float>(size.y);
-        const float viewRatio = view.getSize().x / static_cast<float>(view.getSize().y);
-        float sizeX = 1;
-        float sizeY = 1;
-        float posX = 0;
-        float posY = 0;
-
-        bool horizontalSpacing = true;
-        if (windowRatio < viewRatio)
-            horizontalSpacing = false;
-
-        if (horizontalSpacing) {
-            sizeX = viewRatio / windowRatio;
-            posX = (1 - sizeX) / 2.f;
-        }
-
-        else {
-            sizeY = windowRatio / viewRatio;
-            posY = (1 - sizeY) / 2.f;
-        }
-
-        view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
-        return view;
     }
 
     const sf::Color& Application::GetClearColor() const

@@ -72,7 +72,6 @@ namespace Gx
         void UpdateCursor(const sf::Event& ev) const;
         void SetupWindow() const;
         void SetupTarget() const;
-        static sf::View GetLetterBoxView(sf::View view, sf::Vector2u size);
 
         inline static Application* m_instance = nullptr;
 

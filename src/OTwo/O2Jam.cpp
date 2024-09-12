@@ -79,6 +79,8 @@ void O2Jam::Boot()
     auto& window = GetRenderWindow();
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(0);
+    if (GetWindowState() == sf::State::Fullscreen)
+        window.setView(GetLetterBoxView(window.getView(), window.getSize()));
 
     // Asset Path
     Gx::LocalFileSystem::AddAssetPath("./assets");
@@ -306,13 +308,12 @@ int O2Jam::Shutdown()
 {
     Application::Shutdown();
 
-    auto& context   = GetContext();
-    auto& resources = context.Require<Gx::ResourceManager>();
-    auto& mixer     = context.Require<Gx::Mixer>();
     auto& director  = GetSceneDirector();
+    auto& mixer     = GetContext().Require<Gx::Mixer>();
+    auto& resources = GetContext().Require<Gx::ResourceManager>();
 
-    mixer.Clear();
     director.Unload();
+    mixer.Clear();
     resources.Clear();
 
     return 0;
@@ -322,13 +323,28 @@ void O2Jam::Update(const double delta)
 {
     Application::Update(delta);
 
-    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_switched)
+    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_windowStateSwitched)
     {
-        m_switched = true;
+        m_windowStateSwitched = true;
         SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
     }
-    else if (m_switched && !isKeyPressed(sf::Keyboard::Key::Enter))
-        m_switched = false;
+    else if (m_windowStateSwitched && !isKeyPressed(sf::Keyboard::Key::Enter))
+        m_windowStateSwitched = false;
+
+    if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Up) && !m_letterboxSwitched)
+    {
+        m_letterboxSwitched = true;
+        if (GetWindowState() == sf::State::Fullscreen)
+        {
+            auto& window = GetRenderWindow();
+            if (window.getView().getViewport() ==  sf::FloatRect({0.f, 0.f}, {1.f, 1.f}))
+                window.setView(GetLetterBoxView(window.getView(), window.getSize()));
+            else
+                window.setView(sf::View(window.getView().getCenter(), window.getView().getSize()));
+        }
+    }
+    else if (m_letterboxSwitched && !isKeyPressed(sf::Keyboard::Key::Up))
+        m_letterboxSwitched = false;
 }
 
 Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
@@ -337,4 +353,31 @@ Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates stat
     surface.Render(Console::Instance(), states);
 
     return states;
+}
+
+sf::View O2Jam::GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize)
+{
+    const float windowRatio = static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
+    const float viewRatio = view.getSize().x / static_cast<float>(view.getSize().y);
+    float sizeX = 1;
+    float sizeY = 1;
+    float posX = 0;
+    float posY = 0;
+
+    bool horizontalSpacing = true;
+    if (windowRatio < viewRatio)
+        horizontalSpacing = false;
+
+    if (horizontalSpacing) {
+        sizeX = viewRatio / windowRatio;
+        posX = (1 - sizeX) / 2.f;
+    }
+
+    else {
+        sizeY = windowRatio / viewRatio;
+        posY = (1 - sizeY) / 2.f;
+    }
+
+    view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
+    return view;
 }

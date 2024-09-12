@@ -21,7 +21,10 @@ protected:
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
 private:
-    bool m_switched;
+    static sf::View GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize);
+
+    bool m_windowStateSwitched;
+    bool m_letterboxSwitched;
 };
 
 #endif
