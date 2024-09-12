@@ -1,4 +1,5 @@
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateMyRoom.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
@@ -7,7 +8,7 @@
 
 #include <OTwo/UI/Common/Marquee.hpp>
 #include <OTwo/UI/Common/ChatPanel.hpp>
-#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/UI/Room/UserList.hpp>
 #include <OTwo/UI/Dialogs/OptionDialog.hpp>
 #include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
@@ -24,7 +25,6 @@
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
-#include <OTwo/States/StateMyRoom.hpp>
 
 StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items) :
     m_mixer(mixer),
@@ -95,7 +95,7 @@ void StateRoom::Initialize()
     for (unsigned int i = 0; i < 34; i++)
         userList->AddUser(Player{i + 3, Role::Normal, "Dummy " + std::to_string(i), static_cast<signed short>(i) });
 
-    const auto roomContainer = Instantiate<RoomContainer>("IDC_ROOM_CONTAINER");
+    const auto roomList = Instantiate<RoomList>("IDC_ROOM_LIST");
     Room rooms[] = {
         Room{
             /* .ID           = */ 0,
@@ -170,7 +170,7 @@ void StateRoom::Initialize()
     };
 
     for (auto& room : rooms)
-        roomContainer->Add(room);
+        roomList->Add(room);
 
     const auto createRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_CREATE_ROOM");
     if (const auto createRoomDialog = Instantiate<CreateRoomDialog>("IDC_DIALOG_CREATE_ROOM"); createRoomDialog)
@@ -223,7 +223,7 @@ void StateRoom::Initialize()
         waitingRoomButton->SetVisible(true);
         waitingRoomButton->SetEnabled(true);
 
-        roomContainer->ShowWaitingOnly();
+        roomList->ShowWaitingOnly();
     });
 
     waitingRoomButton->SetClickCallback([=] (auto& sender, auto& ev) {
@@ -235,7 +235,7 @@ void StateRoom::Initialize()
         waitingRoomButton->SetVisible(false);
         waitingRoomButton->SetEnabled(false);
 
-        roomContainer->ShowAll();
+        roomList->ShowAll();
     });
 
     const auto roomLeftButton  = Instantiate<Gx::Button>("IDC_BUTTON_ROOM_LEFT");
@@ -243,12 +243,12 @@ void StateRoom::Initialize()
 
     roomLeftButton->SetClickCallback([=] (auto& sender, auto& ev) {
         m_mixer.Play(sfxNavigate, "SFX");
-        roomContainer->PreviousPage();
+        roomList->PreviousPage();
     });
 
     roomRightButton->SetClickCallback([=] (auto& sender, auto& ev) {
         m_mixer.Play(sfxNavigate, "SFX");
-        roomContainer->NextPage();
+        roomList->NextPage();
     });
 
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");

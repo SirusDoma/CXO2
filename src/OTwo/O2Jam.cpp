@@ -46,7 +46,8 @@
 #include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
 #include <OTwo/UI/Dialogs/OptionDialog.hpp>
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
-#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomButton.hpp>
+#include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/UI/Room/UserList.hpp>
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Waiting/MapSelector.hpp>
@@ -121,10 +122,10 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
     // O2Jam Derived Components
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, ChatPanel>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, RoomContainer>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, UserList>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, MapSelector>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, InstrumentSelector>();
+    Gx::ResourceLoaderFactory::RegisterDerived<Gx::List, RoomList>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, RoomButton>();
     Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, PlayMenu>();
     // O2Jam Dialogs

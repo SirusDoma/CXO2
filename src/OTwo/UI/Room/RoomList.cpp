@@ -1,87 +1,77 @@
-#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/States/State.hpp>
 
 #include <Genode/UI/List.hpp>
 
 #include <cmath>
 
-RoomContainer::RoomContainer() :
+RoomList::RoomList(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+    m_mixer(mixer),
+    m_resources(resources),
     m_rooms(),
-    m_waiting(false),
-    m_page(1)
+    m_page(1),
+    m_waiting(false)
 {
 }
 
-void RoomContainer::Initialize()
+void RoomList::Initialize()
 {
-    Gx::UiContainer::Initialize();
+    Gx::List::Initialize();
 
-    const auto parent = GetParent<::State>();
-    if (!parent)
-        return;
-
-    auto& mixer         = parent->Require<Gx::Mixer>();
-    auto sfxInvalid     = parent->Instantiate<sf::Sound>("STATE_ROOM/IDC_SOUND_15");
-    const auto roomList = FindChild<Gx::List>("IDC_LIST_ROOM");
-    for (const auto child : roomList->GetChildren())
+    auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>("bgEffect/15");
+    for (const auto child : GetChildren())
     {
         auto roomButton = dynamic_cast<RoomButton*>(child);
-        roomButton->SetClickCallback([&, sfx = sfxInvalid, button = roomButton] (auto& sender, auto& ev)
+        roomButton->SetClickCallback([this, sfx = sfxInvalid, button = roomButton] (auto& sender, auto& ev)
         {
            if (!button->IsActive())
            {
-               mixer.Play(sfx, "SFX");
+               m_mixer.Play(sfx, "SFX");
                return;
            }
         });
-
     }
-    AddChild(roomList);
 }
 
-void RoomContainer::Add(const Room& room)
+void RoomList::Add(const Room& room)
 {
     m_rooms[room.ID] = room;
     Invalidate();
 }
 
-void RoomContainer::Clear()
+void RoomList::Clear()
 {
     m_rooms.clear();
     Invalidate();
 }
 
-void RoomContainer::ShowAll()
+void RoomList::ShowAll()
 {
     m_waiting = false;
     Invalidate();
 }
 
-void RoomContainer::ShowWaitingOnly()
+void RoomList::ShowWaitingOnly()
 {
     m_waiting = true;
     Invalidate();
 }
 
-void RoomContainer::NextPage()
+void RoomList::NextPage()
 {
     m_page++;
     Invalidate();
 }
 
-void RoomContainer::PreviousPage()
+void RoomList::PreviousPage()
 {
     m_page--;
     Invalidate();
 }
 
-void RoomContainer::Invalidate()
+void RoomList::Invalidate()
 {
-    const auto roomList = FindChild<Gx::List>("IDC_LIST_ROOM");
-    if (!roomList)
-        return;
-
-    const auto children = roomList->GetChildren();
+    const auto children = GetChildren();
     m_page = std::min(m_page, static_cast<unsigned int>(std::round(static_cast<float>(MAX_NUMBER_OF_ROOM) / children.size())));
     m_page = std::max(m_page, static_cast<unsigned int>(1));
     for (size_t i = 0; i < children.size(); i++)

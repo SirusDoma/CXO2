@@ -31,18 +31,18 @@ namespace Gx
         return m_order;
     }
 
-    void List::SetOrder(List::Order order)
+    void List::SetOrder(const List::Order order)
     {
         m_order = order;
     }
 
-    void List::SetVerticalRepeat(int count, float spacing)
+    void List::SetVerticalRepeat(const int count, const float spacing)
     {
         m_verticalCount   = count;
         m_verticalSpacing = spacing;
     }
 
-    void List::SetHorizontalRepeat(int count, float spacing)
+    void List::SetHorizontalRepeat(const int count, const float spacing)
     {
         m_horizontalCount   = count;
         m_horizontalSpacing = spacing;

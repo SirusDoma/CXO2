@@ -58,7 +58,7 @@ struct ResourceMetadata
         ChannelBoard,
         ChannelButton,
         UserList,
-        RoomContainer,
+        RoomList,
         RoomButton,
         AvatarInfo,
         MapSelector,

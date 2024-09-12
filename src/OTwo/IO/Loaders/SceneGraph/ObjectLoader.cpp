@@ -12,7 +12,7 @@
 #include <OTwo/UI/Planet/ChannelButton.hpp>
 #include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/UI/Room/UserList.hpp>
-#include <OTwo/UI/Room/RoomContainer.hpp>
+#include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/UI/Room/RoomButton.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
 #include <OTwo/UI/Waiting/MapSelector.hpp>
@@ -179,9 +179,9 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<Gx::UiContainer, UserList>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::RoomContainer:
+        case ResourceMetadata::ResourceType::RoomList:
         {
-            container.Add(name, LoadResource<Gx::UiContainer, RoomContainer>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::List, RoomList>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::RoomButton:

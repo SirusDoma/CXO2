@@ -24,12 +24,10 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& m
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto list = std::make_unique<Gx::List>(
-        metadata->VerticalCount,   metadata->VerticalSpacing,
-        metadata->HorizontalCount, metadata->HorizontalSpacing
-    );
-    
+    auto list = Create();
     list->SetName(metadata->Name);
+    list->SetVerticalRepeat(metadata->VerticalCount, metadata->VerticalSpacing);
+    list->SetHorizontalRepeat(metadata->HorizontalCount, metadata->HorizontalSpacing);
     list->SetOrigin(metadata->Origin);
     list->SetPosition(metadata->Position);
     list->SetScale(metadata->Scale);
