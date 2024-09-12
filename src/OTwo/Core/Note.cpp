@@ -12,7 +12,7 @@ Note::Note(const double position, const Chart::Channel channel) :
     m_channel(channel),
     m_line(*this)
 {
-    for (int i = 0; i < m_vertices.size(); i++)
+    for (std::size_t i = 0; i < m_vertices.size(); i++)
         m_vertices[i] = nullptr;
 }
 

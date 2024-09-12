@@ -89,7 +89,7 @@ void ChannelBoard::Initialize()
     );
 
     const auto channelButtons = channelList->GetChildren();
-    for (int i = 0; i < channelButtons.size(); i++)
+    for (std::size_t i = 0; i < channelButtons.size(); i++)
     {
         auto channelButton = dynamic_cast<ChannelButton*>(channelButtons[i]);
         channelButton->SetChannelNumber(i + 1);
@@ -361,7 +361,7 @@ void ChannelBoard::ShowChannelList(unsigned int page)
 
     const auto children = channelList->GetChildren();
     channelList->SetVisible(true);
-    for (int i = 0; i < m_channelsPerPage; i++)
+    for (unsigned int i = 0; i < m_channelsPerPage; i++)
     {
         const auto channelButton = dynamic_cast<ChannelButton*>(children[i]);
         if (!channelButton)

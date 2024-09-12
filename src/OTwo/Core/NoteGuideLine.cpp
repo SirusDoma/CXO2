@@ -130,7 +130,7 @@ void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
     const auto width     = prefab ? prefab->GetLocalBounds().size.x  : 0.f;
     const auto height    = prefab ? prefab->GetLocalBounds().size.y : 0.f;
 
-    for (int i = 0; i < 4; i += 2)
+    for (unsigned int i = 0; i < 4; i += 2)
     {
         // Head
         double target = distance;
@@ -156,7 +156,7 @@ void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
         m_vertices[i + 1]->color = sf::Color::Black;
     }
 
-    for (int i = 4; i < 8; i++)
+    for (unsigned int i = 4; i < 8; i++)
     {
         m_vertices[i]->position    = m_vertices[i - 4]->position;
         m_vertices[i]->position.x += width - 1; // let the grid occupy 1px of the note

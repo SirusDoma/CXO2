@@ -111,9 +111,9 @@ void StatePlanet::OnMusicHallSelected(MusicHall hall)
     auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;
 
-    for (int x = 0; x < 2; x++)
+    for (unsigned int x = 0; x < 2; x++)
     {
-        for (int i = 1; i <= 20; i++)
+        for (unsigned int i = 1; i <= 20; i++)
         {
             auto channel       = ServerChannel();
             channel.ID         = (x * 20) + i;

@@ -61,9 +61,9 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1",  std::string(), ctx, 1);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE2",  std::string(), ctx, 1);
 
-    for (int i = 1; i <= 7; i++) // Channel
+    for (unsigned int i = 1; i <= 7; i++) // Channel
     {
-        for (int s = 1; s <= 2; s++) // Shape (Square, Circle)
+        for (unsigned int s = 1; s <= 2; s++) // Shape (Square, Circle)
         {
             LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_NORMAL" + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
             LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_LONG"   + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);

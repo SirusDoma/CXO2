@@ -98,7 +98,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
             loadSamples(&archive);
     }
 
-    for (int diff = 0; diff < 3; diff++)
+    for (unsigned int diff = 0; diff < 3; diff++)
     {
         const auto difficulty = static_cast<Difficulty>(diff);
         if (difficulty != m_difficulty)
@@ -135,7 +135,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
         if (!stream.seek(offset).has_value())
             continue;
 
-        for (int p = 0; p < blockCount; p++)
+        for (unsigned int p = 0; p < blockCount; p++)
         {
             auto block = NoteBlockHeader();
             if (stream.read(&block, sizeof(NoteBlockHeader)) != sizeof(NoteBlockHeader))
@@ -146,7 +146,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromStream(sf::InputStream& stream, cons
             const auto channel = static_cast<Chart::Channel>(block.Channel);
             // ====================================================================================================
 
-            for (int i = 0; i < block.EventCount; i++)
+            for (unsigned int i = 0; i < block.EventCount; i++)
             {
                 double position = block.Measure + (static_cast<double>(i) / static_cast<double>(block.EventCount));
                 if (auto fractions = chart->GetMeasureFractions(difficulty); fractions.size() > 0)

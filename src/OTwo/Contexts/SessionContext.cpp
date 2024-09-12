@@ -62,7 +62,7 @@ const std::array<ScoreResultItem, 8> & SessionContext::GetLatestScoreResults() c
 
 void SessionContext::SetLatestScoreResults(const std::array<ScoreResultItem, 8> &result)
 {
-    for (int i = 0; i < m_lastResult.size(); i++)
+    for (std::size_t i = 0; i < m_lastResult.size(); i++)
         m_lastResult[i] = result[i];
 
     std::sort(m_lastResult.begin(), m_lastResult.end(), [] (auto& a, auto& b) { return a.ScorePoint > b.ScorePoint; });

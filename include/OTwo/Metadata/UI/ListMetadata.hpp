@@ -15,7 +15,7 @@ struct ListMetadata : public TransformMetadata
     ResourceType ItemType = ResourceType::None;
     std::string ItemName = std::string();
     Gx::Json ItemSource;
-    int ItemCount = 0;
+    unsigned int ItemCount = 0;
 };
 
 #endif

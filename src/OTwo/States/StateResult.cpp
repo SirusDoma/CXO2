@@ -81,7 +81,7 @@ void StateResult::Initialize()
     {
         const auto listItems  = list->GetChildren();
         const auto scoreItems = m_session.GetLatestScoreResults();
-        for (int i = 0; i < listItems.size(); i++)
+        for (std::size_t i = 0; i < listItems.size(); i++)
         {
             const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
             if (!item)

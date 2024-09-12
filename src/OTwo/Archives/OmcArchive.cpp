@@ -311,7 +311,7 @@ std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *ac
     const int blockSize = length / 17;
 
     memcpy(out, in, length);
-    for (int block = 0; block < 17; block++)
+    for (unsigned int block = 0; block < 17; block++)
     {
         const int inOffset = blockSize * block;
         const int outOffset = blockSize * WAVE_REARRANGE_TABLE[key];
@@ -320,7 +320,7 @@ std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *ac
         key++;
     }
 
-    for (int i = 0; i < length; i++)
+    for (unsigned int i = 0; i < length; i++)
     {
         std::uint8_t currentByte = out[i], temp = out[i];
         if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)

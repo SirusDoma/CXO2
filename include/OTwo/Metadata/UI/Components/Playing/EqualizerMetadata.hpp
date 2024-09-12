@@ -5,7 +5,7 @@
 
 struct EqualizerMetadata : public TransformMetadata
 {
-    int   Count;
+    unsigned int Count;
     float Spacing;
     ResourceType ItemType = ResourceType::None;
     std::string ItemName = std::string();

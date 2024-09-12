@@ -161,10 +161,10 @@ void NoteContainer::Update(const double delta)
 Gx::RenderStates NoteContainer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     RenderMeasures(states.Delta);
-    for (int i = m_tapCounter; i < m_notes.size(); i++)
+    for (std::size_t i = m_tapCounter; i < m_notes.size(); i++)
         m_notes[i]->SetVisible(false);
 
-    for (int i = m_longCounter; i < m_longNotes.size(); i++)
+    for (std::size_t i = m_longCounter; i < m_longNotes.size(); i++)
         m_longNotes[i]->SetVisible(false);
 
     m_tapCounter = 0;

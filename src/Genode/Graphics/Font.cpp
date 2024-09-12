@@ -762,7 +762,7 @@ namespace Gx
                 if (!FT_IS_SCALABLE(face))
                 {
                     sf::err() << "Failed to set bitmap font size to " << characterSize << '\n' << "Available sizes are: ";
-                    for (int i = 0; i < face->num_fixed_sizes; ++i)
+                    for (unsigned int i = 0; i < face->num_fixed_sizes; ++i)
                     {
                         const long size = (face->available_sizes[i].y_ppem + 32) >> 6;
                         sf::err() << size << ' ';

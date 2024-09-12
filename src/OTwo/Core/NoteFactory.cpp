@@ -90,7 +90,7 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     auto& guideLineVertices = container->GetGuideLineVertices();
 
     // Resize the vertices to buffer size
-    constexpr int bufferSize = 192 * 20 * 2;
+    constexpr unsigned int bufferSize = 192 * 20 * 2;
     vertices.resize((bufferSize * 6 * 3) + (20 * 6));
     guideLineVertices.resize(bufferSize * 2 * 4);
 
@@ -114,11 +114,11 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     auto vz = std::array<sf::Vertex*, 8>();
 
     // Configure measure vertices
-    for (int m = 1; m <= 20; m++)
+    for (unsigned int m = 1; m <= 20; m++)
     {
         auto& measure = m_resources->Create<Measure>("IDC_MEASURE_" + std::to_string(m), m, Chart::Channel::Background);
 
-        for (int v = 0; v < vx.size(); v++)
+        for (std::size_t v = 0; v < vx.size(); v++)
             vx[v] = &vertices[vi + v];
 
         vi += 6;
@@ -130,19 +130,19 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     }
 
     // Configure note vertices
-    for (int i = 0; i < bufferSize; i++)
+    for (unsigned int i = 0; i < bufferSize; i++)
     {
         if (i < bufferSize / 2)
         {
             auto& note = m_resources->Create<Note>(state + "/IDC_TAP_NOTE_" + std::to_string(i), 0, Chart::Channel::Note4);
-            for (int v = 0; v < vx.size(); v++)
+            for (std::size_t v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             note.SetVertices(vx);
             note.SetPrefabs(tapNotePrefabs);
 
-            for (int v = 0; v < vz.size(); v++)
+            for (std::size_t v = 0; v < vz.size(); v++)
                 vz[v] = &guideLineVertices[vg + v];
 
             vg += 8;
@@ -153,26 +153,26 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
         else
         {
             auto& longNote = m_resources->Create<LongNote>(state + "/IDC_LONG_NOTE_" + std::to_string(i), 0, 1, Chart::Channel::Note4);
-            for (int v = 0; v < vx.size(); v++)
+            for (std::size_t v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             longNote.SetVertices(vx);
             longNote.SetPrefabs(longNotePrefabs);
 
-            for (int v = 0; v < vx.size(); v++)
+            for (std::size_t v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             longNote.SetHeadVertices(vx);
 
-            for (int v = 0; v < vx.size(); v++)
+            for (std::size_t v = 0; v < vx.size(); v++)
                 vx[v] = &vertices[vi + v];
 
             vi += 6;
             longNote.SetTailVertices(vx);
 
-            for (int v = 0; v < vz.size(); v++)
+            for (std::size_t v = 0; v < vz.size(); v++)
                 vz[v] = &guideLineVertices[vg + v];
 
             vg += 8;

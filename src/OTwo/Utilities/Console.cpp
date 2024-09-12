@@ -122,7 +122,7 @@ void Console::Invalidate()
         return;
 
     m_text.SetString(std::string());
-    for (int i = std::max(static_cast<int>(m_logs.size() - m_maxLines), 0); i < m_logs.size(); i++)
+    for (std::size_t i = std::max(static_cast<int>(m_logs.size() - m_maxLines), 0); i < m_logs.size(); i++)
     {
         if (i >= static_cast<int>(m_logs.size() + m_maxLines))
             break;

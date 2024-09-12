@@ -69,7 +69,7 @@ void StatePlaying7K::Initialize()
 
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
     const auto avaContainers = avatarList->GetChildren();
-    for (int i = 0; i < avaContainers.size(); i++)
+    for (std::size_t i = 0; i < avaContainers.size(); i++)
     {
         const auto container = dynamic_cast<Gx::UiContainer*>(avaContainers[i]);
         if (!container)
@@ -215,7 +215,7 @@ void StatePlaying7K::Initialize()
     const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
     const auto buffers = bufferContainer->GetChildren();
-    for (int i = 0; i < buffers.size(); i++)
+    for (std::size_t i = 0; i < buffers.size(); i++)
     {
         const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
         renderable->SetVisible(false);
@@ -306,7 +306,7 @@ void StatePlaying7K::Initialize()
         jamGauge->SetValue(m_scoreTracker.GetJamProgress());
 
         // Buffer
-        for (int i = 0; i < buffers.size(); i++)
+        for (std::size_t i = 0; i < buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
             renderable->SetVisible(i < m_scoreTracker.GetBufferCount());
@@ -370,7 +370,7 @@ void StatePlaying7K::Initialize()
 void StatePlaying7K::OnRenderComplete()
 {
     auto items = std::array<ScoreResultItem, 8>();
-    for (int i = 0; i < items.size(); i++)
+    for (std::size_t i = 0; i < items.size(); i++)
     {
         auto& member = m_session.GetCurrentRoom().Members[i];
         if (member.ID == m_session.GetCurrentPlayer().ID)

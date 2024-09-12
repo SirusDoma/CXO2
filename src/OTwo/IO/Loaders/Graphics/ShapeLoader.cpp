@@ -193,7 +193,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata&
     {
         const auto polyMeta = dynamic_cast<const PolygonMetadata*>(&meta);
         auto polygon = std::make_unique<Gx::Polygon>(polyMeta->PointCount);
-        for (int i = 0; i < polyMeta->Points.size(); i++)
+        for (std::size_t i = 0; i < polyMeta->Points.size(); i++)
             polygon->SetPoint(i, polyMeta->Points[i]);
 
         shape = std::move(polygon);

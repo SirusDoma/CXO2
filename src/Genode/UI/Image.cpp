@@ -76,7 +76,7 @@ namespace Gx
 
     void Image::SetFrame(const std::string& name)
     {
-        for (int i = 0; i < m_indices.size(); i++)
+        for (std::size_t i = 0; i < m_indices.size(); i++)
         {
             if (m_indices[i] == name)
             {

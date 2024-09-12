@@ -18,7 +18,7 @@ void UserList::Initialize()
 
     auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
     auto listChildren = list->GetChildren();
-    for (int i = 0; i < listChildren.size(); i++)
+    for (std::size_t i = 0; i < listChildren.size(); i++)
     {
         auto userButton    = dynamic_cast<Gx::RadioButton*>(listChildren[i]);
         auto userNickLabel = userButton->FindChild<Gx::Label>("IDC_TEXT_USER_NAME");

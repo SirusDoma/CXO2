@@ -119,7 +119,7 @@ namespace Gx
 
         m_texCoords.clear();
         unsigned int current = 0;
-        for (int i = 0; i < 10; i++)
+        for (unsigned int i = 0; i < 10; i++)
         {
             SetDigitFrame(i, sf::IntRect(sf::Vector2i(current, 0), sf::Vector2i(size.x, size.y)));
             current += size.x;
@@ -277,7 +277,7 @@ namespace Gx
         value = m_value;
 
         std::stack<unsigned int> digits = std::stack<unsigned int>();
-        for (int d = 0; d < digitCount; d++)
+        for (unsigned int d = 0; d < digitCount; d++)
         {
             if (d > 0)
                 m_width += m_kerning;

@@ -35,7 +35,7 @@ void PlayMenu::Initialize()
     if (const auto pointList = FindChild<Gx::List>("IDC_LIST_NOTE_POINT_NUMBER"); pointList)
     {
         const auto children = pointList->GetChildren();
-        for (int i = 0; i < children.size(); i++)
+        for (std::size_t i = 0; i < children.size(); i++)
         {
             auto acc = static_cast<Accuracy>(i);
             m_counters[acc] = dynamic_cast<Gx::Number*>(children[i]);

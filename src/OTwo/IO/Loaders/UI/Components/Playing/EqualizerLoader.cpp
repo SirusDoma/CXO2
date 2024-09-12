@@ -53,7 +53,7 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
     if (context.Available())
     {
         auto container = ObjectContainer::Decorate(equalizer.get());
-        for (int i = 0; i < metadata->Count; i++)
+        for (unsigned int i = 0; i < metadata->Count; i++)
         {
             auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
             auto ctx  = Gx::ResourceContext::Rebind(name, context);

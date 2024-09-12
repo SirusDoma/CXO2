@@ -95,7 +95,7 @@ void SelectMusicDialog::Initialize()
     if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
     {
         auto children = list->GetChildren();
-        for (int i = 0; i < children.size(); i++)
+        for (std::size_t i = 0; i < children.size(); i++)
         {
             auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
             if (!button)
@@ -439,7 +439,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
         {
             const auto children = list->GetChildren();
             Gx::RadioButton* previous = nullptr;
-            for (int i = 0; i < children.size(); i++)
+            for (std::size_t i = 0; i < children.size(); i++)
             {
                 const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
                 if (!button)
@@ -451,7 +451,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
                     {
                         m_page--;
                         m_music = ChartMetadata{};
-                        for (int j = children.size() - 1; j > 0; j--)
+                        for (std::size_t j = children.size() - 1; j > 0; j--)
                         {
                             if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
                             {
@@ -484,7 +484,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
         {
             const auto children = list->GetChildren();
             const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
-            for (int i = 0; i < children.size(); i++)
+            for (std::size_t i = 0; i < children.size(); i++)
             {
                 const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
                 if (!button)
@@ -501,7 +501,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
                     }
                     else if (i < children.size())
                     {
-                        for (int j = i + 1; j < children.size(); j++)
+                        for (std::size_t j = i + 1; j < children.size(); j++)
                         {
                             if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
                             {
@@ -801,7 +801,7 @@ void SelectMusicDialog::Invalidate()
 
         std::unordered_set<unsigned int> scanned;
         unsigned int used = 0;
-        for (int r = 1; r < elements.size(); r++)
+        for (std::size_t r = 1; r < elements.size(); r++)
         {
             if (auto button = dynamic_cast<Gx::RadioButton*>(elements[r]); button)
             {
@@ -1083,7 +1083,7 @@ void SelectMusicDialog::Invalidate()
         };
 
         auto children = infoList->GetChildren();
-        for (int x = 0; x < children.size(); x++)
+        for (std::size_t x = 0; x < children.size(); x++)
         {
             auto label = dynamic_cast<Gx::Label*>(children[x]);
             if (!label)
