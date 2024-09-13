@@ -6,7 +6,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/ToolTip.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/RadioButton.hpp>

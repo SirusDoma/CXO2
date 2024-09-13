@@ -1,5 +1,5 @@
-#ifndef GENODE_UI_NUMBER_HPP
-#define GENODE_UI_NUMBER_HPP
+#ifndef GENODE_UI_BITMAP_NUMBER_HPP
+#define GENODE_UI_BITMAP_NUMBER_HPP
 
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/Graphics/Sprite.hpp>
@@ -13,13 +13,13 @@
 
 namespace Gx
 {
-    class Number : public virtual Control, public Colorable
+    class BitmapNumber : public virtual Control, public Colorable
     {
     public:
         enum class Alignment { None, Left, Center, Right };
 
-        Number();
-        explicit Number(const sf::Texture& texture);
+        BitmapNumber();
+        explicit BitmapNumber(const sf::Texture& texture);
 
         sf::FloatRect GetLocalBounds() const override;
 
@@ -53,7 +53,7 @@ namespace Gx
         void SetBlendMode(Gx::BlendMode blendMode);
 
         Animation::AnimationState GetAnimationState() const;
-        void SetAnimationCallback(const std::function<void(Number&)> &animationCallback);
+        void SetAnimationCallback(const std::function<void(BitmapNumber&)> &animationCallback);
 
         void Stop();
         void Reset();
@@ -79,7 +79,7 @@ namespace Gx
         std::unordered_map<unsigned int, sf::Time> m_elapseds;
         std::unordered_map<unsigned int, unsigned int> m_frames;
 
-        std::function<void(Number&)> m_callback;
+        std::function<void(BitmapNumber&)> m_callback;
         std::unordered_map<unsigned int, std::vector<sf::IntRect>> m_texCoords;
     };
 }

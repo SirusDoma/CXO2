@@ -27,8 +27,8 @@ void PlayMenu::Initialize()
     m_playIcon = FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
     m_level    = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
     m_wave     = FindChild<Gx::Gauge>("IDC_GAUGE_WAVE");
-    m_minutes  = FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_MINUTE");
-    m_seconds  = FindChild<Gx::Number>("IDC_NUMBER_PLAY_TIME_SECOND");
+    m_minutes  = FindChild<Gx::BitmapNumber>("IDC_NUMBER_PLAY_TIME_MINUTE");
+    m_seconds  = FindChild<Gx::BitmapNumber>("IDC_NUMBER_PLAY_TIME_SECOND");
     m_bgmVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
     m_sfxVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
 
@@ -38,7 +38,7 @@ void PlayMenu::Initialize()
         for (std::size_t i = 0; i < children.size(); i++)
         {
             auto acc = static_cast<Accuracy>(i);
-            m_counters[acc] = dynamic_cast<Gx::Number*>(children[i]);
+            m_counters[acc] = dynamic_cast<Gx::BitmapNumber*>(children[i]);
         }
     }
 }

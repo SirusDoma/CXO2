@@ -4,7 +4,7 @@
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Graphics/Animation.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 
 class ComboCounter : public virtual Gx::Node, public Gx::Renderable, public Gx::UpdatableContainer
@@ -22,7 +22,7 @@ private:
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     Gx::Animation* m_header;
-    Gx::Number*    m_counter;
+    Gx::BitmapNumber*    m_counter;
     Gx::Sequence   m_sequence;
 };
 

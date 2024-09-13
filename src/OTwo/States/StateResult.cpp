@@ -71,7 +71,7 @@ void StateResult::Initialize()
             maxJamCombo->SetString(std::to_string(m_scoreTracker.GetMaxJamCombo()));
     }
 
-    if (const auto point = top->FindChild<Gx::Number>("IDC_NUMBER_POINT"); point)
+    if (const auto point = top->FindChild<Gx::BitmapNumber>("IDC_NUMBER_POINT"); point)
         point->SetValue(m_scoreTracker.GetScorePoint());
 
     if (const auto gem = top->FindChild<Gx::Label>("IDC_TEXT_GEM"); gem)

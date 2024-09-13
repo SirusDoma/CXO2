@@ -9,7 +9,7 @@
 #include <Genode/Fx/Move.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/List.hpp>

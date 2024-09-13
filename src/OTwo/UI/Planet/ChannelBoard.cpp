@@ -65,8 +65,8 @@ void ChannelBoard::Initialize()
     );
 
     const auto channelList       = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
-    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto maxPageNumber     = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto currentPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto maxPageNumber     = FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_CHANNEL_PAGE");
     currentPageNumber->SetDigitCount(2);
     maxPageNumber->SetDigitCount(2);
 
@@ -213,8 +213,8 @@ void ChannelBoard::SwitchTab(const ChannelBoard::Tab tab)
     const auto channelTabButton  = FindChild<Gx::Button>("IDC_BUTTON_CHANNEL_TAB");
     const auto noticeTabButton   = FindChild<Gx::Button>("IDC_BUTTON_NOTICE_TAB");
     const auto container         = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
-    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
-    const auto maxPageNumber     = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto currentPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto maxPageNumber     = FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_CHANNEL_PAGE");
 
     if (m_tab == Tab::ChannelList)
     {
@@ -328,7 +328,7 @@ void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
     m_planetInfo = planet;
     m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildren().size()));
 
-    const auto maxPageNumber = FindChild<Gx::Number>("IDC_NUMBER_MAX_CHANNEL_PAGE");
+    const auto maxPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_CHANNEL_PAGE");
     maxPageNumber->SetValue(m_channelMaxPage);
 
     m_selectedChannel = 0;
@@ -343,7 +343,7 @@ void ChannelBoard::ShowChannelList(unsigned int page)
     if (page > m_channelMaxPage)
         page = m_channelMaxPage;
 
-    const auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    const auto currentPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
     const auto container         = FindChild<Gx::UiContainer>("IDC_CONTAINER_CHANNEL_CONTROLS");
     const auto channelList       = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
 
@@ -393,7 +393,7 @@ void ChannelBoard::ShowNotice(unsigned int page)
     if (page > m_noticeMaxPage)
         page = m_noticeMaxPage;
 
-    auto currentPageNumber = FindChild<Gx::Number>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
+    auto currentPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_CHANNEL_PAGE");
     auto notice            = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NOTICE");
 
     m_noticePageIndex = page;

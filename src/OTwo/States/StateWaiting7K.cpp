@@ -56,10 +56,10 @@ void StateWaiting7K::Initialize()
         default: break;
     }
 
-    const auto channelNumber = Instantiate<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CHANNEL_ID");
     channelNumber->SetValue(m_session.GetChannelID());
 
-    const auto roomNumber = Instantiate<Gx::Number>("IDC_NUMBER_ROOM_ID");
+    const auto roomNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_ROOM_ID");
     roomNumber->SetValue(room.ID);
 
     const auto roomName = Instantiate<Gx::Label>("IDC_TEXT_ROOM_NAME");
@@ -74,8 +74,8 @@ void StateWaiting7K::Initialize()
     if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_EMOTICON"); dialog)
     {
         const auto content     = dialog->FindChild<Gx::Image>("IDC_IMAGE_CONTENT");
-        const auto currentPage = dialog->FindChild<Gx::Number>("IDC_NUMBER_CURRENT_PAGE");
-        const auto maxPage     = dialog->FindChild<Gx::Number>("IDC_NUMBER_MAX_PAGE");
+        const auto currentPage = dialog->FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_PAGE");
+        const auto maxPage     = dialog->FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_PAGE");
         const auto prevButton  = dialog->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
         const auto nextButton  = dialog->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
 

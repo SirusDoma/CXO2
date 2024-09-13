@@ -5,7 +5,7 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 
 #include <OTwo/Models/Room.hpp>
 

@@ -74,7 +74,7 @@ void StateRoom::Initialize()
         default: break;
     }
 
-    const auto channelNumber = Instantiate<Gx::Number>("IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CHANNEL_ID");
     channelNumber->SetValue(m_session.GetChannelID());
 
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");

@@ -7,7 +7,7 @@
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/Gauge.hpp>
 
 #include <OTwo/Models/Planet.hpp>
@@ -45,7 +45,7 @@ private:
     void OnControlStateChanged(Control& sender, State state) override;
 
     Gx::Image* m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
-    Gx::Number* m_numberIndicator;
+    Gx::BitmapNumber* m_numberIndicator;
     Gx::Gauge* m_populationCounter;
 
     StateMap m_states;

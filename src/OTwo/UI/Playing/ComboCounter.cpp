@@ -18,7 +18,7 @@ void ComboCounter::Initialize()
         AddChild(m_header);
     }
 
-    if (m_counter = parent->FindResource<Gx::Number>("IDC_NUMBER_NOTE_COMBO"); m_counter)
+    if (m_counter = parent->FindResource<Gx::BitmapNumber>("IDC_NUMBER_NOTE_COMBO"); m_counter)
     {
         m_counter->SetValue(0);
         AddChild(m_counter);

@@ -15,7 +15,7 @@
 #include <OTwo/IO/Loaders/UI/ImageLoader.hpp>
 #include <OTwo/IO/Loaders/UI/LabelLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ToolTipLoader.hpp>
-#include <OTwo/IO/Loaders/UI/NumberLoader.hpp>
+#include <OTwo/IO/Loaders/UI/BitmapNumberLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
 #include <OTwo/IO/Loaders/UI/RadioButtonLoader.hpp>
@@ -101,7 +101,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Number, NumberLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::BitmapNumber, BitmapNumberLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::CheckBox, CheckBoxLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();

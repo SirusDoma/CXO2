@@ -35,7 +35,7 @@ struct ResourceMetadata
         Cursor,
         List,
         Label,
-        Number,
+        BitmapNumber,
         TextBox,
         Button,
         CheckBox,

@@ -11,7 +11,7 @@
 #include <Genode/UI/CheckBox.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/List.hpp>
-#include <Genode/UI/Number.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
 StateMyRoom::StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
@@ -96,7 +96,7 @@ void StateMyRoom::Initialize()
     const auto equipmentsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_EQUIPMENTS");
     equipmentsContainer->SetVisible(true);
 
-    const auto gemNumber = Instantiate<Gx::Number>("IDC_NUMBER_GEM");
+    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     gemNumber->SetValue(player.Gem);
 
     const auto statusPanel = Instantiate<Gx::Image>("IDC_IMAGE_STATUS");
@@ -330,7 +330,7 @@ void StateMyRoom::Invalidate()
     const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MY_BAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(inventory.size()) / 2.f));
 
-    const auto gemNumber = Instantiate<Gx::Number>("IDC_NUMBER_GEM");
+    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     gemNumber->SetValue(player->Gem);
 }
 

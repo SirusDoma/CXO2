@@ -106,9 +106,9 @@ void StatePlaying7K::Initialize()
             effectContainer->AddChild(fx);
         }
 
-        if (const auto numPrefab = FindResource<Gx::Number>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
+        if (const auto numPrefab = FindResource<Gx::BitmapNumber>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
         {
-            const auto numEffect = Create<Gx::Number>(*numPrefab);
+            const auto numEffect = Create<Gx::BitmapNumber>(*numPrefab);
             numEffect->SetName("IDC_NUMBER_EFFECT_JAM");
             numEffect->SetAnimationCallback([=] (auto& _) {
                 numEffect->SetVisible(
@@ -211,7 +211,7 @@ void StatePlaying7K::Initialize()
     playMenu->SetScoreTracker(m_scoreTracker);
 
     // Setup Score Counter
-    const auto scoreNumber = Instantiate<Gx::Number>("IDC_NUMBER_POINT_NUMBER");
+    const auto scoreNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_POINT_NUMBER");
     const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
     const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
     const auto buffers = bufferContainer->GetChildren();
@@ -231,7 +231,7 @@ void StatePlaying7K::Initialize()
     const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
     jamContainer->SetVisible(false);
     const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
-    const auto jamNumber    = jamContainer->FindChild<Gx::Number>("IDC_NUMBER_NOTE_JAM");
+    const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>("IDC_NUMBER_NOTE_JAM");
 
     jamContainer->SetVisible(false);
     jamAnimation->Stop();
@@ -326,7 +326,7 @@ void StatePlaying7K::Initialize()
 
         for (const auto child : effectContainer->GetChildren())
         {
-            if (const auto number = dynamic_cast<Gx::Number*>(child); number)
+            if (const auto number = dynamic_cast<Gx::BitmapNumber*>(child); number)
             {
                 number->SetValue(jamCombo);
                 number->Reset();

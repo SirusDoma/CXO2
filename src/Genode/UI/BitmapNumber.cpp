@@ -1,81 +1,81 @@
-﻿#include <Genode/UI/Number.hpp>
+﻿#include <Genode/UI/BitmapNumber.hpp>
 #include <stack>
 
 namespace Gx
 {
-    Number::Number() :
+    BitmapNumber::BitmapNumber() :
         m_vertices(sf::PrimitiveType::TriangleStrip, 6 * 10),
         m_texture(),
         m_blendMode(BlendMode::Auto),
         m_alignment(Alignment::Left),
-        m_texCoords(),
         m_state(Animation::AnimationState::Initial),
+        m_value(),
         m_digitCount(),
         m_width(),
         m_height(),
         m_kerning(),
-        m_value(),
-        m_needUpdate(true)
+        m_needUpdate(true),
+        m_texCoords()
     {
     }
 
-    Number::Number(const sf::Texture& texture) :
-        Number()
+    BitmapNumber::BitmapNumber(const sf::Texture& texture) :
+        BitmapNumber()
     {
         SetTexture(texture);
         SetValue(0);
     }
 
-    sf::FloatRect Number::GetLocalBounds() const
+    sf::FloatRect BitmapNumber::GetLocalBounds() const
     {
         return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_width, m_height));
     }
 
-    const sf::Texture* Number::GetTexture() const
+    const sf::Texture* BitmapNumber::GetTexture() const
     {
         return m_texture;
     }
 
-    void Number::SetTexture(const sf::Texture& texture)
+    void BitmapNumber::SetTexture(const sf::Texture& texture)
     {
         m_texture = &texture;
         m_needUpdate = true;
     }
 
-    const sf::Color& Number::GetColor() const
+    const sf::Color& BitmapNumber::GetColor() const
     {
         return m_vertices[0].color;
     }
 
-    void Number::SetColor(const sf::Color& color)
+    void BitmapNumber::SetColor(const sf::Color& color)
     {
         for (unsigned int i = 0; i < m_vertices.getVertexCount(); i++)
             m_vertices[i].color = color;
     }
 
-    float Number::GetKerning() const
+    float BitmapNumber::GetKerning() const
     {
         return m_kerning;
     }
 
-    void Number::SetKerning(const float value)
+    void BitmapNumber::SetKerning(const float value)
     {
         m_kerning = value;
         m_needUpdate = true;
     }
 
-    int Number::GetDigitCount() const
+    int BitmapNumber::GetDigitCount() const
     {
         return m_digitCount;
     }
 
-    void Number::SetDigitCount(const int count)
+    void BitmapNumber::SetDigitCount(const int count)
     {
         m_digitCount = count;
         m_needUpdate = true;
     }
 
-    const sf::Time& Number::GetAnimationDuration(const unsigned int digit) const
+    const sf::Time& BitmapNumber::GetAnimationDuration(const unsigned int digit) const
     {
         if (const auto it = m_durations.find(digit % 10); it != m_durations.end())
             return it->second;
@@ -83,18 +83,18 @@ namespace Gx
         return sf::Time::Zero;
     }
 
-    void Number::SetAnimationDuration(const sf::Time& duration)
+    void BitmapNumber::SetAnimationDuration(const sf::Time& duration)
     {
         for (unsigned int digit = 0; digit < 10; digit++)
             m_durations[digit] = duration;
     }
 
-    void Number::SetAnimationDuration(const unsigned int digit, const sf::Time& duration)
+    void BitmapNumber::SetAnimationDuration(const unsigned int digit, const sf::Time& duration)
     {
         m_durations[digit % 10] = duration;
     }
 
-    void Number::SetDigitFrames(const unsigned int digit, const std::vector<sf::IntRect>& texCoords)
+    void BitmapNumber::SetDigitFrames(const unsigned int digit, const std::vector<sf::IntRect>& texCoords)
     {
         m_texCoords[digit % 10] = texCoords;
         m_elapseds[digit % 10] = sf::Time::Zero;
@@ -103,7 +103,7 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    void Number::SetDigitFrame(const unsigned int digit, sf::IntRect texCoords)
+    void BitmapNumber::SetDigitFrame(const unsigned int digit, sf::IntRect texCoords)
     {
         m_texCoords[digit % 10] = { texCoords };
         m_elapseds[digit % 10] = sf::Time::Zero;
@@ -112,7 +112,7 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    void Number::SetDigitsSize(const sf::Vector2u size)
+    void BitmapNumber::SetDigitsSize(const sf::Vector2u size)
     {
         if (size == sf::Vector2u())
             return;
@@ -128,56 +128,56 @@ namespace Gx
         m_needUpdate = true;
     }
 
-    unsigned long long Number::GetValue() const
+    unsigned long long BitmapNumber::GetValue() const
     {
         return m_value;
     }
 
-    void Number::SetValue(const unsigned long long value)
+    void BitmapNumber::SetValue(const unsigned long long value)
     {
         m_value = value;
         m_needUpdate = true;
     }
 
-    Number::Alignment Number::GetAlignment() const
+    BitmapNumber::Alignment BitmapNumber::GetAlignment() const
     {
         return m_alignment;
     }
 
-    void Number::SetAlignment(const Alignment alignment)
+    void BitmapNumber::SetAlignment(const Alignment alignment)
     {
         m_alignment = alignment;
         m_needUpdate = true;
     }
 
-    BlendMode Number::GetBlendMode() const
+    BlendMode BitmapNumber::GetBlendMode() const
     {
         return m_blendMode;
     }
 
-    void Number::SetBlendMode(const Gx::BlendMode blendMode)
+    void BitmapNumber::SetBlendMode(const Gx::BlendMode blendMode)
     {
         m_blendMode = blendMode;
     }
 
-    Animation::AnimationState Number::GetAnimationState() const
+    Animation::AnimationState BitmapNumber::GetAnimationState() const
     {
         return m_state;
     }
 
-    void Number::SetAnimationCallback(const std::function<void(Number&)> &animationCallback)
+    void BitmapNumber::SetAnimationCallback(const std::function<void(BitmapNumber&)> &animationCallback)
     {
         m_callback = animationCallback;
     }
 
-    void Number::Stop()
+    void BitmapNumber::Stop()
     {
         m_state = Animation::AnimationState::Stopped;
         if (m_callback)
             m_callback(*this);
     }
 
-    void Number::Reset()
+    void BitmapNumber::Reset()
     {
         for (auto& [digit, _] : m_frames)
         {
@@ -189,7 +189,7 @@ namespace Gx
         }
     }
 
-    void Number::Update(const double delta)
+    void BitmapNumber::Update(const double delta)
     {
         if (m_state == Animation::AnimationState::Initial || m_state == Animation::AnimationState::Playing)
         {
@@ -229,7 +229,7 @@ namespace Gx
         Control::Update(delta);
     }
 
-    RenderStates Number::Render(RenderSurface& surface, RenderStates states) const
+    RenderStates BitmapNumber::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -251,7 +251,7 @@ namespace Gx
         return Control::Render(surface, states);
     }
 
-    void Number::Invalidate()
+    void BitmapNumber::Invalidate()
     {
         const auto color = GetColor();
         m_vertices = sf::VertexArray(sf::PrimitiveType::Triangles, 6 * 10);

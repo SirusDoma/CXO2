@@ -1,4 +1,4 @@
-﻿#include <OTwo/IO/Loaders/UI/NumberLoader.hpp>
+﻿#include <OTwo/IO/Loaders/UI/BitmapNumberLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/Metadata/UI/NumberMetadata.hpp>
@@ -7,7 +7,7 @@
 
 #include <magic_enum.hpp>
 
-Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = NumberMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
@@ -87,13 +87,13 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json& json, con
 
     if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
     {
-        if (auto parsed = magic_enum::enum_cast<Gx::Number::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+        if (auto parsed = magic_enum::enum_cast<Gx::BitmapNumber::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
             metadata.Alignment = parsed.value();
         else
-            metadata.Alignment = Gx::Number::Alignment::None;
+            metadata.Alignment = Gx::BitmapNumber::Alignment::None;
     }
     else
-        metadata.Alignment = Gx::Number::Alignment::None;
+        metadata.Alignment = Gx::BitmapNumber::Alignment::None;
 
     if (auto value = attributes.find("value"); value != attributes.end())
         metadata.Value = value->get<unsigned int>();
@@ -110,13 +110,13 @@ Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromJson(const Gx::Json& json, con
     return LoadFromMetadata(metadata, context);
 }
 
-Gx::ResourcePtr<Gx::Number> NumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
     const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto number = std::make_unique<Gx::Number>();
+    auto number = std::make_unique<Gx::BitmapNumber>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         number->SetTexture(*texture);

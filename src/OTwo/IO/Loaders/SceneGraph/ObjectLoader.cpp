@@ -84,9 +84,9 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<Gx::Label>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::Number:
+        case ResourceMetadata::ResourceType::BitmapNumber:
         {
-            container.Add(name, LoadResource<Gx::Number>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::BitmapNumber>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::TextBox:
