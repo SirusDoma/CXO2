@@ -123,15 +123,16 @@ void ScoreTracker::SetEnabled(const bool enabled)
 
 unsigned long long ScoreTracker::GetScorePoint() const
 {
-    if (std::all_of(m_points.begin(), m_points.end(), [this] (const auto& p) { return p.first == Accuracy::Miss || p.second == 0; }))
+    const long long positiveScore = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
+                                    m_points[Accuracy::Good] * (100 + 5  * m_jams) +
+                                    m_points[Accuracy::Bad]  * 4;
+
+    const long long negativeScore = m_points[Accuracy::Miss] * 10;
+
+    if (positiveScore <= negativeScore)
         return 0;
 
-    const long long score = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
-                            m_points[Accuracy::Good] * (100 + 5  * m_jams) +
-                            m_points[Accuracy::Bad]  * 4 -
-                            m_points[Accuracy::Miss] * 10;
-
-    return std::max<unsigned long long>(score, 0);
+    return std::max<unsigned long long>(positiveScore - negativeScore, 0);
 }
 
 unsigned long long ScoreTracker::GetPoint(const Accuracy acc) const
