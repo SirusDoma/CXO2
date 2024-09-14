@@ -51,8 +51,9 @@ public:
     const RenderSettings& GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
     double GetCurrentTime() const;
-    double GetRenderPosition() const;
     double GetCurrentBPM() const;
+    double GetRenderPosition() const;
+    double GetLastMeasurePosition() const;
 
     void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
     void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned long long)> &incrementCallback);

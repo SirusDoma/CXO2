@@ -60,7 +60,6 @@ private:
     TextureMap m_textures;
     NoteShape  m_shape;
 
-    unsigned int m_lastMeasure;
     mutable unsigned int m_tapCounter;
     mutable unsigned int m_longCounter;
 

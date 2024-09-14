@@ -14,7 +14,6 @@ NoteContainer::NoteContainer() :
     m_notes(),
     m_measures(),
     m_shape(NoteShape::Square),
-    m_lastMeasure(),
     m_tapCounter(0),
     m_longCounter(0)
 {
@@ -33,9 +32,6 @@ void NoteContainer::AddNote(Note& note)
         m_longNotes.push_back(ln);
     else
         m_notes.push_back(&note);
-
-    if (const auto position = static_cast<unsigned int>(std::ceil(note.GetRenderPosition())); m_lastMeasure < position)
-        m_lastMeasure = position;
 }
 
 void NoteContainer::AddMeasure(Measure& measure)
@@ -102,11 +98,6 @@ std::unordered_set<Gx::Updatable*> NoteContainer::GetRegisteredPrefabs()
     return m_prefabs;
 }
 
-unsigned int NoteContainer::GetLastMeasure() const
-{
-    return m_lastMeasure;
-}
-
 void NoteContainer::Render(const Chart::NoteEvent& ev, const double delta) const
 {
     RenderMeasures(delta);
@@ -134,15 +125,21 @@ void NoteContainer::Render(const Chart::NoteEvent& ev, const double delta) const
     note->Render(*m_renderer, delta);
 }
 
-void NoteContainer::RenderMeasures(double delta) const
+void NoteContainer::RenderMeasures(const double delta) const
 {
     if (m_tapCounter == 0)
     {
         double position = std::ceil(m_renderer->GetRenderPosition()) - 1.f;
         for (const auto measure : m_measures)
         {
-            measure->SetRenderPosition(position);
-            measure->Render(*m_renderer, delta);
+            if (position < m_renderer->GetLastMeasurePosition())
+            {
+                measure->SetVisible(true);
+                measure->SetRenderPosition(position);
+                measure->Render(*m_renderer, delta);
+            }
+            else
+                measure->SetVisible(false);
 
             position += m_chart->GetMeasureFraction(m_difficulty, position);
         }

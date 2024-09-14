@@ -405,14 +405,19 @@ double ChartRenderer::GetCurrentTime() const
     return m_currentTime;
 }
 
+double ChartRenderer::GetCurrentBPM() const
+{
+    return m_bpm;
+}
+
 double ChartRenderer::GetRenderPosition() const
 {
     return ((m_currentTime - m_refTime) / TickSignature* m_bpm) + m_refPosition;
 }
 
-double ChartRenderer::GetCurrentBPM() const
+double ChartRenderer::GetLastMeasurePosition() const
 {
-    return m_bpm;
+    return m_endPosition;
 }
 
 void ChartRenderer::SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback)
