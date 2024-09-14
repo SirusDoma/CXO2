@@ -24,7 +24,7 @@ public:
     const Gx::Sprite* GetEdgePrefab(NoteShape) const;
     void SetEdgePrefabs(const PrefabMap& prefabs);
 
-    void Render(const ChartRenderer& renderer, double delta) override;
+    void UpdateGeometry(const ChartRenderer& renderer, double delta) override;
 
 private:
     VerticesPtr m_headVertices;

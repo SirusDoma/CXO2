@@ -109,7 +109,7 @@ const ScoreTracker* PlayMenu::GetScoreTracker() const
 
 void PlayMenu::Update(const double delta)
 {
-    if (m_renderer && m_renderer->IsStarted())
+    if (m_renderer && m_renderer->IsRendering())
     {
         if (m_elapsed < m_metadata.Duration.asMilliseconds())
             m_elapsed += delta;

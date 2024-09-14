@@ -31,7 +31,7 @@ Chart::Channel Note::GetChannel() const
     return m_channel;
 }
 
-void Note::SetChannel(Chart::Channel channel)
+void Note::SetChannel(const Chart::Channel channel)
 {
     m_channel = channel;
 }
@@ -94,7 +94,7 @@ void Note::SetVisible(const bool visible)
     }
 }
 
-void Note::Render(const ChartRenderer& renderer, const double delta)
+void Note::UpdateGeometry(const ChartRenderer& renderer, const double delta)
 {
     if (!m_vertices[0])
         return;

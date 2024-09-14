@@ -59,7 +59,7 @@ void Chart::SortEvents()
             // - Any abnormal `Release` notes occurence without holds are treated as `Normal` type.
             // - Any hold non-playable events are treated as `Normal` type.
             // - Under any circumstances, do not remove `Normal` non-playable events.
-            // - Under any circumstances, remove `Release` type.
+            // - Under any circumstances, eliminate all `Release` type.
 
             const auto note = static_cast<NoteEvent*>(ev);
             if (holds[ev->Channel])
@@ -85,8 +85,8 @@ void Chart::SortEvents()
                         it = m_events[diff].erase(it);
                         continue;
                     }
-                    else
-                        note->Type = NoteType::Tap;
+
+                    note->Type = NoteType::Tap;
                 }
 
                 ++it;

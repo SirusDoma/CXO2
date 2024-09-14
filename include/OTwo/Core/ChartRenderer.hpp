@@ -26,7 +26,7 @@ public:
     struct RenderSettings
     {
         bool          Autoplay;
-        GameConfig* Config;
+        GameConfig*   Config;
         unsigned int  Viewport;
         float         Speed;
         ::Difficulty  Difficulty;
@@ -36,17 +36,23 @@ public:
 
     static constexpr unsigned int DefaultMeasureHeight = 384;
 
-    explicit ChartRenderer(const ChannelSet& instantiables);
+    ChartRenderer(
+        JudgementStrategy& judgement,
+        LifeSystem& life,
+        ScoreTracker& scores,
+        GameConfig& config,
+        Gx::ResourceManager& prefabResources,
+        const ChannelSet& instantiables
+    );
 
-    void Initialize(const Chart& chart, const GameContext& context, const std::function<void()>& completeCallback);
-    void Initialize(const Chart& chart, const RenderSettings& settings, const std::function<void()>& callback);
+    void Initialize(const Chart& chart, const GameContext& context);
+    void Initialize(const Chart& chart, const RenderSettings& settings);
 
     void StartRender();
-
-    bool IsStarted() const;
+    bool IsRendering() const;
 
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
-    void Input(Chart::Channel channel, bool pressed) const ;
+    void Input(Chart::Channel channel, bool pressed) const;
 
     const RenderSettings& GetRenderSettings() const;
     float GetSpeed(Chart::Channel channel) const;
@@ -55,9 +61,8 @@ public:
     double GetRenderPosition() const;
     double GetLastMeasurePosition() const;
 
+    void SetRenderCompleteCallback(const std::function<void()> &completeCallback);
     void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
-    void SetIncrementCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned long long)> &incrementCallback);
-    void SetJamComboCallback(const std::function<void(const Chart::NoteEvent &, Accuracy, unsigned long long)> &jamComboCallback);
 
     int MapRenderPositionToPixels(Chart::Channel channel, double position, bool absolute = false) const;
 
@@ -69,8 +74,8 @@ private:
     {
         Chart::Event* Event;
         Chart::Event* LastEvent;
-        Judgement    Tap     = {Accuracy::None, 0.f};
-        Judgement    Release = {Accuracy::None, 0};
+        Judgement     Tap     = {Accuracy::None, 0.f};
+        Judgement     Release = {Accuracy::None, 0};
 
         bool IsRenderable(const double position) const;
         bool IsRegistered() const;
@@ -86,18 +91,22 @@ private:
     using InputStateMap  = std::unordered_map<Chart::Channel, bool>;
     using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
 
+    JudgementStrategy& m_judgement;
+    LifeSystem& m_life;
+    ScoreTracker& m_scores;
+    GameConfig& m_config;
+    Gx::ResourceManager& m_prefabResources;
+    ChannelSet m_instantiables;
+
     NoteContainer* m_container;
     bool m_rendering;
     double m_endPosition;
 
     const Chart* m_chart;
     RenderSettings m_settings;
-    LifeSystem* m_life;
-    ScoreTracker* m_scores;
-    JudgementStrategy* m_judgement;
+    Gx::ResourceManager m_resources;
     mutable std::unordered_map<Chart::Channel, Gx::Delay> m_autoDelays;
 
-    ChannelSet m_instantiables;
     SpeedMap m_speeds;
     sf::Clock m_timer;
     mutable EventStateList m_events;
@@ -115,8 +124,6 @@ private:
 
     std::function<void()> m_completeCallback;
     std::function<void(Chart::Channel, bool)> m_inputCallback;
-    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_incrementCallback;
-    std::function<void(const Chart::NoteEvent&, Accuracy, unsigned int)> m_jamComboCallback;
 };
 
 #endif

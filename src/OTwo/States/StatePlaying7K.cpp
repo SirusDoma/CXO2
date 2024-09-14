@@ -24,49 +24,61 @@
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, GameConfig& config, ScoreTracker& scoreTracker, LifeSystem& lifeSystem, ItemFactory& items) :
+StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, GameConfig& config, JudgementStrategy& judgementStrategy, ScoreTracker& scoreTracker, LifeSystem& lifeSystem, ItemFactory& items) :
     m_session(session),
     m_context(context),
     m_config(config),
     m_scoreTracker(scoreTracker),
     m_lifeSystem(lifeSystem),
     m_items(items),
-    m_renderer(ChannelSet{
-       Chart::Channel::Note1,
-       Chart::Channel::Note2,
-       Chart::Channel::Note3,
-       Chart::Channel::Note4,
-       Chart::Channel::Note5,
-       Chart::Channel::Note6,
-       Chart::Channel::Note7
-   }),
+    m_renderer(
+        judgementStrategy,
+        lifeSystem,
+        scoreTracker,
+        config,
+        GetResources(),
+        ChannelSet{
+           Chart::Channel::Note1,
+           Chart::Channel::Note2,
+           Chart::Channel::Note3,
+           Chart::Channel::Note4,
+           Chart::Channel::Note5,
+           Chart::Channel::Note6,
+           Chart::Channel::Note7
+       }
+    ),
    m_self(),
    m_chatBox(),
    m_viewport()
 {
+
 }
 
 void StatePlaying7K::Initialize()
 {
     State::Initialize();
-    
+
+    // Setup providers
     auto& room = m_session.GetCurrentRoom();
     m_context.SetViewport(GetViewport());
-    if (!m_context.GetConfig())
-        m_context.SetConfig(m_config);
+    m_scoreTracker.Initialize(m_context.GetDifficulty());
+    m_lifeSystem.Initialize(m_context.GetDifficulty());
 
+    // Add chart renderer
+    m_renderer.SetName("IDC_CHART_RENDERER");
+    m_renderer.SetRenderCompleteCallback([this] { OnRenderComplete(); });
+    AddChild(&m_renderer);
+
+    m_renderer.Initialize(*m_context.GetChart(), m_context);
+
+    // Setup chat panel
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");;
     chatPanel->SetMaximumTextLength(50);
     m_chatBox = chatPanel->FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
     m_chatBox->SetPermanentFocusEnabled(true);
     m_chatBox->SetEnabled(false);
 
-    m_scoreTracker.Initialize(m_context.GetDifficulty());
-    m_lifeSystem.Initialize(m_context.GetDifficulty());
-
-    const auto jam = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
-    jam->SetValue(0);
-
+    // Setup avatars + avatars effects'
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
     const auto avaContainers = avatarList->GetChildren();
     for (std::size_t i = 0; i < avaContainers.size(); i++)
@@ -135,6 +147,7 @@ void StatePlaying7K::Initialize()
         m_avatars[i] = avatar;
     }
 
+    // Key down & effects
     const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
     const auto keyDownContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
     for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
@@ -154,18 +167,49 @@ void StatePlaying7K::Initialize()
         m_keyEffects[channel] = keyEffect;
     }
 
-    m_renderer.SetName("IDC_CHART_RENDERER");
-    AddChild(&m_renderer);
-    m_renderer.Initialize(*m_context.GetChart(), m_context, [this] () {
-        OnRenderComplete();
+    // Setup Play Menu
+    const auto playMenu = Instantiate<PlayMenu>("IDC_PLAY_MENU");
+    playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
+    playMenu->SetScoreTracker(m_scoreTracker);
+
+    // Setup Score Counter
+    const auto scoreNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_POINT_NUMBER");
+    const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
+    const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
+    const auto buffers = bufferContainer->GetChildren();
+    for (std::size_t i = 0; i < buffers.size(); i++)
+    {
+        const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
+        renderable->SetVisible(false);
+    }
+
+    // Setup Life Bar
+    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    lifeBar->SetSlanted(true);
+    lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+    lifeBar->SetValue(0);
+
+      // Setup Jam Combo
+    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
+    jamContainer->SetVisible(false);
+    const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
+    const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>("IDC_NUMBER_NOTE_JAM");
+
+    jamContainer->SetVisible(false);
+    jamAnimation->Stop();
+    jamAnimation->SetAnimationCallback([=] (auto animation) {
+        jamContainer->SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
     });
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------
-    // IMPORTANT: All elements after this point need to be called after `ChartRenderer.Initialize` in order to preserve correct layout ordering.
-    //            Every resource below is likely to be a prefab (Resources that are defined under `"require"`).
-    //
-    //            With this, we don't have to maintain depth position, which SFML does not support natively.
-    // ----------------------------------------------------------------------------------------------------------------------------------------
+    // Setup Combo Counter
+    const auto comboCounter = Create<ComboCounter>();
+    comboCounter->SetName("IDC_CONTAINER_COMBO");
+    AddChild(comboCounter);
+
+    // Setup Judgement Indicator
+    const auto judgementIndicator = Create<JudgementIndicator>(m_config.UseFx);
+    judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
+    AddChild(judgementIndicator);
 
     // Setup Long Note effects
     if (const auto longNoteEffectList = FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
@@ -205,50 +249,6 @@ void StatePlaying7K::Initialize()
         }
     }
 
-    // Setup Play Menu
-    const auto playMenu = Instantiate<PlayMenu>("IDC_PLAY_MENU");
-    playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
-    playMenu->SetScoreTracker(m_scoreTracker);
-
-    // Setup Score Counter
-    const auto scoreNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_POINT_NUMBER");
-    const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
-    const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
-    const auto buffers = bufferContainer->GetChildren();
-    for (std::size_t i = 0; i < buffers.size(); i++)
-    {
-        const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
-        renderable->SetVisible(false);
-    }
-
-    // Setup Life Bar
-    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
-    lifeBar->SetSlanted(true);
-    lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-    lifeBar->SetValue(0);
-
-    // Setup Jam Combo
-    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
-    jamContainer->SetVisible(false);
-    const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
-    const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>("IDC_NUMBER_NOTE_JAM");
-
-    jamContainer->SetVisible(false);
-    jamAnimation->Stop();
-    jamAnimation->SetAnimationCallback([=] (auto animation) {
-        jamContainer->SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
-    });
-
-    // Setup Combo Counter
-    const auto comboCounter = Create<ComboCounter>();
-    comboCounter->SetName("IDC_CONTAINER_COMBO");
-    AddChild(comboCounter);
-
-    // Setup Judgement Indicator
-    const auto judgementIndicator = Create<JudgementIndicator>(m_config.UseFx);
-    judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
-    AddChild(judgementIndicator);
-
     // Setup Key Effects
     m_renderer.SetInputCallback([=] (auto channel, bool state)
     {
@@ -260,25 +260,24 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup Score changes
-    m_renderer.SetIncrementCallback([=] (auto& ev, auto acc, auto count)
+    m_scoreTracker.AddIncrementListener([=] (auto& ev, auto acc, auto count)
     {
         // Life System
+        m_lifeSystem.Update(acc, count);
+        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
         lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
-        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
         if (m_lifeSystem.GetCurrentLifePoint() == 0)
         {
-            if (m_context.GetDifficulty() != Difficulty::EX && m_self->IsAlive())
-            {
-                Run(Create<Gx::Delay>(sf::milliseconds(2000),
-                    [this] {
-                        OnRenderComplete();
-                    })
-                );
-            }
-
             m_scoreTracker.SetEnabled(false);
             m_self->Die();
 
+            if (m_context.GetDifficulty() != Difficulty::EX)
+            {
+                Run(Create<Gx::Delay>(sf::milliseconds(2000), [this]
+                {
+                    OnRenderComplete();
+                }));
+            }
             return;
         }
 
@@ -314,7 +313,7 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup jam combo effect
-    m_renderer.SetJamComboCallback([=] (auto& ev, auto acc, auto jamCombo)
+    m_scoreTracker.AddJamComboListener([=] (auto& ev, auto acc, auto jamCombo)
     {
         jamNumber->SetValue(jamCombo);
         jamAnimation->Reset();
@@ -337,17 +336,19 @@ void StatePlaying7K::Initialize()
         }
     });
 
+    // Exit button
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
         GetDirector().Present<StateWaiting7K>();
     });
 
+    // Start initial lifebar fill-up animation
     Run(Create<Gx::Step>
     (
         sf::seconds((m_lifeSystem.GetMaxLifePoint() / (m_lifeSystem.GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
         sf::seconds(1.f / 60.f),
-        [this, lifeBar] (const auto& step, auto const delta)
+        [this, lifeBar] (const auto& step, auto const)
         {
             lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * 0.01f));
             for (auto [_, avatar] : m_avatars)
@@ -360,6 +361,7 @@ void StatePlaying7K::Initialize()
                 // TODO: There's no need to animate avatar life bar?
                 for (auto [_, avatar] : m_avatars)
                     avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
+
 
                 m_renderer.StartRender();
             }

@@ -98,9 +98,9 @@ std::unordered_set<Gx::Updatable*> NoteContainer::GetRegisteredPrefabs()
     return m_prefabs;
 }
 
-void NoteContainer::Render(const Chart::NoteEvent& ev, const double delta) const
+void NoteContainer::UpdateGeometry(const Chart::NoteEvent& ev, const double delta) const
 {
-    RenderMeasures(delta);
+    UpdateMeasures(delta);
 
     Note* note = nullptr;
     if (ev.Type == Chart::NoteType::Hold)
@@ -122,10 +122,10 @@ void NoteContainer::Render(const Chart::NoteEvent& ev, const double delta) const
     note->SetRenderPosition(ev.Position);
     note->SetChannel(ev.Channel);
     note->SetVisible(true);
-    note->Render(*m_renderer, delta);
+    note->UpdateGeometry(*m_renderer, delta);
 }
 
-void NoteContainer::RenderMeasures(const double delta) const
+void NoteContainer::UpdateMeasures(const double delta) const
 {
     if (m_tapCounter == 0)
     {
@@ -136,7 +136,7 @@ void NoteContainer::RenderMeasures(const double delta) const
             {
                 measure->SetVisible(true);
                 measure->SetRenderPosition(position);
-                measure->Render(*m_renderer, delta);
+                measure->UpdateGeometry(*m_renderer, delta);
             }
             else
                 measure->SetVisible(false);
@@ -157,7 +157,7 @@ void NoteContainer::Update(const double delta)
 
 Gx::RenderStates NoteContainer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    RenderMeasures(states.Delta);
+    UpdateMeasures(states.Delta);
     for (std::size_t i = m_tapCounter; i < m_notes.size(); i++)
         m_notes[i]->SetVisible(false);
 

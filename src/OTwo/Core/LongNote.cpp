@@ -96,7 +96,7 @@ void LongNote::SetEdgePrefabs(const PrefabMap& prefabs)
     m_edgePrefabs = prefabs;
 }
 
-void LongNote::Render(const ChartRenderer& renderer, const double delta)
+void LongNote::UpdateGeometry(const ChartRenderer& renderer, const double delta)
 {
     const double distance = GetRenderPosition() - renderer.GetRenderPosition();
     if (distance > 5.f || GetRenderPosition() + GetLength() - renderer.GetRenderPosition() < -0.5f)

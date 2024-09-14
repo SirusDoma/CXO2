@@ -10,16 +10,19 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-ChartRenderer::ChartRenderer(const ChannelSet& instantiables) :
+ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, GameConfig& config, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
+    m_judgement(judgement),
+    m_life(life),
+    m_scores(scores),
+    m_config(config),
+    m_prefabResources(prefabResources),
+    m_instantiables(instantiables),
     m_container(),
     m_rendering(false),
     m_endPosition(),
     m_chart(),
     m_settings(),
-    m_life(),
-    m_scores(),
-    m_judgement(),
-    m_instantiables(instantiables),
+    m_resources(),
     m_speeds(),
     m_timer(),
     m_events(),
@@ -34,13 +37,11 @@ ChartRenderer::ChartRenderer(const ChannelSet& instantiables) :
     m_lastEventID(0),
     m_completed(false),
     m_completeCallback(),
-    m_inputCallback(),
-    m_incrementCallback(),
-    m_jamComboCallback()
+    m_inputCallback()
 {
 }
 
-void ChartRenderer::Initialize(const Chart& chart, const GameContext& context, const std::function<void()>& completeCallback)
+void ChartRenderer::Initialize(const Chart& chart, const GameContext& context)
 {
     if (!context.GetConfig())
         throw Gx::Exception("GameConfig cannot be null");
@@ -51,43 +52,22 @@ void ChartRenderer::Initialize(const Chart& chart, const GameContext& context, c
         context.GetViewport(),
         context.GetSpeed(),
         context.GetDifficulty()
-    }, completeCallback);
+    });
 }
 
-void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& settings, const std::function<void()>& callback)
+void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& settings)
 {
     const auto parent = GetParent<State>();
     if (!parent)
-        throw Gx::Exception("ChartRenderer needs to be attached into a State!");
-    
-    if (!settings.Config)
-        throw Gx::Exception("GameConfig cannot be null");
+        throw Gx::Exception("ChartRenderer needs to be attached into a State");
 
     m_chart    = &chart;
     m_settings = settings;
-    m_completeCallback = callback;
+    if (!m_settings.Config)
+        m_settings.Config = &m_config;
 
     // Setup judgement
-    m_judgement = &parent->Require<JudgementStrategy>();
-    m_judgement->Initialize(*this);
-
-    // Setup life system
-    m_life = &parent->Require<LifeSystem>();
-    m_life->Initialize(settings.Difficulty);
-
-    // Setup score tracker
-    m_scores = &parent->Require<ScoreTracker>();
-    m_scores->Initialize(settings.Difficulty);
-    m_scores->AddIncrementListener([this] (auto ev, auto acc, auto count) {
-        m_life->Update(acc, count);
-        if (m_incrementCallback)
-            m_incrementCallback(ev, acc, count);
-    });
-
-    m_scores->AddJamComboListener([this] (auto ev, auto acc, auto count) {
-        if (m_jamComboCallback)
-            m_jamComboCallback(ev, acc, count);
-    });
+    m_judgement.Initialize(*this);
 
     // Setup Speed
     const auto speed = settings.Speed;
@@ -111,31 +91,24 @@ void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& setting
     }
 
     // Create Note Container with Note Factory
-    const auto factory = NoteFactory(
-        parent->GetResources(ResourceScope::Immediate),
-        parent->GetResources(ResourceScope::Local),
-        m_instantiables
-    );
-    RemoveChild(FindChild<NoteContainer>("IDC_NOTE_CONTAINER"));
+    const auto factory = NoteFactory(m_resources, m_prefabResources, m_instantiables);
     m_container = factory.Generate(settings);
     m_container->SetName("IDC_NOTE_CONTAINER");
     m_container->Initialize(*this, chart, settings.Difficulty);
+    RemoveChild(FindChild<NoteContainer>(m_container->GetName()));
     AddChild(m_container);
 
     // Register events for processing
     m_events.clear();
     for (auto& ev : m_chart->GetEvents(settings.Difficulty))
         m_events.push_back(EventState{ ev.get() });
+
 }
 
 void ChartRenderer::StartRender()
 {
-    if (m_rendering)
-        return;
-
-    m_rendering = true;
-
     // Reset rendering states
+    m_rendering   = true;
     m_currentTime = 0;
     m_refPosition = 0;
     m_refTime     = 0;
@@ -146,18 +119,22 @@ void ChartRenderer::StartRender()
     m_timer.restart();
 }
 
-bool ChartRenderer::IsStarted() const
+bool ChartRenderer::IsRendering() const
 {
     return m_rendering;
 }
 
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
+    const auto config = m_settings.Config ? m_settings.Config : &m_config;
     if (!m_chart || !m_rendering)
     {
+        if (m_instantiables.empty() || !config)
+            return states;
+
         // Still send key press event with empty front buffers for fun
         const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-        for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
+        for (auto [channel, key] : config->KeyBindings.at(keyMode))
             Input(channel, isKeyPressed(key));
 
         return states;
@@ -184,13 +161,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
     m_frameID = states.FrameID;
 
     // Update input states
-
     if (!m_settings.Autoplay)
     {
         // TODO: Implement poll rate
         m_inputTime = m_currentTime;
         const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-        for (auto [channel, key] : m_settings.Config->KeyBindings.at(keyMode))
+        for (auto [channel, key] : config->KeyBindings.at(keyMode))
             Input(channel, isKeyPressed(key));
     }
     else
@@ -210,12 +186,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
                 auto release = Chart::NoteEvent(ev);
                 release.Type = Chart::NoteType::Release;
                 release.Position += ev.Length;
-                if (const auto releaseResult = m_judgement->Judge(release); releaseResult.Latency <= 0)
+                if (const auto releaseResult = m_judgement.Judge(release); releaseResult.Latency <= 0)
                 {
                     Input(channel, false);
                 }
             }
-            else if (const auto tapResult = m_judgement->Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Latency <= 0)
+            else if (const auto tapResult = m_judgement.Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Latency <= 0)
             {
                 if (m_inputs[channel])
                 {
@@ -246,23 +222,23 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
         }
 
         auto& ev = static_cast<Chart::NoteEvent&>(*state->Event);
-        if (const auto tapResult = m_judgement->Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Accuracy == Accuracy::Miss)
+        if (const auto tapResult = m_judgement.Judge(ev); state->Tap.Accuracy == Accuracy::None && tapResult.Accuracy == Accuracy::Miss)
         {
             state->Tap = tapResult;
             if (ev.Length > 0)
                 state->Release = tapResult;
 
-            m_scores->Increment(ev, tapResult.Accuracy, ev.Length > 0 ? 2 : 1);
+            m_scores.Increment(ev, tapResult.Accuracy, ev.Length > 0 ? 2 : 1);
         }
         else if (ev.Length > 0)
         {
             auto release = Chart::NoteEvent(ev);
             release.Type = Chart::NoteType::Release;
             release.Position += ev.Length;
-            if (const auto releaseResult = m_judgement->Judge(release); releaseResult.Accuracy == Accuracy::Miss)
+            if (const auto releaseResult = m_judgement.Judge(release); releaseResult.Accuracy == Accuracy::Miss)
             {
                 state->Release = releaseResult;
-                m_scores->Increment(ev, releaseResult.Accuracy);
+                m_scores.Increment(ev, releaseResult.Accuracy);
             }
         }
     }
@@ -302,7 +278,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
                 });
             }
 
-            m_container->Render(note, states.Delta);
+            m_container->UpdateGeometry(note, states.Delta);
         }
         else
         {
@@ -329,7 +305,6 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
         }
     }
 
-    //m_container->Render(*this, states.Delta);
     return RenderableContainer::Render(surface, states);
 }
 
@@ -344,19 +319,19 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
         const auto note = static_cast<Chart::NoteEvent*>(front->Event);
         if (pressed)
         {
-            auto result = m_judgement->Judge(*note);
+            auto result = m_judgement.Judge(*note);
             if (front->Tap.Accuracy == Accuracy::None && result.Accuracy != Accuracy::None)
             {
-                result.Accuracy = m_scores->Increment(*note, result.Accuracy);
+                result.Accuracy = m_scores.Increment(*note, result.Accuracy);
                 front->Tap      = result;
-                if (note->Length > 0 && result.Accuracy == Accuracy::Bad && m_scores->GetBufferCount() <= 0)
+                if (note->Length > 0 && result.Accuracy == Accuracy::Bad && m_scores.GetBufferCount() <= 0)
                 {
                     auto release      = Chart::NoteEvent(*note);
                     release.Type      = Chart::NoteType::Release;
                     release.Position += note->Length;
 
                     front->Release = Judgement{ Accuracy::Miss, 0.f };
-                    m_scores->Increment(release, Accuracy::Miss);
+                    m_scores.Increment(release, Accuracy::Miss);
                 }
             }
 
@@ -371,12 +346,12 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
             release.Type      = Chart::NoteType::Release;
             release.Position += note->Length;
 
-            if (auto result = m_judgement->Judge(release); front->Release.Accuracy == Accuracy::None)
+            if (auto result = m_judgement.Judge(release); front->Release.Accuracy == Accuracy::None)
             {
                 if (result.Accuracy == Accuracy::None)
                     result.Accuracy = Accuracy::Miss;
 
-                result.Accuracy = m_scores->Increment(release, result.Accuracy);
+                result.Accuracy = m_scores.Increment(release, result.Accuracy);
                 front->Release  = result;
 
             }
@@ -420,19 +395,14 @@ double ChartRenderer::GetLastMeasurePosition() const
     return m_endPosition;
 }
 
+void ChartRenderer::SetRenderCompleteCallback(const std::function<void()>& completeCallback)
+{
+    m_completeCallback = completeCallback;
+}
+
 void ChartRenderer::SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback)
 {
     m_inputCallback = inputCallback;
-}
-
-void ChartRenderer::SetIncrementCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned long long)>& incrementCallback)
-{
-    m_incrementCallback = incrementCallback;
-}
-
-void ChartRenderer::SetJamComboCallback(const std::function<void(const Chart::NoteEvent&, Accuracy, unsigned long long)>& jamComboCallback)
-{
-    m_jamComboCallback = jamComboCallback;
 }
 
 int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const double position, const bool absolute) const

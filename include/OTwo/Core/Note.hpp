@@ -36,7 +36,7 @@ public:
     bool IsVisible() const override;
     void SetVisible(const bool visible) override;
 
-    virtual void Render(const ChartRenderer& renderer, double delta);
+    virtual void UpdateGeometry(const ChartRenderer& renderer, double delta);
 
 protected:
     using VerticesPtr = std::array<sf::Vertex*, 6>;

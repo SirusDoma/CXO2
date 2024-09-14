@@ -148,7 +148,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
-    // Initialize providers
+    // Initialize singleton providers
     auto& context = GetContext();
     context.Provide<GameConfig>([] (auto& ctx)
     {
@@ -202,15 +202,16 @@ void O2Jam::Boot()
         return session;
     }, Gx::Context::Scope::Singleton);
 
-    context.Provide<JudgementStrategy>([] (auto& ctx)
-    {
-        return std::make_unique<RenderPositionJudgementStrategy>();
-    }, Gx::Context::Scope::Singleton);
-
     context.Provide<ScoreTracker>([] (auto& ctx)
     {
         return std::make_unique<ScoreTracker>();
     }, Gx::Context::Scope::Singleton);
+
+    // Initialize local providers
+    context.Provide<JudgementStrategy>([] (auto& ctx)
+    {
+        return std::make_unique<RenderPositionJudgementStrategy>();
+    });
 
     // Set-up console
     Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
