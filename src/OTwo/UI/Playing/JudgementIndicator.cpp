@@ -1,7 +1,8 @@
 #include <OTwo/States/State.hpp>
 #include <OTwo/UI/Playing/JudgementIndicator.hpp>
 
-JudgementIndicator::JudgementIndicator(const bool useFx) :
+JudgementIndicator::JudgementIndicator(const std::unordered_map<Accuracy, Gx::Animation*>& indicators, const bool useFx) :
+    m_indicators(indicators),
     m_useFx(useFx),
     m_elapsed(0),
     m_target(nullptr)
@@ -12,34 +13,20 @@ void JudgementIndicator::Initialize()
 {
     Gx::Node::Initialize();
 
-    const auto parent = GetParent<State>();
-    if (!parent)
-        return;
-
     m_elapsed = 0;
-    for (auto& [acc, name] : std::unordered_map<Accuracy, std::string>
-        {
-            { Accuracy::Cool, "IDC_ANIMATION_NOTE_COOL" },
-            { Accuracy::Good, "IDC_ANIMATION_NOTE_GOOD" },
-            { Accuracy::Bad,  "IDC_ANIMATION_NOTE_BAD" },
-            { Accuracy::Miss, "IDC_ANIMATION_NOTE_MISS" },
-        })
+    for (auto& [acc, indicator] : m_indicators)
     {
-        if (const auto indicator = parent->FindResource<Gx::Animation>(name); indicator)
+        if (!m_useFx)
         {
-            m_indicators[acc] = indicator;
-            if (!m_useFx)
+            indicator->SetAnimationCallback([=] (auto _)
             {
-                indicator->SetAnimationCallback([=] (auto _)
-                {
-                    indicator->SetVisible(
-                        indicator->GetState() == Gx::Animation::AnimationState::Playing ||
-                        indicator->GetState() == Gx::Animation::AnimationState::Initial
-                    );
-                });
-            }
-            indicator->SetVisible(false);
+                indicator->SetVisible(
+                    indicator->GetState() == Gx::Animation::AnimationState::Playing ||
+                    indicator->GetState() == Gx::Animation::AnimationState::Initial
+                );
+            });
         }
+        indicator->SetVisible(false);
     }
 }
 

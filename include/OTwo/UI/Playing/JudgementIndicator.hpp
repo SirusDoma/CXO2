@@ -11,10 +11,11 @@
 
 #include <unordered_map>
 
+namespace Gx { class ResourceManager; }
 class JudgementIndicator : public Gx::Node, public Gx::Renderable, public Gx::Updatable
 {
 public:
-    explicit JudgementIndicator(bool useFx = true);
+    explicit JudgementIndicator(const std::unordered_map<Accuracy, Gx::Animation*>& indicators, bool useFx = true);
 
     void Initialize() override;
     void Play(Accuracy accuracy);
@@ -23,10 +24,11 @@ private:
     void Update(const double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
+    std::unordered_map<Accuracy, Gx::Animation*> m_indicators;
     bool m_useFx;
+
     double m_elapsed;
     Gx::Animation* m_target;
-    std::unordered_map<Accuracy, Gx::Animation*> m_indicators;
     std::unique_ptr<Gx::Scale> m_scale;
 };
 

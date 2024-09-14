@@ -24,7 +24,16 @@
 #include <Genode/UI.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, GameConfig& config, JudgementStrategy& judgementStrategy, ScoreTracker& scoreTracker, LifeSystem& lifeSystem, ItemFactory& items) :
+StatePlaying7K::StatePlaying7K(
+    Gx::Mixer& mixer,
+    SessionContext& session,
+    GameContext& context,
+    GameConfig& config,
+    JudgementStrategy& judgementStrategy,
+    ScoreTracker& scoreTracker,
+    LifeSystem& lifeSystem,
+    ItemFactory& items
+) :
     m_session(session),
     m_context(context),
     m_config(config),
@@ -35,7 +44,7 @@ StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, Ga
         judgementStrategy,
         lifeSystem,
         scoreTracker,
-        config,
+        mixer,
         GetResources(),
         ChannelSet{
            Chart::Channel::Note1,
@@ -51,7 +60,6 @@ StatePlaying7K::StatePlaying7K(SessionContext& session, GameContext& context, Ga
    m_chatBox(),
    m_viewport()
 {
-
 }
 
 void StatePlaying7K::Initialize()
@@ -202,12 +210,23 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup Combo Counter
-    const auto comboCounter = Create<ComboCounter>();
+    const auto comboCounter = Create<ComboCounter>(
+        FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COMBO"),
+        FindResource<Gx::BitmapNumber>("IDC_NUMBER_NOTE_COMBO")
+    );
     comboCounter->SetName("IDC_CONTAINER_COMBO");
     AddChild(comboCounter);
 
     // Setup Judgement Indicator
-    const auto judgementIndicator = Create<JudgementIndicator>(m_config.UseFx);
+    const auto judgementIndicator = Create<JudgementIndicator>(
+        std::unordered_map<Accuracy, Gx::Animation*>
+        {
+            { Accuracy::Cool, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COOL") },
+            { Accuracy::Good, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_GOOD") },
+            { Accuracy::Bad,  FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_BAD")  },
+            { Accuracy::Miss, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_MISS") },
+        }, m_config.UseFx
+    );
     judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
     AddChild(judgementIndicator);
 
@@ -405,10 +424,15 @@ void StatePlaying7K::OnRenderComplete()
             items[i] = ScoreResultItem{};
     }
 
-    m_session.SetLatestScoreResults(items);
-
     CaptureScreen();
-    GetDirector().Present<StateResult>();
+
+    QueueEvent([this, items]
+    {
+        m_session.SetLatestScoreResults(items);
+        m_context.Reset();
+
+        GetDirector().Present<StateResult>();
+    });
 }
 
 unsigned int StatePlaying7K::GetViewport() const

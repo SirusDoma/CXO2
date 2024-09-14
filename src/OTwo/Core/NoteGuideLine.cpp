@@ -71,7 +71,7 @@ void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
     float base = 0.f;
     float factor = 0.f;
     const float speed = renderer.GetSpeed(m_parent->GetChannel());
-    switch (renderer.GetRenderSettings().Config->NoteGuideLength)
+    switch (renderer.GetRenderSettings().Config.NoteGuideLength)
     {
         case 1:
             base   = 16.f;
@@ -115,7 +115,7 @@ void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
         return;
 
     const double distance = m_parent->GetRenderPosition() - renderer.GetRenderPosition();
-    const auto shape = renderer.GetRenderSettings().Config->NoteShapeType;
+    const auto shape = renderer.GetRenderSettings().Config.NoteShapeType;
     auto prefab = m_parent->GetPrefab(shape);
 
     float noteLength = 0.f;

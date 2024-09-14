@@ -10,19 +10,19 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, GameConfig& config, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
+ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::Mixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
     m_judgement(judgement),
     m_life(life),
     m_scores(scores),
-    m_config(config),
+    m_mixer(mixer),
     m_prefabResources(prefabResources),
     m_instantiables(instantiables),
     m_container(),
     m_rendering(false),
     m_endPosition(),
     m_chart(),
-    m_settings(),
     m_resources(),
+    m_settings(),
     m_speeds(),
     m_timer(),
     m_events(),
@@ -41,11 +41,14 @@ ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, Sco
 {
 }
 
+ChartRenderer::~ChartRenderer()
+{
+    m_rendering = false;
+    m_mixer.StopAll();
+}
+
 void ChartRenderer::Initialize(const Chart& chart, const GameContext& context)
 {
-    if (!context.GetConfig())
-        throw Gx::Exception("GameConfig cannot be null");
-
     Initialize(chart, RenderSettings{
         false,
         context.GetConfig(),
@@ -57,14 +60,8 @@ void ChartRenderer::Initialize(const Chart& chart, const GameContext& context)
 
 void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& settings)
 {
-    const auto parent = GetParent<State>();
-    if (!parent)
-        throw Gx::Exception("ChartRenderer needs to be attached into a State");
-
     m_chart    = &chart;
-    m_settings = settings;
-    if (!m_settings.Config)
-        m_settings.Config = &m_config;
+    m_settings = std::make_unique<RenderSettings>(settings);
 
     // Setup judgement
     m_judgement.Initialize(*this);
@@ -115,7 +112,7 @@ void ChartRenderer::StartRender()
     m_frameID     = 0;
     m_lastEventID = 0;
     m_bpm         = m_chart->GetMetadata().BPM;
-    m_endPosition = std::ceil(m_chart->GetLastEventPosition(m_settings.Difficulty)) + 1.f;
+    m_endPosition = std::ceil(m_chart->GetLastEventPosition(m_settings->Difficulty)) + 1.f;
     m_timer.restart();
 }
 
@@ -126,15 +123,14 @@ bool ChartRenderer::IsRendering() const
 
 Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    const auto config = m_settings.Config ? m_settings.Config : &m_config;
     if (!m_chart || !m_rendering)
     {
-        if (m_instantiables.empty() || !config)
+        if (m_instantiables.empty())
             return states;
 
         // Still send key press event with empty front buffers for fun
         const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-        for (auto [channel, key] : config->KeyBindings.at(keyMode))
+        for (auto [channel, key] :  m_settings->Config.KeyBindings.at(keyMode))
             Input(channel, isKeyPressed(key));
 
         return states;
@@ -161,12 +157,12 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
     m_frameID = states.FrameID;
 
     // Update input states
-    if (!m_settings.Autoplay)
+    if (!m_settings->Autoplay)
     {
         // TODO: Implement poll rate
         m_inputTime = m_currentTime;
         const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
-        for (auto [channel, key] : config->KeyBindings.at(keyMode))
+        for (auto [channel, key] : m_settings->Config.KeyBindings.at(keyMode))
             Input(channel, isKeyPressed(key));
     }
     else
@@ -364,7 +360,7 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
 
 const ChartRenderer::RenderSettings& ChartRenderer::GetRenderSettings() const
 {
-    return m_settings;
+    return *m_settings;
 }
 
 float ChartRenderer::GetSpeed(const Chart::Channel channel) const
@@ -412,7 +408,7 @@ int ChartRenderer::MapRenderPositionToPixels(const Chart::Channel channel, const
         speed = it->second;
 
     const int pixels = static_cast<int>(position * (static_cast<float>(DefaultMeasureHeight) * speed));
-    return absolute ? pixels : static_cast<int>(m_settings.Viewport) - pixels;
+    return absolute ? pixels : static_cast<int>(m_settings->Viewport) - pixels;
 }
 
 void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& group) const
@@ -420,15 +416,13 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& gr
     if (!ev || !ev->Sample)
         return;
 
-    const auto parent = GetParent<State>();
-    auto& mixer = parent->Require<Gx::Mixer>();
     if (m_sounds.find(ev->ID) == m_sounds.end())
     {
-        m_sounds[ev->ID] = parent->Create<sf::Sound>(*ev->Sample);
+        m_sounds[ev->ID] = &m_resources.Create<sf::Sound>(std::to_string(ev->ID), *ev->Sample);
         m_sounds[ev->ID]->setVolume(ev->Volume);
     }
 
-    mixer.Play(m_sounds[ev->ID], group);
+    m_mixer.Play(m_sounds[ev->ID], group);
 }
 
 bool ChartRenderer::EventState::IsRenderable(const double position) const

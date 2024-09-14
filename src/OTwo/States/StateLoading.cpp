@@ -11,10 +11,9 @@
 
 #include <thread>
 
-StateLoading::StateLoading(const SessionContext& session, GameContext& game, GameConfig& config) :
+StateLoading::StateLoading(const SessionContext& session, GameContext& game) :
     m_session(session),
-    m_game(game),
-    m_config(config)
+    m_context(game)
 {
 }
 
@@ -38,15 +37,14 @@ void StateLoading::Initialize()
     }
 
     const auto metadata = room.ChartMetadata;
-    m_game.SetConfig(m_config);
-    m_game.SetMode(room.GameMode);
-    m_game.SetDifficulty(room.Difficulty);
-    m_game.SetSpeed(room.Speed);
+    m_context.SetMode(room.GameMode);
+    m_context.SetDifficulty(room.Difficulty);
+    m_context.SetSpeed(room.Speed);
 
-    const auto chart = m_game.GetChart();
-    if (!chart || std::to_string(chart->GetMetadata().ID) != metadata.ID || chart->GetEventCount(m_game.GetDifficulty()) == 0)
+    const auto chart = m_context.GetChart();
+    if (!chart || std::to_string(chart->GetMetadata().ID) != metadata.ID || chart->GetEventCount(m_context.GetDifficulty()) == 0)
     {
-        auto loader = ChartLoader(m_game);
+        auto loader = ChartLoader(m_context);
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
         {
             OnCoverLoaded(image);
@@ -61,8 +59,8 @@ void StateLoading::Initialize()
 
         auto thread = std::thread([=] ()
         {
-            m_game.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
-            QueueEvent([this] { OnChartLoaded(m_game.GetChart()); });
+            m_context.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+            QueueEvent([this] { OnChartLoaded(m_context.GetChart()); });
         });
 
         thread.detach();
@@ -72,7 +70,7 @@ void StateLoading::Initialize()
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
             OnCoverLoaded(image);
 
-        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this] { OnChartLoaded(m_game.GetChart()); }));
+        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this] { OnChartLoaded(m_context.GetChart()); }));
     }
 }
 
@@ -101,7 +99,7 @@ void StateLoading::OnChartLoaded(const Chart* chart)
             auto& room     = m_session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
-            ctx.SetFxEnabled(m_config.UseFx);
+            ctx.SetFxEnabled(m_context.GetConfig().UseFx);
             ctx.SetMapID(room.MapID);
             ctx.SetEffectID(room.EffectID);
 

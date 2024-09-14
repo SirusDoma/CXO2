@@ -264,9 +264,9 @@ void O2Jam::OnFocusChanged(const bool focus)
 {
     Application::OnFocusChanged(focus);
 
-    auto& context      = GetContext();
-    const auto& config = context.Require<GameConfig>();
-    auto& mixer        = context.Require<Gx::Mixer>();
+    const auto& context = GetContext();
+    const auto& config  = context.Require<GameConfig>();
+    auto& mixer         = context.Require<Gx::Mixer>();
 
     const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
                          GetSceneDirector().IsPresenting<StatePlaying7K>() ||

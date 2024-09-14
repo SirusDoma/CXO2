@@ -26,7 +26,7 @@ public:
     struct RenderSettings
     {
         bool          Autoplay;
-        GameConfig*   Config;
+        GameConfig&   Config;
         unsigned int  Viewport;
         float         Speed;
         ::Difficulty  Difficulty;
@@ -40,10 +40,11 @@ public:
         JudgementStrategy& judgement,
         LifeSystem& life,
         ScoreTracker& scores,
-        GameConfig& config,
+        Gx::Mixer& mixer,
         Gx::ResourceManager& prefabResources,
         const ChannelSet& instantiables
     );
+    ~ChartRenderer() override;
 
     void Initialize(const Chart& chart, const GameContext& context);
     void Initialize(const Chart& chart, const RenderSettings& settings);
@@ -94,7 +95,7 @@ private:
     JudgementStrategy& m_judgement;
     LifeSystem& m_life;
     ScoreTracker& m_scores;
-    GameConfig& m_config;
+    Gx::Mixer& m_mixer;
     Gx::ResourceManager& m_prefabResources;
     ChannelSet m_instantiables;
 
@@ -103,8 +104,8 @@ private:
     double m_endPosition;
 
     const Chart* m_chart;
-    RenderSettings m_settings;
-    Gx::ResourceManager m_resources;
+    mutable Gx::ResourceManager m_resources;
+    std::unique_ptr<RenderSettings> m_settings;
     mutable std::unordered_map<Chart::Channel, Gx::Delay> m_autoDelays;
 
     SpeedMap m_speeds;

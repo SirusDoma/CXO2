@@ -4,28 +4,34 @@
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Fx/Move.hpp>
 
+ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
+    m_header(header),
+    m_counter(counter),
+    m_action([] {}),
+    m_move(this, {}, sf::Time::Zero),
+    m_delay(sf::Time::Zero)
+{
+    AddChild(m_header, m_counter);
+}
+
 void ComboCounter::Initialize()
 {
     Gx::Node::Initialize();
 
-    const auto parent = GetParent<State>();
-    if (!parent)
-        return;
-
-    if (m_header = parent->FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COMBO"); m_header)
-    {
-        m_header->Stop();
-        AddChild(m_header);
-    }
-
-    if (m_counter = parent->FindResource<Gx::BitmapNumber>("IDC_NUMBER_NOTE_COMBO"); m_counter)
-    {
-        m_counter->SetValue(0);
-        AddChild(m_counter);
-    }
-
     SetVisible(false);
     SetPosition(sf::Vector2f(0.f, -30.f / 5.f));
+
+    m_action = Gx::Action([this]
+    {
+        if (m_header)
+            m_header->Reset();
+
+        SetVisible(true);
+    });
+
+    m_move  = Gx::Move(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6));
+    m_delay = Gx::Delay(sf::milliseconds(1000));
+
     m_sequence = Gx::Sequence([this] ()
         {
             if (m_header)
@@ -35,15 +41,9 @@ void ComboCounter::Initialize()
         },
         Gx::Sequence::ListOf(
         {
-            parent->Create<Gx::Action>([this]
-            {
-                if (m_header)
-                    m_header->Reset();
-
-                SetVisible(true);
-            }),
-            parent->Create<Gx::Move>(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6)),
-            parent->Create<Gx::Delay>(sf::milliseconds(1000))
+            &m_action,
+            &m_move,
+            &m_delay
         })
     );
     m_sequence.Stop();

@@ -1,5 +1,19 @@
 #include <OTwo/Contexts/GameContext.hpp>
 
+GameContext::GameContext(GameConfig& config) :
+    m_config(config),
+    m_difficulty(),
+    m_mode(),
+    m_speed(),
+    m_viewport()
+{
+}
+
+GameConfig& GameContext::GetConfig() const
+{
+    return m_config;
+}
+
 const Chart* GameContext::GetChart() const
 {
     return m_chart.get();
@@ -8,16 +22,6 @@ const Chart* GameContext::GetChart() const
 void GameContext::SetChart(Gx::ResourcePtr<Chart> chart)
 {
     m_chart = std::move(chart);
-}
-
-GameConfig* GameContext::GetConfig() const
-{
-    return m_config;
-}
-
-void GameContext::SetConfig(GameConfig& config)
-{
-    m_config = &config;
 }
 
 Difficulty GameContext::GetDifficulty() const
@@ -63,7 +67,6 @@ void GameContext::SetViewport(const unsigned int viewport)
 void GameContext::Reset()
 {
     m_chart      = nullptr;
-    m_config     = nullptr;
     m_difficulty = Difficulty::EX;
     m_mode       = GameMode::Single;
     m_speed      = 0;

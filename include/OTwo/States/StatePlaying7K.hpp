@@ -18,7 +18,17 @@ class Avatar;
 class StatePlaying7K : public State
 {
 public:
-    StatePlaying7K(SessionContext& session, GameContext& context, GameConfig& config, JudgementStrategy& judgementStrategy, ScoreTracker& scoreTracker, LifeSystem& lifeSystem, ItemFactory& items);
+    StatePlaying7K(
+        Gx::Mixer& mixer,
+        SessionContext& session,
+        GameContext& context,
+        GameConfig& config,
+        JudgementStrategy& judgementStrategy,
+        ScoreTracker& scoreTracker,
+        LifeSystem& lifeSystem,
+        ItemFactory& items
+    );
+
     void Initialize() override;
 
     unsigned int GetViewport() const;

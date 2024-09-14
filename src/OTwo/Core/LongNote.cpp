@@ -107,7 +107,7 @@ void LongNote::UpdateGeometry(const ChartRenderer& renderer, const double delta)
         return;
     }
 
-    const Gx::Sprite* sprite = GetPrefab(renderer.GetRenderSettings().Config->NoteShapeType);
+    const Gx::Sprite* sprite = GetPrefab(renderer.GetRenderSettings().Config.NoteShapeType);
     if (!sprite)
     {
         SetVisible(false);
@@ -120,7 +120,7 @@ void LongNote::UpdateGeometry(const ChartRenderer& renderer, const double delta)
 
     GetGuideLine()->Render(renderer, delta);
 
-    const auto edge = GetEdgePrefab(renderer.GetRenderSettings().Config->NoteShapeType);
+    const auto edge = GetEdgePrefab(renderer.GetRenderSettings().Config.NoteShapeType);
     auto transform  = sprite->GetTransform();
     auto position   = transform.transformPoint(sf::Vector2f(0, renderer.MapRenderPositionToPixels(GetChannel(), distance + GetLength()) - 1));
     auto bounds     = transform.transformRect(sprite->GetLocalBounds());

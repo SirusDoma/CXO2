@@ -12,7 +12,7 @@ class GameContext;
 class StateLoading : public State
 {
 public:
-    StateLoading(const SessionContext& session, GameContext& game, GameConfig& config);
+    StateLoading(const SessionContext& session, GameContext& game);
     void Initialize() override;
 
 private:
@@ -22,8 +22,7 @@ private:
 
     sf::Texture m_texture;
     const SessionContext& m_session;
-    GameContext& m_game;
-    GameConfig& m_config;
+    GameContext& m_context;
 };
 
 #endif

@@ -11,13 +11,12 @@ class Chart;
 class GameContext
 {
 public:
-    GameContext() = default;
+    explicit GameContext(GameConfig &config);
+
+    GameConfig& GetConfig() const;
 
     const Chart* GetChart() const;
     void SetChart(Gx::ResourcePtr<Chart> chart);
-
-    GameConfig* GetConfig() const;
-    void SetConfig(GameConfig& config);
 
     Difficulty GetDifficulty() const;
     void SetDifficulty(Difficulty difficulty);
@@ -34,8 +33,9 @@ public:
     void Reset();
 
 private:
+    GameConfig& m_config;
+
     Gx::ResourcePtr<Chart> m_chart;
-    GameConfig* m_config;
     Difficulty m_difficulty;
     GameMode m_mode;
     float m_speed;

@@ -6,11 +6,14 @@
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/Tasks/Sequence.hpp>
+#include <Genode/Tasks/Action.hpp>
+#include <Genode/Fx/Move.hpp>
 
+namespace Gx { class ResourceManager; }
 class ComboCounter : public virtual Gx::Node, public Gx::Renderable, public Gx::UpdatableContainer
 {
 public:
-    ComboCounter() = default;
+    explicit ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter);
 
     void Initialize() override;
 
@@ -21,9 +24,12 @@ private:
     void Update(const double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-    Gx::Animation* m_header;
+    Gx::Animation*       m_header;
     Gx::BitmapNumber*    m_counter;
-    Gx::Sequence   m_sequence;
+    Gx::Sequence         m_sequence;
+    Gx::Action           m_action;
+    Gx::Move             m_move;
+    Gx::Delay            m_delay;
 };
 
 #endif

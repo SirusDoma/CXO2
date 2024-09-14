@@ -108,7 +108,7 @@ void Note::UpdateGeometry(const ChartRenderer& renderer, const double delta)
         return;
     }
 
-    const Gx::Sprite* sprite = GetPrefab(renderer.GetRenderSettings().Config->NoteShapeType);
+    const Gx::Sprite* sprite = GetPrefab(renderer.GetRenderSettings().Config.NoteShapeType);
     if (!sprite)
     {
         SetVisible(false);

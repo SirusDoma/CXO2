@@ -91,10 +91,10 @@ void PlayMenu::SetMetadata(const ChartMetadataView& metadata, const Difficulty d
     }
 
     if (m_bgmVol)
-        m_bgmVol->SetValue(m_context.GetConfig()->MusicVolume);
+        m_bgmVol->SetValue(m_context.GetConfig().MusicVolume);
 
     if (m_sfxVol)
-        m_sfxVol->SetValue(m_context.GetConfig()->EffectVolume);
+        m_sfxVol->SetValue(m_context.GetConfig().EffectVolume);
 }
 
 void PlayMenu::SetScoreTracker(const ScoreTracker& scores)
@@ -109,6 +109,9 @@ const ScoreTracker* PlayMenu::GetScoreTracker() const
 
 void PlayMenu::Update(const double delta)
 {
+    if (!m_renderer)
+        m_renderer = GetParent<::State>()->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
+
     if (m_renderer && m_renderer->IsRendering())
     {
         if (m_elapsed < m_metadata.Duration.asMilliseconds())
@@ -127,10 +130,10 @@ void PlayMenu::Update(const double delta)
             m_playIcon->SetDuration(sf::milliseconds((60000.f / m_renderer->GetCurrentBPM()) * m_playIcon->GetFrameCount()) / 4.f);
 
         if (m_bgmVol)
-            m_bgmVol->SetValue(m_renderer->GetRenderSettings().Config->MusicVolume);
+            m_bgmVol->SetValue(m_renderer->GetRenderSettings().Config.MusicVolume);
 
         if (m_sfxVol)
-            m_sfxVol->SetValue(m_renderer->GetRenderSettings().Config->EffectVolume);
+            m_sfxVol->SetValue(m_renderer->GetRenderSettings().Config.EffectVolume);
     }
 
     if (m_scoreTracker)
