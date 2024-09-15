@@ -3,7 +3,7 @@
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
-#include <Genode/Graphics/RenderTargetAdapter.hpp>
+#include <Genode/Graphics/RenderSurfaceAdaptor.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 
 #include <SFML/Window.hpp>
@@ -16,13 +16,13 @@ namespace Gx
     class Scene;
     class Cursor;
     class Context;
-    class Application : public Renderable, public Updatable
+    class Application : protected Renderable, protected Updatable
     {
     public:
         static Application& Instance();
 
-        explicit Application(const std::string& title, const sf::VideoMode& mode, bool fullScreen = false);
-        Application(const std::string& title, const sf::VideoMode& mode, const sf::VideoMode& gameVideoMode, bool fullScreen = false);
+        Application(const std::string& title, const sf::VideoMode& mode, bool fullScreen = false, const sf::ContextSettings& settings = {});
+        Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
 
         ~Application() override = default;
 
@@ -30,7 +30,7 @@ namespace Gx
         int Start(Scene& scene);
         void Close();
 
-        Context& GetContext();
+        Context& GetContext() const;
 
         SceneDirector& GetSceneDirector() const;
         unsigned int GetRenderFrequency() const;
@@ -45,17 +45,23 @@ namespace Gx
         void SetCursor(Cursor& cursor);
         void InvalidateCursor() const;
 
-        sf::View GetVirtualView() const;
-        static sf::VideoMode GetDesktopVideoMode();
+        sf::VideoMode GetCurrentVideoMode() const;
+
+        const sf::View& GetInitialView() const;
+        virtual const sf::View& GetView() const;
+        virtual void SetView(const sf::View& view);
 
         // ReSharper disable CppNonExplicitConversionOperator
-        operator sf::RenderTarget&() const;
-        operator sf::RenderWindow&() const;
-        operator RenderSurface&() const;
+        virtual operator sf::RenderTarget&() const;
+        virtual operator sf::RenderWindow&() const;
+        virtual operator RenderSurface&() const;
         // ReSharper restore CppNonExplicitConversionOperator
 
+        static sf::VideoMode GetDesktopVideoMode();
+
     protected:
-        sf::RenderWindow& GetRenderWindow() const;
+        sf::RenderWindow& GetMainWindow() const;
+        const sf::ContextSettings& GetSettings() const;
 
         virtual void Boot();
         virtual int Shutdown();
@@ -69,22 +75,21 @@ namespace Gx
         virtual void OnClose();
 
     private:
+        void CreateMainWindow() const;
         void UpdateCursor(const sf::Event& ev) const;
-        void SetupWindow() const;
-        void SetupTarget() const;
 
         inline static Application* m_instance = nullptr;
 
         mutable std::unique_ptr<sf::RenderWindow> m_window;
-        mutable std::unique_ptr<sf::RenderTexture> m_target;
-        mutable RenderTargetAdapter m_adapter;
+        mutable RenderSurfaceAdaptor m_adaptor;
         mutable SceneDirector m_director;
 
         std::unique_ptr<Context> m_context;
-        sf::State m_state;
 
-        sf::VideoMode m_windowVideoMode;
-        sf::VideoMode m_gameVideoMode;
+        sf::State m_state;
+        sf::VideoMode m_mode;
+        sf::View m_view;
+        sf::ContextSettings m_settings;
         Cursor* m_cursor;
 
         const std::string m_title;

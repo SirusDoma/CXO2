@@ -48,11 +48,8 @@ namespace Gx
             m_nextScene = nullptr;
 
             m_currentScene->SetDirector(*this);
-
-            const sf::RenderTarget& target = *m_application;
-            m_currentScene->SetView(target.getView());
-
             m_currentScene->Initialize();
+
             m_staged = true;
         }
     }

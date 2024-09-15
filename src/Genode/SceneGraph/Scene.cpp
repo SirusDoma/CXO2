@@ -65,13 +65,12 @@ namespace Gx
 
     sf::View Scene::GetView() const
     {
-        const sf::RenderTarget& target = GetApplication();
-        return target.getView();
+        return GetApplication().GetView();
     }
 
-    sf::View Scene::GetVirtualView() const
+    sf::View Scene::GetInitialView() const
     {
-        return GetApplication().GetVirtualView();
+        return GetApplication().GetInitialView();
     }
 
     sf::View Scene::GetDefaultView() const
@@ -82,8 +81,7 @@ namespace Gx
 
     void Scene::SetView(const sf::View& view)
     {
-        sf::RenderTarget& target = GetApplication();
-        target.setView(view);
+        GetApplication().SetView(view);
     }
 
     Node* Scene::GetCurrentOverlay() const

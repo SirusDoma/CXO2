@@ -76,11 +76,11 @@
 void O2Jam::Boot()
 {
     // Render Settings
-    auto& window = GetRenderWindow();
+    auto& window = GetMainWindow();
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(0);
     if (GetWindowState() == sf::State::Fullscreen)
-        window.setView(GetLetterBoxView(window.getView(), window.getSize()));
+        Gx::Application::SetView(GetLetterBoxView(window.getView(), window.getSize()));
 
     // Asset Path
     Gx::LocalFileSystem::AddAssetPath("./assets");
@@ -337,11 +337,10 @@ void O2Jam::Update(const double delta)
         m_letterboxSwitched = true;
         if (GetWindowState() == sf::State::Fullscreen)
         {
-            auto& window = GetRenderWindow();
-            if (window.getView().getViewport() ==  sf::FloatRect({0.f, 0.f}, {1.f, 1.f}))
-                window.setView(GetLetterBoxView(window.getView(), window.getSize()));
+            if (Gx::Application::GetView().getViewport() ==  sf::FloatRect({0.f, 0.f}, {1.f, 1.f}))
+                Gx::Application::SetView(GetLetterBoxView(Gx::Application::GetView(), GetMainWindow().getSize()));
             else
-                window.setView(sf::View(window.getView().getCenter(), window.getView().getSize()));
+                Gx::Application::SetView(GetInitialView());
         }
     }
     else if (m_letterboxSwitched && !isKeyPressed(sf::Keyboard::Key::Up))
@@ -350,10 +349,36 @@ void O2Jam::Update(const double delta)
 
 Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    Application::Render(surface, states);
-    surface.Render(Console::Instance(), states);
+    if (GetWindowState() == sf::State::Fullscreen)
+    {
+        if (m_layeredTarget->getSize() != GetMainWindow().getSize())
+            SetupLayeredTarget();
+
+        m_layeredTarget->clear(GetClearColor());
+        {
+            Application::Render(m_layeredAdaptor, states);
+            m_layeredAdaptor.Render(Console::Instance(), states);
+        }
+        m_layeredTarget->display();
+
+        auto& app         = Application::operator Gx::RenderSurface&();
+        const auto buffer = Gx::Sprite(m_layeredTarget->getTexture());
+        GetMainWindow().draw(buffer, Gx::RenderStates::Default);
+    }
+    else
+    {
+        Application::Render(surface, states);
+        surface.Render(Console::Instance(), states);
+    }
 
     return states;
+}
+
+void O2Jam::SetupLayeredTarget() const
+{
+    m_layeredTarget = std::make_unique<sf::RenderTexture>(GetMainWindow().getSize(), GetSettings());
+    m_layeredTarget->setSmooth(true);
+    m_layeredAdaptor = Gx::RenderSurfaceAdaptor(*m_layeredTarget);
 }
 
 sf::View O2Jam::GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize)
@@ -381,4 +406,12 @@ sf::View O2Jam::GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize)
 
     view.setViewport(sf::FloatRect({posX, posY}, {sizeX, sizeY}));
     return view;
+}
+
+O2Jam::operator sf::RenderTarget&() const
+{
+    if (GetWindowState() == sf::State::Fullscreen)
+        return *m_layeredTarget;
+
+    return Application::operator sf::RenderTarget&();
 }

@@ -10,6 +10,8 @@ public:
 
     ~O2Jam() override = default;
 
+    operator sf::RenderTarget&() const override;
+
 protected:
     void Boot() override;
     int  Shutdown() override;
@@ -21,10 +23,14 @@ protected:
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
 private:
+    void SetupLayeredTarget() const;
     static sf::View GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize);
 
     bool m_windowStateSwitched;
     bool m_letterboxSwitched;
+
+    mutable std::unique_ptr<sf::RenderTexture> m_layeredTarget = std::make_unique<sf::RenderTexture>();
+    mutable Gx::RenderSurfaceAdaptor m_layeredAdaptor = Gx::RenderSurfaceAdaptor(*m_layeredTarget);
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <Genode/Graphics/RenderStates.hpp>
-#include <Genode/Graphics/RenderTargetAdapter.hpp>
+#include <Genode/Graphics/RenderSurfaceAdaptor.hpp>
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -24,7 +24,7 @@ namespace Gx
     protected:
         void draw(sf::RenderTarget& target, const sf::RenderStates states) const override
         {
-            auto adapter = RenderTargetAdapter(target);
+            auto adapter = RenderSurfaceAdaptor(target);
             Render(adapter, RenderStates(states));
         }
 

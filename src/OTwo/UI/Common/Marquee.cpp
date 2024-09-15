@@ -61,7 +61,7 @@ void Marquee::Update(const double delta)
 
     m_renderTexture->clear(sf::Color::Transparent);
     {
-        auto adapter = Gx::RenderTargetAdapter(*m_renderTexture);
+        auto adapter = Gx::RenderSurfaceAdaptor(*m_renderTexture);
         Text::Render(adapter, Gx::RenderStates::Default);
     }
     m_renderTexture->display();

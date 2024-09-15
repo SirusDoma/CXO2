@@ -21,7 +21,7 @@ int main(int argc , char** argv)
                 Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
 
-        auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::VideoMode({800, 600}), true);
+        auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);
         return o2jam.Start();
     }
     catch (std::exception &ex)

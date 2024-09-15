@@ -492,7 +492,7 @@ void StatePlaying7K::CaptureScreen()
     auto target = sf::RenderTexture(window.getSize());
     target.clear(GetApplication().GetClearColor());
     {
-        auto surface = Gx::RenderTargetAdapter(target);
+        auto surface = Gx::RenderSurfaceAdaptor(target);
 
         Update(0);
         surface.Render(*this, Gx::RenderStates::Default);

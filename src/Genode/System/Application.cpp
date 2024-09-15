@@ -8,29 +8,28 @@
 
 namespace Gx
 {
-    Application::Application(const std::string& title, const sf::VideoMode& mode, const bool fullScreen)
-        : Application(title, mode, mode, fullScreen)
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const bool fullScreen, const sf::ContextSettings& settings)
+        : Application(title, mode, sf::View({mode.size.x / 2.f, mode.size.y / 2.f}, {static_cast<float>(mode.size.x), static_cast<float>(mode.size.y)}), fullScreen)
     {
     }
 
-    Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::VideoMode& gameVideoMode, const bool fullScreen) :
-        m_target(std::make_unique<sf::RenderTexture>()),
-        m_adapter(*this),
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
+        m_adaptor(*this),
         m_director(SceneDirector(*this)),
         m_context(std::make_unique<Context>()),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
+        m_mode(mode),
+        m_view(view),
+        m_settings(settings),
         m_cursor(),
         m_title(title),
         m_frameID(0),
         m_frames(0),
-        m_renderFreq(0)
+        m_renderFreq(0),
+        m_fullScreen(fullScreen),
+        m_closeRequested(false)
     {
-        m_windowVideoMode = mode;
-        m_gameVideoMode   = gameVideoMode;
-        m_fullScreen      = fullScreen;
-        m_closeRequested  = false;
-
-        SetWindowState(fullScreen ? sf::State::Fullscreen : sf::State::Windowed);
+        CreateMainWindow();
         ResourceLoaderFactory::SetApplicationContext(*m_context);
     }
 
@@ -50,9 +49,6 @@ namespace Gx
         // Initialize application instance and director
         m_instance = this;
 
-        // Prepare window
-        SetupWindow();
-
         // Bootstrap the game
         Boot();
 
@@ -60,7 +56,7 @@ namespace Gx
         UpdateCursor(sf::Event::Closed());
 
         // Setup timer
-        auto timer  = sf::Clock();
+        const auto timer  = sf::Clock();
         double last = timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
 
         // Main game loop
@@ -106,31 +102,8 @@ namespace Gx
             // Render the window
             m_window->clear(m_clearColor);
             {
-                // Use render target only when full screen
-                if (m_state == sf::State::Fullscreen)
-                {
-                    // Setup Render Target
-                    SetupTarget();
-
-                    // Render objects
-                    m_target->clear(m_clearColor);
-                    {
-                        auto surface = RenderTargetAdapter(*m_target);
-                        surface.SetClearColorResolver([this] { return m_clearColor; });
-
-                        Render(surface, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
-                    }
-                    m_target->display();
-
-                    // Render the target
-                    auto sprite = Gx::Sprite(m_target->getTexture());
-                    m_window->draw(sprite);
-                }
-                else
-                {
-                    // Render objects
-                    Render(*this, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
-                }
+                // Render objects
+                Render(*this, RenderStates(sf::RenderStates::Default, m_frameID++, delta));
             }
             m_window->display();
 
@@ -165,9 +138,14 @@ namespace Gx
         return Start();
     }
 
-    sf::RenderWindow& Application::GetRenderWindow() const
+    sf::RenderWindow& Application::GetMainWindow() const
     {
         return *m_window;
+    }
+
+    const sf::ContextSettings& Application::GetSettings() const
+    {
+        return m_settings;
     }
 
     SceneDirector& Application::GetSceneDirector() const
@@ -199,7 +177,7 @@ namespace Gx
         OnClose();
     }
 
-    Context& Application::GetContext()
+    Context& Application::GetContext() const
     {
         return *m_context;
     }
@@ -219,39 +197,8 @@ namespace Gx
         if (m_window && m_state == state)
             return;
 
-        if (m_window)
-            m_window->close();
-
-        if (state == sf::State::Fullscreen)
-        {
-            if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
-                m_windowVideoMode = fsModes.front();
-            else
-                m_windowVideoMode = GetDesktopVideoMode();
-        }
-        else
-            m_windowVideoMode = m_gameVideoMode;
-
-        m_window = std::make_unique<sf::RenderWindow>(
-            m_windowVideoMode,
-            m_title,
-            state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
-            sf::State::Windowed
-        );
-
-        if (state == sf::State::Fullscreen)
-            m_window->setPosition(sf::Vector2i(0, 0));
-
         m_state = state;
-        SetupWindow();
-    }
-
-    sf::View Application::GetVirtualView() const
-    {
-        return sf::View(
-            { m_gameVideoMode.size.x / 2.f, m_gameVideoMode.size.y / 2.f },
-            { static_cast<float>(m_gameVideoMode.size.x), static_cast<float>(m_gameVideoMode.size.y) }
-        );
+        CreateMainWindow();
     }
 
     void Application::OnFocusChanged(bool focus)
@@ -325,6 +272,43 @@ namespace Gx
             m_closeRequested = true;
     }
 
+    void Application::CreateMainWindow() const
+    {
+        // Close existing window
+        if (m_window)
+            m_window->close();
+
+        // Determine video mode to use
+        auto mode = m_mode;
+        if (m_state == sf::State::Fullscreen)
+        {
+            if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
+                mode = fsModes.front();
+            else
+                mode = GetDesktopVideoMode();
+        }
+
+        // (Re-)create the window and apply window state.
+        // No option to turn into exclusive fullscreen for now.
+        m_window = std::make_unique<sf::RenderWindow>(
+            mode,
+            m_title,
+            m_state == sf::State::Fullscreen ? sf::Style::None : sf::Style::Titlebar | sf::Style::Close,
+            sf::State::Windowed,
+            m_settings
+        );
+
+        // This fix windowed to fullscreen issue in X11
+        if (m_state == sf::State::Fullscreen)
+            m_window->setPosition(sf::Vector2i(0, 0));
+
+        m_window->setVerticalSyncEnabled(true);
+        m_window->setView(m_view);
+
+        m_adaptor = RenderSurfaceAdaptor(*m_window);
+        UpdateCursor(sf::Event::Closed());
+    }
+
     void Application::UpdateCursor(const sf::Event& ev) const
     {
         if (!m_cursor)
@@ -334,35 +318,11 @@ namespace Gx
         if (const auto mp = ev.getIf<sf::Event::MouseButtonPressed>(); mp && mp->button == sf::Mouse::Button::Left)
             type = Cursor::Type::Click;
 
-        float scale = static_cast<float>(m_window->getSize().x) / m_gameVideoMode.size.x;
-              scale = std::max(static_cast<float>(m_window->getSize().y) / m_gameVideoMode.size.y, scale);
+        float ratio = static_cast<float>(m_window->getSize().x) / m_window->getView().getSize().x;
+        ratio = std::max(static_cast<float>(m_window->getSize().y) / m_window->getView().getSize().y, ratio);
 
-        if (m_cursor->Scale(scale) || m_cursor->GetLastRetrievedHandleType() != type)
+        if (m_cursor->Scale(ratio) || m_cursor->GetLastRetrievedHandleType() != type)
             m_window->setMouseCursor(m_cursor->GetHandle(type));
-    }
-
-    void Application::SetupWindow() const
-    {
-        // Set render frequency
-        m_window->setVerticalSyncEnabled(true);
-
-        // Setup view
-        const auto size = sf::Vector2f{static_cast<float>(m_gameVideoMode.size.x), static_cast<float>(m_gameVideoMode.size.y)};
-        const auto view = sf::View({std::floor(size.x / 2.0f), std::floor(size.y / 2.0f)}, size);
-
-        m_window->setView(view);
-        m_adapter = RenderTargetAdapter(*this);
-
-        UpdateCursor(sf::Event::Closed());
-    }
-
-    void Application::SetupTarget() const
-    {
-        if (m_target->getSize().x == 0 || m_target->getSize().y == 0)
-        {
-            m_target = std::make_unique<sf::RenderTexture>(m_windowVideoMode.size);
-            m_target->setSmooth(true);
-        }
     }
 
     const sf::Color& Application::GetClearColor() const
@@ -391,16 +351,28 @@ namespace Gx
         m_window->setMouseCursor(m_cursor->GetHandle());
     }
 
-    sf::VideoMode Application::GetDesktopVideoMode()
+    sf::VideoMode Application::GetCurrentVideoMode() const
     {
-        return sf::VideoMode::getDesktopMode();
+        return m_mode;
+    }
+
+    const sf::View& Application::GetInitialView() const
+    {
+        return m_view;
+    }
+
+    const sf::View& Application::GetView() const
+    {
+        return m_window->getView();
+    }
+
+    void Application::SetView(const sf::View& view)
+    {
+        m_window->setView(view);
     }
 
     Application::operator sf::RenderTarget&() const
     {
-        if (m_state == sf::State::Fullscreen)
-            return *m_target;
-
         return *m_window;
     }
 
@@ -411,6 +383,12 @@ namespace Gx
 
     Application::operator RenderSurface&() const
     {
-        return m_adapter;
+        return m_adaptor;
     }
+
+    sf::VideoMode Application::GetDesktopVideoMode()
+    {
+        return sf::VideoMode::getDesktopMode();
+    }
+
 }

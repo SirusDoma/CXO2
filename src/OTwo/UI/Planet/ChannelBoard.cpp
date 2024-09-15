@@ -196,7 +196,7 @@ void ChannelBoard::CaptureCurrentState()
 {
     m_renderTexture.clear(sf::Color::Transparent);
     {
-        auto adapter = Gx::RenderTargetAdapter(m_renderTexture);
+        auto adapter = Gx::RenderSurfaceAdaptor(m_renderTexture);
         Render(adapter, sf::Transform().translate(-GetPosition()));
     }
     m_renderTexture.display();

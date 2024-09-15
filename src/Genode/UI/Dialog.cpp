@@ -148,8 +148,8 @@ namespace Gx
         m_scene = scene;
         if (m_scene)
         {
-            const auto view   = m_scene->GetVirtualView();
-            const auto center = view.getCenter();
+            const auto view      = m_scene->GetView();
+            const auto center    = view.getCenter();
             const unsigned int x = static_cast<unsigned int>(center.x - (GetLocalBounds().size.x / 2.f));
             const unsigned int y = static_cast<unsigned int>(center.y - (GetLocalBounds().size.y / 2.f));
 

@@ -4,7 +4,7 @@
 #include <Genode/Graphics/BlendMode.hpp>
 #include <Genode/Graphics/RenderStates.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
-#include <Genode/Graphics/RenderTargetAdapter.hpp>
+#include <Genode/Graphics/RenderSurfaceAdaptor.hpp>
 #include <Genode/Graphics/Transformable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/Graphics/Animation.hpp>

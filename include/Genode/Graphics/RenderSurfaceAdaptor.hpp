@@ -1,5 +1,5 @@
-#ifndef GENODE_RENDER_TARGET_ADAPTER_HPP
-#define GENODE_RENDER_TARGET_ADAPTER_HPP
+#ifndef GENODE_RENDER_SURFACE_ADAPTOR_HPP
+#define GENODE_RENDER_SURFACE_ADAPTOR_HPP
 
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -8,11 +8,11 @@
 
 namespace Gx
 {
-    class RenderTargetAdapter : public RenderSurface
+    class RenderSurfaceAdaptor : public virtual RenderSurface
     {
     public:
-        explicit RenderTargetAdapter(sf::RenderTarget& target);
-        ~RenderTargetAdapter() override = default;
+        explicit RenderSurfaceAdaptor(sf::RenderTarget& target);
+        ~RenderSurfaceAdaptor() override = default;
 
         void SetClearColorResolver(const std::function<sf::Color()>& resolver);
 
