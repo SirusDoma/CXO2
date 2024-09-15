@@ -361,9 +361,9 @@ Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates stat
         }
         m_layeredTarget->display();
 
-        auto& app         = Application::operator Gx::RenderSurface&();
         const auto buffer = Gx::Sprite(m_layeredTarget->getTexture());
-        GetMainWindow().draw(buffer, Gx::RenderStates::Default);
+        auto& app = Application::operator Gx::RenderSurface&();
+        app.Render(buffer, Gx::RenderStates::Default);
     }
     else
     {
