@@ -30,7 +30,7 @@ R* State::Instantiate(const std::string& source, const ResourceScope scope)
     }
 
     if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
-        AddChild(instance);
+        AddChild(*instance);
 
     return instance;
 }
@@ -51,12 +51,12 @@ R* State::Instantiate(const R& prefab, const ResourceScope scope)
 
     auto name     = GetName() + "/" + prefab.GetName() + "_" + std::to_string(resources->Count<R>());
     auto resource = Gx::ResourcePtr<R>(new R(prefab), [] (auto ptr) { delete ptr; });
-    auto instance = &resources->Store<R>(name, std::move(resource), Gx::CacheMode::None);
+    auto instance = resources->Store<R>(name, std::move(resource), Gx::CacheMode::None);
 
     if constexpr (!std::is_base_of_v<Gx::Dialog, R>)
         AddChild(instance);
 
-    return instance;
+    return &instance;
 }
 
 template<typename R>
@@ -91,18 +91,15 @@ R* State::Import(const std::string& id, Gx::ResourcePtr<R> resource, const Resou
 }
 
 template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int>>
-R* State::Create(Args&&... args)
+R& State::Create(Args&&... args)
 {
     auto resources = m_tempResources.get();
-    if (!resources)
-        return nullptr;
-
-    auto name     = Gx::StringHelper::GetTypeName<R>();
-    auto resource = Gx::ResourcePtr<R>(new R(std::forward<Args>(args)...), [] (auto ptr) {
+    auto name      = Gx::StringHelper::GetTypeName<R>();
+    auto resource  = Gx::ResourcePtr<R>(new R(std::forward<Args>(args)...), [] (auto ptr) {
         delete ptr;
     });
 
-    return &resources->Store(GetName() + "/" + name + "_" + std::to_string(resources->Count<R>()), std::move(resource), Gx::CacheMode::None);
+    return resources->Store(GetName() + "/" + name + "_" + std::to_string(resources->Count<R>()), std::move(resource), Gx::CacheMode::None);
 }
 
 template<typename R>

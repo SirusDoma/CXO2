@@ -21,21 +21,17 @@ void StateAvi::Initialize()
     const auto bgm = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
     m_mixer.Play(bgm, "BGM");
 
-    auto overlay = Create<Gx::Rectangle>(GetView().getSize());
-    overlay->SetColor(sf::Color(0, 0, 0, 255));
+    auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
+    overlay.SetColor(sf::Color(0, 0, 0, 255));
     AddChild(overlay);
 
-    const auto splash = Create<Gx::Sequence>([&]
+    auto& splash = Create<Gx::Sequence>([&]
         {
             director.Present<StatePlanet>();
         },
-        Gx::Sequence::ListOf(
-        {
-            Create<Gx::Fade>(overlay, 000, sf::seconds(2.5f)),
-            Create<Gx::Fade>(overlay, 255, sf::seconds(2.5f)),
-            Create<Gx::Action>([=] { AddChild(overlay); }),
-
-        })
+        Create<Gx::Fade>(overlay, 000, sf::seconds(2.5f)),
+        Create<Gx::Fade>(overlay, 255, sf::seconds(2.5f)),
+        Create<Gx::Action>([&] { AddChild(overlay); })
     );
 
     Run(splash);

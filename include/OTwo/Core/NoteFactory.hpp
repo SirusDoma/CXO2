@@ -22,7 +22,7 @@ public:
 
     NoteFactory(Gx::ResourceManager& instantiationResources, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables);
 
-    NoteContainer* Generate(const ChartRenderer::RenderSettings& settings) const;
+    NoteContainer& Generate(const ChartRenderer::RenderSettings& settings) const;
 
 private:
     Gx::ResourceManager* m_resources, *m_prefabResources;

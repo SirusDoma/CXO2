@@ -27,7 +27,7 @@ namespace Gx
         return m_alignment;
     }
 
-    void Label::SetAlignment(Label::Alignment alignment)
+    void Label::SetAlignment(Alignment alignment)
     {
         if (m_alignment == alignment)
             return;

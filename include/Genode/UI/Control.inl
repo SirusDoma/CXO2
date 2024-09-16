@@ -1,20 +1,20 @@
 namespace Gx
 {
     template<typename... Args>
-    void Control::AddChild(Control* first, Args... args)
+    void Control::AddChild(Control& first, Args&... args)
     {
-        AddChild(first);
-        AddChild(args...);
+        Control::AddChild(first);
+        Control::AddChild(args...);
 
         if constexpr (sizeof ...(args) == 0)
             Invalidate();
     }
 
     template<typename... Args>
-    void Control::RemoveChild(Control* first, Args... args)
+    void Control::RemoveChild(Control& first, Args&... args)
     {
-        RemoveChild(first);
-        RemoveChild(args...);
+        Control::RemoveChild(first);
+        Control::RemoveChild(args...);
 
         if constexpr (sizeof ...(args) == 0)
             Invalidate();

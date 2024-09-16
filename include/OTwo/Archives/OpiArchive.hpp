@@ -29,7 +29,6 @@ public:
     };
 
     OpiArchive() = default;
-    ~OpiArchive() override = default;
 
     Signature GetSignature() const;
     bool LoadFromFile(const std::string& fileName) override;

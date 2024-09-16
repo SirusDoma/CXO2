@@ -8,8 +8,6 @@ class O2Jam : public Gx::Application
 public:
     using Gx::Application::Application;
 
-    ~O2Jam() override = default;
-
     operator sf::RenderTarget&() const override;
 
 protected:

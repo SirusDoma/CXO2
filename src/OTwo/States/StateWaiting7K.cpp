@@ -158,9 +158,9 @@ void StateWaiting7K::Initialize()
             continue;
 
         m_avatars.push_back(avatar);
-        const auto emoticonContainer = Create<Gx::UiContainer>();
-        emoticonContainer->SetName("IDC_CONTAINER_EMOTICON");
-        emoticonContainer->SetVisible(false);
+        auto& emoticonContainer = Create<Gx::UiContainer>();
+        emoticonContainer.SetName("IDC_CONTAINER_EMOTICON");
+        emoticonContainer.SetVisible(false);
         avatar->AddChild(emoticonContainer);
 
         const auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
@@ -386,12 +386,10 @@ void StateWaiting7K::Initialize()
         btnBack->SetEnabled(false);
         m_mixer.Play(sfxStart, "SFX");
 
-        Run(Create<Gx::Sequence>([&director]
-            {
-                director.Present<StateLoading>();
-            },
-            Gx::Sequence::ListOf({ Create<Gx::Delay>(sf::milliseconds(100.f)) })
-        ));
+        Run(Create<Gx::Delay>(sf::milliseconds(100.f), [&director]
+        {
+            director.Present<StateLoading>();
+        }));
     });
 
     m_mixer.Play(bgm, "BGM");
@@ -460,7 +458,7 @@ void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoti
     auto emoticon = container->FindChild<Gx::Animation>(emoticonID);
     if (!emoticon)
     {
-        emoticon = Create<Gx::Animation>(*FindResource<Gx::Animation>(emoticonID));
+        emoticon = &Create<Gx::Animation>(*FindResource<Gx::Animation>(emoticonID));
         emoticon->SetName(emoticonID);
         emoticon->SetAnimationCallback([=] (auto& sender)
         {
@@ -470,7 +468,7 @@ void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoti
             );
             sender.SetVisible(container->IsVisible());
         });
-        container->AddChild(emoticon);
+        container->AddChild(*emoticon);
     }
 
     emoticon->Reset();

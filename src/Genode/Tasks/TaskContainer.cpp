@@ -8,19 +8,18 @@ namespace Gx
     {
     }
 
-    void TaskContainer::Run(Task* task)
+    void TaskContainer::Run(Task& task)
     {
-        if (task)
-            m_tasks.push_back(task);
+        m_tasks.push_back(&task);
     }
 
-    void TaskContainer::Stop(Task* task)
+    void TaskContainer::Stop(Task& task)
     {
-        auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto t) { return task == t; });
+        const auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto t) { return &task == t; });
         if (iterator != m_tasks.end())
         {
             // Run update before deleting
-            auto item = *iterator;
+            const auto item = *iterator;
             if (item->GetState() != TaskState::Completed)
             {
                 item->Stop();
@@ -36,7 +35,7 @@ namespace Gx
         for (unsigned int i = 0; i < m_tasks.size(); i++)
         {
             // Run update before deleting
-            auto item = m_tasks[i];
+            const auto item = m_tasks[i];
             if (item->GetState() != TaskState::Completed)
             {
                 item->Stop();
@@ -51,7 +50,7 @@ namespace Gx
 
     void TaskContainer::Update(const double delta)
     {
-        for (auto task : m_tasks)
+        for (const auto task : m_tasks)
             task->Update(delta);
     }
 }

@@ -75,7 +75,7 @@ void StatePlaying7K::Initialize()
     // Add chart renderer
     m_renderer.SetName("IDC_CHART_RENDERER");
     m_renderer.SetRenderCompleteCallback([this] { OnRenderComplete(); });
-    AddChild(&m_renderer);
+    AddChild(m_renderer);
 
     m_renderer.Initialize(*m_context.GetChart(), m_context);
 
@@ -108,38 +108,38 @@ void StatePlaying7K::Initialize()
         for (const auto id : member.EquippedItemIDs)
             avatar->Equip(m_items.GetItem(id));
 
-        const auto effectContainer = Create<Gx::UiContainer>();
-        effectContainer->SetName("IDC_CONTAINER_EFFECT_JAM");
+        auto& effectContainer = Create<Gx::UiContainer>();
+        effectContainer.SetName("IDC_CONTAINER_EFFECT_JAM");
 
         if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
         {
-            const auto fx = Create<Gx::Animation>(*fxPrefab);
-            fx->SetName("IDC_ANIMATION_EFFECT_JAM");
-            fx->Stop();
-            fx->SetAnimationCallback([=] (auto& _) {
-                effectContainer->SetVisible(
-                    fx->GetState() == Gx::Animation::AnimationState::Playing ||
-                    fx->GetState() == Gx::Animation::AnimationState::Initial
+            auto& fx = Create<Gx::Animation>(*fxPrefab);
+            fx.SetName("IDC_ANIMATION_EFFECT_JAM");
+            fx.Stop();
+            fx.SetAnimationCallback([&] (auto& _) {
+                effectContainer.SetVisible(
+                    fx.GetState() == Gx::Animation::AnimationState::Playing ||
+                    fx.GetState() == Gx::Animation::AnimationState::Initial
                 );
             });
 
-            effectContainer->AddChild(fx);
+            effectContainer.AddChild(fx);
         }
 
         if (const auto numPrefab = FindResource<Gx::BitmapNumber>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
         {
-            const auto numEffect = Create<Gx::BitmapNumber>(*numPrefab);
-            numEffect->SetName("IDC_NUMBER_EFFECT_JAM");
-            numEffect->SetAnimationCallback([=] (auto& _) {
-                numEffect->SetVisible(
-                    numEffect->GetAnimationState() == Gx::Animation::AnimationState::Playing ||
-                    numEffect->GetAnimationState() == Gx::Animation::AnimationState::Initial
+            auto& numEffect = Create<Gx::BitmapNumber>(*numPrefab);
+            numEffect.SetName("IDC_NUMBER_EFFECT_JAM");
+            numEffect.SetAnimationCallback([&] (auto& _) {
+                numEffect.SetVisible(
+                    numEffect.GetAnimationState() == Gx::Animation::AnimationState::Playing ||
+                    numEffect.GetAnimationState() == Gx::Animation::AnimationState::Initial
                 );
             });
-            effectContainer->AddChild(numEffect);
+            effectContainer.AddChild(numEffect);
         }
 
-        effectContainer->SetVisible(false);
+        effectContainer.SetVisible(false);
         avatar->AddChild(effectContainer);
 
         const auto info = avatar->GetAvatarInfo();
@@ -210,15 +210,15 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup Combo Counter
-    const auto comboCounter = Create<ComboCounter>(
+    auto& comboCounter = Create<ComboCounter>(
         FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COMBO"),
         FindResource<Gx::BitmapNumber>("IDC_NUMBER_NOTE_COMBO")
     );
-    comboCounter->SetName("IDC_CONTAINER_COMBO");
+    comboCounter.SetName("IDC_CONTAINER_COMBO");
     AddChild(comboCounter);
 
     // Setup Judgement Indicator
-    const auto judgementIndicator = Create<JudgementIndicator>(
+    auto& judgementIndicator = Create<JudgementIndicator>(
         std::unordered_map<Accuracy, Gx::Animation*>
         {
             { Accuracy::Cool, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COOL") },
@@ -227,7 +227,7 @@ void StatePlaying7K::Initialize()
             { Accuracy::Miss, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_MISS") },
         }, m_config.UseFx
     );
-    judgementIndicator->SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
+    judgementIndicator.SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
     AddChild(judgementIndicator);
 
     // Setup Long Note effects
@@ -239,11 +239,13 @@ void StatePlaying7K::Initialize()
             if (id < 1 || id > 7)
                 continue;
 
-            const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>("IDC_ANIMATION_LONG_NOTE_EFFECT" + std::to_string(id));
-            longNoteEffect->SetVisible(false);
-            m_longNoteEffects[channel] = longNoteEffect;
+            if (const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>("IDC_ANIMATION_LONG_NOTE_EFFECT" + std::to_string(id)); longNoteEffect)
+            {
+                longNoteEffect->SetVisible(false);
+                m_longNoteEffects[channel] = longNoteEffect;
 
-            AddChild(longNoteEffect);
+                AddChild(*longNoteEffect);
+            }
         }
     }
 
@@ -256,15 +258,17 @@ void StatePlaying7K::Initialize()
             if (id < 1 || id > 7)
                 continue;
 
-            const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id));
-            noteClick->SetVisible(false);
-            noteClick->Stop();
-            noteClick->SetAnimationCallback([] (auto& animation) {
-                animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
-            });
+            if (const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id)); noteClick)
+            {
+                noteClick->SetVisible(false);
+                noteClick->Stop();
+                noteClick->SetAnimationCallback([] (auto& animation) {
+                    animation.SetVisible(animation.GetState() == Gx::Animation::AnimationState::Playing);
+                });
 
-            m_noteClicks[channel] = noteClick;
-            AddChild(noteClick);
+                m_noteClicks[channel] = noteClick;
+                AddChild(*noteClick);
+            }
         }
     }
 
@@ -279,7 +283,7 @@ void StatePlaying7K::Initialize()
     });
 
     // Setup Score changes
-    m_scoreTracker.AddIncrementListener([=] (auto& ev, auto acc, auto count)
+    m_scoreTracker.AddIncrementListener([=, &comboCounter, &judgementIndicator] (auto& ev, auto acc, auto count)
     {
         // Life System
         m_lifeSystem.Update(acc, count);
@@ -316,8 +320,8 @@ void StatePlaying7K::Initialize()
         }
 
         // Combo
-        comboCounter->SetCombo(m_scoreTracker.GetCombo());
-        judgementIndicator->Play(acc);
+        comboCounter.SetCombo(m_scoreTracker.GetCombo());
+        judgementIndicator.Play(acc);
 
         // Score and Jam Combo
         scoreNumber->SetValue(m_scoreTracker.GetScorePoint());

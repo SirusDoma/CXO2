@@ -11,7 +11,8 @@ namespace Gx
     class Scale : public Task
     {
     public:
-        Scale(Transformable* target, sf::Vector2f scale, const sf::Time& duration);
+        Scale() = default;
+        Scale(Transformable& target, sf::Vector2f scale, const sf::Time& duration);
 
         void Update(double delta) override;
         void Reset() override;

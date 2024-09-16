@@ -16,7 +16,6 @@ class OjmArchive final : public virtual Gx::Archive, M30Archive, OmcArchive
 {
 public:
     OjmArchive() = default;
-    ~OjmArchive() override = default;
 
     bool LoadFromFile(const std::string& fileName) override;
 

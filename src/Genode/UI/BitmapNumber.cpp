@@ -155,7 +155,7 @@ namespace Gx
         return m_blendMode;
     }
 
-    void BitmapNumber::SetBlendMode(const Gx::BlendMode blendMode)
+    void BitmapNumber::SetBlendMode(const BlendMode blendMode)
     {
         m_blendMode = blendMode;
     }

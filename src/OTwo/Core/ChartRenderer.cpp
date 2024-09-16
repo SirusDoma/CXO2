@@ -89,11 +89,13 @@ void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& setting
 
     // Create Note Container with Note Factory
     const auto factory = NoteFactory(m_resources, m_prefabResources, m_instantiables);
-    m_container = factory.Generate(settings);
+    m_container = &factory.Generate(settings);
     m_container->SetName("IDC_NOTE_CONTAINER");
     m_container->Initialize(*this, chart, settings.Difficulty);
-    RemoveChild(FindChild<NoteContainer>(m_container->GetName()));
-    AddChild(m_container);
+    if (const auto container = FindChild<NoteContainer>(m_container->GetName()); container)
+        RemoveChild(*container);
+
+    AddChild(*m_container);
 
     // Register events for processing
     m_events.clear();

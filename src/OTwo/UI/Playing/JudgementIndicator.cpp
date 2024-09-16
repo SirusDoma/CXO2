@@ -5,7 +5,8 @@ JudgementIndicator::JudgementIndicator(const std::unordered_map<Accuracy, Gx::An
     m_indicators(indicators),
     m_useFx(useFx),
     m_elapsed(0),
-    m_target(nullptr)
+    m_target(nullptr),
+    m_scale()
 {
 }
 
@@ -43,11 +44,9 @@ void JudgementIndicator::Play(const Accuracy accuracy)
 
             if (m_useFx)
             {
-                if (m_scale)
-                    m_scale->Stop();
-
+                m_scale.Stop();
                 m_target->SetScale(sf::Vector2f(0.5f, 0.5f));
-                m_scale = std::make_unique<Gx::Scale>(m_target, sf::Vector2f(1.f, 1.f), sf::seconds(0.12083333f));
+                m_scale =  Gx::Scale(*m_target, sf::Vector2f(1.f, 1.f), sf::seconds(0.12083333f));
             }
         }
         else
@@ -57,10 +56,10 @@ void JudgementIndicator::Play(const Accuracy accuracy)
 
 void JudgementIndicator::Update(const double delta)
 {
-    if (m_useFx && m_scale)
+    if (m_useFx)
     {
-        m_scale->Update(delta);
-        if (m_scale->GetState() == Gx::TaskState::Completed)
+        m_scale.Update(delta);
+        if (m_scale.GetState() == Gx::TaskState::Completed)
             m_elapsed += delta;
     }
 

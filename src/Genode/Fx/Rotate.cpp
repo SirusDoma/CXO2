@@ -2,9 +2,9 @@
 
 namespace Gx
 {
-    Rotate::Rotate(Transformable* target, const float angle, const sf::Time& duration) :
-        m_target(target),
-        m_start(target->GetRotation()),
+    Rotate::Rotate(Transformable& target, const float angle, const sf::Time& duration) :
+        m_target(&target),
+        m_start(target.GetRotation()),
         m_end(angle),
         m_diff(0),
         m_duration(duration)

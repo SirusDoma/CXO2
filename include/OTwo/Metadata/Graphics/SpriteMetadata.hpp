@@ -10,8 +10,6 @@
 
 struct SpriteMetadata : TransformMetadata
 {
-    ~SpriteMetadata() override = default;
-
     sf::Color     Color;
     sf::IntRect   TexCoords;
     Gx::BlendMode BlendMode;

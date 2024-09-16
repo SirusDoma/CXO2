@@ -12,16 +12,15 @@ namespace Gx
     {
     public:
         TaskContainer();
-        ~TaskContainer() override = default;
 
-        void Run(Task* task);
-        void Stop(Task* task);
-
-        template<typename... Args>
-        void Run(Task* first, Args... args);
+        void Run(Task& task);
+        void Stop(Task& task);
 
         template<typename... Args>
-        void Stop(Task* first, Args... args);
+        void Run(Task& first, Args&... args);
+
+        template<typename... Args>
+        void Stop(Task& first, Args&... args);
 
         void StopAll();
 

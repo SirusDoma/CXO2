@@ -37,10 +37,10 @@ namespace Gx
     Button::Frame CheckBox::GetCurrentFrame() const
     {
         if (IsChecked())
-            return GetStateFrame(CheckBox::State::Active);
+            return GetStateFrame(State::Active);
 
-        if (GetControlState() == CheckBox::State::Active)
-            return GetStateFrame(CheckBox::State::Hover);
+        if (GetControlState() == State::Active)
+            return GetStateFrame(State::Hover);
 
         return GetStateFrame(GetControlState());
     }

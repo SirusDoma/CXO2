@@ -29,7 +29,7 @@ private:
 
     double m_elapsed;
     Gx::Animation* m_target;
-    std::unique_ptr<Gx::Scale> m_scale;
+    Gx::Scale m_scale;
 };
 
 #endif

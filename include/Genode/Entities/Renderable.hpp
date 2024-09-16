@@ -14,7 +14,6 @@ namespace Gx
     {
     public:
         Renderable() = default;
-        ~Renderable() override = default;
 
         virtual RenderStates Render(RenderSurface& surface, RenderStates states) const = 0;
 

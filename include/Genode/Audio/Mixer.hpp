@@ -19,7 +19,6 @@ namespace Gx
     public:
         Mixer();
         Mixer(Mixer&& right) noexcept;
-        ~Mixer() override = default;
 
         Mixer& operator=(Mixer&& right) noexcept;
 

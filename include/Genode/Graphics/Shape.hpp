@@ -40,8 +40,6 @@ namespace Gx
     class Shape : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public Colorable
     {
     public:
-        ~Shape() override = default;
-
         void SetTexture(const sf::Texture& texture, bool resetRect = false);
         void SetTexCoords(const sf::IntRect& rect);
 

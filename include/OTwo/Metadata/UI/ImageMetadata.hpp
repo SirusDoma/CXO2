@@ -14,7 +14,6 @@ struct ImageMetadata : public SpriteMetadata
     };
 
     ImageMetadata() : Frames() {}
-    ~ImageMetadata() override = default;
 
     std::vector<FrameMetadata> Frames;
 };

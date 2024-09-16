@@ -9,7 +9,6 @@ namespace Gx
     {
     public:
         RenderBatchContainer() = default;
-        ~RenderBatchContainer() override = default;
 
         void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
 

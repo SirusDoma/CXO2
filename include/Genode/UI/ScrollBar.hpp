@@ -12,8 +12,6 @@ namespace Gx
         enum class ScrollOrientation { Horizontal, Vertical };
         
         ScrollBar();
-        ~ScrollBar() override = default;
-
         ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
         ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
 

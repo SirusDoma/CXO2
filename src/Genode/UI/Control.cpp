@@ -27,11 +27,11 @@ namespace Gx
 
     void Control::SetFocus(const bool focus)
     {
-        if (m_focused == focus || m_state == Control::State::Active)
+        if (m_focused == focus || m_state == State::Active)
             return;
 
         m_focused = focus;
-        auto uiEvent = Event{false, m_focused ? Control::State::Hover : Control::State::Normal};
+        auto uiEvent = Event{false, m_focused ? State::Hover : State::Normal};
         if (m_onFocusChanged)
             m_onFocusChanged(*this, uiEvent);
 
@@ -71,12 +71,12 @@ namespace Gx
         return m_state;
     }
 
-    void Control::SetControlState(const Control::State& state)
+    void Control::SetControlState(const State& state)
     {
         if (m_state != state)
         {
             m_state = state;
-            SetFocus(m_state == Control::State::Hover || m_state == Control::State::Active);
+            SetFocus(m_state == State::Hover || m_state == State::Active);
             if (IsEnabled())
                 OnControlStateChanged(*this, m_state);
         }
@@ -96,22 +96,22 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    void Control::SetFocusChangedCallback(std::function<void(Control&, Control::Event&)> callback)
+    void Control::SetFocusChangedCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onFocusChanged = std::move(callback);
     }
 
-    void Control::SetGainFocusCallback(std::function<void(Control&, Control::Event&)> callback)
+    void Control::SetGainFocusCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onGainFocus = std::move(callback);
     }
 
-    void Control::SetLostFocusCallback(std::function<void(Control&, Control::Event&)> callback)
+    void Control::SetLostFocusCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onLostFocus = std::move(callback);
     }
 
-    void Control::SetClickCallback(std::function<void(Control&, Control::Event&)> callback)
+    void Control::SetClickCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onClick = std::move(callback);
     }
@@ -121,7 +121,7 @@ namespace Gx
         m_onHoldClick = std::move(callback);
     }
 
-    void Control::SetDoubleClickCallback(std::function<void(Control&, Control::Event&)> callback)
+    void Control::SetDoubleClickCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onDoubleClick = std::move(callback);
     }
@@ -166,39 +166,34 @@ namespace Gx
         return m_onScrollWheel;
     }
 
-    void Control::AddChild(Control* node)
+    void Control::AddChild(Control& node)
     {
-        if (!node)
-            return;
-
         Node::AddChild(node);
-        OnControlChildAdded(*node);
+        OnControlChildAdded(node);
 
         Invalidate();
     }
 
-    void Control::AddChild(Node* node)
+    void Control::AddChild(Node& node)
     {
-        if (const auto control = dynamic_cast<Gx::Control*>(node); control)
-            AddChild(control);
+        if (const auto control = dynamic_cast<Control*>(&node); control)
+            AddChild(*control);
         else
             Node::AddChild(node);
     }
 
-    void Control::RemoveChild(Control* node)
+    void Control::RemoveChild(Control& node)
     {
-        if (!node)
-            return;
-
-        OnControlChildRemove(*node);
+        OnControlChildRemove(node);
         Node::RemoveChild(node);
+
         Invalidate();
     }
 
-    void Control::RemoveChild(Node* node)
+    void Control::RemoveChild(Node& node)
     {
-        if (const auto control = dynamic_cast<Gx::Control*>(node); control)
-            RemoveChild(control);
+        if (const auto control = dynamic_cast<Control*>(&node); control)
+            RemoveChild(*control);
         else
             Node::RemoveChild(node);
     }
@@ -227,7 +222,7 @@ namespace Gx
             }
         }
 
-        if (GetControlState() == Control::State::Active && m_onHoldClick)
+        if (GetControlState() == State::Active && m_onHoldClick)
         {
             m_deltaHoldDuration += delta;
             if (m_deltaHoldDuration >= HOLD_CLICK_THRESHOLD)
@@ -262,13 +257,13 @@ namespace Gx
 
     void Control::OnMouseMoved(const sf::Event::MouseMoved& ev)
     {
-        if (GetControlState() != Control::State::Active)
+        if (GetControlState() != State::Active)
         {
             const bool intersect = GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y));
-            if (intersect && GetControlState() == Control::State::Normal)
-                SetControlState(Control::State::Hover);
-            else if (!intersect && GetControlState() == Control::State::Hover)
-                SetControlState(Control::State::Normal);
+            if (intersect && GetControlState() == State::Normal)
+                SetControlState(State::Hover);
+            else if (!intersect && GetControlState() == State::Hover)
+                SetControlState(State::Normal);
         }
 
         if (!IsEnabled())
@@ -281,9 +276,9 @@ namespace Gx
     {
         if (GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
-            if (GetControlState() == Control::State::Hover)
+            if (GetControlState() == State::Hover)
             {
-                SetControlState(Control::State::Active);
+                SetControlState(State::Active);
                 OnControlPress(*this, ev);
 
                 if (m_clicked)
@@ -311,7 +306,7 @@ namespace Gx
                 m_deltaClickDuration = 0;
             }
             else
-                SetControlState(Control::State::Hover);
+                SetControlState(State::Hover);
         }
 
         InputableContainer::OnMouseButtonPressed(ev);
@@ -321,11 +316,11 @@ namespace Gx
     {
         if (GetGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
-            if (GetControlState() == Control::State::Active)
+            if (GetControlState() == State::Active)
             {
                 if (m_onClick && !m_doubleClicked)
                 {
-                    auto uiEvent = Event{false, Control::State::Hover};
+                    auto uiEvent = Event{false, State::Hover};
                     m_onClick(*this, uiEvent);
 
                     SetControlState(uiEvent.State);
@@ -333,19 +328,19 @@ namespace Gx
                         return;
                 }
                 else
-                    SetControlState(Control::State::Hover);
+                    SetControlState(State::Hover);
 
                 OnControlClick(*this, ev);
             }
             else
-                SetControlState(Control::State::Hover);
+                SetControlState(State::Hover);
         }
         else
         {
             m_clicked = false;
             m_deltaClickDuration = 0;
 
-            SetControlState(Control::State::Normal);
+            SetControlState(State::Normal);
         }
 
         m_doubleClicked = false;
@@ -360,7 +355,7 @@ namespace Gx
     {
     }
 
-    void Control::OnControlStateChanged(Control& sender, const Control::State state)
+    void Control::OnControlStateChanged(Control& sender, const State state)
     {
         Invalidate();
 
@@ -392,7 +387,7 @@ namespace Gx
             return;
 
         const auto state = GetControlState();
-        if (state == Control::State::Hover || state == Control::State::Active)
+        if (state == State::Hover || state == State::Active)
         {
             auto uiEvent = Event{false, state, ev.delta};
             if (m_onScrollWheel)

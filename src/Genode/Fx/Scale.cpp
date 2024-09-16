@@ -2,9 +2,9 @@
 
 namespace Gx
 {
-    Scale::Scale(Transformable* target, const sf::Vector2f scale, const sf::Time& duration) :
-        m_target(target),
-        m_start(target->GetScale()),
+    Scale::Scale(Transformable& target, const sf::Vector2f scale, const sf::Time& duration) :
+        m_target(&target),
+        m_start(target.GetScale()),
         m_end(scale),
         m_diff(),
         m_duration(duration)

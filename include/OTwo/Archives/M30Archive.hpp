@@ -36,7 +36,6 @@ class M30Archive : public virtual Gx::Archive
 {
 public:
     M30Archive() = default;
-    ~M30Archive() override = default;
 
     bool LoadFromFile(const std::string& fileName) override;
 

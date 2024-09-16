@@ -9,7 +9,8 @@ namespace Gx
     class Rotate : public Task
     {
     public:
-        Rotate(Transformable* target, float rotation, const sf::Time& duration);
+        Rotate() = default;
+        Rotate(Transformable& target, float rotation, const sf::Time& duration);
 
         void Update(double delta) override;
         void Reset() override;

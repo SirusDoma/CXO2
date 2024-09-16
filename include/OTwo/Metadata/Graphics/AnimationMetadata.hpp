@@ -8,8 +8,6 @@
 
 struct AnimationMetadata : SpriteMetadata
 {
-    ~AnimationMetadata() override = default;
-
     bool     IsLoop;
     sf::Time Duration;
     float    Speed;

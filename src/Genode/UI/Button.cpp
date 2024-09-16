@@ -62,12 +62,12 @@ namespace Gx
         m_texture = &texture;
     }
 
-    Button::Frame Button::GetStateFrame(const Control::State state) const
+    Button::Frame Button::GetStateFrame(const State state) const
     {
         return m_stateData[state];
     }
 
-    void Button::SetStateFrame(const Control::State state, const Button::Frame& frame)
+    void Button::SetStateFrame(const State state, const Frame& frame)
     {
         m_stateData[state] = frame;
         Invalidate();

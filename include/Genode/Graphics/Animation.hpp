@@ -35,10 +35,9 @@ namespace Gx
 
         Animation();
         Animation(const sf::Texture& texture, const sf::Time& duration, std::initializer_list<Frame> frames);
-        ~Animation() override = default;
 
         template<typename... Args>
-        void AddFrame(const Frame& first, Args... args);
+        void AddFrame(const Frame& first, const Args&... args);
         void AddFrame(const Frame& frame);
         unsigned int GetFrameCount() const;
         Frame& GetFrame(unsigned int index);

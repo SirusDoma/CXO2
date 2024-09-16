@@ -7,11 +7,15 @@
 ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
     m_header(header),
     m_counter(counter),
-    m_action([] {}),
-    m_move(this, {}, sf::Time::Zero),
+    m_action(),
+    m_move(),
     m_delay(sf::Time::Zero)
 {
-    AddChild(m_header, m_counter);
+    if (m_header)
+        Gx::Node::AddChild(*m_header);
+
+    if (m_counter)
+        Gx::Node::AddChild(*m_counter);
 }
 
 void ComboCounter::Initialize()
@@ -29,23 +33,19 @@ void ComboCounter::Initialize()
         SetVisible(true);
     });
 
-    m_move  = Gx::Move(this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6));
+    m_move  = Gx::Move(*this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6));
     m_delay = Gx::Delay(sf::milliseconds(1000));
 
-    m_sequence = Gx::Sequence([this] ()
+    m_sequence = Gx::Sequence([this]
         {
             if (m_header)
                 m_header->Stop();
 
             SetVisible(false);
         },
-        Gx::Sequence::ListOf(
-        {
-            &m_action,
-            &m_move,
-            &m_delay
-        })
+        m_action, m_move, m_delay
     );
+
     m_sequence.Stop();
 }
 

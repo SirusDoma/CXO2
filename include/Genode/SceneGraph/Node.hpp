@@ -26,8 +26,8 @@ namespace Gx
         Node* GetChildByName(const std::string& name) const;
         Node* GetChildByTag(const std::string& tag) const;
 
-        virtual void AddChild(Node* child);
-        virtual void RemoveChild(Node* child);
+        virtual void AddChild(Node& child);
+        virtual void RemoveChild(Node& child);
         virtual void ClearChildren();
 
         template<typename T>
@@ -37,10 +37,10 @@ namespace Gx
         T* FindChild(const std::string& name) const;
 
         template<typename... Args>
-        void AddChild(Node* first, Args... args);
+        void AddChild(Node& first, Args&... args);
 
         template<typename... Args>
-        void RemoveChild(Node* first, Args... args);
+        void RemoveChild(Node& first, Args&... args);
 
         protected:
             Node();

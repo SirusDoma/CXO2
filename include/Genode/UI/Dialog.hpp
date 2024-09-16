@@ -19,8 +19,6 @@ namespace Gx
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        ~Dialog() override = default;
-
         const sf::Texture* GetTexture() const;
         void SetTexture(const sf::Texture& texture);
 

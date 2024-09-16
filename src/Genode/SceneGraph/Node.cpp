@@ -125,42 +125,36 @@ namespace Gx
         return nullptr;
     }
 
-    void Node::AddChild(Node* child)
+    void Node::AddChild(Node& child)
     {
-        if (child)
+        if (std::find(m_children.begin(), m_children.end(), &child) == m_children.end())
         {
-            if (std::find(m_children.begin(), m_children.end(), child) == m_children.end())
-            {
-                if (child->m_parent)
-                    child->m_parent->RemoveChild(child);
+            if (child.m_parent)
+                child.m_parent->RemoveChild(child);
 
-                child->SetParent(this);
-                m_children.push_back(child);
-            }
-            else
-                child->SetParent(this);
-
-            if (m_initialized && !child->m_initialized)
-            {
-                child->Initialize();
-                child->m_initialized = true;
-            }
-            else
-                m_pristine = child->m_initialized;
+            child.SetParent(this);
+            m_children.push_back(&child);
         }
+        else
+            child.SetParent(this);
+
+        if (m_initialized && !child.m_initialized)
+        {
+            child.Initialize();
+            child.m_initialized = true;
+        }
+        else
+            m_pristine = child.m_initialized;
     }
 
-    void Node::RemoveChild(Node* child)
+    void Node::RemoveChild(Node& child)
     {
-        if (child)
-        {
-            if (child->m_parent == this)
-                child->m_parent = nullptr;
+        if (child.m_parent == this)
+            child.m_parent = nullptr;
 
-            const auto iterator = std::find(m_children.begin(), m_children.end(), child);
-            if (iterator != m_children.end())
-                m_children.erase(iterator);
-        }
+        const auto iterator = std::find(m_children.begin(), m_children.end(), &child);
+        if (iterator != m_children.end())
+            m_children.erase(iterator);
     }
 
     void Node::ClearChildren()

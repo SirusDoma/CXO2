@@ -23,8 +23,6 @@ namespace Gx
             double Delta;
         };
 
-        ~Control() override = default;
-
         virtual sf::FloatRect GetLocalBounds() const = 0;
         sf::FloatRect GetGlobalBounds() const;
 
@@ -44,17 +42,17 @@ namespace Gx
 
         void SetVisible(bool visible) override;
 
-        virtual void AddChild(Control* node);
-        virtual void RemoveChild(Control* node);
+        virtual void AddChild(Control& node);
+        virtual void RemoveChild(Control& node);
 
-        void AddChild(Gx::Node* node) override;
-        void RemoveChild(Gx::Node* node) override;
-
-        template<typename... Args>
-        void AddChild(Control* first, Args... args);
+        void AddChild(Gx::Node& node) override;
+        void RemoveChild(Gx::Node& node) override;
 
         template<typename... Args>
-        void RemoveChild(Control* first, Args... args);
+        void AddChild(Control& first, Args&... args);
+
+        template<typename... Args>
+        void RemoveChild(Control& first, Args&... args);
 
     protected:
         Control();

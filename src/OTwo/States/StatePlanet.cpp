@@ -19,26 +19,22 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    const auto bgm = Instantiate<sf::Music>("STATE_PLANET/IDC_MUSIC");
-    auto clickSfx  = Instantiate<sf::Sound>("STATE_PLANET/IDC_SOUND_02");
-    auto hoverSfx  = Instantiate<sf::Sound>("STATE_PLANET/IDC_SOUND_BEEP");
+    const auto bgm = Instantiate<sf::Music>("IDC_MUSIC");
+    auto clickSfx  = Instantiate<sf::Sound>("IDC_SOUND_02");
+    auto hoverSfx  = Instantiate<sf::Sound>("IDC_SOUND_BEEP");
 
-    auto euta     = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_01");
-    auto thalo    = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_02");
-    auto melpomin = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_BEGINNER_03");
-    auto kalliope = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_HIGH_01");
-    auto kleo     = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_INTERMEDIATE_01");
-    auto philix   = Instantiate<Gx::RadioButton>("STATE_PLANET/IDC_RADIO_PREMIUM_01");
+    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MUSIC_HALL");
+    auto euta     = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_01");
+    auto thalo    = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_02");
+    auto melpomin = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_03");
+    auto kalliope = container->FindChild<Gx::RadioButton>("IDC_RADIO_HIGH_01");
+    auto kleo     = container->FindChild<Gx::RadioButton>("IDC_RADIO_INTERMEDIATE_01");
+    auto philix   = container->FindChild<Gx::RadioButton>("IDC_RADIO_PREMIUM_01");
 
-    const auto exitButton = Instantiate<Gx::Button>("STATE_PLANET/IDC_BUTTON_EXIT");
+    const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([&] (auto& sender, auto& ev) { GetApplication().Close(); });
 
-    const auto container = Create<Gx::UiContainer>();
-    container->SetName("STATE_PLANET/IDC_CONTAINER_MUSIC_HALL");
-    container->AddChild(philix, kleo, kalliope, euta, thalo, melpomin);
-    AddChild(container);
-
-    auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    auto channelBoard = Instantiate<ChannelBoard>("IDC_CHANNEL_BOARD");
     channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
 
     std::unordered_map<MusicHall, Gx::RadioButton*> planets =
@@ -64,9 +60,6 @@ void StatePlanet::Initialize()
         radio->SetClickCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender, auto& ev)
         {
             const auto r = dynamic_cast<Gx::RadioButton*>(&sender);
-            if (!r)
-                return;
-
             if (r->IsChecked() || channelBoard->InTransition() || IsConnecting())
             {
                 ev.Handled = true;
@@ -80,19 +73,17 @@ void StatePlanet::Initialize()
 
     if (m_session.GetMusicHall() == MusicHall::None)
     {
-        auto overlay = Create<Gx::Rectangle>(GetView().getSize());
-        overlay->SetFillColor(sf::Color::Black);
+        auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
+        overlay.SetFillColor(sf::Color::Black);
         AddChild(overlay);
 
-        const auto splash = Create<Gx::Sequence>([&, overlay]
+        auto& transition = Create<Gx::Sequence>([&]
             {
                 RemoveChild(overlay);
             },
-            Gx::Sequence::ListOf({
-                Create<Gx::Fade>(overlay, 0, sf::seconds(1.5f))
-            })
+            Create<Gx::Fade>(overlay, 0, sf::seconds(0.5f))
         );
-        Run(splash);
+        Run(transition);
     }
 
     m_mixer.Play(bgm, "BGM");
@@ -103,10 +94,10 @@ bool StatePlanet::IsConnecting() const
     return m_connecting;
 }
 
-void StatePlanet::OnMusicHallSelected(MusicHall hall)
+void StatePlanet::OnMusicHallSelected(const MusicHall hall)
 {
     m_connecting = true;
-    const auto channelBoard = Instantiate<ChannelBoard>("STATE_PLANET/IDC_CHANNEL_BOARD");
+    const auto channelBoard = Instantiate<ChannelBoard>("IDC_CHANNEL_BOARD");
 
     auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;
@@ -139,14 +130,12 @@ void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& chan
     m_session.SetChannelID(channel.ID);
 
     m_connecting = true;
-    const auto sequence = Create<Gx::Sequence>([&] ()
-        {
+    auto& sequence = Create<Gx::Sequence>([&]
+                                          {
             auto& director = GetDirector();
             director.Present<StateRoom>();
         },
-        Gx::Sequence::ListOf({
-            Create<Gx::Delay>(sf::milliseconds(750))
-        })
+        Create<Gx::Delay>(sf::milliseconds(750))
     );
 
     Run(sequence);

@@ -8,9 +8,6 @@ namespace Gx
 {
     class RenderableContainer : public virtual Node, public virtual Renderable
     {
-    public:
-        ~RenderableContainer() override = default;
-
     protected:
         RenderableContainer() = default;
 

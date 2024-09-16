@@ -28,7 +28,7 @@ void StateResult::Initialize()
         const auto& resources = GetResources(ResourceScope::Shared);
         if (const auto texture = resources.Find<sf::Texture>("IDC_TEXTURE_STATE_PLAYING"); texture)
         {
-            const auto fragment = Create<Gx::Sprite>(*texture);
+            auto& fragment = Create<Gx::Sprite>(*texture);
             container->AddChild(fragment);
         }
     }
@@ -184,18 +184,15 @@ void StateResult::Initialize()
         GetDirector().Present<StateWaiting7K>();
     });
 
-    const auto topFx    = Create<Gx::Move>(top, sf::Vector2f(0, 0), sf::seconds(2.f));
-    const auto bottomFx = Create<Gx::Sequence>([=]
+    auto& topFx    = Create<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
+    auto& bottomFx = Create<Gx::Sequence>([=]
         {
             background->SetVisible(true);
             banner->SetVisible(true);
             btnRetry->SetEnabled(true);
             btnBack->SetEnabled(true);
         },
-        Gx::Sequence::ListOf(
-        {
-            Create<Gx::Move>(bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f)),
-        })
+        Create<Gx::Move>(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))
     );
 
     if (const auto bgm = Instantiate<sf::Music>("IDC_MUSIC"); bgm)

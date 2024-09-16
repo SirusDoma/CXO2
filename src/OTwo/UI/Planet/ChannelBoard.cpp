@@ -14,8 +14,8 @@ ChannelBoard::ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
     m_captureImage(),
     m_tab(ChannelBoard::Tab::Notice),
     m_sequence(),
-    m_moveIn(this, {}, sf::Time::Zero),
-    m_moveOut(this, {}, sf::Time::Zero),
+    m_moveIn(),
+    m_moveOut(),
     m_transitioning(false),
     m_animationEnabled(true),
     m_selectedChannel(),
@@ -147,7 +147,6 @@ void ChannelBoard::Initialize()
     m_captureImage.SetPosition(GetPosition());
     m_captureImage.SetVisible(false);
 
-    AddChild(notice, channelTabButton, noticeTabButton, currentPageNumber, maxPageNumber, leftButton, rightButton);
     SwitchTab(Tab::Notice);
 }
 
@@ -291,26 +290,22 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
         m_transitioning = true;
         const auto position = GetPosition();
         SetPosition(800 + GetLocalBounds().size.x, position.y);
-        Stop(&m_sequence);
+        Stop(m_sequence);
 
-        m_moveIn  = Gx::Move(this, position - sf::Vector2f(30, 0), sf::milliseconds(200));
-        m_moveOut = Gx::Move(this, position, sf::milliseconds(200));
+        m_moveIn  = Gx::Move(*this, position - sf::Vector2f(30, 0), sf::milliseconds(200));
+        m_moveOut = Gx::Move(*this, position, sf::milliseconds(200));
 
         m_sequence = Gx::Sequence([&, callback]
-        {
-            m_transitioning = false;
-            m_captureImage.SetVisible(false);
-            if (callback)
-                callback();
-        },
-        Gx::Sequence::ListOf(
-        {
-            //parent->Create<Gx::Action>([&, sfxPopup] { mixer.Play(sfxPopup, "SFX"); }),
-            &m_moveIn,
-            &m_moveOut
-        }));
+            {
+                m_transitioning = false;
+                m_captureImage.SetVisible(false);
+                if (callback)
+                    callback();
+            },
+            m_moveIn, m_moveOut
+        );
 
-        Run(&m_sequence);
+        Run(m_sequence);
     }
     else
     {

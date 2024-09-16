@@ -9,7 +9,8 @@ namespace Gx
     class Move : public Task
     {
     public:
-        Move(Transformable* target, sf::Vector2f position, const sf::Time& duration);
+        Move() = default;
+        Move(Transformable& target, sf::Vector2f position, const sf::Time& duration);
 
         void Update(const double delta) override;
         void Reset() override;

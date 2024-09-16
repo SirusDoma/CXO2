@@ -20,15 +20,12 @@ namespace Gx
     class Task : public Updatable
     {
     public:
-        friend class TaskContainer;
-        ~Task() override = default;
-
         TaskState GetState() const;
         virtual const sf::Time& GetElapsed() const;
 
-        void OnStart(std::function<void()> callback);
-        void OnStopped(std::function<void()> callback);
-        void OnCompleted(std::function<void()> callback);
+        void SetStartCallback(const std::function<void()>& callback);
+        void SetStoppedCallback(const std::function<void()>& callback);
+        void SetCompletedCallback(const std::function<void()>& callback);
 
         virtual void Stop();
         virtual void Complete();
@@ -45,7 +42,7 @@ namespace Gx
         TaskState m_state;
         sf::Time m_elapsed;
 
-        std::function<void()> m_onStart, m_onStop, m_onComplete;
+        std::function<void()> m_startCallback, m_stopCallback, m_completeCallback;
     };
 }
 

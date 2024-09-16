@@ -92,20 +92,17 @@ namespace Gx
         return nullptr;
     }
 
-    void Scene::PushOverlay(Node* overlay)
+    void Scene::PushOverlay(Node& overlay)
     {
-        if (overlay)
-        {
-            AddChild(overlay);
-            m_overlays.push_back(overlay);
-        }
+        AddChild(overlay);
+        m_overlays.push_back(&overlay);
     }
 
     void Scene::CloseOverlay()
     {
         if (!m_overlays.empty())
         {
-            RemoveChild(m_overlays.back());
+            RemoveChild(*m_overlays.back());
             m_overlays.pop_back();
         }
 

@@ -7,49 +7,30 @@ namespace Gx
         m_frames()
     {
     }
-    
-    Timeline::~Timeline()
-    {
-        for (auto frame : m_frames)
-        {
-            if (frame) 
-                delete frame;
-        }
 
-        m_frames.clear();
-    }
-
-    Timeline::KeyFrame::KeyFrame(const sf::Time& offset, Task* task) :
-        KeyTask(task),
+    Timeline::KeyFrame::KeyFrame(const sf::Time& offset, Gx::Task& task) :
+        Task(&task),
         Offset(offset)
     {
     }
 
-    Timeline::KeyFrame::~KeyFrame()
+    bool Timeline::KeyFrame::operator==(const KeyFrame& rhs) const
     {
-        if (KeyTask)
-            delete KeyTask;
+        return Task == rhs.Task && Offset == rhs.Offset;
     }
-    
-    Timeline* Timeline::Add(KeyFrame* frame)
+
+    Timeline* Timeline::Add(const KeyFrame& frame)
     {
-        if (frame)
+        if (frame.Task)
             m_frames.push_back(frame);
 
         return this;
     }
     
-    Timeline* Timeline::Remove(KeyFrame* frame)
+    Timeline* Timeline::Remove(const KeyFrame& frame)
     {
-        if (frame)
-        {
-            auto iterator = std::find(m_frames.begin(), m_frames.end(), frame);
-            if (iterator != m_frames.end())
-            {
-                delete* iterator;
-                m_frames.erase(iterator);
-            }
-        }
+        if (const auto iterator = std::find(m_frames.begin(), m_frames.end(), frame); iterator != m_frames.end())
+            m_frames.erase(iterator);
 
         return this;
     }
@@ -66,14 +47,14 @@ namespace Gx
             return;
 
         int completed = 0;
-        sf::Time elapsed = GetElapsed();
-        for (auto frame : m_frames)
+        const sf::Time elapsed = GetElapsed();
+        for (const auto frame : m_frames)
         {
-            if (frame->KeyTask && frame->Offset <= elapsed)
+            if (frame.Task && frame.Offset <= elapsed)
             {
-                state = frame->KeyTask->GetState();
+                state = frame.Task->GetState();
                 if (state == TaskState::Initial || state == TaskState::Running)
-                    frame->KeyTask->Update(delta);
+                    frame.Task->Update(delta);
                 else
                     completed++;
             }
@@ -86,10 +67,10 @@ namespace Gx
     void Timeline::Reset()
     {
         Task::Reset();
-        for (auto frame : m_frames)
+        for (const auto frame : m_frames)
         {
-            if (frame->KeyTask)
-                frame->KeyTask->Reset();
+            if (frame.Task)
+                frame.Task->Reset();
         }
     }
 }

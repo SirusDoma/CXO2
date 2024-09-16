@@ -11,23 +11,22 @@ namespace Gx
     public:
         struct KeyFrame
         {
-            Task*    KeyTask;
+            Task* Task;
             sf::Time Offset;
 
-            KeyFrame(const sf::Time& offset, Gx::Task* task);
-            ~KeyFrame();
+            KeyFrame(const sf::Time& offset, Gx::Task& task);
+            bool operator==(const KeyFrame& rhs) const;
         };
 
         Timeline();
-        ~Timeline() override;
 
         template<typename... Args>
-        Timeline* Add(KeyFrame* first, Args... args);
-        Timeline* Add(KeyFrame* frame);
+        Timeline* Add(const KeyFrame& first, const Args&... args);
+        Timeline* Add(const KeyFrame& frame);
 
         template<typename... Args>
-        Timeline* Remove(KeyFrame* first, Args... args);
-        Timeline* Remove(KeyFrame* frame);
+        Timeline* Remove(const KeyFrame& first, const Args&... args);
+        Timeline* Remove(const KeyFrame& frame);
 
         void Reset() override;
 
@@ -35,7 +34,7 @@ namespace Gx
         void Update(double delta) override;
 
     private:
-        std::vector<const KeyFrame*> m_frames;
+        std::vector<KeyFrame> m_frames;
     };
 }
 

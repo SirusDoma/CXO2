@@ -28,8 +28,6 @@ namespace Gx
         List(int verticalCount, float verticalSpacing);
         List(int verticalCount, float verticalSpacing, int horizontalCount, float horizontalSpacing);
 
-        ~List() override = default;
-
         Order GetOrder() const;
         void SetOrder(Order order);
 
@@ -46,7 +44,8 @@ namespace Gx
         void AddLayout(const LayoutItem& layout);
         void ClearLayouts();
 
-        void AddChild(Gx::Node* node) override;
+        void AddChild(Node& node) override;
+        void RemoveChild(Node& child) override;
 
         using Control::AddChild;
         using Control::RemoveChild;
@@ -59,7 +58,9 @@ namespace Gx
         bool IsSpaceAvailable() const;
 
         sf::Vector2f GetNextItemPosition() const;
+
         void IncreaseSpacingCounter();
+        void DecreaseSpacingCounter();
 
         void Update(const double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;

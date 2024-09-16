@@ -10,7 +10,6 @@ namespace Gx
     public:
         Step();
         explicit Step(sf::Time duration, sf::Time stepDuration, const std::function<void(const Step&, double)> &update);
-        ~Step() override = default;
 
     protected:
         void Update(double delta) override;

@@ -16,8 +16,6 @@ struct ShapeMetadata : TransformMetadata
         RoundedRectangle
     };
 
-    ~ShapeMetadata() override = default;
-
     Type        ShapeType;
     sf::Color   Color;
     sf::IntRect TexCoords;
@@ -28,32 +26,24 @@ struct ShapeMetadata : TransformMetadata
 
 struct CircleMetadata : ShapeMetadata
 {
-    ~CircleMetadata() override = default;
-
     float Radius;
     unsigned int PointCount;
 };
 
 struct PolygonMetadata : ShapeMetadata
 {
-    ~PolygonMetadata() override = default;
-
     unsigned int PointCount;
     std::vector<sf::Vector2f> Points;
 };
 
 struct RectangleMetadata : ShapeMetadata
 {
-    ~RectangleMetadata() override = default;
-
     unsigned int Width;
     unsigned int Height;
 };
 
 struct RoundedRectangleMetadata : ShapeMetadata
 {
-    ~RoundedRectangleMetadata() override = default;
-
     unsigned int Width;
     unsigned int Height;
     unsigned int CornerPointCount;

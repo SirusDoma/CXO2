@@ -64,7 +64,7 @@ namespace Gx
             SetFrame(name);
     }
 
-    void Image::AddFrame(const std::string& name, const Image::Frame& frame)
+    void Image::AddFrame(const std::string& name, const Frame& frame)
     {
         if (m_frames.find(name) == m_frames.end())
             m_indices.push_back(name);
@@ -99,7 +99,7 @@ namespace Gx
         }
     }
 
-    void Image::ApplyFrame(const Image::Frame& frame)
+    void Image::ApplyFrame(const Frame& frame)
     {
         m_currentFrame = &frame;
 

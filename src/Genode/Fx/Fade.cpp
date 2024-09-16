@@ -2,9 +2,9 @@
 
 namespace Gx
 {
-    Fade::Fade(Colorable* target, const std::uint8_t opacity, const sf::Time& duration) :
-        m_target(target),
-        m_start(target->GetColor().a),
+    Fade::Fade(Colorable& target, const std::uint8_t opacity, const sf::Time& duration) :
+        m_target(&target),
+        m_start(target.GetColor().a),
         m_end(opacity),
         m_diff(0),
         m_duration(duration)

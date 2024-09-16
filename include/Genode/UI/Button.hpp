@@ -24,8 +24,6 @@ namespace Gx
         Button() = default;
         explicit Button(const sf::Texture& texture);
 
-        ~Button() override = default;
-
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color& color) override;
 

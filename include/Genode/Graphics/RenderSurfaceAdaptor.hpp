@@ -12,7 +12,6 @@ namespace Gx
     {
     public:
         explicit RenderSurfaceAdaptor(sf::RenderTarget& target);
-        ~RenderSurfaceAdaptor() override = default;
 
         void SetClearColorResolver(const std::function<sf::Color()>& resolver);
 

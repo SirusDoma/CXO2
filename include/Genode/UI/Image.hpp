@@ -23,7 +23,6 @@ namespace Gx
         };
 
         using Sprite::Sprite;
-        ~Image() override = default;
 
         sf::FloatRect GetLocalBounds() const override;
 

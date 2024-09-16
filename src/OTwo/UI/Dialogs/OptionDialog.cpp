@@ -45,7 +45,6 @@ void OptionDialog::Initialize()
 
     const auto keySelect = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
     const auto keyBar = FindChild<Gx::Image>("IDC_IMAGE_KEY_BAR");
-    keySelect->AddChild(keyBar);
 
     const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
     gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseFx = sender->IsChecked(); });
@@ -82,7 +81,7 @@ void OptionDialog::Initialize()
 
         keyDown->SetFrame("Note" + std::to_string(i));
         m_keyDowns[channel] = keyDown;
-        AddChild(keyDown);
+        // AddChild(keyDown);
     }
 
     const auto bgmCheckBox           = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");

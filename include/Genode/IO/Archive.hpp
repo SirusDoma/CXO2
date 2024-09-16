@@ -14,9 +14,7 @@ namespace Gx
     class Archive : public FileSystemController
     {
     public:
-
         Archive() = default;
-        ~Archive() override = default;
 
         const std::string& GetFileName() const;
 

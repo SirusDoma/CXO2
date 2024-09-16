@@ -43,7 +43,7 @@ public:
     R* Import(const std::string& id, Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
 
     template<typename R, class... Args, std::enable_if_t<!std::is_array_v<R>, int> = 0>
-    R* Create(Args&&... args);
+    R& Create(Args&&... args);
 
     template<typename R>
     R* FindResource(const std::string& id, ResourceScope scope = ResourceScope::Local);
@@ -54,7 +54,7 @@ public:
 protected:
     void Initialize() override;
     void ShowDialog(const std::string& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
-    void ShowDialog(Gx::Node* content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
+    void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
 
 private:
     void LoadCommonResources();

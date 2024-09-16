@@ -268,7 +268,7 @@ void StateMyRoom::Invalidate()
             m_selectedItem = item;
             m_bagSelect->SetVisible(true);
 
-            slot->AddChild(m_bagSelect);
+            slot->AddChild(*m_bagSelect);
             m_mixer.Play(sfxClick, "SFX");
         });
 
@@ -293,13 +293,13 @@ void StateMyRoom::Invalidate()
     if (!currentSlot)
     {
         if (m_bagSelect->GetParent())
-            m_bagSelect->GetParent()->RemoveChild(m_bagSelect);
+            m_bagSelect->GetParent()->RemoveChild(*m_bagSelect);
 
         m_bagSelect->SetVisible(false);
     }
     else
     {
-        currentSlot->AddChild(m_bagSelect);
+        currentSlot->AddChild(*m_bagSelect);
         m_bagSelect->SetVisible(true);
     }
 

@@ -40,7 +40,7 @@ namespace Gx
         sf::View GetDefaultView() const;
 
         Node* GetCurrentOverlay() const;
-        void PushOverlay(Node* overlay);
+        void PushOverlay(Node& overlay);
         void CloseOverlay();
 
         template<typename T>

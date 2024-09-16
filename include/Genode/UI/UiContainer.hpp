@@ -19,7 +19,6 @@ namespace Gx
     {
     public:
         UiContainer();
-        ~UiContainer() override = default;
 
         sf::FloatRect GetLocalBounds() const override;
         void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);

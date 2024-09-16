@@ -4,45 +4,22 @@
 namespace Gx
 {
     Sequence::Sequence() :
-        m_iterator(),
-        m_tasks()
+        m_tasks(),
+        m_iterator()
     {
     }
 
-    Sequence::Sequence(std::initializer_list<Task*> tasks) :
-        m_iterator(),
-        m_tasks(tasks)
+    Sequence* Sequence::Add(Task& task)
     {
-    }
-
-    Sequence::Sequence(std::function<void()> callback, std::initializer_list<Task*> tasks) :
-        m_iterator(),
-        m_tasks(tasks)
-    {
-        OnCompleted(callback);
-    }
-
-    Sequence::~Sequence()
-    {
-        m_tasks.clear();
-    }
-
-    Sequence* Sequence::Add(Task* task)
-    {
-        if (task)
-            m_tasks.push_back(task);
-
+        m_tasks.push_back(&task);
         return this;
     }
 
-    Sequence* Sequence::Remove(Task* task)
+    Sequence* Sequence::Remove(const Task& task)
     {
-        if (task)
-        {
-            auto iterator = std::find(m_tasks.begin(), m_tasks.end(), task);
-            if (iterator != m_tasks.end())
-                m_tasks.erase(iterator);
-        }
+        const auto iterator = std::find(m_tasks.begin(), m_tasks.end(), &task);
+        if (iterator != m_tasks.end())
+            m_tasks.erase(iterator);
 
         return this;
     }
@@ -57,18 +34,19 @@ namespace Gx
             m_iterator = m_tasks.begin();
         else if (GetState() != TaskState::Running)
             return;
-        else if (m_iterator == m_tasks.end())
-            return Complete();
 
         if (m_iterator != m_tasks.end())
         {
-            auto task = *m_iterator;
+            const auto task = *m_iterator;
             task->Update(delta);
             if (task->GetState() == TaskState::Completed || task->GetState() == TaskState::Stopped)
                 ++m_iterator;
         }
         else
-            ++m_iterator;
+        {
+            m_iterator = m_tasks.end();
+            return Complete();
+        }
     }
 
     void Sequence::Complete()
@@ -81,13 +59,7 @@ namespace Gx
         Task::Reset();
 
         m_iterator = m_tasks.begin();
-        for (auto task : m_tasks)
+        for (const auto task : m_tasks)
             task->Reset();
     }
-
-    std::initializer_list<Task *> Sequence::ListOf(std::initializer_list<Task *> &&tasks)
-    {
-        return tasks;
-    }
-
 }

@@ -16,7 +16,7 @@ namespace Gx
     {
     }
 
-    ScrollBar::ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollOrientation orientation) :
         m_sprite(texture),
         m_bounds(),
         m_step(1.f),
@@ -30,7 +30,7 @@ namespace Gx
         SetLocalBounds(bounds);
     }
 
-    ScrollBar::ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollOrientation orientation) :
         m_sprite(texture, texCoords),
         m_bounds(),
         m_step(1.f),
@@ -103,7 +103,7 @@ namespace Gx
         return m_orientation;
     }
 
-    void ScrollBar::SetScrollOrientation(ScrollBar::ScrollOrientation orientation)
+    void ScrollBar::SetScrollOrientation(ScrollOrientation orientation)
     {
         m_orientation = orientation;
     }

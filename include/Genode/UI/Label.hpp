@@ -12,7 +12,6 @@ namespace Gx
         enum class Alignment { None, Left, Center, Right };
 
         using Text::Text;
-        ~Label() override = default;
 
         sf::FloatRect GetLocalBounds() const override;
 

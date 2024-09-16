@@ -7,7 +7,6 @@
 
 struct StateMetadata : ResourceMetadata
 {
-    ~StateMetadata() override = default;
 };
 
 #endif

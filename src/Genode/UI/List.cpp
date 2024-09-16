@@ -31,7 +31,7 @@ namespace Gx
         return m_order;
     }
 
-    void List::SetOrder(const List::Order order)
+    void List::SetOrder(const Order order)
     {
         m_order = order;
     }
@@ -133,6 +133,28 @@ namespace Gx
         }
     }
 
+    void List::DecreaseSpacingCounter()
+    {
+        if (m_order == Order::Vertical)
+        {
+            m_verticalCounter--;
+            if (m_verticalCounter < 0)
+            {
+                m_verticalCounter = 0;
+                m_horizontalCounter = std::max(0, m_horizontalCounter - 1);
+            }
+        }
+        else
+        {
+            m_horizontalCounter--;
+            if (m_horizontalCounter < 0)
+            {
+                m_horizontalCounter = 0;
+                m_verticalCounter = std::max(0, m_verticalCounter - 1);
+            }
+        }
+    }
+
     void List::Update(const double delta)
     {
         UiContainer::Update(delta);
@@ -146,26 +168,35 @@ namespace Gx
         return UiContainer::Render(surface, states);
     }
 
-    void List::AddChild(Node* node)
+    void List::AddChild(Node& node)
     {
-        if (!node || (!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
+        if ((!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
             return;
 
         if (m_layouts.empty())
         {
-            node->SetPosition(GetNextItemPosition());
+            node.SetPosition(GetNextItemPosition());
             IncreaseSpacingCounter();
         }
         else
         {
             const auto& [origin, position, rotation, scale] = m_layouts[GetChildren().size()];
-            node->SetOrigin(origin);
-            node->SetPosition(position);
-            node->SetRotation(rotation);
-            node->SetScale(scale);
+            node.SetOrigin(origin);
+            node.SetPosition(position);
+            node.SetRotation(rotation);
+            node.SetScale(scale);
         }
 
-        Control::AddChild(node);
+        UiContainer::AddChild(node);
+    }
+
+    void List::RemoveChild(Node& child)
+    {
+        const auto size = GetChildren().size();
+        UiContainer::RemoveChild(child);
+
+        if (m_layouts.empty() && size != GetChildren().size())
+            DecreaseSpacingCounter();
     }
 
     void List::Invalidate()

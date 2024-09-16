@@ -7,7 +7,6 @@
 
 struct UiContainerMetadata : public TransformMetadata
 {
-    ~UiContainerMetadata() override = default;
 };
 
 #endif

@@ -93,7 +93,7 @@ void StateLoading::OnCoverLoaded(const sf::Image* cover)
 
 void StateLoading::OnChartLoaded(const Chart* chart)
 {
-    const auto transition = Create<Gx::Sequence>([this, chart]
+    auto& transition = Create<Gx::Sequence>([this, chart]
         {
             auto& director = GetDirector();
             auto& room     = m_session.GetCurrentRoom();
@@ -105,9 +105,7 @@ void StateLoading::OnChartLoaded(const Chart* chart)
 
             director.Present<StatePlaying7K>(ctx);
         },
-        Gx::Sequence::ListOf({
-            Create<Gx::Delay>(sf::seconds(0.5f))
-        })
+        Create<Gx::Delay>(sf::seconds(0.5f))
     );
 
     Run(transition);

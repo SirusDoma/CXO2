@@ -14,7 +14,7 @@ namespace Gx
         m_permanentFocus(false),
         m_focused(),
         m_numeric(false),
-        m_state(Control::State::Normal)
+        m_state(State::Normal)
     {
     }
 
@@ -26,7 +26,7 @@ namespace Gx
         m_permanentFocus(false),
         m_focused(),
         m_numeric(false),
-        m_state(Control::State::Normal)
+        m_state(State::Normal)
     {
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
@@ -350,7 +350,7 @@ namespace Gx
         return m_state;
     }
 
-    void TextBox::SetControlState(const Control::State& state)
+    void TextBox::SetControlState(const State& state)
     {
         if (m_state != state)
         {
@@ -382,7 +382,7 @@ namespace Gx
         return Control::Render(surface, states);
     }
 
-    void TextBox::OnControlStateChanged(Control& sender, Control::State state)
+    void TextBox::OnControlStateChanged(Control& sender, State state)
     {
     }
 
@@ -422,7 +422,7 @@ namespace Gx
     {
         Control::OnMouseButtonReleased(ev);
 
-        if (GetControlState() == Control::State::Normal)
+        if (GetControlState() == State::Normal)
         {
             SetFocus(false);
             Invalidate();

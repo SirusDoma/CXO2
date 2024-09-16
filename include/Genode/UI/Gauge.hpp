@@ -28,7 +28,7 @@ namespace Gx
         Animation::AnimationState GetAnimationState() const;
 
         template<typename... Args>
-        void AddAnimationFrame(const Animation::Frame& first, Args... args);
+        void AddAnimationFrame(const Animation::Frame& first, const Args&... args);
         void AddAnimationFrame(const Animation::Frame& frame);
         unsigned int GetAnimationFrameCount() const;
 

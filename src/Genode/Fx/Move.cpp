@@ -2,8 +2,8 @@
 
 namespace Gx
 {
-    Move::Move(Transformable* target, const sf::Vector2f position, const sf::Time& duration) :
-        m_target(target),
+    Move::Move(Transformable& target, const sf::Vector2f position, const sf::Time& duration) :
+        m_target(&target),
         m_start(),
         m_end(position),
         m_diff(),

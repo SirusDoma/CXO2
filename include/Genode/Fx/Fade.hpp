@@ -11,7 +11,8 @@ namespace Gx
     class Fade : public Task
     {
     public:
-        Fade(Colorable* target, std::uint8_t opacity, const sf::Time& duration);
+        Fade() = default;
+        Fade(Colorable& target, std::uint8_t opacity, const sf::Time& duration);
 
         void Update(const double delta) override;
         void Reset() override;

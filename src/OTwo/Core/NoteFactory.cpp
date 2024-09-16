@@ -31,12 +31,13 @@ NoteFactory::NoteFactory(Gx::ResourceManager& instantiationResources, Gx::Resour
     }
 }
 
-NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settings) const
+NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settings) const
 {
-    auto state = "STATE_PLAYING_" + std::to_string(m_channels.size()) + "K";
-    const auto container = &m_resources->Create<NoteContainer>(state + "/IDC_NOTE_CONTAINER");
-    auto tapNotePrefabs = PrefabMap();
+    auto state           = "STATE_PLAYING_" + std::to_string(m_channels.size()) + "K";
+    auto& container      = m_resources->Create<NoteContainer>(state + "/IDC_NOTE_CONTAINER");
+    auto tapNotePrefabs  = PrefabMap();
     auto longNotePrefabs = PrefabMap();
+    
     float x1 = 0, x2 = 0;
     for (auto channel : m_channels)
     {
@@ -51,8 +52,8 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
             const auto tap   = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_NORMAL" + std::to_string(key) + "_" + std::to_string(subKey));
             const auto hold  = m_prefabResources->Find<Gx::Animation>(state + "/IDC_ANIMATION_NOTE_LONG" + std::to_string(key) + "_" + std::to_string(subKey));
 
-            container->RegisterPrefab(*tap);
-            container->RegisterPrefab(*hold);
+            container.RegisterPrefab(*tap);
+            container.RegisterPrefab(*hold);
 
             tapNotePrefabs[channel][shape] = tap;
             longNotePrefabs[channel][shape] = hold;
@@ -63,8 +64,8 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
             x2 = std::max(tap->GetPosition().x + tap->GetLocalBounds().size.x, x2);
             x2 = std::max(hold->GetPosition().x + hold->GetLocalBounds().size.x, x2);
 
-            if (const auto texture = container->GetTexture(shape); !texture)
-                container->SetTexture(shape, *tap->GetTexture());
+            if (const auto texture = container.GetTexture(shape); !texture)
+                container.SetTexture(shape, *tap->GetTexture());
             else if (texture != tap->GetTexture() || texture != hold->GetTexture())
                 throw Gx::NotSupportedException("Note and Measure prefab must share same texture");
         }
@@ -81,13 +82,13 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     }
 
     // Viewport is calculated based on Min X and Max X notes on all channels
-    container->SetViewport({ { x1, 0 }, { x2, static_cast<float>(settings.Viewport) }});
+    container.SetViewport({ { x1, 0 }, { x2, static_cast<float>(settings.Viewport) }});
 
     // TODO: Apply Arrangement Modifiers
 
     // Initializes vertices and reserve the array to prevent vertex address from shifting
-    auto& vertices = container->GetNoteVertices();
-    auto& guideLineVertices = container->GetGuideLineVertices();
+    auto& vertices = container.GetNoteVertices();
+    auto& guideLineVertices = container.GetGuideLineVertices();
 
     // Resize the vertices to buffer size
     constexpr unsigned int bufferSize = 192 * 20 * 2;
@@ -106,8 +107,8 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
         { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>(state + "/IDC_IMAGE_NOTE_MEASURE2") }
     };
 
-    container->RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);
-    container->RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Circle]);
+    container.RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);
+    container.RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Circle]);
 
     // Set-up temp vertices
     auto vx = std::array<sf::Vertex*, 6>();
@@ -126,7 +127,7 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
         measure.SetPrefabs(measurePrefabs);
 
 
-        container->AddMeasure(measure);
+        container.AddMeasure(measure);
     }
 
     // Configure note vertices
@@ -148,7 +149,7 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
             vg += 8;
             note.GetGuideLine()->SetVertices(vz);
 
-            container->AddNote(note);
+            container.AddNote(note);
         }
         else
         {
@@ -179,7 +180,7 @@ NoteContainer* NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
             longNote.GetGuideLine()->SetVertices(vz);
 
             longNote.SetEdgePrefabs(tapNotePrefabs);
-            container->AddNote(longNote);
+            container.AddNote(longNote);
         }
     }
 

@@ -42,7 +42,6 @@ class OmcArchive : public virtual Gx::Archive
 {
 public:
     OmcArchive() = default;
-    ~OmcArchive() override = default;
 
     bool LoadFromFile(const std::string& fileName) override;
 

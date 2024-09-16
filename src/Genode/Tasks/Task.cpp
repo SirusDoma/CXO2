@@ -6,7 +6,7 @@ namespace Gx
         m_state(TaskState::Initial),
         m_elapsed(sf::Time::Zero)
     {
-        Reset();
+        Task::Reset();
     }
 
     TaskState Task::GetState() const
@@ -24,19 +24,19 @@ namespace Gx
         return m_elapsed;
     }
 
-    void Task::OnStart(std::function<void()> callback)
+    void Task::SetStartCallback(const std::function<void()>& callback)
     {
-        m_onStart = std::move(callback);
+        m_startCallback = callback;
     }
 
-    void Task::OnStopped(std::function<void()> callback)
+    void Task::SetStoppedCallback(const std::function<void()>& callback)
     {
-        m_onStop = std::move(callback);
+        m_stopCallback = callback;
     }
 
-    void Task::OnCompleted(std::function<void()> callback)
+    void Task::SetCompletedCallback(const std::function<void()>& callback)
     {
-        m_onComplete = std::move(callback);
+        m_completeCallback = callback;
     }
 
     void Task::Update(const double delta)
@@ -44,8 +44,8 @@ namespace Gx
         if (m_state == TaskState::Completed || m_state == TaskState::Stopped)
             return;
 
-        if (m_elapsed == sf::Time::Zero && m_onStart)
-            m_onStart();
+        if (m_elapsed == sf::Time::Zero && m_startCallback)
+            m_startCallback();
         else if (m_elapsed > sf::Time::Zero && m_state == TaskState::Initial)
             m_state = TaskState::Running;
 
@@ -57,8 +57,8 @@ namespace Gx
         m_state   = TaskState::Stopped;
         m_elapsed = sf::Time::Zero;
 
-        if (m_onStop)
-            m_onStop();
+        if (m_stopCallback)
+            m_stopCallback();
     }
 
     void Task::Complete()
@@ -66,8 +66,8 @@ namespace Gx
         m_state   = TaskState::Completed;
         m_elapsed = sf::Time::Zero;
 
-        if (m_onComplete)
-            m_onComplete();
+        if (m_completeCallback)
+            m_completeCallback();
     }
 
     void Task::Reset()

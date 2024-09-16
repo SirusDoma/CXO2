@@ -12,7 +12,6 @@ class ResourceLoader : public Gx::ResourceLoader<R>
 {
 public:
     ResourceLoader() = default;
-    ~ResourceLoader() override = default;
 
     bool IsStreaming() const override { return Gx::ResourceLoader<R>::IsStreaming(); }
 

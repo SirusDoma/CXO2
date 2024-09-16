@@ -89,10 +89,10 @@ namespace Gx
     void Dialog::SetLabel(Label& label)
     {
         if (m_promptText)
-            RemoveChild(m_promptText);
+            RemoveChild(*m_promptText);
 
         m_promptText = &label;
-        AddChild(m_promptText);
+        AddChild(label);
     }
 
     void Dialog::SetPromptString(const std::string& prompt)
@@ -106,23 +106,23 @@ namespace Gx
     void Dialog::SetAcceptButton(Button& acceptButton)
     {
         if (m_acceptButton)
-            RemoveChild(m_acceptButton);
+            RemoveChild(*m_acceptButton);
 
         m_acceptButton = &acceptButton;
         m_acceptButton->SetClickCallback([&] (auto& sender, auto& ev) { OnAccepted(); });
 
-        AddChild(m_acceptButton);
+        AddChild(acceptButton);
     }
 
     void Dialog::SetCancelButton(Button& cancelButton)
     {
         if (m_cancelButton)
-            RemoveChild(m_cancelButton);
+            RemoveChild(*m_cancelButton);
 
         m_cancelButton = &cancelButton;
         m_cancelButton->SetClickCallback([&] (auto& sender, auto& ev) { OnCancelled(); });
 
-        AddChild(m_cancelButton);
+        AddChild(cancelButton);
     }
 
     void Dialog::SetAcceptCallback(std::function<void()> callback)
@@ -166,7 +166,7 @@ namespace Gx
             if (m_promptText)
                 m_promptText->SetString(prompt);
 
-            m_scene->PushOverlay(this);
+            m_scene->PushOverlay(*this);
             m_shown = true;
 
             const sf::RenderWindow& target = m_scene->GetApplication();

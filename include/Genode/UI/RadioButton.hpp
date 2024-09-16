@@ -11,8 +11,6 @@ namespace Gx
     class RadioButton : public CheckBox
     {
     public:
-        ~RadioButton() override = default;
-
         using CheckBox::CheckBox;
 
         virtual void SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback);
@@ -22,7 +20,7 @@ namespace Gx
         virtual void Unpair(RadioButton& radio);
 
         template<typename... Args>
-        void Pair(RadioButton& first, Args... args);
+        void Pair(RadioButton& first, Args&... args);
 
         void UnpairAll();
 

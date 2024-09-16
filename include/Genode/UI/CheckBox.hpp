@@ -12,7 +12,6 @@ namespace Gx
     {
     public:
         CheckBox() = default;
-        ~CheckBox() override = default;
 
         virtual bool IsChecked() const;
         virtual void SetCheckedState(bool checked);
