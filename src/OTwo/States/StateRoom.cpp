@@ -25,6 +25,7 @@
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
+#include <OTwo/States/StateItemShop.hpp>
 
 StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items) :
     m_mixer(mixer),
@@ -251,6 +252,9 @@ void StateRoom::Initialize()
         roomList->NextPage();
     });
 
+    const auto itemShopButton = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SHOP");
+    itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopClicked(); });
+
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
     myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomClicked(); });
 
@@ -267,6 +271,12 @@ void StateRoom::Initialize()
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
+}
+
+void StateRoom::OnItemShopClicked() const
+{
+    auto& director = GetDirector();
+    director.Present<StateItemShop>();
 }
 
 void StateRoom::OnMyRoomClicked() const

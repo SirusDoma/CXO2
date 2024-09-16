@@ -1,5 +1,5 @@
-#include <magic_enum.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
+#include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
@@ -13,6 +13,8 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/ScrollBar.hpp>
+
+#include <magic_enum.hpp>
 
 StateMyRoom::StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
     m_mixer(mixer),
@@ -195,6 +197,12 @@ void StateMyRoom::Initialize()
         bagList->SetEnabled(!checkBox->IsChecked());
         equipmentsContainer->SetVisible(!checkBox->IsChecked());
         equipmentsContainer->SetEnabled(!checkBox->IsChecked());
+    });
+
+    const auto shopButton = Instantiate<Gx::Button>("IDC_BUTTON_SHOP");
+    shopButton->SetClickCallback([this] (auto&, auto&)
+    {
+        GetDirector().Present<StateItemShop>();
     });
 
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");

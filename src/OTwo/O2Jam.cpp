@@ -66,6 +66,7 @@
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
+#include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StateResult.hpp>
@@ -143,6 +144,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<State, StatePlanet>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateRoom>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateMyRoom>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StateItemShop>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateWaiting7K>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateLoading>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
@@ -252,6 +254,7 @@ void O2Jam::Boot()
     director.Register<StatePlanet>("Interface/State/Planet.json");
     director.Register<StateRoom>("Interface/State/Room.json");
     director.Register<StateMyRoom>("Interface/State/MyRoom.json");
+    director.Register<StateItemShop>("Interface/State/ItemShop.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
     director.Register<StatePlaying7K>("Playing/State/Playing7K.json");

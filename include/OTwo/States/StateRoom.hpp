@@ -14,6 +14,7 @@ public:
     void Initialize() override;
 
 private:
+    void OnItemShopClicked() const;
     void OnMyRoomClicked() const;
     void OnBackClicked() const;
 
