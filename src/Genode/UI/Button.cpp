@@ -33,28 +33,36 @@ namespace Gx
     sf::FloatRect Button::GetLocalBounds() const
     {
         // Use frame for active state first before looking for other frames
-        auto bounds = m_stateData[GetControlState()].TexCoords;
-        if (bounds.size.x <= 0 || bounds.size.y <= 0)
+        const auto state = m_stateData[GetControlState()];
+        auto bounds = state.Bounds;
+        if (bounds == sf::Vector2f())
+        {
+            bounds = {
+                static_cast<float>(state.TexCoords.size.x),
+                static_cast<float>(state.TexCoords.size.y)
+            };
+        }
+
+        if (bounds == sf::Vector2f())
         {
             // There's no frame for active state, look for valid frame
             for (auto [_, frame] : m_stateData)
             {
-                bounds = frame.TexCoords;
-                if (bounds.size.x > 0 && bounds.size.y > 0)
+                bounds = frame.Bounds;
+                if (bounds != sf::Vector2f())
+                    break;
+
+                bounds = {
+                    static_cast<float>(frame.TexCoords.size.x),
+                    static_cast<float>(frame.TexCoords.size.y)
+                };
+
+                if (bounds != sf::Vector2f())
                     break;
             }
         }
 
-        return sf::FloatRect(
-            {
-                0.f,
-                0.f
-            },
-            {
-                static_cast<float>(bounds.size.x),
-                static_cast<float>(bounds.size.y)
-            }
-        );
+        return sf::FloatRect({ 0.f, 0.f }, bounds);
     }
 
     void Button::SetTexture(const sf::Texture& texture)

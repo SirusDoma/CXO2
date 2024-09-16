@@ -9,11 +9,19 @@
 struct ButtonMetadata : public SpriteMetadata
 {
     ButtonMetadata() : States() {}
-    virtual ~ButtonMetadata() {}
+
+    struct ButtonState : SpriteMetadata
+    {
+        ButtonState() = default;
+        ButtonState(const SpriteMetadata& sprite) : SpriteMetadata(sprite) {}
+
+        sf::Vector2f Bounds;
+    };
+
 
     bool Enabled = true;
     bool Visible = true;
-    std::unordered_map<Gx::Control::State, SpriteMetadata> States;
+    std::unordered_map<Gx::Control::State, ButtonState> States;
 };
 
 #endif

@@ -17,8 +17,9 @@ namespace Gx
     public:
         struct Frame
         {
-            sf::IntRect TexCoords = sf::IntRect();
-            sf::Color   Color     = sf::Color::White;
+            sf::IntRect  TexCoords = sf::IntRect();
+            sf::Color    Color     = sf::Color::White;
+            sf::Vector2f Bounds    = sf::Vector2f();
         };
 
         Button() = default;

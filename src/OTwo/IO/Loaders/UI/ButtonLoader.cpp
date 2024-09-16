@@ -22,23 +22,18 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json& json, con
 
 Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    auto metadata = dynamic_cast<const ButtonMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ButtonMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto button = std::make_unique<Gx::Button>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         button->SetTexture(*texture);
-    else
-        return nullptr;
 
     auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-    {
-        auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
-        button->SetStateFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
-    }
+        button->SetStateFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
 
     button->SetName(metadata->Name);
     button->SetOrigin(metadata->Origin);
@@ -89,9 +84,25 @@ bool ButtonLoader::ParseMetadata(const Gx::Json& attributes, ButtonMetadata& met
         if (!states.contains(name))
             continue;
 
-        SpriteMetadata stateMeta;
-        if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, context))
+        auto stateData = states.at(name);
+        ButtonMetadata::ButtonState stateMeta;
+        if (!SpriteLoader::ParseMetadata(stateData, stateMeta, context))
             continue;
+
+        if (auto b = stateData.find("bounds"); b != stateData.end())
+        {
+            float width  = b->at("width").get<float>();
+            float height = b->at("height").get<float>();
+
+            stateMeta.Bounds = { width, height };
+        }
+        else
+        {
+            stateMeta.Bounds = {
+                static_cast<float>(stateMeta.TexCoords.size.x),
+                static_cast<float>(stateMeta.TexCoords.size.y)
+            };
+        }
 
         metadata.States[state] = stateMeta;
     }
