@@ -1,4 +1,4 @@
-﻿#include <Genode/Fx/Fade.hpp>
+﻿#include <Genode/Tween/Fade.hpp>
 
 namespace Gx
 {

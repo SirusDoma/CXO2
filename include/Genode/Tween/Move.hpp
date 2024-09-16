@@ -1,5 +1,5 @@
-#ifndef GENODE_FX_MOVE_HPP
-#define GENODE_FX_MOVE_HPP
+#ifndef GENODE_TWEEN_MOVE_HPP
+#define GENODE_TWEEN_MOVE_HPP
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>

@@ -10,7 +10,7 @@
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <Genode/Fx/Move.hpp>
+#include <Genode/Tween/Move.hpp>
 #include <Genode/UI.hpp>
 
 StateResult::StateResult(Gx::Mixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :

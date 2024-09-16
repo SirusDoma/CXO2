@@ -7,7 +7,7 @@
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tasks/Action.hpp>
-#include <Genode/Fx/Move.hpp>
+#include <Genode/Tween/Move.hpp>
 
 namespace Gx { class ResourceManager; }
 class ComboCounter : public virtual Gx::Node, public Gx::Renderable, public Gx::UpdatableContainer

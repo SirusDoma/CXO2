@@ -6,7 +6,7 @@
 #include <OTwo/Core/NoteFactory.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
-#include <Genode/Fx/Fade.hpp>
+#include <Genode/Tween/Fade.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 

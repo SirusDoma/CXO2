@@ -3,7 +3,7 @@
 #include <OTwo/UI/Planet/ChannelButton.hpp>
 
 #include <Genode/Tasks.hpp>
-#include <Genode/Fx.hpp>
+#include <Genode/Tween.hpp>
 
 #include <cmath>
 

@@ -6,7 +6,7 @@
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/SceneGraph.hpp>
-#include <Genode/Fx/Move.hpp>
+#include <Genode/Tween/Move.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/BitmapNumber.hpp>

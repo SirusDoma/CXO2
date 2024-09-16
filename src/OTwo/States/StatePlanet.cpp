@@ -6,7 +6,7 @@
 
 #include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Sequence.hpp>
-#include <Genode/Fx/Fade.hpp>
+#include <Genode/Tween/Fade.hpp>
 
 StatePlanet::StatePlanet(Gx::Mixer& mixer, SessionContext& session) :
     m_mixer(mixer),
@@ -81,7 +81,7 @@ void StatePlanet::Initialize()
             {
                 RemoveChild(overlay);
             },
-            Create<Gx::Fade>(overlay, 0, sf::seconds(0.5f))
+            Create<Gx::Fade>(overlay, 0, sf::seconds(1.0f))
         );
         Run(transition);
     }
@@ -131,7 +131,7 @@ void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& chan
 
     m_connecting = true;
     auto& sequence = Create<Gx::Sequence>([&]
-                                          {
+        {
             auto& director = GetDirector();
             director.Present<StateRoom>();
         },

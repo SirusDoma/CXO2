@@ -2,7 +2,7 @@
 
 #include <SFML/Audio/Music.hpp>
 
-#include <Genode/Fx/Fade.hpp>
+#include <Genode/Tween/Fade.hpp>
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 

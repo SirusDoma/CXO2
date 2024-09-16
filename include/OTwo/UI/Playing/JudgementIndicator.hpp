@@ -7,7 +7,7 @@
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Entities/Updatable.hpp>
 #include <Genode/Graphics/Animation.hpp>
-#include <Genode/Fx/Scale.hpp>
+#include <Genode/Tween/Scale.hpp>
 
 #include <unordered_map>
 

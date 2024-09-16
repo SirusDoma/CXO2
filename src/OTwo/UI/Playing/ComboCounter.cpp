@@ -2,7 +2,7 @@
 #include <OTwo/States/State.hpp>
 
 #include <Genode/Tasks/Action.hpp>
-#include <Genode/Fx/Move.hpp>
+#include <Genode/Tween/Move.hpp>
 
 ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
     m_header(header),

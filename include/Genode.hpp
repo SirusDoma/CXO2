@@ -7,7 +7,7 @@
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks.hpp>
-#include <Genode/Fx.hpp>
+#include <Genode/Tween.hpp>
 #include <Genode/System.hpp>
 #include <Genode/IO.hpp>
 #include <Genode/UI.hpp>
