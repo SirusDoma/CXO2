@@ -21,7 +21,7 @@ StateMyRoom::StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory&
     m_session(session),
     m_items(items),
     m_selectedItem(nullptr),
-    m_bagSelect(nullptr)
+    m_bagSelectIndicator(nullptr)
 {
 }
 
@@ -53,8 +53,8 @@ void StateMyRoom::Initialize()
             m_inventory.push_back(item);
     }
 
-    m_bagSelect = Instantiate<Gx::Image>("IDC_IMAGE_BAG_SELECT");
-    m_bagSelect->SetVisible(false);
+    m_bagSelectIndicator = Instantiate<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
+    m_bagSelectIndicator->SetVisible(false);
 
     const auto bagList = Instantiate<Gx::List>("IDC_LIST_BAG");
     const auto bagSlots = bagList->GetChildren();
@@ -69,7 +69,7 @@ void StateMyRoom::Initialize()
         slot->SetDoubleClickCallback(nullptr);
     }
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MY_BAG");
+    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(m_inventory.size()) / 2.f));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
@@ -179,7 +179,7 @@ void StateMyRoom::Initialize()
                 m_inventory.end()
             );
 
-            m_selectedItem = nullptr; m_selectedItem = nullptr;
+            m_selectedItem = nullptr;
             if (currency == Currency::Gem)
                 player.Gem += price;
             else
@@ -194,6 +194,7 @@ void StateMyRoom::Initialize()
     inventoryButton->SetCheckStateChangeCallback([=] (auto checkBox)
     {
         statusPanel->SetVisible(checkBox->IsChecked());
+        statusPanel->SetEnabled(checkBox->IsChecked());
         bagList->SetEnabled(!checkBox->IsChecked());
         equipmentsContainer->SetVisible(!checkBox->IsChecked());
         equipmentsContainer->SetEnabled(!checkBox->IsChecked());
@@ -266,9 +267,9 @@ void StateMyRoom::Invalidate()
                 return;
 
             m_selectedItem = item;
-            m_bagSelect->SetVisible(true);
+            m_bagSelectIndicator->SetVisible(true);
 
-            slot->AddChild(*m_bagSelect);
+            slot->AddChild(*m_bagSelectIndicator);
             m_mixer.Play(sfxClick, "SFX");
         });
 
@@ -292,15 +293,15 @@ void StateMyRoom::Invalidate()
 
     if (!currentSlot)
     {
-        if (m_bagSelect->GetParent())
-            m_bagSelect->GetParent()->RemoveChild(*m_bagSelect);
+        if (m_bagSelectIndicator->GetParent())
+            m_bagSelectIndicator->GetParent()->RemoveChild(*m_bagSelectIndicator);
 
-        m_bagSelect->SetVisible(false);
+        m_bagSelectIndicator->SetVisible(false);
     }
     else
     {
-        currentSlot->AddChild(*m_bagSelect);
-        m_bagSelect->SetVisible(true);
+        currentSlot->AddChild(*m_bagSelectIndicator);
+        m_bagSelectIndicator->SetVisible(true);
     }
 
     const auto equippedItems  = avatar->GetEquipedItems();
@@ -335,7 +336,7 @@ void StateMyRoom::Invalidate()
     InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_GLOVES"),                 EquipmentType::Gloves);
     InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_CLOTHES_ACCESSORIES"),    EquipmentType::ClothesAccessories);
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MY_BAG");
+    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(inventory.size()) / 2.f));
 
     const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");

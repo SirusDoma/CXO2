@@ -29,7 +29,7 @@ private:
     unsigned int m_bagMaxPage     = 0;
 
     Item* m_selectedItem;
-    Gx::Image* m_bagSelect;
+    Gx::Image* m_bagSelectIndicator;
     std::vector<Item*> m_inventory;
 };
 #endif
