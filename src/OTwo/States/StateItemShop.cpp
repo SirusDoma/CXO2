@@ -56,6 +56,36 @@ void StateItemShop::Initialize()
         GetDirector().Present<StateMyRoom>();
     });
 
+    const auto maleButton   = Instantiate<Gx::Button>("IDC_BUTTON_MALE");
+    const auto femaleButton = Instantiate<Gx::Button>("IDC_BUTTON_FEMALE");
+
+    maleButton->SetClickCallback([=] (auto&, auto&)
+    {
+        m_genderCategory = m_genderCategory = Gender::Female;
+
+        maleButton->SetEnabled(false);
+        maleButton->SetVisible(false);
+
+        femaleButton->SetEnabled(true);
+        femaleButton->SetVisible(true);
+    });
+
+    femaleButton->SetClickCallback([=] (auto&, auto&)
+    {
+        m_genderCategory = m_genderCategory = Gender::Male;
+
+        femaleButton->SetEnabled(false);
+        femaleButton->SetVisible(false);
+
+        maleButton->SetEnabled(true);
+        maleButton->SetVisible(true);
+    });
+
+    maleButton->SetEnabled(true);
+    maleButton->SetVisible(true);
+    femaleButton->SetEnabled(false);
+    femaleButton->SetVisible(false);
+
     const auto myBagContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
     m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
     m_myBagSelectIndicator->SetVisible(false);
@@ -101,20 +131,20 @@ void StateItemShop::Initialize()
 
     myBagButton->SetClickCallback([=] (auto&, auto&)
     {
-        myBagContainer->SetVisible(true);
         myBagContainer->SetEnabled(true);
+        myBagContainer->SetVisible(true);
 
-        cartContainer->SetVisible(false);
         cartContainer->SetEnabled(false);
+        cartContainer->SetVisible(false);
     });
 
     cartButton->SetClickCallback([=] (auto&, auto&)
     {
-        myBagContainer->SetVisible(false);
         myBagContainer->SetEnabled(false);
+        myBagContainer->SetVisible(false);
 
-        cartContainer->SetVisible(true);
         cartContainer->SetEnabled(true);
+        cartContainer->SetVisible(true);
     });
 
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");

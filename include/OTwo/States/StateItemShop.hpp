@@ -24,6 +24,8 @@ private:
     SessionContext& m_session;
     ItemFactory& m_items;
 
+    Gender m_genderCategory = Gender::Male;
+
     unsigned int m_myBagCurrentPage = 0;
     unsigned int m_myBagMaxPage     = 0;
 
