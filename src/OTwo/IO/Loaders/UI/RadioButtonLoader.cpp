@@ -53,7 +53,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
     for (auto [state, frame] : metadata->States)
     {
         auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
-        radio->SetStateFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
+        radio->SetFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
     }
 
     radio->SetName(metadata->Name);

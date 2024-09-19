@@ -33,7 +33,7 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
 
         void SetTexture(const sf::Texture& texture);
-        void SetStateFrame(Control::State state, const Frame& frame);
+        void SetFrame(Control::State state, const Frame& frame);
 
         void PerformClick();
 
@@ -50,7 +50,7 @@ namespace Gx
 
         std::array<sf::Vertex, 4> m_vertices;
         const sf::Texture* m_texture;
-        mutable std::unordered_map<Control::State, Frame> m_stateData;
+        mutable std::unordered_map<Control::State, Frame> m_frames;
     };
 }
 

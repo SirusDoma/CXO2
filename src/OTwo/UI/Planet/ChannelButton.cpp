@@ -132,7 +132,7 @@ void ChannelButton::SetMusicHall(const MusicHall hall)
     if (auto it = m_states.find(mode); it != m_states.end())
     {
         for (auto [state, frame] : it->second)
-            SetStateFrame(state, Frame{frame});
+            SetFrame(state, Frame{frame});
     }
 }
 

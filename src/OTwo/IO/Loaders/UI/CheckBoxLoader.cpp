@@ -54,7 +54,7 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
     for (auto [state, frame] : metadata->States)
     {
         auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
-        checkBox->SetStateFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
+        checkBox->SetFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
     }
 
     checkBox->SetName(metadata->Name);

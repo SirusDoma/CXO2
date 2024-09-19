@@ -27,13 +27,13 @@ namespace Gx
 
     const sf::IntRect& Button::GetTextCoords() const
     {
-        return m_stateData[GetControlState()].TexCoords;
+        return m_frames[GetControlState()].TexCoords;
     }
 
     sf::FloatRect Button::GetLocalBounds() const
     {
         // Use frame for active state first before looking for other frames
-        const auto state = m_stateData[GetControlState()];
+        const auto state = m_frames[GetControlState()];
         auto bounds = state.Bounds;
         if (bounds == sf::Vector2f())
         {
@@ -46,7 +46,7 @@ namespace Gx
         if (bounds == sf::Vector2f())
         {
             // There's no frame for active state, look for valid frame
-            for (auto [_, frame] : m_stateData)
+            for (auto [_, frame] : m_frames)
             {
                 bounds = frame.Bounds;
                 if (bounds != sf::Vector2f())
@@ -72,12 +72,12 @@ namespace Gx
 
     Button::Frame Button::GetStateFrame(const State state) const
     {
-        return m_stateData[state];
+        return m_frames[state];
     }
 
-    void Button::SetStateFrame(const State state, const Frame& frame)
+    void Button::SetFrame(const State state, const Frame& frame)
     {
-        m_stateData[state] = frame;
+        m_frames[state] = frame;
         Invalidate();
     }
 
@@ -98,7 +98,7 @@ namespace Gx
 
     Button::Frame Button::GetCurrentFrame() const
     {
-        return m_stateData[GetControlState()];
+        return m_frames[GetControlState()];
     }
 
     RenderStates Button::Render(RenderSurface& surface, RenderStates states) const
