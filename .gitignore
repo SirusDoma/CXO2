@@ -213,3 +213,6 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+
+# Generated schema header files
+/schemas/headers/

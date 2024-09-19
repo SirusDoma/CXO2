@@ -7,6 +7,7 @@ endif()
 
 include(CheckIncludeFiles)
 include(FetchContent)
+include(schemas/generator.cmake)
 
 # Compiler
 set(CMAKE_CXX_STANDARD 17)
@@ -18,9 +19,38 @@ file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.h)
+file(GLOB_RECURSE HEADERS schemas/headers/*.hpp)
 include_directories(src)
 include_directories(include)
 include_directories(extlibs/headers)
+include_directories(schemas/headers)
+
+
+file(GLOB_RECURSE SCHEMA_ASSET_METADATA schemas/assets/*.bop)
+if (SCHEMA_ASSET_METADATA)
+    message("-- Configuring assets schema generator --")
+    set(SCHEMA_ASSETS_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Metadata.g.hpp)
+    bebop_generate(Schema-Assets
+        VERSION "v3.0.14"
+        LANGUAGE cpp
+        OUTPUT ${SCHEMA_ASSETS_OUTPUT}
+        BOPS ${SCHEMA_ASSET_METADATA}
+        OPTIONS "namespace=OTwo::Serializable::Metadata"
+    )
+endif()
+
+file(GLOB_RECURSE SCHEMA_MESSAGE_METADATA schemas/messages/*.bop)
+if (SCHEMA_MESSAGE_METADATA)
+    message("-- Configuring messages schema generator --")
+    set(SCHEMA_MESSAGE_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Message.g.hpp)
+    bebop_generate(Schema-Message
+        VERSION "v3.0.14"
+        LANGUAGE cpp
+        OUTPUT ${SCHEMA_MESSAGE_OUTPUT}
+        BOPS ${SCHEMA_MESSAGE_METADATA}
+        OPTIONS "namespace=OTwo::Serializable::Message"
+    )
+endif()
 
 # Default flags
 if (NOT CMAKE_BUILD_TYPE)

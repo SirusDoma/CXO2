@@ -1,0 +1,10 @@
+enum BlendMode
+{
+    Auto           = 1;
+    Alpha          = 2;
+    Additive       = 3;
+    Multiplicative = 4;
+    Min            = 5;
+    Max            = 6;
+    None           = 7;
+}
