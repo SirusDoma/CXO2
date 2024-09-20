@@ -28,9 +28,25 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json&
         if (!states.contains(name))
             continue;
 
-        SpriteMetadata stateMeta;
-        if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, ctx))
+        auto stateData = states.at(name);
+        ButtonMetadata::ButtonState stateMeta;
+        if (!SpriteLoader::ParseMetadata(stateData, stateMeta, ctx))
             continue;
+
+        if (auto b = stateData.find("bounds"); b != stateData.end())
+        {
+            float width  = b->at("width").get<float>();
+            float height = b->at("height").get<float>();
+
+            stateMeta.Bounds = { width, height };
+        }
+        else
+        {
+            stateMeta.Bounds = {
+                static_cast<float>(stateMeta.TexCoords.size.x),
+                static_cast<float>(stateMeta.TexCoords.size.y)
+            };
+        }
 
         metadata.States[state] = stateMeta;
     }
@@ -40,21 +56,17 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json&
 
 Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    auto metadata = dynamic_cast<const RadioButtonMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const RadioButtonMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto radio = std::make_unique<Gx::RadioButton>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         radio->SetTexture(*texture);
 
-    auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-    {
-        auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
-        radio->SetFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
-    }
+        radio->SetFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
 
     radio->SetName(metadata->Name);
     radio->SetOrigin(metadata->Origin);

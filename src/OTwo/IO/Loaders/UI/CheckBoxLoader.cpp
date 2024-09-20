@@ -29,9 +29,25 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json,
         if (!states.contains(name))
             continue;
 
-        SpriteMetadata stateMeta;
-        if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, ctx))
+        auto stateData = states.at(name);
+        ButtonMetadata::ButtonState stateMeta;
+        if (!SpriteLoader::ParseMetadata(stateData, stateMeta, ctx))
             continue;
+
+        if (auto b = stateData.find("bounds"); b != stateData.end())
+        {
+            float width  = b->at("width").get<float>();
+            float height = b->at("height").get<float>();
+
+            stateMeta.Bounds = { width, height };
+        }
+        else
+        {
+            stateMeta.Bounds = {
+                static_cast<float>(stateMeta.TexCoords.size.x),
+                static_cast<float>(stateMeta.TexCoords.size.y)
+            };
+        }
 
         metadata.States[state] = stateMeta;
     }
@@ -41,21 +57,17 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json,
 
 Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    auto metadata = dynamic_cast<const CheckBoxMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const CheckBoxMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
     auto checkBox = std::make_unique<Gx::CheckBox>();
-    auto ctx = ResourceContextDecorator::Decorate(context);
-    if (auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         checkBox->SetTexture(*texture);
 
-    auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-    {
-        auto sprite = Gx::Sprite(*spriteLoader.LoadFromMetadata(frame, ctx));
-        checkBox->SetFrame(state, {sprite.GetTexCoords(), sprite.GetColor()});
-    }
+        checkBox->SetFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
 
     checkBox->SetName(metadata->Name);
     checkBox->SetOrigin(metadata->Origin);
