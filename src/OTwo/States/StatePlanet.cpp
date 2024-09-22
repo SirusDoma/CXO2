@@ -57,14 +57,10 @@ void StatePlanet::Initialize()
             m_mixer.Play(hoverSfx, "SFX");
         });
 
-        radio->SetClickCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender, auto& ev)
+        radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)
         {
-            const auto r = dynamic_cast<Gx::RadioButton*>(&sender);
-            if (r->IsChecked() || channelBoard->InTransition() || IsConnecting())
-            {
-                ev.Handled = true;
+            if (!sender.IsChecked() || channelBoard->InTransition() || IsConnecting())
                 return;
-            }
 
             m_mixer.Play(clickSfx, "SFX");
             channelBoard->Show(hall, [=] { OnMusicHallSelected(hall); });

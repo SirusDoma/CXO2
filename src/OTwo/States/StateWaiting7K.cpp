@@ -224,9 +224,9 @@ void StateWaiting7K::Initialize()
         if (!teamButton)
             continue;
 
-        teamButton->SetCheckStateChangeCallback([=] (auto sender)
+        teamButton->SetCheckStateChangeCallback([=] (auto& sender)
         {
-            if (!sender->IsChecked())
+            if (!sender.IsChecked())
                 return;
 
             if (currentAvatarInfo)
@@ -368,21 +368,21 @@ void StateWaiting7K::Initialize()
     const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
     readyButton->SetVisible(m_session.GetCurrentPlayer().ID != room.RoomMasterID);
     readyButton->SetEnabled(readyButton->IsVisible());
-    readyButton->SetCheckStateChangeCallback([=, &director] (auto sender)
+    readyButton->SetCheckStateChangeCallback([=, &director] (auto& sender)
     {
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
             return;
     });
 
     const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START");
     btnStart->SetVisible(m_session.GetCurrentPlayer().ID == room.RoomMasterID);
     btnStart->SetEnabled(btnStart->IsVisible());
-    btnStart->SetCheckStateChangeCallback([=, &director] (auto sender)
+    btnStart->SetCheckStateChangeCallback([=, &director] (auto& sender)
     {
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
             return;
 
-        sender->SetEnabled(false);
+        sender.SetEnabled(false);
         btnBack->SetEnabled(false);
         m_mixer.Play(sfxStart, "SFX");
 

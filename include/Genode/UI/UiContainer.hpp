@@ -21,7 +21,6 @@ namespace Gx
         UiContainer();
 
         sf::FloatRect GetLocalBounds() const override;
-        void SetRadioActiveCallback(std::function<void(RadioButton*)> callback);
 
         virtual bool IsBatchingEnabled() const;
         virtual void SetBatchingEnabled(bool batchingEnabled);
@@ -37,9 +36,7 @@ namespace Gx
 
     private:
         sf::FloatRect m_localBounds;
-        RadioButton* m_activeRadio;
-        bool m_radioHandled, m_useBatching{false};
-        std::function<void(RadioButton*)> m_radioCallback;
+        bool m_useBatching{false};
     };
 }
 

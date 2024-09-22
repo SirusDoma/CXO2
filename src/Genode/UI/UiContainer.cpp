@@ -5,20 +5,13 @@
 namespace Gx
 {
     UiContainer::UiContainer() :
-        m_localBounds(),
-        m_activeRadio(),
-        m_radioHandled(false)
+        m_localBounds()
     {
     }
 
     sf::FloatRect UiContainer::GetLocalBounds() const
     {
         return m_localBounds;
-    }
-
-    void UiContainer::SetRadioActiveCallback(std::function<void(RadioButton *)> callback)
-    {
-        m_radioCallback = std::move(callback);
     }
 
     bool UiContainer::IsBatchingEnabled() const
@@ -37,12 +30,6 @@ namespace Gx
             return;
 
         Control::OnControlClick(sender, ev);
-
-        const auto radio = dynamic_cast<RadioButton *>(&sender);
-        if (!radio || radio->IsChecked())
-            return;
-
-        m_activeRadio = radio;
     }
 
     void UiContainer::OnKeyPressed(const sf::Event::KeyPressed& ev)

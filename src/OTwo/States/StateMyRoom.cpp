@@ -191,13 +191,13 @@ void StateMyRoom::Initialize()
     });
 
     const auto inventoryButton = Instantiate<Gx::CheckBox>("IDC_CHECKBOX_INVENTORY");
-    inventoryButton->SetCheckStateChangeCallback([=] (auto checkBox)
+    inventoryButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        statusPanel->SetVisible(checkBox->IsChecked());
-        statusPanel->SetEnabled(checkBox->IsChecked());
-        bagList->SetEnabled(!checkBox->IsChecked());
-        equipmentsContainer->SetVisible(!checkBox->IsChecked());
-        equipmentsContainer->SetEnabled(!checkBox->IsChecked());
+        statusPanel->SetVisible(sender.IsChecked());
+        statusPanel->SetEnabled(sender.IsChecked());
+        bagList->SetEnabled(!sender.IsChecked());
+        equipmentsContainer->SetVisible(!sender.IsChecked());
+        equipmentsContainer->SetEnabled(!sender.IsChecked());
     });
 
     const auto shopButton = Instantiate<Gx::Button>("IDC_BUTTON_SHOP");

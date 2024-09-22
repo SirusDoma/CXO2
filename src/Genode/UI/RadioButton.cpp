@@ -22,7 +22,7 @@ namespace Gx
             }
 
             if (m_onCheckStateChanged)
-                m_onCheckStateChanged(this);
+                m_onCheckStateChanged(*this);
         }
     }
 
@@ -36,7 +36,7 @@ namespace Gx
             SetCheckedState(true);
     }
 
-    void RadioButton::SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback)
+    void RadioButton::SetCheckStateChangeCallback(std::function<void(RadioButton&)> callback)
     {
         m_onCheckStateChanged = std::move(callback);
     }

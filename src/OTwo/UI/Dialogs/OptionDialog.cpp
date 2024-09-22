@@ -47,13 +47,13 @@ void OptionDialog::Initialize()
     const auto keyBar = FindChild<Gx::Image>("IDC_IMAGE_KEY_BAR");
 
     const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    gfxCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseFx = sender->IsChecked(); });
+    gfxCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseFx = sender.IsChecked(); });
     const auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
-    cursorCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseWindowCursor = sender->IsChecked(); });
+    cursorCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseWindowCursor = sender.IsChecked(); });
     const auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
-    keyTestCheckBox->SetCheckStateChangeCallback([=] (auto sender)
+    keyTestCheckBox->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        m_keyTestEnabled = sender->IsChecked();
+        m_keyTestEnabled = sender.IsChecked();
         m_keyChannel     = Chart::Channel::Note1;
         keySelect->SetFrame(0);
         keySelect->SetVisible(!m_keyTestEnabled);
@@ -84,8 +84,8 @@ void OptionDialog::Initialize()
         // AddChild(keyDown);
     }
 
-    const auto bgmCheckBox           = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
-    bgmCheckBox->SetCheckStateChangeCallback([=] (auto sender) { m_tempConfig.UseBGM = sender->IsChecked(); });
+    const auto bgmCheckBox       = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
+    bgmCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseBGM = sender.IsChecked(); });
     const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
@@ -252,9 +252,9 @@ void OptionDialog::Initialize()
     const auto keyTab   = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto soundTab = FindChild<Gx::RadioButton>("IDC_BUTTON_SOUND_TAB");
 
-    keyTab->SetCheckStateChangeCallback([=] (auto sender)
+    keyTab->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
             return;
 
         const auto bgGroup = m_mixer.GetSoundGroup("BGTest");
@@ -284,9 +284,9 @@ void OptionDialog::Initialize()
         musicOption->SetEnabled(false);
         musicOption->SetVisible(false);
     });
-    soundTab->SetCheckStateChangeCallback([=] (auto sender)
+    soundTab->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
             return;
 
         m_mixer.Play(sfxNavigation, "SFX");

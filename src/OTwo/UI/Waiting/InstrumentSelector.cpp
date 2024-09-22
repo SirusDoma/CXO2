@@ -49,9 +49,9 @@ void InstrumentSelector::Initialize()
     if (const auto guitar = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); guitar)
     {
         guitar->SetEnabled(false);
-        guitar->SetCheckStateChangeCallback([this] (auto sender)
+        guitar->SetCheckStateChangeCallback([this] (auto& sender)
         {
-            if (!sender->IsChecked() || m_currentInstrument == Instrument::Guitar)
+            if (!sender.IsChecked() || m_currentInstrument == Instrument::Guitar)
                 return;
 
             m_currentIndex = 0;
@@ -63,9 +63,9 @@ void InstrumentSelector::Initialize()
     if (const auto bass = FindChild<Gx::RadioButton>("IDC_RADIO_BASS"); bass)
     {
         bass->SetEnabled(false);
-        bass->SetCheckStateChangeCallback([this] (auto sender)
+        bass->SetCheckStateChangeCallback([this] (auto& sender)
         {
-            if (!sender->IsChecked() || m_currentInstrument == Instrument::Bass)
+            if (!sender.IsChecked() || m_currentInstrument == Instrument::Bass)
                 return;
 
             m_currentIndex = 0;
@@ -77,9 +77,9 @@ void InstrumentSelector::Initialize()
     if (const auto keyboard = FindChild<Gx::RadioButton>("IDC_RADIO_KEYBOARD"); keyboard)
     {
         keyboard->SetEnabled(false);
-        keyboard->SetCheckStateChangeCallback([this] (auto sender)
+        keyboard->SetCheckStateChangeCallback([this] (auto& sender)
         {
-            if (!sender->IsChecked() || m_currentInstrument == Instrument::Keyboard)
+            if (!sender.IsChecked() || m_currentInstrument == Instrument::Keyboard)
                 return;
 
             m_currentIndex = 0;
@@ -91,9 +91,9 @@ void InstrumentSelector::Initialize()
     if (const auto drum = FindChild<Gx::RadioButton>("IDC_RADIO_DRUM"); drum)
     {
         drum->SetEnabled(false);
-        drum->SetCheckStateChangeCallback([this] (auto sender)
+        drum->SetCheckStateChangeCallback([this] (auto& sender)
         {
-            if (!sender->IsChecked() || m_currentInstrument == Instrument::Drum)
+            if (!sender.IsChecked() || m_currentInstrument == Instrument::Drum)
                 return;
 
             m_currentIndex = 0;

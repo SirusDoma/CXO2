@@ -16,16 +16,16 @@ void UserList::Initialize()
 {
     Gx::UiContainer::Initialize();
 
-    auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
-    auto listChildren = list->GetChildren();
+    const auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
+    const auto listChildren = list->GetChildren();
     for (std::size_t i = 0; i < listChildren.size(); i++)
     {
-        auto userButton    = dynamic_cast<Gx::RadioButton*>(listChildren[i]);
+        const auto userButton    = dynamic_cast<Gx::RadioButton*>(listChildren[i]);
         auto userNickLabel = userButton->FindChild<Gx::Label>("IDC_TEXT_USER_NAME");
-        userButton->SetCheckStateChangeCallback([=] (auto sender)
+        userButton->SetCheckStateChangeCallback([=] (auto& sender)
         {
-            size_t index = ((m_page - 1) * listChildren.size()) + i;
-            if (index < m_users.size() && sender->IsChecked())
+            const size_t index = ((m_page - 1) * listChildren.size()) + i;
+            if (index < m_users.size() && sender.IsChecked())
                 m_selectedUser = m_users[index].ID;
         });
 
@@ -33,10 +33,10 @@ void UserList::Initialize()
         userButton->SetEnabled(false);
     }
 
-    auto userCountLabel = FindChild<Gx::Label>("IDC_TEXT_USER_COUNT");
-    auto btnUserRefresh = FindChild<Gx::Button>("IDC_BUTTON_REFRESH");
-    auto btnUserLeft    = FindChild<Gx::Button>("IDC_BUTTON_USER_LEFT");
-    auto btnUserRight   = FindChild<Gx::Button>("IDC_BUTTON_USER_RIGHT");
+    auto userCountLabel     = FindChild<Gx::Label>("IDC_TEXT_USER_COUNT");
+    auto btnUserRefresh     = FindChild<Gx::Button>("IDC_BUTTON_REFRESH");
+    const auto btnUserLeft  = FindChild<Gx::Button>("IDC_BUTTON_USER_LEFT");
+    const auto btnUserRight = FindChild<Gx::Button>("IDC_BUTTON_USER_RIGHT");
 
     btnUserLeft->SetClickCallback([=] (auto& sender, auto& ev)
     {
@@ -65,7 +65,7 @@ void UserList::Clear()
 
 void UserList::Invalidate()
 {
-    auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
+    const auto list = FindChild<Gx::List>("IDC_LIST_USER_BUTTON");
     if (!list)
         return;
 
@@ -74,21 +74,21 @@ void UserList::Invalidate()
     m_page = std::min(m_page, max);
     m_page = std::max(m_page, static_cast<unsigned int>(1));
 
-    auto userCountLabel = FindChild<Gx::Label>("IDC_TEXT_USER_COUNT");
+    const auto userCountLabel = FindChild<Gx::Label>("IDC_TEXT_USER_COUNT");
     if (userCountLabel)
         userCountLabel->SetString("Users: " + std::to_string(m_users.size()) + " (" + std::to_string(m_page) + "/" + std::to_string(max) + ")");
 
-    auto children = list->GetChildren();
+    const auto children = list->GetChildren();
     for (size_t i = 0; i < children.size(); i++)
     {
-        auto userButton = dynamic_cast<Gx::RadioButton*>(children[i]);
+        const auto userButton = dynamic_cast<Gx::RadioButton*>(children[i]);
         if (!userButton)
             continue;
 
-        size_t index = ((m_page - 1) * list->GetChildren().size()) + i;
+        const size_t index = ((m_page - 1) * list->GetChildren().size()) + i;
         if (index < m_users.size())
         {
-            auto userNickLabel = userButton->FindChild<Gx::Label>("IDC_TEXT_USER_NAME");
+            const auto userNickLabel = userButton->FindChild<Gx::Label>("IDC_TEXT_USER_NAME");
             if (!userNickLabel)
                 continue;
 

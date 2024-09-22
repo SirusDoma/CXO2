@@ -53,16 +53,16 @@ void MapSelector::Initialize()
     });
 
     const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
-    mapEffectTopButton->SetCheckStateChangeCallback([=] (auto sender)
+    mapEffectTopButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        if (sender->IsChecked())
+        if (sender.IsChecked())
             SetEffectID(1);
     });
 
     const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
-    mapEffectBottomButton->SetCheckStateChangeCallback([=] (auto sender)
+    mapEffectBottomButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        if (sender->IsChecked())
+        if (sender.IsChecked())
             SetEffectID(2);
     });
 }

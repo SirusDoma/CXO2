@@ -15,11 +15,11 @@ namespace Gx
             Invalidate();
 
             if (m_onCheckStateChanged)
-                m_onCheckStateChanged(this);
+                m_onCheckStateChanged(*this);
         }
     }
 
-    void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox*)> callback)
+    void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox&)> callback)
     {
         m_onCheckStateChanged = std::move(callback);
     }

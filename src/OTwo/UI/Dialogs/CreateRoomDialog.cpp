@@ -46,12 +46,12 @@ void CreateRoomDialog::Initialize()
     passwordTextBox->SetMasked(true);
     passwordTextBox->SetMaximumTextLength(12);
 
-    levelLimitCheckBox->SetCheckStateChangeCallback([=] (auto sender)
+    levelLimitCheckBox->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        minLevelLimitTextBox->SetEnabled(sender->IsChecked());
-        maxLevelLimitTextBox->SetEnabled(sender->IsChecked());
+        minLevelLimitTextBox->SetEnabled(sender.IsChecked());
+        maxLevelLimitTextBox->SetEnabled(sender.IsChecked());
 
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
         {
             minLevelLimitTextBox->SetString("");
             maxLevelLimitTextBox->SetString("");
@@ -65,9 +65,9 @@ void CreateRoomDialog::Initialize()
         m_mixer.Play(sfxClick, "SFX");
     });
 
-    jamModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    jamModeButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        if (!sender->IsChecked())
+        if (!sender.IsChecked())
             return;
 
         if (jamAnimation->GetState() != Gx::Animation::AnimationState::Playing)
@@ -91,10 +91,10 @@ void CreateRoomDialog::Initialize()
         m_mixer.Play(sfxClick, "SFX");
     });
 
-    versusModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    versusModeButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         versusAnimation->Reset();
-        versusAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
+        versusAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
     });
 
     versusAnimation->SetAnimationCallback([=] (const Gx::Animation& sender) {
@@ -105,16 +105,16 @@ void CreateRoomDialog::Initialize()
         m_mixer.Play(sfxClick, "SFX");
     });
 
-    singleModeButton->SetCheckStateChangeCallback([=] (auto sender)
+    singleModeButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         singleAnimation->Reset();
-        singleAnimation->SetRepeatCount(sender->IsChecked() ? 3 : 1);
+        singleAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
 
-        levelLimitCheckBox->SetEnabled(!sender->IsChecked());
-        if (sender->IsChecked())
+        levelLimitCheckBox->SetEnabled(!sender.IsChecked());
+        if (sender.IsChecked())
             levelLimitCheckBox->SetCheckedState(false);
 
-        passwordTextBox->SetEnabled(!sender->IsChecked());
+        passwordTextBox->SetEnabled(!sender.IsChecked());
         if (!passwordTextBox->IsEnabled())
             passwordTextBox->SetString("");
     });

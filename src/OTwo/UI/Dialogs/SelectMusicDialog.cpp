@@ -113,21 +113,21 @@ void SelectMusicDialog::Initialize()
                     focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
             });
 
-            button->SetCheckStateChangeCallback([this, i] (auto sender)
+            button->SetCheckStateChangeCallback([this, i] (auto& sender)
             {
-                const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
-                if (!sender->IsChecked())
+                const auto listSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+                if (!sender.IsChecked())
                 {
-                    if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                    if (auto activeHighlighter = sender.template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                         activeHighlighter->SetVisible(false);
 
                     return;
                 }
 
-                if (auto activeHighlighter = sender->template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                if (auto activeHighlighter = sender.template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
                     activeHighlighter->SetVisible(true);
 
-                const unsigned int itemListCount = list->GetVerticalCount() * list->GetHorizontalCount();
+                const unsigned int itemListCount = listSelector->GetVerticalCount() * listSelector->GetHorizontalCount();
                 const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
                 if (m_music.Source == music.Source)
                     return;
@@ -208,14 +208,14 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
-            button->SetCheckStateChangeCallback([this, g = genre] (auto sender)
+            button->SetCheckStateChangeCallback([this, g = genre] (auto& sender)
             {
-                if (!sender->IsChecked())
+                if (!sender.IsChecked())
                     return;
 
                 if (m_random != static_cast<LevelCategory>(0))
                 {
-                    sender->SetCheckedState(false);
+                    sender.SetCheckedState(false);
                     return;
                 }
 
@@ -249,9 +249,9 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
-            button->SetCheckStateChangeCallback([this, lv = level] (auto sender)
+            button->SetCheckStateChangeCallback([this, lv = level] (auto& sender)
             {
-                if (sender->IsChecked())
+                if (sender.IsChecked())
                     m_random = static_cast<LevelCategory>(static_cast<int>(m_random) | static_cast<int>(lv));
                 else
                     m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
@@ -317,14 +317,14 @@ void SelectMusicDialog::Initialize()
         if (auto exButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_EX"); exButton)
         {
             exButton->SetCheckedState(true);
-            exButton->SetCheckStateChangeCallback([this] (auto sender)
+            exButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
-                if (!sender->IsChecked())
+                if (!sender.IsChecked())
                     return;
 
                 if (m_random != static_cast<LevelCategory>(0))
                 {
-                    sender->SetCheckedState(false);
+                    sender.SetCheckedState(false);
                     return;
                 }
 
@@ -335,14 +335,14 @@ void SelectMusicDialog::Initialize()
 
         if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_NX"); nxButton)
         {
-            nxButton->SetCheckStateChangeCallback([this] (auto sender)
+            nxButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
-                if (!sender->IsChecked())
+                if (!sender.IsChecked())
                     return;
 
                 if (m_random != static_cast<LevelCategory>(0))
                 {
-                    sender->SetCheckedState(false);
+                    sender.SetCheckedState(false);
                     return;
                 }
 
@@ -353,14 +353,14 @@ void SelectMusicDialog::Initialize()
 
         if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_HX"); hxButton)
         {
-            hxButton->SetCheckStateChangeCallback([this] (auto sender)
+            hxButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
-                if (!sender->IsChecked())
+                if (!sender.IsChecked())
                     return;
 
                 if (m_random != static_cast<LevelCategory>(0))
                 {
-                    sender->SetCheckedState(false);
+                    sender.SetCheckedState(false);
                     return;
                 }
 
@@ -415,9 +415,9 @@ void SelectMusicDialog::Initialize()
             if (speed == m_speed)
                 button->SetCheckedState(true);
 
-            button->SetCheckStateChangeCallback([this, speed] (auto sender)
+            button->SetCheckStateChangeCallback([this, speed] (auto& sender)
             {
-                if (!sender->IsChecked())
+                if (!sender.IsChecked())
                     return;
 
                 m_speed = speed;
