@@ -64,11 +64,11 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
 
 Item* ItemFactory::GetItem(const unsigned int id) const
 {
-    if (!m_resources || !m_itemData)
+    if (!m_resources)
         return nullptr;
 
-    const auto iterator = m_itemData->Items.find(id);
-    if (iterator == m_itemData->Items.end())
+    const auto iterator = m_itemData.Items.find(id);
+    if (iterator == m_itemData.Items.end())
         return nullptr;
 
     const ItemMetadata metadata = iterator->second;
