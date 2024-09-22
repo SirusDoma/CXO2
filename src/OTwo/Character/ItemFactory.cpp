@@ -3,10 +3,10 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
-ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources)
+ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources) :
+    m_itemData(sharedResources.AddFromFile<ItemData>("Avatar/Itemdata.json"))
 {
     m_resources = &sharedResources;
-    m_itemData  = &m_resources->AddFromFile<ItemData>("Avatar/Itemdata.json");
 }
 
 std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gender& gender) const
@@ -78,4 +78,9 @@ Item* ItemFactory::GetItem(const unsigned int id) const
     const auto ctx  = Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse);
 
     return &m_resources->AddFromDeserializer<Item>(name, [&] () { return loader.LoadFromMetadata(metadata, ctx); }, ctx.GetCacheMode());
+}
+
+const ItemData& ItemFactory::GetItemData() const
+{
+    return m_itemData;
 }
