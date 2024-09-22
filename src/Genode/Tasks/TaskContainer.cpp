@@ -13,9 +13,9 @@ namespace Gx
         m_tasks.push_back(&task);
     }
 
-    void TaskContainer::Stop(Task& task)
+    void TaskContainer::Stop(const Task& task)
     {
-        const auto iterator = std::find_if(m_tasks.begin(), m_tasks.end(), [task](auto t) { return &task == t; });
+        const auto iterator = std::find(m_tasks.begin(), m_tasks.end(), &task);
         if (iterator != m_tasks.end())
         {
             // Run update before deleting

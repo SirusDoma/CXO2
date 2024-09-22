@@ -8,7 +8,7 @@ namespace Gx
     }
 
     template<typename... Args>
-    void TaskContainer::Stop(Task& first, Args&... args)
+    void TaskContainer::Stop(const Task& first, const Args&... args)
     {
         Stop(first);
         Stop(args...);

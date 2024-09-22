@@ -14,13 +14,13 @@ namespace Gx
         TaskContainer();
 
         void Run(Task& task);
-        void Stop(Task& task);
+        void Stop(const Task& task);
 
         template<typename... Args>
         void Run(Task& first, Args&... args);
 
         template<typename... Args>
-        void Stop(Task& first, Args&... args);
+        void Stop(const Task& first, const Args&... args);
 
         void StopAll();
 
