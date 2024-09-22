@@ -1,3 +1,4 @@
+#include <emmintrin.h>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
@@ -12,6 +13,7 @@
 
 #include <magic_enum.hpp>
 #include <Genode/UI/Label.hpp>
+#include <Genode/UI/RadioButton.hpp>
 
 StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
     m_mixer(mixer),
@@ -32,6 +34,10 @@ void StateItemShop::Initialize()
     const auto sfxCancel    = Instantiate<sf::Sound>("bgEffect/03");
     const auto sfxMyBagPrev = Instantiate<sf::Sound>("bgEffect/19_1");
     const auto sfxMyBagNext = Instantiate<sf::Sound>("bgEffect/19_2");
+
+    m_genderCategory = player.Gender;
+    m_shopCategory   = ShopCategory::Special;
+    m_itemCategory   = EquipmentType::Costume;
 
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
     avatar->SetGender(player.Gender);
@@ -56,8 +62,85 @@ void StateItemShop::Initialize()
         GetDirector().Present<StateMyRoom>();
     });
 
+    const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CATEGORY_BUTTONS");
+    const std::unordered_map<ShopCategory, Gx::RadioButton*> shopCategoryButtonMap =
+    {
+         { ShopCategory::Special,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_SPECIAL") },
+         { ShopCategory::Fashion,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_FASHION") },
+         { ShopCategory::Accessory,  categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_ACCESSORY") },
+         { ShopCategory::Beauty,     categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_BEAUTY") },
+         { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_INSTRUMENT") },
+    };
+
+    const std::unordered_map<ShopCategory, Gx::UiContainer*> shopCategoryContainerMap =
+    {
+        { ShopCategory::Special,    Instantiate<Gx::UiContainer>("IDC_CONTAINER_SPECIAL_CATEGORY") },
+        { ShopCategory::Fashion,    Instantiate<Gx::UiContainer>("IDC_CONTAINER_FASHION_CATEGORY") },
+        { ShopCategory::Accessory,  Instantiate<Gx::UiContainer>("IDC_CONTAINER_ACCESSORY_CATEGORY") },
+        { ShopCategory::Beauty,     Instantiate<Gx::UiContainer>("IDC_CONTAINER_BEAUTY_CATEGORY") },
+        { ShopCategory::Instrument, Instantiate<Gx::UiContainer>("IDC_CONTAINER_INSTRUMENT_CATEGORY") },
+    };
+
+    const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap =
+    {
+        { ShopCategory::Special, { EquipmentType::Costume, EquipmentType::Wings, EquipmentType::Pet, EquipmentType::AttributiveItem } },
+        { ShopCategory::Fashion, { EquipmentType::Top, EquipmentType::Pants, EquipmentType::ClothesAccessories, EquipmentType::Shoes } },
+        { ShopCategory::Accessory, { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::Gloves } },
+        { ShopCategory::Beauty, { EquipmentType::Hair, EquipmentType::HairAccessories, EquipmentType::Face } },
+        { ShopCategory::Instrument, { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Keyboard, EquipmentType::Drum, EquipmentType::InstrumentAccessories } },
+    };
+
+    for (auto [category, button] : shopCategoryButtonMap)
+    {
+        shopCategoryContainerMap.at(category)->SetEnabled(category == ShopCategory::Special);
+        shopCategoryContainerMap.at(category)->SetVisible(category == ShopCategory::Special);
+
+        button->SetCheckedState(category == ShopCategory::Special);
+        button->SetCheckStateChangeCallback([this, category, shopCategoryContainerMap] (auto& sender)
+        {
+            if (!sender.IsChecked())
+                return;
+
+            m_shopCategory = category;
+            for (const auto iterator : shopCategoryContainerMap)
+            {
+                iterator.second->SetEnabled(iterator.first == category);
+                iterator.second->SetVisible(iterator.first == category);
+
+                if (iterator.first != category)
+                    continue;
+
+                for (const auto child : iterator.second->GetChildren())
+                {
+                    if (const auto cradio = dynamic_cast<Gx::RadioButton*>(child))
+                    {
+                        cradio->SetCheckedState(true);
+                        break;
+                    }
+                }
+            }
+        });
+
+        auto children = shopCategoryContainerMap.at(category)->GetChildren();
+        for (std::size_t i = 0; i < children.size(); i++)
+        {
+            if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
+            {
+                radio->SetCheckStateChangeCallback([this, i, category, itemCategoryMap] (auto)
+                {
+                    m_itemCategory = itemCategoryMap.at(category).at(i);
+                });
+            }
+        }
+    }
+
     const auto maleButton   = Instantiate<Gx::Button>("IDC_BUTTON_MALE");
     const auto femaleButton = Instantiate<Gx::Button>("IDC_BUTTON_FEMALE");
+
+    maleButton->SetEnabled(m_genderCategory == Gender::Male);
+    maleButton->SetVisible(m_genderCategory == Gender::Male);
+    femaleButton->SetEnabled(m_genderCategory == Gender::Female);
+    femaleButton->SetVisible(m_genderCategory == Gender::Female);
 
     maleButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -80,11 +163,6 @@ void StateItemShop::Initialize()
         maleButton->SetEnabled(true);
         maleButton->SetVisible(true);
     });
-
-    maleButton->SetEnabled(true);
-    maleButton->SetVisible(true);
-    femaleButton->SetEnabled(false);
-    femaleButton->SetVisible(false);
 
     const auto myBagContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
     m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
@@ -114,7 +192,8 @@ void StateItemShop::Initialize()
     const auto bagScrollRight = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_RIGHT");
     bagScrollRight->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
-    bagList->SetScrollWheelCallback([=] (auto&, auto& ev) {
+    bagList->SetScrollWheelCallback([=] (auto&, auto& ev)
+    {
         if (ev.Delta > 0)
             bagScrollRight->PerformClick();
         else
@@ -152,7 +231,6 @@ void StateItemShop::Initialize()
     {
         GetDirector().Present<StateRoom>();
     });
-
 
     myBagButton->PerformClick();
     InvalidateMyBag();

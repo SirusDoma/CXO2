@@ -16,6 +16,15 @@ public:
     void Initialize() override;
 
 private:
+    enum class ShopCategory
+    {
+        Special,
+        Fashion,
+        Accessory,
+        Beauty,
+        Instrument
+    };
+
     void OnItemSellClicked();
 
     void InvalidateMyBag();
@@ -24,7 +33,9 @@ private:
     SessionContext& m_session;
     ItemFactory& m_items;
 
-    Gender m_genderCategory = Gender::Male;
+    ShopCategory m_shopCategory       = ShopCategory::Special;
+    EquipmentType m_itemCategory = EquipmentType::Costume;
+    Gender m_genderCategory           = Gender::Male;
 
     unsigned int m_myBagCurrentPage = 0;
     unsigned int m_myBagMaxPage     = 0;
