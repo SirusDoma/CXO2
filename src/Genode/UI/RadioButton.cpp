@@ -9,48 +9,21 @@ namespace Gx
         if (IsChecked() != checked)
         {
             CheckBox::SetCheckedState(checked);
-            if (IsChecked())
+            if (const auto parent = GetParent(); parent && IsChecked())
             {
-                for (const auto pair : m_pairs)
+                for (const auto child : parent->GetChildren())
                 {
-                    if (pair && pair != this)
-                        pair->SetCheckedState(false);
+                    const auto other = dynamic_cast<RadioButton*>(child);
+                    if (!other || other == this)
+                        continue;
+
+                    other->SetCheckedState(false);
                 }
             }
 
             if (m_onCheckStateChanged)
                 m_onCheckStateChanged(this);
         }
-    }
-
-    void RadioButton::Pair(RadioButton& radio)
-    {
-        m_pairs.push_back(&radio);
-        radio.m_pairs.push_back(this);
-    }
-
-    void RadioButton::Unpair(RadioButton& radio)
-    {
-        for (const auto pair : m_pairs)
-        {
-            pair->m_pairs.erase(
-                std::remove_if(pair->m_pairs.begin(), pair->m_pairs.end(), [src = &radio](auto r) { return src == r; }),
-                pair->m_pairs.end()
-            );
-        }
-
-        m_pairs.erase(
-            std::remove_if(m_pairs.begin(), m_pairs.end(), [src = &radio](auto r) { return src == r; }),
-           m_pairs.end()
-        );
-    }
-
-    void RadioButton::UnpairAll()
-    {
-        for (const auto pair : m_pairs)
-            pair->m_pairs.clear();
-
-        m_pairs.clear();
     }
 
     void RadioButton::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)

@@ -14,24 +14,14 @@ namespace Gx
         using CheckBox::CheckBox;
 
         virtual void SetCheckStateChangeCallback(std::function<void(RadioButton*)> callback);
-
         void SetCheckedState(bool checked) override;
-        virtual void Pair(RadioButton& radio);
-        virtual void Unpair(RadioButton& radio);
-
-        template<typename... Args>
-        void Pair(RadioButton& first, Args&... args);
-
-        void UnpairAll();
 
     protected:
         void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev) override;
 
     private:
-        std::vector<RadioButton*> m_pairs;
         std::function<void(RadioButton*)> m_onCheckStateChanged;
     };
 }
 
-#include <Genode/UI/RadioButton.inl>
 #endif

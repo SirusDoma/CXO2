@@ -104,32 +104,6 @@ namespace Gx
             Control::Update(delta);
     }
 
-    bool UiContainer::Input(const sf::Event& ev)
-    {
-        const bool input = Control::Input(ev);
-        if (!m_activeRadio)
-            return input;
-
-        for (const auto child : GetChildren())
-        {
-            if (child == m_activeRadio)
-                continue;
-
-            const auto other = dynamic_cast<RadioButton *>(child);
-            if (!other || other == m_activeRadio)
-                continue;
-
-            other->SetCheckedState(false);
-        }
-
-        m_activeRadio->SetCheckedState(true);
-        if (m_radioCallback)
-            m_radioCallback(m_activeRadio);
-
-        m_activeRadio = nullptr;
-        return input;
-    }
-
     void UiContainer::Invalidate()
     {
         auto result = sf::FloatRect();
