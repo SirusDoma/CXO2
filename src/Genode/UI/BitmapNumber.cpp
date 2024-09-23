@@ -28,6 +28,13 @@ namespace Gx
 
     sf::FloatRect BitmapNumber::GetLocalBounds() const
     {
+        if (m_needUpdate)
+        {
+            // Hack
+            const auto self = const_cast<BitmapNumber*>(this);
+            self->Invalidate();
+        }
+
         return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_width, m_height));
     }
 
@@ -276,7 +283,7 @@ namespace Gx
         digitCount += leadingCount;
         value = m_value;
 
-        std::stack<unsigned int> digits = std::stack<unsigned int>();
+        auto digits = std::stack<unsigned int>();
         for (unsigned int d = 0; d < digitCount; d++)
         {
             if (d > 0)
