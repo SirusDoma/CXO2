@@ -25,7 +25,6 @@ include_directories(include)
 include_directories(extlibs/headers)
 include_directories(schemas/headers)
 
-
 file(GLOB_RECURSE SCHEMA_ASSET_METADATA schemas/assets/*.bop)
 if (SCHEMA_ASSET_METADATA)
     message("-- Configuring assets schema generator --")

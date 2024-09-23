@@ -44,6 +44,7 @@ function(Bebop_Generate target_name)
         set(_system_processor "arm64")
     endif()
 
+    FetchContent_GetProperties(${_bebopc_prefix})
     if(NOT ${_bebopc_prefix}_POPULATED)
         if(CMAKE_HOST_WIN32)
             string(APPEND _bebopc_executable_name ".exe")
