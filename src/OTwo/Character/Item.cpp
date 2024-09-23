@@ -98,26 +98,26 @@ void Item::SetPrice(const Currency& currency, const unsigned int price)
     m_prices[currency] = price;
 }
 
-const Gx::Sprite* Item::GetSmallPreview() const
+const Gx::Sprite* Item::GetSmallThumbnail() const
 {
-    return m_smallPreview.get();
+    return m_smallThumbnail.get();
 }
 
-void Item::SetSmallPreview(Gx::ResourcePtr<Gx::Sprite> smallPreview)
+void Item::SetSmallThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail)
 {
-    if (smallPreview)
-        m_smallPreview = std::move(smallPreview);
+    if (thumbnail)
+        m_smallThumbnail = std::move(thumbnail);
 }
 
-const Gx::Sprite* Item::GetLargePreview() const
+const Gx::Sprite* Item::GetLargeThumbnail() const
 {
-    return m_largePreview.get();
+    return m_largeThumbnail.get();
 }
 
-void Item::SetLargePreview(Gx::ResourcePtr<Gx::Sprite> largePreview)
+void Item::SetLargeThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail)
 {
-    if (largePreview)
-        m_largePreview = std::move(largePreview);
+    if (thumbnail)
+        m_largeThumbnail = std::move(thumbnail);
 }
 
 void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)

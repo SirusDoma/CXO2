@@ -80,6 +80,22 @@ Item* ItemFactory::GetItem(const unsigned int id) const
     return &m_resources->AddFromDeserializer<Item>(name, [&] () { return loader.LoadFromMetadata(metadata, ctx); }, ctx.GetCacheMode());
 }
 
+Gx::ResourcePtr<Item> ItemFactory::Create(const unsigned int id, const bool thumbnailOnly) const
+{
+    const auto iterator = m_itemData.Items.find(id);
+    if (iterator == m_itemData.Items.end())
+        return nullptr;
+
+    const ItemMetadata metadata = iterator->second;
+    const auto loader = ItemLoader(thumbnailOnly);
+
+    const auto name = "Avatar/Items/" + std::to_string(id);
+    const auto ctx  = Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse);
+
+    return loader.LoadFromMetadata(metadata, ctx);
+}
+
+
 const ItemData& ItemFactory::GetItemData() const
 {
     return m_itemData;

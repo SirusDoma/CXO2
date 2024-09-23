@@ -255,10 +255,10 @@ void StateMyRoom::Invalidate()
         itemCount++;
 
         currentSlot = item == m_selectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargePreview() && item->GetLargePreview()->GetTexture())
-            slot->SetTexture(*item->GetLargePreview()->GetTexture(), true);
-        else if (item->GetSmallPreview() && item->GetSmallPreview()->GetTexture())
-            slot->SetTexture(*item->GetSmallPreview()->GetTexture(), true);
+        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail() && item->GetLargeThumbnail()->GetTexture())
+            slot->SetTexture(*item->GetLargeThumbnail()->GetTexture(), true);
+        else if (item->GetSmallThumbnail() && item->GetSmallThumbnail()->GetTexture())
+            slot->SetTexture(*item->GetSmallThumbnail()->GetTexture(), true);
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -343,13 +343,13 @@ void StateMyRoom::Invalidate()
     gemNumber->SetValue(player->Gem);
 }
 
-void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart preview)
+void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart thumbnailType)
 {
     if (!slot)
         return;
 
-    if (preview != RenderPart::SmallPreview)
-        preview = RenderPart::LargePreview;
+    if (thumbnailType != RenderPart::SmallThumbnail)
+        thumbnailType = RenderPart::LargeThumbnail;
 
     const auto player   = &m_session.GetCurrentPlayer();
     const auto sfxDress = Instantiate<sf::Sound>("bgEffect/27_dress");
@@ -364,10 +364,10 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
     {
         const auto item = it->second;
         slot->SetVisible(true);
-        if (preview == RenderPart::LargePreview)
-            slot->SetTexture(*it->second->GetLargePreview()->GetTexture(), true);
+        if (thumbnailType == RenderPart::LargeThumbnail)
+            slot->SetTexture(*it->second->GetLargeThumbnail()->GetTexture(), true);
         else
-            slot->SetTexture(*it->second->GetSmallPreview()->GetTexture(), true);
+            slot->SetTexture(*it->second->GetSmallThumbnail()->GetTexture(), true);
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {

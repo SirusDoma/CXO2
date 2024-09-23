@@ -18,6 +18,7 @@ public:
 
     std::unordered_map<EquipmentType, Item*> GetDefaultItems(const Gender& gender) const;
     Item* GetItem(unsigned int id) const;
+    Gx::ResourcePtr<Item> Create(unsigned int id, bool thumbnailOnly = false) const;
 
     const ItemData& GetItemData() const;
 

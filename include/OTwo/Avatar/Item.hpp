@@ -52,11 +52,11 @@ public:
     unsigned int GetPrice(const Currency& currency) const;
     void SetPrice(const Currency& currency, unsigned int price);
 
-    const Gx::Sprite* GetSmallPreview() const;
-    void SetSmallPreview(Gx::ResourcePtr<Gx::Sprite> smallPreview);
+    const Gx::Sprite* GetSmallThumbnail() const;
+    void SetSmallThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail);
 
-    const Gx::Sprite* GetLargePreview() const;
-    void SetLargePreview(Gx::ResourcePtr<Gx::Sprite> largePreview);
+    const Gx::Sprite* GetLargeThumbnail() const;
+    void SetLargeThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail);
 
     void SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation);
     Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const;
@@ -77,7 +77,7 @@ private:
     sf::String       m_name, m_description;
     mutable PriceMap m_prices;
 
-    Gx::ResourcePtr<Gx::Sprite> m_smallPreview, m_largePreview;
+    Gx::ResourcePtr<Gx::Sprite> m_smallThumbnail, m_largeThumbnail;
     std::map<RenderableKey, Gx::ResourcePtr<Gx::Animation>> m_renderables;
 };
 

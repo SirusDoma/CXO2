@@ -36,8 +36,8 @@ enum class EquipmentType
 
 enum class RenderPart
 {
-    SmallPreview,
-    LargePreview,
+    SmallThumbnail,
+    LargeThumbnail,
     Body,
     RightArm,
     LeftArm,

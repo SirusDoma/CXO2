@@ -21,10 +21,10 @@ struct ItemMetadata : ResourceMetadata
 
     unsigned int                     ID;
     ::EquipmentType                  EquipmentType;
-    Planet                       Origin;
+    ::Planet                         Origin;
     ::Gender                         Gender;
     bool                             IsNew;
-    sf::String                       Name, Description, SmallPreview, LargePreview;
+    sf::String                       Name, Description, SmallThumbnail, LargeThumbnail;
     std::map<Currency, unsigned int> Prices;
     std::vector<ItemSpriteMetadata>  References = std::vector<ItemSpriteMetadata>();
 };

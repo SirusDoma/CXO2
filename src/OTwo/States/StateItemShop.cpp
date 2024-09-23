@@ -1,4 +1,5 @@
 #include <emmintrin.h>
+#include <future>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
@@ -10,10 +11,11 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
-
-#include <magic_enum.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/RadioButton.hpp>
+
+#include <magic_enum.hpp>
+#include <mutex>
 
 StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
     m_mixer(mixer),
@@ -28,12 +30,12 @@ void StateItemShop::Initialize()
 {
     State::Initialize();
 
-    const auto& player      = m_session.GetCurrentPlayer();
-    const auto bgm          = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
-    const auto sfxAccept    = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxCancel    = Instantiate<sf::Sound>("bgEffect/03");
-    const auto sfxMyBagPrev = Instantiate<sf::Sound>("bgEffect/19_1");
-    const auto sfxMyBagNext = Instantiate<sf::Sound>("bgEffect/19_2");
+    const auto& player   = m_session.GetCurrentPlayer();
+    const auto bgm       = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
+    const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
+    const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
+    const auto sfxPrev = Instantiate<sf::Sound>("bgEffect/19_1");
+    const auto sfxNext = Instantiate<sf::Sound>("bgEffect/19_2");
 
     m_genderCategory = player.Gender;
     m_shopCategory   = ShopCategory::Special;
@@ -62,6 +64,20 @@ void StateItemShop::Initialize()
         GetDirector().Present<StateMyRoom>();
     });
 
+    const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+    tooltip->SetVisible(false);
+
+    const auto defaultButton = Instantiate<Gx::Button>("IDC_BUTTON_DEFAULT");
+    defaultButton->SetClickCallback([=] (auto&, auto&)
+    {
+        avatar->ClearEquipments();
+        for (const auto id : player.EquippedItemIDs)
+        {
+            if (const auto item = m_items.GetItem(id); item)
+                avatar->Equip(item);
+        }
+    });
+
     const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CATEGORY_BUTTONS");
     const std::unordered_map<ShopCategory, Gx::RadioButton*> shopCategoryButtonMap =
     {
@@ -85,7 +101,7 @@ void StateItemShop::Initialize()
     {
         { ShopCategory::Special, { EquipmentType::Costume, EquipmentType::Wings, EquipmentType::Pet, EquipmentType::AttributiveItem } },
         { ShopCategory::Fashion, { EquipmentType::Top, EquipmentType::Pants, EquipmentType::ClothesAccessories, EquipmentType::Shoes } },
-        { ShopCategory::Accessory, { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::Gloves } },
+        { ShopCategory::Accessory, { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::Glasses, EquipmentType::Gloves } },
         { ShopCategory::Beauty, { EquipmentType::Hair, EquipmentType::HairAccessories, EquipmentType::Face } },
         { ShopCategory::Instrument, { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Keyboard, EquipmentType::Drum, EquipmentType::InstrumentAccessories } },
     };
@@ -96,7 +112,7 @@ void StateItemShop::Initialize()
         shopCategoryContainerMap.at(category)->SetVisible(category == ShopCategory::Special);
 
         button->SetCheckedState(category == ShopCategory::Special);
-        button->SetCheckStateChangeCallback([this, category, shopCategoryContainerMap] (auto& sender)
+        button->SetCheckStateChangeCallback([this, category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
         {
             if (!sender.IsChecked())
                 return;
@@ -112,9 +128,16 @@ void StateItemShop::Initialize()
 
                 for (const auto child : iterator.second->GetChildren())
                 {
-                    if (const auto cradio = dynamic_cast<Gx::RadioButton*>(child))
+                    if (const auto radio = dynamic_cast<Gx::RadioButton*>(child))
                     {
-                        cradio->SetCheckedState(true);
+                        if (radio->IsChecked())
+                        {
+                            m_itemCategory = itemCategoryMap.at(m_shopCategory).at(0);
+                            InvalidateShopItemList(true);
+                        }
+                        else
+                            radio->SetCheckedState(true);
+
                         break;
                     }
                 }
@@ -126,9 +149,14 @@ void StateItemShop::Initialize()
         {
             if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
             {
-                radio->SetCheckStateChangeCallback([this, i, category, itemCategoryMap] (auto)
+                radio->SetCheckedState(category == ShopCategory::Special && i == 0);
+                radio->SetCheckStateChangeCallback([this, i, category, itemCategoryMap] (auto& sender)
                 {
+                    if (!sender.IsChecked())
+                        return;
+
                     m_itemCategory = itemCategoryMap.at(category).at(i);
+                    InvalidateShopItemList(true);
                 });
             }
         }
@@ -164,6 +192,36 @@ void StateItemShop::Initialize()
         maleButton->SetVisible(true);
     });
 
+    m_shopCurrentPage = 0;
+    const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+    shopScrollBar->SetMaximumValue(std::floor(static_cast<float>(m_shopItemList.size()) / 8.f));
+    shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
+    {
+        if (value < m_myBagCurrentPage)
+            m_mixer.Play(sfxPrev, "SFX");
+        else
+            m_mixer.Play(sfxNext, "SFX");
+
+        m_shopCurrentPage = static_cast<unsigned int>(value);
+        InvalidateShopItemList();
+    });
+
+    const auto shopScrollLeft = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SCROLL_LEFT");
+    shopScrollLeft->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Decrease(); });
+
+    const auto shopScrollRight = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SCROLL_RIGHT");
+    shopScrollRight->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Increase(); });
+
+    const auto shopItemList = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    shopItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
+    {
+        if (ev.Delta > 0)
+            shopScrollRight->PerformClick();
+        else
+            shopScrollLeft->PerformClick();
+    });
+
+
     const auto myBagContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
     m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
     m_myBagSelectIndicator->SetVisible(false);
@@ -172,15 +230,14 @@ void StateItemShop::Initialize()
     const auto bagSlots = bagList->GetChildren();
 
     m_myBagCurrentPage = 0;
-
     const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(m_inventory.size()) / 2.f));
-    bagScrollBar->SetValueChangedCallback([this, sfxMyBagPrev, sfxMyBagNext] (auto&, const float value)
+    bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
-            m_mixer.Play(sfxMyBagPrev, "SFX");
+            m_mixer.Play(sfxPrev, "SFX");
         else
-            m_mixer.Play(sfxMyBagNext, "SFX");
+            m_mixer.Play(sfxNext, "SFX");
 
         m_myBagCurrentPage = static_cast<unsigned int>(value);
         InvalidateMyBag();
@@ -234,6 +291,7 @@ void StateItemShop::Initialize()
 
     myBagButton->PerformClick();
     InvalidateMyBag();
+    InvalidateShopItemList(true);
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
@@ -346,10 +404,10 @@ void StateItemShop::InvalidateMyBag()
         itemCount++;
 
         currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargePreview() && item->GetLargePreview()->GetTexture())
-            slot->SetTexture(*item->GetLargePreview()->GetTexture(), true);
-        else if (item->GetSmallPreview() && item->GetSmallPreview()->GetTexture())
-            slot->SetTexture(*item->GetSmallPreview()->GetTexture(), true);
+        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail() && item->GetLargeThumbnail()->GetTexture())
+            slot->SetTexture(*item->GetLargeThumbnail()->GetTexture(), true);
+        else if (item->GetSmallThumbnail() && item->GetSmallThumbnail()->GetTexture())
+            slot->SetTexture(*item->GetSmallThumbnail()->GetTexture(), true);
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -383,4 +441,179 @@ void StateItemShop::InvalidateMyBag()
 
     const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     gemNumber->SetValue(player.Gem);
+}
+
+void StateItemShop::InvalidateShopItemList(const bool rebuildList)
+{
+    const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
+    const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto slots         = itemList->GetChildren();
+    const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+
+    Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP")->SetVisible(false);
+    if (rebuildList)
+    {
+        m_shopItemList.clear();
+        for (auto& [_, header] : m_items.GetItemData().Items)
+        {
+            // Check price
+            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::MCash) == header.Prices.end())
+                continue;
+
+            // Check Category
+            if (header.EquipmentType != m_itemCategory)
+                continue;
+
+            // Check Gender
+            if (header.Gender != m_genderCategory && header.Gender != Gender::Any)
+                continue;
+
+            // Check Planet
+            if (m_shopPlanetCategory != Planet::Unknown && header.Origin != Planet::Unknown && m_shopPlanetCategory != header.Origin)
+                continue;
+
+            m_shopItemList.push_back(header);
+        }
+
+        shopScrollBar->SetMaximumValue(std::max(std::ceil(static_cast<float>(m_shopItemList.size()) / static_cast<float>(slots.size())) - 1.f, 0.f));
+        if (shopScrollBar->GetValue() != 0)
+        {
+            shopScrollBar->SetValue(0); // This must trigger invalidate;
+            return;
+        }
+    }
+
+    static std::array<std::mutex,  100> mutexes;
+
+    for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
+    {
+        const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
+        if (!slot)
+            continue;
+
+        if (j >= m_shopItemList.size())
+        {
+            slot->SetEnabled(false);
+            slot->SetVisible(false);
+            continue;
+        }
+
+        auto metadata = m_shopItemList[j++];
+        auto currency = Currency::Gem;
+        auto price    = 0;
+        for (auto cur : { Currency::Gem, Currency::MCash })
+        {
+            price    = metadata.Prices[cur];
+            currency = cur;
+            if (price > 0)
+                break;
+        }
+
+        slot->SetEnabled(true);
+        slot->SetVisible(true);
+
+        const auto name = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
+        name->SetString(metadata.Name);
+
+        const auto priceTag = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
+        priceTag->SetValue(price);
+
+        const auto currencyTag = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
+        if (currency == Currency::Gem)
+            currencyTag->SetFrame("Gem");
+        else
+            currencyTag->SetFrame("Cash");
+
+        currencyTag->SetPosition({
+            priceTag->GetPosition().x - priceTag->GetLocalBounds().size.x - currencyTag->GetLocalBounds().size.x - 1,
+            currencyTag->GetPosition().y
+        });
+
+        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
+        previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
+        {
+            avatar->Equip(m_items.GetItem(id));
+        });
+
+        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
+        thumbnail->SetVisible(false);
+        thumbnail->SetFocusChangedCallback(nullptr);
+
+        if (m_thumbnails.find(metadata.ID) == m_thumbnails.end())
+            m_thumbnails[metadata.ID] = std::move(m_items.Create(metadata.ID));
+
+        const auto item = m_thumbnails[metadata.ID].get();
+        if (!item)
+            continue;
+
+        const auto sprite = item->GetLargeThumbnail();
+        if (!sprite || !sprite->GetTexture())
+            continue;
+
+        thumbnail->SetVisible(true);
+        thumbnail->SetTexture(*sprite->GetTexture());
+        thumbnail->SetTexCoords(sprite->GetTexCoords());
+        thumbnail->SetOrigin({
+            thumbnail->GetTexCoords().size.x / 2.f,
+            thumbnail->GetTexCoords().size.y / 2.f,
+        });
+
+        thumbnail->SetFocusChangedCallback([=, description = metadata.Description] (auto& sender, auto&)
+        {
+            const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+            Stop(m_tooltipDelay);
+            if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
+            {
+                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
+                {
+                    const auto message = tooltip->FindChild<Gx::Label>("IDC_TEXT_MESSAGE");
+                    message->SetString(description);
+
+                    const auto  bounds = tooltip->GetGlobalBounds();
+                    const float right  = bounds.position.x + bounds.size.x;
+
+                    auto string = message->GetString();
+                    std::size_t checkpoint = 0;
+                    for (std::size_t c = 0; c < string.getSize(); c++)
+                    {
+                        if (string[c] == '\n')
+                            continue;
+
+                        if (string[c] == ' ')
+                        {
+                            checkpoint = c;
+                            continue;
+                        }
+
+                        const auto position = message->FindCharacterPosition(c);
+                        if (bounds.position.x + position.x > right - message->GetPosition().x)
+                        {
+                            string.replace(checkpoint, 1, "\n");
+                            message->SetString(string);
+
+                            c = 0;
+                        }
+                    }
+
+                    tooltip->SetVisible(slot->IsVisible());
+                });
+
+                Run(m_tooltipDelay);
+            }
+            else
+            {
+                if (!sender.IsFocused())
+                    m_tooltipDelay.Reset();
+
+                tooltip->SetVisible(false);
+            }
+        });
+
+        if (thumbnail->IsFocused())
+        {
+            // Force re-focus
+            thumbnail->SetFocus(false);
+            thumbnail->SetFocus(true);
+        }
+    }
 }

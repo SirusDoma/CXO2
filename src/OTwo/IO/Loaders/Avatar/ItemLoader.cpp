@@ -12,6 +12,11 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Models/Character.hpp>
 
+ItemLoader::ItemLoader(const bool thumbnailOnly) :
+    m_thumbnailOnly(thumbnailOnly)
+{
+}
+
 Gx::ResourcePtr<Item> ItemLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     if (json.empty())
@@ -49,18 +54,21 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata& meta,
     for (auto [currency, price] : metadata->Prices)
         item->SetPrice(currency, price);
 
-    if (!metadata->SmallPreview.isEmpty())
-        item->SetSmallPreview(spriteLoader.LoadFromFile(metadata->SmallPreview, ctx));
+    if (!metadata->SmallThumbnail.isEmpty())
+        item->SetSmallThumbnail(spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx));
 
-    if (!metadata->LargePreview.isEmpty())
-        item->SetLargePreview(spriteLoader.LoadFromFile(metadata->LargePreview, ctx));
+    if (!metadata->LargeThumbnail.isEmpty())
+        item->SetLargeThumbnail(spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx));
 
-    for (const auto& ref : metadata->References)
+    if (!m_thumbnailOnly)
     {
-        auto animation = animationLoader.LoadFromFile(ref.Reference, ctx);
-        animation->SetLoop(true);
+        for (const auto& ref : metadata->References)
+        {
+            auto animation = animationLoader.LoadFromFile(ref.Reference, ctx);
+            animation->SetLoop(true);
 
-        item->SetRenderableItem(ref.Gender, ref.RenderPart, ref.Instrument, std::move(animation));
+            item->SetRenderableItem(ref.Gender, ref.RenderPart, ref.Instrument, std::move(animation));
+        }
     }
 
     return item;
@@ -105,12 +113,12 @@ bool ItemLoader::ParseMetadata(Gx::Json json, ItemMetadata& metadata, const Gx::
 
     if (!metadata.Require.empty())
     {
-        if (auto it = metadata.Require.find("preview"); it != metadata.Require.end())
+        if (auto it = metadata.Require.find("thumbnail"); it != metadata.Require.end())
         {
-            if (auto preview = std::any_cast<Gx::Json>(it->second); !preview.empty())
+            if (auto thumbnail = std::any_cast<Gx::Json>(it->second); !thumbnail.empty())
             {
-                metadata.SmallPreview = preview.at("small").get<std::string>();
-                metadata.LargePreview = preview.at("large").get<std::string>();
+                metadata.SmallThumbnail = thumbnail.at("small").get<std::string>();
+                metadata.LargeThumbnail = thumbnail.at("large").get<std::string>();
             }
         }
 

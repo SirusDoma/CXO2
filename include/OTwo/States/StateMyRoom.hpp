@@ -19,7 +19,7 @@ public:
 
 private:
     void Invalidate();
-    void InvalidateSlot(Gx::Image* slot, EquipmentType type, RenderPart preview = RenderPart::LargePreview);
+    void InvalidateSlot(Gx::Image* slot, EquipmentType type, RenderPart thumbnail = RenderPart::LargeThumbnail);
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;

@@ -193,8 +193,8 @@ void InstrumentSelector::Invalidate()
     UiContainer::Invalidate();
 
     const auto items = m_items[m_currentInstrument];
-    const auto instrumentPreview = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
-    if (!instrumentPreview)
+    const auto instrumentThumbnail = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
+    if (!instrumentThumbnail)
         return;
 
     const auto instrumentLabel = FindChild<Gx::Label>("IDC_TEXT_INSTRUMENT_NAME");
@@ -207,7 +207,7 @@ void InstrumentSelector::Invalidate()
     if (m_currentIndex >= items.size())
     {
         m_currentItem = nullptr;
-        instrumentPreview->SetVisible(false);
+        instrumentThumbnail->SetVisible(false);
         if (instrumentLabel)
             instrumentLabel->SetString("(None)");
 
@@ -215,11 +215,11 @@ void InstrumentSelector::Invalidate()
     }
 
     m_currentItem = items[m_currentIndex];
-    if (const auto texture = m_currentItem->GetLargePreview()->GetTexture(); texture)
+    if (const auto texture = m_currentItem->GetLargeThumbnail()->GetTexture(); texture)
     {
-        instrumentPreview->SetVisible(true);
-        instrumentPreview->SetTexture(*texture);
-        instrumentPreview->SetTexCoords(m_currentItem->GetLargePreview()->GetTexCoords());
+        instrumentThumbnail->SetVisible(true);
+        instrumentThumbnail->SetTexture(*texture);
+        instrumentThumbnail->SetTexCoords(m_currentItem->GetLargeThumbnail()->GetTexCoords());
 
         if (instrumentLabel)
             instrumentLabel->SetString(m_currentItem->GetName());
