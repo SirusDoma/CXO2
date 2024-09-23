@@ -25,6 +25,7 @@ namespace Gx
         using Sprite::Sprite;
 
         sf::FloatRect GetLocalBounds() const override;
+        sf::FloatRect GetGlobalBounds() const override;
 
         unsigned int GetFrameCount() const;
         const Frame* GetFrame(const std::string& name) const;

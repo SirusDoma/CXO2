@@ -24,7 +24,7 @@ namespace Gx
         };
 
         virtual sf::FloatRect GetLocalBounds() const = 0;
-        sf::FloatRect GetGlobalBounds() const;
+        virtual sf::FloatRect GetGlobalBounds() const;
 
         virtual bool IsFocused() const;
         virtual void SetFocus(bool focus);

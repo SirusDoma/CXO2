@@ -7,6 +7,11 @@ namespace Gx
         return Sprite::GetLocalBounds();
     }
 
+    sf::FloatRect Image::GetGlobalBounds() const
+    {
+        return Control::GetGlobalBounds();
+    }
+
     unsigned int Image::GetFrameCount() const
     {
         return !m_frames.empty() ? m_frames.size() : 1;
@@ -20,9 +25,9 @@ namespace Gx
         return nullptr;
     }
 
-    const Image::Frame* Image::GetFrame(unsigned int index) const
+    const Image::Frame* Image::GetFrame(const unsigned int index) const
     {
-        if (index < 0 || index >= m_frames.size())
+        if (index >= m_frames.size())
             return nullptr;
 
         return GetFrame(m_indices[index]);
@@ -49,7 +54,7 @@ namespace Gx
         return it != m_frames.end();
     }
 
-    bool Image::ContainsFrame(unsigned int index) const
+    bool Image::ContainsFrame(const unsigned int index) const
     {
         return index >= 0 && index < m_frames.size();
     }
@@ -89,7 +94,7 @@ namespace Gx
         }
     }
 
-    void Image::SetFrame(unsigned int index)
+    void Image::SetFrame(const unsigned int index)
     {
         if (const auto frame = GetFrame(index); frame)
         {

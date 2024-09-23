@@ -58,7 +58,7 @@ namespace Gx
         void SetBlendMode(Gx::BlendMode blendMode);
 
         virtual sf::FloatRect GetLocalBounds() const;
-        sf::FloatRect GetGlobalBounds() const;
+        virtual sf::FloatRect GetGlobalBounds() const;
 
     protected:
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
