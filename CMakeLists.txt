@@ -30,12 +30,12 @@ file(GLOB_RECURSE SCHEMA_ASSET_METADATA schemas/assets/*.bop)
 if (SCHEMA_ASSET_METADATA)
     message("-- Configuring assets schema generator --")
     set(SCHEMA_ASSETS_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Metadata.g.hpp)
-    bebop_generate(Schema-Assets
+    bebop_generate(Schema-Metadata
         VERSION "v3.0.14"
         LANGUAGE cpp
         OUTPUT ${SCHEMA_ASSETS_OUTPUT}
         BOPS ${SCHEMA_ASSET_METADATA}
-        OPTIONS "namespace=OTwo::Serializable::Metadata"
+        OPTIONS "namespace=Mx"
     )
 endif()
 
@@ -48,7 +48,7 @@ if (SCHEMA_MESSAGE_METADATA)
         LANGUAGE cpp
         OUTPUT ${SCHEMA_MESSAGE_OUTPUT}
         BOPS ${SCHEMA_MESSAGE_METADATA}
-        OPTIONS "namespace=OTwo::Serializable::Message"
+        OPTIONS "namespace=Nx"
     )
 endif()
 
@@ -67,7 +67,7 @@ set(SFML_STATIC_LIBRARIES TRUE)
 fetchcontent_declare(
     SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 7fdce1235e509242bfb9b3532be76830485e2a5e
+    GIT_TAG 3.0.0-rc.1
 )
 fetchcontent_makeavailable(SFML)
 
