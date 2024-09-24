@@ -5,9 +5,8 @@
 #include <OTwo/States/StateMyRoom.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/CartContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
-
-#include <OTwo/Serializable/Models.g.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/List.hpp>
@@ -17,9 +16,8 @@
 #include <Genode/UI/RadioButton.hpp>
 
 #include <magic_enum.hpp>
-#include <mutex>
 
-StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, Mx::CartContext& cart, ItemFactory& items) :
+StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_cart(cart),
@@ -246,24 +244,52 @@ void StateItemShop::Initialize()
         InvalidateMyBag();
     });
 
-    const auto bagScrollLeft = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_LEFT");
-    bagScrollLeft->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
+    const auto bagScrollLeftButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_LEFT");
+    bagScrollLeftButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
 
-    const auto bagScrollRight = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_RIGHT");
-    bagScrollRight->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
+    const auto bagScrollRightButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_RIGHT");
+    bagScrollRightButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
     bagList->SetScrollWheelCallback([=] (auto&, auto& ev)
     {
         if (ev.Delta > 0)
-            bagScrollRight->PerformClick();
+            bagScrollRightButton->PerformClick();
         else
-            bagScrollLeft->PerformClick();
+            bagScrollLeftButton->PerformClick();
     });
 
     const auto sellButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_SELL");
     sellButton->SetClickCallback([this] (auto&, auto&) { OnItemSellClicked(); });
 
+    m_cartCurrentPage = 0;
     const auto cartContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
+
+    const auto cartList           = cartContainer->FindChild<Gx::List>("IDC_LIST_CART");
+    const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
+    const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+
+    cartPrevPageButton->SetClickCallback([this] (auto&, auto&)
+    {
+        if (m_cartCurrentPage > 0)
+        {
+            m_cartCurrentPage--;
+            InvalidateCart();
+        }
+    });
+
+    cartNextPageButton->SetClickCallback([this] (auto&, auto&)
+    {
+        m_cartCurrentPage++;
+        InvalidateCart();
+    });
+
+    cartList->SetScrollWheelCallback([=] (auto&, auto& ev)
+    {
+        if (ev.Delta > 0)
+            cartNextPageButton->PerformClick();
+        else
+            cartPrevPageButton->PerformClick();
+    });
 
     const auto myBagButton = Instantiate<Gx::Button>("IDC_BUTTON_MYBAG");
     const auto cartButton  = Instantiate<Gx::Button>("IDC_BUTTON_CART");
@@ -294,6 +320,7 @@ void StateItemShop::Initialize()
 
     myBagButton->PerformClick();
     InvalidateMyBag();
+    InvalidateCart();
     InvalidateShopItemList(true);
 
     bgm->setLooping(true);
@@ -446,6 +473,103 @@ void StateItemShop::InvalidateMyBag()
     gemNumber->SetValue(player.Gem);
 }
 
+void StateItemShop::InvalidateCart()
+{
+    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
+    const auto cartList  = container->FindChild<Gx::List>("IDC_LIST_CART");
+    const auto slots     = cartList->GetChildren();
+    const auto cartItems = m_cart.GetItems();
+    const int maxPage    = static_cast<unsigned int>(std::ceil(static_cast<float>(cartItems.size()) / static_cast<float>(slots.size())));
+
+    m_cartCurrentPage = m_cartCurrentPage >= maxPage ? maxPage - 1 : m_cartCurrentPage;
+    auto itemData = m_items.GetItemData();
+    unsigned int gem = 0, cash = 0;
+    for (auto item : cartItems)
+    {
+        if (item.Type == Mx::CartItemType::Equipment || item.Type == Mx::CartItemType::EquipmentSet)
+        {
+            if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
+            {
+                // Item or Set with one single costume item
+                auto metadata = it->second;
+                if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
+                    gem += gemPrice->second;
+                else if (auto cashPrice = metadata.Prices.find(Currency::MCash); cashPrice != metadata.Prices.end())
+                    cash += cashPrice->second;
+            }
+            else
+            {
+                // Set composed with multiple items
+            }
+        }
+    }
+
+    for (std::size_t i = 0, j = m_cartCurrentPage * slots.size(); i < slots.size(); i++)
+    {
+        const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
+        if (!slot)
+            continue;
+
+        if (j >= cartItems.size())
+        {
+            slot->SetEnabled(false);
+            slot->SetVisible(false);
+            continue;
+        }
+
+        slot->SetEnabled(true);
+        slot->SetVisible(true);
+
+        auto item               = cartItems[j++];
+        const auto id           = slot->FindChild<Gx::Label>("IDC_TEXT_NUMBER");
+        const auto name         = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
+        const auto type         = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM_TYPE");
+        const auto price        = slot->FindChild<Gx::Label>("IDC_TEXT_PRICE");
+        const auto deleteButton = slot->FindChild<Gx::Button>("IDC_BUTTON_DELETE");
+
+        id->SetString(std::to_string(j));
+        if (item.Type == Mx::CartItemType::Equipment || item.Type == Mx::CartItemType::EquipmentSet)
+        {
+            if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
+            {
+                // Item or Set with one single costume item
+                auto metadata = it->second;
+                name->SetString(metadata.Name);
+                if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
+                    price->SetString(std::to_string(gemPrice->second) + "G");
+                else if (auto cashPrice = metadata.Prices.find(Currency::MCash); cashPrice != metadata.Prices.end())
+                    price->SetString(std::to_string(cashPrice->second) + "M");
+            }
+            else if (item.Type == Mx::CartItemType::EquipmentSet)
+            {
+                // Set composed with multiple items
+            }
+
+            type->SetFrame(item.Type == Mx::CartItemType::Equipment ? "Equipment" : "EquipmentSet");
+        }
+        else if (item.Type == Mx::CartItemType::Music)
+        {
+            type->SetFrame("Music");
+        }
+
+        deleteButton->SetClickCallback([this, index = j - 1] (auto&, auto&)
+        {
+            m_cart.Remove(index);
+            InvalidateCart();
+        });
+    }
+
+    const auto currentPage = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_PAGE");
+    const auto totalPage   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_PAGE");
+    const auto totalGem    = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_GEM");
+    const auto totalCash   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_CASH");
+
+    currentPage->SetValue(maxPage > 0 ? m_cartCurrentPage + 1 : 0);
+    totalPage->SetValue(maxPage);
+    totalGem->SetValue(gem);
+    totalCash->SetValue(cash);
+}
+
 void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 {
     const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
@@ -513,14 +637,16 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         slot->SetEnabled(true);
         slot->SetVisible(true);
 
+        const auto name          = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
+        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
+        const auto currencyTag   = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
+        const auto addButton     = slot->FindChild<Gx::Button>("IDC_BUTTON_ADD");
+        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
+        const auto thumbnail     = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
 
-        const auto name = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
         name->SetString(metadata.Name);
-
-        const auto priceTag = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
         priceTag->SetValue(price);
 
-        const auto currencyTag = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
         if (currency == Currency::Gem)
             currencyTag->SetFrame("Gem");
         else
@@ -531,13 +657,25 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             currencyTag->GetPosition().y
         });
 
-        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
+        addButton->SetClickCallback([this, metadata] (auto&, auto&)
+        {
+            const auto cartButton  = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            if (metadata.EquipmentType == EquipmentType::Costume)
+                m_cart.AddEquipmentSet(metadata.ID);
+            else
+                m_cart.AddEquipment(metadata.ID);
+
+            m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
+            InvalidateCart();
+
+            cartButton->PerformClick();
+        });
+
         previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
         {
             avatar->Equip(m_items.GetItem(id));
         });
 
-        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
         thumbnail->SetVisible(false);
         thumbnail->SetFocusChangedCallback(nullptr);
 

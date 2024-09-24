@@ -6,6 +6,7 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
+#include <OTwo/Contexts/CartContext.hpp>
 
 #include <OTwo/Serializable/Models.g.hpp>
 
@@ -18,7 +19,7 @@ class ItemFactory;
 class StateItemShop : public State
 {
 public:
-    explicit StateItemShop(Gx::Mixer& mixer, SessionContext& session, Mx::CartContext& cart, ItemFactory& items);
+    explicit StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -34,11 +35,12 @@ private:
     void OnItemSellClicked();
 
     void InvalidateMyBag();
+    void InvalidateCart();
     void InvalidateShopItemList(bool rebuildList = false);
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;
-    Mx::CartContext& m_cart;
+    CartContext& m_cart;
     ItemFactory& m_items;
 
     Planet m_shopPlanetCategory  = Planet::Unknown;
@@ -47,6 +49,7 @@ private:
     Gender m_genderCategory      = Gender::Male;
 
     unsigned int m_myBagCurrentPage = 0;
+    unsigned int m_cartCurrentPage = 0;
     unsigned int m_shopCurrentPage = 0;
 
     Gx::Delay m_tooltipDelay;

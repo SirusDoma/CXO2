@@ -55,6 +55,7 @@
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/CartContext.hpp>
 
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
@@ -70,8 +71,6 @@
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StateResult.hpp>
-
-#include <OTwo/Serializable/Models.g.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Utilities/Console.hpp>
@@ -206,9 +205,9 @@ void O2Jam::Boot()
         return session;
     }, Gx::Context::Scope::Singleton);
 
-    context.Provide<Mx::CartContext>([&] (auto& ctx)
+    context.Provide<CartContext>([&] (auto& ctx)
     {
-        return std::make_unique<Mx::CartContext>();
+        return std::make_unique<CartContext>();
     }, Gx::Context::Scope::Singleton);
 
     context.Provide<ScoreTracker>([] (auto& ctx)

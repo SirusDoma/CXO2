@@ -2,7 +2,7 @@ enum CartItemType
 {
     Equipment    = 1;
     Music        = 2;
-    SetEquipment = 3;
+    EquipmentSet = 3;
 }
 
 struct CartItem
@@ -11,7 +11,7 @@ struct CartItem
     CartItemType Type;
 }
 
-struct CartContext
+struct Cart
 {
     CartItem[] Items;
 }
