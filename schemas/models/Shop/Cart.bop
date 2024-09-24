@@ -1,0 +1,17 @@
+enum CartItemType
+{
+    Equipment    = 1;
+    Music        = 2;
+    SetEquipment = 3;
+}
+
+struct CartItem
+{
+    uint32       ID;
+    CartItemType Type;
+}
+
+struct CartContext
+{
+    CartItem[] Items;
+}
