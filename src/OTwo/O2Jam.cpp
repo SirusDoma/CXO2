@@ -71,6 +71,8 @@
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StateResult.hpp>
 
+#include <OTwo/Serializable/Models.g.hpp>
+
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Utilities/Console.hpp>
 
@@ -202,6 +204,11 @@ void O2Jam::Boot()
 
         auto session  = std::make_unique<SessionContext>(player);
         return session;
+    }, Gx::Context::Scope::Singleton);
+
+    context.Provide<Mx::CartContext>([&] (auto& ctx)
+    {
+        return std::make_unique<Mx::CartContext>();
     }, Gx::Context::Scope::Singleton);
 
     context.Provide<ScoreTracker>([] (auto& ctx)

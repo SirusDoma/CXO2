@@ -7,6 +7,8 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
 
+#include <OTwo/Serializable/Models.g.hpp>
+
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Delay.hpp>
 #include <Genode/UI/Image.hpp>
@@ -16,7 +18,7 @@ class ItemFactory;
 class StateItemShop : public State
 {
 public:
-    explicit StateItemShop(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items);
+    explicit StateItemShop(Gx::Mixer& mixer, SessionContext& session, Mx::CartContext& cart, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -36,6 +38,7 @@ private:
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;
+    Mx::CartContext& m_cart;
     ItemFactory& m_items;
 
     Planet m_shopPlanetCategory  = Planet::Unknown;
@@ -53,7 +56,6 @@ private:
     std::vector<Item*> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;
     std::unordered_map<unsigned int, Gx::ResourcePtr<Item>> m_thumbnails;
-    std::unordered_map<unsigned int, std::mutex> m_mutexes;
 };
 
 

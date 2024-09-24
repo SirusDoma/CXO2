@@ -7,6 +7,8 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/Serializable/Models.g.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/ScrollBar.hpp>
@@ -17,9 +19,10 @@
 #include <magic_enum.hpp>
 #include <mutex>
 
-StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
+StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, Mx::CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
+    m_cart(cart),
     m_items(items),
     m_myBagSelectedItem(),
     m_myBagSelectIndicator()
@@ -34,8 +37,8 @@ void StateItemShop::Initialize()
     const auto bgm       = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
     const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
     const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
-    const auto sfxPrev = Instantiate<sf::Sound>("bgEffect/19_1");
-    const auto sfxNext = Instantiate<sf::Sound>("bgEffect/19_2");
+    const auto sfxPrev   = Instantiate<sf::Sound>("bgEffect/19_1");
+    const auto sfxNext   = Instantiate<sf::Sound>("bgEffect/19_2");
 
     m_genderCategory = player.Gender;
     m_shopCategory   = ShopCategory::Special;
@@ -483,8 +486,6 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         }
     }
 
-    static std::array<std::mutex,  100> mutexes;
-
     for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
@@ -511,6 +512,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         slot->SetEnabled(true);
         slot->SetVisible(true);
+
 
         const auto name = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
         name->SetString(metadata.Name);
