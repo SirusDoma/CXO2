@@ -31,10 +31,13 @@ void OptionDialog::Initialize()
         return;
 
     m_parent                 = GetParent<::State>();
-    const auto bgAllTest     = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_MASTER");
-    const auto bgTest        = m_parent->Instantiate<sf::Music>("IDC_DIALOG_OPTION/IDC_MUSIC_SAMPLE");
-    const auto sfxTest       = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_SAMPLE");
-    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto bgAllTest     = m_parent->Instantiate<sf::Music>("bgEffect/MusicVolumn");
+    const auto bgTest        = m_parent->Instantiate<sf::Music>("bgEffect/SampleSong.ogg");
+    const auto sfxTest       = m_parent->Instantiate<sf::Sound>("bgEffect/38");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("bgEffect/01");
+
+    bgAllTest->setLooping(true);
+    bgTest->setLooping(true);
 
     const auto background = FindChild<Gx::Image>("IDC_IMAGE_DIALOG_OPTION");
     background->SetFrame("KeyOption");
@@ -323,7 +326,7 @@ void OptionDialog::OnShown(Gx::Scene& scene)
     const auto musicOption   = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
     const auto toolTip       = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
     const auto keySelect     = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("bgEffect/01");
 
     background->SetFrame("KeyOption");
     //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
@@ -347,7 +350,7 @@ void OptionDialog::OnShown(Gx::Scene& scene)
 void OptionDialog::OnClose()
 {
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
-    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("IDC_DIALOG_OPTION/IDC_SOUND_NAVIGATION");
+    const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("bgEffect/01");
 
     m_mixer.Stop("BGTest");
     m_mixer.Stop("EFTest");

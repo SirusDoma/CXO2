@@ -22,7 +22,7 @@ void CreateRoomDialog::Initialize()
         return;
 
     const auto parent = GetParent<::State>();
-    const auto sfxClick = parent->Instantiate<sf::Sound>("IDC_DIALOG_CREATE_ROOM/IDC_SOUND_CLICK");
+    const auto sfxClick = parent->Instantiate<sf::Sound>("bgEffect/10");
 
     const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
     const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");

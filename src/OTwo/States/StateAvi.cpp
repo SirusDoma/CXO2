@@ -18,7 +18,7 @@ void StateAvi::Initialize()
     State::Initialize();
 
     auto& director = GetDirector();
-    const auto bgm = Instantiate<sf::Music>("STATE_AVI/IDC_MUSIC");
+    const auto bgm = Instantiate<sf::Music>("BGM/bgLogo.ogg");
     m_mixer.Play(bgm, "BGM");
 
     auto& overlay = Create<Gx::Rectangle>(GetView().getSize());

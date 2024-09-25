@@ -19,9 +19,9 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    const auto bgm = Instantiate<sf::Music>("IDC_MUSIC");
-    auto clickSfx  = Instantiate<sf::Sound>("IDC_SOUND_02");
-    auto hoverSfx  = Instantiate<sf::Sound>("IDC_SOUND_BEEP");
+    const auto bgm = Instantiate<sf::Music>("BGM/bgMainRoom.ogg");
+    auto clickSfx  = Instantiate<sf::Sound>("bgEffect/02");
+    auto hoverSfx  = Instantiate<sf::Sound>("Planet/BEEppq");
 
     const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MUSIC_HALL");
     auto euta     = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_01");
@@ -82,6 +82,7 @@ void StatePlanet::Initialize()
         Run(transition);
     }
 
+    bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 }
 

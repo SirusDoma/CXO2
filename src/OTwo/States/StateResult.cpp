@@ -195,7 +195,7 @@ void StateResult::Initialize()
         Create<Gx::Move>(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))
     );
 
-    if (const auto bgm = Instantiate<sf::Music>("IDC_MUSIC"); bgm)
+    if (const auto bgm = Instantiate<sf::Music>("BGM/bgResult.ogg"); bgm)
         m_mixer.Play(bgm, "BGM");
 
     Run(topFx, bottomFx);

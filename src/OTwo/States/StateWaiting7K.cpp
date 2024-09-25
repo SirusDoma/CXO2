@@ -39,10 +39,10 @@ void StateWaiting7K::Initialize()
     auto& player    = m_session.GetCurrentPlayer();
     auto& room      = m_session.GetCurrentRoom();
 
-    const auto bgm            = Instantiate<sf::Music>("IDC_MUSIC");
-    const auto sfxStart       = Instantiate<sf::Sound>("IDC_SOUND_33");
-    const auto sfxTeam        = Instantiate<sf::Sound>("IDC_SOUND_34");
-    const auto sfxSelectMusic = Instantiate<sf::Sound>("IDC_SOUND_35");
+    const auto bgm            = Instantiate<sf::Music>("BGM/bgWaiting.ogg");
+    const auto sfxStart       = Instantiate<sf::Sound>("bgEffect/33");
+    const auto sfxTeam        = Instantiate<sf::Sound>("bgEffect/34");
+    const auto sfxSelectMusic = Instantiate<sf::Sound>("bgEffect/35");
 
     const auto channelCategory = Instantiate<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
     switch (m_session.GetMusicHall())
@@ -392,6 +392,7 @@ void StateWaiting7K::Initialize()
         }));
     });
 
+    bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 }
 
