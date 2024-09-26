@@ -37,6 +37,9 @@ void StateItemShop::Initialize()
     const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
     const auto sfxPrev   = Instantiate<sf::Sound>("bgEffect/19_1");
     const auto sfxNext   = Instantiate<sf::Sound>("bgEffect/19_2");
+    const auto sfxMenu   = Instantiate<sf::Sound>("bgEffect/11");
+    const auto sfxGender = Instantiate<sf::Sound>("bgEffect/15");
+    const auto sfxPlanet = Instantiate<sf::Sound>("bgEffect/24_");
 
     m_genderCategory = player.Gender;
     m_shopCategory   = ShopCategory::Special;
@@ -113,12 +116,14 @@ void StateItemShop::Initialize()
         shopCategoryContainerMap.at(category)->SetVisible(category == ShopCategory::Special);
 
         button->SetCheckedState(category == ShopCategory::Special);
-        button->SetCheckStateChangeCallback([this, category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
+        button->SetCheckStateChangeCallback([this, sfxMenu, category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
         {
             if (!sender.IsChecked())
                 return;
 
             m_shopCategory = category;
+            m_mixer.Play(sfxMenu);
+
             for (const auto iterator : shopCategoryContainerMap)
             {
                 iterator.second->SetEnabled(iterator.first == category);
@@ -151,17 +156,44 @@ void StateItemShop::Initialize()
             if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
             {
                 radio->SetCheckedState(category == ShopCategory::Special && i == 0);
-                radio->SetCheckStateChangeCallback([this, i, category, itemCategoryMap] (auto& sender)
+                radio->SetCheckStateChangeCallback([this, i, sfxMenu, category, itemCategoryMap] (auto& sender)
                 {
                     if (!sender.IsChecked())
                         return;
 
                     m_itemCategory = itemCategoryMap.at(category).at(i);
+                    m_mixer.Play(sfxMenu);
+
                     InvalidateShopItemList(true);
                 });
             }
         }
     }
+
+    const auto planetPrevButton = Instantiate<Gx::Button>("IDC_BUTTON_PLANET_UP");
+    const auto planetNextButton = Instantiate<Gx::Button>("IDC_BUTTON_PLANET_DOWN");
+
+    planetPrevButton->SetClickCallback([=] (auto&, auto&)
+    {
+        if (m_shopPlanetCategory == Planet::Unknown)
+            m_shopPlanetCategory = Planet::Event;
+        else
+            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
+
+        m_mixer.Play(sfxPlanet);
+        InvalidateShopItemList(true);
+    });
+
+    planetNextButton->SetClickCallback([=] (auto&, auto&)
+    {
+        if (m_shopPlanetCategory == Planet::Event)
+            m_shopPlanetCategory = Planet::Unknown;
+        else
+            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
+
+        m_mixer.Play(sfxPlanet);
+        InvalidateShopItemList(true);
+    });
 
     const auto maleButton   = Instantiate<Gx::Button>("IDC_BUTTON_MALE");
     const auto femaleButton = Instantiate<Gx::Button>("IDC_BUTTON_FEMALE");
@@ -180,6 +212,9 @@ void StateItemShop::Initialize()
 
         femaleButton->SetEnabled(true);
         femaleButton->SetVisible(true);
+
+        m_mixer.Play(sfxGender);
+        InvalidateShopItemList(true);
     });
 
     femaleButton->SetClickCallback([=] (auto&, auto&)
@@ -191,6 +226,9 @@ void StateItemShop::Initialize()
 
         maleButton->SetEnabled(true);
         maleButton->SetVisible(true);
+
+        m_mixer.Play(sfxGender);
+        InvalidateShopItemList(true);
     });
 
     m_shopCurrentPage = 0;
@@ -573,11 +611,17 @@ void StateItemShop::InvalidateCart()
 void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 {
     const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
+    const auto planet        = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
     const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
     const auto slots         = itemList->GetChildren();
     const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
 
     Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP")->SetVisible(false);
+    if (m_shopPlanetCategory == Planet::Unknown)
+        planet->SetFrame("ShowAll");
+    else
+        planet->SetFrame(std::string(magic_enum::enum_name(m_shopPlanetCategory)));
+
     if (rebuildList)
     {
         m_shopItemList.clear();
@@ -659,14 +703,18 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
-            const auto cartButton  = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            bool updated = false;
             if (metadata.EquipmentType == EquipmentType::Costume)
-                m_cart.AddEquipmentSet(metadata.ID);
+                updated = m_cart.AddEquipmentSet(metadata.ID);
             else
-                m_cart.AddEquipment(metadata.ID);
+                updated = m_cart.AddEquipment(metadata.ID);
 
-            m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
-            InvalidateCart();
+            if (updated)
+            {
+                m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
+                InvalidateCart();
+            }
 
             cartButton->PerformClick();
         });
