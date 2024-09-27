@@ -98,8 +98,11 @@ void StateMyRoom::Initialize()
     const auto equipmentsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_EQUIPMENTS");
     equipmentsContainer->SetVisible(true);
 
-    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
-    gemNumber->SetValue(player.Gem);
+    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    currentGem->SetValue(player.Gem);
+
+    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    currentCash->SetValue(player.Cash);
 
     const auto statusPanel = Instantiate<Gx::Image>("IDC_IMAGE_STATUS");
     statusPanel->SetVisible(false);
@@ -339,8 +342,11 @@ void StateMyRoom::Invalidate()
     const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(inventory.size()) / 2.f));
 
-    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
-    gemNumber->SetValue(player->Gem);
+    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    currentGem->SetValue(player->Gem);
+
+    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    currentCash->SetValue(player->Cash);
 }
 
 void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart thumbnailType)
