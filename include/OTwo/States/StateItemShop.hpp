@@ -37,6 +37,7 @@ private:
     void InvalidateMyBag();
     void InvalidateCart();
     void InvalidateShopItemList(bool rebuildList = false);
+    void InvalidateShopSetItemList(bool rebuildList = false);
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;
@@ -58,6 +59,7 @@ private:
     Gx::Image* m_myBagSelectIndicator;
     std::vector<Item*> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;
+    std::vector<ItemMetadata> m_shopSetItemList;
     std::unordered_map<unsigned int, Gx::ResourcePtr<Item>> m_thumbnails;
 };
 

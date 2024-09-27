@@ -59,8 +59,11 @@ void StateItemShop::Initialize()
     const auto nicknameText = Instantiate<Gx::Label>("IDC_TEXT_NICKNAME");
     nicknameText->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
 
-    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
-    gemNumber->SetValue(player.Gem);
+    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    currentGem->SetValue(player.Gem);
+
+    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    currentCash->SetValue(player.Cash);
 
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
     myRoomButton->SetClickCallback([this] (auto&, auto&)
@@ -507,8 +510,11 @@ void StateItemShop::InvalidateMyBag()
     const auto bagScrollBar = container->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
     bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(inventory.size()) / 2.f));
 
-    const auto gemNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
-    gemNumber->SetValue(player.Gem);
+    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    currentGem->SetValue(player.Gem);
+
+    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    currentCash->SetValue(player.Cash);
 }
 
 void StateItemShop::InvalidateCart()
@@ -617,6 +623,18 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
     const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
 
     Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP")->SetVisible(false);
+    if (m_itemCategory == EquipmentType::Costume)
+    {
+        InvalidateShopSetItemList(rebuildList);
+        return;
+    }
+
+    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
+    itemList->SetVisible(true);
+    itemList->SetEnabled(true);
+    setItemContainer->SetVisible(false);
+    setItemContainer->SetEnabled(false);
+
     if (m_shopPlanetCategory == Planet::Unknown)
         planet->SetFrame("ShowAll");
     else
@@ -802,6 +820,140 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             // Force re-focus
             thumbnail->SetFocus(false);
             thumbnail->SetFocus(true);
+        }
+    }
+}
+
+void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
+{
+    const auto currentAvatar    = Instantiate<Avatar>("IDC_AVATAR");
+    const auto planet           = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
+    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
+    const auto slots            = setItemList->GetChildren();
+
+    itemList->SetVisible(false);
+    itemList->SetEnabled(false);
+    setItemContainer->SetVisible(true);
+    setItemContainer->SetEnabled(true);
+
+    if (m_shopPlanetCategory == Planet::Unknown)
+        planet->SetFrame("ShowAll");
+    else
+        planet->SetFrame(std::string(magic_enum::enum_name(m_shopPlanetCategory)));
+
+    if (rebuildList)
+    {
+        m_shopSetItemList.clear();
+        for (auto& [_, header] : m_items.GetItemData().Items)
+        {
+            // Check price
+            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::MCash) == header.Prices.end())
+                continue;
+
+            // Check Category
+            if (header.EquipmentType != m_itemCategory)
+                continue;
+
+            // Check Gender
+            if (header.Gender != m_genderCategory && header.Gender != Gender::Any)
+                continue;
+
+            // Check Planet
+            if (m_shopPlanetCategory != Planet::Unknown && header.Origin != Planet::Unknown && m_shopPlanetCategory != header.Origin)
+                continue;
+
+            m_shopSetItemList.push_back(header);
+        }
+
+        shopScrollBar->SetMaximumValue(std::max(std::ceil(static_cast<float>(m_shopSetItemList.size()) / static_cast<float>(slots.size())) - 1.f, 0.f));
+        if (shopScrollBar->GetValue() != 0)
+        {
+            shopScrollBar->SetValue(0); // This must trigger invalidate;
+            return;
+        }
+    }
+
+
+    for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
+    {
+        const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
+        if (!slot)
+            continue;
+
+        if (j >= m_shopSetItemList.size())
+        {
+            slot->SetEnabled(false);
+            slot->SetVisible(false);
+            continue;
+        }
+
+        auto metadata = m_shopSetItemList[j++];
+        auto currency = Currency::Gem;
+        auto price    = 0;
+        for (auto cur : { Currency::Gem, Currency::MCash })
+        {
+            price    = metadata.Prices[cur];
+            currency = cur;
+            if (price > 0)
+                break;
+        }
+
+        slot->SetEnabled(true);
+        slot->SetVisible(true);
+
+        const auto name          = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
+        const auto avatar        = slot->FindChild<Avatar>("IDC_AVATAR");
+        const auto pieceList     = slot->FindChild<Gx::List>("IDC_LIST_ITEM_PIECE");
+        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
+        const auto currencyTag   = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
+        const auto addButton     = slot->FindChild<Gx::Button>("IDC_BUTTON_ADD");
+        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
+
+        name->SetString(metadata.Name);
+        avatar->Equip(m_items.GetItem(metadata.ID));
+        priceTag->SetValue(price);
+
+        if (currency == Currency::Gem)
+            currencyTag->SetFrame("Gem");
+        else
+            currencyTag->SetFrame("Cash");
+
+        currencyTag->SetPosition({
+            priceTag->GetPosition().x - priceTag->GetLocalBounds().size.x - currencyTag->GetLocalBounds().size.x - 1,
+            currencyTag->GetPosition().y
+        });
+
+        addButton->SetClickCallback([this, metadata] (auto&, auto&)
+        {
+            const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            if (m_cart.AddEquipmentSet(metadata.ID))
+            {
+                m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
+                InvalidateCart();
+            }
+
+            cartButton->PerformClick();
+        });
+
+        previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
+        {
+            currentAvatar->Equip(m_items.GetItem(id));
+        });
+
+        const auto pieces = pieceList->GetChildren();
+        for (std::size_t p = 0; p < pieces.size(); p++)
+        {
+            const auto pieceName = dynamic_cast<Gx::Label*>(pieces[p]);
+            if (!pieceName)
+                continue;
+
+            pieceName->SetVisible(true);
+            pieceName->SetString(std::to_string(p + 1));
+            if (p == 0)
+                pieceName->SetString(pieceName->GetString() + " " + metadata.Name);
         }
     }
 }
