@@ -1,3 +1,5 @@
+import "Currency.bop"
+
 enum CartItemType
 {
     Equipment    = 1;
@@ -9,6 +11,7 @@ struct CartItem
 {
     uint32       ID;
     CartItemType Type;
+    Currency     Currency;
 }
 
 struct Cart

@@ -1,10 +1,9 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
-#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
 ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources) :
-    m_itemData(sharedResources.AddFromFile<ItemData>("Avatar/Itemdata.json"))
+    m_itemData(sharedResources.AddFromFile<ItemData>("Avatar/ItemData.json"))
 {
     m_resources = &sharedResources;
 }

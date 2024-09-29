@@ -2,9 +2,8 @@
 #define O2JAM_MODELS_ROOM_HPP
 
 #include <OTwo/Core/Chart.hpp>
-
+#include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Models/Character.hpp>
 
 #include <SFML/System/String.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -56,7 +55,7 @@ struct Player
     std::uint32_t Exp;
     std::uint32_t NextExp;
     std::uint32_t EventPoint;
-    ::Gender      Gender;
+    Gender        Gender;
     std::uint32_t Gem;
     std::uint32_t Cash;
     std::uint32_t Wins;

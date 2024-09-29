@@ -1,5 +1,4 @@
 #include <OTwo/Avatar/Avatar.hpp>
-#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Equipment.hpp>
 
 Avatar::RenderableStateMap Avatar::m_renderableStates;

@@ -8,9 +8,8 @@
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
-#include <OTwo/Models/Shop.hpp>
+#include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Equipment.hpp>
-#include <OTwo/Models/Character.hpp>
 
 ItemLoader::ItemLoader(const bool thumbnailOnly) :
     m_thumbnailOnly(thumbnailOnly)

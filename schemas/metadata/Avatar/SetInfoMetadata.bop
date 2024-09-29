@@ -1,0 +1,16 @@
+import "../../models/Avatar/Gender.bop"
+import "../../models/Planet/Planet.bop"
+import "../../models/Shop/Currency.bop"
+
+message SetInfoMetadata
+{
+    1 -> uint32 ID;
+    2 -> string Name;
+    3 -> string Description;
+    4 -> Planet Origin;
+    5 -> Gender Gender;
+    6 -> bool IsNew;
+    7 -> map[Currency, uint32] Price;
+    8 -> map[Currency, uint32] OriginalPrice;
+    9 -> uint32[] Items;
+}

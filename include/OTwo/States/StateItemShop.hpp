@@ -8,7 +8,7 @@
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
 
-#include <OTwo/Serializable/Models.g.hpp>
+#include <OTwo/Serializable.g.hpp>
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Delay.hpp>

@@ -1,7 +1,6 @@
 #include <OTwo/Avatar/Item.hpp>
-#include <OTwo/Models/Shop.hpp>
+#include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Planet.hpp>
-#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Equipment.hpp>
 
 unsigned int Item::GetID() const

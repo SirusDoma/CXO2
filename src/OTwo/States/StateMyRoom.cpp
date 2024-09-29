@@ -146,7 +146,7 @@ void StateMyRoom::Initialize()
         auto currency = Currency::Gem;
         auto price    = 0;
 
-        for (auto cur : { Currency::Gem, Currency::MCash })
+        for (auto cur : { Currency::Gem, Currency::Cash })
         {
             price    = m_selectedItem->GetPrice(cur);
             currency = cur;

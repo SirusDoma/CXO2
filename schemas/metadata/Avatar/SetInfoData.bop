@@ -1,0 +1,17 @@
+message SetInfoItem
+{
+    1 -> string Type;
+    2 -> map[string, string] Require;
+    3 -> SetInfoMetadata Attributes;
+}
+
+message SetInfoAttributes
+{
+    1 -> string Version;
+}
+
+message SetInfoData
+{
+    1 -> map[string, SetInfoItem] Require;
+    2 -> SetInfoAttributes Attributes;
+}

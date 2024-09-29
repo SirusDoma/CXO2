@@ -1,10 +1,8 @@
 #ifndef O2JAM_AVATAR_ITEM_HPP
 #define O2JAM_AVATAR_ITEM_HPP
 
-#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Equipment.hpp>
-#include <OTwo/Models/Planet.hpp>
-#include <OTwo/Models/Shop.hpp>
+#include <OTwo/Serializable.g.hpp>
 
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/Graphics/Animation.hpp>

@@ -1,0 +1,10 @@
+enum MusicHall
+{
+    None     = 0;
+    Melpomin = 1;
+    Thalo    = 2;
+    Euta     = 3;
+    Kalliope = 4;
+    Kleo     = 5;
+    Philix   = 6;
+}

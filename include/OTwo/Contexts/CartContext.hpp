@@ -2,9 +2,9 @@
 #define O2JAM_CART_CONTEXT_HPP
 
 #include <OTwo/IO/Serializable.hpp>
-#include <OTwo/Serializable/Models.g.hpp>
+#include <OTwo/Serializable.g.hpp>
 
-class CartContext : public Serializable<Mx::Cart>
+class CartContext : public Serializable<Cart>
 {
 public:
     CartContext() = default;
@@ -15,8 +15,8 @@ public:
 
     bool Remove(std::size_t index);
 
-    bool Contains(Mx::CartItemType type, unsigned int id);
-    const std::vector<Mx::CartItem>& GetItems() const;
+    bool Contains(CartItemType type, unsigned int id);
+    const std::vector<CartItem>& GetItems() const;
 };
 
 #endif

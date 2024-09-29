@@ -20,7 +20,6 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Room.hpp>
 
 #include <Genode/Graphics.hpp>

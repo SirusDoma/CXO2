@@ -2,10 +2,8 @@
 #define O2JAM_AVATAR_ITEM_METADATA_HPP
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
-#include <OTwo/Models/Shop.hpp>
-#include <OTwo/Models/Planet.hpp>
+#include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Equipment.hpp>
-#include <OTwo/Models/Character.hpp>
 
 #include <SFML/System/String.hpp>
 

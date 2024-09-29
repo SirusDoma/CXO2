@@ -1,10 +1,6 @@
 #ifndef O2JAM_PLANET_CHANNEL_BUTTON_HPP
 #define O2JAM_PLANET_CHANNEL_BUTTON_HPP
 
-#include <Genode/Graphics/Sprite.hpp>
-
-#include <Genode/IO/Resource.hpp>
-#include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/BitmapNumber.hpp>

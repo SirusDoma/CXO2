@@ -383,7 +383,7 @@ void StateItemShop::OnItemSellClicked()
     auto currency = Currency::Gem;
     auto price    = 0;
 
-    for (auto cur : { Currency::Gem, Currency::MCash })
+    for (auto cur : { Currency::Gem, Currency::Cash })
     {
         price    = m_myBagSelectedItem->GetPrice(cur);
         currency = cur;
@@ -530,7 +530,7 @@ void StateItemShop::InvalidateCart()
     unsigned int gem = 0, cash = 0;
     for (auto item : cartItems)
     {
-        if (item.Type == Mx::CartItemType::Equipment || item.Type == Mx::CartItemType::EquipmentSet)
+        if (item.Type == CartItemType::Equipment || item.Type == CartItemType::EquipmentSet)
         {
             if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
             {
@@ -538,7 +538,7 @@ void StateItemShop::InvalidateCart()
                 auto metadata = it->second;
                 if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
                     gem += gemPrice->second;
-                else if (auto cashPrice = metadata.Prices.find(Currency::MCash); cashPrice != metadata.Prices.end())
+                else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
                     cash += cashPrice->second;
             }
             else
@@ -572,7 +572,7 @@ void StateItemShop::InvalidateCart()
         const auto deleteButton = slot->FindChild<Gx::Button>("IDC_BUTTON_DELETE");
 
         id->SetString(std::to_string(j));
-        if (item.Type == Mx::CartItemType::Equipment || item.Type == Mx::CartItemType::EquipmentSet)
+        if (item.Type == CartItemType::Equipment || item.Type == CartItemType::EquipmentSet)
         {
             if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
             {
@@ -581,17 +581,17 @@ void StateItemShop::InvalidateCart()
                 name->SetString(metadata.Name);
                 if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
                     price->SetString(std::to_string(gemPrice->second) + "G");
-                else if (auto cashPrice = metadata.Prices.find(Currency::MCash); cashPrice != metadata.Prices.end())
+                else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
                     price->SetString(std::to_string(cashPrice->second) + "M");
             }
-            else if (item.Type == Mx::CartItemType::EquipmentSet)
+            else if (item.Type == CartItemType::EquipmentSet)
             {
                 // Set composed with multiple items
             }
 
-            type->SetFrame(item.Type == Mx::CartItemType::Equipment ? "Equipment" : "EquipmentSet");
+            type->SetFrame(item.Type == CartItemType::Equipment ? "Equipment" : "EquipmentSet");
         }
-        else if (item.Type == Mx::CartItemType::Music)
+        else if (item.Type == CartItemType::Music)
         {
             type->SetFrame("Music");
         }
@@ -646,7 +646,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         for (auto& [_, header] : m_items.GetItemData().Items)
         {
             // Check price
-            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::MCash) == header.Prices.end())
+            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::Cash) == header.Prices.end())
                 continue;
 
             // Check Category
@@ -688,7 +688,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         auto metadata = m_shopItemList[j++];
         auto currency = Currency::Gem;
         auto price    = 0;
-        for (auto cur : { Currency::Gem, Currency::MCash })
+        for (auto cur : { Currency::Gem, Currency::Cash })
         {
             price    = metadata.Prices[cur];
             currency = cur;
@@ -850,7 +850,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         for (auto& [_, header] : m_items.GetItemData().Items)
         {
             // Check price
-            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::MCash) == header.Prices.end())
+            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::Cash) == header.Prices.end())
                 continue;
 
             // Check Category
@@ -893,7 +893,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         auto metadata = m_shopSetItemList[j++];
         auto currency = Currency::Gem;
         auto price    = 0;
-        for (auto cur : { Currency::Gem, Currency::MCash })
+        for (auto cur : { Currency::Gem, Currency::Cash })
         {
             price    = metadata.Prices[cur];
             currency = cur;

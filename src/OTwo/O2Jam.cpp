@@ -195,6 +195,7 @@ void O2Jam::Boot()
         player.Draws   = 10;
         player.Loses   = 5;
         player.Gender  = Gender::Male;
+        player.Cash    = 15000;
         player.Inventory = { 582,  1534, 342,  115,  255,
                              312,  112,  811,  722,  821,
                              1195, 1104, 1042, 1055, 1461,

@@ -25,42 +25,15 @@ include_directories(include)
 include_directories(extlibs/headers)
 include_directories(schemas/headers)
 
-file(GLOB_RECURSE SCHEMA_MODELS schemas/models/*.bop)
-if (SCHEMA_MODELS)
-    message("-- Configuring models schema generator --")
-    set(SCHEMA_MESSAGE_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Models.g.hpp)
-    bebop_generate(Schema-Models
+file(GLOB_RECURSE SCHEMA_FILES schemas/**/*.bop)
+if (SCHEMA_FILES)
+    message("-- Configuring schema generator --")
+    set(SCHEMA_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable.g.hpp)
+    bebop_generate(Application-Schema
         VERSION "v3.0.14"
         LANGUAGE cpp
-        OUTPUT ${SCHEMA_MESSAGE_OUTPUT}
-        BOPS ${SCHEMA_MODELS}
-        OPTIONS "namespace=Mx"
-    )
-endif()
-
-file(GLOB_RECURSE SCHEMA_ASSETS schemas/metadata/*.bop)
-if (SCHEMA_ASSETS)
-    message("-- Configuring assets schema generator --")
-    set(SCHEMA_ASSETS_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Metadata.g.hpp)
-    bebop_generate(Schema-Assets
-        VERSION "v3.0.14"
-        LANGUAGE cpp
-        OUTPUT ${SCHEMA_ASSETS_OUTPUT}
-        BOPS ${SCHEMA_ASSETS}
-        OPTIONS "namespace=Mx"
-    )
-endif()
-
-file(GLOB_RECURSE SCHEMA_MESSAGES schemas/messages/*.bop)
-if (SCHEMA_MESSAGES)
-    message("-- Configuring messages schema generator --")
-    set(SCHEMA_MESSAGE_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable/Message.g.hpp)
-    bebop_generate(Schema-Messages
-        VERSION "v3.0.14"
-        LANGUAGE cpp
-        OUTPUT ${SCHEMA_MESSAGE_OUTPUT}
-        BOPS ${SCHEMA_MESSAGES}
-        OPTIONS "namespace=Mx"
+        OUTPUT ${SCHEMA_OUTPUT}
+        BOPS ${SCHEMA_FILES}
     )
 endif()
 
