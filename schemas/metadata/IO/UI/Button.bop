@@ -1,0 +1,12 @@
+enum ButtonState : uint8
+{
+    Default = 0;
+    Hover   = 1;
+    Click   = 2;
+}
+
+message ButtonFrame
+{
+    1 -> IntRect TexCoords;
+    2 -> IntRect Bounds;
+}

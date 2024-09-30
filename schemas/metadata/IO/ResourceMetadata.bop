@@ -1,0 +1,50 @@
+import "Common/Types.bop"
+import "Common/Enums.bop"
+
+import "UI/Button.bop"
+
+union ResourceAttributes
+{
+    1 -> struct ResourceCollection
+    {
+        map[string, string] Objects;
+    }
+    2 -> message SpriteAttribute
+    {
+        1 -> Transform Transform;
+        2 -> IntRect TexCoords;
+        3 -> Color Color;
+        4 -> BlendMode BlendMode;
+        5 -> map[string, string] Objects;
+    }
+    3 -> message ButtonAttribute
+    {
+        1 -> Transform Transform;
+        2 -> IntRect TexCoords;
+        3 -> Color Color;
+        4 -> BlendMode BlendMode;
+        5 -> map[ButtonState, ButtonFrame] Frames;
+        6 -> map[string, string] Objects;
+    }
+}
+
+union ResourceDependency
+{
+    1 -> struct ResourceReference
+    {
+        string Path;
+    }
+    2 -> message ResourceTemplate
+    {
+        1 -> string Name;
+        2 -> string Path;
+        3 -> uint16 Count;
+    }
+}
+
+message ResourceMetadataNew
+{
+    1 -> string Type;
+    2 -> map[string, ResourceDependency] Require;
+    3 -> ResourceAttributes Attributes;
+}
