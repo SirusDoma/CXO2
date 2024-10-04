@@ -263,6 +263,15 @@ void StateItemShop::Initialize()
             shopScrollLeft->PerformClick();
     });
 
+    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
+    setItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
+    {
+        if (ev.Delta > 0)
+            shopScrollRight->PerformClick();
+        else
+            shopScrollLeft->PerformClick();
+    });
 
     const auto myBagContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
     m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
