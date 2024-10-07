@@ -9,8 +9,6 @@ message SetInfoMetadata
     3 -> string Description;
     4 -> Planet Origin;
     5 -> Gender Gender;
-    6 -> bool IsNew;
-    7 -> map[Currency, uint32] Price;
-    8 -> map[Currency, uint32] OriginalPrice;
-    9 -> uint32[] Items;
+    6 -> uint32[] Items;
+    7 -> map[uint32, map[Currency, uint32]] Discounts;
 }
