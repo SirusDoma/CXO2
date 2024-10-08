@@ -7,8 +7,8 @@ message SetInfoMetadata
     1 -> uint32 ID;
     2 -> string Name;
     3 -> string Description;
-    4 -> Planet Origin;
-    5 -> Gender Gender;
+    4 -> Gender Gender;
+    5 -> Planet Origin;
     6 -> uint32[] Items;
     7 -> map[uint32, map[Currency, uint32]] Discounts;
 }
