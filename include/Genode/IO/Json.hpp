@@ -14,7 +14,7 @@ struct nlohmann::adl_serializer<std::optional<T>>
         if (opt == std::nullopt)
             j = nullptr;
         else
-            j = *opt;
+            nlohmann::to_json(j, opt.value());
     }
 
     static void from_json(const json& j, std::optional<T>& opt)
