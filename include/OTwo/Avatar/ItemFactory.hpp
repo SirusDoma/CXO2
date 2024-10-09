@@ -3,8 +3,8 @@
 
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Metadata/Avatar/ItemData.hpp>
-
 #include <OTwo/Models/Equipment.hpp>
+#include <OTwo/Serializable.g.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 
@@ -20,9 +20,11 @@ public:
     Gx::ResourcePtr<Item> Create(unsigned int id, bool thumbnailOnly = false) const;
 
     const ItemData& GetItemData() const;
+    const SetInfoData& GetSetInfoData() const;
 
 private:
     ItemData& m_itemData;
+    SetInfoData& m_setInfoData;
     Gx::ResourceManager* m_resources;
 };
 

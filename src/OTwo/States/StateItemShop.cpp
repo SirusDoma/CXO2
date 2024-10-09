@@ -217,7 +217,11 @@ void StateItemShop::Initialize()
         femaleButton->SetVisible(true);
 
         m_mixer.Play(sfxGender);
-        InvalidateShopItemList(true);
+
+        if (m_itemCategory == EquipmentType::Costume)
+            InvalidateShopSetItemList(true);
+        else
+            InvalidateShopItemList(true);
     });
 
     femaleButton->SetClickCallback([=] (auto&, auto&)
@@ -231,7 +235,10 @@ void StateItemShop::Initialize()
         maleButton->SetVisible(true);
 
         m_mixer.Play(sfxGender);
-        InvalidateShopItemList(true);
+        if (m_itemCategory == EquipmentType::Costume)
+            InvalidateShopSetItemList(true);
+        else
+            InvalidateShopItemList(true);
     });
 
     m_shopCurrentPage = 0;
@@ -853,28 +860,50 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
     else
         planet->SetFrame(std::string(magic_enum::enum_name(m_shopPlanetCategory)));
 
+    const auto setInfoData = m_items.GetSetInfoData();
+    const auto itemData    = m_items.GetItemData();
     if (rebuildList)
     {
+        m_shopSetList.clear();
         m_shopSetItemList.clear();
-        for (auto& [_, header] : m_items.GetItemData().Items)
+        m_shopSetItemPrices.clear();
+        for (auto& [_, header] : setInfoData.Require->Sets.value())
         {
-            // Check price
-            if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::Cash) == header.Prices.end())
+            if (!header.Require.has_value() || !header.Require->Items.has_value() || !header.Attributes.has_value())
                 continue;
 
-            // Check Category
-            if (header.EquipmentType != m_itemCategory)
+            auto setItems = std::vector<ItemMetadata>();
+            auto prices   = std::unordered_map<Currency, unsigned int>();
+            for (unsigned int itemID : header.Require->Items.value())
+            {
+                if (auto it = itemData.Items.find(itemID); it != itemData.Items.end())
+                {
+                    for (const auto& [c, p] : it->second.Prices)
+                        prices[c] += p;
+
+                    setItems.push_back(it->second);
+                }
+            }
+
+            // Check contents of set items
+            if (setItems.empty())
+                continue;
+
+            // Check price
+            if (prices.find(Currency::Gem) == prices.end() && prices.find(Currency::Cash) == prices.end())
                 continue;
 
             // Check Gender
-            if (header.Gender != m_genderCategory && header.Gender != Gender::Any)
+            if (header.Attributes->Gender != m_genderCategory && header.Attributes->Gender != Gender::Any)
                 continue;
 
             // Check Planet
-            if (m_shopPlanetCategory != Planet::Unknown && header.Origin != Planet::Unknown && m_shopPlanetCategory != header.Origin)
+            if (m_shopPlanetCategory != Planet::Unknown && header.Attributes->Origin != Planet::Unknown && m_shopPlanetCategory != header.Attributes->Origin)
                 continue;
 
-            m_shopSetItemList.push_back(header);
+            m_shopSetList.push_back(header.Attributes.value());
+            m_shopSetItemList[*header.Attributes->ID] = setItems;
+            m_shopSetItemPrices[*header.Attributes->ID] = prices;
         }
 
         shopScrollBar->SetMaximumValue(std::max(std::ceil(static_cast<float>(m_shopSetItemList.size()) / static_cast<float>(slots.size())) - 1.f, 0.f));
@@ -884,7 +913,6 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             return;
         }
     }
-
 
     for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
     {
@@ -899,12 +927,14 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             continue;
         }
 
-        auto metadata = m_shopSetItemList[j++];
+        auto metadata = m_shopSetList[j++];
+        const auto itemSetList = m_shopSetItemList[*metadata.ID];
+
         auto currency = Currency::Gem;
         auto price    = 0;
         for (auto cur : { Currency::Gem, Currency::Cash })
         {
-            price    = metadata.Prices[cur];
+            price    = m_shopSetItemPrices[*metadata.ID][cur];
             currency = cur;
             if (price > 0)
                 break;
@@ -921,8 +951,16 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         const auto addButton     = slot->FindChild<Gx::Button>("IDC_BUTTON_ADD");
         const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
 
-        name->SetString(metadata.Name);
-        avatar->Equip(m_items.GetItem(metadata.ID));
+        name->SetString(sf::String::fromUtf8(metadata.Name->begin(), metadata.Name->end()));
+        avatar->SetGender(m_genderCategory);
+
+        for (auto [_, item] : m_items.GetDefaultItems(avatar->GetGender()))
+            avatar->SetDefaultItem(item);
+
+        avatar->ClearEquipments();
+        for (const auto& itemMetadata : itemSetList)
+            avatar->Equip(m_items.GetItem(itemMetadata.ID));
+
         priceTag->SetValue(price);
 
         if (currency == Currency::Gem)
@@ -938,7 +976,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
             const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
-            if (m_cart.AddEquipmentSet(metadata.ID))
+            if (m_cart.AddEquipmentSet(*metadata.ID))
             {
                 m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
                 InvalidateCart();
@@ -947,9 +985,11 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             cartButton->PerformClick();
         });
 
-        previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
+        previewButton->SetClickCallback([=, id = *metadata.ID] (auto&, auto&)
         {
-            currentAvatar->Equip(m_items.GetItem(id));
+            currentAvatar->ClearEquipments();
+            for (const auto& itemMetadata : m_shopSetItemList[id])
+                currentAvatar->Equip(m_items.GetItem(itemMetadata.ID));
         });
 
         const auto pieces = pieceList->GetChildren();
@@ -961,8 +1001,8 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 
             pieceName->SetVisible(true);
             pieceName->SetString(std::to_string(p + 1));
-            if (p == 0)
-                pieceName->SetString(pieceName->GetString() + " " + metadata.Name);
+            if (p < itemSetList.size())
+                pieceName->SetString(pieceName->GetString() + " " + itemSetList[p].Name);
         }
     }
 }

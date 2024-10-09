@@ -28,6 +28,7 @@
 
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemDataLoader.hpp>
+#include <OTwo/IO/Loaders/Avatar/SetInfoDataLoader.hpp>
 #include <OTwo/IO/Loaders/Avatar/AvatarLoader.hpp>
 
 #include <OTwo/IO/Loaders/UI/Components/Common/MarqueeLoader.hpp>
@@ -116,6 +117,7 @@ void O2Jam::Boot()
     // Avatar
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
+    Gx::ResourceLoaderFactory::Register<SetInfoData, SetInfoDataLoader>();
     Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
     // O2Jam Exclusive Components
     Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();

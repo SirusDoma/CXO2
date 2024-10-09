@@ -3,7 +3,8 @@
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
 ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources) :
-    m_itemData(sharedResources.AddFromFile<ItemData>("Avatar/ItemData.json"))
+    m_itemData(sharedResources.AddFromFile<ItemData>("Avatar/ItemData.json")),
+    m_setInfoData(sharedResources.AddFromFile<SetInfoData>("Avatar/SetInfoData.json"))
 {
     m_resources = &sharedResources;
 }
@@ -98,4 +99,9 @@ Gx::ResourcePtr<Item> ItemFactory::Create(const unsigned int id, const bool thum
 const ItemData& ItemFactory::GetItemData() const
 {
     return m_itemData;
+}
+
+const SetInfoData& ItemFactory::GetSetInfoData() const
+{
+    return m_setInfoData;
 }
