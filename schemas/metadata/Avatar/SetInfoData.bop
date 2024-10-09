@@ -15,8 +15,13 @@ message SetInfoAttributes
     1 -> string Version;
 }
 
+message SetInfoDependency
+{
+    1 -> map[uint32, SetInfoItem] Sets;
+}
+
 message SetInfoData
 {
-    1 -> map[string, SetInfoItem] Require;
+    1 -> SetInfoDependency Require;
     2 -> SetInfoAttributes Attributes;
 }
