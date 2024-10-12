@@ -869,17 +869,38 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         m_shopSetItemPrices.clear();
         for (auto& [_, header] : setInfoData.Require->Sets.value())
         {
+            // Check item set list
             if (!header.Require.has_value() || !header.Require->Items.has_value() || !header.Attributes.has_value())
                 continue;
 
+            // Check Gender
+            if (header.Attributes->Gender != m_genderCategory && header.Attributes->Gender != Gender::Any)
+                continue;
+
+            // Check Planet
+            if (m_shopPlanetCategory != Planet::Unknown && header.Attributes->Origin != Planet::Unknown && m_shopPlanetCategory != header.Attributes->Origin)
+                continue;
+
+            // Calculate prices
             auto setItems = std::vector<ItemMetadata>();
             auto prices   = std::unordered_map<Currency, unsigned int>();
+            auto priceEnabled = std::unordered_map<Currency, bool>{ { Currency::Gem, true}, {Currency::Cash, true} };
             for (unsigned int itemID : header.Require->Items.value())
             {
                 if (auto it = itemData.Items.find(itemID); it != itemData.Items.end())
                 {
                     for (const auto& [c, p] : it->second.Prices)
+                    {
+                        // The all items in the set must be buyable with the currency
+                        priceEnabled[c] = priceEnabled[c] && p > 0;
+                        if (!priceEnabled[c])
+                        {
+                            prices[c] = 0;
+                            continue;
+                        }
+
                         prices[c] += p;
+                    }
 
                     setItems.push_back(it->second);
                 }
@@ -893,13 +914,6 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             if (prices.find(Currency::Gem) == prices.end() && prices.find(Currency::Cash) == prices.end())
                 continue;
 
-            // Check Gender
-            if (header.Attributes->Gender != m_genderCategory && header.Attributes->Gender != Gender::Any)
-                continue;
-
-            // Check Planet
-            if (m_shopPlanetCategory != Planet::Unknown && header.Attributes->Origin != Planet::Unknown && m_shopPlanetCategory != header.Attributes->Origin)
-                continue;
 
             m_shopSetList.push_back(header.Attributes.value());
             m_shopSetItemList[*header.Attributes->ID] = setItems;
