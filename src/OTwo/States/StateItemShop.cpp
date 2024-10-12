@@ -867,8 +867,11 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         m_shopSetList.clear();
         m_shopSetItemList.clear();
         m_shopSetItemPrices.clear();
-        for (auto& [_, header] : setInfoData.Require->Sets.value())
+        const auto sets = setInfoData.Require->Sets.value();
+        for (auto it = sets.rbegin(); it != sets.rend(); ++it)
         {
+            const auto& header = it->second;
+
             // Check item set list
             if (!header.Require.has_value() || !header.Require->Items.has_value() || !header.Attributes.has_value())
                 continue;
