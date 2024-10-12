@@ -1,4 +1,6 @@
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StateBulletin.hpp>
+#include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
@@ -24,7 +26,6 @@
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
-#include <OTwo/States/StateItemShop.hpp>
 
 StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items) :
     m_mixer(mixer),
@@ -251,6 +252,9 @@ void StateRoom::Initialize()
         roomList->NextPage();
     });
 
+    const auto bulletinButton = Instantiate<Gx::Button>("IDC_BUTTON_BULLETIN");
+    bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinClicked(); });
+
     const auto itemShopButton = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SHOP");
     itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopClicked(); });
 
@@ -270,6 +274,12 @@ void StateRoom::Initialize()
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
+}
+
+void StateRoom::OnBulletinClicked() const
+{
+    auto& director = GetDirector();
+    director.Present<StateBulletin>();
 }
 
 void StateRoom::OnItemShopClicked() const
