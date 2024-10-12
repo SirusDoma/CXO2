@@ -959,6 +959,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 
         const auto name          = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
         const auto avatar        = slot->FindChild<Avatar>("IDC_AVATAR");
+        const auto thumbnail     = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
         const auto pieceList     = slot->FindChild<Gx::List>("IDC_LIST_ITEM_PIECE");
         const auto priceTag      = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
         const auto currencyTag   = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
@@ -1017,6 +1018,65 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             pieceName->SetString(std::to_string(p + 1));
             if (p < itemSetList.size())
                 pieceName->SetString(pieceName->GetString() + " " + itemSetList[p].Name);
+        }
+
+        thumbnail->SetVisible(false);
+        thumbnail->SetFocusChangedCallback([=, description = metadata.Description.value_or(std::string())] (auto& sender, auto&)
+        {
+            const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+            Stop(m_tooltipDelay);
+            if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
+            {
+                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
+                {
+                    const auto message = tooltip->FindChild<Gx::Label>("IDC_TEXT_MESSAGE");
+                    message->SetString(sf::String::fromUtf8(description.begin(), description.end()));
+
+                    const auto  bounds = tooltip->GetGlobalBounds();
+                    const float right  = bounds.position.x + bounds.size.x;
+
+                    auto string = message->GetString();
+                    std::size_t checkpoint = 0;
+                    for (std::size_t c = 0; c < string.getSize(); c++)
+                    {
+                        if (string[c] == '\n')
+                            continue;
+
+                        if (string[c] == ' ')
+                        {
+                            checkpoint = c;
+                            continue;
+                        }
+
+                        const auto position = message->FindCharacterPosition(c);
+                        if (bounds.position.x + position.x > right - message->GetPosition().x)
+                        {
+                            string.replace(checkpoint, 1, "\n");
+                            message->SetString(string);
+
+                            c = 0;
+                        }
+                    }
+
+                    tooltip->SetVisible(slot->IsVisible());
+                });
+
+                Run(m_tooltipDelay);
+            }
+            else
+            {
+                if (!sender.IsFocused())
+                    m_tooltipDelay.Reset();
+
+                tooltip->SetVisible(false);
+            }
+        });
+
+        if (thumbnail->IsFocused())
+        {
+            // Force re-focus
+            thumbnail->SetFocus(false);
+            thumbnail->SetFocus(true);
         }
     }
 }
