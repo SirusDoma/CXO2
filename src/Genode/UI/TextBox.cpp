@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    TextBox::TextBox(const sf::String& string, const Font& font, unsigned int characterSize, sf::FloatRect bounds) :
+    TextBox::TextBox(const sf::String& string, const Font& font, const unsigned int characterSize, sf::FloatRect bounds) :
         m_text(string, font, characterSize),
         m_caret(*this),
         m_bounds(bounds),
@@ -31,7 +31,7 @@ namespace Gx
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
 
-        SetHighlightBackColor(sf::Color::White);
+        TextBox::SetHighlightBackColor(sf::Color::White);
         SetHighlightTextColor(sf::Color::Black);
     }
 
@@ -40,12 +40,12 @@ namespace Gx
         return m_bounds;
     }
 
-    void TextBox::SetLocalBounds(sf::FloatRect bounds)
+    void TextBox::SetLocalBounds(const sf::FloatRect bounds)
     {
         m_bounds = bounds;
     }
 
-    sf::Vector2f TextBox::FindCharacterPosition(std::size_t index) const
+    sf::Vector2f TextBox::FindCharacterPosition(const std::size_t index) const
     {
         return m_text.FindCharacterPosition(index);
     }
@@ -60,12 +60,12 @@ namespace Gx
         m_text.SetFont(font);
     }
 
-    void TextBox::SetMasked(bool masked)
+    void TextBox::SetMasked(const bool masked)
     {
         m_text.SetMasked(masked);
     }
 
-    void TextBox::SetNumericModeEnabled(bool enabled)
+    void TextBox::SetNumericModeEnabled(const bool enabled)
     {
         if (m_numeric != enabled)
         {
@@ -75,22 +75,22 @@ namespace Gx
         }
     }
 
-    void TextBox::SetCharacterSize(unsigned int size)
+    void TextBox::SetCharacterSize(const unsigned int size)
     {
         m_text.SetCharacterSize(size);
     }
 
-    void TextBox::SetLineSpacing(float spacingFactor)
+    void TextBox::SetLineSpacing(const float spacingFactor)
     {
         m_text.SetLetterSpacing(spacingFactor);
     }
 
-    void TextBox::SetLetterSpacing(float spacingFactor)
+    void TextBox::SetLetterSpacing(const float spacingFactor)
     {
         m_text.SetLetterSpacing(spacingFactor);
     }
 
-    void TextBox::SetStyle(std::uint32_t style)
+    void TextBox::SetStyle(const std::uint32_t style)
     {
         m_text.SetStyle(style);
     }
@@ -120,7 +120,7 @@ namespace Gx
         m_text.SetOutlineColor(color);
     }
 
-    void TextBox::SetOutlineThickness(float thickness)
+    void TextBox::SetOutlineThickness(const float thickness)
     {
         m_text.SetOutlineThickness(thickness);
     }
@@ -199,7 +199,7 @@ namespace Gx
         return m_maxLength;
     }
 
-    void TextBox::SetMaximumTextLength(unsigned int maxLength)
+    void TextBox::SetMaximumTextLength(const unsigned int maxLength)
     {
         m_maxLength = maxLength;
     }
@@ -211,7 +211,7 @@ namespace Gx
 
     bool TextBox::IsNextCharacterFit()
     {
-        auto string = m_text.GetString();
+        const auto string = m_text.GetString();
         auto index  = m_caret.Index;
 
         if (m_caret.SelectionLength != 0)
@@ -220,13 +220,13 @@ namespace Gx
         auto newString = m_text.GetString();
         newString.insert(index, " ");
         m_text.SetString(newString);
-        bool fit = m_text.GetLocalBounds().size.x <= m_bounds.size.x;
+        const bool fit = m_text.GetLocalBounds().size.x <= m_bounds.size.x;
 
         m_text.SetString(string);
         return fit;
     }
 
-    void TextBox::Select(std::size_t index, int selectionLength)
+    void TextBox::Select(const std::size_t index, const int selectionLength)
     {
         m_caret.Index = static_cast<int>(index);
         m_caret.SelectionLength = selectionLength;
@@ -237,14 +237,14 @@ namespace Gx
 
     void TextBox::SelectAll()
     {
-        int length = static_cast<int>(GetString().getSize());
+        const int length = static_cast<int>(GetString().getSize());
         Select(length, -length);
     }
 
     sf::String TextBox::GetSelectedText() const
     {
         auto index  = m_caret.Index - 1;
-        auto length = m_caret.SelectionLength;
+        const auto length = m_caret.SelectionLength;
         if (length < 0)
             index += length + 1;
         else if (length > 0)
@@ -255,7 +255,7 @@ namespace Gx
         return m_text.GetString().substring(index, std::abs(length));
     }
 
-    size_t TextBox::Insert(size_t index, std::uint32_t unicode, int selectionLength)
+    size_t TextBox::Insert(size_t index, const std::uint32_t unicode, const int selectionLength)
     {
         // backspace, tab, enter, etc
         if (unicode <= 31)
@@ -281,7 +281,7 @@ namespace Gx
         return index;
     }
 
-    std::size_t TextBox::Erase(std::size_t index, int length)
+    std::size_t TextBox::Erase(std::size_t index, const int length)
     {
         if (length < 0)
             index += length + 1;
@@ -302,7 +302,7 @@ namespace Gx
         return m_permanentFocus;
     }
 
-    void TextBox::SetPermanentFocusEnabled(bool enable)
+    void TextBox::SetPermanentFocusEnabled(const bool enable)
     {
         if (m_permanentFocus != enable)
         {
@@ -391,10 +391,10 @@ namespace Gx
         float minDistance  = -1;
         size_t selectIndex = m_caret.Index;
 
-        auto bounds = GetGlobalBounds();
+        const auto bounds = GetGlobalBounds();
         for (size_t index = 0; index <= m_text.GetString().getSize(); index++)
         {
-            float distance = std::abs((FindCharacterPosition(index).x + bounds.position.x) - static_cast<float>(ev.position.x));
+            const float distance = std::abs((FindCharacterPosition(index).x + bounds.position.x) - static_cast<float>(ev.position.x));
             if (minDistance == -1 || distance < minDistance)
             {
                 selectIndex = index;
@@ -444,7 +444,7 @@ namespace Gx
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
 
-            int length    = m_caret.SelectionLength;
+            const int length    = m_caret.SelectionLength;
             m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, length == 0 ? -1 : length));
             m_caret.SelectionLength = 0;
         }
@@ -462,7 +462,7 @@ namespace Gx
         else if (ev.code == sf::Keyboard::Key::Enter)
         {
             // Trim front and back string from whitespaces
-            sf::String string = StringHelper::Trim(m_text.GetString());
+            const sf::String string = StringHelper::Trim(m_text.GetString());
             if (!string.isEmpty() && m_onTextEntered)
                 m_onTextEntered(*this, string);
 
@@ -585,14 +585,14 @@ namespace Gx
         SelectionLength(),
         m_cursor(),
         m_highlight(),
-        m_elapsed(),
-        m_visible(true)
+        m_visible(true),
+        m_elapsed()
     {
         SetHighlightColor(sf::Color::Transparent);
         Invalidate();
     }
 
-    void TextBox::Caret::Reset(bool visible)
+    void TextBox::Caret::Reset(const bool visible)
     {
         m_elapsed = 0;
         m_visible = visible;
@@ -603,7 +603,7 @@ namespace Gx
         return m_highlight;
     }
 
-    void TextBox::Caret::SetHighlightColor(sf::Color color)
+    void TextBox::Caret::SetHighlightColor(const sf::Color color)
     {
         m_highlight.SetColor(color);
     }
@@ -637,7 +637,7 @@ namespace Gx
 
         if (Instance.GetFont())
         {
-            auto glyph = Instance.GetFont()->GetGlyph('|', Instance.GetCharacterSize(), false);
+            const auto glyph = Instance.GetFont()->GetGlyph('|', Instance.GetCharacterSize(), false);
             m_cursor.SetSize(sf::Vector2f(glyph.bounds.size.x * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
         }
 
@@ -647,14 +647,14 @@ namespace Gx
         if (SelectionLength != 0)
         {
             size_t index = Index - 1;
-            int length   = SelectionLength;
+            const int length   = SelectionLength;
             if (length < 0)
                 index += length + 1;
             else if (length > 0)
                 index++;
 
-            auto charPos = Instance.FindCharacterPosition(index);
-            auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
+            const auto charPos = Instance.FindCharacterPosition(index);
+            const auto endPos  = Instance.FindCharacterPosition(index + std::abs(length));
             m_highlight.SetPosition(sf::Vector2f(charPos.x, m_cursor.GetPosition().y));
             m_highlight.SetSize(sf::Vector2f(std::abs(charPos.x - endPos.x), static_cast<float>(Instance.GetCharacterSize())));
         }
