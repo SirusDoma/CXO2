@@ -62,11 +62,11 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata& m
     avatar->SetScale(metadata->Scale);
     avatar->SetRotation(metadata->Rotation);
 
-    for (const auto [_, item] : m_items->GetDefaultItems(avatar->GetGender()))
-        avatar->Equip(item);
+    for (auto& [_, item] : m_items->GetDefaultItems(avatar->GetGender()))
+        avatar->Equip(std::move(item));
 
     for (const auto id : metadata->ItemIDs)
-        avatar->Equip(m_items->GetItem(id));
+        avatar->Equip(m_items->Create(id));
 
     auto container = ObjectContainer::Decorate(avatar.get());
     if (!metadata->Objects.empty())

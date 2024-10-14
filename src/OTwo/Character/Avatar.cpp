@@ -1,18 +1,13 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Models/Equipment.hpp>
 
-Avatar::RenderableStateMap Avatar::m_renderableStates;
-unsigned int Avatar::m_lastFrameID = 0;
-
 Avatar::Avatar() :
     m_gender(),
     m_instrument(Instrument::None),
     m_items(),
     m_defaultItems(),
-    m_alive(true),
-    m_elapsed()
+    m_alive(true)
 {
-    m_renderableStates.clear();
 }
 
 Avatar::Avatar(const Gender gender) :
@@ -36,112 +31,94 @@ void Avatar::SetGender(const Gender gender)
     m_gender = gender;
 }
 
-void Avatar::SetDefaultItem(const Item* item)
+void Avatar::SetDefaultItem(const Item& item)
 {
-    if (item)
-    {
-        m_defaultItems[item->GetType()] = item;
-        if (const auto it = m_items.find(item->GetType()); it == m_items.end())
-            Equip(item);
-    }
+    if (item.GetID() != 0)
+        m_defaultItems[item.GetType()] = item;
 }
 
-bool Avatar::IsEquiped(const Item* item) const
+bool Avatar::IsEquiped(const Item& item) const
 {
-    const auto iterator = m_items.find(item->GetType());
-    return iterator != m_items.end() && iterator->second->GetID() == item->GetID();
+    if (item.GetID() == 0)
+        return false;
+
+    const auto iterator = m_items.find(item.GetType());
+    return iterator != m_items.end() && iterator->second.GetID() == item.GetID();
 }
 
-void Avatar::Equip(const Item* item, const bool reset)
+void Avatar::Equip(const Item& item, const bool reset)
 {
-    if (item)
-    {
-        if (!item->IsEquipable())
-            return;
-
-        if (const auto equipped = m_items.find(item->GetType()); equipped != m_items.end() && equipped->second->GetID() == item->GetID())
-            return;
-
-        if (const auto equipped = m_items.find(EquipmentType::Costume); equipped != m_items.end())
-            return;
-
-        if (item->GetGender() != Gender::Any && item->GetGender() != m_gender)
-            return;
-
-        if (item->GetInstrument() != Instrument::None)
-        {
-            for (const auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
-                Unequip(type);
-        }
-
-        if (item->GetType() == EquipmentType::Costume)
-            ClearEquipments();
-
-        m_items[item->GetType()] = item;
-        switch (item->GetType())
-        {
-            case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard;  break;
-            case EquipmentType::Bass:     m_instrument = Instrument::Bass;   break;
-            case EquipmentType::Drum:     m_instrument = Instrument::Drum;   break;
-            case EquipmentType::Guitar:   m_instrument = Instrument::Guitar; break;
-            default: break;
-        }
-
-        if (reset)
-        {
-            for (const auto renderable: item->GetRenderables())
-            {
-                renderable->Reset();
-                for (auto type : { EquipmentType::Body, EquipmentType::Top, EquipmentType::LeftArm, EquipmentType::RightArm, EquipmentType::LeftHand, EquipmentType::RightHand })
-                {
-                    if (auto itemRef = m_items.find(type); itemRef != m_items.end())
-                    {
-                        if (type == EquipmentType::Body)
-                        {
-                            for (const auto part: { RenderPart::LeftArm, RenderPart::RightArm })
-                            {
-                                if (const auto refRenderable = itemRef->second->GetRenderableItem(GetGender(), part, item->GetInstrument()); refRenderable)
-                                    refRenderable->Reset();
-                            }
-                        }
-                        else
-                        {
-                            for (const auto refRenderable : itemRef->second->GetRenderables())
-                                refRenderable->Reset();
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void Avatar::Unequip(const Item* item)
-{
-    if (!item)
+    if (item.GetID() == 0)
         return;
 
-    const auto iterator = m_items.find(item->GetType());
+    if (IsEquiped(item))
+        return;
+
+    // Equip only equippable item
+    if (!item.IsEquipable())
+        return;
+
+    // Check whether the item gender is matching
+    if (item.GetGender() != Gender::Any && item.GetGender() != m_gender)
+        return;
+
+    // Check whether the item is already equipped
+    if (const auto equipped = m_items.find(item.GetType()); equipped != m_items.end() && equipped->second.GetID() == item.GetID())
+        return;
+
+    // Check whether a costume is currently equipped
+    if (const auto equipped = m_items.find(EquipmentType::Costume); equipped != m_items.end())
+        return;
+
+    // Unequip existing instrument if the item is an instrument
+    if (item.GetInstrument() != Instrument::None)
+    {
+        for (const auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
+            Unequip(type);
+    }
+
+    // Remove all equipments if the item is costume
+    if (item.GetType() == EquipmentType::Costume)
+        ClearEquipments();
+
+    m_items[item.GetType()] = std::move(item);
+    switch (item.GetType())
+    {
+        case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard;  break;
+        case EquipmentType::Bass:     m_instrument = Instrument::Bass;   break;
+        case EquipmentType::Drum:     m_instrument = Instrument::Drum;   break;
+        case EquipmentType::Guitar:   m_instrument = Instrument::Guitar; break;
+        default: break;
+    }
+
+    if (reset)
+        ResetRenderables();
+}
+
+void Avatar::Unequip(const Item& item)
+{
+    if (item.GetID() == 0)
+        return;
+
+    const auto iterator = m_items.find(item.GetType());
     if (iterator == m_items.end())
         return;
 
-    if (iterator->second == item)
-    {
-        switch (item->GetType())
-        {
-            case EquipmentType::Keyboard:
-            case EquipmentType::Bass:
-            case EquipmentType::Drum:
-            case EquipmentType::Guitar:
-                m_instrument = Instrument::None;
-                break;
-            default: break;
-        }
+    if (iterator->second.GetID() != item.GetID())
+        return;
 
-        m_items.erase(iterator);
-        if (const auto defaultIterator = m_defaultItems.find(item->GetType()); defaultIterator != m_defaultItems.end())
-            Equip(defaultIterator->second);
+    switch (item.GetType())
+    {
+        case EquipmentType::Keyboard:
+        case EquipmentType::Bass:
+        case EquipmentType::Drum:
+        case EquipmentType::Guitar:
+            m_instrument = Instrument::None;
+        break;
+        default: break;
     }
+
+    m_items.erase(iterator);
 }
 
 void Avatar::Unequip(const EquipmentType type)
@@ -162,8 +139,6 @@ void Avatar::Unequip(const EquipmentType type)
     }
 
     m_items.erase(iterator);
-    if (const auto defaultIterator = m_defaultItems.find(type); defaultIterator != m_defaultItems.end())
-        Equip(defaultIterator->second);
 }
 
 bool Avatar::IsAlive() const
@@ -181,18 +156,17 @@ void Avatar::Revive()
     m_alive = true;
 }
 
-void Avatar::ResetRenderables()
+void Avatar::ResetRenderables() const
 {
-    m_renderableStates.clear();
-    for (auto [_, item] : m_items)
+    for (auto& [_, item] : m_items)
     {
-        for (const auto renderable : item->GetRenderables())
+        for (const auto renderable : item.GetRenderables())
             renderable->Reset();
     }
 
-    for (auto [_, item] : m_defaultItems)
+    for (auto& [_, item] : m_defaultItems)
     {
-        for (const auto renderable : item->GetRenderables())
+        for (const auto renderable : item.GetRenderables())
             renderable->Reset();
     }
 }
@@ -209,17 +183,20 @@ const Instrument& Avatar::GetEquipedInstrumentType() const
 
 std::unordered_map<EquipmentType, const Item*> Avatar::GetEquipedItems(const bool includeDefaultItems) const
 {
-    if (includeDefaultItems)
-        return m_items;
+    auto itemMap = std::unordered_map<EquipmentType, const Item*>();
+    for (const auto& [type, item] : m_items)
+        itemMap[type] = &item;
 
-    auto result = std::unordered_map<EquipmentType, const Item*>();
-    for (auto [type, item] : m_items)
+    if (!includeDefaultItems)
+        return itemMap;
+
+    for (const auto& [type, item] : m_defaultItems)
     {
-        if (auto it = m_defaultItems.find(type); it == m_defaultItems.end() || it->second != item)
-            result[type] = item;
+        if (auto it = itemMap.find(type); it == itemMap.end())
+            itemMap[type] = &item;
     }
 
-    return result;
+    return itemMap;
 }
 
 void Avatar::Update(const double delta)
@@ -254,9 +231,23 @@ void Avatar::Update(const double delta)
         ohmEffect->Reset();
     }
 
-    // Item instance are shared between multiple instances of Avatar
-    // Therefore, we need to avoid making multiple Update calls on the item animations.
-    // To do that, we need "Frame ID" from the RenderStates. Thus, the animation update need to be done in Render()
+    for (auto [type, part] : RenderLayerOrder)
+    {
+        auto iterator = m_items.find(type);
+        if (iterator == m_items.end())
+        {
+            iterator = m_defaultItems.find(type);
+            if (iterator == m_defaultItems.end())
+                continue;
+        }
+
+        if (const auto animation = iterator->second.GetRenderableItem(m_gender, part, m_instrument))
+            animation->Update(delta);
+
+        if (type == EquipmentType::Costume && part == RenderPart::Body)
+            break;
+    }
+
     UpdatableContainer::Update(delta);
 }
 
@@ -266,30 +257,18 @@ Gx::RenderStates Avatar::Render(Gx::RenderSurface& surface, Gx::RenderStates sta
     if (!m_alive)
         return RenderableContainer::Render(surface, states);
 
-    // This will prevent static state map from growing non-stop
-    if (m_lastFrameID != states.FrameID)
-    {
-        //m_renderableStates.clear();
-        m_lastFrameID = states.FrameID;
-    }
-
-    m_elapsed += states.Delta;
     for (auto [type, part] : RenderLayerOrder)
     {
         auto iterator = m_items.find(type);
         if (iterator == m_items.end())
-            continue;
-
-        if (const auto animation = iterator->second->GetRenderableItem(m_gender, part, m_instrument))
         {
-            // Item and its Animation instances are shared across multiple instances of Avatar.
-            // Make sure to update the animation only once, otherwise the animation might be played at speed-up pace
-            if (m_renderableStates[animation] != states.FrameID)
-                animation->Update(states.Delta);
-
-            animation->Render(surface, states);
-            m_renderableStates[animation] = states.FrameID;
+            iterator = m_defaultItems.find(type);
+            if (iterator == m_defaultItems.end())
+                continue;
         }
+
+        if (const auto& animation = iterator->second.GetRenderableItem(m_gender, part, m_instrument))
+            animation->Render(surface, states);
 
         states.Layer += 1.f;
         if (type == EquipmentType::Costume && part == RenderPart::Body)
@@ -303,7 +282,4 @@ void Avatar::ClearEquipments()
 {
     m_items.clear();
     m_instrument = Instrument::None;
-
-    for (auto [_, item] : m_defaultItems)
-        Equip(item);
 }

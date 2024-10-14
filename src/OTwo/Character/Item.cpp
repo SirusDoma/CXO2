@@ -97,48 +97,45 @@ void Item::SetPrice(const Currency& currency, const unsigned int price)
     m_prices[currency] = price;
 }
 
-const Gx::Sprite* Item::GetSmallThumbnail() const
+const Gx::Sprite& Item::GetSmallThumbnail() const
 {
-    return m_smallThumbnail.get();
+    return m_smallThumbnail;
 }
 
-void Item::SetSmallThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail)
+void Item::SetSmallThumbnail(Gx::Sprite&& thumbnail)
 {
-    if (thumbnail)
-        m_smallThumbnail = std::move(thumbnail);
+    m_smallThumbnail = std::move(thumbnail);
 }
 
-const Gx::Sprite* Item::GetLargeThumbnail() const
+const Gx::Sprite& Item::GetLargeThumbnail() const
 {
-    return m_largeThumbnail.get();
+    return m_largeThumbnail;
 }
 
-void Item::SetLargeThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail)
+void Item::SetLargeThumbnail(Gx::Sprite&& thumbnail)
 {
-    if (thumbnail)
-        m_largeThumbnail = std::move(thumbnail);
+    m_largeThumbnail = std::move(thumbnail);
 }
 
-void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation)
+void Item::SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::Animation&& animation)
 {
-    if (animation)
-        m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
+    m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
 }
 
-Gx::Animation* Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const
+Gx::Animation* Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument)
 {
     const auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
     if (find != m_renderables.end())
-        return find->second.get();
+        return &find->second;
 
     return nullptr;
 }
 
-std::vector<Gx::Animation *> Item::GetRenderables() const
+std::vector<Gx::Animation*> Item::GetRenderables()
 {
     auto renderables = std::vector<Gx::Animation *>();
     for (auto& [_, renderable] : m_renderables)
-        renderables.push_back(renderable.get());
+        renderables.push_back(&renderable);
 
     return renderables;
 }
@@ -147,7 +144,7 @@ std::vector<Gx::Animation *> Item::GetRenderables() const
 void Item::ResetRenderables()
 {
     for (auto& [key, renderable] : m_renderables)
-        renderable->Reset();
+        renderable.Reset();
 }
 
 Instrument Item::GetInstrument() const

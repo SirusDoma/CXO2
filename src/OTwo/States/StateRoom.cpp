@@ -52,13 +52,10 @@ void StateRoom::Initialize()
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
     avatar->SetGender(player.Gender);
     for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
-        avatar->SetDefaultItem(item);
+        avatar->SetDefaultItem(std::move(item));
 
     for (const auto id : player.EquippedItemIDs)
-    {
-        if (const auto item = m_items.GetItem(id); item)
-            avatar->Equip(item);
-    }
+        avatar->Equip(m_items.Create(id));
 
     const auto notice = Instantiate<Marquee>("IDC_TEXT_NOTICE");
     notice->SetString("Welcome to O2Jam! Let's play together~");

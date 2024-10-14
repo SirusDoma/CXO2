@@ -186,19 +186,16 @@ void StateWaiting7K::Initialize()
         avatarInfo->SetMember(const_cast<RoomMember&>(member));
 
         for (auto [_, item]: m_items.GetDefaultItems(member.Gender))
-            avatar->SetDefaultItem(item);
+            avatar->SetDefaultItem(std::move(item));
 
         for (const auto itemID : member.EquippedItemIDs)
-        {
-            if (const auto item = m_items.GetItem(itemID); item)
-                avatar->Equip(item);
-        }
+            avatar->Equip(m_items.Create(itemID));
 
         memberIndex++;
     }
 
     const auto teamButtons = Instantiate<Gx::UiContainer>("IDC_CONTAINER_TEAM_BUTTONS");
-    auto teamButtonMatcher = [=] (RoomTeam team) -> Gx::RadioButton*
+    auto teamButtonMatcher = [=] (const RoomTeam team) -> Gx::RadioButton*
     {
         switch (team)
         {
@@ -263,13 +260,13 @@ void StateWaiting7K::Initialize()
     const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
     if (currentAvatarInfo)
     {
-        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const Item* item)
+        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const ItemMetadata& metadata)
         {
-
+            auto item = m_items.Create(metadata.ID);
             if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)
             {
                 auto data = Room(room);
-                if (!item || avatar->IsEquiped(item))
+                if (item.GetID() == 0 || avatar->IsEquiped(item))
                 {
                     avatar->Unequip(EquipmentType::Bass);
                     avatar->Unequip(EquipmentType::Guitar);
@@ -277,7 +274,7 @@ void StateWaiting7K::Initialize()
                     avatar->Unequip(EquipmentType::Drum);
                 }
                 else
-                    avatar->Equip(item, false);
+                    avatar->Equip(std::move(item));
 
                 for (auto& member : data.Members)
                 {
@@ -296,19 +293,19 @@ void StateWaiting7K::Initialize()
         });
     }
 
-    instrumentSelector->AddInstrument(m_items.GetItem(232));
-    instrumentSelector->AddInstrument(m_items.GetItem(233));
-    instrumentSelector->AddInstrument(m_items.GetItem(234));
-    instrumentSelector->AddInstrument(m_items.GetItem(39));
-    instrumentSelector->AddInstrument(m_items.GetItem(238));
-    instrumentSelector->AddInstrument(m_items.GetItem(255));
-    instrumentSelector->AddInstrument(m_items.GetItem(256));
-    instrumentSelector->AddInstrument(m_items.GetItem(257));
-    instrumentSelector->AddInstrument(m_items.GetItem(304));
-    instrumentSelector->AddInstrument(m_items.GetItem(410));
-    instrumentSelector->AddInstrument(m_items.GetItem(411));
-    instrumentSelector->AddInstrument(m_items.GetItem(412));
-    instrumentSelector->AddInstrument(m_items.GetItem(1429));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(232));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(233));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(234));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(39));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(238));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(255));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(256));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(257));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(304));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(410));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(411));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(412));
+    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(1429));
 
     const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     chatPanel->SetMaximumTextLength(50);
@@ -361,14 +358,14 @@ void StateWaiting7K::Initialize()
 
 
     const auto btnBack = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
-    btnBack->SetClickCallback([&] (auto& sender, auto& ev) {
+    btnBack->SetClickCallback([&] (auto&, auto&) {
         director.Present<StateRoom>();
     });
 
     const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
     readyButton->SetVisible(m_session.GetCurrentPlayer().ID != room.RoomMasterID);
     readyButton->SetEnabled(readyButton->IsVisible());
-    readyButton->SetCheckStateChangeCallback([=, &director] (auto& sender)
+    readyButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         if (!sender.IsChecked())
             return;

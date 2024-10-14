@@ -1,11 +1,11 @@
 #ifndef O2JAM_WAITING_INSTRUMENT_SELECTOR_HPP
 #define O2JAM_WAITING_INSTRUMENT_SELECTOR_HPP
 
-#include <OTwo/Avatar/Item.hpp>
-
+#include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
 #include <Genode/UI/UiContainer.hpp>
 
 #include <unordered_map>
+#include <OTwo/Avatar/ItemFactory.hpp>
 
 namespace Gx
 {
@@ -13,30 +13,33 @@ namespace Gx
     class ResourceManager;
 }
 
-class  InstrumentSelector : public Gx::UiContainer
+class ItemFactory;
+class InstrumentSelector : public Gx::UiContainer
 {
 public:
-    InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources);
+    InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, ItemFactory& items);
 
     void Initialize() override;
 
-    void AddInstrument(Item* item);
+    void AddInstrumentMetadata(const ItemMetadata& item);
 
-    Item* GetInstrument() const;
-    void SetInstrument(int itemID);
+    const ItemMetadata& GetInstrumentMetadata() const;
+    void SetSelectedInstrument(int itemID);
 
-    void SetInstrumentSelectCallack(const std::function<void(Item*)>& callback);
+    void SetInstrumentSelectCallack(const std::function<void(const ItemMetadata&)>& callback);
 
     void Invalidate() override;
 
 private:
     Gx::Mixer& m_mixer;
     Gx::ResourceManager& m_resources;
+    ItemFactory& m_items;
 
-    Item* m_currentItem;
+    Item m_currentItem;
+    ItemMetadata m_currentItemHeader;
     Instrument m_currentInstrument;
     int m_currentIndex;
-    std::unordered_map<Instrument, std::vector<Item*>> m_items;
+    std::unordered_map<Instrument, std::vector<ItemMetadata>> m_headers;
 };
 
 #endif

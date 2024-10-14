@@ -54,19 +54,27 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata& meta,
         item->SetPrice(currency, price);
 
     if (!metadata->SmallThumbnail.isEmpty())
-        item->SetSmallThumbnail(spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx));
+    {
+        if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx))
+            item->SetSmallThumbnail(std::move(*thumbnail));
+    }
 
     if (!metadata->LargeThumbnail.isEmpty())
-        item->SetLargeThumbnail(spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx));
+    {
+        if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx))
+            item->SetLargeThumbnail(std::move(*thumbnail));
+    }
 
     if (!m_thumbnailOnly)
     {
         for (const auto& ref : metadata->References)
         {
             auto animation = animationLoader.LoadFromFile(ref.Reference, ctx);
-            animation->SetLoop(true);
+            if (!animation)
+                continue;
 
-            item->SetRenderableItem(ref.Gender, ref.RenderPart, ref.Instrument, std::move(animation));
+            animation->SetLoop(true);
+            item->SetRenderableItem(ref.Gender, ref.RenderPart, ref.Instrument, std::move(*animation));
         }
     }
 

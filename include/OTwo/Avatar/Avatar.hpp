@@ -13,7 +13,7 @@
 class Avatar : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
-    using ItemMap = std::unordered_map<EquipmentType, const Item*>;
+    using ItemMap = std::unordered_map<EquipmentType, Item>;
 
     Avatar();
     explicit Avatar(Gender gender);
@@ -23,11 +23,11 @@ public:
     Gender GetGender() const;
     void SetGender(Gender gender);
 
-    void SetDefaultItem(const Item* item);
+    void SetDefaultItem(const Item& item);
 
-    bool IsEquiped(const Item* item) const;
-    void Equip(const Item* item, bool reset = true);
-    void Unequip(const Item* item);
+    bool IsEquiped(const Item& item) const;
+    void Equip(const Item& item, bool reset = true);
+    void Unequip(const Item& item);
     void Unequip(EquipmentType type);
     void ClearEquipments();
 
@@ -39,7 +39,7 @@ public:
     void Die();
     void Revive();
 
-    void ResetRenderables();
+    void ResetRenderables() const;
 
 private:
      using RenderableStateMap = std::unordered_map<const Gx::Updatable*, unsigned int>;
@@ -153,13 +153,8 @@ private:
 
     Gender     m_gender;
     Instrument m_instrument;
-    ItemMap    m_items, m_defaultItems;
     bool       m_alive;
-
-    mutable double m_elapsed;
-
-    static unsigned int m_lastFrameID;
-    static RenderableStateMap m_renderableStates;
+    mutable ItemMap m_items, m_defaultItems;
 };
 
 #endif

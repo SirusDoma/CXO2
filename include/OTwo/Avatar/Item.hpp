@@ -15,7 +15,7 @@
 #include <memory>
 #include <map>
 
-class Item
+class Item final
 {
 public:
     Item() = default;
@@ -50,15 +50,15 @@ public:
     unsigned int GetPrice(const Currency& currency) const;
     void SetPrice(const Currency& currency, unsigned int price);
 
-    const Gx::Sprite* GetSmallThumbnail() const;
-    void SetSmallThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail);
+    const Gx::Sprite& GetSmallThumbnail() const;
+    void SetSmallThumbnail(Gx::Sprite&& thumbnail);
 
-    const Gx::Sprite* GetLargeThumbnail() const;
-    void SetLargeThumbnail(Gx::ResourcePtr<Gx::Sprite> thumbnail);
+    const Gx::Sprite& GetLargeThumbnail() const;
+    void SetLargeThumbnail(Gx::Sprite&& thumbnail);
 
-    void SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::ResourcePtr<Gx::Animation> animation);
-    Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const;
-    std::vector<Gx::Animation*> GetRenderables() const;
+    void SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::Animation&& animation);
+    Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument);
+    std::vector<Gx::Animation*> GetRenderables();
 
     void ResetRenderables();
 
@@ -71,12 +71,11 @@ private:
     Planet           m_origin;
     Gender           m_gender;
     bool             m_isNew;
-    unsigned int     m_price;
     sf::String       m_name, m_description;
     mutable PriceMap m_prices;
 
-    Gx::ResourcePtr<Gx::Sprite> m_smallThumbnail, m_largeThumbnail;
-    std::map<RenderableKey, Gx::ResourcePtr<Gx::Animation>> m_renderables;
+    Gx::Sprite m_smallThumbnail, m_largeThumbnail;
+    std::map<RenderableKey, Gx::Animation> m_renderables;
 };
 
 #endif

@@ -47,14 +47,11 @@ void StateItemShop::Initialize()
 
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
     avatar->SetGender(player.Gender);
-    for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
-        avatar->SetDefaultItem(item);
+    for (auto& [_, item] : m_items.GetDefaultItems(player.Gender))
+        avatar->SetDefaultItem(std::move(item));
 
     for (const auto id : player.EquippedItemIDs)
-    {
-        if (const auto item = m_items.GetItem(id); item)
-            avatar->Equip(item);
-    }
+        avatar->Equip(m_items.Create(id));
 
     const auto nicknameText = Instantiate<Gx::Label>("IDC_TEXT_NICKNAME");
     nicknameText->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
@@ -79,10 +76,7 @@ void StateItemShop::Initialize()
     {
         avatar->ClearEquipments();
         for (const auto id : player.EquippedItemIDs)
-        {
-            if (const auto item = m_items.GetItem(id); item)
-                avatar->Equip(item);
-        }
+            avatar->Equip(m_items.Create(id));
     });
 
     const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CATEGORY_BUTTONS");
@@ -431,7 +425,7 @@ void StateItemShop::OnItemSellClicked()
         );
 
         m_inventory.erase(
-            std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i->GetID() == m_myBagSelectedItem->GetID(); }),
+            std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i.GetID() == m_myBagSelectedItem->GetID(); }),
             m_inventory.end()
         );
 
@@ -459,18 +453,18 @@ void StateItemShop::InvalidateMyBag()
     {
         for (const auto id : player.Inventory)
         {
-            if (const auto item = m_items.GetItem(id); item)
-                m_inventory.push_back(item);
+            if (const auto item = m_items.Create(id); item.GetID() != 0)
+                m_inventory.push_back(std::move(item));
         }
     }
 
     Gx::Image* currentSlot = nullptr;
     unsigned int itemCount = 0;
     auto inventory = std::vector<Item*>();
-    for (auto item : m_inventory)
+    for (auto& item : m_inventory)
     {
         if (!avatar->IsEquiped(item))
-            inventory.push_back(item);
+            inventory.push_back(&item);
     }
 
     for (std::size_t i = 0, j = m_myBagCurrentPage * 2; i < bagSlots.size(); i++)
@@ -491,10 +485,10 @@ void StateItemShop::InvalidateMyBag()
         itemCount++;
 
         currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail() && item->GetLargeThumbnail()->GetTexture())
-            slot->SetTexture(*item->GetLargeThumbnail()->GetTexture(), true);
-        else if (item->GetSmallThumbnail() && item->GetSmallThumbnail()->GetTexture())
-            slot->SetTexture(*item->GetSmallThumbnail()->GetTexture(), true);
+        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail().GetTexture())
+            slot->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
+        else if (item->GetSmallThumbnail().GetTexture())
+            slot->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -817,7 +811,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
         {
-            avatar->Equip(m_items.GetItem(id));
+            avatar->Equip(m_items.Create(id));
         });
 
         thumbnail->SetVisible(false);
@@ -826,17 +820,17 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         if (m_thumbnails.find(metadata.ID) == m_thumbnails.end())
             m_thumbnails[metadata.ID] = std::move(m_items.Create(metadata.ID));
 
-        const auto item = m_thumbnails[metadata.ID].get();
-        if (!item)
+        const auto item = m_thumbnails[metadata.ID];
+        if (item.GetID() == 0)
             continue;
 
-        const auto sprite = item->GetLargeThumbnail();
-        if (!sprite || !sprite->GetTexture())
+        const auto sprite = item.GetLargeThumbnail();
+        if (!sprite.GetTexture())
             continue;
 
         thumbnail->SetVisible(true);
-        thumbnail->SetTexture(*sprite->GetTexture());
-        thumbnail->SetTexCoords(sprite->GetTexCoords());
+        thumbnail->SetTexture(*sprite.GetTexture());
+        thumbnail->SetTexCoords(sprite.GetTexCoords());
         thumbnail->SetOrigin({
             thumbnail->GetTexCoords().size.x / 2.f,
             thumbnail->GetTexCoords().size.y / 2.f,
@@ -1034,12 +1028,12 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         name->SetString(sf::String::fromUtf8(metadata.Name->begin(), metadata.Name->end()));
         avatar->SetGender(m_genderCategory);
 
-        for (auto [_, item] : m_items.GetDefaultItems(avatar->GetGender()))
-            avatar->SetDefaultItem(item);
+        for (auto& [_, item] : m_items.GetDefaultItems(avatar->GetGender()))
+            avatar->SetDefaultItem(std::move(item));
 
         avatar->ClearEquipments();
         for (const auto& itemMetadata : itemSetList)
-            avatar->Equip(m_items.GetItem(itemMetadata.ID));
+            avatar->Equip(m_items.Create(itemMetadata.ID));
 
         priceTag->SetValue(price);
 
@@ -1069,7 +1063,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         {
             currentAvatar->ClearEquipments();
             for (const auto& itemMetadata : m_shopSetItemList[id])
-                currentAvatar->Equip(m_items.GetItem(itemMetadata.ID));
+                currentAvatar->Equip(m_items.Create(itemMetadata.ID));
         });
 
         const auto pieces = pieceList->GetChildren();

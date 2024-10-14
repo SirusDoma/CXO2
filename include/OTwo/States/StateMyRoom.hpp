@@ -30,6 +30,6 @@ private:
 
     Item* m_selectedItem;
     Gx::Image* m_bagSelectIndicator;
-    std::vector<Item*> m_inventory;
+    std::vector<Item> m_inventory;
 };
 #endif

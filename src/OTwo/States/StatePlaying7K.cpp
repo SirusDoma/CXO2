@@ -106,7 +106,7 @@ void StatePlaying7K::Initialize()
 
         const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
         for (const auto id : member.EquippedItemIDs)
-            avatar->Equip(m_items.GetItem(id));
+            avatar->Equip(m_items.Create(id));
 
         auto& effectContainer = Create<Gx::UiContainer>();
         effectContainer.SetName("IDC_CONTAINER_EFFECT_JAM");

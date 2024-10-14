@@ -39,18 +39,15 @@ void StateMyRoom::Initialize()
     const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
     avatar->SetGender(player.Gender);
     for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
-        avatar->SetDefaultItem(item);
+        avatar->SetDefaultItem(std::move(item));
 
     for (const auto id : player.EquippedItemIDs)
-    {
-        if (const auto item = m_items.GetItem(id); item)
-            avatar->Equip(item);
-    }
+        avatar->Equip(m_items.Create(id));
 
     for (const auto id : player.Inventory)
     {
-        if (const auto item = m_items.GetItem(id); item)
-            m_inventory.push_back(item);
+        if (const auto item = m_items.Create(id); item.GetID() != 0)
+            m_inventory.push_back(std::move(item));
     }
 
     m_bagSelectIndicator = Instantiate<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
@@ -178,7 +175,7 @@ void StateMyRoom::Initialize()
             );
 
             m_inventory.erase(
-                std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i->GetID() == m_selectedItem->GetID(); }),
+                std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i.GetID() == m_selectedItem->GetID(); }),
                 m_inventory.end()
             );
 
@@ -234,10 +231,10 @@ void StateMyRoom::Invalidate()
     Gx::Image* currentSlot = nullptr;
     unsigned int itemCount = 0;
     auto inventory = std::vector<Item*>();
-    for (auto item : m_inventory)
+    for (auto& item : m_inventory)
     {
         if (!avatar->IsEquiped(item))
-            inventory.push_back(item);
+            inventory.push_back(&item);
     }
 
     for (std::size_t i = 0, j = m_bagCurrentPage * 2; i < bagSlots.size(); i++)
@@ -258,10 +255,10 @@ void StateMyRoom::Invalidate()
         itemCount++;
 
         currentSlot = item == m_selectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail() && item->GetLargeThumbnail()->GetTexture())
-            slot->SetTexture(*item->GetLargeThumbnail()->GetTexture(), true);
-        else if (item->GetSmallThumbnail() && item->GetSmallThumbnail()->GetTexture())
-            slot->SetTexture(*item->GetSmallThumbnail()->GetTexture(), true);
+        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail().GetTexture())
+            slot->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
+        else if (item->GetSmallThumbnail().GetTexture())
+            slot->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -278,10 +275,10 @@ void StateMyRoom::Invalidate()
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
-            if (avatar->IsEquiped(item))
-                avatar->Unequip(item);
+            if (avatar->IsEquiped(*item))
+                avatar->Unequip(item->GetType());
             else
-                avatar->Equip(item);
+                avatar->Equip(*item);
 
             avatar->ResetRenderables();
 
@@ -371,13 +368,13 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
         const auto item = it->second;
         slot->SetVisible(true);
         if (thumbnailType == RenderPart::LargeThumbnail)
-            slot->SetTexture(*it->second->GetLargeThumbnail()->GetTexture(), true);
+            slot->SetTexture(*it->second->GetLargeThumbnail().GetTexture(), true);
         else
-            slot->SetTexture(*it->second->GetSmallThumbnail()->GetTexture(), true);
+            slot->SetTexture(*it->second->GetSmallThumbnail().GetTexture(), true);
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
-            avatar->Unequip(item);
+            avatar->Unequip(item->GetType());
             player->EquippedItemIDs.clear();
             for (auto [_, item] : avatar->GetEquipedItems())
                 player->EquippedItemIDs.push_back(item->GetID());

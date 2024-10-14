@@ -5,11 +5,13 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
 
-InstrumentSelector::InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+InstrumentSelector::InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, ItemFactory& items) :
     m_mixer(mixer),
     m_resources(resources),
-    m_currentItem(nullptr),
+    m_items(items),
+    m_currentItemHeader(),
     m_currentInstrument(),
     m_currentIndex(0)
 {
@@ -106,22 +108,32 @@ void InstrumentSelector::Initialize()
     Invalidate();
 }
 
-void InstrumentSelector::AddInstrument(Item* item)
+void InstrumentSelector::AddInstrumentMetadata(const ItemMetadata& item)
 {
-    if (!item || item->GetInstrument() == Instrument::None)
+    auto instrument = Instrument::None;
+    switch(item.EquipmentType)
+    {
+        case EquipmentType::Bass:     instrument = Instrument::Bass;     break;
+        case EquipmentType::Guitar:   instrument = Instrument::Guitar;   break;
+        case EquipmentType::Keyboard: instrument = Instrument::Keyboard; break;
+        case EquipmentType::Drum:     instrument = Instrument::Drum;     break;
+        default:                      instrument = Instrument::None;     break;
+    }
+
+    if (instrument == Instrument::None)
         return;
 
-    const auto key = item->GetInstrument();
-    if (const auto it = m_items.find(key); it == m_items.end())
-        m_items[key] = std::vector<Item*>();
+    const auto key = instrument;
+    if (const auto it = m_headers.find(key); it == m_headers.end())
+        m_headers[key] = std::vector<ItemMetadata>();
 
-    for (const auto i : m_items[key])
+    for (const auto i : m_headers[key])
     {
-        if (i->GetID() == item->GetID())
+        if (i.ID == item.ID)
             return;
     }
 
-    m_items[key].push_back(item);
+    m_headers[key].push_back(item);
     Gx::RadioButton* button = nullptr;
     switch (key)
     {
@@ -154,24 +166,32 @@ void InstrumentSelector::AddInstrument(Item* item)
     }
 }
 
-Item* InstrumentSelector::GetInstrument() const
+const ItemMetadata& InstrumentSelector::GetInstrumentMetadata() const
 {
-    return m_currentItem;
+    return m_currentItemHeader;
 }
 
-void InstrumentSelector::SetInstrument(int itemID)
+void InstrumentSelector::SetSelectedInstrument(int itemID)
 {
-    for (auto& [_, items] : m_items)
+    for (auto& [_, items] : m_headers)
     {
         m_currentIndex = 0;
         for (const auto item : items)
         {
             m_currentIndex++;
-            if (item->GetID() == itemID)
+            if (item.ID == itemID)
             {
-                m_currentInstrument = item->GetInstrument();
+                switch(item.EquipmentType)
+                {
+                    case EquipmentType::Bass:     m_currentInstrument = Instrument::Bass;     break;
+                    case EquipmentType::Guitar:   m_currentInstrument = Instrument::Guitar;   break;
+                    case EquipmentType::Keyboard: m_currentInstrument = Instrument::Keyboard; break;
+                    case EquipmentType::Drum:     m_currentInstrument = Instrument::Drum;     break;
+                    default:                      m_currentInstrument = Instrument::None;     break;
+                }
+
                 if (m_currentInstrument != Instrument::None)
-                    m_currentItem = item;
+                    m_currentItemHeader = item;
 
                 return;
             }
@@ -182,17 +202,17 @@ void InstrumentSelector::SetInstrument(int itemID)
     Invalidate();
 }
 
-void InstrumentSelector::SetInstrumentSelectCallack(const std::function<void(Item *)>& callback)
+void InstrumentSelector::SetInstrumentSelectCallack(const std::function<void(const ItemMetadata&)>& callback)
 {
     if (const auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
-        selectButton->SetClickCallback([this, callback] (auto& sender, auto& ev) { callback(m_currentItem); });
+        selectButton->SetClickCallback([this, callback] (auto&, auto&) { callback(m_currentItemHeader); });
 }
 
 void InstrumentSelector::Invalidate()
 {
     UiContainer::Invalidate();
 
-    const auto items = m_items[m_currentInstrument];
+    const auto items = m_headers[m_currentInstrument];
     const auto instrumentThumbnail = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
     if (!instrumentThumbnail)
         return;
@@ -206,7 +226,7 @@ void InstrumentSelector::Invalidate()
 
     if (m_currentIndex >= items.size())
     {
-        m_currentItem = nullptr;
+        m_currentItemHeader = ItemMetadata();
         instrumentThumbnail->SetVisible(false);
         if (instrumentLabel)
             instrumentLabel->SetString("(None)");
@@ -214,14 +234,18 @@ void InstrumentSelector::Invalidate()
         return;
     }
 
-    m_currentItem = items[m_currentIndex];
-    if (const auto texture = m_currentItem->GetLargeThumbnail()->GetTexture(); texture)
+    m_currentItemHeader = items[m_currentIndex];
+    m_currentItem = m_items.Create(m_currentItemHeader.ID);
+    if (m_currentItem.GetID() == 0)
+        return;
+
+    if (const auto texture = m_currentItem.GetLargeThumbnail().GetTexture(); texture)
     {
         instrumentThumbnail->SetVisible(true);
         instrumentThumbnail->SetTexture(*texture);
-        instrumentThumbnail->SetTexCoords(m_currentItem->GetLargeThumbnail()->GetTexCoords());
+        instrumentThumbnail->SetTexCoords(m_currentItem.GetLargeThumbnail().GetTexCoords());
 
         if (instrumentLabel)
-            instrumentLabel->SetString(m_currentItem->GetName());
+            instrumentLabel->SetString(m_currentItem.GetName());
     }
 }

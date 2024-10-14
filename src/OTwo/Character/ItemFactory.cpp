@@ -1,3 +1,4 @@
+#include <Genode/Utilities/StringHelper.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
@@ -9,12 +10,9 @@ ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources) :
     m_resources = &sharedResources;
 }
 
-std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gender& gender) const
+std::unordered_map<EquipmentType, Item> ItemFactory::GetDefaultItems(const Gender& gender) const
 {
-    auto items = std::unordered_map<EquipmentType, Item*>();
-    if (!m_resources)
-        return items;
-
+    auto items = std::unordered_map<EquipmentType, Item>();
     const auto names = {
         "Avatar/default/Body.json",
         "Avatar/default/LeftArm.json",
@@ -23,20 +21,24 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
         "Avatar/default/RightHand.json"
     };
 
-    for (const auto name : names)
-    {
-        auto& item = m_resources->AddFromFile<Item>(name);
-        items[item.GetType()] = &item;
-    }
-
     auto equips = [&] (const std::initializer_list<std::string> equipments)
     {
+        const auto loader = ItemLoader();
         for (auto& name : equipments)
         {
-            auto& item = m_resources->AddFromFile<Item>(name);
-            items[item.GetType()] = &item;
+            auto item = m_resources->Instantiate<Item>(name, [&]
+            {
+                const auto ctx = Gx::ResourceContext(Gx::StringHelper::RemoveExtension(name), *m_resources, Gx::CacheMode::Reuse);
+                return loader.LoadFromFile(name, ctx);
+            });
+
+            if (item)
+                items[item->GetType()] = std::move(*item);
         }
     };
+
+    for (const auto& name : names)
+        equips({ name });
 
     if (gender == Gender::Male)
     {
@@ -62,39 +64,29 @@ std::unordered_map<EquipmentType, Item*> ItemFactory::GetDefaultItems(const Gend
     return items;
 }
 
-Item* ItemFactory::GetItem(const unsigned int id) const
+Item ItemFactory::Create(const unsigned int id) const
 {
-    if (!m_resources)
-        return nullptr;
-
     const auto iterator = m_itemData.Items.find(id);
     if (iterator == m_itemData.Items.end())
-        return nullptr;
+        return {};
 
     const ItemMetadata metadata = iterator->second;
+    const auto name   = "Avatar/Items/" + std::to_string(id);
     const auto loader = ItemLoader();
 
-    const auto name = "Avatar/Items/" + std::to_string(id);
-    const auto ctx  = Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse);
-
-    return &m_resources->AddFromDeserializer<Item>(name, [&] () { return loader.LoadFromMetadata(metadata, ctx); }, ctx.GetCacheMode());
+    return std::move(*m_resources->Instantiate<Item>(name, [&]
+    {
+        return loader.LoadFromMetadata(metadata, Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse));
+    }));
 }
 
-Gx::ResourcePtr<Item> ItemFactory::Create(const unsigned int id, const bool thumbnailOnly) const
+const ItemMetadata& ItemFactory::GetItemMetadata(const unsigned int id) const
 {
-    const auto iterator = m_itemData.Items.find(id);
-    if (iterator == m_itemData.Items.end())
-        return nullptr;
+    if (const auto it = m_itemData.Items.find(id); it != m_itemData.Items.end())
+        return it->second;
 
-    const ItemMetadata metadata = iterator->second;
-    const auto loader = ItemLoader(thumbnailOnly);
-
-    const auto name = "Avatar/Items/" + std::to_string(id);
-    const auto ctx  = Gx::ResourceContext(name, *m_resources, Gx::CacheMode::Reuse);
-
-    return loader.LoadFromMetadata(metadata, ctx);
+    return DefaultItemMetadata;
 }
-
 
 const ItemData& ItemFactory::GetItemData() const
 {
@@ -104,4 +96,9 @@ const ItemData& ItemFactory::GetItemData() const
 const SetInfoData& ItemFactory::GetSetInfoData() const
 {
     return m_setInfoData;
+}
+
+void ItemFactory::ClearCache()
+{
+    m_resources->Clear();
 }
