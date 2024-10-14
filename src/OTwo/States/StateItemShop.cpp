@@ -542,26 +542,52 @@ void StateItemShop::InvalidateCart()
     const int maxPage    = static_cast<unsigned int>(std::ceil(static_cast<float>(cartItems.size()) / static_cast<float>(slots.size())));
 
     m_cartCurrentPage = m_cartCurrentPage >= maxPage ? maxPage - 1 : m_cartCurrentPage;
-    auto itemData = m_items.GetItemData();
+    const auto& itemData = m_items.GetItemData();
+    const auto& setInfoData = m_items.GetSetInfoData();
+
     unsigned int gem = 0, cash = 0;
+    const auto calculateItem = [&] (const unsigned int itemID)
+    {
+        if (const auto it = itemData.Items.find(itemID); it != itemData.Items.end())
+        {
+            // Item or Set with one single costume item
+            auto metadata = it->second;
+            if (const auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
+                gem += gemPrice->second;
+            else if (const auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
+                cash += cashPrice->second;
+        }
+    };
+
     for (auto item : cartItems)
     {
-        if (item.Type == CartItemType::Equipment || item.Type == CartItemType::EquipmentSet)
+        if (item.Type == CartItemType::EquipmentSet)
         {
-            if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
+            const auto& sets = setInfoData.Require->Sets.value();
+            if (auto set = sets.find(item.ID); set != sets.end())
             {
-                // Item or Set with one single costume item
-                auto metadata = it->second;
-                if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
-                    gem += gemPrice->second;
-                else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
-                    cash += cashPrice->second;
-            }
-            else
-            {
-                // Set composed with multiple items
+                for (const auto itemID : set->second.Require->Items.value())
+                {
+                    calculateItem(itemID);
+
+                    if (!set->second.Attributes->Discounts.has_value())
+                        continue;
+
+                    auto discounts = set->second.Attributes->Discounts->find(itemID);
+                    if (discounts == set->second.Attributes->Discounts->end())
+                        continue;
+
+                    if (auto gemDiscount = discounts->second.find(Currency::Gem); gemDiscount != discounts->second.end())
+                        gem = gem < gemDiscount->second ? 0 : gem - gemDiscount->second;
+                    else if (auto cashDiscount = discounts->second.find(Currency::Cash); cashDiscount != discounts->second.end())
+                        cash = cash < cashDiscount->second ? 0 : cash - cashDiscount->second;
+                }
             }
         }
+        if (item.Type == CartItemType::Equipment)
+            calculateItem(item.ID);
+
+        // TODO: Music
     }
 
     for (std::size_t i = 0, j = m_cartCurrentPage * slots.size(); i < slots.size(); i++)
@@ -588,11 +614,51 @@ void StateItemShop::InvalidateCart()
         const auto deleteButton = slot->FindChild<Gx::Button>("IDC_BUTTON_DELETE");
 
         id->SetString(std::to_string(j));
-        if (item.Type == CartItemType::Equipment || item.Type == CartItemType::EquipmentSet)
+        if (item.Type == CartItemType::EquipmentSet)
+        {
+            const auto& sets = setInfoData.Require->Sets.value();
+            if (auto set = sets.find(item.ID); set != sets.end())
+            {
+                name->SetString(sf::String::fromUtf8(set->second.Attributes->Name->begin(), set->second.Attributes->Name->end()));
+                unsigned int setPriceGem  = 0;
+                unsigned int setPriceCash = 0;
+
+                for (const auto itemID : set->second.Require->Items.value())
+                {
+                    if (auto it = itemData.Items.find(itemID); it != itemData.Items.end())
+                    {
+                        auto metadata = it->second;
+                        if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
+                            setPriceGem += gemPrice->second;
+                        else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
+                            setPriceCash += cashPrice->second;
+
+                        if (!set->second.Attributes->Discounts.has_value())
+                            continue;
+
+                        auto discounts = set->second.Attributes->Discounts->find(itemID);
+                        if (discounts == set->second.Attributes->Discounts->end())
+                            continue;
+
+                        if (auto gemDiscount = discounts->second.find(Currency::Gem); gemDiscount != discounts->second.end())
+                            setPriceGem = setPriceGem < gemDiscount->second ? 0 : setPriceGem - gemDiscount->second;
+                        else if (auto cashDiscount = discounts->second.find(Currency::Cash); cashDiscount != discounts->second.end())
+                            setPriceCash = setPriceCash < cashDiscount->second ? 0 : setPriceCash - cashDiscount->second;
+                    }
+                }
+
+                if (setPriceGem > 0)
+                    price->SetString(std::to_string(setPriceGem) + "G");
+                else
+                    price->SetString(std::to_string(setPriceCash) + "M");
+            }
+
+            type->SetFrame("EquipmentSet");
+        }
+        else if (item.Type == CartItemType::Equipment)
         {
             if (auto it = itemData.Items.find(item.ID); it != itemData.Items.end())
             {
-                // Item or Set with one single costume item
                 auto metadata = it->second;
                 name->SetString(metadata.Name);
                 if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
@@ -600,12 +666,8 @@ void StateItemShop::InvalidateCart()
                 else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
                     price->SetString(std::to_string(cashPrice->second) + "M");
             }
-            else if (item.Type == CartItemType::EquipmentSet)
-            {
-                // Set composed with multiple items
-            }
 
-            type->SetFrame(item.Type == CartItemType::Equipment ? "Equipment" : "EquipmentSet");
+            type->SetFrame("Equipment");
         }
         else if (item.Type == CartItemType::Music)
         {
@@ -868,9 +930,9 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         m_shopSetItemList.clear();
         m_shopSetItemPrices.clear();
         const auto sets = setInfoData.Require->Sets.value();
-        for (auto it = sets.rbegin(); it != sets.rend(); ++it)
+        for (auto set = sets.rbegin(); set != sets.rend(); ++set)
         {
-            const auto& header = it->second;
+            const auto& header = set->second;
 
             // Check item set list
             if (!header.Require.has_value() || !header.Require->Items.has_value() || !header.Attributes.has_value())
