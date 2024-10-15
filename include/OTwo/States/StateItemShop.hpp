@@ -34,6 +34,7 @@ private:
 
     void OnItemSellClicked();
 
+    void InvalidateShopMaster();
     void InvalidateMyBag();
     void InvalidateCart();
     void InvalidateShopItemList(bool rebuildList = false);
@@ -60,6 +61,7 @@ private:
     std::vector<Item> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;
     std::vector<SetInfoMetadata> m_shopSetList;
+    std::unordered_map<Planet, Gx::Image*> m_shopMasters;
     std::unordered_map<unsigned int, std::vector<ItemMetadata>> m_shopSetItemList;
     std::unordered_map<unsigned int, std::unordered_map<Currency, unsigned int>> m_shopSetItemPrices;
     std::unordered_map<unsigned int, Item> m_thumbnails;

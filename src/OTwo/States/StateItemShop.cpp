@@ -68,6 +68,26 @@ void StateItemShop::Initialize()
         GetDirector().Present<StateMyRoom>();
     });
 
+    const auto shopMasterLipsAnimationCallback = [=] (Gx::Animation& animation)
+    {
+        animation.SetVisible(
+            animation.GetState() == Gx::Animation::AnimationState::Playing ||
+            animation.GetState() == Gx::Animation::AnimationState::Initial
+        );
+    };
+
+    const auto shopMasterMain = Instantiate<Gx::Image>("IDC_IMAGE_SHOP_MASTER_MAIN");
+    if (auto lips = shopMasterMain->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+    {
+        lips->SetAnimationCallback(shopMasterLipsAnimationCallback);
+        lips->Stop();
+    }
+
+    m_shopMasters = {
+        { Planet::Unknown,  shopMasterMain },
+        { Planet::O2Planet, shopMasterMain },
+    };
+
     const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
     tooltip->SetVisible(false);
 
@@ -438,6 +458,27 @@ void StateItemShop::OnItemSellClicked()
         m_mixer.Play(sfxAccept, "SFX");
         InvalidateMyBag();
     });
+}
+
+void StateItemShop::InvalidateShopMaster()
+{
+    const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+    const Gx::Image* shopMaster = nullptr;
+    if (const auto it = m_shopMasters.find(m_shopPlanetCategory); it != m_shopMasters.end())
+        shopMaster = it->second;
+    else
+        shopMaster = m_shopMasters[Planet::Unknown];
+
+    if (shopMaster)
+    {
+        if (const auto lips = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+        {
+            if (tooltip->IsVisible())
+                lips->Reset();
+            else
+                lips->Stop();
+        }
+    }
 }
 
 void StateItemShop::InvalidateMyBag()
@@ -874,6 +915,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                     }
 
                     tooltip->SetVisible(slot->IsVisible());
+                    InvalidateShopMaster();
                 });
 
                 Run(m_tooltipDelay);
@@ -884,6 +926,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                     m_tooltipDelay.Reset();
 
                 tooltip->SetVisible(false);
+                InvalidateShopMaster();
             }
         });
 
@@ -892,6 +935,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             // Force re-focus
             thumbnail->SetFocus(false);
             thumbnail->SetFocus(true);
+            InvalidateShopMaster();
         }
     }
 }
@@ -1118,6 +1162,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
                     }
 
                     tooltip->SetVisible(slot->IsVisible());
+                    InvalidateShopMaster();
                 });
 
                 Run(m_tooltipDelay);
@@ -1128,6 +1173,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
                     m_tooltipDelay.Reset();
 
                 tooltip->SetVisible(false);
+                InvalidateShopMaster();
             }
         });
 
@@ -1136,6 +1182,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             // Force re-focus
             thumbnail->SetFocus(false);
             thumbnail->SetFocus(true);
+            InvalidateShopMaster();
         }
     }
 }
