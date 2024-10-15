@@ -8,9 +8,10 @@
 
 struct AnimationMetadata : SpriteMetadata
 {
-    bool     IsLoop;
-    sf::Time Duration;
-    float    Speed;
+    bool         IsLoop;
+    sf::Time     Duration;
+    float        Speed;
+    unsigned int RepeatCount;
     std::vector<Gx::Animation::Frame> Frames;
 };
 

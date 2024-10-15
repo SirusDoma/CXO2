@@ -14,7 +14,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& jso
     if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
         return nullptr;
 
-    if (auto frames = attributes.find("frames"); frames != attributes.end())
+    if (const auto frames = attributes.find("frames"); frames != attributes.end())
     {
         for (const auto& frame : frames->items())
         {
@@ -57,13 +57,16 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& jso
         });
     }
 
-    auto loop = attributes.find("isLoop");
+    const auto loop = attributes.find("isLoop");
     metadata.IsLoop = loop != attributes.end() && loop->get<bool>();
 
-    auto speed = attributes.find("speed");
+    const auto repeatCount = attributes.find("repeatCount");
+    metadata.RepeatCount = repeatCount != attributes.end() ? repeatCount->get<unsigned int>() : 1;
+
+    const auto speed = attributes.find("speed");
     metadata.Speed = speed != attributes.end() ? speed->get<float>() : 1.0f;
 
-    if (auto duration = attributes.find("duration"); duration != attributes.end())
+    if (const auto duration = attributes.find("duration"); duration != attributes.end())
         metadata.Duration = sf::milliseconds(duration->get<unsigned int>());
     else
         metadata.Duration = sf::milliseconds(metadata.Frames.size() * 60);
@@ -92,6 +95,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
     animation->SetLoop(metadata->IsLoop);
     animation->SetDuration(metadata->Duration);
     animation->SetSpeed(metadata->Speed);
+    animation->SetRepeatCount(metadata->RepeatCount);
     animation->SetBlendMode(metadata->BlendMode);
     animation->SetColor(metadata->Color);
     animation->SetOrigin(metadata->Origin);
