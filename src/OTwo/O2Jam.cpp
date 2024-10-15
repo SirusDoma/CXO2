@@ -70,6 +70,7 @@
 #include <OTwo/States/StateBulletin.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StateItemShop.hpp>
+#include <OTwo/States/StatePayment.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StateResult.hpp>
@@ -150,6 +151,7 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateBulletin>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateMyRoom>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateItemShop>();
+    Gx::ResourceLoaderFactory::RegisterDerived<State, StatePayment>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateWaiting7K>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateLoading>();
     Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
@@ -267,6 +269,7 @@ void O2Jam::Boot()
     director.Register<StateBulletin>("Interface/State/Bulletin.json");
     director.Register<StateMyRoom>("Interface/State/MyRoom.json");
     director.Register<StateItemShop>("Interface/State/ItemShop.json");
+    director.Register<StatePayment>("Interface/State/Payment.json");
     director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
     director.Register<StateLoading>("Interface/State/Loading.json");
     director.Register<StatePlaying7K>("Playing/State/Playing7K.json");

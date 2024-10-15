@@ -33,6 +33,7 @@ private:
     };
 
     void OnItemSellClicked();
+    void OnBuyButtonClicked();
 
     void InvalidateShopMaster();
     void InvalidateMyBag();

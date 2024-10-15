@@ -16,6 +16,7 @@
 #include <Genode/UI/RadioButton.hpp>
 
 #include <magic_enum.hpp>
+#include <OTwo/States/StatePayment.hpp>
 
 StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
@@ -335,6 +336,9 @@ void StateItemShop::Initialize()
     m_cartCurrentPage = 0;
     const auto cartContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
 
+    const auto buyButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_BUY");
+    buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
+
     const auto cartList           = cartContainer->FindChild<Gx::List>("IDC_LIST_CART");
     const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
     const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
@@ -396,6 +400,21 @@ void StateItemShop::Initialize()
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
+}
+
+void StateItemShop::OnBuyButtonClicked()
+{
+    if (m_cart.GetItems().size() == 0)
+    {
+        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [this] (const bool){});
+        return;
+    }
+
+    ShowDialog("Proceed to the payment?", DialogStyle::YesNo, false, [this] (const bool answer)
+    {
+        if (answer)
+            GetDirector().Present<StatePayment>();
+    });
 }
 
 void StateItemShop::OnItemSellClicked()
