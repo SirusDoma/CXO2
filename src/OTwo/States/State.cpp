@@ -51,26 +51,10 @@ void State::LoadCommonResources()
     m_dialogInfo  = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
     m_dialog1     = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
     m_dialog2     = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+    m_exitDialog  = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
     m_cancelSound = Instantiate<sf::Sound>("Interface/Sound/Effect/03.json", ResourceScope::Shared);
     m_popupSound  = Instantiate<sf::Sound>("Interface/Sound/Effect/06.json", ResourceScope::Shared);
 
-    if (m_dialog2)
-    {
-        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-        m_exitDialog->SetAcceptCallback([&]
-        {
-            m_prompted = true;
-            Gx::Application::Instance().Close();
-        });
-
-        m_exitDialog->SetCancelCallback([&]
-        {
-            auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
-
-            mixer.Play(m_cancelSound, "SFX");
-            m_prompted = false;
-        });
-    }
     loaded = true;
 }
 
@@ -123,6 +107,19 @@ bool State::Close(const bool quit)
             mixer.Play(m_popupSound, "SFX");
         }
 
+        m_exitDialog->SetAcceptCallback([&]
+        {
+            m_prompted = true;
+            Gx::Application::Instance().Close();
+        });
+
+        m_exitDialog->SetCancelCallback([&]
+        {
+            auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
+
+            mixer.Play(m_cancelSound, "SFX");
+            m_prompted = false;
+        });
         m_exitDialog->Show(this, "Do you really want to exit?", true);
         return false;
     }
