@@ -77,16 +77,29 @@ void StateItemShop::Initialize()
         );
     };
 
-    const auto shopMasterMain = Instantiate<Gx::Image>("IDC_IMAGE_SHOP_MASTER_MAIN");
-    if (auto lips = shopMasterMain->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+    const auto shopMasterWireAnimation = [=] (const Gx::Image* shopMaster)
     {
-        lips->SetAnimationCallback(shopMasterLipsAnimationCallback);
-        lips->Stop();
-    }
+        if (!shopMaster)
+            return;
+
+        if (const auto lips = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+        {
+            lips->SetAnimationCallback(shopMasterLipsAnimationCallback);
+            lips->Stop();
+        }
+    };
+
+    const auto shopMasterContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP_MASTER");
+    const auto shopMasterMain = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_MAIN");
+    shopMasterWireAnimation(shopMasterMain);
+
+    const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_AQUA");
+    shopMasterAqua->SetVisible(false);
+    shopMasterWireAnimation(shopMasterAqua);
 
     m_shopMasters = {
         { Planet::Unknown,  shopMasterMain },
-        { Planet::O2Planet, shopMasterMain },
+        { Planet::Aqua,     shopMasterAqua },
     };
 
     const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
@@ -199,6 +212,7 @@ void StateItemShop::Initialize()
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
 
         m_mixer.Play(sfxPlanet);
+        InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
 
@@ -210,6 +224,7 @@ void StateItemShop::Initialize()
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
 
         m_mixer.Play(sfxPlanet);
+        InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
 
@@ -406,14 +421,19 @@ void StateItemShop::OnBuyButtonClicked()
 {
     if (m_cart.GetItems().size() == 0)
     {
-        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [this] (const bool){});
+        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
         return;
     }
 
-    ShowDialog("Proceed to the payment?", DialogStyle::YesNo, false, [this] (const bool answer)
+    ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, false, [=] (const bool answer)
     {
         if (answer)
+        {
+            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/02"));
             GetDirector().Present<StatePayment>();
+        }
+        else
+            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/03"));
     });
 }
 
@@ -479,17 +499,39 @@ void StateItemShop::OnItemSellClicked()
     });
 }
 
-void StateItemShop::InvalidateShopMaster()
+void StateItemShop::InvalidateShopMaster(const bool moveIn)
 {
     const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
-    const Gx::Image* shopMaster = nullptr;
-    if (const auto it = m_shopMasters.find(m_shopPlanetCategory); it != m_shopMasters.end())
-        shopMaster = it->second;
-    else
-        shopMaster = m_shopMasters[Planet::Unknown];
+    Gx::Image* shopMaster = nullptr;
 
+    for (auto [planet, master] : m_shopMasters)
+    {
+        if (master)
+        {
+            master->SetVisible(planet == m_shopPlanetCategory);
+            if (planet == m_shopPlanetCategory)
+                shopMaster = master;
+        }
+    }
+
+    shopMaster = shopMaster ? shopMaster : m_shopMasters[Planet::Unknown];
     if (shopMaster)
     {
+        shopMaster->SetVisible(true);
+        if (moveIn)
+        {
+            if (m_shopMasterEffect.GetState() != Gx::TaskState::Initial)
+            {
+                Stop(m_shopMasterEffect);
+                m_shopMasterEffect.Complete();
+            }
+
+            m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.25f));
+            shopMaster->SetPosition(GetView().getSize().x, shopMaster->GetPosition().y);
+
+            Run(m_shopMasterEffect);
+        }
+
         if (const auto lips = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
         {
             if (tooltip->IsVisible())

@@ -12,6 +12,7 @@
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Delay.hpp>
+#include <Genode/Tween/Move.hpp>
 #include <Genode/UI/Image.hpp>
 
 class SessionContext;
@@ -35,7 +36,7 @@ private:
     void OnItemSellClicked();
     void OnBuyButtonClicked();
 
-    void InvalidateShopMaster();
+    void InvalidateShopMaster(bool moveIn = false);
     void InvalidateMyBag();
     void InvalidateCart();
     void InvalidateShopItemList(bool rebuildList = false);
@@ -59,6 +60,7 @@ private:
 
     Item* m_myBagSelectedItem;
     Gx::Image* m_myBagSelectIndicator;
+    Gx::Move m_shopMasterEffect;
     std::vector<Item> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;
     std::vector<SetInfoMetadata> m_shopSetList;
