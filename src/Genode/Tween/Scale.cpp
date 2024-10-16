@@ -70,6 +70,12 @@ namespace Gx
             Complete();
     }
 
+    void Scale::Complete()
+    {
+        Task::Complete();
+        m_target->SetScale(m_end);
+    }
+
     void Scale::Reset()
     {
         Task::Reset();

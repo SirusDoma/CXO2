@@ -50,7 +50,17 @@ namespace Gx
         if (current.a == m_end)
             Complete();
     }
-    
+
+    void Fade::Complete()
+    {
+        Task::Complete();
+
+        auto color = m_target->GetColor();
+        color.a = m_end;
+
+        m_target->SetColor(color);
+    }
+
     void Fade::Reset()
     {
         Task::Reset();

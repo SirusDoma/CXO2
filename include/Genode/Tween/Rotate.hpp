@@ -13,6 +13,7 @@ namespace Gx
         Rotate(Transformable& target, float rotation, const sf::Time& duration);
 
         void Update(double delta) override;
+        void Complete() override;
         void Reset() override;
 
     private:

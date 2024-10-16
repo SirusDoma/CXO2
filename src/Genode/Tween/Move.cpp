@@ -69,7 +69,13 @@ namespace Gx
         if (current == m_end)
             Complete();
     }
-    
+
+    void Move::Complete()
+    {
+        Task::Complete();
+        m_target->SetPosition(m_end);
+    }
+
     void Move::Reset()
     {
         Task::Reset();

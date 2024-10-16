@@ -15,6 +15,7 @@ namespace Gx
         Scale(Transformable& target, sf::Vector2f scale, const sf::Time& duration);
 
         void Update(double delta) override;
+        void Complete() override;
         void Reset() override;
 
     private:

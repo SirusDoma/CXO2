@@ -51,6 +51,12 @@ namespace Gx
             Complete();
     }
 
+    void Rotate::Complete()
+    {
+        Task::Complete();
+        m_target->SetRotation(m_end);
+    }
+
     void Rotate::Reset()
     {
         Task::Reset();
