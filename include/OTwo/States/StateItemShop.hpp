@@ -35,6 +35,7 @@ private:
 
     void OnItemSellClicked();
     void OnBuyButtonClicked();
+    void OnGiftButtonClicked();
 
     void InvalidateShopMaster(bool moveIn = false);
     void InvalidateMyBag();

@@ -24,7 +24,8 @@ StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartCont
     m_cart(cart),
     m_items(items),
     m_myBagSelectedItem(),
-    m_myBagSelectIndicator()
+    m_myBagSelectIndicator(),
+    m_shopMasterEffect()
 {
 }
 
@@ -396,6 +397,9 @@ void StateItemShop::Initialize()
     const auto buyButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_BUY");
     buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
 
+    const auto giftButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_GIFT");
+    giftButton->SetClickCallback([this] (auto&, auto&) { OnGiftButtonClicked(); });
+
     const auto cartList           = cartContainer->FindChild<Gx::List>("IDC_LIST_CART");
     const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
     const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
@@ -478,6 +482,17 @@ void StateItemShop::OnBuyButtonClicked()
         else
             m_mixer.Play(Instantiate<sf::Sound>("bgEffect/03"));
     });
+}
+
+void StateItemShop::OnGiftButtonClicked()
+{
+    if (m_cart.GetItems().size() == 0)
+    {
+        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
+        return;
+    }
+
+    ShowDialog("Gift is currently not available", DialogStyle::Information, false, [] (bool) {});
 }
 
 void StateItemShop::OnItemSellClicked()
@@ -939,6 +954,12 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
+            if (metadata.EquipmentType == EquipmentType::AttributiveItem)
+            {
+                ShowDialog("Skill item is currently not available", DialogStyle::Information, false, [] (bool) {});
+                return;
+            }
+
             const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
             bool updated = false;
             if (metadata.EquipmentType == EquipmentType::Costume)
