@@ -32,15 +32,19 @@ void StateItemShop::Initialize()
 {
     State::Initialize();
 
-    const auto& player   = m_session.GetCurrentPlayer();
-    const auto bgm       = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
-    const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
-    const auto sfxPrev   = Instantiate<sf::Sound>("bgEffect/19_1");
-    const auto sfxNext   = Instantiate<sf::Sound>("bgEffect/19_2");
-    const auto sfxMenu   = Instantiate<sf::Sound>("bgEffect/11");
-    const auto sfxGender = Instantiate<sf::Sound>("bgEffect/15");
-    const auto sfxPlanet = Instantiate<sf::Sound>("bgEffect/24_");
+    const auto& player    = m_session.GetCurrentPlayer();
+    const auto bgm        = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
+    const auto sfxWelcome = Instantiate<sf::Sound>("O2PlanetNPC/1");
+    const auto sfxAccept  = Instantiate<sf::Sound>("bgEffect/02");
+    const auto sfxCancel  = Instantiate<sf::Sound>("bgEffect/03");
+    const auto sfxPrev    = Instantiate<sf::Sound>("bgEffect/19_1");
+    const auto sfxNext    = Instantiate<sf::Sound>("bgEffect/19_2");
+    const auto sfxMenu    = Instantiate<sf::Sound>("bgEffect/11");
+    const auto sfxGender  = Instantiate<sf::Sound>("bgEffect/15");
+    const auto sfxPlanet  = Instantiate<sf::Sound>("bgEffect/24_");
+
+    for (auto id : { "O2PlanetNPC/5", "O2PlanetNPC/6", "O2PlanetNPC/7" })
+        m_shopMasterSpeech.push_back(Instantiate<sf::Sound>(id));
 
     m_genderCategory = player.Gender;
     m_shopCategory   = ShopCategory::Special;
@@ -82,24 +86,62 @@ void StateItemShop::Initialize()
         if (!shopMaster)
             return;
 
-        if (const auto lips = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+        if (const auto speech = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_SPEECH"))
         {
-            lips->SetAnimationCallback(shopMasterLipsAnimationCallback);
-            lips->Stop();
+            speech->SetAnimationCallback(shopMasterLipsAnimationCallback);
+            speech->Stop();
         }
+    };
+
+    const auto shopMasterWireSpeech = [this] (Gx::Image* shopMaster)
+    {
+        shopMaster->SetClickCallback([this, shopMaster] (auto&, auto&)
+        {
+            m_shopMasterSpeechCounter++;
+            if (m_shopMasterSpeechCounter >= m_shopMasterSpeech.size())
+                m_shopMasterSpeechCounter = 0;
+
+            for (std::size_t i = 0; i < m_shopMasterSpeech.size(); i++)
+            {
+                if (i == m_shopMasterSpeechCounter)
+                    m_mixer.Play(m_shopMasterSpeech[i]);
+                else
+                    m_mixer.Stop(m_shopMasterSpeech[i]);
+            }
+        });
     };
 
     const auto shopMasterContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP_MASTER");
     const auto shopMasterMain = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_MAIN");
     shopMasterWireAnimation(shopMasterMain);
+    shopMasterWireSpeech(shopMasterMain);
+
+    const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_O2P");
+    shopMasterO2P->SetVisible(false);
+    shopMasterWireAnimation(shopMasterO2P);
 
     const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_AQUA");
     shopMasterAqua->SetVisible(false);
     shopMasterWireAnimation(shopMasterAqua);
 
+    const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_GRAFFITI");
+    shopMasterGraffiti->SetVisible(false);
+    shopMasterWireAnimation(shopMasterGraffiti);
+
+    const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_EVENT");
+    shopMasterEvent->SetVisible(false);
+    shopMasterWireAnimation(shopMasterEvent);
+
     m_shopMasters = {
-        { Planet::Unknown,  shopMasterMain },
-        { Planet::Aqua,     shopMasterAqua },
+        { Planet::Unknown,    shopMasterMain     },
+        { Planet::O2Planet,   shopMasterO2P      },
+        { Planet::Aqua,       shopMasterAqua     },
+        { Planet::Graffiti,   shopMasterGraffiti },
+        { Planet::Crush,      shopMasterGraffiti },
+        { Planet::Wonderland, shopMasterAqua     },
+        { Planet::Meganut,    shopMasterO2P      },
+        { Planet::Draconic,   shopMasterO2P      },
+        { Planet::Event,      shopMasterEvent    }
     };
 
     const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
@@ -415,6 +457,7 @@ void StateItemShop::Initialize()
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(sfxWelcome);
 }
 
 void StateItemShop::OnBuyButtonClicked()
@@ -526,18 +569,19 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
                 m_shopMasterEffect.Complete();
             }
 
-            m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.25f));
+            m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.15f));
             shopMaster->SetPosition(GetView().getSize().x, shopMaster->GetPosition().y);
 
+            m_shopMasterSpeechCounter = 0;
             Run(m_shopMasterEffect);
         }
 
-        if (const auto lips = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_LIPS"))
+        if (const auto speech = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_SPEECH"))
         {
             if (tooltip->IsVisible())
-                lips->Reset();
+                speech->Reset();
             else
-                lips->Stop();
+                speech->Stop();
         }
     }
 }

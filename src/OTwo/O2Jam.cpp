@@ -249,6 +249,7 @@ void O2Jam::Boot()
     auto& bgEvent   = resources.Create<OjmArchive>("Event");
     auto& bgEffect  = resources.Create<OjmArchive>("BgEffect");
     auto& bgPlanet  = resources.Create<OjmArchive>("BgPlanet");
+    auto& npc       = resources.Create<OjmArchive>("O2PlanetNPC");
 
     if (bgm.LoadFromFile("BGM.ojm"))
         Gx::FileSystem::Mount(bgm);
@@ -261,6 +262,9 @@ void O2Jam::Boot()
 
     if (bgPlanet.LoadFromFile("Planet.ojm"))
         Gx::FileSystem::Mount(bgPlanet);
+
+    if (npc.LoadFromFile("O2PlanetNPC.ojm"))
+        Gx::FileSystem::Mount(npc);
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
     director.Register<StateAvi>("Interface/State/Avi.json");

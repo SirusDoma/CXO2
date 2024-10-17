@@ -55,12 +55,14 @@ private:
     unsigned int m_myBagCurrentPage = 0;
     unsigned int m_cartCurrentPage = 0;
     unsigned int m_shopCurrentPage = 0;
+    unsigned int m_shopMasterSpeechCounter = 0;
 
     Gx::Delay m_tooltipDelay;
 
     Item* m_myBagSelectedItem;
     Gx::Image* m_myBagSelectIndicator;
     Gx::Move m_shopMasterEffect;
+    std::vector<sf::Sound*> m_shopMasterSpeech;
     std::vector<Item> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;
     std::vector<SetInfoMetadata> m_shopSetList;
