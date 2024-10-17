@@ -61,7 +61,7 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& jso
     metadata.IsLoop = loop != attributes.end() && loop->get<bool>();
 
     const auto repeatCount = attributes.find("repeatCount");
-    metadata.RepeatCount = repeatCount != attributes.end() ? repeatCount->get<unsigned int>() : 1;
+    metadata.RepeatCount = repeatCount != attributes.end() ? repeatCount->get<unsigned int>() : 0;
 
     const auto speed = attributes.find("speed");
     metadata.Speed = speed != attributes.end() ? speed->get<float>() : 1.0f;

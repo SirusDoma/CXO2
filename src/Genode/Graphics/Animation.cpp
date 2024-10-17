@@ -10,7 +10,7 @@ namespace Gx
         m_speed(1.f),
         m_currentFrame(0),
         m_currentRepeat(0),
-        m_repeatCount(1),
+        m_repeatCount(0),
         m_loop(false),
         m_frames(),
         m_animationCallback()
@@ -25,7 +25,7 @@ namespace Gx
         m_speed(1.f),
         m_currentFrame(0),
         m_currentRepeat(0),
-        m_repeatCount(1),
+        m_repeatCount(0),
         m_loop(false),
         m_frames(frames),
         m_animationCallback()
