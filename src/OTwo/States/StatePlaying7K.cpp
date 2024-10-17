@@ -369,11 +369,11 @@ void StatePlaying7K::Initialize()
     // Start initial lifebar fill-up animation
     Run(Create<Gx::Step>
     (
-        sf::seconds((m_lifeSystem.GetMaxLifePoint() / (m_lifeSystem.GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
+        sf::seconds(1),
         sf::seconds(1.f / 60.f),
         [this, lifeBar] (const auto& step, auto const)
         {
-            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * 0.01f));
+            lifeBar->SetValue(lifeBar->GetValue() + (static_cast<int>(m_lifeSystem.GetMaxLifePoint() * (1.f / 60.f))));
             for (auto [_, avatar] : m_avatars)
                 avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
