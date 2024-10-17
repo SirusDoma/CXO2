@@ -167,8 +167,20 @@ std::optional<std::size_t> OmcArchive::ReadFile(const unsigned int index, void* 
                 throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the encoded WAV data");
             }
 
-            // Still need to decode even not desired sample to increment accKeyByte and accCounter
-            const auto decodedData = DecodeWave(encodedData, waveHeader.ChunkSize, &accKeyByte, &accCounter);
+            std::uint8_t* decodedData = nullptr;
+            if (std::string(m_header.Signature, 3) == "OJM")
+            {
+                // OJM wav is not encrypted
+                decodedData = new std::uint8_t[waveHeader.ChunkSize];
+                memcpy(decodedData, encodedData, waveHeader.ChunkSize);
+            }
+            else
+            {
+                // Still need to decode even not desired sample to increment accKeyByte and accCounter
+                decodedData = DecodeWave(encodedData, waveHeader.ChunkSize, &accKeyByte, &accCounter);
+            }
+
+
             int pcm = 16, fileSize = waveHeader.ChunkSize + 36;
             if (i != index)
             {
