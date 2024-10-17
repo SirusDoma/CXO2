@@ -35,6 +35,8 @@ void Avatar::SetDefaultItem(const Item& item)
 {
     if (item.GetID() != 0)
         m_defaultItems[item.GetType()] = item;
+
+    ResetRenderables();
 }
 
 bool Avatar::IsEquiped(const Item& item) const
@@ -46,7 +48,7 @@ bool Avatar::IsEquiped(const Item& item) const
     return iterator != m_items.end() && iterator->second.GetID() == item.GetID();
 }
 
-void Avatar::Equip(const Item& item, const bool reset)
+void Avatar::Equip(const Item& item)
 {
     if (item.GetID() == 0)
         return;
@@ -91,8 +93,7 @@ void Avatar::Equip(const Item& item, const bool reset)
         default: break;
     }
 
-    if (reset)
-        ResetRenderables();
+    ResetRenderables();
 }
 
 void Avatar::Unequip(const Item& item)
@@ -119,6 +120,7 @@ void Avatar::Unequip(const Item& item)
     }
 
     m_items.erase(iterator);
+    ResetRenderables();
 }
 
 void Avatar::Unequip(const EquipmentType type)
@@ -139,6 +141,7 @@ void Avatar::Unequip(const EquipmentType type)
     }
 
     m_items.erase(iterator);
+    ResetRenderables();
 }
 
 bool Avatar::IsAlive() const
@@ -185,7 +188,10 @@ std::unordered_map<EquipmentType, const Item*> Avatar::GetEquipedItems(const boo
 {
     auto itemMap = std::unordered_map<EquipmentType, const Item*>();
     for (const auto& [type, item] : m_items)
-        itemMap[type] = &item;
+    {
+        if (auto it = m_defaultItems.find(type); it == m_defaultItems.end() || it->second.GetID() != item.GetID())
+            itemMap[type] = &item;
+    }
 
     if (!includeDefaultItems)
         return itemMap;
@@ -282,4 +288,6 @@ void Avatar::ClearEquipments()
 {
     m_items.clear();
     m_instrument = Instrument::None;
+
+    ResetRenderables();
 }

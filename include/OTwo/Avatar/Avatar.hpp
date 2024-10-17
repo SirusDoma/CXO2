@@ -26,7 +26,7 @@ public:
     void SetDefaultItem(const Item& item);
 
     bool IsEquiped(const Item& item) const;
-    void Equip(const Item& item, bool reset = true);
+    void Equip(const Item& item);
     void Unequip(const Item& item);
     void Unequip(EquipmentType type);
     void ClearEquipments();
