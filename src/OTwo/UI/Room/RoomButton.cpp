@@ -16,7 +16,6 @@ void RoomButton::Initialize()
 {
     Gx::Image::Initialize();
 
-    //m_button = FindChild<Gx::Button>("Interface/Metadata/State/Room/Btn_Room/Button.json");
     auto number   = FindChild<Gx::BitmapNumber>("IDC_NUMBER_ROOM_ID");
     auto title    = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
     auto music    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");

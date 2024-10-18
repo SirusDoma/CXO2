@@ -192,7 +192,7 @@ void O2Jam::Boot()
     {
         auto player    = Player();
         player.ID      = 1;
-        player.Name    = "CXO2";
+        player.Name    = "Player";
         player.Level   = -1;
         player.Rank    = 7;
         player.Exp     = 11200;
@@ -202,11 +202,11 @@ void O2Jam::Boot()
         player.Loses   = 5;
         player.Gender  = Gender::Male;
         player.Cash    = 15000;
-        player.Inventory = { 582,  1534, 342,  115,  255,
-                             312,  112,  811,  722,  821,
+        player.Inventory = { 582,  1534, 115,  255,  1494,
+                             312,  112,  722,  821,  1084,
                              1195, 1104, 1042, 1055, 1461,
-                             1481, 44,   1493, 1269, 1084,
-                             1494 };
+                             1481, 44,   1493, 1269,
+                           };
 
         auto session  = std::make_unique<SessionContext>(player);
         return session;
