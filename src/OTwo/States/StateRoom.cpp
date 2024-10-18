@@ -1,7 +1,8 @@
 #include <OTwo/States/StateRoom.hpp>
-#include <OTwo/States/StateBulletin.hpp>
+#include <OTwo/States/StateMusicShop.hpp>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
+#include <OTwo/States/StateBulletin.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
@@ -249,14 +250,17 @@ void StateRoom::Initialize()
         roomList->NextPage();
     });
 
-    const auto bulletinButton = Instantiate<Gx::Button>("IDC_BUTTON_BULLETIN");
-    bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinClicked(); });
+    const auto musicShopButton = Instantiate<Gx::Button>("IDC_BUTTON_MUSIC_SHOP");
+    musicShopButton->SetClickCallback([this](auto& , auto& ) { OnMusicShopClicked(); });
 
     const auto itemShopButton = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SHOP");
     itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopClicked(); });
 
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
     myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomClicked(); });
+
+    const auto bulletinButton = Instantiate<Gx::Button>("IDC_BUTTON_BULLETIN");
+    bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinClicked(); });
 
     if (const auto optionDialog = Instantiate<OptionDialog>("IDC_DIALOG_OPTION"); optionDialog)
     {
@@ -273,10 +277,10 @@ void StateRoom::Initialize()
     m_mixer.Play(bgm, "BGM");
 }
 
-void StateRoom::OnBulletinClicked() const
+void StateRoom::OnMusicShopClicked() const
 {
     auto& director = GetDirector();
-    director.Present<StateBulletin>();
+    director.Present<StateMusicShop>();
 }
 
 void StateRoom::OnItemShopClicked() const
@@ -289,6 +293,12 @@ void StateRoom::OnMyRoomClicked() const
 {
     auto& director = GetDirector();
     director.Present<StateMyRoom>();
+}
+
+void StateRoom::OnBulletinClicked() const
+{
+    auto& director = GetDirector();
+    director.Present<StateBulletin>();
 }
 
 void StateRoom::OnBackClicked() const

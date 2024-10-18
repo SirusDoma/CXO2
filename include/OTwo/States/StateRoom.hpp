@@ -14,9 +14,10 @@ public:
     void Initialize() override;
 
 private:
-    void OnBulletinClicked() const;
+    void OnMusicShopClicked() const;
     void OnItemShopClicked() const;
     void OnMyRoomClicked() const;
+    void OnBulletinClicked() const;
     void OnBackClicked() const;
 
     Gx::Mixer& m_mixer;
