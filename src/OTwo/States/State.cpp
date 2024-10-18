@@ -52,8 +52,8 @@ void State::LoadCommonResources()
     m_dialog1     = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
     m_dialog2     = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
     m_exitDialog  = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-    m_cancelSound = Instantiate<sf::Sound>("Interface/Sound/Effect/03.json", ResourceScope::Shared);
-    m_popupSound  = Instantiate<sf::Sound>("Interface/Sound/Effect/06.json", ResourceScope::Shared);
+    m_cancelSound = Instantiate<sf::Sound>("bgEffect/03", ResourceScope::Shared);
+    m_popupSound  = Instantiate<sf::Sound>("bgEffect/06", ResourceScope::Shared);
 
     loaded = true;
 }
