@@ -41,7 +41,7 @@ enum class RenderPart
     Body,
     RightArm,
     LeftArm,
-    Cape
+    Back
 };
 enum class Instrument
 {
