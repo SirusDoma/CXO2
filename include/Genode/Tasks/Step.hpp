@@ -11,10 +11,11 @@ namespace Gx
         Step();
         explicit Step(sf::Time duration, sf::Time stepDuration, const std::function<void(const Step&, double)> &update);
 
-    protected:
-        void Update(double delta) override;
         void Complete() override;
         void Reset() override;
+
+    protected:
+        void Update(double delta) override;
 
     private:
         sf::Time m_stepDuration, m_elapsed;

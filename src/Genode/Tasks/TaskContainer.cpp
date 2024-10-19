@@ -10,6 +10,7 @@ namespace Gx
 
     void TaskContainer::Run(Task& task)
     {
+        Stop(task);
         m_tasks.push_back(&task);
     }
 
