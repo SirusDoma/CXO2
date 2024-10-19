@@ -159,12 +159,12 @@ void StateItemShop::Initialize()
     const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CATEGORY_BUTTONS");
     const std::unordered_map<ShopCategory, Gx::RadioButton*> shopCategoryButtonMap =
     {
-         { ShopCategory::Special,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_SPECIAL") },
-         { ShopCategory::Fashion,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_FASHION") },
-         { ShopCategory::Accessory,  categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_ACCESSORY") },
-         { ShopCategory::Beauty,     categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_BEAUTY") },
-         { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_INSTRUMENT") },
-    };
+        { ShopCategory::Special,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_SPECIAL") },
+        { ShopCategory::Fashion,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_FASHION") },
+        { ShopCategory::Accessory,  categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_ACCESSORY") },
+        { ShopCategory::Beauty,     categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_BEAUTY") },
+        { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_INSTRUMENT") },
+   };
 
     const std::unordered_map<ShopCategory, Gx::UiContainer*> shopCategoryContainerMap =
     {
@@ -271,6 +271,42 @@ void StateItemShop::Initialize()
         InvalidateShopItemList(true);
     });
 
+    const auto extButton = Instantiate<Gx::Button>("IDC_BUTTON_EXT_MENU");
+    extButton->SetClickCallback([this] (auto&, auto&) { OnExtensionButtonClicked(); });
+
+    const auto planetExt = Instantiate<Gx::Image>("IDC_IMAGE_EXT_MENU");
+    planetExt->SetTexCoords({});
+    planetExt->SetEnabled(false);
+    const std::unordered_map<Planet, Gx::Button*> shopPlanetExtMap =
+    {
+        { Planet::Unknown,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_ALL") },
+        { Planet::O2Planet,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_NORMAL") },
+        { Planet::Aqua,       planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_AQUA") },
+        { Planet::Eliten,     planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_ELITEN") },
+        { Planet::Graffiti,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_GRAFFITI") },
+        { Planet::Bikini,     planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_BIKINI") },
+        { Planet::Crush,      planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_CRUSH") },
+        { Planet::Wonderland, planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_WONDERLAND") },
+        { Planet::Meganut,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_MEGANUT") },
+        { Planet::Crystal,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_CRYSTAL") },
+        { Planet::Draconic,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_DRACONIC") },
+        { Planet::Event,      planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_EVENT") },
+   };
+
+    for (auto [planet, button] : shopPlanetExtMap)
+    {
+        button->SetClickCallback([=] (auto&, auto&)
+        {
+            if (m_shopPlanetCategory == planet)
+                return;
+
+            m_shopPlanetCategory = planet;
+            m_mixer.Play(sfxPlanet);
+            InvalidateShopMaster(true);
+            InvalidateShopItemList(true);
+        });
+    }
+
     const auto maleButton   = Instantiate<Gx::Button>("IDC_BUTTON_MALE");
     const auto femaleButton = Instantiate<Gx::Button>("IDC_BUTTON_FEMALE");
 
@@ -316,7 +352,8 @@ void StateItemShop::Initialize()
 
     m_shopCurrentPage = 0;
     const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
-    shopScrollBar->SetMaximumValue(std::floor(static_cast<float>(m_shopItemList.size()) / 8.f));
+    const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    shopScrollBar->SetMaximumValue(((m_shopItemList.size() + itemList->GetVerticalCount() - 1) / itemList->GetVerticalCount()) - 1);
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -362,7 +399,7 @@ void StateItemShop::Initialize()
 
     m_myBagCurrentPage = 0;
     const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(m_inventory.size()) / 2.f));
+    bagScrollBar->SetMaximumValue(((m_inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -462,6 +499,96 @@ void StateItemShop::Initialize()
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
     m_mixer.Play(sfxWelcome);
+}
+
+void StateItemShop::OnExtensionButtonClicked()
+{
+    if (m_extensionMenuEffect.GetState() == Gx::TaskState::Running)
+        return;
+
+    if (m_extensionMenuEffect.GetState() != Gx::TaskState::Initial)
+        Stop(m_extensionMenuEffect);
+
+    const auto extMenu          = Instantiate<Gx::Image>("IDC_IMAGE_EXT_MENU");
+    const auto extDefaultFrame  = extMenu->GetFrame(0);
+    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+
+    bool open = true;
+    const bool invalidate = shopScrollBar->GetValue() == 0;
+    if (extMenu->IsEnabled())
+    {
+        open = false;
+        extMenu->SetEnabled(false);
+        extMenu->SetTexCoords(extDefaultFrame->TexCoords);
+
+        itemList->SetHorizontalRepeat(itemList->GetHorizontalCount() + 1, itemList->GetHorizontalSpacing());
+        itemList->SetPosition(itemList->GetPosition().x - itemList->GetHorizontalSpacing(), itemList->GetPosition().y);
+
+        setItemList->SetHorizontalRepeat(setItemList->GetHorizontalCount() + 1, setItemList->GetHorizontalSpacing());
+        setItemList->SetPosition(setItemList->GetPosition().x - setItemList->GetHorizontalSpacing(), setItemList->GetPosition().y);
+
+        shopScrollBar->SetValue(0);
+        if (invalidate)
+            InvalidateShopItemList();
+    }
+    else
+    {
+        extMenu->SetTexCoords({});
+
+        itemList->SetHorizontalRepeat(itemList->GetHorizontalCount() - 1, itemList->GetHorizontalSpacing());
+        itemList->SetPosition(itemList->GetPosition().x + itemList->GetHorizontalSpacing(), itemList->GetPosition().y);
+
+        setItemList->SetHorizontalRepeat(setItemList->GetHorizontalCount() - 1, setItemList->GetHorizontalSpacing());
+        setItemList->SetPosition(setItemList->GetPosition().x + setItemList->GetHorizontalSpacing(), setItemList->GetPosition().y);
+
+        shopScrollBar->SetValue(0);
+        if (invalidate)
+            InvalidateShopItemList();
+    }
+
+    m_extensionMenuEffect = Gx::Step(
+        sf::seconds(1.f),
+        sf::seconds(1.f / 60.f),
+        [=] (auto& task, auto delta)
+        {
+            if (task.GetState() == Gx::TaskState::Completed)
+            {
+                if (open)
+                {
+                    extMenu->SetEnabled(true);
+                    extMenu->SetTexCoords(extDefaultFrame->TexCoords);
+                }
+                else
+                {
+                    extMenu->SetEnabled(false);
+                    extMenu->SetTexCoords({});
+                }
+            }
+            else
+            {
+                const auto& texCoords = extDefaultFrame->TexCoords;
+                if (open)
+                {
+                    extMenu->SetTexCoords({
+                        { static_cast<int>(texCoords.size.x - (texCoords.size.x * (task.GetElapsed().asSeconds() / task.GetDuration().asSeconds()))), texCoords.position.y },
+                        { static_cast<int>(texCoords.size.x * (task.GetElapsed().asSeconds() / task.GetDuration().asSeconds())), texCoords.size.y }
+                    });
+                }
+                else
+                {
+                    extMenu->SetTexCoords({
+                        { static_cast<int>((texCoords.size.x * (task.GetElapsed().asSeconds() / task.GetDuration().asSeconds()))), texCoords.position.y },
+                        { static_cast<int>(texCoords.size.x * (1.f - (task.GetElapsed().asSeconds() / task.GetDuration().asSeconds()))), texCoords.size.y }
+                    });
+                }
+            }
+        }
+    );
+
+    Run(m_extensionMenuEffect);
 }
 
 void StateItemShop::OnBuyButtonClicked()
@@ -679,7 +806,7 @@ void StateItemShop::InvalidateMyBag()
     }
 
     const auto bagScrollBar = container->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(std::ceil(static_cast<float>(inventory.size()) / 2.f));
+    bagScrollBar->SetMaximumValue(((inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     currentGem->SetValue(player.Gem);
@@ -849,11 +976,12 @@ void StateItemShop::InvalidateCart()
 
 void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 {
-    const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
-    const auto planet        = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
-    const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
-    const auto slots         = itemList->GetChildren();
-    const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+    const auto avatar           = Instantiate<Avatar>("IDC_AVATAR");
+    const auto planet           = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
+    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto slots            = itemList->GetChildren();
+    const std::size_t slotCount = itemList->GetVerticalCount() * itemList->GetHorizontalCount();
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
 
     Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP")->SetVisible(false);
     if (m_itemCategory == EquipmentType::Costume)
@@ -896,22 +1024,27 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
             m_shopItemList.push_back(header);
         }
-
-        shopScrollBar->SetMaximumValue(std::max(std::ceil(static_cast<float>(m_shopItemList.size()) / static_cast<float>(slots.size())) - 1.f, 0.f));
-        if (shopScrollBar->GetValue() != 0)
-        {
-            shopScrollBar->SetValue(0); // This must trigger invalidate;
-            return;
-        }
     }
 
-    for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
+    const auto scrollValue = shopScrollBar->GetValue();
+    shopScrollBar->SetMaximumValue(((m_shopItemList.size() + itemList->GetVerticalCount() - 1) / itemList->GetVerticalCount()) - 1);
+    if (rebuildList && shopScrollBar->GetValue() != 0)
+    {
+        // This causes 2 times invalidation, but it can't be that bad, right?
+        shopScrollBar->SetValue(0); // This must trigger invalidate;
+        return;
+    }
+
+    if (scrollValue != shopScrollBar->GetValue())
+        return; // Already invalidated via SetMaximumValue (which trigger SetValue)
+
+    for (std::size_t i = 0, j = m_shopCurrentPage * itemList->GetVerticalCount(); i < slots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
         if (!slot)
             continue;
 
-        if (j >= m_shopItemList.size())
+        if (j >= m_shopItemList.size() || i >= slotCount)
         {
             slot->SetEnabled(false);
             slot->SetVisible(false);
@@ -1075,6 +1208,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
     const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
     const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
     const auto slots            = setItemList->GetChildren();
+    const std::size_t slotCount = setItemList->GetVerticalCount() * setItemList->GetHorizontalCount();
 
     itemList->SetVisible(false);
     itemList->SetEnabled(false);
@@ -1148,22 +1282,27 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             m_shopSetItemList[*header.Attributes->ID] = setItems;
             m_shopSetItemPrices[*header.Attributes->ID] = prices;
         }
-
-        shopScrollBar->SetMaximumValue(std::max(std::ceil(static_cast<float>(m_shopSetItemList.size()) / static_cast<float>(slots.size())) - 1.f, 0.f));
-        if (shopScrollBar->GetValue() != 0)
-        {
-            shopScrollBar->SetValue(0); // This must trigger invalidate;
-            return;
-        }
     }
 
-    for (std::size_t i = 0, j = m_shopCurrentPage * slots.size(); i < slots.size(); i++)
+    const auto scrollValue = shopScrollBar->GetValue();
+    shopScrollBar->SetMaximumValue(((m_shopSetList.size() + setItemList->GetVerticalCount() - 1) / setItemList->GetVerticalCount()) - 1);
+    if (rebuildList && shopScrollBar->GetValue() != 0)
+    {
+        // This causes 2 times invalidation, but it can't be that bad, right?
+        shopScrollBar->SetValue(0); // This must trigger invalidate;
+        return;
+    }
+
+    if (scrollValue != shopScrollBar->GetValue())
+        return; // Already invalidated via SetMaximumValue (which trigger SetValue)
+
+    for (std::size_t i = 0, j = m_shopCurrentPage * setItemList->GetVerticalCount(); i < slots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
         if (!slot)
             continue;
 
-        if (j >= m_shopSetItemList.size())
+        if (j >= m_shopSetItemList.size() || i >= slotCount)
         {
             slot->SetEnabled(false);
             slot->SetVisible(false);
