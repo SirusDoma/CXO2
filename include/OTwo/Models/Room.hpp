@@ -45,7 +45,8 @@ struct Guild
 
 struct Player
 {
-    using ItemList = std::vector<std::uint32_t>;
+    using ItemList     = std::vector<std::uint32_t>;
+    using QuantityList = std::map<std::uint32_t, std::uint16_t>;
 
     std::uint32_t ID;
     ::Role        Role;
@@ -63,6 +64,7 @@ struct Player
     std::uint32_t Loses;
     ItemList      EquippedItemIDs;
     ItemList      Inventory;
+    QuantityList  ItemQuantities;
     ::Guild       Guild;
 };
 

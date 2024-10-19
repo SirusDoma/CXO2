@@ -207,8 +207,13 @@ void O2Jam::Boot()
         player.Inventory = { 582,  1534, 115,  255,  1494,
                              312,  112,  722,  821,  1084,
                              1195, 1104, 1042, 1055, 1461,
-                             1481, 44,   1493, 1269,
+                             1481, 44,   1493, 1269, 806
                            };
+
+        player.ItemQuantities =
+        {
+            { 806, 50}
+        };
 
         auto session  = std::make_unique<SessionContext>(player);
         return session;

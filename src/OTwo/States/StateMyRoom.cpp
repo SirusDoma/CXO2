@@ -254,6 +254,7 @@ void StateMyRoom::Invalidate()
         const auto item = inventory[j++];
         itemCount++;
 
+        // TODO: Always use Small Thumbnail
         currentSlot = item == m_selectedItem ? slot : currentSlot;
         if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail().GetTexture())
             slot->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
@@ -275,6 +276,63 @@ void StateMyRoom::Invalidate()
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
+            if (!item)
+                return;
+
+            unsigned int quantity = 0;
+            if (const auto it = player->ItemQuantities.find(item->GetID()); it != player->ItemQuantities.end())
+                quantity = it->second;
+
+            if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
+            {
+                if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_SKILL_INFO"); dialog)
+                {
+                    const auto nameLabel        = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_NAME");
+                    const auto quantityLabel    = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_QUANTITY");
+                    const auto skillLabel       = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_SKILL");
+                    const auto descriptionLabel = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_DESCRIPTION");
+                    const auto thumbnail        = dialog->FindChild<Gx::Image>("IDC_IMAGE_ITEM_THUMBNAIL");
+
+                    nameLabel->SetString(item->GetName());
+                    quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-");
+                    skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
+                    descriptionLabel->SetString(item->GetDescription());
+
+                    constexpr unsigned int bounds = 160;
+                    auto string = item->GetDescription();
+
+                    std::size_t checkpoint = 0;
+                    for (std::size_t c = 0; c < string.getSize(); c++)
+                    {
+                        if (string[c] == '\n')
+                            continue;
+
+                        if (string[c] == ' ')
+                        {
+                            checkpoint = c;
+                            continue;
+                        }
+
+                        const auto position = descriptionLabel->FindCharacterPosition(c);
+                        if (position.x > descriptionLabel->GetPosition().x + bounds)
+                        {
+                            string.replace(checkpoint, 1, "\n");
+                            descriptionLabel->SetString(string);
+
+                            c = 0;
+                        }
+                    }
+
+                    if (const auto texture = item->GetLargeThumbnail().GetTexture())
+                        thumbnail->SetTexture(*texture, true);
+
+                    dialog->Show(this, std::string(), false);
+                }
+
+                return;
+            }
+
+
             if (avatar->IsEquiped(*item))
                 avatar->Unequip(item->GetType());
             else
