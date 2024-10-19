@@ -603,6 +603,7 @@ void StateItemShop::OnBuyButtonClicked()
     {
         if (answer)
         {
+            m_cart.SetCheckoutType(CartContext::CheckoutType::Item);
             m_mixer.Play(Instantiate<sf::Sound>("bgEffect/02"));
             GetDirector().Present<StatePayment>();
         }

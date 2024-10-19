@@ -41,6 +41,16 @@ const std::vector<CartItem>& CartContext::GetItems() const
     return Record.Items;
 }
 
+CartContext::CheckoutType CartContext::GetCheckoutType() const
+{
+    return m_checkoutType;
+}
+
+void CartContext::SetCheckoutType(const CheckoutType checkoutType)
+{
+    m_checkoutType = checkoutType;
+}
+
 bool CartContext::Contains(CartItemType type, unsigned int id)
 {
    return std::find_if(Record.Items.begin(), Record.Items.end(), [type, id] (const CartItem& item)

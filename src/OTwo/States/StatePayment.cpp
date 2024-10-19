@@ -1,15 +1,18 @@
 ﻿#include <OTwo/States/StatePayment.hpp>
 #include <OTwo/States/StateItemShop.hpp>
+#include <OTwo/States/StateMusicShop.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/CartContext.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
-StatePayment::StatePayment(Gx::Mixer& mixer, SessionContext& session) :
+StatePayment::StatePayment(Gx::Mixer& mixer, SessionContext& session, CartContext& cart) :
     m_mixer(mixer),
-    m_session(session)
+    m_session(session),
+    m_cart(cart)
 {
 }
 
@@ -28,8 +31,10 @@ void StatePayment::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([this] (auto&, auto&)
     {
-        // TODO: Use cart context to determine previous scene
-        GetDirector().Present<StateItemShop>();
+        if (m_cart.GetCheckoutType() == CartContext::CheckoutType::Music)
+            GetDirector().Present<StateMusicShop>();
+        else
+            GetDirector().Present<StateItemShop>();
     });
 
     const auto bgm = Instantiate<sf::Music>("BGM/bgLogin.ogg");
