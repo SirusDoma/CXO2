@@ -67,7 +67,7 @@ void StateMyRoom::Initialize()
     }
 
     const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(((m_inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
+    bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_bagCurrentPage)
@@ -102,6 +102,7 @@ void StateMyRoom::Initialize()
     currentCash->SetValue(player.Cash);
 
     const auto statusPanel = Instantiate<Gx::Image>("IDC_IMAGE_STATUS");
+    statusPanel->SetEnabled(false);
     statusPanel->SetVisible(false);
 
     const auto nickname = statusPanel->FindChild<Gx::Label>("IDC_TEXT_NAME");
@@ -395,7 +396,7 @@ void StateMyRoom::Invalidate()
     InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_CLOTHES_ACCESSORIES"),    EquipmentType::ClothesAccessories);
 
     const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(((inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
+    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     currentGem->SetValue(player->Gem);

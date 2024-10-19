@@ -353,7 +353,7 @@ void StateItemShop::Initialize()
     m_shopCurrentPage = 0;
     const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
     const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
-    shopScrollBar->SetMaximumValue(((m_shopItemList.size() + itemList->GetVerticalCount() - 1) / itemList->GetVerticalCount()) - 1);
+    shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildren().size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildren().size()) / itemList->GetVerticalCount())));
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -399,7 +399,7 @@ void StateItemShop::Initialize()
 
     m_myBagCurrentPage = 0;
     const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(((m_inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
+    bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -868,7 +868,7 @@ void StateItemShop::InvalidateMyBag()
     }
 
     const auto bagScrollBar = container->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
-    bagScrollBar->SetMaximumValue(((inventory.size() + bagList->GetVerticalCount() - 1) / bagList->GetVerticalCount()) - 1);
+    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
     currentGem->SetValue(player.Gem);
@@ -1089,7 +1089,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
     }
 
     const auto scrollValue = shopScrollBar->GetValue();
-    shopScrollBar->SetMaximumValue(((m_shopItemList.size() + itemList->GetVerticalCount() - 1) / itemList->GetVerticalCount()) - 1);
+    shopScrollBar->SetMaximumValue(m_shopItemList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - slots.size()) / itemList->GetVerticalCount())));
     if (rebuildList && shopScrollBar->GetValue() != 0)
     {
         // This causes 2 times invalidation, but it can't be that bad, right?
@@ -1354,7 +1354,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
     }
 
     const auto scrollValue = shopScrollBar->GetValue();
-    shopScrollBar->SetMaximumValue(((m_shopSetList.size() + setItemList->GetVerticalCount() - 1) / setItemList->GetVerticalCount()) - 1);
+    shopScrollBar->SetMaximumValue(m_shopSetList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopSetList.size() - slots.size()) / setItemList->GetVerticalCount())));
     if (rebuildList && shopScrollBar->GetValue() != 0)
     {
         // This causes 2 times invalidation, but it can't be that bad, right?

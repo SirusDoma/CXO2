@@ -150,6 +150,9 @@ namespace Gx
 
     void ScrollBar::SetMaximumValue(float max)
     {
+        if (max < 0)
+            max = 0;
+
         if (max != m_maxValue)
         {
             m_maxValue = max;
