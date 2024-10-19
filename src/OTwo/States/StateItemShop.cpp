@@ -1111,6 +1111,13 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
         {
+            const auto& player = m_session.GetCurrentPlayer();
+            if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
+            {
+                ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information, false, [](const bool){});
+                return;
+            }
+
             avatar->Equip(m_items.Create(id));
         });
 
@@ -1370,6 +1377,13 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 
         previewButton->SetClickCallback([=, id = *metadata.ID] (auto&, auto&)
         {
+            const auto& player = m_session.GetCurrentPlayer();
+            if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
+            {
+                ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information, false, [](const bool){});
+                return;
+            }
+
             currentAvatar->ClearEquipments();
             for (const auto& itemMetadata : m_shopSetItemList[id])
                 currentAvatar->Equip(m_items.Create(itemMetadata.ID));
