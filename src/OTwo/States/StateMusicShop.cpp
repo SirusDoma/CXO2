@@ -2,6 +2,7 @@
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StatePayment.hpp>
 
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
@@ -27,10 +28,42 @@ void StateMusicShop::Initialize()
 {
     State::Initialize();
 
+    const auto& player = m_session.GetCurrentPlayer();
+    const auto bgm     = Instantiate<sf::Music>("BGM/bgMusicShop.ogg");
+
+    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    currentGem->SetValue(player.Gem);
+
+    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    currentCash->SetValue(player.Cash);
+
+    const auto shopContainer    = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP");
     const auto downloadContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_DOWNLOAD");
     const auto cartContainer     = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
     const auto downloadTabButton = Instantiate<Gx::Button>("IDC_BUTTON_DOWNLOAD_TAB");
     const auto cartTabButton     = Instantiate<Gx::Button>("IDC_BUTTON_CART_TAB");
+
+    const auto showAllButton     = shopContainer->FindChild<Gx::Button>("IDC_BUTTON_SHOW_ALL");
+    const auto showBuyableButton = shopContainer->FindChild<Gx::Button>("IDC_BUTTON_SHOW_BUYABLE");
+
+    showAllButton->SetClickCallback([=] (auto&, auto&)
+    {
+        showAllButton->SetEnabled(false);
+        showAllButton->SetVisible(false);
+
+        showBuyableButton->SetEnabled(true);
+        showBuyableButton->SetVisible(true);
+    });
+
+    showBuyableButton->SetClickCallback([=] (auto&, auto&)
+    {
+        showAllButton->SetEnabled(true);
+        showAllButton->SetVisible(true);
+
+        showBuyableButton->SetEnabled(false);
+        showBuyableButton->SetVisible(false);
+    });
+
 
     downloadTabButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -96,10 +129,10 @@ void StateMusicShop::Initialize()
         GetDirector().Present<StateRoom>();
     });
 
+    showBuyableButton->PerformClick();
     downloadTabButton->PerformClick();
     InvalidateCart();
 
-    const auto bgm = Instantiate<sf::Music>("BGM/bgMusicShop.ogg");
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 }
