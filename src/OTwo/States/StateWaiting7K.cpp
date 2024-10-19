@@ -182,6 +182,12 @@ void StateWaiting7K::Initialize()
             m_playerAvatar = avatar;
         }
 
+        const auto bossMark = avatar->FindChild<Gx::Sprite>("IDC_IMAGE_BOSS_MARK");
+        const auto noMusic  = avatar->FindChild<Gx::Sprite>("IDC_IMAGE_NO_MUSIC");
+
+        bossMark->SetVisible(member.ID == room.RoomMasterID);
+        noMusic->SetVisible(false);
+
         avatar->SetGender(member.Gender);
         avatarInfo->SetMember(const_cast<RoomMember&>(member));
 
@@ -213,7 +219,6 @@ void StateWaiting7K::Initialize()
 
     if (const auto currentTeamButton = teamButtonMatcher(currentMember.Team); currentTeamButton)
         currentTeamButton->SetCheckedState(true);
-
 
     for (const auto team : {RoomTeam::A, RoomTeam::B, RoomTeam::C, RoomTeam::D, RoomTeam::E, RoomTeam::F, RoomTeam::G, RoomTeam::H })
     {
