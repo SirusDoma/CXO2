@@ -45,6 +45,7 @@ private:
     void CaptureScreen();
 
     using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
+    using InputStateMap = std::unordered_map<Chart::Channel, bool>;
     using AnimationMap = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using AvatarMap = std::unordered_map<unsigned int, Avatar*>;
 
@@ -62,7 +63,10 @@ private:
     Avatar* m_self;
 
     Gx::TextBox* m_chatBox;
-    ImageMap m_keyDowns, m_keyEffects;
+    ImageMap m_keyDowns, m_keyEffects, m_guideKeyEffects;
+    InputStateMap m_inputStates;
+    InputStateMap m_guideKeyEffectStates;
+    std::unordered_map<Chart::Channel, float> m_guideKeyEffectDeltas;
 
     unsigned int m_viewport;
 };

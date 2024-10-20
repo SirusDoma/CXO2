@@ -107,7 +107,10 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT"); keyEffectContainer)
     {
         if (ctx.GetMode() == GameMode::Tutorial)
+        {
             LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::string(), ctx, 7);
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_GUIDE_KEY_EFFECT", std::string(), ctx, 7);
+        }
         else
             LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::to_string(mapID), ctx, 7);
 

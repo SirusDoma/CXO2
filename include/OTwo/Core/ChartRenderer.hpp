@@ -34,6 +34,19 @@ public:
         // TODO: Modifiers
     };
 
+    struct EventState
+    {
+        Chart::Event* Event;
+        Chart::Event* LastEvent;
+        Judgement     Tap     = {Accuracy::None, 0.f};
+        Judgement     Release = {Accuracy::None, 0};
+
+        bool IsRenderable(const double position) const;
+        bool IsRegistered() const;
+
+        Chart::Event* operator->() const { return Event; }
+    };
+
     static constexpr unsigned int DefaultMeasureHeight = 384;
 
     ChartRenderer(
@@ -61,6 +74,7 @@ public:
     double GetCurrentBPM() const;
     double GetRenderPosition() const;
     double GetLastMeasurePosition() const;
+    std::unordered_map<Chart::Channel, EventState*> GetFrontBuffers() const;
 
     void SetRenderCompleteCallback(const std::function<void()> &completeCallback);
     void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
@@ -71,18 +85,7 @@ private:
     // Measure interval per millisecond @ 60bpm in 1/4 note
     static constexpr double TickSignature = 60000.f * 4.f;
 
-    struct EventState
-    {
-        Chart::Event* Event;
-        Chart::Event* LastEvent;
-        Judgement     Tap     = {Accuracy::None, 0.f};
-        Judgement     Release = {Accuracy::None, 0};
 
-        bool IsRenderable(const double position) const;
-        bool IsRegistered() const;
-
-        Chart::Event* operator->() const { return Event; }
-    };
 
     void PlaySample(const Chart::NoteEvent* ev, const std::string& group = "BGM") const;
 

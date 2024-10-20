@@ -393,6 +393,11 @@ double ChartRenderer::GetLastMeasurePosition() const
     return m_endPosition;
 }
 
+std::unordered_map<Chart::Channel, ChartRenderer::EventState*> ChartRenderer::GetFrontBuffers() const
+{
+    return m_frontBuffers;
+}
+
 void ChartRenderer::SetRenderCompleteCallback(const std::function<void()>& completeCallback)
 {
     m_completeCallback = completeCallback;

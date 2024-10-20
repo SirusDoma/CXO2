@@ -29,6 +29,7 @@
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
 StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
@@ -310,16 +311,16 @@ void StateRoom::OnBulletinButtonClicked() const
 void StateRoom::OnTutorialButtonClicked() const
 {
     auto chart    = std::make_unique<Chart>();
-    chart->Source = "/Music/Tutorial.ojn";
+    chart->Source = "Tutorial.ojn";
 
     auto& resources = GetResources(ResourceScope::Shared);
-    auto metadata   = ChartMetadata{};
-    metadata.Source = chart->Source;
-
-    if (auto image = ChartLoader::LoadCoverArt(metadata, Gx::ResourceContext::Default); image)
-        resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
-    else
-        resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+    if (const auto metadata = ChartMetadataLoader().LoadFromFile(chart->Source, Gx::ResourceContext::Default))
+    {
+        if (auto image = ChartLoader::LoadCoverArt(*metadata, Gx::ResourceContext::Default); image)
+            resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+        else
+            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+    }
 
     m_game.GetConfig().KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];
     m_game.SetChart(std::move(chart));

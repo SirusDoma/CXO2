@@ -215,6 +215,13 @@ void StatePlaying7K::Initialize()
         keyEffect->SetFrame(id - 1);
         keyEffect->SetVisible(false);
 
+        if (m_context.GetMode() == GameMode::Tutorial)
+        {
+            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_GUIDE_KEY_EFFECT" + std::to_string(id));
+            guideKeyEffect->SetVisible(false);
+            m_guideKeyEffects[channel] = guideKeyEffect;
+        }
+
         m_keyDowns[channel]   = keyDown;
         m_keyEffects[channel] = keyEffect;
     }
@@ -319,8 +326,18 @@ void StatePlaying7K::Initialize()
     // Setup Key Effects
     m_renderer.SetInputCallback([=] (auto channel, bool state)
     {
+        m_inputStates[channel] = state;
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(state);
+
+        if (const auto guideKeyEffect = m_guideKeyEffects.find(channel); guideKeyEffect != m_guideKeyEffects.end())
+        {
+            guideKeyEffect->second->SetVisible(state);
+            if (state)
+                guideKeyEffect->second->SetFrame(std::to_string(static_cast<int>(channel) - 2) + "B");
+            else
+                guideKeyEffect->second->SetFrame(std::to_string(static_cast<int>(channel) - 2) + "A");
+        }
 
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
             keyDown->second->SetVisible(state);
@@ -424,11 +441,11 @@ void StatePlaying7K::Initialize()
     // Start initial lifebar fill-up animation
     Run(Create<Gx::Step>
     (
-        sf::seconds((m_lifeSystem.GetMaxLifePoint() / (m_lifeSystem.GetMaxLifePoint() * 0.01f)) * (1.f / 60.f)),
+        sf::seconds(1.f),
         sf::seconds(1.f / 60.f),
         [this, lifeBar] (const auto& step, auto const)
         {
-            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * 0.01f));
+            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * (1.f / 60.f)));
             for (auto [_, avatar] : m_avatars)
                 avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
@@ -517,6 +534,42 @@ void StatePlaying7K::Update(const double delta)
 
     if (m_context.GetMode() == GameMode::Tutorial)
     {
+        const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
+        const auto frontBuffers = m_renderer.GetFrontBuffers();
+        for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
+        {
+            const int id = static_cast<int>(channel) - 2;
+            if (id < 0|| id > 6)
+                continue;
+
+            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_GUIDE_KEY_EFFECT" + std::to_string(id + 1));
+            const auto frameName      = std::to_string(id) + "A";
+            if (auto buffer = frontBuffers.find(channel); buffer != frontBuffers.end() && buffer->second)
+            {
+                const double position = buffer->second->Event->Position - m_renderer.GetRenderPosition();
+                if (position >= 1.5f || buffer->second->IsRegistered())
+                {
+                    m_guideKeyEffectDeltas[channel] = 0;
+                    m_guideKeyEffectStates[channel] = false;
+                }
+                else
+                {
+                    m_guideKeyEffectDeltas[channel] += delta;
+                    if (m_guideKeyEffectDeltas[channel] >= 500)
+                    {
+                        m_guideKeyEffectDeltas[channel] = 0;
+                        m_guideKeyEffectStates[channel] = !m_guideKeyEffectStates[channel];
+                    }
+                }
+
+                if (guideKeyEffect->IsVisible() != m_guideKeyEffectStates[channel] && !m_inputStates[channel])
+                {
+                    guideKeyEffect->SetFrame(frameName);
+                    guideKeyEffect->SetVisible(m_guideKeyEffectStates[channel]);
+                }
+            }
+        }
+
         const auto instruction = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUCTION");
         const double position  = m_renderer.GetRenderPosition();
         if (instruction && position >= 9.f)
