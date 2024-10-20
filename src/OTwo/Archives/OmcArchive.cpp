@@ -160,6 +160,15 @@ std::optional<std::size_t> OmcArchive::ReadFile(const unsigned int index, void* 
             if (!ReadStream(&waveHeader, sizeof(waveHeader)))
                 throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the WAV header");
 
+            if (waveHeader.ChunkSize == 0)
+            {
+                if (i != index)
+                    continue;
+
+                data = nullptr;
+                return std::nullopt;
+            }
+
             const auto encodedData = new std::uint8_t[waveHeader.ChunkSize];
             if (!ReadStream(encodedData, waveHeader.ChunkSize))
             {
