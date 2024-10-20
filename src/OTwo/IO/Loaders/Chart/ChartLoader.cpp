@@ -18,14 +18,14 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromMetadata(const ChartMetadata& meta, 
     return chart;
 }
 
-Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& context) const
+Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
     const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
         throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
 
     auto& inputStream = *stream.get();
-    auto chart        = LoadFromStream(inputStream, context);
+    auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(fileName, ctx));
     chart->Source     = fileName;
 
     return chart;

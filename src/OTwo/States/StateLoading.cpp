@@ -11,8 +11,7 @@
 
 #include <thread>
 
-StateLoading::StateLoading(const SessionContext& session, GameContext& game) :
-    m_session(session),
+StateLoading::StateLoading(GameContext& game) :
     m_context(game)
 {
 }
@@ -20,9 +19,6 @@ StateLoading::StateLoading(const SessionContext& session, GameContext& game) :
 void StateLoading::Initialize()
 {
     State::Initialize();
-    
-    const auto& room      = m_session.GetCurrentRoom();
-    const auto& resources = GetResources(ResourceScope::Shared);
 
     std::size_t index = 0;
     const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
@@ -36,13 +32,9 @@ void StateLoading::Initialize()
         }
     }
 
-    const auto metadata = room.ChartMetadata;
-    m_context.SetMode(room.GameMode);
-    m_context.SetDifficulty(room.Difficulty);
-    m_context.SetSpeed(room.Speed);
-
-    const auto chart = m_context.GetChart();
-    if (!chart || std::to_string(chart->GetMetadata().ID) != metadata.ID || chart->GetEventCount(m_context.GetDifficulty()) == 0)
+    const auto chart      = m_context.GetChart();
+    const auto& resources = GetResources(ResourceScope::Shared);
+    if (chart->GetEventCount(m_context.GetDifficulty()) == 0)
     {
         auto loader = ChartLoader(m_context);
         if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
@@ -53,13 +45,13 @@ void StateLoading::Initialize()
         {
             loader.SetCoverLoadCallback([this] (auto cover)
             {
-                QueueEvent([this, cover] () { OnCoverLoaded(cover); });
+                QueueEvent([this, cover] { OnCoverLoaded(cover); });
             });
         }
 
         auto thread = std::thread([=] ()
         {
-            m_context.SetChart(loader.LoadFromFile(metadata.Source, Gx::ResourceContext("o2ma" + metadata.ID)));
+            m_context.SetChart(loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default));
             QueueEvent([this] { OnChartLoaded(m_context.GetChart()); });
         });
 
@@ -96,12 +88,11 @@ void StateLoading::OnChartLoaded(const Chart* chart)
     auto& transition = Create<Gx::Sequence>([this, chart]
         {
             auto& director = GetDirector();
-            auto& room     = m_session.GetCurrentRoom();
             auto ctx       = PlayingResourceContext();
 
             ctx.SetFxEnabled(m_context.GetConfig().UseFx);
-            ctx.SetMapID(room.MapID);
-            ctx.SetEffectID(room.EffectID);
+            ctx.SetMapID(m_context.GetMapID());
+            ctx.SetEffectID(m_context.GetEffectID());
 
             director.Present<StatePlaying7K>(ctx);
         },

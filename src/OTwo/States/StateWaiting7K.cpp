@@ -9,6 +9,7 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/Models/Room.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
@@ -22,8 +23,9 @@
 
 #include <magic_enum.hpp>
 
-StateWaiting7K::StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
+StateWaiting7K::StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
+    m_game(game),
     m_session(session),
     m_items(items),
     m_playerAvatar(nullptr),
@@ -387,6 +389,21 @@ void StateWaiting7K::Initialize()
         sender.SetEnabled(false);
         btnBack->SetEnabled(false);
         m_mixer.Play(sfxStart, "SFX");
+
+        const auto& data = m_session.GetCurrentRoom();
+        if (!m_game.GetChart() || m_game.GetChart()->Source != data.ChartMetadata.Source)
+        {
+            auto chart    = std::make_unique<Chart>();
+            chart->Source = data.ChartMetadata.Source;
+
+            m_game.SetChart(std::move(chart));
+        }
+
+        m_game.SetMode(data.GameMode);
+        m_game.SetDifficulty(data.Difficulty);
+        m_game.SetSpeed(data.Speed);
+        m_game.SetMapID(data.MapID);
+        m_game.SetEffectID(data.EffectID);
 
         Run(Create<Gx::Delay>(sf::milliseconds(100.f), [&director]
         {

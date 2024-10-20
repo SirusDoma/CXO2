@@ -27,6 +27,12 @@ public:
     float GetSpeed() const;
     void SetSpeed(float speed);
 
+    unsigned int GetMapID() const;
+    void SetMapID(const unsigned int mapID);
+
+    unsigned int GetEffectID() const;
+    void SetEffectID(const unsigned int effectID);
+
     unsigned int GetViewport() const;
     void SetViewport(unsigned int viewport);
 
@@ -39,6 +45,8 @@ private:
     Difficulty m_difficulty;
     GameMode m_mode;
     float m_speed;
+    unsigned int m_mapID;
+    unsigned int m_effectID;
     unsigned int m_viewport;
 
     // TODO: Skill modifiers

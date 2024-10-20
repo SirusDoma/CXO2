@@ -7,12 +7,11 @@
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
-class SessionContext;
 class GameContext;
 class StateLoading : public State
 {
 public:
-    StateLoading(const SessionContext& session, GameContext& game);
+    explicit StateLoading(GameContext& game);
     void Initialize() override;
 
 private:
@@ -21,7 +20,6 @@ private:
     void OnChartLoaded(const Chart* chart);
 
     sf::Texture m_texture;
-    const SessionContext& m_session;
     GameContext& m_context;
 };
 

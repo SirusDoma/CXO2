@@ -3,6 +3,12 @@
 
 #include <Genode/IO/ResourceContext.hpp>
 
+enum class PlayingMode
+{
+    Normal,
+    Tutorial
+};
+
 class PlayingResourceContext : public Gx::ResourceContext
 {
 public:
@@ -17,10 +23,14 @@ public:
     unsigned int GetEffectID() const;
     void SetEffectID(const unsigned int effectID);
 
+    PlayingMode GetPlayingMode() const;
+    void SetPlayingMode(const PlayingMode playingMode);
+
 private:
     bool m_fxEnabled;
     unsigned int m_mapID{0};
     unsigned int m_effectID{1};
+    PlayingMode m_playingMode = PlayingMode::Normal;
 };
 
 #endif

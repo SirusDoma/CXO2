@@ -9,10 +9,11 @@ class Avatar;
 class ItemFactory;
 class SessionContext;
 class MusicSelectionContext;
+class GameContext;
 class StateWaiting7K : public State
 {
 public:
-    StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items);
+    StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -23,6 +24,7 @@ private:
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;
+    GameContext& m_game;
     ItemFactory& m_items;
 
     Avatar* m_playerAvatar;

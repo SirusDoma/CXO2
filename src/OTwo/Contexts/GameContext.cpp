@@ -5,6 +5,8 @@ GameContext::GameContext(GameConfig& config) :
     m_difficulty(),
     m_mode(),
     m_speed(),
+    m_mapID(),
+    m_effectID(),
     m_viewport()
 {
 }
@@ -54,6 +56,26 @@ void GameContext::SetSpeed(const float speed)
     m_speed = speed;
 }
 
+unsigned int GameContext::GetMapID() const
+{
+    return m_mapID;
+}
+
+void GameContext::SetMapID(const unsigned int mapID)
+{
+    m_mapID = mapID;
+}
+
+unsigned int GameContext::GetEffectID() const
+{
+    return m_effectID;
+}
+
+void GameContext::SetEffectID(const unsigned int effectID)
+{
+    m_effectID = effectID;
+}
+
 unsigned int GameContext::GetViewport() const
 {
     return m_viewport;
@@ -70,5 +92,7 @@ void GameContext::Reset()
     m_difficulty = Difficulty::EX;
     m_mode       = GameMode::Single;
     m_speed      = 0;
+    m_mapID      = 0;
+    m_effectID   = 0;
     m_viewport   = 0;
 }

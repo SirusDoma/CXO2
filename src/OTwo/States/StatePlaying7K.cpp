@@ -433,8 +433,6 @@ void StatePlaying7K::OnRenderComplete()
     QueueEvent([this, items]
     {
         m_session.SetLatestScoreResults(items);
-        m_context.Reset();
-
         GetDirector().Present<StateResult>();
     });
 }

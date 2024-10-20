@@ -12,6 +12,7 @@ constexpr float TdSpeed = -2.0f;
 
 enum class GameMode : std::uint8_t
 {
+    Tutorial,
     Single,
     Versus,
     Album,
