@@ -3,6 +3,7 @@
 ScoreTracker::ScoreTracker(const Difficulty diff) :
     m_difficulty(diff),
     m_enabled(true),
+    m_capturedScore(0),
     m_maxCombo(0),
     m_combo(0),
     m_jams(0),
@@ -16,16 +17,14 @@ ScoreTracker::ScoreTracker(const Difficulty diff) :
 
 Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count)
 {
-    if (acc == Accuracy::None || !m_enabled)
-    {
-        if (!m_enabled)
-            acc = Accuracy::None;
-
+    if (acc == Accuracy::None)
         return acc;
-    }
 
     if (acc == Accuracy::Bad && m_buffer > 0)
     {
+        if (!m_enabled)
+            return acc;
+
         m_bufferProgress = 0;
         if (count > m_buffer)
         {
@@ -38,40 +37,48 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
         m_buffer -= count;
     }
 
-    m_points[acc] += count;
+    if (m_enabled || acc != Accuracy::Miss)
+        m_points[acc] += count;
+
     if (acc == Accuracy::Cool || acc == Accuracy::Good)
     {
         m_combo += count;
-        if (acc == Accuracy::Cool)
+        if (m_enabled)
         {
-            m_bufferProgress += count;
-            m_jamProgress += 4 * count;
-        }
-        else
-        {
-            m_bufferProgress = 0;
-            m_jamProgress += 2 * count;
-        }
-
-        // Buffer
-        if (m_bufferProgress >= 15)
-        {
-            m_buffer = std::min<unsigned int>(m_buffer + 1, 5);
-            m_bufferProgress = 0;
-        }
-
-        // Jam Combo
-        if (m_jamProgress >= 100)
-        {
-            m_jamProgress %= 100;
-            m_jamCombo++;
-            m_jams++;
-
-            for (auto callback : m_jamComboCallbacks)
+            if (acc == Accuracy::Cool)
             {
-                if (callback)
-                    callback(ev, acc, m_jamCombo);
+                m_bufferProgress += count;
+                m_jamProgress += 4 * count;
             }
+            else
+            {
+                m_bufferProgress = 0;
+                m_jamProgress += 2 * count;
+            }
+
+            // Buffer
+            if (m_bufferProgress >= 15)
+            {
+                m_buffer = std::min<unsigned int>(m_buffer + 1, 5);
+                m_bufferProgress = 0;
+            }
+
+            // Jam Combo
+            if (m_jamProgress >= 100)
+            {
+                m_jamProgress %= 100;
+                m_jamCombo++;
+                m_jams++;
+
+                for (auto callback : m_jamComboCallbacks)
+                {
+                    if (callback)
+                        callback(ev, acc, m_jamCombo);
+                }
+            }
+
+            m_maxCombo = m_maxCombo < GetCombo() ? GetCombo() : m_maxCombo;
+            m_maxJamCombo = std::max(m_maxJamCombo, m_jamCombo);
         }
     }
     else
@@ -81,9 +88,6 @@ Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsig
         m_jamProgress = 0;
         m_jamCombo = 0;
     }
-
-    m_maxCombo = m_maxCombo < GetCombo() ? GetCombo() : m_maxCombo;
-    m_maxJamCombo = std::max(m_maxJamCombo, m_jamCombo);
 
     for (auto callback : m_incrementCallbacks)
     {
@@ -118,11 +122,18 @@ bool ScoreTracker::IsEnabled() const
 
 void ScoreTracker::SetEnabled(const bool enabled)
 {
-    m_enabled = enabled;
+    if (m_enabled != enabled)
+    {
+        m_capturedScore = enabled ? 0 : GetScorePoint();
+        m_enabled = enabled;
+    }
 }
 
 unsigned long long ScoreTracker::GetScorePoint() const
 {
+    if (!m_enabled)
+        return m_capturedScore;
+
     const long long positiveScore = m_points[Accuracy::Cool] * (200 + 10 * m_jams) +
                                     m_points[Accuracy::Good] * (100 + 5  * m_jams) +
                                     m_points[Accuracy::Bad]  * 4;
@@ -180,6 +191,7 @@ unsigned int ScoreTracker::GetBufferProgress() const
 
 void ScoreTracker::Reset()
 {
+    m_capturedScore  = 0;
     m_maxCombo       = 0;
     m_combo          = 0;
     m_maxJamCombo    = 0;

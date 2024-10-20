@@ -50,6 +50,7 @@ private:
     mutable std::unordered_map<Accuracy, unsigned int> m_points;
 
     bool m_enabled;
+    unsigned long long m_capturedScore;
     unsigned long long m_maxCombo;
     unsigned long long m_combo;
     unsigned long long m_jams;

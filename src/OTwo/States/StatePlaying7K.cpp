@@ -330,9 +330,13 @@ void StatePlaying7K::Initialize()
     m_scoreTracker.AddIncrementListener([=, &comboCounter, &judgementIndicator] (auto& ev, auto acc, auto count)
     {
         // Life System
-        m_lifeSystem.Update(acc, count);
-        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
-        lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
+        if (m_scoreTracker.IsEnabled())
+        {
+            m_lifeSystem.Update(acc, count);
+            m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
+            lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
+        }
+
         if (m_lifeSystem.GetCurrentLifePoint() == 0)
         {
             m_scoreTracker.SetEnabled(false);
@@ -344,8 +348,9 @@ void StatePlaying7K::Initialize()
                 {
                     OnRenderComplete();
                 }));
+
+                return;
             }
-            return;
         }
 
         // Note Click and Long Note Effects
@@ -365,7 +370,10 @@ void StatePlaying7K::Initialize()
 
         // Combo
         comboCounter.SetCombo(m_scoreTracker.GetCombo());
-        judgementIndicator.Play(acc);
+        if (m_lifeSystem.GetCurrentLifePoint() > 0 || acc != Accuracy::Miss)
+            judgementIndicator.Play(acc);
+        else
+            judgementIndicator.Play(Accuracy::None);
 
         // Score and Jam Combo
         scoreNumber->SetValue(m_scoreTracker.GetScorePoint());
