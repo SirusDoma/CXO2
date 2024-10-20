@@ -12,6 +12,7 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
+#include <Genode/UI/CheckBox.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -20,7 +21,8 @@ StateMusicShop::StateMusicShop(Gx::Mixer& mixer, SessionContext& session, CartCo
     m_session(session),
     m_cart(cart),
     m_items(items),
-    m_cartCurrentPage(0)
+    m_cartCurrentPage(0),
+    m_selector(nullptr)
 {
 }
 
@@ -37,7 +39,8 @@ void StateMusicShop::Initialize()
     const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
     currentCash->SetValue(player.Cash);
 
-    const auto shopContainer    = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP");
+    const auto shopContainer     = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP");
+    const auto musicContainer    = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MUSIC");
     const auto downloadContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_DOWNLOAD");
     const auto cartContainer     = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
     const auto downloadTabButton = Instantiate<Gx::Button>("IDC_BUTTON_DOWNLOAD_TAB");
@@ -83,12 +86,56 @@ void StateMusicShop::Initialize()
         cartContainer->SetVisible(true);
     });
 
+    const auto musicList = musicContainer->FindChild<Gx::List>("IDC_LIST_MUSIC");
+    for (const auto child : musicList->GetChildren())
+    {
+        const auto item = dynamic_cast<Gx::UiContainer*>(child);
+        if (!item)
+            continue;
+
+        if (const auto selector = item->FindChild<Gx::Image>("IDC_IMAGE_SELECTOR"))
+        {
+            selector->SetVisible(false);
+            selector->SetFocusChangedCallback([=] (auto& sender, auto&)
+            {
+                sender.SetVisible(sender.IsFocused());
+                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+                {
+                    if (checkBox->IsEnabled() && checkBox->IsVisible())
+                        checkBox->SetFocus(sender.IsFocused());
+                }
+            });
+
+            selector->SetMouseMoveCallback([=] (auto& sender, auto&)
+            {
+                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+                {
+                    if (checkBox->IsEnabled() && checkBox->IsVisible())
+                        checkBox->SetFocus(sender.IsFocused());
+                }
+            });
+
+            selector->SetClickCallback([=] (auto&, auto&)
+            {
+                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+                {
+                    if (checkBox->IsEnabled() && checkBox->IsVisible())
+                    {
+                        checkBox->SetCheckedState(!checkBox->IsChecked());
+                        checkBox->SetFocus(true);
+                    }
+                }
+            });
+        }
+
+
+    }
+
     const auto musicGauge = downloadContainer->FindChild<Gx::Gauge>("IDC_TEXT_DOWNLOAD_MUSIC_GAUGE");
     const auto totalGauge = downloadContainer->FindChild<Gx::Gauge>("IDC_TEXT_DOWNLOAD_TOTAL_GAUGE");
 
     musicGauge->SetValue(70);
     totalGauge->SetValue(35);
-
 
     const auto buyButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_BUY");
     buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });

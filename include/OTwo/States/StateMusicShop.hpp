@@ -1,8 +1,9 @@
 #ifndef O2JAM_STATE_MUSIC_SHOP_HPP
 #define O2JAM_STATE_MUSIC_SHOP_HPP
 
-#include <Genode/SceneGraph.hpp>
 #include <OTwo/States/State.hpp>
+#include <Genode/SceneGraph.hpp>
+#include <Genode/UI/Image.hpp>
 
 class CartContext;
 class SessionContext;
@@ -25,6 +26,8 @@ private:
     ItemFactory& m_items;
 
     unsigned int m_cartCurrentPage;
+
+    Gx::Image* m_selector;
 };
 
 #endif
