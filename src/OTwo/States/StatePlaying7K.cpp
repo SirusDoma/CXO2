@@ -67,7 +67,6 @@ void StatePlaying7K::Initialize()
     State::Initialize();
 
     // Setup providers
-    auto& room = m_session.GetCurrentRoom();
     m_context.SetViewport(GetViewport());
     m_scoreTracker.Initialize(m_context.GetDifficulty());
     m_lifeSystem.Initialize(m_context.GetDifficulty());
@@ -80,11 +79,26 @@ void StatePlaying7K::Initialize()
     m_renderer.Initialize(*m_context.GetChart(), m_context);
 
     // Setup chat panel
-    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");;
-    chatPanel->SetMaximumTextLength(50);
+    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     m_chatBox = chatPanel->FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
-    m_chatBox->SetPermanentFocusEnabled(true);
-    m_chatBox->SetEnabled(false);
+    if (m_context.GetMode() != GameMode::Tutorial)
+    {
+        chatPanel->SetMaximumTextLength(50);
+        m_chatBox->SetPermanentFocusEnabled(true);
+        m_chatBox->SetEnabled(false);
+    }
+    else
+    {
+        chatPanel->SetEnabled(false);
+        chatPanel->SetVisible(false);
+    }
+
+    // Setup Guide
+    if (const auto instructor = Instantiate<Gx::Animation>("IDC_ANIMATION_INSTRUCTOR"))
+        instructor->SetVisible(m_context.GetMode() == GameMode::Tutorial);
+
+    if (const auto instruction = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUCTION"))
+        instruction->SetVisible(false);
 
     // Setup avatars + avatars effects'
     const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
@@ -95,64 +109,94 @@ void StatePlaying7K::Initialize()
         if (!container)
             continue;
 
-        if (i >= room.MaxCapacity)
-            break;
-
-        auto member = room.Members[i];
-        container->SetVisible(member.ID != 0);
-
-        if (!container->IsVisible())
-            continue;
-
         const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
-        for (const auto id : member.EquippedItemIDs)
-            avatar->Equip(m_items.Create(id));
-
-        auto& effectContainer = Create<Gx::UiContainer>();
-        effectContainer.SetName("IDC_CONTAINER_EFFECT_JAM");
-
-        if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
+        if (m_context.GetMode() == GameMode::Tutorial)
         {
-            auto& fx = Create<Gx::Animation>(*fxPrefab);
-            fx.SetName("IDC_ANIMATION_EFFECT_JAM");
-            fx.Stop();
-            fx.SetAnimationCallback([&] (auto& _) {
-                effectContainer.SetVisible(
-                    fx.GetState() == Gx::Animation::AnimationState::Playing ||
-                    fx.GetState() == Gx::Animation::AnimationState::Initial
-                );
-            });
+            container->SetVisible(i == 4);
+            if (!container->IsVisible())
+                continue;
 
-            effectContainer.AddChild(fx);
+            auto player = m_session.GetCurrentPlayer();
+            for (const auto id : player.EquippedItemIDs)
+                avatar->Equip(m_items.Create(id));
+
+            auto member  = RoomMember{player};
+            member.Team  = RoomTeam::A;
+            member.Color = sf::Color(255, 0, 21);
+
+            const auto info = avatar->GetAvatarInfo();
+            info->SetMember(member);
+
+            const auto playerLifeBar = info->GetLifeBar();
+            playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+            playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+
+            if (m_session.GetCurrentPlayer().ID == member.ID)
+                m_self = avatar;
+
+            m_avatars[i] = avatar;
         }
-
-        if (const auto numPrefab = FindResource<Gx::BitmapNumber>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
+        else
         {
-            auto& numEffect = Create<Gx::BitmapNumber>(*numPrefab);
-            numEffect.SetName("IDC_NUMBER_EFFECT_JAM");
-            numEffect.SetAnimationCallback([&] (auto& _) {
-                numEffect.SetVisible(
-                    numEffect.GetAnimationState() == Gx::Animation::AnimationState::Playing ||
-                    numEffect.GetAnimationState() == Gx::Animation::AnimationState::Initial
-                );
-            });
-            effectContainer.AddChild(numEffect);
+            auto& room = m_session.GetCurrentRoom();
+            if (i >= room.MaxCapacity)
+                break;
+
+            auto member = room.Members[i];
+            container->SetVisible(member.ID != 0);
+
+            if (!container->IsVisible())
+                continue;
+
+            for (const auto id : member.EquippedItemIDs)
+                avatar->Equip(m_items.Create(id));
+
+            auto& effectContainer = Create<Gx::UiContainer>();
+            effectContainer.SetName("IDC_CONTAINER_EFFECT_JAM");
+
+            if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
+            {
+                auto& fx = Create<Gx::Animation>(*fxPrefab);
+                fx.SetName("IDC_ANIMATION_EFFECT_JAM");
+                fx.Stop();
+                fx.SetAnimationCallback([&] (auto& _) {
+                    effectContainer.SetVisible(
+                        fx.GetState() == Gx::Animation::AnimationState::Playing ||
+                        fx.GetState() == Gx::Animation::AnimationState::Initial
+                    );
+                });
+
+                effectContainer.AddChild(fx);
+            }
+
+            if (const auto numPrefab = FindResource<Gx::BitmapNumber>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
+            {
+                auto& numEffect = Create<Gx::BitmapNumber>(*numPrefab);
+                numEffect.SetName("IDC_NUMBER_EFFECT_JAM");
+                numEffect.SetAnimationCallback([&] (auto& _) {
+                    numEffect.SetVisible(
+                        numEffect.GetAnimationState() == Gx::Animation::AnimationState::Playing ||
+                        numEffect.GetAnimationState() == Gx::Animation::AnimationState::Initial
+                    );
+                });
+                effectContainer.AddChild(numEffect);
+            }
+
+            effectContainer.SetVisible(false);
+            avatar->AddChild(effectContainer);
+
+            const auto info = avatar->GetAvatarInfo();
+            info->SetMember(member);
+
+            const auto playerLifeBar = info->GetLifeBar();
+            playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+            playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+
+            if (m_session.GetCurrentPlayer().ID == member.ID)
+                m_self = avatar;
+
+            m_avatars[i] = avatar;
         }
-
-        effectContainer.SetVisible(false);
-        avatar->AddChild(effectContainer);
-
-        const auto info = avatar->GetAvatarInfo();
-        info->SetMember(member);
-
-        const auto playerLifeBar = info->GetLifeBar();
-        playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-        playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
-
-        if (m_session.GetCurrentPlayer().ID == member.ID)
-            m_self = avatar;
-
-        m_avatars[i] = avatar;
     }
 
     // Key down & effects
@@ -363,7 +407,10 @@ void StatePlaying7K::Initialize()
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
-        GetDirector().Present<StateWaiting7K>();
+        if (m_context.GetMode() == GameMode::Tutorial)
+            GetDirector().Present<StateRoom>();
+        else
+            GetDirector().Present<StateWaiting7K>();
     });
 
     // Start initial lifebar fill-up animation
@@ -394,6 +441,15 @@ void StatePlaying7K::Initialize()
 
 void StatePlaying7K::OnRenderComplete()
 {
+    if (m_context.GetMode() == GameMode::Tutorial)
+    {
+        QueueEvent([this]
+        {
+            GetDirector().Present<StateRoom>();
+        });
+
+        return;
+    }
     auto items = std::array<ScoreResultItem, 8>();
     for (std::size_t i = 0; i < items.size(); i++)
     {
@@ -450,6 +506,42 @@ void StatePlaying7K::SetViewport(const unsigned int viewport)
 void StatePlaying7K::Update(const double delta)
 {
     State::Update(delta);
+
+    if (m_context.GetMode() == GameMode::Tutorial)
+    {
+        const auto instruction = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUCTION");
+        const double position  = m_renderer.GetRenderPosition();
+        if (instruction && position >= 9.f)
+        {
+            instruction->SetVisible(true);
+            if (position >= 111.5f)
+                instruction->SetFrame(12);
+            else if (position >= 104.5f)
+                instruction->SetFrame(11);
+            else if (position >= 97.5f)
+                instruction->SetFrame(10);
+            else if (position >= 90.f)
+                instruction->SetFrame(9);
+            else if (position >= 77.f)
+                instruction->SetFrame(8);
+            else if (position >= 70.5f)
+                instruction->SetFrame(7);
+            else if (position >= 61.f)
+                instruction->SetFrame(6);
+            else if (position >= 53.f)
+                instruction->SetFrame(5);
+            else if (position >= 45.5f)
+                instruction->SetFrame(4);
+            else if (position >= 35.f)
+                instruction->SetFrame(3);
+            else if (position >= 31.f) // 1:15
+                instruction->SetFrame(2);
+            else if (position >= 19.5f) // 47
+                instruction->SetFrame(1);
+            else if (position > 9.f) // 21
+                instruction->SetFrame(0);
+        }
+    }
 }
 
 void StatePlaying7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -479,6 +571,12 @@ void StatePlaying7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
 
     if (ev.code == sf::Keyboard::Key::Enter)
         m_chatBox->SetEnabled(true);
+
+    if (ev.code == sf::Keyboard::Key::Escape)
+    {
+        m_chatBox->SetString(std::string());
+        m_chatBox->SetEnabled(false);
+    }
 }
 
 Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const

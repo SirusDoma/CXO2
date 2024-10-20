@@ -93,6 +93,7 @@ void StateLoading::OnChartLoaded(const Chart* chart)
             ctx.SetFxEnabled(m_context.GetConfig().UseFx);
             ctx.SetMapID(m_context.GetMapID());
             ctx.SetEffectID(m_context.GetEffectID());
+            ctx.SetMode(m_context.GetMode());
 
             director.Present<StatePlaying7K>(ctx);
         },

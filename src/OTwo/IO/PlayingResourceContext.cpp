@@ -33,12 +33,12 @@ void PlayingResourceContext::SetEffectID(const unsigned int effectID)
     m_effectID = effectID;
 }
 
-PlayingMode PlayingResourceContext::GetPlayingMode() const
+GameMode PlayingResourceContext::GetMode() const
 {
-    return m_playingMode;
+    return m_mode;
 }
 
-void PlayingResourceContext::SetPlayingMode(const PlayingMode playingMode)
+void PlayingResourceContext::SetMode(const GameMode mode)
 {
-    m_playingMode = playingMode;
+    m_mode = mode;
 }

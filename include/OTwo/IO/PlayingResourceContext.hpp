@@ -2,12 +2,7 @@
 #define O2JAM_PLAYING_RESOURCE_CONTEXT_HPP
 
 #include <Genode/IO/ResourceContext.hpp>
-
-enum class PlayingMode
-{
-    Normal,
-    Tutorial
-};
+#include <OTwo/Models/Game.hpp>
 
 class PlayingResourceContext : public Gx::ResourceContext
 {
@@ -23,14 +18,14 @@ public:
     unsigned int GetEffectID() const;
     void SetEffectID(const unsigned int effectID);
 
-    PlayingMode GetPlayingMode() const;
-    void SetPlayingMode(const PlayingMode playingMode);
+    GameMode GetMode() const;
+    void SetMode(const GameMode playingMode);
 
 private:
     bool m_fxEnabled;
     unsigned int m_mapID{0};
     unsigned int m_effectID{1};
-    PlayingMode m_playingMode = PlayingMode::Normal;
+    GameMode m_mode  = GameMode::Versus;
 };
 
 #endif

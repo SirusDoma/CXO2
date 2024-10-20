@@ -49,12 +49,20 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     {
         auto device     = std::random_device();
         auto seeder     = std::mt19937(device());
-        auto randomizer = std::uniform_int_distribution<unsigned int>(1, maps.size());
+        auto randomizer = std::uniform_int_distribution<unsigned int>(1, maps.size() - 1);
         mapID           = randomizer(seeder);
     }
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
+    if (ctx.GetMode() == GameMode::Tutorial)
+    {
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::string(), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::string(), ctx);
+    }
+    else
+    {
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
+    }
 
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_NOTE_CLICK",      std::string(), ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_LONG_NOTE_EFFECT",std::string(), ctx);
@@ -98,7 +106,11 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT"); keyEffectContainer)
     {
-        LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::to_string(mapID), ctx, 7);
+        if (ctx.GetMode() == GameMode::Tutorial)
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::string(), ctx, 7);
+        else
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::to_string(mapID), ctx, 7);
+
         keyEffectContainer->SetBatchingEnabled(true);
     }
     else

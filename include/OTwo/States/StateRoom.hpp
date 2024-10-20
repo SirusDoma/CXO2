@@ -3,6 +3,7 @@
 
 #include <OTwo/States/State.hpp>
 
+class GameContext;
 class ItemFactory;
 class MusicSelectionContext;
 class SessionContext;
@@ -10,19 +11,21 @@ class SessionContext;
 class StateRoom : public State
 {
 public:
-    StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items);
+    StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items);
     void Initialize() override;
 
 private:
-    void OnMusicShopClicked() const;
-    void OnItemShopClicked() const;
-    void OnMyRoomClicked() const;
-    void OnBulletinClicked() const;
-    void OnBackClicked() const;
+    void OnMusicShopButtonClicked() const;
+    void OnItemShopButtonClicked() const;
+    void OnMyRoomButtonClicked() const;
+    void OnBulletinButtonClicked() const;
+    void OnTutorialButtonClicked() const;
+    void OnBackButtonClicked() const;
 
     Gx::Mixer& m_mixer;
     SessionContext& m_session;
     MusicSelectionContext& m_selection;
+    GameContext& m_game;
     ItemFactory& m_items;
 };
 

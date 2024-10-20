@@ -3,6 +3,7 @@
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StateBulletin.hpp>
+#include <OTwo/States/StateLoading.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
@@ -22,16 +23,18 @@
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
+#include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Models/Room.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 
-StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, ItemFactory& items) :
+StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_selection(selection),
+    m_game(game),
     m_items(items)
 {
 }
@@ -251,16 +254,19 @@ void StateRoom::Initialize()
     });
 
     const auto musicShopButton = Instantiate<Gx::Button>("IDC_BUTTON_MUSIC_SHOP");
-    musicShopButton->SetClickCallback([this](auto& , auto& ) { OnMusicShopClicked(); });
+    musicShopButton->SetClickCallback([this](auto& , auto& ) { OnMusicShopButtonClicked(); });
 
     const auto itemShopButton = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SHOP");
-    itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopClicked(); });
+    itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopButtonClicked(); });
 
     const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
-    myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomClicked(); });
+    myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomButtonClicked(); });
 
     const auto bulletinButton = Instantiate<Gx::Button>("IDC_BUTTON_BULLETIN");
-    bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinClicked(); });
+    bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinButtonClicked(); });
+
+    const auto tutorialButton = Instantiate<Gx::Button>("IDC_BUTTON_TUTORIAL");
+    tutorialButton->SetClickCallback([this](auto& , auto& ) { OnTutorialButtonClicked(); });
 
     if (const auto optionDialog = Instantiate<OptionDialog>("IDC_DIALOG_OPTION"); optionDialog)
     {
@@ -271,37 +277,63 @@ void StateRoom::Initialize()
     }
 
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
-    backButton->SetClickCallback([&](auto& , auto& ) { OnBackClicked(); });
+    backButton->SetClickCallback([&](auto& , auto& ) { OnBackButtonClicked(); });
 
     bgm->setLooping(true);
     m_mixer.Play(bgm, "BGM");
 }
 
-void StateRoom::OnMusicShopClicked() const
+void StateRoom::OnMusicShopButtonClicked() const
 {
     auto& director = GetDirector();
     director.Present<StateMusicShop>();
 }
 
-void StateRoom::OnItemShopClicked() const
+void StateRoom::OnItemShopButtonClicked() const
 {
     auto& director = GetDirector();
     director.Present<StateItemShop>();
 }
 
-void StateRoom::OnMyRoomClicked() const
+void StateRoom::OnMyRoomButtonClicked() const
 {
     auto& director = GetDirector();
     director.Present<StateMyRoom>();
 }
 
-void StateRoom::OnBulletinClicked() const
+void StateRoom::OnBulletinButtonClicked() const
 {
     auto& director = GetDirector();
     director.Present<StateBulletin>();
 }
 
-void StateRoom::OnBackClicked() const
+void StateRoom::OnTutorialButtonClicked() const
+{
+    auto chart    = std::make_unique<Chart>();
+    chart->Source = "/Music/Tutorial.ojn";
+
+    auto& resources = GetResources(ResourceScope::Shared);
+    auto metadata   = ChartMetadata{};
+    metadata.Source = chart->Source;
+
+    if (auto image = ChartLoader::LoadCoverArt(metadata, Gx::ResourceContext::Default); image)
+        resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+    else
+        resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+
+    m_game.GetConfig().KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];
+    m_game.SetChart(std::move(chart));
+    m_game.SetMode(GameMode::Tutorial);
+    m_game.SetDifficulty(Difficulty::EX);
+    m_game.SetSpeed(1.0);
+    m_game.SetMapID(1);
+    m_game.SetEffectID(1);
+
+    auto& director = GetDirector();
+    director.Present<StateLoading>();
+}
+
+void StateRoom::OnBackButtonClicked() const
 {
     auto& director = GetDirector();
     director.Present<StatePlanet>();
