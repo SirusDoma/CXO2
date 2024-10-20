@@ -11,6 +11,7 @@ namespace Gx
         m_doubleClicked(false),
         m_deltaClickDuration(),
         m_deltaHoldDuration(),
+        m_onMouseMove(),
         m_onClick(),
         m_onHoldClick(),
         m_onDoubleClick(),
@@ -96,6 +97,11 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
+    void Control::SetMouseMoveCallback(const std::function<void(Control&, Event&)>& onMouseMove)
+    {
+        m_onMouseMove = onMouseMove;
+    }
+
     void Control::SetFocusChangedCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onFocusChanged = std::move(callback);
@@ -131,37 +137,42 @@ namespace Gx
         m_onScrollWheel = std::move(callback);
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetFocusChangedCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetMouseMoveCallback() const
+    {
+        return m_onMouseMove;
+    }
+
+    const std::function<void(Control&, Control::Event&)>& Control::GetFocusChangedCallback() const
     {
         return m_onFocusChanged;
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetGainFocusCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetGainFocusCallback() const
     {
         return m_onGainFocus;
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetLostFocusCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetLostFocusCallback() const
     {
         return m_onLostFocus;
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetClickCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetClickCallback() const
     {
         return m_onClick;
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetHoldClickCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetHoldClickCallback() const
     {
         return m_onHoldClick;
     }
 
-    const std::function<void(Control&, Control::Event&)> &Control::GetDoubleClickCallback()
+    const std::function<void(Control&, Control::Event&)>& Control::GetDoubleClickCallback() const
     {
         return m_onDoubleClick;
     }
 
-    const std::function<void(Control &, Control::Event&)> &Control::GetScrollWheelCallback()
+    const std::function<void(Control &, Control::Event&)>& Control::GetScrollWheelCallback() const
     {
         return m_onScrollWheel;
     }
@@ -268,6 +279,16 @@ namespace Gx
 
         if (!IsEnabled())
             return;
+
+        if (m_onMouseMove)
+        {
+            auto uiEvent = Event{false, GetControlState()};
+            m_onMouseMove(*this, uiEvent);
+
+            SetControlState(uiEvent.State);
+            if (uiEvent.Handled)
+                return;
+        }
 
         InputableContainer::OnMouseMoved(ev);
     }
