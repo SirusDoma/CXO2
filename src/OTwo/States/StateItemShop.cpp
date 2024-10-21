@@ -747,7 +747,7 @@ void StateItemShop::InvalidateMyBag()
         }
     }
 
-    Gx::Image* currentSlot = nullptr;
+    Gx::UiContainer* currentSlot = nullptr;
     unsigned int itemCount = 0;
     auto inventory = std::vector<Item*>();
     for (auto& item : m_inventory)
@@ -758,7 +758,7 @@ void StateItemShop::InvalidateMyBag()
 
     for (std::size_t i = 0, j = m_myBagCurrentPage * 2; i < bagSlots.size(); i++)
     {
-        const auto slot = dynamic_cast<Gx::Image*>(bagSlots[i]);
+        const auto slot = dynamic_cast<Gx::UiContainer*>(bagSlots[i]);
         if (!slot)
             continue;
 
@@ -773,11 +773,27 @@ void StateItemShop::InvalidateMyBag()
         const auto item = inventory[j++];
         itemCount++;
 
+        unsigned int quantity = 0;
+        if (const auto it = player.ItemQuantities.find(item->GetID()); it != player.ItemQuantities.end())
+            quantity = it->second;
+
         currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail().GetTexture())
-            slot->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
-        else if (item->GetSmallThumbnail().GetTexture())
-            slot->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
+        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_THUMBNAIL");
+        if (item->GetSmallThumbnail().GetTexture())
+            thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
+        else if (item->GetLargeThumbnail().GetTexture())
+            thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
+
+        if (const auto texture = thumbnail->GetTexture())
+            thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
+
+        if (const auto quantityLabel = slot->FindChild<Gx::Label>("IDC_TEXT_QUANTITY"))
+        {
+            if (quantity > 0)
+                quantityLabel->SetString(std::to_string(quantity));
+            else
+                quantityLabel->SetString(std::string());
+        }
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -796,10 +812,6 @@ void StateItemShop::InvalidateMyBag()
         {
             if (!item)
                 return;
-
-            unsigned int quantity = 0;
-            if (const auto it = player.ItemQuantities.find(item->GetID()); it != player.ItemQuantities.end())
-                quantity = it->second;
 
             if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
             {

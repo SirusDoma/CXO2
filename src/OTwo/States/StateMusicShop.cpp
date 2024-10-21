@@ -96,39 +96,31 @@ void StateMusicShop::Initialize()
         if (const auto selector = item->FindChild<Gx::Image>("IDC_IMAGE_SELECTOR"))
         {
             selector->SetVisible(false);
-            selector->SetFocusChangedCallback([=] (auto& sender, auto&)
+            item->SetFocusChangedCallback([=] (auto& sender, auto&)
             {
-                sender.SetVisible(sender.IsFocused());
-                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
-                {
-                    if (checkBox->IsEnabled() && checkBox->IsVisible())
-                        checkBox->SetFocus(sender.IsFocused());
-                }
+                selector->SetVisible(sender.IsFocused());
+                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"); sender.IsFocused() && checkBox)
+                    checkBox->SetFocus(sender.IsFocused());
             });
 
-            selector->SetMouseMoveCallback([=] (auto& sender, auto&)
+            if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
             {
-                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+                checkBox->SetClickCallback([=] (auto&, auto& ev)
                 {
-                    if (checkBox->IsEnabled() && checkBox->IsVisible())
-                        checkBox->SetFocus(sender.IsFocused());
-                }
-            });
+                    ev.Handled = true; // Use item click callback
+                });
 
-            selector->SetClickCallback([=] (auto&, auto&)
-            {
-                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+                checkBox->SetFocusChangedCallback([=] (auto&, auto& ev)
                 {
-                    if (checkBox->IsEnabled() && checkBox->IsVisible())
-                    {
-                        checkBox->SetCheckedState(!checkBox->IsChecked());
-                        checkBox->SetFocus(true);
-                    }
-                }
-            });
+                    ev.State = item->IsFocused() ? Gx::Control::State::Hover : Gx::Control::State::Normal;
+                });
+
+                item->SetClickCallback([=] (auto&, auto&)
+                {
+                    checkBox->SetCheckedState(!checkBox->IsChecked());
+                });
+            }
         }
-
-
     }
 
     const auto musicGauge = downloadContainer->FindChild<Gx::Gauge>("IDC_TEXT_DOWNLOAD_MUSIC_GAUGE");

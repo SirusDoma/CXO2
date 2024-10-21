@@ -59,7 +59,7 @@ void StateMyRoom::Initialize()
     m_bagCurrentPage = 0;
     for (std::size_t i = 0; i < bagSlots.size(); i++)
     {
-        const auto slot = dynamic_cast<Gx::Image*>(bagSlots[i]);
+        const auto slot = dynamic_cast<Gx::UiContainer*>(bagSlots[i]);
         if (!slot)
             continue;
 
@@ -229,7 +229,7 @@ void StateMyRoom::Invalidate()
     const auto bagList  = Instantiate<Gx::List>("IDC_LIST_BAG");
     const auto bagSlots = bagList->GetChildren();
 
-    Gx::Image* currentSlot = nullptr;
+    Gx::UiContainer* currentSlot = nullptr;
     unsigned int itemCount = 0;
     auto inventory = std::vector<Item*>();
     for (auto& item : m_inventory)
@@ -240,7 +240,7 @@ void StateMyRoom::Invalidate()
 
     for (std::size_t i = 0, j = m_bagCurrentPage * bagList->GetVerticalCount(); i < bagSlots.size(); i++)
     {
-        const auto slot = dynamic_cast<Gx::Image*>(bagSlots[i]);
+        const auto slot = dynamic_cast<Gx::UiContainer*>(bagSlots[i]);
         if (!slot)
             continue;
 
@@ -255,12 +255,27 @@ void StateMyRoom::Invalidate()
         const auto item = inventory[j++];
         itemCount++;
 
-        // TODO: Always use Small Thumbnail
+        unsigned int quantity = 0;
+        if (const auto it = player->ItemQuantities.find(item->GetID()); it != player->ItemQuantities.end())
+            quantity = it->second;
+
         currentSlot = item == m_selectedItem ? slot : currentSlot;
-        if (item->GetType() == EquipmentType::AttributiveItem && item->GetLargeThumbnail().GetTexture())
-            slot->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
-        else if (item->GetSmallThumbnail().GetTexture())
-            slot->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
+        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_THUMBNAIL");
+        if (item->GetSmallThumbnail().GetTexture())
+            thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
+        else if (item->GetLargeThumbnail().GetTexture())
+            thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
+
+        if (const auto texture = thumbnail->GetTexture())
+            thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
+
+        if (const auto quantityLabel = slot->FindChild<Gx::Label>("IDC_TEXT_QUANTITY"))
+        {
+            if (quantity > 0)
+                quantityLabel->SetString(std::to_string(quantity));
+            else
+                quantityLabel->SetString(std::string());
+        }
 
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
@@ -280,10 +295,6 @@ void StateMyRoom::Invalidate()
             if (!item)
                 return;
 
-            unsigned int quantity = 0;
-            if (const auto it = player->ItemQuantities.find(item->GetID()); it != player->ItemQuantities.end())
-                quantity = it->second;
-
             if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
             {
                 if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_SKILL_INFO"); dialog)
@@ -292,10 +303,10 @@ void StateMyRoom::Invalidate()
                     const auto quantityLabel    = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_QUANTITY");
                     const auto skillLabel       = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_SKILL");
                     const auto descriptionLabel = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_DESCRIPTION");
-                    const auto thumbnail        = dialog->FindChild<Gx::Image>("IDC_IMAGE_ITEM_THUMBNAIL");
+                    const auto skillThumbnail   = dialog->FindChild<Gx::Image>("IDC_IMAGE_ITEM_THUMBNAIL");
 
                     nameLabel->SetString(item->GetName());
-                    quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-");
+                    quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-"); // L"\u221E"
                     skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
                     descriptionLabel->SetString(item->GetDescription());
 
@@ -325,7 +336,7 @@ void StateMyRoom::Invalidate()
                     }
 
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
-                        thumbnail->SetTexture(*texture, true);
+                        skillThumbnail->SetTexture(*texture, true);
 
                     dialog->Show(this, std::string(), false);
                 }
