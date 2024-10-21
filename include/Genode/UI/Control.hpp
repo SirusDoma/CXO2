@@ -19,7 +19,7 @@ namespace Gx
         struct Event
         {
             bool Handled;
-            const Control::State State;
+            Control::State State;
             double Delta;
         };
 
@@ -29,9 +29,6 @@ namespace Gx
         virtual bool IsFocused() const;
         virtual void SetFocus(bool focus);
 
-
-
-        void SetMouseMoveCallback(const std::function<void(Control&, Event&)>& onMouseMove);
         void SetFocusChangedCallback(std::function<void(Control&, Event&)> callback);
         void SetGainFocusCallback(std::function<void(Control&, Event&)> callback);
         void SetLostFocusCallback(std::function<void(Control&, Event&)> callback);
@@ -63,7 +60,6 @@ namespace Gx
         virtual State GetControlState() const;
         virtual void SetControlState(const State& state);
 
-        const std::function<void(Control&, Event&)>& GetMouseMoveCallback() const;
         const std::function<void(Control&, Event&)>& GetFocusChangedCallback() const;
         const std::function<void(Control&, Event&)>& GetGainFocusCallback() const;
         const std::function<void(Control&, Event&)>& GetLostFocusCallback() const;
@@ -99,7 +95,7 @@ namespace Gx
         bool   m_enabled, m_focused, m_clicked, m_doubleClicked;
         double m_deltaClickDuration, m_deltaHoldDuration;
 
-        std::function<void(Control&, Event&)> m_onMouseMove, m_onClick, m_onHoldClick, m_onDoubleClick, m_onScrollWheel,
+        std::function<void(Control&, Event&)> m_onClick, m_onHoldClick, m_onDoubleClick, m_onScrollWheel,
                                               m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }

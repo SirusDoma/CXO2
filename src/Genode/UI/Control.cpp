@@ -11,7 +11,6 @@ namespace Gx
         m_doubleClicked(false),
         m_deltaClickDuration(),
         m_deltaHoldDuration(),
-        m_onMouseMove(),
         m_onClick(),
         m_onHoldClick(),
         m_onDoubleClick(),
@@ -97,11 +96,6 @@ namespace Gx
         return transform.transformRect(GetLocalBounds());
     }
 
-    void Control::SetMouseMoveCallback(const std::function<void(Control&, Event&)>& onMouseMove)
-    {
-        m_onMouseMove = onMouseMove;
-    }
-
     void Control::SetFocusChangedCallback(std::function<void(Control&, Event&)> callback)
     {
         m_onFocusChanged = std::move(callback);
@@ -135,11 +129,6 @@ namespace Gx
     void Control::SetScrollWheelCallback(std::function<void(Control &, Event &)> callback)
     {
         m_onScrollWheel = std::move(callback);
-    }
-
-    const std::function<void(Control&, Control::Event&)>& Control::GetMouseMoveCallback() const
-    {
-        return m_onMouseMove;
     }
 
     const std::function<void(Control&, Control::Event&)>& Control::GetFocusChangedCallback() const
@@ -279,16 +268,6 @@ namespace Gx
 
         if (!IsEnabled())
             return;
-
-        if (m_onMouseMove)
-        {
-            auto uiEvent = Event{false, GetControlState()};
-            m_onMouseMove(*this, uiEvent);
-
-            SetControlState(uiEvent.State);
-            if (uiEvent.Handled)
-                return;
-        }
 
         InputableContainer::OnMouseMoved(ev);
     }
