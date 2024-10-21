@@ -713,7 +713,7 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
             }
 
             m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.15f));
-            shopMaster->SetPosition(GetView().getSize().x, shopMaster->GetPosition().y);
+            shopMaster->SetPosition(shopMaster->GetPosition().x - 100, shopMaster->GetPosition().y);
 
             m_shopMasterSpeechCounter = 0;
             Run(m_shopMasterEffect);
