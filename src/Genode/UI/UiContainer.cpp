@@ -5,13 +5,27 @@
 namespace Gx
 {
     UiContainer::UiContainer() :
+        m_computedBounds(),
         m_localBounds()
     {
     }
 
     sf::FloatRect UiContainer::GetLocalBounds() const
     {
-        return m_localBounds;
+        if (m_localBounds != sf::FloatRect())
+            return m_localBounds;
+
+        return m_computedBounds;
+    }
+
+    void UiContainer::SetLocalBounds(const sf::FloatRect& bounds)
+    {
+        if (m_localBounds == bounds)
+            return;
+
+        m_localBounds = bounds;
+        if (m_localBounds == sf::FloatRect())
+            Invalidate();
     }
 
     bool UiContainer::IsBatchingEnabled() const
@@ -93,6 +107,9 @@ namespace Gx
 
     void UiContainer::Invalidate()
     {
+        if (m_localBounds != sf::FloatRect())
+            return;
+
         auto result = sf::FloatRect();
         bool first = true;
 
@@ -121,6 +138,6 @@ namespace Gx
                 result.size.y = bounds.position.y  + bounds.size.y;
         }
 
-        m_localBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.size.x - result.position.x, result.size.y - result.position.y));
+        m_computedBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.size.x - result.position.x, result.size.y - result.position.y));
     }
 }

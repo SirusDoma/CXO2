@@ -7,6 +7,7 @@
 
 struct UiContainerMetadata : public TransformMetadata
 {
+    sf::FloatRect Bounds = {};
 };
 
 #endif

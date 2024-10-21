@@ -15,6 +15,18 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json&
     {
         if (const auto transform = attributes->find("transform"); transform != attributes->end())
             TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+
+        metadata.Bounds = {};
+        if (const auto bounds = attributes->find("bounds"); bounds != attributes->end())
+        {
+            metadata.Bounds = {
+                {},
+                {
+                    bounds->at("width"),
+                    bounds->at("height")
+                }
+            };
+        }
     }
 
     return LoadFromMetadata(metadata, ctx);
@@ -34,6 +46,7 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
     container->SetPosition(metadata->Position);
     container->SetScale(metadata->Scale);
     container->SetRotation(metadata->Rotation);
+    container->SetLocalBounds(metadata->Bounds);
 
     auto metaLoader = MetadataLoader();
     for (auto [key, value] : meta.Require)

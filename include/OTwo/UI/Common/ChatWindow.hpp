@@ -19,7 +19,7 @@ public:
     ChatWindow(const Gx::Font& font, const sf::FloatRect& localBounds, unsigned int characterSize = 13);
 
     sf::FloatRect GetLocalBounds() const override;
-    void SetLocalBounds(const sf::FloatRect& bounds);
+    void SetLocalBounds(const sf::FloatRect& bounds) override;
 
     void SetFont(const Gx::Font& font);
     void SetCharacterSize(unsigned int characterSize);
