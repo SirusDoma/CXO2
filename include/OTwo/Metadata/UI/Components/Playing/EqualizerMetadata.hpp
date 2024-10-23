@@ -1,15 +1,11 @@
 #ifndef O2JAM_EQUALIZER_METADATA_HPP
 #define O2JAM_EQUALIZER_METADATA_HPP
 
-#include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
+#include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
 
-struct EqualizerMetadata : public TransformMetadata
+struct EqualizerMetadata : public UiContainerMetadata
 {
-    unsigned int Count;
-    float Spacing;
-    ResourceType ItemType = ResourceType::None;
-    std::string ItemName = std::string();
-    Gx::Json ItemSource;
+    unsigned int BufferSampleCount;
 };
 
 #endif

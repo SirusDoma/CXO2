@@ -15,6 +15,8 @@ public:
     void Initialize() override;
 
 private:
+    void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
+
     void OnMusicShopButtonClicked() const;
     void OnItemShopButtonClicked() const;
     void OnMyRoomButtonClicked() const;

@@ -25,6 +25,7 @@ struct GameConfig
     {
         UseFx           = src.UseFx;
         UseBGM          = src.UseBGM;
+        UseEqualizer    = src.UseEqualizer;
         UseWindowCursor = src.UseWindowCursor;
         MusicVolume     = src.MusicVolume;
         EffectVolume    = src.EffectVolume;
@@ -38,6 +39,7 @@ struct GameConfig
     {
         UseFx           = true;
         UseBGM          = true;
+        UseEqualizer    = false;
         UseWindowCursor = false;
         MusicVolume     = 100;
         EffectVolume    = 100;
@@ -80,6 +82,7 @@ struct GameConfig
 
     bool UseFx;
     bool UseBGM;
+    bool UseEqualizer;
     bool UseWindowCursor;
 
     unsigned int MusicVolume;

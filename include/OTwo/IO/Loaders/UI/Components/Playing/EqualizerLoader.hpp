@@ -1,5 +1,5 @@
-#ifndef O2JAM_LOADER_EQUALIZER_LOADER_HPP
-#define O2JAM_LOADER_EQUALIZER_LOADER_HPP
+#ifndef O2JAM_EQUALIZER_LOADER_HPP
+#define O2JAM_EQUALIZER_LOADER_HPP
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>

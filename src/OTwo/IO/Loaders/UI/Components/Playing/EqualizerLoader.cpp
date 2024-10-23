@@ -1,6 +1,7 @@
 #include <OTwo/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 #include <OTwo/Metadata/UI/Components/Playing/EqualizerMetadata.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
+#include <OTwo/IO/Loaders/UI/UiContainerLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
@@ -13,24 +14,22 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromJson(const Gx::Json& json, c
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
-        TransformLoader::ParseMetadata(transform.value(), metadata, context);
-
-    if (auto count = attributes.find("count"); count != attributes.end())
-        metadata.Count = count->get<int>();
-
-    if (auto spacing = attributes.find("spacing"); spacing != attributes.end())
-        metadata.Spacing = spacing->get<float>();
-
-    if (auto it = metadata.Require.find("gauge"); it != metadata.Require.end())
+    if (const auto attributes = json.find("attributes"); attributes != json.end())
     {
-        auto prefab = std::any_cast<Gx::Json>(it->second);
-        if (auto data = prefab.find("name"); data != prefab.end())
-            metadata.ItemName = data->get<std::string>();
+        if (const auto transform = attributes->find("transform"); transform != attributes->end())
+            TransformLoader::ParseMetadata(transform.value(), metadata, context);
 
-        if (auto data = prefab.find("source"); data != prefab.end())
-            metadata.ItemSource = data.value();
+        metadata.Bounds = {};
+        if (const auto bounds = attributes->find("bounds"); bounds != attributes->end())
+        {
+            metadata.Bounds = {
+                {},
+                {
+                    bounds->at("width"),
+                    bounds->at("height")
+                }
+            };
+        }
     }
 
     return LoadFromMetadata(metadata, context);
@@ -41,25 +40,32 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
     const auto metadata = dynamic_cast<const EqualizerMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
-    
-    auto equalizer = std::make_unique<Equalizer>(metadata->Count, metadata->Spacing);
 
+    auto equalizer = std::make_unique<Equalizer>();
+    auto populator  = ObjectContainer::Decorate(equalizer.get());
+    auto ctx        = ResourceContextDecorator::Decorate(context);
     equalizer->SetName(metadata->Name);
     equalizer->SetOrigin(metadata->Origin);
     equalizer->SetPosition(metadata->Position);
     equalizer->SetScale(metadata->Scale);
     equalizer->SetRotation(metadata->Rotation);
+    equalizer->SetLocalBounds(metadata->Bounds);
 
-    if (context.Available())
+    auto metaLoader = MetadataLoader();
+    for (auto [key, value] : meta.Require)
     {
-        auto container = ObjectContainer::Decorate(equalizer.get());
-        for (unsigned int i = 0; i < metadata->Count; i++)
-        {
-            auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
-            auto ctx  = Gx::ResourceContext::Rebind(name, context);
+        auto reference = std::any_cast<Gx::Json>(value);
+        if (reference.type() != Gx::Json::value_t::string)
+            continue;
 
-            ObjectLoader::Load(name, metadata->ItemSource, container, ctx);
-        }
+        auto name = meta.Name + "/" + key;
+        ObjectLoader::Load(name, reference, populator, ctx);
+    }
+
+    for (auto [key, object] : metadata->Objects)
+    {
+        auto name = meta.Name + "/" + key;
+        ObjectLoader::Load(name, object, populator, ctx);
     }
 
     return equalizer;

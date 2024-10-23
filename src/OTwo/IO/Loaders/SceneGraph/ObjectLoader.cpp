@@ -19,6 +19,7 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>

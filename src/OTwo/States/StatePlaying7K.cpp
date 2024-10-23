@@ -14,10 +14,11 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
+#include <OTwo/UI/Waiting/AvatarInfo.hpp>
 #include <OTwo/UI/Playing/ComboCounter.hpp>
 #include <OTwo/UI/Playing/JudgementIndicator.hpp>
 #include <OTwo/UI/Playing/PlayMenu.hpp>
-#include <OTwo/UI/Waiting/AvatarInfo.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Step.hpp>
@@ -321,6 +322,13 @@ void StatePlaying7K::Initialize()
                 AddChild(*noteClick);
             }
         }
+    }
+
+    // Setup equalizer
+    if (m_config.UseEqualizer)
+    {
+        if (const auto equalizer = playMenu->FindChild<Equalizer>("IDC_EQUALIZER"))
+            m_renderer.SetEqualizer(*equalizer);
     }
 
     // Setup Key Effects

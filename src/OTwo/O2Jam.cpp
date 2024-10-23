@@ -53,6 +53,7 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Waiting/MapSelector.hpp>
 #include <OTwo/UI/Playing/PlayMenu.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>

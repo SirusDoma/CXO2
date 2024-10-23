@@ -9,6 +9,7 @@
 #include <Genode/Tween/Fade.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
 
 ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::Mixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
     m_judgement(judgement),
@@ -18,6 +19,7 @@ ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, Sco
     m_prefabResources(prefabResources),
     m_instantiables(instantiables),
     m_container(),
+    m_equalizer(),
     m_rendering(false),
     m_endPosition(),
     m_chart(),
@@ -303,6 +305,9 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
         }
     }
 
+    if (m_equalizer)
+        m_equalizer->Update(states.Delta);
+
     return RenderableContainer::Render(surface, states);
 }
 
@@ -398,6 +403,16 @@ std::unordered_map<Chart::Channel, ChartRenderer::EventState*> ChartRenderer::Ge
     return m_frontBuffers;
 }
 
+Equalizer* ChartRenderer::GetEqualizer() const
+{
+    return m_equalizer;
+}
+
+void ChartRenderer::SetEqualizer(Equalizer& equalizer) const
+{
+    m_equalizer = &equalizer;
+}
+
 void ChartRenderer::SetRenderCompleteCallback(const std::function<void()>& completeCallback)
 {
     m_completeCallback = completeCallback;
@@ -428,6 +443,9 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& gr
         m_sounds[ev->ID] = &m_resources.Create<sf::Sound>(std::to_string(ev->ID), *ev->Sample);
         m_sounds[ev->ID]->setVolume(ev->Volume);
     }
+
+    if (m_equalizer && ev->SampleType == Chart::SampleType::KeySound)
+        m_equalizer->Register(*m_sounds[ev->ID]);
 
     m_mixer.Play(m_sounds[ev->ID], group);
 }

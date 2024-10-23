@@ -424,6 +424,14 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
         if (const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START"))
             btnStart->SetCheckedState(true);
     }
+    else if (ev.code == sf::Keyboard::Key::F9)
+    {
+        m_game.GetConfig().UseEqualizer = !m_game.GetConfig().UseEqualizer;
+        if (m_game.GetConfig().UseEqualizer)
+            ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+        else
+            ShowDialog("Equalizer deactivated.\n( To active press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+    }
 
     if (ev.control)
     {

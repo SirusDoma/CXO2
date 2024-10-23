@@ -20,6 +20,7 @@ using ChannelSet = std::unordered_set<Chart::Channel>;
 using SpeedMap = std::unordered_map<Chart::Channel, float>;
 
 class NoteContainer;
+class Equalizer;
 class ChartRenderer : public virtual Gx::Node, public Gx::RenderableContainer, public Gx::UpdatableContainer
 {
 public:
@@ -76,6 +77,9 @@ public:
     double GetLastMeasurePosition() const;
     std::unordered_map<Chart::Channel, EventState*> GetFrontBuffers() const;
 
+    Equalizer* GetEqualizer() const;
+    void SetEqualizer(Equalizer& equalizer) const;
+
     void SetRenderCompleteCallback(const std::function<void()> &completeCallback);
     void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
 
@@ -84,8 +88,6 @@ public:
 private:
     // Measure interval per millisecond @ 60bpm in 1/4 note
     static constexpr double TickSignature = 60000.f * 4.f;
-
-
 
     void PlaySample(const Chart::NoteEvent* ev, const std::string& group = "BGM") const;
 
@@ -113,6 +115,7 @@ private:
 
     SpeedMap m_speeds;
     sf::Clock m_timer;
+    mutable Equalizer* m_equalizer;
     mutable EventStateList m_events;
     mutable FrontBufferMap m_frontBuffers;
     mutable InputStateMap m_inputs;
