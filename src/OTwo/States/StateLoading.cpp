@@ -45,7 +45,8 @@ void StateLoading::Initialize()
         {
             loader.SetCoverLoadCallback([this] (auto cover)
             {
-                QueueEvent([this, cover] { OnCoverLoaded(cover); });
+                if (cover)
+                    QueueEvent([this, cover] { OnCoverLoaded(cover); });
             });
         }
 
