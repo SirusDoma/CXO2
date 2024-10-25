@@ -113,6 +113,9 @@ void Equalizer::Update(double delta)
     if (!combinedSamples.empty())
     {
         auto magnitudes = std::vector<float>(m_bars.size());
+        if (combinedSamples.size() % 2 != 0)
+            combinedSamples.push_back(0);
+
         AnalyzeSamples(combinedSamples, magnitudes);
 
         // Normalize magnitudes
@@ -123,7 +126,7 @@ void Equalizer::Update(double delta)
         // Map magnitudes to target heights
         for (std::size_t i = 0; i < m_bars.size(); ++i)
         {
-            m_targets[i] = magnitudes[i] / maxMagnitude * m_bars[i]->GetMaximumValue();
+            m_targets[i] = magnitudes[i] * m_bars[i]->GetMaximumValue();
         }
     }
     else
@@ -217,49 +220,46 @@ void Equalizer::Update(double delta)
 
 void Equalizer::AnalyzeSamples(const std::vector<std::int16_t>& samples, std::vector<float>& magnitudes)
 {
-    // PLEASE DON'T QUOTE ME ON THIS, THE CODE TOTALLY GENERATED
-
     const std::size_t N = samples.size();
-    if (kissCfg->nfft != N)
-    {
-        free(kissCfg);
-        kissCfg = kiss_fft_alloc(N, 0, nullptr, nullptr);
-    }
+    const auto cfg = kiss_fftr_alloc(N, 0, nullptr, nullptr);
 
-    std::vector<kiss_fft_cpx> in(N);
-    std::vector<kiss_fft_cpx> out(N);
+    std::vector<float> in(N);
+    std::vector<kiss_fft_cpx> out(N / 2 + 1);
 
-    // TODO: Cache the input?
     for (std::size_t i = 0; i < N; ++i)
     {
         const float hanningWindow = 0.5f * (1.0f - std::cos(2.0f * 3.14159265f * i / (N - 1)));
-        in[i].r = static_cast<float>(samples[i]) * hanningWindow;
-        in[i].i = 0.0f;
+        in[i] = static_cast<float>(samples[i]) * hanningWindow;
     }
 
-    kiss_fft(kissCfg, in.data(), out.data());
+    kiss_fftr(cfg, in.data(), out.data());
 
-    const auto first = out.begin();
-    const auto last  = out.begin() + (out.size() / 2);
-    const std::vector<kiss_fft_cpx> nyquist = { first, last };
-
-    float sum = 0.f;
-    magnitudes.assign(magnitudes.size(), 0);
-
-    constexpr std::size_t binSize = 5.f; // Prime number?
-    for (int frequency = 0; frequency < nyquist.size(); frequency++)
+    const std::vector<float> frequencies = { 20, 250, 500, 2000, 6000, 20000 };
+    auto peaks = std::vector<float>();
+    for (std::size_t i = 0; i < N / 2 + 1; i++)
     {
-        constexpr float minAmp = 1.f;
-        constexpr float maxAmp = 500.f;
+        constexpr std::size_t sampleRate   = 44100;
+        constexpr std::size_t channelCount = 2;
 
-        const float real = out[frequency].r * 2 / N;
-        const float imag = out[frequency].i * 2 / N;
+        const float frequency = i * (channelCount * sampleRate) / N;
+        const float magnitude = std::hypot(out[i].r, out[i].i);
 
-        sum += std::hypot(real, imag); // std::clamp(std::hypot(real, imag), minAmp, maxAmp);
-        if (frequency > 0 && frequency <= magnitudes.size() * binSize && frequency % binSize == 0)
+        for (std::size_t j = 0; j < frequencies.size() - 1; j++)
         {
-            magnitudes[(frequency / binSize) - 1] = sum / static_cast<float>(binSize);
-            sum = 0;
+            if (frequency > frequencies[j] && frequency <= frequencies[j + 1])
+            {
+                peaks.push_back(magnitude);
+            }
         }
     }
+
+    for (std::size_t i = 0; i < magnitudes.size(); i++)
+    {
+        if (i >= peaks.size())
+            break;
+
+        magnitudes[i] = peaks[i] * 0.00000045f; //* 0.025f; //* 0.00000045f;
+    }
+
+    free(cfg);
 }
