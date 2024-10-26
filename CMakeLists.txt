@@ -13,6 +13,9 @@ include(schemas/generator.cmake)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Aliases
+set(EXECUTABLE_NAME "OTwo")
+
 # Sources
 file(GLOB_RECURSE SRCS src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.hpp)
@@ -20,11 +23,8 @@ file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.h)
 file(GLOB_RECURSE HEADERS schemas/headers/*.hpp)
-include_directories(src)
-include_directories(include)
-include_directories(extlibs/headers)
-include_directories(schemas/headers)
 
+# Schema
 file(GLOB_RECURSE SCHEMA_FILES schemas/**/*.bop)
 if (SCHEMA_FILES)
     message("-- Configuring schema generator --")
@@ -97,18 +97,8 @@ if(USE_BOXER)
     )
     fetchcontent_makeavailable(Boxer)
 else()
-    # -- MessageBox-X11 Flags
     message("-- System message box: MessageBox-X11")
-    fetchcontent_declare(
-        MessageBoxX11
-        GIT_REPOSITORY https://github.com/Eleobert/MessageBox-X11.git
-        GIT_TAG master
-    )
-    fetchcontent_makeavailable(MessageBoxX11)
 endif()
-
-# Aliases
-set(EXECUTABLE_NAME "OTwo")
 
 # Specific OS Directories and Flags
 if(WIN32)
@@ -132,14 +122,7 @@ if(WIN32)
     )
 
     # External Libs Compiler Flags
-    set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET sfml-system PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET sfml-graphics PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET sfml-audio PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET sfml-window PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET sfml-main PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET clip PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET Boxer PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     # Set dependencies libs
     set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
@@ -188,8 +171,6 @@ elseif(APPLE)
     )
 
     # Set dependencies libs
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework CoreAudio")
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework AudioUnit")
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE "-framework Security")
 else()
     # Executable
@@ -227,6 +208,12 @@ endif()
 
 message("-- Output Directory: " ${OUTPUT_DIR})
 
+# Application includes
+target_include_directories(${EXECUTABLE_NAME} PRIVATE src)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE include)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE extlibs/headers)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE schemas/headers)
+
 # Link JSON
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
@@ -234,15 +221,12 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
 
 # Link Clip
-include_directories(${FETCHCONTENT_BASE_DIR}/clip-src)
+target_include_directories(clip INTERFACE ${FETCHCONTENT_BASE_DIR}/clip-src)
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
-# Link Boxer / MessageBox-X11
+# Link Boxer
 if(USE_BOXER)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE Boxer)
-else()
-    include_directories(${FETCHCONTENT_BASE_DIR}/MessageBox-X11-src)
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE MessageBoxX11)
 endif()
 
 # Link SFML

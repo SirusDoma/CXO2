@@ -4,11 +4,16 @@
 #include <Genode/System/Exception.hpp>
 #include <Genode/Utilities/Debugger.hpp>
 
-#include <iostream>
-
 #ifdef USE_BOXER
 #include <boxer/boxer.h>
+#else
+#include <messagebox-x11/messagebox.h>
 #endif
+
+#include <iostream>
+#include <exception>
+#include <typeinfo>
+#include <stdexcept>
 
 int main(int argc , char** argv)
 {
@@ -27,10 +32,7 @@ int main(int argc , char** argv)
     catch (std::exception &ex)
     {
         if (Gx::Debugger::IsDebuggerAttached())
-        {
             std::cerr << ex.what() << std::endl;
-            throw;
-        }
 
         auto details = std::string();
         if (typeid(ex) == typeid(Gx::ResourceAccessException) || typeid(ex) == typeid(Gx::ResourceLoadException))
@@ -43,10 +45,19 @@ int main(int argc , char** argv)
                 details += path + "\n";
         }
 
+        const auto message = std::string(std::string(ex.what()) + details);
 #ifdef USE_BOXER
-        boxer::show(std::string(std::string(ex.what()) + details).c_str(), "Fatal Error", boxer::Style::Error);
+        boxer::show(message.c_str(), "Fatal Error", boxer::Style::Error);
+#else
+        wchar_t text[] = L"OK";
+        const std::vector<Button> buttons = { {text } };
+
+        Messagebox("Fatal Error", std::wstring(message.begin(), message.end()).c_str(), buttons.data(), 1);
 #endif
 
-        throw;
+        if (Gx::Debugger::IsDebuggerAttached())
+            throw;
+
+        return -1;
     }
 }
