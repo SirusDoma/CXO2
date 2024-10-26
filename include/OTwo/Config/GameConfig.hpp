@@ -1,5 +1,6 @@
 #pragma once
 
+#include <magic_enum.hpp>
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
 
@@ -9,81 +10,26 @@
 
 enum class NoteShape : std::uint8_t
 {
-    Square = 1,
-    Circle = 2
+    Circle = 0,
+    Square = 1
 };
 
 struct GameConfig
 {
-    GameConfig()
-    {
-        Reset();
-    }
+    GameConfig();
 
-    void Apply(const GameConfig& src)
-    {
-        UseFx           = src.UseFx;
-        UseBGM          = src.UseBGM;
-        UseEqualizer    = src.UseEqualizer;
-        UseWindowCursor = src.UseWindowCursor;
-        MusicVolume     = src.MusicVolume;
-        EffectVolume    = src.EffectVolume;
-        NoteShapeType   = src.NoteShapeType;
-        NoteGuideLength = src.NoteGuideLength;
-        PollingRate     = src.PollingRate;
-        KeyBindings     = src.KeyBindings;
-    }
+    void Load();
+    void Save();
 
-    void Reset()
-    {
-        UseFx           = true;
-        UseBGM          = true;
-        UseEqualizer    = false;
-        UseWindowCursor = false;
-        MusicVolume     = 100;
-        EffectVolume    = 100;
-        NoteShapeType   = NoteShape::Square,
-        NoteGuideLength = 0,
-        PollingRate     = 1000; // hz
-        KeyBindings     = {
-            {
-                KeyMode::Seven,
-                {
-                    {Chart::Channel::Note1, sf::Keyboard::Key::S},
-                    {Chart::Channel::Note2, sf::Keyboard::Key::D},
-                    {Chart::Channel::Note3, sf::Keyboard::Key::F},
-                    {Chart::Channel::Note4, sf::Keyboard::Key::Space},
-                    {Chart::Channel::Note5, sf::Keyboard::Key::J},
-                    {Chart::Channel::Note6, sf::Keyboard::Key::K},
-                    {Chart::Channel::Note7, sf::Keyboard::Key::L}
-                }
-            },
-            {
-                KeyMode::Five,
-                {
-                    {Chart::Channel::Note2, sf::Keyboard::Key::D},
-                    {Chart::Channel::Note3, sf::Keyboard::Key::F},
-                    {Chart::Channel::Note4, sf::Keyboard::Key::Space},
-                    {Chart::Channel::Note5, sf::Keyboard::Key::J},
-                    {Chart::Channel::Note6, sf::Keyboard::Key::K},
-                }
-            },
-            {
-                KeyMode::Three,
-                {
-                    {Chart::Channel::Note1, sf::Keyboard::Key::LShift},
-                    {Chart::Channel::Note2, sf::Keyboard::Key::RShift},
-                    {Chart::Channel::Note4, sf::Keyboard::Key::Enter}
-                }
-            }
-        };
-    }
+    void Apply(const GameConfig& src);
+    void Reset();
 
     bool UseFx;
     bool UseBGM;
     bool UseEqualizer;
     bool UseWindowCursor;
 
+    unsigned int FxLevel;
     unsigned int MusicVolume;
     unsigned int EffectVolume;
 

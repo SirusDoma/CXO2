@@ -164,8 +164,9 @@ void O2Jam::Boot()
     auto& context = GetContext();
     context.Provide<GameConfig>([] (auto& ctx)
     {
-        // TODO: Load game config from file
         auto config = std::make_unique<GameConfig>();
+        config->Load();
+
         return config;
     }, Gx::Context::Scope::Singleton);
 
