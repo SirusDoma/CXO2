@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_METADATA_HPP
-#define O2JAM_STATE_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
@@ -8,5 +7,3 @@
 struct StateMetadata : ResourceMetadata
 {
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_DIALOG_LOADER_HPP
-#define O2JAM_DIALOG_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 
@@ -14,5 +13,3 @@ public :
     Gx::ResourcePtr<Gx::Dialog> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Gx::Dialog> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

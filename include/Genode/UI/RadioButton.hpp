@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_RADIO_BUTTON_HPP
-#define GENODE_UI_RADIO_BUTTON_HPP
+#pragma once
 
 #include <Genode/UI/CheckBox.hpp>
 
@@ -23,5 +22,3 @@ namespace Gx
         std::function<void(RadioButton&)> m_onCheckStateChanged;
     };
 }
-
-#endif

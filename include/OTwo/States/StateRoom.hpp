@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_ROOM_HPP
-#define O2JAM_STATE_ROOM_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -30,5 +29,3 @@ private:
     GameContext& m_game;
     ItemFactory& m_items;
 };
-
-#endif

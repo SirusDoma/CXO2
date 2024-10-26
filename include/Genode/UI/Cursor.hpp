@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_CURSOR_HPP
-#define GENODE_GRAPHICS_CURSOR_HPP
+#pragma once
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Image.hpp>
@@ -8,7 +7,7 @@
 
 #include <unordered_map>
 
-namespace Gx 
+namespace Gx
 {
     class Cursor
     {
@@ -71,5 +70,3 @@ namespace Gx
         std::unordered_map<Type, CursorHandle> m_cursors;
     };
 }
-
-#endif

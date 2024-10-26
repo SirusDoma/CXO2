@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_LIFE_SYSTEM_HPP
-#define O2JAM_CORE_LIFE_SYSTEM_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -29,6 +28,3 @@ private:
     int m_max;
     int m_point;
 };
-
-
-#endif

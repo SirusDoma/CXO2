@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_INFO_LOADER_HPP
-#define O2JAM_AVATAR_INFO_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
@@ -12,5 +11,3 @@ public :
     Gx::ResourcePtr<AvatarInfo> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<AvatarInfo> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

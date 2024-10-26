@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_CACHE_HPP
-#define GENODE_IO_CACHE_HPP
+#pragma once
 
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/IOException.hpp>
@@ -49,4 +48,3 @@ namespace Gx
 }
 
 #include <Genode/IO/ResourceContainer.inl>
-#endif

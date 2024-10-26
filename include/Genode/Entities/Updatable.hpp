@@ -1,5 +1,4 @@
-#ifndef GENODE_ENTITIES_UPDATABLE_HPP
-#define GENODE_ENTITIES_UPDATABLE_HPP
+#pragma once
 
 namespace Gx
 {
@@ -10,5 +9,3 @@ namespace Gx
         virtual ~Updatable() = default;
     };
 }
-
-#endif

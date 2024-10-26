@@ -1,5 +1,4 @@
-#ifndef GENODE_SYSTEM_CONTEXT_HPP
-#define GENODE_SYSTEM_CONTEXT_HPP
+#pragma once
 
 #include <Genode/Utilities/Reflection.hpp>
 
@@ -119,4 +118,3 @@ namespace Gx
 }
 
 #include <Genode/System/Context.inl>
-#endif

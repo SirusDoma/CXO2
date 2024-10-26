@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_NOTE_GUIDE_LINE_HPP
-#define O2JAM_CORE_NOTE_GUIDE_LINE_HPP
+#pragma once
 
 #include <Genode/Entities/Renderable.hpp>
 
@@ -29,5 +28,3 @@ private:
     double m_delta;
     std::array<sf::Vertex*, 8> m_vertices;
 };
-
-#endif

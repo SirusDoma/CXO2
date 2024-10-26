@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_LOADING_HPP
-#define O2JAM_STATE_LOADING_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -22,5 +21,3 @@ private:
     sf::Texture m_texture;
     GameContext& m_context;
 };
-
-#endif

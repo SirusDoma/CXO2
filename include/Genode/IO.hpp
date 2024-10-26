@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_HPP
-#define GENODE_IO_HPP
+#pragma once
 
 #include <Genode/IO/Json.hpp>
 #include <Genode/IO/Resource.hpp>
@@ -13,5 +12,3 @@
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/ResourceManager.hpp>
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_MUSIC_SELECTION_CONTEXT_HPP
-#define O2JAM_MUSIC_SELECTION_CONTEXT_HPP
+#pragma once
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
@@ -50,5 +49,3 @@ private:
     Difficulty     m_difficulty;
     float          m_speed;
 };
-
-#endif

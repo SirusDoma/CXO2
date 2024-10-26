@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_SCORE_TRACKER_HPP
-#define O2JAM_CORE_SCORE_TRACKER_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -60,5 +59,3 @@ private:
     unsigned int m_buffer;
     unsigned int m_bufferProgress;
 };
-
-#endif

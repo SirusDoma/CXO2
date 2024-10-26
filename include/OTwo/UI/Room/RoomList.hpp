@@ -1,5 +1,4 @@
-#ifndef O2JAM_ROOM_LIST_HPP
-#define O2JAM_ROOM_LIST_HPP
+#pragma once
 
 #include <Genode/UI/List.hpp>
 #include <OTwo/UI/Room/RoomButton.hpp>
@@ -42,5 +41,3 @@ private:
     unsigned int m_page;
     bool m_waiting;
 };
-
-#endif

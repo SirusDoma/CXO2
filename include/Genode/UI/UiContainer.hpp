@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_CONTAINER_HPP
-#define GENODE_UI_CONTAINER_HPP
+#pragma once
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -41,5 +40,3 @@ namespace Gx
         bool m_useBatching{false};
     };
 }
-
-#endif

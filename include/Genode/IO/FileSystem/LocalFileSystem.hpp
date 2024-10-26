@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_LOCAL_FILESYSTEM_HPP
-#define GENODE_IO_LOCAL_FILESYSTEM_HPP
+#pragma once
 
 #include <Genode/IO/FileSystem/FileSystemController.hpp>
 
@@ -47,5 +46,3 @@ namespace Gx
         inline static std::vector<std::string> m_paths;
     };
 }
-
-#endif

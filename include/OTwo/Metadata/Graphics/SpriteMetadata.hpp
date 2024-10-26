@@ -1,5 +1,4 @@
-#ifndef O2JAM_SPRITE_METADATA_HPP
-#define O2JAM_SPRITE_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
@@ -14,5 +13,3 @@ struct SpriteMetadata : TransformMetadata
     sf::IntRect   TexCoords;
     Gx::BlendMode BlendMode;
 };
-
-#endif

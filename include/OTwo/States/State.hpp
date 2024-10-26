@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_HPP
-#define O2JAM_STATE_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Dialog.hpp>
@@ -68,4 +67,3 @@ private:
 };
 
 #include <OTwo/States/State.inl>
-#endif

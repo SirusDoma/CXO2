@@ -1,5 +1,4 @@
-#ifndef O2JAM_CURSOR_METADATA_HPP
-#define O2JAM_CURSOR_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/UI/Cursor.hpp>
@@ -17,5 +16,3 @@ struct CursorMetadata : public ResourceMetadata
 
     std::vector<CursorStateMetadata> States;
 };
-
-#endif

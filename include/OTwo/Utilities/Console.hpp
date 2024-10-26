@@ -1,5 +1,4 @@
-#ifndef O2JAM_UTILITIES_CONSOLE_HPP
-#define O2JAM_UTILITIES_CONSOLE_HPP
+#pragma once
 
 #include <Genode/Graphics/Transformable.hpp>
 #include <Genode/Graphics/Text.hpp>
@@ -45,5 +44,3 @@ private:
     std::vector<std::string> m_logs;
     bool m_enabled;
 };
-
-#endif

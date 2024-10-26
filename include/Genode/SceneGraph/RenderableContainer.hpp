@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_RENDERABLE_CONTAINER_HPP
-#define GENODE_SCENEGRAPH_RENDERABLE_CONTAINER_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/Entities/Renderable.hpp>
@@ -14,5 +13,3 @@ namespace Gx
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
     };
 }
-
-#endif

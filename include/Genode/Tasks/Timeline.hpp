@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_TIMELINE_HPP
-#define GENODE_TASKS_TIMELINE_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 #include <vector>
@@ -39,4 +38,3 @@ namespace Gx
 }
 
 #include <Genode/Tasks/Timeline.inl>
-#endif

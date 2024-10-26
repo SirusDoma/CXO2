@@ -1,5 +1,4 @@
-#ifndef O2JAM_OPI_ARCHIVE_HPP
-#define O2JAM_OPI_ARCHIVE_HPP
+#pragma once
 
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
@@ -48,12 +47,10 @@ private:
     const unsigned int ITEM_HEADER_SIZE = 152;
 
     bool ReadStream(void* data, std::uint64_t size) const;
- 
+
     Signature m_signature;
     std::uint32_t m_count;
 
     mutable std::unordered_map<std::string, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
-
-#endif

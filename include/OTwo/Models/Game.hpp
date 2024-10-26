@@ -1,5 +1,4 @@
-#ifndef O2JAM_MODELS_GAME_HPP
-#define O2JAM_MODELS_GAME_HPP
+#pragma once
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 
@@ -37,5 +36,3 @@ enum class Accuracy : std::uint8_t
     Bad  = 3,
     Miss = 4
 };
-
-#endif

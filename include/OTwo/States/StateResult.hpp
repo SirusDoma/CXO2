@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_RESULT_HPP
-#define O2JAM_STATE_RESULT_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -20,5 +19,3 @@ private:
     SessionContext& m_session;
     const ScoreTracker& m_scoreTracker;
 };
-
-#endif

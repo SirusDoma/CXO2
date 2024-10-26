@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_SCENE_DIRECTOR
-#define GENODE_SCENEGRAPH_SCENE_DIRECTOR
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
@@ -69,4 +68,3 @@ namespace Gx
 }
 
 #include <Genode/SceneGraph/SceneDirector.inl>
-#endif

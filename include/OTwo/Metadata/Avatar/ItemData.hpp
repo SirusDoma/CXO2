@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_ITEM_DATA_HPP
-#define O2JAM_AVATAR_ITEM_DATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
@@ -11,5 +10,3 @@ struct ItemData : ResourceMetadata
     std::string Version;
     std::map<unsigned int, ItemMetadata> Items;
 };
-
-#endif

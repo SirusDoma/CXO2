@@ -1,5 +1,4 @@
-#ifndef O2JAM_LIST_METADATA_HPP
-#define O2JAM_LIST_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
@@ -17,5 +16,3 @@ struct ListMetadata : public TransformMetadata
     Gx::Json ItemSource;
     unsigned int ItemCount = 0;
 };
-
-#endif

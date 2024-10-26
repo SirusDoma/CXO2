@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_FILE_INFO_HPP
-#define GENODE_IO_FILE_INFO_HPP
+#pragma once
 
 #include <optional>
 #include <string>
@@ -26,5 +25,3 @@ namespace Gx
         std::size_t m_size = 0;
     };
 }
-
-#endif

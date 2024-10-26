@@ -1,5 +1,4 @@
-#ifndef O2JAM_RESOURCE_CONTEXT_HPP
-#define O2JAM_RESOURCE_CONTEXT_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
@@ -31,4 +30,3 @@ private:
 };
 
 #include <OTwo/Decorators/IO/ResourceContextDecorator.inl>
-#endif

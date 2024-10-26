@@ -1,5 +1,4 @@
-#ifndef GENODE_RENDER_SURFACE_ADAPTOR_HPP
-#define GENODE_RENDER_SURFACE_ADAPTOR_HPP
+#pragma once
 
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -42,5 +41,3 @@ namespace Gx
         std::function<sf::Color()> m_clearColorResolver;
     };
 }
-
-#endif

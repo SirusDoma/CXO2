@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_TASK_HPP
-#define GENODE_TASKS_TASK_HPP
+#pragma once
 
 #include <SFML/System/Time.hpp>
 
@@ -45,5 +44,3 @@ namespace Gx
         std::function<void()> m_startCallback, m_stopCallback, m_completeCallback;
     };
 }
-
-#endif

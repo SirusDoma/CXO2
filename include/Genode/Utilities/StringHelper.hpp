@@ -1,5 +1,4 @@
-#ifndef GENODE_UTILITIES_STRING_HELPER_HPP
-#define GENODE_UTILITIES_STRING_HELPER_HPP
+#pragma once
 
 #include <SFML/System/String.hpp>
 
@@ -87,7 +86,6 @@ namespace Gx
                     regexPattern += c;
             }
 
-
             auto regex = std::regex(regexPattern);
             return std::regex_match(input, regex);
         }
@@ -154,5 +152,3 @@ namespace Gx
         }
     };
 }
-
-#endif

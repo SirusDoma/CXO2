@@ -1,5 +1,4 @@
-#ifndef O2JAM_ROOM_BUTTON_HPP
-#define O2JAM_ROOM_BUTTON_HPP
+#pragma once
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Button.hpp>
@@ -31,5 +30,3 @@ private:
     Gx::Image* m_hover;
     bool m_active;
 };
-
-#endif

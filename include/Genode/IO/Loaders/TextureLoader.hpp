@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_TEXTURE_LOADER_HPP
-#define GENODE_IO_TEXTURE_LOADER_HPP
+#pragma once
 
 #include <Genode/IO/ResourceLoader.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -20,5 +19,3 @@ namespace Gx
         bool m_smooth = true;
     };
 }
-
-#endif

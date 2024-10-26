@@ -1,5 +1,4 @@
-#ifndef O2JAM_ROOM_USER_LIST_HPP
-#define O2JAM_ROOM_USER_LIST_HPP
+#pragma once
 
 #include <Genode/UI/UiContainer.hpp>
 
@@ -26,5 +25,3 @@ private:
     unsigned int m_selectedUser;
     unsigned int m_page = 1;
 };
-
-#endif

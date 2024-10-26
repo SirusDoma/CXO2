@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_RENDER_SURFACE_HPP
-#define GENODE_GRAPHICS_RENDER_SURFACE_HPP
+#pragma once
 
 #include <Genode/Graphics/RenderStates.hpp>
 
@@ -47,5 +46,3 @@ namespace Gx
         virtual void SetView(const sf::View& view) = 0;
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_OJM_ARCHIVE_HPP
-#define O2JAM_OJM_ARCHIVE_HPP
+#pragma once
 
 #include <OTwo/Archives/FileInfo.hpp>
 #include <OTwo/Archives/M30Archive.hpp>
@@ -41,5 +40,3 @@ private:
 
     ArchiveType m_type = ArchiveType::Unknown;
 };
-
-#endif

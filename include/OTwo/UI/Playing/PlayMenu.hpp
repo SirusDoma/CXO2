@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLAYING_PLAY_MENU_HPP
-#define O2JAM_PLAYING_PLAY_MENU_HPP
+#pragma once
 
 #include <OTwo/Core/ScoreTracker.hpp>
 
@@ -44,6 +43,3 @@ private:
     Gx::Gauge* m_sfxVol;
     std::unordered_map<Accuracy, Gx::BitmapNumber*> m_counters;
 };
-
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_MARQUEE_METADATA_HPP
-#define O2JAM_MARQUEE_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
 
@@ -10,5 +9,3 @@ struct MarqueeMetadata : public LabelMetadata
     double        Speed;
     sf::FloatRect Bounds;
 };
-
-#endif

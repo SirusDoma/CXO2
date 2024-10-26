@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_RECTANGLE_HPP
-#define GENODE_GRAPHICS_RECTANGLE_HPP
+#pragma once
 
 #include <Genode/Graphics/Shape.hpp>
 
@@ -45,6 +44,3 @@ namespace Gx
     };
 
 }
-
-
-#endif

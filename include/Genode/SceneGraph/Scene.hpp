@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_SCENE_HPP
-#define GENODE_SCENEGRAPH_SCENE_HPP
+#pragma once
 
 #include <Genode/System/Context.hpp>
 
@@ -76,4 +75,3 @@ namespace Gx
 }
 
 #include <Genode/SceneGraph/Scene.inl>
-#endif

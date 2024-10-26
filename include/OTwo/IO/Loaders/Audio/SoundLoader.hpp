@@ -1,5 +1,4 @@
-#ifndef O2JAM_SOUND_LOADER_HPP
-#define O2JAM_SOUND_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <SFML/Audio/Sound.hpp>
@@ -13,5 +12,3 @@ public :
     Gx::ResourcePtr<sf::Sound> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<sf::Sound> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLAYING_JUDGEMENT_INDICATOR_HPP
-#define O2JAM_PLAYING_JUDGEMENT_INDICATOR_HPP
+#pragma once
 
 #include <OTwo/Models/Game.hpp>
 
@@ -31,5 +30,3 @@ private:
     Gx::Animation* m_target;
     Gx::Scale m_scale;
 };
-
-#endif

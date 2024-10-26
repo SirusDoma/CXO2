@@ -1,5 +1,4 @@
-#ifndef GENODE_SYSTEM_APPLICATION_HPP
-#define GENODE_SYSTEM_APPLICATION_HPP
+#pragma once
 
 #include <Genode/Audio/Mixer.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
@@ -101,5 +100,3 @@ namespace Gx
         sf::Color m_clearColor = sf::Color::Black;
     };
 }
-
-#endif

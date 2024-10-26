@@ -1,5 +1,4 @@
-#ifndef O2JAM_ADL_SERIALIZER_HPP
-#define O2JAM_ADL_SERIALIZER_HPP
+#pragma once
 
 #include <OTwo/Serializable.g.hpp>
 #include <Genode/IO/Json.hpp>
@@ -62,7 +61,6 @@ struct nlohmann::adl_serializer<std::unordered_map<K, V>>
     }
 };
 
-
 template<typename Enum>
 struct nlohmann::adl_serializer<Enum, std::enable_if_t<std::is_enum_v<Enum>>>
 {
@@ -72,5 +70,3 @@ struct nlohmann::adl_serializer<Enum, std::enable_if_t<std::is_enum_v<Enum>>>
             p = parsed.value();
     }
 };
-
-#endif

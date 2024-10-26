@@ -1,5 +1,4 @@
-#ifndef O2JAM_CHECK_BOX_METADATA_HPP
-#define O2JAM_CHECK_BOX_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <Genode/IO/Json.hpp>
@@ -9,5 +8,3 @@
 struct CheckBoxMetadata : public ButtonMetadata
 {
 };
-
-#endif

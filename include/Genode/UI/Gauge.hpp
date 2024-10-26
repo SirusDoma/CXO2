@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_GAUGE_HPP
-#define GENODE_UI_GAUGE_HPP
+#pragma once
 
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Control.hpp>
@@ -77,4 +76,3 @@ namespace Gx
 }
 
 #include <Genode/UI/Gauge.inl>
-#endif

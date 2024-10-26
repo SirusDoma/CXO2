@@ -1,5 +1,4 @@
-#ifndef O2JAM_COMMON_CHAT_WINDOW_HPP
-#define O2JAM_COMMON_CHAT_WINDOW_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/List.hpp>
@@ -56,5 +55,3 @@ private:
     std::vector<ChatMessage> m_chats;
     std::vector<std::unique_ptr<Gx::Label>> m_labels;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_FILESYSTEM_CONTROLLER_HPP
-#define GENODE_IO_FILESYSTEM_CONTROLLER_HPP
+#pragma once
 
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/FileSystem/FileInfo.hpp>
@@ -38,5 +37,3 @@ namespace Gx
         std::string m_prefix;
     };
 }
-
-#endif

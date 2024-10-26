@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_CIRCLE_HPP
-#define GENODE_GRAPHICS_CIRCLE_HPP
+#pragma once
 
 #include <Genode/Graphics/Shape.hpp>
 
@@ -43,10 +42,8 @@ namespace Gx
         sf::Vector2f GetPoint(std::size_t index) const override;
 
     private:
-        float       m_radius;     
-        std::size_t m_pointCount; 
+        float       m_radius;
+        std::size_t m_pointCount;
     };
 
-} 
-
-#endif
+}

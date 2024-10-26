@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_PAYMENT_HPP
-#define O2JAM_STATE_PAYMENT_HPP
+#pragma once
 
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/States/State.hpp>
@@ -17,5 +16,3 @@ private:
     SessionContext& m_session;
     CartContext& m_cart;
 };
-
-#endif

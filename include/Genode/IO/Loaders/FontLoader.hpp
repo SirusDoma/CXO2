@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_FONT_LOADER_HPP
-#define GENODE_IO_FONT_LOADER_HPP
+#pragma once
 
 #include <Genode/IO/ResourceLoader.hpp>
 #include <string>
@@ -23,5 +22,3 @@ namespace Gx
         bool m_smooth = true;
     };
 }
-
-#endif

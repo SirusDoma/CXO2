@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_ITEM_SHOP_HPP
-#define O2JAM_STATE_ITEM_SHOP_HPP
+#pragma once
 
 #include <mutex>
 #include <OTwo/States/State.hpp>
@@ -75,6 +74,3 @@ private:
     std::unordered_map<unsigned int, std::unordered_map<Currency, unsigned int>> m_shopSetItemPrices;
     std::unordered_map<unsigned int, Item> m_thumbnails;
 };
-
-
-#endif

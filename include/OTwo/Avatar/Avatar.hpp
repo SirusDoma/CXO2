@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_AVATAR_HPP
-#define O2JAM_AVATAR_AVATAR_HPP
+#pragma once
 
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Equipment.hpp>
@@ -50,5 +49,3 @@ private:
     bool       m_alive;
     mutable ItemMap m_items, m_defaultItems;
 };
-
-#endif

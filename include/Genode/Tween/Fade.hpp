@@ -1,5 +1,4 @@
-#ifndef GENODE_TWEEN_FADE_HPP
-#define GENODE_TWEEN_FADE_HPP
+#pragma once
 
 #include <SFML/System/Time.hpp>
 
@@ -24,5 +23,3 @@ namespace Gx
         sf::Time m_duration;
     };
 }
-
-#endif

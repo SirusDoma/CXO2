@@ -1,5 +1,4 @@
-#ifndef O2JAM_FILE_ENTRY_HPP
-#define O2JAM_FILE_ENTRY_HPP
+#pragma once
 
 #include <Genode/IO/FileSystem/FileInfo.hpp>
 
@@ -22,5 +21,3 @@ private:
     std::uint16_t m_index  = 0;
     std::uint64_t m_offset = 0;
 };
-
-#endif

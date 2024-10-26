@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_MUSIC_SHOP_HPP
-#define O2JAM_STATE_MUSIC_SHOP_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 #include <Genode/SceneGraph.hpp>
@@ -29,5 +28,3 @@ private:
 
     Gx::Image* m_selector;
 };
-
-#endif

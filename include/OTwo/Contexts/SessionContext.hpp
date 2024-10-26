@@ -1,5 +1,4 @@
-#ifndef O2JAM_SESSION_CONTEXT_HPP
-#define O2JAM_SESSION_CONTEXT_HPP
+#pragma once
 
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Room.hpp>
@@ -52,5 +51,3 @@ private:
     std::array<ScoreResultItem, 8> m_lastResult;
     mutable std::vector<ChartMetadata> m_installedMusicList;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_RESOURCEMANAGER_HPP
-#define GENODE_IO_RESOURCEMANAGER_HPP
+#pragma once
 
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/ResourceContainer.hpp>
@@ -111,4 +110,3 @@ namespace Gx
 }
 
 #include <Genode/IO/ResourceManager.inl>
-#endif

@@ -119,5 +119,3 @@ R* State::FindResource(const std::string& id, const ResourceScope scope)
 
     return resources->Find<R>(GetName() + "/" + id);
 }
-
-

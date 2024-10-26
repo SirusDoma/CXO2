@@ -1,5 +1,4 @@
-#ifndef GENODE_AUDIO_SOUNDGROUP_HPP
-#define GENODE_AUDIO_SOUNDGROUP_HPP
+#pragma once
 
 #include <Genode/Entities/Updatable.hpp>
 #include <SFML/Audio.hpp>
@@ -39,7 +38,6 @@ namespace Gx
     private:
         friend class Mixer;
 
-
         sf::SoundSource* Play(sf::SoundSource* source);
         bool Remove(sf::SoundSource* source);
 
@@ -52,5 +50,3 @@ namespace Gx
         std::vector<sf::SoundSource*> m_sources;
     };
 }
-
-#endif

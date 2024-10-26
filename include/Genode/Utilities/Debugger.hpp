@@ -1,5 +1,4 @@
-#ifndef GENODE_UTILITIES_DEBUGGER_HELPER_HPP
-#define GENODE_UTILITIES_DEBUGGER_HELPER_HPP
+#pragma once
 
 #ifdef _WIN32
 #include <windows.h>
@@ -59,4 +58,3 @@ namespace Gx
         }
     };
 }
-#endif

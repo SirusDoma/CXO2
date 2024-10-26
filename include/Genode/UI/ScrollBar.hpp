@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_SCROLLBAR_HPP
-#define GENODE_UI_SCROLLBAR_HPP
+#pragma once
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/Graphics/Sprite.hpp>
@@ -10,7 +9,7 @@ namespace Gx
     {
     public:
         enum class ScrollOrientation { Horizontal, Vertical };
-        
+
         ScrollBar();
         ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
         ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollBar::ScrollOrientation orientation = ScrollOrientation::Horizontal);
@@ -26,7 +25,7 @@ namespace Gx
 
         const sf::Color& GetColor() const override;
         void SetColor(const sf::Color& color) override;
-        
+
         ScrollOrientation GetScrollOrientation() const;
         void SetScrollOrientation(ScrollOrientation orientation);
 
@@ -67,5 +66,3 @@ namespace Gx
         std::function<void(ScrollBar&, float)> m_onValueChanged;
     };
 }
-
-#endif

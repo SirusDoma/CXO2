@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_PLAYING_LOADER_HPP
-#define O2JAM_STATE_PLAYING_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/States/StatePlaying7K.hpp>
@@ -18,5 +17,3 @@ public :
 private:
     static void LoadRequiredResource(ObjectContainer container, const StateMetadata* metadata, const std::string& key, const std::string& suffix, const PlayingResourceContext& context, unsigned int count = 1);
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_LOADER_HPP
-#define O2JAM_AVATAR_LOADER_HPP
+#pragma once
 
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/IO/ResourceLoader.hpp>
@@ -16,5 +15,3 @@ public :
 private:
     ItemFactory* m_items;
 };
-
-#endif

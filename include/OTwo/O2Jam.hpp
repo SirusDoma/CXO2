@@ -1,5 +1,4 @@
-#ifndef O2JAM_HPP
-#define O2JAM_HPP
+#pragma once
 
 #include <Genode/System/Application.hpp>
 
@@ -30,5 +29,3 @@ private:
     mutable std::unique_ptr<sf::RenderTexture> m_layeredTarget = std::make_unique<sf::RenderTexture>();
     mutable Gx::RenderSurfaceAdaptor m_layeredAdaptor = Gx::RenderSurfaceAdaptor(*m_layeredTarget);
 };
-
-#endif

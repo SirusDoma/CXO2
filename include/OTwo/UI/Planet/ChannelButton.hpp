@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLANET_CHANNEL_BUTTON_HPP
-#define O2JAM_PLANET_CHANNEL_BUTTON_HPP
+#pragma once
 
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
@@ -49,5 +48,3 @@ private:
     unsigned int m_population;
     bool m_initialized;
 };
-
-#endif

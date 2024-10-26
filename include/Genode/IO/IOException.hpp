@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_EXCEPTION_HPP
-#define GENODE_IO_EXCEPTION_HPP
+#pragma once
 
 #include <Genode/System/Exception.hpp>
 
@@ -47,5 +46,3 @@ namespace Gx
         std::string m_resourceID;
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_MODELS_ROOM_HPP
-#define O2JAM_MODELS_ROOM_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Serializable.g.hpp>
@@ -92,7 +91,7 @@ enum class RoomTeam
 struct RoomMember : Player
 {
     RoomMember() = default;
-    
+
     RoomTeam  Team  = static_cast<RoomTeam>(-1);
     sf::Color Color = sf::Color::Transparent;
     std::uint8_t Index = 0;
@@ -154,5 +153,3 @@ struct Room
         return "MX" + speedStr;
     }
 };
-
-#endif

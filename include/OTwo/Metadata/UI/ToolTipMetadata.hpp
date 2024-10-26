@@ -1,5 +1,4 @@
-#ifndef O2JAM_TOOLTIP_METADATA_HPP
-#define O2JAM_TOOLTIP_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
 #include <SFML/System/Time.hpp>
@@ -12,5 +11,3 @@ struct ToolTipMetadata : public LabelMetadata
     sf::Color    ContainerFillColor;
     sf::Color    ContainerOutlineColor;
 };
-
-#endif

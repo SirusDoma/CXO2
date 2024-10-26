@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_CONTROL_HPP
-#define GENODE_UI_CONTROL_HPP
+#pragma once
 
 #include <SFML/Window/Event.hpp>
 
@@ -101,4 +100,3 @@ namespace Gx
 }
 
 #include <Genode/UI/Control.inl>
-#endif

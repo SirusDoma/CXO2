@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_BLEND_MODE_HPP
-#define GENODE_GRAPHICS_BLEND_MODE_HPP
+#pragma once
 
 namespace Gx
 {
@@ -14,5 +13,3 @@ namespace Gx
         None
     };
 }
-
-#endif

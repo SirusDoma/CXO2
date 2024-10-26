@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_ANIMATION_HPP
-#define GENODE_GRAPHICS_ANIMATION_HPP
+#pragma once
 
 #include <SFML/Graphics/Rect.hpp>
 
@@ -81,4 +80,3 @@ namespace Gx
 }
 
 #include <Genode/Graphics/Animation.inl>
-#endif

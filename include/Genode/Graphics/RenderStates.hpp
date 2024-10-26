@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_RENDER_STATES
-#define GENODE_GRAPHICS_RENDER_STATES
+#pragma once
 
 #include <SFML/Graphics/RenderStates.hpp>
 
@@ -16,7 +15,7 @@ namespace Gx
         float Layer                = 0.f;
 
         static const RenderStates Default;
-        
+
         // ReSharper disable CppNonExplicitConvertingConstructor
         RenderStates(const sf::BlendMode& blendMode);
         RenderStates(const sf::StencilMode& stencilMode);
@@ -33,5 +32,3 @@ namespace Gx
         friend class Application;
     };
 }
-
-#endif

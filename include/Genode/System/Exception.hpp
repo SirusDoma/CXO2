@@ -1,5 +1,4 @@
-#ifndef GENODE_EXCEPTION_HPP
-#define GENODE_EXCEPTION_HPP
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -40,5 +39,3 @@ namespace Gx
         std::string m_parameter;
     };
 }
-
-#endif

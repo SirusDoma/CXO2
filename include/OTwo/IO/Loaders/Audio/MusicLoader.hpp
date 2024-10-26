@@ -1,5 +1,4 @@
-#ifndef O2JAM_MUSIC_LOADER_HPP
-#define O2JAM_MUSIC_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <SFML/Audio/Music.hpp>
@@ -15,5 +14,3 @@ public :
 
     bool IsStreaming() const override;
 };
-
-#endif

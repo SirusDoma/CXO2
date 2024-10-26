@@ -1,5 +1,4 @@
-#ifndef O2JAM_RESOURCE_METADATA_HPP
-#define O2JAM_RESOURCE_METADATA_HPP
+#pragma once
 
 #include <Genode/IO/Json.hpp>
 
@@ -82,5 +81,3 @@ struct ResourceMetadata
     RequireMap   Require;
     ObjectMap    Objects;
 };
-
-#endif

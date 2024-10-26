@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_UPDATABLE_CONTAINER_HPP
-#define GENODE_SCENEGRAPH_UPDATABLE_CONTAINER_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/Entities/Updatable.hpp>
@@ -16,5 +15,3 @@ namespace Gx
         void Update(const double delta) override;
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_LOGO_HPP
-#define O2JAM_STATE_LOGO_HPP
+#pragma once
 
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/States/State.hpp>
@@ -15,5 +14,3 @@ public:
 private:
     Gx::Mixer& m_mixer;
 };
-
-#endif

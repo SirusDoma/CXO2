@@ -1,5 +1,4 @@
-#ifndef O2JAM_OBJECT_LOADER_HPP
-#define O2JAM_OBJECT_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
@@ -20,4 +19,3 @@ private:
 };
 
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.inl>
-#endif

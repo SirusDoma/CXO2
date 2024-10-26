@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_RESOURCE_LOADER_HPP
-#define GENODE_IO_RESOURCE_LOADER_HPP
+#pragma once
 
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/ResourceContext.hpp>
@@ -68,4 +67,3 @@ namespace Gx
 }
 
 #include <Genode/IO/ResourceLoader.inl>
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLAYING_COMBO_COUNTER_HPP
-#define O2JAM_PLAYING_COMBO_COUNTER_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/Entities/Renderable.hpp>
@@ -31,5 +30,3 @@ private:
     Gx::Move             m_move;
     Gx::Delay            m_delay;
 };
-
-#endif

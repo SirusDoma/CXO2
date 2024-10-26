@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_TEXT_HPP
-#define GENODE_GRAPHICS_TEXT_HPP
+#pragma once
 
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
@@ -69,8 +68,8 @@ namespace Gx
             Regular       = 0,
             Bold          = 1 << 0,
             Italic        = 1 << 1,
-            Underlined    = 1 << 2, 
-            StrikeThrough = 1 << 3  
+            Underlined    = 1 << 2,
+            StrikeThrough = 1 << 3
         };
 
         Text();
@@ -135,10 +134,8 @@ namespace Gx
         mutable sf::VertexArray m_vertices;
         mutable sf::VertexArray m_outlineVertices;
         mutable sf::FloatRect   m_bounds;
-        mutable bool            m_geometryNeedUpdate; 
+        mutable bool            m_geometryNeedUpdate;
         mutable std::uint64_t   m_fontTextureId;
     };
 
 }
-
-#endif

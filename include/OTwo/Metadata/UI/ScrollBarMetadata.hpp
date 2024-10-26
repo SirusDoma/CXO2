@@ -1,5 +1,4 @@
-#ifndef O2JAM_SCROLL_BAR_METADATA_HPP
-#define O2JAM_SCROLL_BAR_METADATA_HPP
+#pragma once
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -13,5 +12,3 @@ struct ScrollBarMetadata : public SpriteMetadata
     sf::FloatRect Bounds;
     Gx::ScrollBar::ScrollOrientation Orientation;
 };
-
-#endif

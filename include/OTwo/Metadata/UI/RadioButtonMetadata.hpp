@@ -1,5 +1,4 @@
-#ifndef O2JAM_RADIO_BUTTON_METADATA_HPP
-#define O2JAM_RADIO_BUTTON_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <OTwo/Metadata/UI/ButtonMetadata.hpp>
@@ -9,5 +8,3 @@
 struct RadioButtonMetadata : public ButtonMetadata
 {
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_O2CHART_METADATA_HPP
-#define O2JAM_O2CHART_METADATA_HPP
+#pragma once
 
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
@@ -131,5 +130,3 @@ struct ChartMetadata
         };
     }
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_MODELS_EQUIPMENT_HPP
-#define O2JAM_MODELS_EQUIPMENT_HPP
+#pragma once
 
 enum class EquipmentType
 {
@@ -51,5 +50,3 @@ enum class Instrument
     Keyboard,
     Drum
 };
-
-#endif

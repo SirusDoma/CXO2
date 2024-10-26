@@ -1,5 +1,4 @@
-#ifndef O2JAM_CHANNEL_BUTTON_METADATA_HPP
-#define O2JAM_CHANNEL_BUTTON_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
@@ -13,5 +12,3 @@ struct ChannelButtonMetadata : public RadioButtonMetadata
 {
     std::unordered_map<ChannelButton::Mode, std::unordered_map<Gx::Control::State, sf::IntRect>> States;
 };
-
-#endif

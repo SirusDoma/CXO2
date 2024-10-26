@@ -1,5 +1,4 @@
-#ifndef GENODE_RENDER_BATCH_CONTAINER_HPP
-#define GENODE_RENDER_BATCH_CONTAINER_HPP
+#pragma once
 
 #include <Genode/Graphics/SpriteBatch.hpp>
 
@@ -21,5 +20,3 @@ namespace Gx
         mutable SpriteBatch m_batcher{SpriteBatch::BatchMode::LayerSort};
     };
 }
-
-#endif

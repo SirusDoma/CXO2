@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_IMAGE_HPP
-#define GENODE_UI_IMAGE_HPP
+#pragma once
 
 #include <SFML/Graphics/Rect.hpp>
 
@@ -58,5 +57,3 @@ namespace Gx
         std::unordered_map<std::string, Frame> m_frames;
     };
 }
-
-#endif

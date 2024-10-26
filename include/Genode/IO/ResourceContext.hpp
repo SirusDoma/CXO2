@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_RESOURCE_CONTEXT_HPP
-#define GENODE_IO_RESOURCE_CONTEXT_HPP
+#pragma once
 
 #include <Genode/IO/ResourceContainer.hpp>
 #include <SFML/System/InputStream.hpp>
@@ -62,4 +61,3 @@ namespace Gx
 }
 
 #include <Genode/IO/ResourceContext.inl>
-#endif

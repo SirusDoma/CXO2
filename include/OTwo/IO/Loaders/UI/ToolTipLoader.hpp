@@ -1,5 +1,4 @@
-#ifndef O2JAM_TOOLTIP_LOADER_HPP
-#define O2JAM_TOOLTIP_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/UI/ToolTipMetadata.hpp>
@@ -13,5 +12,3 @@ public :
     Gx::ResourcePtr<Gx::ToolTip> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Gx::ToolTip> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

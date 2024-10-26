@@ -1,5 +1,4 @@
-#ifndef O2JAM_OBJECT_POPULATOR_HPP
-#define O2JAM_OBJECT_POPULATOR_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -29,4 +28,3 @@ private:
 };
 
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.inl>
-#endif

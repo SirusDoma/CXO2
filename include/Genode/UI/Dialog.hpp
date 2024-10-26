@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_DIALOG_HPP
-#define GENODE_UI_DIALOG_HPP
+#pragma once
 
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
@@ -73,5 +72,3 @@ namespace Gx
         std::function<void()> m_onAccepted, m_onCancelled;
     };
 }
-
-#endif

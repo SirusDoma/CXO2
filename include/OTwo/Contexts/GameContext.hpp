@@ -1,5 +1,4 @@
-#ifndef O2JAM_GAME_CONTEXT_HPP
-#define O2JAM_GAME_CONTEXT_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -51,5 +50,3 @@ private:
 
     // TODO: Skill modifiers
 };
-
-#endif

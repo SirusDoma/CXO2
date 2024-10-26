@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_CHECKBOX_HPP
-#define GENODE_UI_CHECKBOX_HPP
+#pragma once
 
 #include <Genode/UI/Button.hpp>
 
@@ -27,5 +26,3 @@ namespace Gx
         std::function<void(CheckBox&)> m_onCheckStateChanged = nullptr;
     };
 }
-
-#endif

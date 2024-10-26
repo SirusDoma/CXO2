@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_CHART_RENDERER_HPP
-#define O2JAM_CORE_CHART_RENDERER_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
@@ -132,5 +131,3 @@ private:
     std::function<void()> m_completeCallback;
     std::function<void(Chart::Channel, bool)> m_inputCallback;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_ROOM_MARQUEE_HPP
-#define O2JAM_ROOM_MARQUEE_HPP
+#pragma once
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Label.hpp>
@@ -31,5 +30,3 @@ private:
 
     mutable std::unique_ptr<sf::RenderTexture> m_renderTexture;
 };
-
-#endif

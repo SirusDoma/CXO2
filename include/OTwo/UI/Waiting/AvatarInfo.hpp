@@ -1,5 +1,4 @@
-#ifndef O2JAM_WAITING_AVATAR_INFO_HPP
-#define O2JAM_WAITING_AVATAR_INFO_HPP
+#pragma once
 
 #include <OTwo/Models/Room.hpp>
 
@@ -35,5 +34,3 @@ private:
     ColorMap    m_teamColors;
 
 };
-
-#endif

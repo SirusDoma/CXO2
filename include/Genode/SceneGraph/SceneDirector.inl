@@ -39,7 +39,6 @@ namespace Gx
         m_staged = false;
     }
 
-
     template<typename T>
     bool SceneDirector::IsPresenting()
     {

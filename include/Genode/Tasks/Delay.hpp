@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_TASK_DELAY_HPP
-#define GENODE_TASKS_TASK_DELAY_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 
@@ -22,5 +21,3 @@ namespace Gx
         sf::Time m_duration;
     };
 }
-
-#endif

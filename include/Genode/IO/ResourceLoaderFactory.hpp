@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_DESERIALIZER_FACRORY_HPP
-#define GENODE_IO_DESERIALIZER_FACRORY_HPP
+#pragma once
 
 #include <typeindex>
 #include <typeinfo>
@@ -56,4 +55,3 @@ namespace Gx
 }
 
 #include <Genode/IO/ResourceLoaderFactory.inl>
-#endif

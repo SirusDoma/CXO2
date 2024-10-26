@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_JSON_HPP
-#define GENODE_IO_JSON_HPP
+#pragma once
 
 #include <string>
 #include <optional>
@@ -30,5 +29,3 @@ namespace Gx
 {
     using Json = nlohmann::ordered_json;
 }
-
-#endif

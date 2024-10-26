@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_LONG_NOTE_HPP
-#define O2JAM_CORE_LONG_NOTE_HPP
+#pragma once
 
 #include <OTwo/Core/Note.hpp>
 
@@ -33,5 +32,3 @@ private:
     double      m_length;
 
 };
-
-#endif

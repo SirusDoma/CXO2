@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_HPP
-#define GENODE_TASKS_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Tasks/TaskContainer.hpp>
@@ -8,5 +7,3 @@
 #include <Genode/Tasks/Step.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tasks/Timeline.hpp>
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_INFO_METADATA_HPP
-#define O2JAM_AVATAR_INFO_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
 
@@ -11,5 +10,3 @@ struct AvatarInfoMetadata : public UiContainerMetadata
 
     ColorMap TeamColors;
 };
-
-#endif

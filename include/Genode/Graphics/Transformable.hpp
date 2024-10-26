@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_TRANSFORMABLE_HPP
-#define GENODE_GRAPHICS_TRANSFORMABLE_HPP
+#pragma once
 
 #include <SFML/Graphics/Export.hpp>
 #include <SFML/Graphics/Transform.hpp>
@@ -60,17 +59,14 @@ namespace Gx
         const sf::Transform& GetInverseTransform() const;
 
     private:
-        sf::Vector2f          m_origin;                     
-        sf::Vector2f          m_position;                   
-        float                 m_rotation;                   
-        sf::Vector2f          m_scale;                      
-        mutable sf::Transform m_transform;                  
-        mutable bool          m_transformNeedUpdate;        
-        mutable sf::Transform m_inverseTransform;           
+        sf::Vector2f          m_origin;
+        sf::Vector2f          m_position;
+        float                 m_rotation;
+        sf::Vector2f          m_scale;
+        mutable sf::Transform m_transform;
+        mutable bool          m_transformNeedUpdate;
+        mutable sf::Transform m_inverseTransform;
         mutable bool          m_inverseTransformNeedUpdate;
     };
 
 }
-
-
-#endif

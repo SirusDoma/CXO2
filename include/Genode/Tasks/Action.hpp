@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_ACTION_HPP
-#define GENODE_TASKS_ACTION_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 
@@ -18,5 +17,3 @@ namespace Gx
         std::function<void()> m_callback;
     };
 }
-
-#endif

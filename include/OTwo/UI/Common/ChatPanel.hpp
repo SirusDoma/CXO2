@@ -1,5 +1,4 @@
-#ifndef O2JAM_ROOM_CHAT_PANEL_HPP
-#define O2JAM_ROOM_CHAT_PANEL_HPP
+#pragma once
 
 #include <Genode/UI/UiContainer.hpp>
 #include <OTwo/UI/Common/ChatWindow.hpp>
@@ -20,5 +19,3 @@ public:
 private:
     SessionContext& m_session;
 };
-
-#endif

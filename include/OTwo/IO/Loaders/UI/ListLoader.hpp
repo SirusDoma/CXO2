@@ -1,5 +1,4 @@
-#ifndef O2JAM_LIST_LOADER_HPP
-#define O2JAM_LIST_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 
@@ -16,5 +15,3 @@ public:
 
     static bool ParseMetadata(Gx::Json attributes, ListMetadata& metadata, const Gx::ResourceContext& ctx);
 };
-
-#endif

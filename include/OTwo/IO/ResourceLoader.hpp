@@ -1,5 +1,4 @@
-#ifndef O2JAM_RESOURCE_LOADER_HPP
-#define O2JAM_RESOURCE_LOADER_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
@@ -24,4 +23,3 @@ public:
 };
 
 #include <OTwo/IO/ResourceLoader.inl>
-#endif

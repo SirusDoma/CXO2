@@ -1,5 +1,4 @@
-#ifndef GENODE_ENTITIES_INPUTABLE_HPP
-#define GENODE_ENTITIES_INPUTABLE_HPP
+#pragma once
 
 #include <SFML/Window/Event.hpp>
 
@@ -47,5 +46,3 @@ namespace Gx
         }
     };
 }
-
-#endif

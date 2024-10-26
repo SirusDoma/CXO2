@@ -1,5 +1,4 @@
-#ifndef GENODE_SYSTEM_PLATFORM_HPP
-#define GENODE_SYSTEM_PLATFORM_HPP
+#pragma once
 
 namespace Gx
 {
@@ -21,5 +20,3 @@ namespace Gx
 #endif
     }
 }
-
-#endif

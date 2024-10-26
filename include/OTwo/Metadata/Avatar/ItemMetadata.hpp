@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_ITEM_METADATA_HPP
-#define O2JAM_AVATAR_ITEM_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <OTwo/Serializable.g.hpp>
@@ -26,5 +25,3 @@ struct ItemMetadata : ResourceMetadata
     std::map<Currency, unsigned int> Prices;
     std::vector<ItemSpriteMetadata>  References = std::vector<ItemSpriteMetadata>();
 };
-
-#endif

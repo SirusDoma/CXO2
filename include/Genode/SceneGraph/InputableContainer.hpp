@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_INPUTABLE_CONTAINER_HPP
-#define GENODE_SCENEGRAPH_INPUTABLE_CONTAINER_HPP
+#pragma once
 
 #include <SFML/Window/Event.hpp>
 
@@ -18,5 +17,3 @@ namespace Gx
         bool Input(const sf::Event& ev) override;
     };
 }
-
-#endif

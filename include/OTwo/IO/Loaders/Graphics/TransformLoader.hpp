@@ -1,5 +1,4 @@
-#ifndef O2JAM_TRANSFORM_LOADER_HPP
-#define O2JAM_TRANSFORM_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <SFML/Graphics/Transform.hpp>
@@ -15,5 +14,3 @@ public :
 
     static bool ParseMetadata(Gx::Json transform, TransformMetadata& metadata, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
 };
-
-#endif

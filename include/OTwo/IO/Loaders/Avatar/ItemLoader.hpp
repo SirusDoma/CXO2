@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_ITEM_LOADER_HPP
-#define O2JAM_AVATAR_ITEM_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 
@@ -19,5 +18,3 @@ public :
 private:
     bool m_thumbnailOnly = false;
 };
-
-#endif

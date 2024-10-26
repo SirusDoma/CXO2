@@ -1,5 +1,4 @@
-#ifndef GENODE_AUDIO_MIXER_HPP
-#define GENODE_AUDIO_MIXER_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
@@ -67,4 +66,3 @@ namespace Gx
 }
 
 #include <Genode/Audio/Mixer.inl>
-#endif

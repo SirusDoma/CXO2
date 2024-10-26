@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_TEXTBOX_HPP
-#define GENODE_UI_TEXTBOX_HPP
+#pragma once
 
 #include <Genode/UI/Control.hpp>
 
@@ -126,5 +125,3 @@ namespace Gx
         std::function<void(TextBox&, const sf::String&)> m_onTextEntered;
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_ITEM_FACTORY_HPP
-#define O2JAM_ITEM_FACTORY_HPP
+#pragma once
 
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Metadata/Avatar/ItemData.hpp>
@@ -32,5 +31,3 @@ private:
     SetInfoData& m_setInfoData;
     Gx::ResourceManager* m_resources;
 };
-
-#endif

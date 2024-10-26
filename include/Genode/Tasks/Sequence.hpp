@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_SEQUENCE_HPP
-#define GENODE_TASKS_SEQUENCE_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Tasks/Delay.hpp>
@@ -38,4 +37,3 @@ namespace Gx
 }
 
 #include <Genode/Tasks/Sequence.inl>
-#endif

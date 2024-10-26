@@ -1,5 +1,4 @@
-#ifndef O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
-#define O2JAM_DIALOG_CREATE_ROOM_DIALOG_HPP
+#pragma once
 
 #include <Genode/UI/Dialog.hpp>
 #include <OTwo/Models/Room.hpp>
@@ -27,5 +26,3 @@ private:
     SessionContext& m_session;
     Gx::Mixer& m_mixer;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_PLANET_HPP
-#define O2JAM_STATE_PLANET_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Models/Planet.hpp>
@@ -22,6 +21,3 @@ private:
 
     bool m_connecting;
 };
-
-
-#endif

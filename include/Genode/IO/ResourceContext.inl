@@ -61,7 +61,6 @@ namespace Gx
         return m_resources->Store(id, resource, CacheMode::Update);
     }
 
-
     template<typename R>
     R& ResourceContext::Store(const std::string& id, ResourcePtr<R> resource) const
     {

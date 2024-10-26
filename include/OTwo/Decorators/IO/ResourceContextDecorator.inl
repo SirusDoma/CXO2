@@ -79,7 +79,6 @@ R* ResourceContextDecorator::Instantiate(const ResourceMetadata& metadata, const
         id += "_" + std::to_string(resources->Count<R>());
     }
 
-
     return &Store(id, *instance);
 }
 

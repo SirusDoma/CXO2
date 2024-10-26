@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_SHAPE_HPP
-#define GENODE_GRAPHICS_SHAPE_HPP
+#pragma once
 
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -53,7 +52,7 @@ namespace Gx
         const sf::Color& GetFillColor() const;
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;
-        
+
         const sf::Color& GetColor() const override;
         const sf::Color& GetColor(unsigned int index) const;
         void SetColor(const sf::Color& color) override;
@@ -80,18 +79,16 @@ namespace Gx
         void UpdateOutline();
         void UpdateOutlineColors();
 
-        const sf::Texture* m_texture;          
-        sf::IntRect        m_textureRect;      
-        sf::Color          m_fillColor;        
+        const sf::Texture* m_texture;
+        sf::IntRect        m_textureRect;
+        sf::Color          m_fillColor;
         sf::Color          m_outlineColor;
         ColorMap           m_colorMap;
-        float              m_outlineThickness; 
-        sf::VertexArray    m_vertices;         
-        sf::VertexArray    m_outlineVertices;  
-        sf::FloatRect      m_insideBounds;     
+        float              m_outlineThickness;
+        sf::VertexArray    m_vertices;
+        sf::VertexArray    m_outlineVertices;
+        sf::FloatRect      m_insideBounds;
         sf::FloatRect      m_bounds;
     };
 
 }
-
-#endif

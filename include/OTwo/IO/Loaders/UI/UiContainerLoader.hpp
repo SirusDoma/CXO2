@@ -1,5 +1,4 @@
-#ifndef O2JAM_UI_CONTAINER_LOADER_HPP
-#define O2JAM_UI_CONTAINER_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 
@@ -13,5 +12,3 @@ public :
     Gx::ResourcePtr<Gx::UiContainer> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Gx::UiContainer> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

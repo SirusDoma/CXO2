@@ -1,5 +1,4 @@
-#ifndef O2JAM_TEXTBOX_METADATA_HPP
-#define O2JAM_TEXTBOX_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -10,5 +9,3 @@ struct TextBoxMetadata : public LabelMetadata
     unsigned int  MaximumLength;
     sf::Color     HighlightTextColor, HighlightBackColor;
 };
-
-#endif

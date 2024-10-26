@@ -66,7 +66,6 @@ namespace Gx
         return std::make_unique<R>(*resource);
     }
 
-
     template<typename R>
     R& ResourceManager::AddFromFile(const std::string& idOrFileName, CacheMode mode)
     {

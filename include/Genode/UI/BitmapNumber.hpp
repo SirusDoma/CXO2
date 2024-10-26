@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_BITMAP_NUMBER_HPP
-#define GENODE_UI_BITMAP_NUMBER_HPP
+#pragma once
 
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/Graphics/Sprite.hpp>
@@ -83,5 +82,3 @@ namespace Gx
         std::unordered_map<unsigned int, std::vector<sf::IntRect>> m_texCoords;
     };
 }
-
-#endif

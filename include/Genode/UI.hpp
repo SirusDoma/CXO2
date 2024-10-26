@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_HPP
-#define GENODE_UI_HPP
+#pragma once
 
 #include <Genode/UI/Cursor.hpp>
 #include <Genode/UI/Control.hpp>
@@ -16,5 +15,3 @@
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/TextBox.hpp>
 #include <Genode/UI/ScrollBar.hpp>
-
-#endif

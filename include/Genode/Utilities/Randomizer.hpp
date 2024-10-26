@@ -1,5 +1,4 @@
-#ifndef GENODE_UTILITIES_RANDOMIZER_HPP
-#define GENODE_UTILITIES_RANDOMIZER_HPP
+#pragma once
 
 #include <random>
 
@@ -36,5 +35,3 @@ namespace Gx
         std::mt19937       m_seeder;
     };
 }
-
-#endif

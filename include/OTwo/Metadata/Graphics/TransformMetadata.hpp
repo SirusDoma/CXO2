@@ -1,5 +1,4 @@
-#ifndef O2JAM_TRANSFORM_METADATA_HPP
-#define O2JAM_TRANSFORM_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 
@@ -12,5 +11,3 @@ struct TransformMetadata : public ResourceMetadata
     float        Rotation  = 0;
     sf::Vector2f Origin;
 };
-
-#endif

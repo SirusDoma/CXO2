@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_TOOLTIP_HPP
-#define GENODE_UI_TOOLTIP_HPP
+#pragma once
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
@@ -50,5 +49,3 @@ namespace Gx
         sf::Time     m_duration, m_elapsed;
     };
 }
-
-#endif

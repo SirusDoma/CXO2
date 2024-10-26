@@ -1,5 +1,4 @@
-#ifndef O2JAM_UI_CONTAINER_METADATA_HPP
-#define O2JAM_UI_CONTAINER_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
@@ -9,5 +8,3 @@ struct UiContainerMetadata : public TransformMetadata
 {
     sf::FloatRect Bounds = {};
 };
-
-#endif

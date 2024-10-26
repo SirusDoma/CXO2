@@ -1,5 +1,4 @@
-#ifndef O2JAM_WAITING_INSTRUMENT_SELECTOR_HPP
-#define O2JAM_WAITING_INSTRUMENT_SELECTOR_HPP
+#pragma once
 
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
 #include <Genode/UI/UiContainer.hpp>
@@ -41,5 +40,3 @@ private:
     int m_currentIndex;
     std::unordered_map<Instrument, std::vector<ItemMetadata>> m_headers;
 };
-
-#endif

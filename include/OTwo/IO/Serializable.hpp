@@ -1,5 +1,4 @@
-#ifndef O2JAM_SERIALIZABLE_HPP
-#define O2JAM_SERIALIZABLE_HPP
+#pragma once
 
 #include <vector>
 
@@ -22,4 +21,3 @@ protected:
 };
 
 #include <OTwo/IO/Serializable.inl>
-#endif

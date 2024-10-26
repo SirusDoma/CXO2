@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_SOUND_BUFFER_LOADER_HPP
-#define GENODE_IO_SOUND_BUFFER_LOADER_HPP
+#pragma once
 
 #include <Genode/IO/ResourceLoader.hpp>
 
@@ -17,5 +16,3 @@ namespace Gx
         ResourcePtr<sf::SoundBuffer> LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const override;
     };
 }
-
-#endif

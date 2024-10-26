@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_FILESYSTEM_HPP
-#define GENODE_IO_FILESYSTEM_HPP
+#pragma once
 
 #include <Genode/IO/Resource.hpp>
 
@@ -38,8 +37,4 @@ namespace Gx
             inline static FileSystemMap m_controllers;
     };
 
-
-
 }
-
-#endif

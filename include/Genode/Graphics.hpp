@@ -1,5 +1,4 @@
-#ifndef GENODE_GRAPHICS_HPP
-#define GENODE_GRAPHICS_HPP
+#pragma once
 
 #include <Genode/Graphics/BlendMode.hpp>
 #include <Genode/Graphics/RenderStates.hpp>
@@ -16,5 +15,3 @@
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 #include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
 #include <Genode/Graphics/SpriteBatch.hpp>
-
-#endif

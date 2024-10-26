@@ -1,5 +1,4 @@
-#ifndef GENODE_UTILITIES_REFLECTION_HPP
-#define GENODE_UTILITIES_REFLECTION_HPP
+#pragma once
 
 #include <tuple>
 #include <utility>
@@ -140,5 +139,3 @@ namespace Gx
         };
     }
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_NOTE_FACTORY_HPP
-#define O2JAM_CORE_NOTE_FACTORY_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Core/NoteContainer.hpp>
@@ -28,5 +27,3 @@ private:
     Gx::ResourceManager* m_resources, *m_prefabResources;
     ChannelSet           m_channels;
 };
-
-#endif

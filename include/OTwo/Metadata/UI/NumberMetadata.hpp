@@ -1,5 +1,4 @@
-#ifndef O2JAM_NUMBER_METADATA_HPP
-#define O2JAM_NUMBER_METADATA_HPP
+#pragma once
 
 #include <SFML/Graphics/Rect.hpp>
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
@@ -18,5 +17,3 @@ struct NumberMetadata : public TransformMetadata
     Gx::BlendMode BlendMode;
     std::unordered_map<unsigned int, std::vector<sf::IntRect>> DigitFrames = {};
 };
-
-#endif

@@ -1,9 +1,7 @@
-#ifndef O2JAM_CORE_CHART_HPP
-#define O2JAM_CORE_CHART_HPP
+#pragma once
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Models/Game.hpp>
-
 
 #include <SFML/Audio/SoundBuffer.hpp>
 
@@ -176,4 +174,3 @@ private:
 };
 
 #include <OTwo/Core/Chart.inl>
-#endif

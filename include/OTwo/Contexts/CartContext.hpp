@@ -1,5 +1,4 @@
-#ifndef O2JAM_CART_CONTEXT_HPP
-#define O2JAM_CART_CONTEXT_HPP
+#pragma once
 
 #include <OTwo/IO/Serializable.hpp>
 #include <OTwo/Serializable.g.hpp>
@@ -32,5 +31,3 @@ public:
 private:
     CheckoutType m_checkoutType;
 };
-
-#endif

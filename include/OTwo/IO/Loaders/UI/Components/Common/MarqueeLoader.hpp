@@ -1,5 +1,4 @@
-#ifndef O2JAM_MARQUEE_LOADER_HPP
-#define O2JAM_MARQUEE_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/UI/Common/Marquee.hpp>
@@ -12,5 +11,3 @@ public :
     Gx::ResourcePtr<Marquee> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Marquee> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_TASK_CONTAINER_HPP
-#define GENODE_TASKS_TASK_CONTAINER_HPP
+#pragma once
 
 #include <Genode/Entities/Updatable.hpp>
 #include <Genode/Tasks/Task.hpp>
@@ -33,4 +32,3 @@ namespace Gx
 }
 
 #include <Genode/Tasks/TaskContainer.inl>
-#endif

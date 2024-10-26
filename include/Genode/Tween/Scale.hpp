@@ -1,5 +1,4 @@
-#ifndef GENODE_TWEEN_SCALE_HPP
-#define GENODE_TWEEN_SCALE_HPP
+#pragma once
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>
@@ -24,5 +23,3 @@ namespace Gx
         sf::Time m_duration;
     };
 }
-
-#endif

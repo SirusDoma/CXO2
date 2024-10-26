@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLANET_CHANNELBOARD_HPP
-#define O2JAM_PLANET_CHANNELBOARD_HPP
+#pragma once
 
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
@@ -77,5 +76,3 @@ private:
     int m_selectedChannel;
     unsigned int m_channelsPerPage, m_channelPageIndex, m_channelMaxPage, m_noticePageIndex, m_noticeMaxPage;
 };
-
-#endif

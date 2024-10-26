@@ -1,5 +1,4 @@
-#ifndef O2JAM_SET_INFO_DATA_LOADER_HPP
-#define O2JAM_SET_INFO_DATA_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 
@@ -12,5 +11,3 @@ public :
     Gx::ResourcePtr<SetInfoData> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<SetInfoData> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
 };
-
-#endif

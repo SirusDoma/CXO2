@@ -1,5 +1,4 @@
-#ifndef O2JAM_EQUALIZER_LOADER_HPP
-#define O2JAM_EQUALIZER_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
@@ -12,6 +11,3 @@ public:
     Gx::ResourcePtr<Equalizer> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Equalizer> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-
-#endif

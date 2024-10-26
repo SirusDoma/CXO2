@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_NOTE_HPP
-#define O2JAM_CORE_NOTE_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
@@ -53,5 +52,3 @@ private:
     Chart::Channel m_channel;
     NoteGuideLine  m_line;
 };
-
-#endif //NOTE_HPP

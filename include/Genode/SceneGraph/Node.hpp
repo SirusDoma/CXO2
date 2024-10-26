@@ -1,5 +1,4 @@
-#ifndef GENODE_SCENEGRAPH_NODE_HPP
-#define GENODE_SCENEGRAPH_NODE_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -58,4 +57,3 @@ namespace Gx
 }
 
 #include <Genode/SceneGraph/Node.inl>
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_JUDGEMENT_STRATEGY_HPP
-#define O2JAM_CORE_JUDGEMENT_STRATEGY_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -32,5 +31,3 @@ private:
     const ChartRenderer* m_renderer;
     std::unordered_map<Accuracy, JudgementEvaluator> m_evaluators;
 };
-
-#endif

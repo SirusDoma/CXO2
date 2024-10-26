@@ -1,5 +1,4 @@
-#ifndef O2JAM_CONFIG_GAME_CONFIG_HPP
-#define O2JAM_CONFIG_GAME_CONFIG_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
@@ -95,5 +94,3 @@ struct GameConfig
 
     std::map<KeyMode, std::map<Chart::Channel, sf::Keyboard::Key>> KeyBindings;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_CHART_METADATA_HPP
-#define O2JAM_CHART_METADATA_HPP
+#pragma once
 
 #include <SFML/System/String.hpp>
 #include <SFML/System/Time.hpp>
@@ -39,5 +38,3 @@ struct ChartMetadataView
         return LevelCategory::Level4;
     }
 };
-
-#endif

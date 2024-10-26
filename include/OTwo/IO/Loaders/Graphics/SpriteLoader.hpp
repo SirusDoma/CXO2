@@ -1,5 +1,4 @@
-#ifndef O2JAM_SPRITE_LOADER_HPP
-#define O2JAM_SPRITE_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <Genode/Graphics/Sprite.hpp>
@@ -15,5 +14,3 @@ public :
 
     static bool ParseMetadata(Gx::Json json, SpriteMetadata& meta, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
 };
-
-#endif

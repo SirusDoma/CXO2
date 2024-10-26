@@ -1,5 +1,4 @@
-#ifndef O2JAM_SCROLL_BAR_LOADER_HPP
-#define O2JAM_SCROLL_BAR_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <Genode/UI/ScrollBar.hpp>
@@ -12,5 +11,3 @@ public :
     Gx::ResourcePtr<Gx::ScrollBar> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Gx::ScrollBar> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 };
-
-#endif

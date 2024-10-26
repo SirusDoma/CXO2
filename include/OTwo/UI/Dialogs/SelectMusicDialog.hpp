@@ -1,5 +1,4 @@
-#ifndef O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
-#define O2JAM_DIALOG_SELECT_MUSIC_DIALOG_HPP
+#pragma once
 
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -64,5 +63,3 @@ private:
     std::vector<ChartMetadata>   m_musicList;
     std::vector<ChartMetadata>   m_displayList;
 };
-
-#endif

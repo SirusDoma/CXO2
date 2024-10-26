@@ -1,5 +1,4 @@
-#ifndef O2JAM_PLAYING_RESOURCE_CONTEXT_HPP
-#define O2JAM_PLAYING_RESOURCE_CONTEXT_HPP
+#pragma once
 
 #include <Genode/IO/ResourceContext.hpp>
 #include <OTwo/Models/Game.hpp>
@@ -27,5 +26,3 @@ private:
     unsigned int m_effectID{1};
     GameMode m_mode  = GameMode::Versus;
 };
-
-#endif

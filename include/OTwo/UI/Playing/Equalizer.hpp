@@ -1,5 +1,4 @@
-#ifndef O2JAM_EQUALIZER_HPP
-#define O2JAM_EQUALIZER_HPP
+#pragma once
 
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Entities/Updatable.hpp>
@@ -44,5 +43,3 @@ private:
 
     std::size_t m_bufferSampleCount;
 };
-
-#endif

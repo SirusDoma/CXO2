@@ -1,5 +1,4 @@
-#ifndef GENODE_ENTITIES_RENDERABLE_HPP
-#define GENODE_ENTITIES_RENDERABLE_HPP
+#pragma once
 
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <Genode/Graphics/RenderStates.hpp>
@@ -31,5 +30,3 @@ namespace Gx
         bool m_visible = true;
     };
 }
-
-#endif

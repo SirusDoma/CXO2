@@ -1,5 +1,4 @@
-#ifndef O2JAM_EQUALIZER_METADATA_HPP
-#define O2JAM_EQUALIZER_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
 
@@ -7,5 +6,3 @@ struct EqualizerMetadata : public UiContainerMetadata
 {
     unsigned int BufferSampleCount;
 };
-
-#endif

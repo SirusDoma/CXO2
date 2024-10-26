@@ -1,5 +1,4 @@
-#ifndef O2JAM_SHAPE_METADATA_HPP
-#define O2JAM_SHAPE_METADATA_HPP
+#pragma once
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -49,5 +48,3 @@ struct RoundedRectangleMetadata : ShapeMetadata
     unsigned int CornerPointCount;
     float CornerRadius;
 };
-
-#endif

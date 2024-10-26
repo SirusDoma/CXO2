@@ -1,5 +1,4 @@
-#ifndef O2JAM_DIALOG_OPTION_DIALOG_HPP
-#define O2JAM_DIALOG_OPTION_DIALOG_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
@@ -39,5 +38,3 @@ private:
     bool m_initialized = false;
     bool m_keyTestEnabled = false;
 };
-
-#endif

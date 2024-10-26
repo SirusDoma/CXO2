@@ -1,5 +1,4 @@
-#ifndef O2JAM_CORE_NOTE_CONTAINER_HPP
-#define O2JAM_CORE_NOTE_CONTAINER_HPP
+#pragma once
 
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Config/GameConfig.hpp>
@@ -64,5 +63,3 @@ private:
     mutable unsigned int m_longCounter;
 
 };
-
-#endif

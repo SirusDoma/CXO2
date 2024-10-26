@@ -1,5 +1,4 @@
-#ifndef O2JAM_GAUGE_METADATA_HPP
-#define O2JAM_GAUGE_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
@@ -16,5 +15,3 @@ struct GaugeMetadata : public SpriteMetadata
     sf::Time AnimationDuration;
     std::vector<Gx::Animation::Frame> AnimationFrames;
 };
-
-#endif

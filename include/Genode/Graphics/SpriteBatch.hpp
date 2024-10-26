@@ -114,7 +114,6 @@ namespace Gx
                    const sf::Transform&   transform = sf::Transform::Identity,
                    float                  layer     = 0.f);
 
-
         void Update(const double delta) override;
 
         ////////////////////////////////////////////////////////////
@@ -234,7 +233,6 @@ namespace Gx
     };
 
 } // namespace Gx
-
 
 ////////////////////////////////////////////////////////////
 /// \class Gx::SpriteBatch

@@ -22,8 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef GENODE_GRAPHICS_POLYGON_HPP
-#define GENODE_GRAPHICS_POLYGON_HPP
+#pragma once
 
 #include <Genode/Graphics/Shape.hpp>
 #include <vector>
@@ -46,6 +45,4 @@ namespace Gx
         std::vector<sf::Vector2f> m_points;
     };
 
-} 
-
-#endif
+}

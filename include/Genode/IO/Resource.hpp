@@ -1,5 +1,4 @@
-#ifndef GENODE_IO_RESOURCE_HPP
-#define GENODE_IO_RESOURCE_HPP
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -13,5 +12,3 @@ namespace Gx
     using ResourcePtr = std::unique_ptr<R, ResourceDeleter<R>>;
 
 }
-
-#endif

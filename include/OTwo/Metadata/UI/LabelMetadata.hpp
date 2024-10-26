@@ -1,5 +1,4 @@
-#ifndef O2JAM_LABEL_METADATA_HPP
-#define O2JAM_LABEL_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 #include <Genode/UI/Label.hpp>
@@ -18,5 +17,3 @@ struct LabelMetadata : public TransformMetadata
     sf::Color            OutlineColor;
     Gx::Label::Alignment Alignment;
 };
-
-#endif

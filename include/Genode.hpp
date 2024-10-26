@@ -1,5 +1,4 @@
-#ifndef GENODE_MAIN_HPP
-#define GENODE_MAIN_HPP
+#pragma once
 
 #include <Genode/Utilities.hpp>
 #include <Genode/Entities.hpp>
@@ -11,5 +10,3 @@
 #include <Genode/System.hpp>
 #include <Genode/IO.hpp>
 #include <Genode/UI.hpp>
-
-#endif

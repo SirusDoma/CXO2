@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_REPEATER_HPP
-#define GENODE_UI_REPEATER_HPP
+#pragma once
 
 #include <Genode/UI/UiContainer.hpp>
 
@@ -76,5 +75,3 @@ namespace Gx
         std::vector<LayoutItem> m_layouts;
     };
 }
-
-#endif

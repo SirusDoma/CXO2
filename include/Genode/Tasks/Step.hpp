@@ -1,5 +1,4 @@
-#ifndef GENODE_TASKS_TASK_STEP_HPP
-#define GENODE_TASKS_TASK_STEP_HPP
+#pragma once
 
 #include <Genode/Tasks/Delay.hpp>
 
@@ -22,5 +21,3 @@ namespace Gx
         std::function<void(const Step&, double)> m_callback;
     };
 }
-
-#endif

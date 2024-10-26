@@ -1,5 +1,4 @@
-#ifndef O2JAM_METADATA_LOADER_HPP
-#define O2JAM_METADATA_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/ResourceMetadata.hpp>
@@ -12,5 +11,3 @@ public:
 
     static bool Parse(const Gx::Json& json, ResourceMetadata& metadata, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_BUTTON_LOADER_HPP
-#define O2JAM_BUTTON_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/UI/ButtonMetadata.hpp>
@@ -16,5 +15,3 @@ public :
 
     static bool ParseMetadata(const Gx::Json& json, ButtonMetadata& metadata, const Gx::ResourceContext& context);
 };
-
-#endif

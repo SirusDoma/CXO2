@@ -1,5 +1,4 @@
-#ifndef O2JAM_ANIMATION_METADATA_HPP
-#define O2JAM_ANIMATION_METADATA_HPP
+#pragma once
 
 #include <Genode/Graphics/Animation.hpp>
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
@@ -14,5 +13,3 @@ struct AnimationMetadata : SpriteMetadata
     unsigned int RepeatCount;
     std::vector<Gx::Animation::Frame> Frames;
 };
-
-#endif

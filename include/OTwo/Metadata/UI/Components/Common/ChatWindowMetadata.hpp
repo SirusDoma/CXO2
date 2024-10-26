@@ -1,5 +1,4 @@
-#ifndef O2JAM_CHAT_WINDOW_METADATA_HPP
-#define O2JAM_CHAT_WINDOW_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/TransformMetadata.hpp>
 
@@ -13,5 +12,3 @@ struct ChatWindowMetadata : public TransformMetadata
     unsigned int  MaximumChatsLength;
     float         LineSpacing;
 };
-
-#endif

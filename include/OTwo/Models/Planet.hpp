@@ -1,5 +1,4 @@
-#ifndef O2JAM_MODELS_PLANET_HPP
-#define O2JAM_MODELS_PLANET_HPP
+#pragma once
 
 #include <OTwo/Serializable.g.hpp>
 #include <vector>
@@ -17,5 +16,3 @@ struct PlanetInfo
     MusicHall Hall = MusicHall::None;
     std::vector<ServerChannel> Channels;
 };
-
-#endif

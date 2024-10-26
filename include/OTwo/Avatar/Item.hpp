@@ -1,5 +1,4 @@
-#ifndef O2JAM_AVATAR_ITEM_HPP
-#define O2JAM_AVATAR_ITEM_HPP
+#pragma once
 
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Serializable.g.hpp>
@@ -77,5 +76,3 @@ private:
     Gx::Sprite m_smallThumbnail, m_largeThumbnail;
     std::map<RenderableKey, Gx::Animation> m_renderables;
 };
-
-#endif

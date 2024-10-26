@@ -1,5 +1,4 @@
-#ifndef O2JAM_CHART_LOADER_HPP
-#define O2JAM_CHART_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Core/Chart.hpp>
@@ -45,5 +44,3 @@ private:
     GameMode m_mode;
     Difficulty m_difficulty;
 };
-
-#endif

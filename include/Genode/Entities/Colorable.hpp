@@ -1,5 +1,4 @@
-#ifndef GENODE_ENTITIES_COLORABLE_HPP
-#define GENODE_ENTITIES_COLORABLE_HPP
+#pragma once
 
 #include <SFML/Graphics/Color.hpp>
 
@@ -15,5 +14,3 @@ namespace Gx
         virtual ~Colorable() = default;
     };
 }
-
-#endif

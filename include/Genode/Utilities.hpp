@@ -1,8 +1,5 @@
-#ifndef GENODE_UTILITIES_HPP
-#define GENODE_UTILITIES_HPP
+#pragma once
 
 #include <Genode/Utilities/StringHelper.hpp>
 #include <Genode/Utilities/Debugger.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-
-#endif

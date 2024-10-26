@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_MY_ROOM_HPP
-#define O2JAM_STATE_MY_ROOM_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Avatar/Avatar.hpp>
@@ -32,4 +31,3 @@ private:
     Gx::Image* m_bagSelectIndicator;
     std::vector<Item> m_inventory;
 };
-#endif

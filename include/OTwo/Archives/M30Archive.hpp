@@ -1,5 +1,4 @@
-#ifndef O2JAM_M30_ARCHIVE_HPP
-#define O2JAM_M30_ARCHIVE_HPP
+#pragma once
 
 #include <SFML/System/FileInputStream.hpp>
 
@@ -64,5 +63,3 @@ private:
     mutable std::unordered_map<unsigned int, FileInfo> m_entries;
     mutable sf::FileInputStream m_fileStream;
 };
-
-#endif

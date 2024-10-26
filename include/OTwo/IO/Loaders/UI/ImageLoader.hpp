@@ -1,5 +1,4 @@
-#ifndef O2JAM_IMAGE_LOADER_HPP
-#define O2JAM_IMAGE_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/UI/ImageMetadata.hpp>
@@ -14,5 +13,3 @@ public :
 
     static bool ParseMetadata(const Gx::Json& attributes, ImageMetadata& metadata, const Gx::ResourceContext& context);
 };
-
-#endif

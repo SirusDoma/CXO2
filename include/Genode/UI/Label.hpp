@@ -1,5 +1,4 @@
-#ifndef GENODE_UI_LABEL_HPP
-#define GENODE_UI_LABEL_HPP
+#pragma once
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/Graphics/Text.hpp>
@@ -30,5 +29,3 @@ namespace Gx
         Alignment m_alignment = Alignment::None;
     };
 }
-
-#endif

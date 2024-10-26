@@ -1,5 +1,4 @@
-#ifndef O2JAM_WAITING_MAP_SELECTOR_HPP
-#define O2JAM_WAITING_MAP_SELECTOR_HPP
+#pragma once
 
 #include <Genode/UI/UiContainer.hpp>
 
@@ -35,5 +34,3 @@ private:
     std::function<void(unsigned int)> m_mapCallback;
     std::function<void(unsigned int)> m_effectCallback;
 };
-
-#endif

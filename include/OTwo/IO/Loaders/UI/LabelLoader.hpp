@@ -1,5 +1,4 @@
-#ifndef O2JAM_LABEL_LOADER_HPP
-#define O2JAM_LABEL_LOADER_HPP
+#pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/Metadata/UI/LabelMetadata.hpp>
@@ -14,5 +13,3 @@ public :
 
     static bool ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, const Gx::ResourceContext& context);
 };
-
-#endif

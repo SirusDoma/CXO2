@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_WAITING_7K_HPP
-#define O2JAM_STATE_WAITING_7K_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -30,5 +29,3 @@ private:
     Avatar* m_playerAvatar;
     std::vector<Avatar*> m_avatars;
 };
-
-#endif

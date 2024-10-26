@@ -1,5 +1,4 @@
-#ifndef O2JAM_IMAGE_METADATA_HPP
-#define O2JAM_IMAGE_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
 
@@ -17,5 +16,3 @@ struct ImageMetadata : public SpriteMetadata
 
     std::vector<FrameMetadata> Frames;
 };
-
-#endif

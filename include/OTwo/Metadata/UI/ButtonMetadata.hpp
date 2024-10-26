@@ -1,5 +1,4 @@
-#ifndef O2JAM_BUTTON_METADATA_HPP
-#define O2JAM_BUTTON_METADATA_HPP
+#pragma once
 
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
 #include <Genode/UI/Control.hpp>
@@ -18,10 +17,7 @@ struct ButtonMetadata : public SpriteMetadata
         sf::Vector2f Bounds;
     };
 
-
     bool Enabled = true;
     bool Visible = true;
     std::unordered_map<Gx::Control::State, ButtonState> States;
 };
-
-#endif

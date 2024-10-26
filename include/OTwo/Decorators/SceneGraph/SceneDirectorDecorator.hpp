@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_MANAGER_HPP
-#define O2JAM_STATE_MANAGER_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 
@@ -27,4 +26,3 @@ private:
 };
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.inl>
-#endif

@@ -1,5 +1,4 @@
-#ifndef O2JAM_STATE_PLAYING_7K_HPP
-#define O2JAM_STATE_PLAYING_7K_HPP
+#pragma once
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Core/Chart.hpp>
@@ -70,6 +69,3 @@ private:
 
     unsigned int m_viewport;
 };
-
-
-#endif
