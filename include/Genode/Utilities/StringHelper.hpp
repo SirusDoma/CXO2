@@ -129,16 +129,34 @@ namespace Gx
         }
 
         template<typename T>
-        static sf::String GetTypeName(bool withNamespace = true)
+        static sf::String GetTypeName(T& obj, const bool withNamespace = true)
         {
-            auto name = std::string(typeid(T).name());
-            if (auto pos = name.find(' '); pos != std::string::npos) {
+            auto name = std::string(typeid(obj).name());
+            if (const auto pos = name.find(' '); pos != std::string::npos) {
                 name = name.substr(pos + 1);
             }
 
             if (!withNamespace)
             {
-                if (auto pos = name.find_last_of(':'); pos != std::string::npos) {
+                if (const auto pos = name.find_last_of(':'); pos != std::string::npos) {
+                    name = name.substr(pos + 1);
+                }
+            }
+
+            return name;
+        }
+
+        template<typename T>
+        static sf::String GetTypeName(const bool withNamespace = true)
+        {
+            auto name = std::string(typeid(T).name());
+            if (const auto pos = name.find(' '); pos != std::string::npos) {
+                name = name.substr(pos + 1);
+            }
+
+            if (!withNamespace)
+            {
+                if (const auto pos = name.find_last_of(':'); pos != std::string::npos) {
                     name = name.substr(pos + 1);
                 }
             }
