@@ -229,7 +229,7 @@ void Equalizer::AnalyzeSamples(const std::vector<std::int16_t>& samples, std::ve
     for (std::size_t i = 0; i < N; ++i)
     {
         const float hanningWindow = 0.5f * (1.0f - std::cos(2.0f * 3.14159265f * i / (N - 1)));
-        in[i] = static_cast<float>(samples[i]) * hanningWindow;
+        in[i] = std::clamp(static_cast<float>(samples[i]) / std::numeric_limits<int16_t>::max() * hanningWindow, -1.f, 1.f);
     }
 
     kiss_fftr(cfg, in.data(), out.data());
@@ -258,7 +258,7 @@ void Equalizer::AnalyzeSamples(const std::vector<std::int16_t>& samples, std::ve
         if (i >= peaks.size())
             break;
 
-        magnitudes[i] = peaks[i] * 0.00000045f; //* 0.025f; //* 0.00000045f;
+        magnitudes[i] = peaks[i] * 0.017f;
     }
 
     free(cfg);
