@@ -45,6 +45,9 @@ namespace Gx
 
     void Transformable::SetPosition(const float x, const float y)
     {
+        if (x == m_position.x && y == m_position.y)
+            return;
+
         m_position.x = x;
         m_position.y = y;
         m_transformNeedUpdate = true;
@@ -58,6 +61,9 @@ namespace Gx
 
     void Transformable::SetRotation(const float angle)
     {
+        if (angle == m_rotation)
+            return;
+
         m_rotation = static_cast<float>(fmod(angle, 360));
         if (m_rotation < 0)
             m_rotation += 360.f;
@@ -68,6 +74,9 @@ namespace Gx
 
     void Transformable::SetScale(const float factorX, const float factorY)
     {
+        if (factorX == m_position.x && factorY == m_position.y)
+            return;
+
         m_scale.x = factorX;
         m_scale.y = factorY;
         m_transformNeedUpdate = true;
@@ -81,6 +90,9 @@ namespace Gx
 
     void Transformable::SetOrigin(const float x, const float y)
     {
+        if (x == m_origin.x && y == m_origin.y)
+            return;
+
         m_origin.x = x;
         m_origin.y = y;
         m_transformNeedUpdate = true;
