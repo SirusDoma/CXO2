@@ -1,12 +1,16 @@
 ﻿#include <OTwo/O2Jam.hpp>
 #include <Genode.hpp>
 
+#include <OTwo/Archives/OpiArchive.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
+#include <OTwo/IO/Loaders/Graphics/TextureLoader.hpp>
+#include <OTwo/IO/Loaders/Graphics/FontLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/ShapeLoader.hpp>
+#include <OTwo/IO/Loaders/Audio/SoundBufferLoader.hpp>
 #include <OTwo/IO/Loaders/Audio/SoundLoader.hpp>
 #include <OTwo/IO/Loaders/Audio/MusicLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
@@ -96,10 +100,13 @@ void O2Jam::Boot()
     Gx::LocalFileSystem::AddAssetPath("./Music");
 
     // -- Register resource metadata loaders
-    // Basic Resource
+    // Core Resources
     Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<sf::Texture, TextureLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Font, FontLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Shape, ShapeLoader>();
+    Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, SoundBufferLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Sound, SoundLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();
@@ -186,12 +193,6 @@ void O2Jam::Boot()
         return mixer;
     }, Gx::Context::Scope::Singleton);
 
-    context.Provide<ItemFactory>([&](auto& ctx)
-    {
-        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
-        return factory;
-    }, Gx::Context::Scope::Singleton);
-
     context.Provide<SessionContext>([&](auto& ctx)
     {
         auto player    = Player();
@@ -229,23 +230,22 @@ void O2Jam::Boot()
         return std::make_unique<RenderPositionJudgementStrategy>();
     });
 
-    // Set-up console
-    Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
-    Console::Instance().SetCharacterSize(14);
-    Console::Instance().SetBounds({{0, 0}, {400, 165}});
-    Console::Instance().SetPosition({400, 0});
-    Console::Instance().SetMaximumLines(10);
-
-    // Load and set cursor
-    SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
-
-    // Force to load heavy providers during start-up
-    auto _ = context.Require<SessionContext>().GetInstalledMusic();
-    for (auto gender : {Gender::Male, Gender::Female})
-        auto __ = context.Require<ItemFactory>().GetDefaultItems(gender);
-
-    // Load global assets
+    // Load global interface assets
     auto& resources = context.Require<Gx::ResourceManager>();
+    auto& image   = resources.Create<OpiArchive>("Interface");
+    auto& playing = resources.Create<OpiArchive>("Playing");
+    auto& avatar  = resources.Create<OpiArchive>("Avatar");
+
+    if (image.LoadFromFile("Interface.opi"))
+        Gx::FileSystem::Mount(image);
+
+    if (playing.LoadFromFile("Playing.opi"))
+        Gx::FileSystem::Mount(playing);
+
+    if (avatar.LoadFromFile("Avatar.opa"))
+        Gx::FileSystem::Mount(avatar);
+
+    // Load global music assets
     auto& bgm       = resources.Create<OjmArchive>("BGM");
     auto& bgEvent   = resources.Create<OjmArchive>("Event");
     auto& bgEffect  = resources.Create<OjmArchive>("BgEffect");
@@ -266,6 +266,27 @@ void O2Jam::Boot()
 
     if (npc.LoadFromFile("O2PlanetNPC.ojm"))
         Gx::FileSystem::Mount(npc);
+
+    // Force to load heavy providers during start-up
+    context.Provide<ItemFactory>([&](auto& ctx)
+    {
+        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
+        return factory;
+    }, Gx::Context::Scope::Singleton);
+
+    auto _ = context.Require<SessionContext>().GetInstalledMusic();
+    for (auto gender : {Gender::Male, Gender::Female})
+        auto __ = context.Require<ItemFactory>().GetDefaultItems(gender);
+
+    // Load and set cursor
+    SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
+
+    // Set-up console
+    Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
+    Console::Instance().SetCharacterSize(14);
+    Console::Instance().SetBounds({{0, 0}, {400, 165}});
+    Console::Instance().SetPosition({400, 0});
+    Console::Instance().SetMaximumLines(10);
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
     director.Register<StateAvi>("Interface/State/Avi.json");
