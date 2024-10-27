@@ -52,6 +52,9 @@ namespace Gx
     void Sequence::Complete()
     {
         Task::Complete();
+
+        for (const auto task : m_tasks)
+            task->Complete();
     }
 
     void Sequence::Reset()

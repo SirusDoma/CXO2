@@ -15,7 +15,7 @@ namespace Gx
         explicit Sequence(Tasks&... tasks);
 
         template<typename... Tasks>
-        explicit Sequence(const std::function<void()>& callback,Tasks&... tasks);
+        explicit Sequence(const std::function<void()>& callback, Tasks&... tasks);
 
         template<typename... Args>
         Sequence* Add(Task& first, Args&... args);
@@ -24,7 +24,6 @@ namespace Gx
         template<typename... Args>
         Sequence* Remove(const Task& first, Args&... args);
         Sequence* Remove(const Task& task);
-        static std::initializer_list<Task&> ListOf(std::initializer_list<Task&> &&tasks);
 
         void Update(double delta) override;
         void Complete() override;

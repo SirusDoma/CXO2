@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Genode/Tasks/Task.hpp>
+#include <Genode/Tasks/TaskGroup.hpp>
 #include <Genode/Tasks/TaskContainer.hpp>
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Delay.hpp>
