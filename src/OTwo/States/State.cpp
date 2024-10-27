@@ -125,6 +125,7 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
                     if (response)
                     {
                         config.UseWindowCursor = true;
+                        config.Save();
                         if (const auto cursor = GetApplication().GetCursor(); cursor)
                         {
                             cursor->SetEnabled(!config.UseWindowCursor);
@@ -136,6 +137,7 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
             else
             {
                 config.UseWindowCursor = false;
+                config.Save();
                 if (const auto cursor = GetApplication().GetCursor(); cursor)
                 {
                     cursor->SetEnabled(!config.UseWindowCursor);
@@ -148,6 +150,7 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
         else if (ev.code == sf::Keyboard::Key::F9)
         {
             config.UseEqualizer = !config.UseEqualizer;
+            config.Save();
             if (config.UseEqualizer)
                 ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information, false, [] (auto) {});
             else

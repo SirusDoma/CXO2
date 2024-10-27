@@ -41,6 +41,9 @@ public:
 
     const std::vector<ChartMetadata> &GetInstalledMusic(bool rescan = false) const;
 
+    void Load();
+    void Save() const;
+
 private:
     Player m_player;
     Planet m_planet = Planet::O2Planet;

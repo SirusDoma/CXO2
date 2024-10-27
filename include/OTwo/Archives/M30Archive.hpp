@@ -49,7 +49,7 @@ public:
     std::optional<std::size_t> ReadFile(unsigned int index, void* data, std::size_t size) const;
     std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const override;
 
-    void WriteFile(const std::string& fileName, void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
+    void WriteFile(const std::string& fileName, const void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
 
     std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
 

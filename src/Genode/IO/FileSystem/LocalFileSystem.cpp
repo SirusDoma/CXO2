@@ -258,7 +258,7 @@ namespace Gx
         return fs.read(data, size);
     }
 
-    void LocalFileSystem::WriteFile(const std::string& fileName, void* data, const std::size_t size)
+    void LocalFileSystem::WriteFile(const std::string& fileName, const void* data, const std::size_t size)
     {
         if (size <= 0)
             return;

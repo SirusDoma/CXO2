@@ -187,6 +187,7 @@ void StateMyRoom::Initialize()
                 player.Cash += price;
 
             m_mixer.Play(sfxAccept, "SFX");
+            m_session.Save();
             Invalidate();
         });
     });
@@ -357,6 +358,7 @@ void StateMyRoom::Invalidate()
             for (auto [_, item] : avatar->GetEquipedItems())
                 player->EquippedItemIDs.push_back(item->GetID());
 
+            m_session.Save();
             Invalidate();
         });
     }
@@ -388,7 +390,7 @@ void StateMyRoom::Invalidate()
     }
 
     if (const auto it = equippedItems.find(EquipmentType::Costume); it != equippedItems.end())
-        InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR"), EquipmentType::Costume);
+        InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR"), EquipmentType::Costume, RenderPart::SmallThumbnail);
     else
         InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR"), EquipmentType::Hair);
 
@@ -450,6 +452,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
                 player->EquippedItemIDs.push_back(item->GetID());
 
             m_mixer.Play(sfxDress, "SFX");
+            m_session.Save();
             Invalidate();
         });
     }

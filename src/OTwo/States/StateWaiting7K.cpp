@@ -300,19 +300,8 @@ void StateWaiting7K::Initialize()
         });
     }
 
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(232));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(233));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(234));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(39));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(238));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(255));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(256));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(257));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(304));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(410));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(411));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(412));
-    instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(1429));
+    for (const auto id : player.Inventory)
+        instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(id));
 
     const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
     chatPanel->SetMaximumTextLength(50);

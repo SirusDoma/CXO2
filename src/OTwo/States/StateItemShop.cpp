@@ -681,6 +681,7 @@ void StateItemShop::OnItemSellClicked()
             player.Cash += price;
 
         m_mixer.Play(sfxAccept, "SFX");
+        m_session.Save();
         InvalidateMyBag();
     });
 }

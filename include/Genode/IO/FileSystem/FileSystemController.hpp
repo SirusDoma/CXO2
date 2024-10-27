@@ -26,7 +26,7 @@ namespace Gx
         virtual std::vector<std::unique_ptr<FileInfo>> GetFileEntries() const = 0;
 
         virtual std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const = 0;
-        virtual void WriteFile(const std::string& fileName, void* data, std::size_t size) = 0;
+        virtual void WriteFile(const std::string& fileName, const void* data, std::size_t size) = 0;
 
         virtual std::optional<std::size_t> GetFileSize(const std::string& fileName) const = 0;
 
