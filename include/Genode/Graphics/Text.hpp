@@ -80,9 +80,9 @@ namespace Gx
         void SetMasked(bool masked);
 
         void SetCharacterSize(unsigned int size);
-        void SetCharacterWidth(const unsigned int characterWidth);
-        void SetLineSpacing(float spacingFactor);
-        void SetLetterSpacing(float spacingFactor);
+        void SetCharacterWidth(unsigned int characterWidth);
+        void SetLineSpacing(float spacing);
+        void SetLetterSpacing(float spacing);
         void SetStyle(std::uint32_t style);
 
         void SetColor(const sf::Color& color) override;
@@ -123,8 +123,8 @@ namespace Gx
         const Font*             m_font;
         unsigned int            m_characterSize;
         unsigned int            m_characterWidth;
-        float                   m_letterSpacingFactor;
-        float                   m_lineSpacingFactor;
+        float                   m_letterSpacing;
+        float                   m_lineSpacing;
         std::uint32_t           m_style;
         sf::Color               m_fillColor;
         sf::Color               m_outlineColor;

@@ -76,8 +76,8 @@ namespace Gx
         m_font               (nullptr),
         m_characterSize      (30),
         m_characterWidth     (0),
-        m_letterSpacingFactor(1.f),
-        m_lineSpacingFactor  (1.f),
+        m_letterSpacing      (0.f),
+        m_lineSpacing        (1.f),
         m_style              (static_cast<std::uint32_t>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
@@ -97,8 +97,9 @@ namespace Gx
         m_string             (string),
         m_font               (&font),
         m_characterSize      (characterSize),
-        m_letterSpacingFactor(1.f),
-        m_lineSpacingFactor  (1.f),
+        m_characterWidth     (0),
+        m_letterSpacing      (0.f),
+        m_lineSpacing        (1.f),
         m_style              (static_cast<std::uint32_t>(Style::Regular)),
         m_fillColor          (255, 255, 255),
         m_outlineColor       (0, 0, 0),
@@ -155,20 +156,20 @@ namespace Gx
         m_characterWidth = characterWidth;
     }
 
-    void Text::SetLetterSpacing(const float spacingFactor)
+    void Text::SetLetterSpacing(const float spacing)
     {
-        if (m_letterSpacingFactor != spacingFactor)
+        if (m_letterSpacing != spacing)
         {
-            m_letterSpacingFactor = spacingFactor;
+            m_letterSpacing = spacing;
             m_geometryNeedUpdate = true;
         }
     }
 
-    void Text::SetLineSpacing(const float spacingFactor)
+    void Text::SetLineSpacing(const float spacing)
     {
-        if (m_lineSpacingFactor != spacingFactor)
+        if (m_lineSpacing != spacing)
         {
-            m_lineSpacingFactor = spacingFactor;
+            m_lineSpacing = spacing;
             m_geometryNeedUpdate = true;
         }
     }
@@ -287,12 +288,12 @@ namespace Gx
 
     float Text::GetLetterSpacing() const
     {
-        return m_letterSpacingFactor;
+        return m_letterSpacing;
     }
 
     float Text::GetLineSpacing() const
     {
-        return m_lineSpacingFactor;
+        return m_lineSpacing;
     }
 
     std::uint32_t Text::GetStyle() const
@@ -331,11 +332,9 @@ namespace Gx
             index = m_string.getSize();
 
         // Precompute the variables needed by the algorithm
-        const bool  isBold         = m_style & static_cast<std::uint32_t>(Style::Bold);
-        float whitespaceWidth      = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
-        const float letterSpacing  = ( whitespaceWidth / 3.f ) * ( m_letterSpacingFactor - 1.f );
-        whitespaceWidth           += letterSpacing;
-        const float lineSpacing    = m_font->GetLineSpacing(m_characterSize, m_characterWidth) * m_lineSpacingFactor;
+        const bool  isBold          = m_style & static_cast<std::uint32_t>(Style::Bold);
+        const float whitespaceWidth = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
+        const float lineSpacing     = m_font->GetLineSpacing(m_characterSize, m_characterWidth) + m_lineSpacing;
 
         // Compute the position
         sf::Vector2f position;
@@ -360,7 +359,7 @@ namespace Gx
             }
 
             // For regular characters, add the advance offset of the glyph
-            position.x += m_font->GetGlyph(curChar, m_characterSize, isBold, 0, m_characterWidth).advance + letterSpacing;
+            position.x += m_font->GetGlyph(curChar, m_characterSize, isBold, 0, m_characterWidth).advance + m_letterSpacing;
         }
 
         // Transform the position to global coordinates
@@ -443,12 +442,10 @@ namespace Gx
         const float strikeThroughOffset = xBounds.position.y + xBounds.size.y / 2.f;
 
         // Precompute the variables needed by the algorithm
-        float whitespaceWidth     = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
-        const float letterSpacing = ( whitespaceWidth / 3.f ) * ( m_letterSpacingFactor - 1.f );
-        whitespaceWidth          += letterSpacing;
-        const float lineSpacing   = m_font->GetLineSpacing(m_characterSize, m_characterWidth) * m_lineSpacingFactor;
-        float x                   = 0.f;
-        float y                   = static_cast<float>(m_characterSize);
+        const float whitespaceWidth = m_font->GetGlyph(U' ', m_characterSize, isBold, 0, m_characterWidth).advance;
+        const float lineSpacing     = m_font->GetLineSpacing(m_characterSize, m_characterWidth) + m_lineSpacing;
+        float x                     = 0.f;
+        float y                     = static_cast<float>(m_characterSize);
 
         // Create one quad for each character
         float minX = static_cast<float>(m_characterWidth);
@@ -543,7 +540,7 @@ namespace Gx
             maxY = std::max(maxY, y + bottom);
 
             // Advance to the next character
-            x += glyph.advance + letterSpacing;
+            x += glyph.advance + m_letterSpacing;
         }
 
         // If we're using outline, update the current bounds
