@@ -258,7 +258,7 @@ void Equalizer::AnalyzeSamples(const std::vector<std::int16_t>& samples, std::ve
         if (i >= peaks.size())
             break;
 
-        magnitudes[i] = peaks[i] * 0.017f;
+        magnitudes[i] = peaks[i] * 0.013f;
     }
 
     free(cfg);
