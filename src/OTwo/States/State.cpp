@@ -1,4 +1,10 @@
 ﻿#include <OTwo/States/State.hpp>
+#include <OTwo/States/StateAvi.hpp>
+#include <OTwo/States/StateBulletin.hpp>
+#include <OTwo/States/StatePayment.hpp>
+#include <OTwo/States/StatePlaying7K.hpp>
+#include <OTwo/States/StateResult.hpp>
+#include <OTwo/Config/GameConfig.hpp>
 
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
@@ -7,6 +13,7 @@
 #include <Genode/UI/Button.hpp>
 
 #include <memory>
+#include <Genode/UI/Cursor.hpp>
 
 State::State() :
     State(typeid(this).name())
@@ -95,6 +102,58 @@ void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool ba
     dialog->SetCancelCallback([=] () { callback(false); });
 
     dialog->Show(this, std::string(), backdrop);
+}
+
+void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
+{
+    Scene::OnKeyPressed(ev);
+
+    auto& director = GetDirector();
+
+    if (!director.IsPresenting<StateAvi>() &&
+        !director.IsPresenting<StatePayment>() &&
+        !director.IsPresenting<StateBulletin>() &&
+        !director.IsPresenting<StatePlaying7K>())
+    {
+        auto& config = Require<GameConfig>();
+        if (ev.code == sf::Keyboard::Key::F8 && !director.IsPresenting<StateResult>())
+        {
+            if (!config.UseWindowCursor)
+            {
+                ShowDialog("Would you like to change to window\ncursor?\nIf you cannot see the cursor press\nF8 again", DialogStyle::OkCancel, false, [&] (const bool response)
+                {
+                    if (response)
+                    {
+                        config.UseWindowCursor = true;
+                        if (const auto cursor = GetApplication().GetCursor(); cursor)
+                        {
+                            cursor->SetEnabled(!config.UseWindowCursor);
+                            GetApplication().InvalidateCursor();
+                        }
+                    }
+                });
+            }
+            else
+            {
+                config.UseWindowCursor = false;
+                if (const auto cursor = GetApplication().GetCursor(); cursor)
+                {
+                    cursor->SetEnabled(!config.UseWindowCursor);
+                    GetApplication().InvalidateCursor();
+                }
+
+                ShowDialog("Changed to image cursor.\nTo change back to window cursor press F8\nagain", DialogStyle::Information, false, [] (auto) {});
+            }
+        }
+        else if (ev.code == sf::Keyboard::Key::F9)
+        {
+            config.UseEqualizer = !config.UseEqualizer;
+            if (config.UseEqualizer)
+                ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+            else
+                ShowDialog("Equalizer deactivated.\n( To active press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+        }
+    }
 }
 
 bool State::Close(const bool quit)

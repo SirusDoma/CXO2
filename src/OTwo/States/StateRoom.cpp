@@ -287,15 +287,6 @@ void StateRoom::Initialize()
 void StateRoom::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
     State::OnKeyPressed(ev);
-
-    if (ev.code == sf::Keyboard::Key::F9)
-    {
-        m_game.GetConfig().UseEqualizer = !m_game.GetConfig().UseEqualizer;
-        if (m_game.GetConfig().UseEqualizer)
-            ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information, false, [] (auto) {});
-        else
-            ShowDialog("Equalizer deactivated.\n( To active press F9 again. )", DialogStyle::Information, false, [] (auto) {});
-    }
 }
 
 void StateRoom::OnMusicShopButtonClicked() const

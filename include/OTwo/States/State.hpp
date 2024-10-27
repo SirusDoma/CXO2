@@ -55,6 +55,8 @@ protected:
     void ShowDialog(const std::string& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
     void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
 
+    void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
+
 private:
     void LoadCommonResources();
 
