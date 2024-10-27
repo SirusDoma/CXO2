@@ -23,25 +23,30 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& jso
                 continue;
 
             auto transform = frame.value().find("transform");
+
+            std::optional position = frameMetadata.Position;
             if (transform == frame.value().end() || transform.value().find("position") == transform->end())
-                frameMetadata.Position = metadata.Position;
+                position = std::nullopt;
 
+            std::optional scale = frameMetadata.Scale;
             if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
-                frameMetadata.Scale    = metadata.Scale;
+                scale = std::nullopt;
 
+            std::optional rotation = frameMetadata.Rotation;
             if (transform == frame.value().end() || transform.value().find("rotation") == transform->end())
-                frameMetadata.Rotation = metadata.Rotation;
+                rotation = std::nullopt;
 
+            std::optional origin = frameMetadata.Origin;
             if (transform == frame.value().end() || transform.value().find("origin") == transform->end())
-                frameMetadata.Origin   = metadata.Origin;
+                origin = std::nullopt;
 
             metadata.Frames.push_back(Gx::Animation::Frame
             {
                 frameMetadata.TexCoords,
-                frameMetadata.Origin,
-                frameMetadata.Position,
-                frameMetadata.Rotation,
-                frameMetadata.Scale
+                origin,
+                position,
+                rotation,
+                scale
             });
         }
     }
@@ -50,10 +55,10 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& jso
         metadata.Frames.push_back(Gx::Animation::Frame
         {
             metadata.TexCoords,
-            metadata.Origin,
-            metadata.Position,
-            metadata.Rotation,
-            metadata.Scale
+            std::nullopt,
+            std::nullopt,
+            std::nullopt,
+            std::nullopt
         });
     }
 

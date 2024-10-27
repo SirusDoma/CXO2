@@ -168,12 +168,20 @@ namespace Gx
     {
         if (index < m_frames.size())
         {
-            SetTexCoords(m_frames[index].TexCoords);
+            const auto& frame = m_frames[index];
+            SetTexCoords(frame.TexCoords);
 
-            SetOrigin(m_frames[index].Origin);
-            SetPosition(m_frames[index].Position);
-            SetRotation(m_frames[index].Rotation);
-            SetScale(m_frames[index].Scale);
+            if (frame.Origin.has_value())
+                SetOrigin(frame.Origin.value());
+
+            if (frame.Position.has_value())
+                SetPosition(frame.Position.value());
+
+            if (frame.Rotation.has_value())
+                SetRotation(frame.Rotation.value());
+
+            if (frame.Scale.has_value())
+                SetScale(frame.Scale.value());
         }
     }
 

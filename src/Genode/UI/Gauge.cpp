@@ -218,10 +218,18 @@ namespace Gx
         {
             const auto& frame = m_frames[m_currentFrame];
             m_texCoords = frame.TexCoords;
-            SetOrigin(frame.Origin);
-            SetPosition(frame.Position);
-            SetRotation(frame.Rotation);
-            SetScale(frame.Scale);
+
+            if (frame.Origin.has_value())
+                SetOrigin(frame.Origin.value());
+
+            if (frame.Position.has_value())
+                SetPosition(frame.Position.value());
+
+            if (frame.Rotation.has_value())
+                SetRotation(frame.Rotation.value());
+
+            if (frame.Scale.has_value())
+                SetScale(frame.Scale.value());
         }
 
         const auto color  = GetColor();
