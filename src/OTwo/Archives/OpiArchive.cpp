@@ -11,12 +11,12 @@ OpiArchive::Signature OpiArchive::GetSignature() const
 
 bool OpiArchive::LoadFromFile(const std::string& fileName)
 {
-    if (!Archive::LoadFromFile(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
-        return false;
-
     // Fetch meta data
     if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
         return false;
+
+    const auto prefix = Gx::StringHelper::RemoveExtension(fileName);
+    SetPathPrefix(prefix + "/");
 
     if (!m_fileStream.seek(0).has_value())
         return false;
@@ -27,7 +27,11 @@ bool OpiArchive::LoadFromFile(const std::string& fileName)
     if (m_signature != Signature::OPI && m_signature != Signature::OPA)
         return false;
 
-    return ReadStream(&m_count, sizeof(m_count));
+    if (!ReadStream(&m_count, sizeof(m_count)))
+        return false;
+
+    const auto entries = GetFileEntries();
+    return !entries.empty(); // m_count == entries.size();
 }
 
 Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string& fileName) const
