@@ -6,6 +6,7 @@
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tasks/Action.hpp>
+#include <Genode/Tasks/TaskGroup.hpp>
 #include <Genode/Tween/Move.hpp>
 
 namespace Gx { class ResourceManager; }
@@ -27,6 +28,7 @@ private:
     Gx::BitmapNumber*    m_counter;
     Gx::Sequence         m_sequence;
     Gx::Action           m_action;
-    Gx::Move             m_move;
+    Gx::TaskGroup        m_moveGroup;
+    Gx::Move             m_headerMove, m_counterMove;
     Gx::Delay            m_delay;
 };

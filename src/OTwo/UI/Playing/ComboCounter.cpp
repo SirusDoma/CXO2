@@ -2,13 +2,15 @@
 #include <OTwo/States/State.hpp>
 
 #include <Genode/Tasks/Action.hpp>
+#include <Genode/Tasks/Step.hpp>
 #include <Genode/Tween/Move.hpp>
 
 ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
     m_header(header),
     m_counter(counter),
     m_action(),
-    m_move(),
+    m_headerMove(),
+    m_counterMove(),
     m_delay(sf::Time::Zero)
 {
     if (m_header)
@@ -33,9 +35,15 @@ void ComboCounter::Initialize()
         SetVisible(true);
     });
 
-    m_move  = Gx::Move(*this, sf::Vector2f(0.f, -30.f), sf::seconds(1.f / 60.f * 6));
-    m_delay = Gx::Delay(sf::milliseconds(1000));
+    m_headerMove  = Gx::Move(*m_header, sf::Vector2f(m_header->GetPosition().x, m_header->GetPosition().y - 8.f), sf::seconds(1.f / 60.f * 5));
+    m_counterMove = Gx::Move(*m_counter, sf::Vector2f(m_counter->GetPosition().x, m_counter->GetPosition().y - 23.f), sf::seconds(1.f / 60.f * 5));
+    m_moveGroup   = Gx::TaskGroup(m_action, m_headerMove, m_counterMove);
 
+    // Make sure initial is recorded now
+    m_headerMove.Update(0);
+    m_counterMove.Update(0);
+
+    m_delay    = Gx::Delay(sf::milliseconds(1000));
     m_sequence = Gx::Sequence([this]
         {
             if (m_header)
@@ -43,7 +51,7 @@ void ComboCounter::Initialize()
 
             SetVisible(false);
         },
-        m_action, m_move, m_delay
+        m_moveGroup, m_delay
     );
 
     m_sequence.Stop();
