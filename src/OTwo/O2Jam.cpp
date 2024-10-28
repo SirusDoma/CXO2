@@ -87,9 +87,7 @@
 void O2Jam::Boot()
 {
     // Render Settings
-    auto& window = GetMainWindow();
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(0);
+    const auto& window = GetMainWindow();
     if (GetWindowState() == sf::State::Fullscreen)
         Gx::Application::SetView(GetLetterBoxView(window.getView(), window.getSize()));
 
@@ -303,6 +301,17 @@ void O2Jam::Boot()
     director.Register<StateResult>("Interface/State/Result.json");
 
     director.Present<StateAvi>();
+}
+
+void O2Jam::OnWindowCreated(sf::RenderWindow& window)
+{
+    Application::OnWindowCreated(window);
+
+    const auto& context = GetContext();
+    const auto& config  = context.Require<GameConfig>();
+
+    window.setVerticalSyncEnabled(config.UseVsync);
+    window.setFramerateLimit(0);
 }
 
 void O2Jam::OnFocusChanged(const bool focus)

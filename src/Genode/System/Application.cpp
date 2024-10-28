@@ -201,6 +201,10 @@ namespace Gx
         CreateMainWindow();
     }
 
+    void Application::OnWindowCreated(sf::RenderWindow& window)
+    {
+    }
+
     void Application::OnFocusChanged(bool focus)
     {
     }
@@ -272,7 +276,7 @@ namespace Gx
             m_closeRequested = true;
     }
 
-    void Application::CreateMainWindow() const
+    void Application::CreateMainWindow()
     {
         // Close existing window
         if (m_window)
@@ -307,6 +311,7 @@ namespace Gx
 
         m_adaptor = RenderSurfaceAdaptor(*m_window);
         UpdateCursor(sf::Event::Closed());
+        OnWindowCreated(*m_window);
     }
 
     void Application::UpdateCursor(const sf::Event& ev) const

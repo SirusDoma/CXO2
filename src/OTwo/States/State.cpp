@@ -158,14 +158,16 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
         }
         else if (ev.code == sf::Keyboard::Key::F10)
         {
-            static bool vsync = true;
-            sf::RenderWindow& window = GetApplication();
-            window.setVerticalSyncEnabled(vsync = !vsync);
+            config.UseVsync = !config.UseVsync;
+            config.Save(); // TODO: Persist VSync
 
-            if (vsync)
-                ShowDialog("Vsync enabled.\n( Press F12 again to disable. )", DialogStyle::Information, false, [] (auto) {});
+            sf::RenderWindow& window = GetApplication();
+            window.setVerticalSyncEnabled(config.UseVsync);
+
+            if (config.UseVsync)
+                ShowDialog("Vsync enabled.\n( Press F10 again to disable. )", DialogStyle::Information, false, [] (auto) {});
             else
-                ShowDialog("Vsync disabled.\n( Press F12 again to enable. )", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Vsync disabled.\n( Press F10 again to enable. )", DialogStyle::Information, false, [] (auto) {});
         }
     }
 }

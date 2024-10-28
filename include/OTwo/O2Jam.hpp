@@ -7,13 +7,15 @@ class O2Jam : public Gx::Application
 public:
     using Gx::Application::Application;
 
+    // ReSharper disable once CppNonExplicitConversionOperator
     operator sf::RenderTarget&() const override;
 
 protected:
     void Boot() override;
     int  Shutdown() override;
-    void OnFocusChanged(bool focus) override;
 
+    void OnWindowCreated(sf::RenderWindow& window) override;
+    void OnFocusChanged(bool focus) override;
     void OnInputReceived(sf::Event& ev) override;
 
     void Update(const double delta) override;

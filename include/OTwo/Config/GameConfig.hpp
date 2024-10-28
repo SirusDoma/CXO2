@@ -28,6 +28,7 @@ struct GameConfig
     bool UseBGM;
     bool UseEqualizer;
     bool UseWindowCursor;
+    bool UseVsync;
 
     unsigned int FxLevel;
     unsigned int MusicVolume;

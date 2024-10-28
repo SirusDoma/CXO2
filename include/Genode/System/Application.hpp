@@ -68,13 +68,14 @@ namespace Gx
         void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
+        virtual void OnWindowCreated(sf::RenderWindow& window);
         virtual void OnFocusChanged(bool focus);
         virtual void OnResized(const sf::Event::Resized& ev);
         virtual void OnInputReceived(sf::Event& ev);
         virtual void OnClose();
 
     private:
-        void CreateMainWindow() const;
+        void CreateMainWindow();
         void UpdateCursor(const sf::Event& ev) const;
 
         inline static Application* m_instance = nullptr;

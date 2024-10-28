@@ -5,7 +5,7 @@
 #if _WIN32
 #include <winreg/winreg.hpp>
 
-enum class DirectInputKey : uint16_t
+enum class DirectInputKey : std::uint16_t
 {
     Unknown        = 0xFFFF,
     A              = 0x1E,
@@ -197,6 +197,7 @@ void GameConfig::Apply(const GameConfig& src)
     UseBGM          = src.UseBGM;
     UseEqualizer    = src.UseEqualizer;
     UseWindowCursor = src.UseWindowCursor;
+    UseVsync        = src.UseVsync;
     FxLevel         = src.FxLevel;
     MusicVolume     = src.MusicVolume;
     EffectVolume    = src.EffectVolume;
@@ -214,6 +215,7 @@ void GameConfig::Reset()
     UseBGM          = true;
     UseEqualizer    = false;
     UseWindowCursor = false;
+    UseVsync        = true;
     FxLevel         = 2;
     MusicVolume     = 100;
     EffectVolume    = 100;
