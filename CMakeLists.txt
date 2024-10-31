@@ -123,10 +123,6 @@ if(WIN32)
 
     # External Libs Compiler Flags
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-    # Set dependencies libs
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-msvc/${CMAKE_BUILD_TYPE}")
-    set(OpenAL_LIB ${MODULES_DIR}/openal32.lib)
 elseif(APPLE)
     # App Arch
     if (NOT CMAKE_OSX_ARCHITECTURES)
@@ -198,9 +194,6 @@ else()
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
-
-    # Set dependencies libs
-    set(MODULES_DIR "${CMAKE_SOURCE_DIR}/extlibs/lib-gcc")
 
     # Libraries
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE stdc++fs)
