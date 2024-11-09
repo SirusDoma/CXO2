@@ -71,16 +71,6 @@ fetchcontent_declare(
 )
 fetchcontent_makeavailable(magic_enum)
 
-# -- Clip Flags
-set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples")
-set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests")
-fetchcontent_declare(
-    clip
-    GIT_REPOSITORY https://github.com/dacap/clip.git
-    GIT_TAG main
-)
-fetchcontent_makeavailable(clip)
-
 # -- MessageBox
 set(GTK_AVAILABLE FALSE)
 check_include_files("gtk/gtk.h" GTK_AVAILABLE)
@@ -212,10 +202,6 @@ target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # Link Magic Enum
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE magic_enum::magic_enum)
-
-# Link Clip
-target_include_directories(clip INTERFACE ${FETCHCONTENT_BASE_DIR}/clip-src)
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE clip)
 
 # Link Boxer
 if(USE_BOXER)

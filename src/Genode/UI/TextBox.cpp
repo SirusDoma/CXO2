@@ -2,7 +2,7 @@
 #include <Genode/UI/TextBox.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-#include <clip.h>
+#include <SFML/Window/Clipboard.hpp>
 
 namespace Gx
 {
@@ -495,7 +495,7 @@ namespace Gx
             {
                 if (ev.code == sf::Keyboard::Key::C || ev.code == sf::Keyboard::Key::X)
                 {
-                    clip::set_text(GetSelectedText());
+                    sf::Clipboard::setString(GetSelectedText());
                     if (ev.code == sf::Keyboard::Key::X)
                     {
                         m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, m_caret.SelectionLength));
@@ -504,9 +504,7 @@ namespace Gx
                 }
                 else if (ev.code == sf::Keyboard::Key::V)
                 {
-                    auto input = std::string();
-                    clip::get_text(input);
-
+                    std::string input = sf::Clipboard::getString();
                     auto string = sf::String::fromUtf8(input.begin(), input.end());
                     for (size_t index = 0; index < string.getSize(); index++)
                         m_caret.Index = static_cast<int>(Insert(m_caret.Index, string[index]));
