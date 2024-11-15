@@ -188,6 +188,11 @@ void O2Jam::Boot()
     context.Provide<Gx::Mixer>([](auto& ctx)
     {
         auto mixer = std::make_unique<Gx::Mixer>();
+        auto& cfg  = ctx.template Require<GameConfig>();
+
+        mixer->GetSoundGroup("BGM")->SetVolume(cfg.MusicVolume);
+        mixer->GetSoundGroup("SFX")->SetVolume(cfg.EffectVolume);
+
         return mixer;
     }, Gx::Context::Scope::Singleton);
 
