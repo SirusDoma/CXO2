@@ -315,8 +315,12 @@ void O2Jam::OnWindowCreated(sf::RenderWindow& window)
     const auto& context = GetContext();
     const auto& config  = context.Require<GameConfig>();
 
+    auto stream     = sf::MemoryInputStream(app_icon.data(), app_icon.size());
+    const auto icon = sf::Image(stream);
+
     window.setVerticalSyncEnabled(config.UseVsync);
     window.setFramerateLimit(0);
+    window.setIcon(icon);
 }
 
 void O2Jam::OnFocusChanged(const bool focus)
