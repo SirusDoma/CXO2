@@ -88,6 +88,11 @@ public:
         {
             return PlayableChannels.find(Channel) != PlayableChannels.end();
         }
+
+        virtual bool operator==(const Event &other) const
+        {
+            return Channel == other.Channel && Position == other.Position;
+        }
     };
 
     struct TimeEvent : Event
@@ -99,6 +104,12 @@ public:
            Value(value)
         {
         }
+
+        bool operator==(const Event &other) const override
+        {
+            const auto time = dynamic_cast<const TimeEvent*>(&other);
+            return time && Event::operator==(other) && Value == time->Value;
+        }
     };
 
     struct NoteEvent : Event
@@ -108,7 +119,7 @@ public:
         float             Pan;
         NoteType          Type;
         Chart::SampleType SampleType;
-        sf::SoundBuffer* Sample;
+        sf::SoundBuffer*  Sample;
         double            Length;
 
         NoteEvent(const Event& ev, const std::uint16_t id, const float volume, const float pan, const NoteType type, const enum Chart::SampleType sampleType, sf::SoundBuffer* sample) :
@@ -121,6 +132,12 @@ public:
             Sample(sample),
             Length(0)
         {
+        }
+
+        bool operator==(const Event &other) const override
+        {
+            const auto note = dynamic_cast<const NoteEvent*>(&other);
+            return note && Event::operator==(other) && ID == note->ID;
         }
     };
 
@@ -172,5 +189,45 @@ private:
     Gx::ResourcePtr<sf::Image> m_cover;
     Gx::ResourcePtr<sf::Image> m_thumbnail;
 };
+
+template <>
+struct std::hash<Chart::Event>
+{
+    std::size_t operator()(const Chart::Event& key) const noexcept
+    {
+        std::size_t seed = 0;
+        HashMerge(seed, static_cast<int>(key.Channel));
+        HashMerge(seed, key.Position);
+        return seed;
+    }
+
+private:
+    template <class T>
+    void HashMerge(std::size_t& seed, const T& val) const
+    {
+        seed ^= std::hash<T>()(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+};
+
+template <>
+struct std::hash<Chart::NoteEvent>
+{
+    std::size_t operator()(const Chart::NoteEvent& key) const noexcept
+    {
+        std::size_t seed = 0;
+        HashMerge(seed, static_cast<int>(key.Channel));
+        HashMerge(seed, key.Position);
+        HashMerge(seed, key.ID);
+        return seed;
+    }
+
+private:
+    template <class T>
+    void HashMerge(std::size_t& seed, const T& val) const
+    {
+        seed ^= std::hash<T>()(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+};
+
 
 #include <OTwo/Core/Chart.inl>
