@@ -1,4 +1,5 @@
 #pragma once
+#include <OTwo/Core/Chart.hpp>
 
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Entities/Updatable.hpp>
@@ -19,27 +20,24 @@ class Equalizer : public virtual Gx::UiContainer
 {
 public:
     // Constructor with configurable bar size and number of bars
-    explicit Equalizer(unsigned int sampleBufferCount = 2048);
+    explicit Equalizer(unsigned int sampleBufferCount = 1024);
 
     // Add a sound to the equalizer
-    void Register(const sf::Sound& sound);
-
-    // Remove a sound from the equalizer
-    void Remove(const sf::Sound& sound);
+    void Register(const Chart::NoteEvent& ev, const sf::Sound& sound);
 
     void Update(double delta) override;
 
 private:
+    void Initialize() override;
+
     // Compute the FFT of the combined audio samples
-    void AnalyzeSamples(const std::vector<std::int16_t>& samples, std::vector<float>& magnitudes);
+    void AnalyzeSamples(const std::vector<std::int16_t>& samples, std::vector<float>& output) const;
 
-    kiss_fft_cfg kissCfg;
-    std::vector<const sf::Sound*> m_sounds;    // List of sounds to visualize
-    std::vector<Gx::Gauge*> m_bars;            // Visual bars
+    std::unordered_map<const Chart::NoteEvent*, const sf::Sound*> m_sounds;    // List of sounds to visualize
+    std::vector<Gx::Gauge*> m_bars;                                            // Visual bars
 
-    std::vector<float> m_currents;             // Current heights of the bars
-    std::vector<float> m_targets;              // Target heights after FFT
-    float m_smoothingFactor;                   // For exponential moving average
-
+    std::vector<float> m_currents;                                             // Current heights of the bars
+    std::vector<float> m_values;                                               // The bar value after FFT and processing
     std::size_t m_bufferSampleCount;
+    float m_elapsed;
 };

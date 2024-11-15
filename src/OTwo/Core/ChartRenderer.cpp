@@ -300,7 +300,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
             else if (ev->Channel != Chart::Channel::Measure)
             {
                 if (const auto bgm = static_cast<Chart::NoteEvent*>(ev.Event); bgm)
-                    PlaySample(bgm, "BGM");
+                    PlaySample(bgm, bgm->SampleType == Chart::SampleType::Background ? "BGM" : "SFX");
             }
         }
     }
@@ -444,8 +444,8 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& gr
         m_sounds[ev->ID]->setVolume(ev->Volume);
     }
 
-    if (m_equalizer && ev->SampleType == Chart::SampleType::KeySound)
-        m_equalizer->Register(*m_sounds[ev->ID]);
+    if (m_equalizer && ev->SampleType == Chart::SampleType::KeySound && ev->Sample->getDuration() < sf::seconds(60.0))
+        m_equalizer->Register(*ev, *m_sounds[ev->ID]);
 
     m_mixer.Play(m_sounds[ev->ID], group);
 }
