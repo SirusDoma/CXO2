@@ -11,10 +11,9 @@ Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string& fileName
     if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
         return ResourceLoader::LoadFromFile(fileName, context);
 
-    auto metadata = SoundMetadata();
-    metadata.Require["sound"] = fileName;
-
-    return LoadFromMetadata(metadata, context);
+    return std::make_unique<sf::Sound>(
+        context.Acquire<sf::SoundBuffer>(fileName, fileName)
+    );
 }
 
 Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
