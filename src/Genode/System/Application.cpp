@@ -5,6 +5,7 @@
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Cursor.hpp>
+#include <Genode/Utilities/Debugger.hpp>
 
 namespace Gx
 {
@@ -110,13 +111,16 @@ namespace Gx
             // Execute post-processing events
             m_director.ProcessEvents();
 
+            // TODO: Move this to outside engine code
             // Track the number of frames rendered in a second
             fpsDelta += delta;
             if (fpsDelta >= 1000)
             {
                 m_renderFreq = m_frames;
                 m_frames = 0;
-                m_window->setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
+
+                if (Debugger::IsDebuggerAttached())
+                    m_window->setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
 
                 fpsDelta -= 1000.f;
             }
@@ -292,7 +296,7 @@ namespace Gx
                 mode = GetDesktopVideoMode();
         }
 
-        // (Re-)create the window and apply window state.
+        // Create/Re-create the window and apply window state.
         // No option to turn into exclusive fullscreen for now.
         m_window = std::make_unique<sf::RenderWindow>(
             mode,
