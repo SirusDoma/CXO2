@@ -38,11 +38,11 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json&
             float width  = b->at("width").get<float>();
             float height = b->at("height").get<float>();
 
-            stateMeta.Bounds = { width, height };
+            stateMeta.LocalBounds = { width, height };
         }
         else
         {
-            stateMeta.Bounds = {
+            stateMeta.LocalBounds = {
                 static_cast<float>(stateMeta.TexCoords.size.x),
                 static_cast<float>(stateMeta.TexCoords.size.y)
             };
@@ -66,7 +66,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
         radio->SetTexture(*texture);
 
     for (auto [state, frame] : metadata->States)
-        radio->SetFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
+        radio->SetFrame(state, {frame.TexCoords, frame.Color, frame.LocalBounds});
 
     radio->SetName(metadata->Name);
     radio->SetOrigin(metadata->Origin);

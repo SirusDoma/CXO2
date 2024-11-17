@@ -3,8 +3,8 @@
 #include <OTwo/States/State.hpp>
 
 #include <Genode/Graphics/Animation.hpp>
-#include <Genode/UI/TextBox.hpp>
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/InputField.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/ToolTip.hpp>
 
@@ -21,11 +21,11 @@ void CreateRoomDialog::Initialize()
     if (m_initialized)
         return;
 
-    const auto parent = GetParent<::State>();
+    const auto parent   = GetParent<::State>();
     const auto sfxClick = parent->Instantiate<sf::Sound>("bgEffect/10");
 
-    const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
-    const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");
+    const auto titleInput    = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
+    const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
 
     const auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
     const auto versusModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
@@ -35,31 +35,31 @@ void CreateRoomDialog::Initialize()
     const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_VERSUS");
     const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_SINGLE");
 
-    const auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
-    const auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
+    const auto minLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
+    const auto maxLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
 
     const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
 
-    titleTextBox->SetMaximumTextLength(21);
+    titleInput->SetMaximumTextLength(21);
 
-    passwordTextBox->SetMasked(true);
-    passwordTextBox->SetMaximumTextLength(12);
+    passwordInput->SetMasked(true);
+    passwordInput->SetMaximumTextLength(12);
 
-    levelLimitCheckBox->SetCheckStateChangeCallback([=] (auto& sender)
+    levelLimitToggleButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
-        minLevelLimitTextBox->SetEnabled(sender.IsChecked());
-        maxLevelLimitTextBox->SetEnabled(sender.IsChecked());
+        minLevelLimitInput->SetEnabled(sender.IsChecked());
+        maxLevelLimitInput->SetEnabled(sender.IsChecked());
 
         if (!sender.IsChecked())
         {
-            minLevelLimitTextBox->SetString("");
-            maxLevelLimitTextBox->SetString("");
+            minLevelLimitInput->SetString("");
+            maxLevelLimitInput->SetString("");
         }
     });
 
-    minLevelLimitTextBox->SetNumericModeEnabled(true);
-    maxLevelLimitTextBox->SetNumericModeEnabled(true);
+    minLevelLimitInput->SetNumericModeEnabled(true);
+    maxLevelLimitInput->SetNumericModeEnabled(true);
 
     jamModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
         m_mixer.Play(sfxClick, "SFX");
@@ -110,13 +110,13 @@ void CreateRoomDialog::Initialize()
         singleAnimation->Reset();
         singleAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
 
-        levelLimitCheckBox->SetEnabled(!sender.IsChecked());
+        levelLimitToggleButton->SetEnabled(!sender.IsChecked());
         if (sender.IsChecked())
-            levelLimitCheckBox->SetCheckedState(false);
+            levelLimitToggleButton->SetCheckedState(false);
 
-        passwordTextBox->SetEnabled(!sender.IsChecked());
-        if (!passwordTextBox->IsEnabled())
-            passwordTextBox->SetString("");
+        passwordInput->SetEnabled(!sender.IsChecked());
+        if (!passwordInput->IsEnabled())
+            passwordInput->SetString("");
     });
 
     singleAnimation->SetAnimationCallback([=] (const Gx::Animation& sender) {
@@ -132,8 +132,8 @@ void CreateRoomDialog::OnShown(Gx::Scene& scene)
 
     Initialize();
 
-    const auto titleTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
-    const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");
+    const auto titleInput    = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
+    const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
 
     const auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
     const auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
@@ -143,15 +143,15 @@ void CreateRoomDialog::OnShown(Gx::Scene& scene)
     const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_SINGLE");
     const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_VERSUS");
 
-    const auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
-    const auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
+    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
+    const auto maxLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
 
     const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
 
-    titleTextBox->SetString(m_session.GetCurrentPlayer().Name + "'s Room");
-    titleTextBox->SelectAll();
-    passwordTextBox->SetString("");
+    titleInput->SetString(m_session.GetCurrentPlayer().Name + "'s Room");
+    titleInput->SelectAll();
+    passwordInput->SetString("");
 
     jamModeButton->SetCheckedState(false);
     singleModeButton->SetCheckedState(false);
@@ -162,36 +162,36 @@ void CreateRoomDialog::OnShown(Gx::Scene& scene)
     versusAnimation->SetRepeatCount(1);
     versusAnimation->Reset();
 
-    levelLimitCheckBox->SetCheckedState(false);
-    minLevelLimitTextBox->SetEnabled(false);
-    maxLevelLimitTextBox->SetEnabled(false);
-    minLevelLimitTextBox->SetString("");
-    maxLevelLimitTextBox->SetString("");
+    levelLimitToggleButton->SetCheckedState(false);
+    minLevelLimitInput->SetEnabled(false);
+    maxLevelLimitInput->SetEnabled(false);
+    minLevelLimitInput->SetString("");
+    maxLevelLimitInput->SetString("");
 
     toolTip->Hide();
 }
 
 void CreateRoomDialog::OnAccepted()
 {
-    const auto titleTextBox = FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
-    auto passwordTextBox    = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD");
+    const auto titleInput = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
+    auto passwordInput    = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
 
-    const auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
-    const auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
+    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
+    const auto maxLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
 
     const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
 
-    if (titleTextBox->GetString().isEmpty())
+    if (titleInput->GetString().isEmpty())
     {
         toolTip->SetString("Please enter a room name.");
         toolTip->Show(this);
         return;
     }
 
-    if (levelLimitCheckBox->IsChecked())
+    if (levelLimitToggleButton->IsChecked())
     {
-        if (minLevelLimitTextBox->GetString().isEmpty() || maxLevelLimitTextBox->GetString().isEmpty())
+        if (minLevelLimitInput->GetString().isEmpty() || maxLevelLimitInput->GetString().isEmpty())
         {
             toolTip->SetString("Please set level limit. Ex) 10 ~ 20");
             toolTip->Show(this);
@@ -200,8 +200,8 @@ void CreateRoomDialog::OnAccepted()
         }
 
         toolTip->SetString("");
-        const unsigned int min = std::stoi(std::string(minLevelLimitTextBox->GetString()));
-        const unsigned int max = std::stoi(std::string(maxLevelLimitTextBox->GetString()));
+        const unsigned int min = std::stoi(std::string(minLevelLimitInput->GetString()));
+        const unsigned int max = std::stoi(std::string(maxLevelLimitInput->GetString()));
 
         if (min > 100 || max > 100)
             toolTip->SetString("Wrong level selected. You can enter level range from 1 to 100");
@@ -235,38 +235,38 @@ GameMode CreateRoomDialog::GetRoomMode() const
 
 std::string CreateRoomDialog::GetRoomName() const
 {
-    if (const auto titleTextBox = FindChild<Gx::TextBox>("IDC_EDIT_TITLE"); titleTextBox)
-        return titleTextBox->GetString();
+    if (const auto titleInput = FindChild<Gx::InputField>("IDC_EDIT_TITLE"); titleInput)
+        return titleInput->GetString();
 
     return {};
 }
 
 std::string CreateRoomDialog::GetRoomPassword() const
 {
-    if (const auto passwordTextBox = FindChild<Gx::TextBox>("IDC_EDIT_PASSWORD"); passwordTextBox)
-        return passwordTextBox->GetString();
+    if (const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD"); passwordInput)
+        return passwordInput->GetString();
 
     return {};
 }
 
 unsigned int CreateRoomDialog::GetMinLevelLimit() const
 {
-    const auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
-    const auto minLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MIN_LEVEL_LIMIT");
+    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
+    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
 
-    if (minLevelLimitTextBox && levelLimitCheckBox && levelLimitCheckBox->IsChecked())
-        return std::stoi(std::string(minLevelLimitTextBox->GetString()));
+    if (minLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
+        return std::stoi(std::string(minLevelLimitInput->GetString()));
 
     return 0;
 }
 
 unsigned int CreateRoomDialog::GetMaxLevelLimit() const
 {
-    const auto levelLimitCheckBox   = FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_LEVEL_LIMIT");
-    const auto maxLevelLimitTextBox = FindChild<Gx::TextBox>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
+    const auto maxLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
 
-    if (maxLevelLimitTextBox && levelLimitCheckBox && levelLimitCheckBox->IsChecked())
-        return std::stoi(std::string(maxLevelLimitTextBox->GetString()));
+    if (maxLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
+        return std::stoi(std::string(maxLevelLimitInput->GetString()));
 
     return 0;
 }

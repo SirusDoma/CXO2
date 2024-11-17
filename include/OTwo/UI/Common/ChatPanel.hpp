@@ -2,7 +2,7 @@
 
 #include <Genode/UI/UiContainer.hpp>
 #include <OTwo/UI/Common/ChatWindow.hpp>
-#include <Genode/UI/TextBox.hpp>
+#include <Genode/UI/InputField.hpp>
 
 class SessionContext;
 class ChatPanel : public Gx::UiContainer

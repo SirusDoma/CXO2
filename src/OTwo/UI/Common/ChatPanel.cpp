@@ -5,7 +5,7 @@
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/TextBox.hpp>
+#include <Genode/UI/InputField.hpp>
 
 ChatPanel::ChatPanel(SessionContext& session) :
     m_session(session)
@@ -28,9 +28,9 @@ void ChatPanel::Initialize()
     if (const auto btnChatScrollDown = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_DOWN"))
         btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
 
-    const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
-    chatBox->SetPermanentFocusEnabled(true);
-    chatBox->SetTextEnteredCallback([=] (auto& textBox, const sf::String& text)
+    const auto chatInput = FindChild<Gx::InputField>("IDC_EDIT_CHAT");
+    chatInput->SetPermanentFocusEnabled(true);
+    chatInput->SetTextEnteredCallback([=] (auto& sender, const sf::String& text)
     {
         chatWindow->PushMessage(m_session.GetCurrentPlayer(), text);
     });
@@ -61,11 +61,11 @@ void ChatPanel::Initialize()
             {
                 if (const auto dialog = parent->Instantiate<Gx::Dialog>("IDC_DIALOG_WHISPER"); dialog)
                 {
-                    const auto nicknameTextBox = dialog->FindChild<Gx::TextBox>("IDC_EDIT_NICKNAME");
-                    nicknameTextBox->SetMaximumTextLength(20);
+                    const auto nicknameInput = dialog->FindChild<Gx::InputField>("IDC_EDIT_NICKNAME");
+                    nicknameInput->SetMaximumTextLength(20);
                     dialog->SetAcceptCallback([=]
                     {
-                        if (nicknameTextBox->GetString().isEmpty())
+                        if (nicknameInput->GetString().isEmpty())
                             fallbackCheckStateCallback(radio);
                     });
 
@@ -75,9 +75,9 @@ void ChatPanel::Initialize()
                     });
 
                     dialog->Show(parent, "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.", false);
-                    nicknameTextBox->SetString(std::string());
-                    nicknameTextBox->SetFocus(true);
-                    nicknameTextBox->SelectAll();
+                    nicknameInput->SetString(std::string());
+                    nicknameInput->SetFocus(true);
+                    nicknameInput->SelectAll();
                 }
             }
         });
@@ -91,12 +91,12 @@ ChatWindow* ChatPanel::GetChatWindow() const
 
 void ChatPanel::SetInputEnabled(const bool enabled)
 {
-    if (const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::InputField>("IDC_EDIT_CHAT"); chatBox)
         chatBox->SetEnabled(enabled);
 }
 
 void ChatPanel::SetMaximumTextLength(const unsigned int length)
 {
-    if (const auto chatBox = FindChild<Gx::TextBox>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::InputField>("IDC_EDIT_CHAT"); chatBox)
         chatBox->SetMaximumTextLength(length);
 }

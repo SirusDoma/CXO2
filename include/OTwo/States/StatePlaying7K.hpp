@@ -9,7 +9,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/UI/TextBox.hpp>
+#include <Genode/UI/InputField.hpp>
 
 class SessionContext;
 class ItemFactory;
@@ -61,7 +61,7 @@ private:
     AnimationMap m_longNoteEffects;
     Avatar* m_self;
 
-    Gx::TextBox* m_chatBox;
+    Gx::InputField* m_chatBox;
     ImageMap m_keyDowns, m_keyEffects, m_guideKeyEffects;
     InputStateMap m_inputStates;
     InputStateMap m_guideKeyEffectStates;

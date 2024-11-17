@@ -8,7 +8,7 @@ namespace Gx
     {
         if (IsChecked() != checked)
         {
-            CheckBox::SetCheckedState(checked);
+            ToggleButton::SetCheckedState(checked);
             if (const auto parent = GetParent(); parent && IsChecked())
             {
                 for (const auto child : parent->GetChildren())

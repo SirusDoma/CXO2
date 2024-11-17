@@ -1,14 +1,14 @@
-﻿#include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
+﻿#include <OTwo/IO/Loaders/UI/ToggleButtonLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 
-#include <OTwo/Metadata/UI/CheckBoxMetadata.hpp>
+#include <OTwo/Metadata/UI/ToggleButtonMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<Gx::ToggleButton> ToggleButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
-    auto metadata = CheckBoxMetadata();
+    auto metadata = ToggleButtonMetadata();
     if (!MetadataLoader::Parse(json, metadata, ctx))
         return nullptr;
 
@@ -17,10 +17,10 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json,
         return nullptr;
 
     auto states = attributes.at("states");
-    std::unordered_map<std::string, Gx::CheckBox::State> stateMap = {
-        { "normal", Gx::CheckBox::State::Normal },
-        { "hover", Gx::CheckBox::State::Hover },
-        { "active", Gx::CheckBox::State::Active },
+    std::unordered_map<std::string, Gx::ToggleButton::State> stateMap = {
+        { "normal", Gx::ToggleButton::State::Normal },
+        { "hover", Gx::ToggleButton::State::Hover },
+        { "active", Gx::ToggleButton::State::Active },
     };
 
     auto spriteLoader = SpriteLoader();
@@ -39,11 +39,11 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json,
             float width  = b->at("width").get<float>();
             float height = b->at("height").get<float>();
 
-            stateMeta.Bounds = { width, height };
+            stateMeta.LocalBounds = { width, height };
         }
         else
         {
-            stateMeta.Bounds = {
+            stateMeta.LocalBounds = {
                 static_cast<float>(stateMeta.TexCoords.size.x),
                 static_cast<float>(stateMeta.TexCoords.size.y)
             };
@@ -55,27 +55,27 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromJson(const Gx::Json& json,
     return LoadFromMetadata(metadata, ctx);
 }
 
-Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+Gx::ResourcePtr<Gx::ToggleButton> ToggleButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    const auto metadata = dynamic_cast<const CheckBoxMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const ToggleButtonMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto checkBox = std::make_unique<Gx::CheckBox>();
+    auto toggleButton = std::make_unique<Gx::ToggleButton>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
-        checkBox->SetTexture(*texture);
+        toggleButton->SetTexture(*texture);
 
     for (auto [state, frame] : metadata->States)
-        checkBox->SetFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
+        toggleButton->SetFrame(state, {frame.TexCoords, frame.Color, frame.LocalBounds});
 
-    checkBox->SetName(metadata->Name);
-    checkBox->SetOrigin(metadata->Origin);
-    checkBox->SetPosition(metadata->Position);
-    checkBox->SetScale(metadata->Scale);
-    checkBox->SetRotation(metadata->Rotation);
+    toggleButton->SetName(metadata->Name);
+    toggleButton->SetOrigin(metadata->Origin);
+    toggleButton->SetPosition(metadata->Position);
+    toggleButton->SetScale(metadata->Scale);
+    toggleButton->SetRotation(metadata->Rotation);
 
-    auto container = ObjectContainer::Decorate(checkBox.get());
+    auto container = ObjectContainer::Decorate(toggleButton.get());
     if (!metadata->Objects.empty())
     {
         for (auto [key, object] : metadata->Objects)
@@ -87,6 +87,6 @@ Gx::ResourcePtr<Gx::CheckBox> CheckBoxLoader::LoadFromMetadata(const ResourceMet
         }
     }
 
-    return checkBox;
+    return toggleButton;
 }
 

@@ -1,7 +1,7 @@
 ﻿#include <OTwo/IO/Loaders/UI/BitmapNumberLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
-#include <OTwo/Metadata/UI/NumberMetadata.hpp>
+#include <OTwo/Metadata/UI/BitmapNumberMetadata.hpp>
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
@@ -9,7 +9,7 @@
 
 Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
-    auto metadata = NumberMetadata();
+    auto metadata = BitmapNumberMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
@@ -112,7 +112,7 @@ Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Jso
 
 Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    const auto metadata = dynamic_cast<const NumberMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const BitmapNumberMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     

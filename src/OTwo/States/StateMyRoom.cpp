@@ -8,7 +8,7 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 
 #include <Genode/UI/Button.hpp>
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
@@ -192,7 +192,7 @@ void StateMyRoom::Initialize()
         });
     });
 
-    const auto inventoryButton = Instantiate<Gx::CheckBox>("IDC_CHECKBOX_INVENTORY");
+    const auto inventoryButton = Instantiate<Gx::ToggleButton>("IDC_TOGGLE_INVENTORY");
     inventoryButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         statusPanel->SetVisible(sender.IsChecked());

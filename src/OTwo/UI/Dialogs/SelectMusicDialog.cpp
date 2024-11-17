@@ -13,7 +13,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Button.hpp>
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
@@ -237,15 +237,15 @@ void SelectMusicDialog::Initialize()
     if (auto randomSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_RANDOM_SELECTOR"); randomSelector)
     {
         std::unordered_map<std::string, LevelCategory> randomLevelMap = {
-            { "IDC_CHECKBOX_RANDOM_DIFF_1", LevelCategory::Level1 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_2", LevelCategory::Level2 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_3", LevelCategory::Level3 },
-            { "IDC_CHECKBOX_RANDOM_DIFF_4", LevelCategory::Level4 },
+            { "IDC_TOGGLE_RANDOM_DIFF_1", LevelCategory::Level1 },
+            { "IDC_TOGGLE_RANDOM_DIFF_2", LevelCategory::Level2 },
+            { "IDC_TOGGLE_RANDOM_DIFF_3", LevelCategory::Level3 },
+            { "IDC_TOGGLE_RANDOM_DIFF_4", LevelCategory::Level4 },
         };
 
         for (auto [id, level] : randomLevelMap)
         {
-            auto button = randomSelector->FindChild<Gx::CheckBox>(id);
+            auto button = randomSelector->FindChild<Gx::ToggleButton>(id);
             if (!button)
                 continue;
 

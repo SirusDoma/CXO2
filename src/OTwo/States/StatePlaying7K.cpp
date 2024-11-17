@@ -81,7 +81,7 @@ void StatePlaying7K::Initialize()
 
     // Setup chat panel
     const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
-    m_chatBox = chatPanel->FindChild<Gx::TextBox>("IDC_EDIT_CHAT");
+    m_chatBox = chatPanel->FindChild<Gx::InputField>("IDC_EDIT_CHAT");
     if (m_context.GetMode() != GameMode::Tutorial)
     {
         chatPanel->SetMaximumTextLength(50);

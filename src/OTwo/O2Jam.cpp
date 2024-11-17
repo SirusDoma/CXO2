@@ -21,12 +21,12 @@
 #include <OTwo/IO/Loaders/UI/ToolTipLoader.hpp>
 #include <OTwo/IO/Loaders/UI/BitmapNumberLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
-#include <OTwo/IO/Loaders/UI/CheckBoxLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ToggleButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/RadioButtonLoader.hpp>
 #include <OTwo/IO/Loaders/UI/GaugeLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ListLoader.hpp>
 #include <OTwo/IO/Loaders/UI/DialogLoader.hpp>
-#include <OTwo/IO/Loaders/UI/TextBoxLoader.hpp>
+#include <OTwo/IO/Loaders/UI/InputFieldLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ScrollBarLoader.hpp>
 #include <OTwo/IO/Loaders/UI/UiContainerLoader.hpp>
 
@@ -115,12 +115,12 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::BitmapNumber, BitmapNumberLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::CheckBox, CheckBoxLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::ToggleButton, ToggleButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::TextBox, TextBoxLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::InputField, InputFieldLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
     // Avatar

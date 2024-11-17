@@ -8,7 +8,7 @@
 
 #include <Genode/UI/Cursor.hpp>
 #include <Genode/UI/Button.hpp>
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/ToolTip.hpp>
@@ -49,19 +49,19 @@ void OptionDialog::Initialize()
     const auto keySelect = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
     const auto keyBar = FindChild<Gx::Image>("IDC_IMAGE_KEY_BAR");
 
-    const auto gfxCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    gfxCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseFx = sender.IsChecked(); });
-    const auto cursorCheckBox  = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
-    cursorCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseWindowCursor = sender.IsChecked(); });
-    const auto keyTestCheckBox = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
-    keyTestCheckBox->SetCheckStateChangeCallback([=] (auto& sender)
+    const auto gfxToggleButton = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_GFX");
+    gfxToggleButton->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseFx = sender.IsChecked(); });
+    const auto cursorToggleButton  = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_CURSOR");
+    cursorToggleButton->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseWindowCursor = sender.IsChecked(); });
+    const auto keyTestToggleButton = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_KEY_TEST");
+    keyTestToggleButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         m_keyTestEnabled = sender.IsChecked();
         m_keyChannel     = Chart::Channel::Note1;
         keySelect->SetFrame(0);
         keySelect->SetVisible(!m_keyTestEnabled);
     });
-    keyTestCheckBox->SetCheckedState(false);
+    keyTestToggleButton->SetCheckedState(false);
 
     m_keyChannel = Chart::Channel::Note1;
     for (unsigned int i = 1; i <= 7; i++)
@@ -87,8 +87,8 @@ void OptionDialog::Initialize()
         // AddChild(keyDown);
     }
 
-    const auto bgmCheckBox       = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
-    bgmCheckBox->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseBGM = sender.IsChecked(); });
+    const auto bgmToggleButton       = musicOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_BGM");
+    bgmToggleButton->SetCheckStateChangeCallback([=] (auto& sender) { m_tempConfig.UseBGM = sender.IsChecked(); });
     const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
@@ -456,19 +456,19 @@ void OptionDialog::Invalidate()
     const auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
     const auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
 
-    const auto gfxCheckBox       = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_GFX");
-    const auto cursorCheckBox    = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_CURSOR");
-    const auto keyTestCheckBox   = gameOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_KEY_TEST");
+    const auto gfxToggleButton       = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_GFX");
+    const auto cursorToggleButton    = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_CURSOR");
+    const auto keyTestToggleButton   = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_KEY_TEST");
     const auto keySelect         = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    const auto bgmCheckBox       = musicOption->FindChild<Gx::CheckBox>("IDC_CHECKBOX_ENABLE_BGM");
+    const auto bgmToggleButton       = musicOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_BGM");
     const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
     const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
     const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
-    gfxCheckBox->SetCheckedState(m_tempConfig.UseFx);
-    cursorCheckBox->SetCheckedState(m_tempConfig.UseWindowCursor);
-    keyTestCheckBox->SetCheckedState(m_keyTestEnabled);
-    bgmCheckBox->SetCheckedState(m_tempConfig.UseBGM);
+    gfxToggleButton->SetCheckedState(m_tempConfig.UseFx);
+    cursorToggleButton->SetCheckedState(m_tempConfig.UseWindowCursor);
+    keyTestToggleButton->SetCheckedState(m_keyTestEnabled);
+    bgmToggleButton->SetCheckedState(m_tempConfig.UseBGM);
 
     masterVolumeGauge->SetValue(m_tempConfig.MusicVolume == m_tempConfig.EffectVolume ? m_tempConfig.MusicVolume : masterVolumeGauge->GetValue());
     musicVolumeGauge->SetValue(m_tempConfig.MusicVolume);

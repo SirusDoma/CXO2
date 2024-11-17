@@ -112,7 +112,7 @@ void StateWaiting7K::Initialize()
 
     if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_CHANGE_TITLE"); dialog)
     {
-        const auto titleBox = dialog->FindChild<Gx::TextBox>("IDC_EDIT_TITLE");
+        const auto titleBox = dialog->FindChild<Gx::InputField>("IDC_EDIT_TITLE");
         titleBox->SetMaximumTextLength(21);
         dialog->SetAcceptCallback([=, r = &room, s = &m_session]
         {
@@ -358,7 +358,7 @@ void StateWaiting7K::Initialize()
         director.Present<StateRoom>();
     });
 
-    const auto readyButton = Instantiate<Gx::CheckBox>("IDC_BUTTON_READY");
+    const auto readyButton = Instantiate<Gx::ToggleButton>("IDC_BUTTON_READY");
     readyButton->SetVisible(m_session.GetCurrentPlayer().ID != room.RoomMasterID);
     readyButton->SetEnabled(readyButton->IsVisible());
     readyButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -367,7 +367,7 @@ void StateWaiting7K::Initialize()
             return;
     });
 
-    const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START");
+    const auto btnStart = Instantiate<Gx::ToggleButton>("IDC_BUTTON_START");
     btnStart->SetVisible(m_session.GetCurrentPlayer().ID == room.RoomMasterID);
     btnStart->SetEnabled(btnStart->IsVisible());
     btnStart->SetCheckStateChangeCallback([=, &director] (auto& sender)
@@ -410,7 +410,7 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
     if (ev.code == sf::Keyboard::Key::F3)
     {
-        if (const auto btnStart = Instantiate<Gx::CheckBox>("IDC_BUTTON_START"))
+        if (const auto btnStart = Instantiate<Gx::ToggleButton>("IDC_BUTTON_START"))
             btnStart->SetCheckedState(true);
     }
 

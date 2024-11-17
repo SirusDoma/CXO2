@@ -90,9 +90,9 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<Gx::BitmapNumber>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::TextBox:
+        case ResourceMetadata::ResourceType::InputField:
         {
-            container.Add(name, LoadResource<Gx::TextBox>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::InputField>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Button:
@@ -100,9 +100,9 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<Gx::Button>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::CheckBox:
+        case ResourceMetadata::ResourceType::ToggleButton:
         {
-            container.Add(name, LoadResource<Gx::CheckBox>(name, json, ctx), ctx);
+            container.Add(name, LoadResource<Gx::ToggleButton>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::RadioButton:

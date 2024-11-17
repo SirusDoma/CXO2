@@ -12,7 +12,7 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -99,25 +99,25 @@ void StateMusicShop::Initialize()
             item->SetFocusChangedCallback([=] (auto& sender, auto&)
             {
                 selector->SetVisible(sender.IsFocused());
-                if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"); sender.IsFocused() && checkBox)
-                    checkBox->SetFocus(sender.IsFocused());
+                if (const auto toggleButton = item->FindChild<Gx::ToggleButton>("IDC_TOGGLE_SELECT"); sender.IsFocused() && toggleButton)
+                    toggleButton->SetFocus(sender.IsFocused());
             });
 
-            if (const auto checkBox = item->FindChild<Gx::CheckBox>("IDC_CHECKBOX_SELECT"))
+            if (const auto toggleButton = item->FindChild<Gx::ToggleButton>("IDC_TOGGLE_SELECT"))
             {
-                checkBox->SetClickCallback([=] (auto&, auto& ev)
+                toggleButton->SetClickCallback([=] (auto&, auto& ev)
                 {
                     ev.Handled = true; // Use item click callback
                 });
 
-                checkBox->SetFocusChangedCallback([=] (auto&, auto& ev)
+                toggleButton->SetFocusChangedCallback([=] (auto&, auto& ev)
                 {
                     ev.State = item->IsFocused() ? Gx::Control::State::Hover : Gx::Control::State::Normal;
                 });
 
                 item->SetClickCallback([=] (auto&, auto&)
                 {
-                    checkBox->SetCheckedState(!checkBox->IsChecked());
+                    toggleButton->SetCheckedState(!toggleButton->IsChecked());
                 });
             }
         }

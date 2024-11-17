@@ -138,7 +138,7 @@ void ChannelButton::SetMusicHall(const MusicHall hall)
 
 Gx::RenderStates ChannelButton::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    return CheckBox::Render(surface, states);
+    return ToggleButton::Render(surface, states);
 }
 
 void ChannelButton::OnControlStateChanged(Control& sender, Gx::Control::State state)

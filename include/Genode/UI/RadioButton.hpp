@@ -1,16 +1,16 @@
 #pragma once
 
-#include <Genode/UI/CheckBox.hpp>
+#include <Genode/UI/ToggleButton.hpp>
 
 #include <functional>
 #include <unordered_map>
 
 namespace Gx
 {
-    class RadioButton : public CheckBox
+    class RadioButton : public ToggleButton
     {
     public:
-        using CheckBox::CheckBox;
+        using ToggleButton::ToggleButton;
 
         virtual void SetCheckStateChangeCallback(std::function<void(RadioButton&)> callback);
         void SetCheckedState(bool checked) override;

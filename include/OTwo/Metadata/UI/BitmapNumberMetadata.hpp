@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-struct NumberMetadata : public TransformMetadata
+struct BitmapNumberMetadata : public TransformMetadata
 {
     sf::Color    Color;
     sf::Vector2u DigitSize;

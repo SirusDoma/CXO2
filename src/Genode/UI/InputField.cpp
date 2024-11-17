@@ -1,12 +1,12 @@
 #include <Genode/Graphics/Font.hpp>
-#include <Genode/UI/TextBox.hpp>
+#include <Genode/UI/InputField.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <SFML/Window/Clipboard.hpp>
 
 namespace Gx
 {
-    TextBox::TextBox() :
+    InputField::InputField() :
         m_text(),
         m_caret(*this),
         m_bounds(),
@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    TextBox::TextBox(const sf::String& string, const Font& font, const unsigned int characterSize, sf::FloatRect bounds) :
+    InputField::InputField(const sf::String& string, const Font& font, const unsigned int characterSize, sf::FloatRect bounds) :
         m_text(string, font, characterSize),
         m_caret(*this),
         m_bounds(bounds),
@@ -31,41 +31,41 @@ namespace Gx
         if (m_bounds == sf::FloatRect())
             m_bounds = m_text.GetLocalBounds();
 
-        TextBox::SetHighlightBackColor(sf::Color::White);
+        InputField::SetHighlightBackColor(sf::Color::White);
         SetHighlightTextColor(sf::Color::Black);
     }
 
-    sf::FloatRect TextBox::GetLocalBounds() const
+    sf::FloatRect InputField::GetLocalBounds() const
     {
         return m_bounds;
     }
 
-    void TextBox::SetLocalBounds(const sf::FloatRect bounds)
+    void InputField::SetLocalBounds(const sf::FloatRect bounds)
     {
         m_bounds = bounds;
     }
 
-    sf::Vector2f TextBox::FindCharacterPosition(const std::size_t index) const
+    sf::Vector2f InputField::FindCharacterPosition(const std::size_t index) const
     {
         return m_text.FindCharacterPosition(index);
     }
 
-    void TextBox::SetString(const sf::String& string)
+    void InputField::SetString(const sf::String& string)
     {
         m_text.SetString(string);
     }
 
-    void TextBox::SetFont(const Font& font)
+    void InputField::SetFont(const Font& font)
     {
         m_text.SetFont(font);
     }
 
-    void TextBox::SetMasked(const bool masked)
+    void InputField::SetMasked(const bool masked)
     {
         m_text.SetMasked(masked);
     }
 
-    void TextBox::SetNumericModeEnabled(const bool enabled)
+    void InputField::SetNumericModeEnabled(const bool enabled)
     {
         if (m_numeric != enabled)
         {
@@ -75,141 +75,141 @@ namespace Gx
         }
     }
 
-    void TextBox::SetCharacterSize(const unsigned int size)
+    void InputField::SetCharacterSize(const unsigned int size)
     {
         m_text.SetCharacterSize(size);
     }
 
-    void TextBox::SetLineSpacing(const float spacingFactor)
+    void InputField::SetLineSpacing(const float spacingFactor)
     {
         m_text.SetLetterSpacing(spacingFactor);
     }
 
-    void TextBox::SetLetterSpacing(const float spacingFactor)
+    void InputField::SetLetterSpacing(const float spacingFactor)
     {
         m_text.SetLetterSpacing(spacingFactor);
     }
 
-    void TextBox::SetStyle(const std::uint32_t style)
+    void InputField::SetStyle(const std::uint32_t style)
     {
         m_text.SetStyle(style);
     }
 
-    void TextBox::SetColor(const sf::Color& color)
+    void InputField::SetColor(const sf::Color& color)
     {
         m_text.SetColor(color);
     }
 
-    void TextBox::SetFillColor(const sf::Color& color)
+    void InputField::SetFillColor(const sf::Color& color)
     {
         m_text.SetFillColor(color);
     }
 
-    void TextBox::SetHighlightBackColor(const sf::Color& color)
+    void InputField::SetHighlightBackColor(const sf::Color& color)
     {
         m_caret.SetHighlightColor(color);
     }
 
-    void TextBox::SetHighlightTextColor(const sf::Color& color)
+    void InputField::SetHighlightTextColor(const sf::Color& color)
     {
         m_highlightColor = color;
     }
 
-    void TextBox::SetOutlineColor(const sf::Color& color)
+    void InputField::SetOutlineColor(const sf::Color& color)
     {
         m_text.SetOutlineColor(color);
     }
 
-    void TextBox::SetOutlineThickness(const float thickness)
+    void InputField::SetOutlineThickness(const float thickness)
     {
         m_text.SetOutlineThickness(thickness);
     }
 
-    const sf::String& TextBox::GetString() const
+    const sf::String& InputField::GetString() const
     {
         return m_text.GetString();
     }
 
-    const Font* TextBox::GetFont() const
+    const Font* InputField::GetFont() const
     {
         return m_text.GetFont();
     }
 
-    bool TextBox::IsMasked() const
+    bool InputField::IsMasked() const
     {
         return m_text.IsMasked();
     }
 
-    bool TextBox::IsNumericMode() const
+    bool InputField::IsNumericMode() const
     {
         return m_numeric;
     }
 
-    unsigned int TextBox::GetCharacterSize() const
+    unsigned int InputField::GetCharacterSize() const
     {
         return m_text.GetCharacterSize();
     }
 
-    float TextBox::GetLetterSpacing() const
+    float InputField::GetLetterSpacing() const
     {
         return m_text.GetLetterSpacing();
     }
 
-    float TextBox::GetLineSpacing() const
+    float InputField::GetLineSpacing() const
     {
         return m_text.GetLineSpacing();
     }
 
-    std::uint32_t TextBox::GetStyle() const
+    std::uint32_t InputField::GetStyle() const
     {
         return m_text.GetStyle();
     }
 
-    const sf::Color& TextBox::GetColor() const
+    const sf::Color& InputField::GetColor() const
     {
         return m_text.GetColor();
     }
 
-    const sf::Color& TextBox::GetFillColor() const
+    const sf::Color& InputField::GetFillColor() const
     {
         return m_text.GetFillColor();
     }
-    const sf::Color& TextBox::GetHighlightBackColor() const
+    const sf::Color& InputField::GetHighlightBackColor() const
     {
         return m_caret.GetHighlight().GetColor();
     }
 
-    const sf::Color& TextBox::GetHighlightTextColor() const
+    const sf::Color& InputField::GetHighlightTextColor() const
     {
         return m_highlightColor;
     }
 
-    const sf::Color& TextBox::GetOutlineColor() const
+    const sf::Color& InputField::GetOutlineColor() const
     {
         return m_text.GetOutlineColor();
     }
 
-    float TextBox::GetOutlineThickness() const
+    float InputField::GetOutlineThickness() const
     {
         return m_text.GetOutlineThickness();
     }
 
-    unsigned int TextBox::GetMaximumTextLength() const
+    unsigned int InputField::GetMaximumTextLength() const
     {
         return m_maxLength;
     }
 
-    void TextBox::SetMaximumTextLength(const unsigned int maxLength)
+    void InputField::SetMaximumTextLength(const unsigned int maxLength)
     {
         m_maxLength = maxLength;
     }
 
-    void TextBox::SetTextEnteredCallback(std::function<void(TextBox&, const sf::String&)> callback)
+    void InputField::SetTextEnteredCallback(std::function<void(InputField&, const sf::String&)> callback)
     {
         m_onTextEntered = std::move(callback);
     }
 
-    bool TextBox::IsNextCharacterFit()
+    bool InputField::IsNextCharacterFit()
     {
         const auto string = m_text.GetString();
         auto index  = m_caret.Index;
@@ -226,7 +226,7 @@ namespace Gx
         return fit;
     }
 
-    void TextBox::Select(const std::size_t index, const int selectionLength)
+    void InputField::Select(const std::size_t index, const int selectionLength)
     {
         m_caret.Index = static_cast<int>(index);
         m_caret.SelectionLength = selectionLength;
@@ -235,13 +235,13 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::SelectAll()
+    void InputField::SelectAll()
     {
         const int length = static_cast<int>(GetString().getSize());
         Select(length, -length);
     }
 
-    sf::String TextBox::GetSelectedText() const
+    sf::String InputField::GetSelectedText() const
     {
         auto index  = m_caret.Index - 1;
         const auto length = m_caret.SelectionLength;
@@ -255,7 +255,7 @@ namespace Gx
         return m_text.GetString().substring(index, std::abs(length));
     }
 
-    size_t TextBox::Insert(size_t index, const std::uint32_t unicode, const int selectionLength)
+    size_t InputField::Insert(size_t index, const std::uint32_t unicode, const int selectionLength)
     {
         // backspace, tab, enter, etc
         if (unicode <= 31)
@@ -281,7 +281,7 @@ namespace Gx
         return index;
     }
 
-    std::size_t TextBox::Erase(std::size_t index, const int length)
+    std::size_t InputField::Erase(std::size_t index, const int length)
     {
         if (length < 0)
             index += length + 1;
@@ -297,12 +297,12 @@ namespace Gx
         return index;
     }
 
-    bool TextBox::IsPermanentFocus() const
+    bool InputField::IsPermanentFocus() const
     {
         return m_permanentFocus;
     }
 
-    void TextBox::SetPermanentFocusEnabled(const bool enable)
+    void InputField::SetPermanentFocusEnabled(const bool enable)
     {
         if (m_permanentFocus != enable)
         {
@@ -312,7 +312,7 @@ namespace Gx
         }
     }
 
-    bool TextBox::IsFocused() const
+    bool InputField::IsFocused() const
     {
         if (m_permanentFocus)
             return true;
@@ -320,7 +320,7 @@ namespace Gx
         return m_focused;
     }
 
-    void TextBox::SetFocus(bool focus)
+    void InputField::SetFocus(bool focus)
     {
         if (m_permanentFocus)
             focus = true;
@@ -345,12 +345,12 @@ namespace Gx
         }
     }
 
-    Control::State TextBox::GetControlState() const
+    Control::State InputField::GetControlState() const
     {
         return m_state;
     }
 
-    void TextBox::SetControlState(const State& state)
+    void InputField::SetControlState(const State& state)
     {
         if (m_state != state)
         {
@@ -360,13 +360,13 @@ namespace Gx
         }
     }
 
-    void TextBox::Update(const double delta)
+    void InputField::Update(const double delta)
     {
         m_caret.Update(delta);
         Control::Update(delta);
     }
 
-    RenderStates TextBox::Render(RenderSurface& surface, RenderStates states) const
+    RenderStates InputField::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
             return states;
@@ -382,11 +382,11 @@ namespace Gx
         return Control::Render(surface, states);
     }
 
-    void TextBox::OnControlStateChanged(Control& sender, State state)
+    void InputField::OnControlStateChanged(Control& sender, State state)
     {
     }
 
-    void TextBox::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
+    void InputField::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         float minDistance  = -1;
         size_t selectIndex = m_caret.Index;
@@ -408,17 +408,17 @@ namespace Gx
         Control::OnControlClick(sender, ev);
     }
 
-    void TextBox::OnMouseMoved(const sf::Event::MouseMoved& ev)
+    void InputField::OnMouseMoved(const sf::Event::MouseMoved& ev)
     {
         Control::OnMouseMoved(ev);
     }
 
-    void TextBox::OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)
+    void InputField::OnMouseButtonPressed(const sf::Event::MouseButtonPressed& ev)
     {
         Control::OnMouseButtonPressed(ev);
     }
 
-    void TextBox::OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev)
+    void InputField::OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev)
     {
         Control::OnMouseButtonReleased(ev);
 
@@ -429,7 +429,7 @@ namespace Gx
         }
     }
 
-    void TextBox::OnKeyPressed(const sf::Event::KeyPressed& ev)
+    void InputField::OnKeyPressed(const sf::Event::KeyPressed& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -529,7 +529,7 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::OnTextEntered(const sf::Event::TextEntered& ev)
+    void InputField::OnTextEntered(const sf::Event::TextEntered& ev)
     {
         if (!IsEnabled() || !IsFocused())
             return;
@@ -554,7 +554,7 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::Invalidate()
+    void InputField::Invalidate()
     {
         m_caret.Invalidate();
         m_caret.Reset(true);
@@ -577,7 +577,7 @@ namespace Gx
 
 namespace Gx
 {
-    TextBox::Caret::Caret(TextBox& instance) :
+    InputField::Caret::Caret(InputField& instance) :
         Instance(instance),
         Index(),
         SelectionLength(),
@@ -590,23 +590,23 @@ namespace Gx
         Invalidate();
     }
 
-    void TextBox::Caret::Reset(const bool visible)
+    void InputField::Caret::Reset(const bool visible)
     {
         m_elapsed = 0;
         m_visible = visible;
     }
 
-    const Rectangle& TextBox::Caret::GetHighlight() const
+    const Rectangle& InputField::Caret::GetHighlight() const
     {
         return m_highlight;
     }
 
-    void TextBox::Caret::SetHighlightColor(const sf::Color color)
+    void InputField::Caret::SetHighlightColor(const sf::Color color)
     {
         m_highlight.SetColor(color);
     }
 
-    RenderStates TextBox::Caret::Render(RenderSurface& surface, RenderStates states) const
+    RenderStates InputField::Caret::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!m_visible)
             return states;
@@ -615,7 +615,7 @@ namespace Gx
         return states;
     }
 
-    void TextBox::Caret::Update(const double delta)
+    void InputField::Caret::Update(const double delta)
     {
         m_elapsed += delta;
         if (m_elapsed >= BLINK_THRESHOLD)
@@ -625,7 +625,7 @@ namespace Gx
         }
     }
 
-    void TextBox::Caret::Invalidate()
+    void InputField::Caret::Invalidate()
     {
         if (Index < 0)
             Index = 0;

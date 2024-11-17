@@ -7,11 +7,11 @@
 
 namespace Gx
 {
-    class TextBox : public Control, public virtual Colorable
+    class InputField : public Control, public virtual Colorable
     {
     public:
-        TextBox();
-        TextBox(const sf::String& string, const Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
+        InputField();
+        InputField(const sf::String& string, const Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;
         sf::FloatRect GetLocalBounds() const override;
@@ -59,7 +59,7 @@ namespace Gx
 
         unsigned int GetMaximumTextLength() const;
         void SetMaximumTextLength(unsigned int maxLength);
-        void SetTextEnteredCallback(std::function<void(TextBox&, const sf::String&)> callback);
+        void SetTextEnteredCallback(std::function<void(InputField&, const sf::String&)> callback);
 
         void Select(size_t index, int selectionLength);
         void SelectAll();
@@ -90,11 +90,11 @@ namespace Gx
         class Caret : public Renderable, public Updatable
         {
         public:
-            TextBox& Instance;
+            InputField& Instance;
             int Index;
             int SelectionLength;
 
-            explicit Caret(TextBox& instance);
+            explicit Caret(InputField& instance);
             void Reset(bool visible = false);
             const Rectangle& GetHighlight() const;
             void SetHighlightColor(sf::Color color);
@@ -122,6 +122,6 @@ namespace Gx
         bool m_numeric;
         Control::State m_state;
 
-        std::function<void(TextBox&, const sf::String&)> m_onTextEntered;
+        std::function<void(InputField&, const sf::String&)> m_onTextEntered;
     };
 }

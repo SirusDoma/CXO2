@@ -1,13 +1,13 @@
-﻿#include <Genode/UI/CheckBox.hpp>
+﻿#include <Genode/UI/ToggleButton.hpp>
 
 namespace Gx
 {
-    bool CheckBox::IsChecked() const
+    bool ToggleButton::IsChecked() const
     {
         return m_isChecked;
     }
 
-    void CheckBox::SetCheckedState(const bool checked)
+    void ToggleButton::SetCheckedState(const bool checked)
     {
         if (IsChecked() != checked)
         {
@@ -19,12 +19,12 @@ namespace Gx
         }
     }
 
-    void CheckBox::SetCheckStateChangeCallback(std::function<void(CheckBox&)> callback)
+    void ToggleButton::SetCheckStateChangeCallback(std::function<void(ToggleButton&)> callback)
     {
         m_onCheckStateChanged = std::move(callback);
     }
 
-    void CheckBox::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
+    void ToggleButton::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         if (!IsEnabled())
             return;
@@ -34,7 +34,7 @@ namespace Gx
             SetCheckedState(!IsChecked());
     }
 
-    Button::Frame CheckBox::GetCurrentFrame() const
+    Button::Frame ToggleButton::GetCurrentFrame() const
     {
         if (IsChecked())
             return GetStateFrame(State::Active);

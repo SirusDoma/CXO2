@@ -5,6 +5,6 @@
 
 #include <OTwo/Metadata/UI/ButtonMetadata.hpp>
 
-struct CheckBoxMetadata : public ButtonMetadata
+struct ToggleButtonMetadata : public ButtonMetadata
 {
 };

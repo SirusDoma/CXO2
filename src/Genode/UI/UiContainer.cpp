@@ -1,6 +1,6 @@
 ﻿#include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/TextBox.hpp>
+#include <Genode/UI/InputField.hpp>
 
 namespace Gx
 {
@@ -53,27 +53,27 @@ namespace Gx
         if (!IsEnabled() || ev.code != sf::Keyboard::Key::Tab)
             return;
 
-        TextBox* first   = nullptr;
-        TextBox* current = nullptr;
+        InputField* first   = nullptr;
+        InputField* current = nullptr;
 
         for (const auto child : GetChildren())
         {
-            const auto textBox = dynamic_cast<TextBox*>(child);
-            if (!textBox || !textBox->IsEnabled())
+            const auto input = dynamic_cast<InputField*>(child);
+            if (!input || !input->IsEnabled())
                 continue;
 
-            if (current && !textBox->IsFocused())
+            if (current && !input->IsFocused())
             {
                 current->SetFocus(false);
-                textBox->SetFocus(true);
+                input->SetFocus(true);
                 return;
             }
 
             if (!first)
-                first = textBox;
+                first = input;
 
-            if (textBox->IsFocused())
-                current = textBox;
+            if (input->IsFocused())
+                current = input;
         }
 
         if (first && current)

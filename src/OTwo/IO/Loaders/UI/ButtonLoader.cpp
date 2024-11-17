@@ -33,7 +33,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadat
 
     auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-        button->SetFrame(state, {frame.TexCoords, frame.Color, frame.Bounds});
+        button->SetFrame(state, {frame.TexCoords, frame.Color, frame.LocalBounds});
 
     button->SetName(metadata->Name);
     button->SetOrigin(metadata->Origin);
@@ -94,11 +94,11 @@ bool ButtonLoader::ParseMetadata(const Gx::Json& attributes, ButtonMetadata& met
             float width  = b->at("width").get<float>();
             float height = b->at("height").get<float>();
 
-            stateMeta.Bounds = { width, height };
+            stateMeta.LocalBounds = { width, height };
         }
         else
         {
-            stateMeta.Bounds = {
+            stateMeta.LocalBounds = {
                 static_cast<float>(stateMeta.TexCoords.size.x),
                 static_cast<float>(stateMeta.TexCoords.size.y)
             };
