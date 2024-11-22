@@ -18,7 +18,7 @@ struct ResourceMetadata
         None,
 
         // SceneGraph
-        Scene,
+        State,
 
         // Audio
         Music,
