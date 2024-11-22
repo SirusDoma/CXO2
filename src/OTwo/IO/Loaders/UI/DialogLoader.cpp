@@ -57,7 +57,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto dialog = Create();
+    auto dialog = Create(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         dialog->SetTexture(*texture);

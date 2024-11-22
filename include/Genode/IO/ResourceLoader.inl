@@ -2,7 +2,7 @@ namespace Gx
 {
     template<typename T>
     template<class... Args>
-    std::unique_ptr<T> ResourceLoader<T>::Create(Args&&... args) const
+    std::unique_ptr<T> ResourceLoader<T>::Create(const ResourceContext& context, Args&&... args) const
     {
         if constexpr (std::is_default_constructible_v<T>)
         {
@@ -13,7 +13,7 @@ namespace Gx
         if (!m_creator)
             throw NotSupportedException("Insufficient information to construct the resource of " + std::string(m_type.name()));
 
-        return m_creator->Build(args...);
+        return m_creator->Build(context, args...);
     };
 
     template<typename T>
@@ -23,15 +23,18 @@ namespace Gx
         static_assert(std::is_base_of_v<T, R>, "Specified type must be a derived class of the base resource type");
 
         m_type    = std::type_index(typeid(R));
-        m_creator = std::make_unique<ResourceBuilder<Args...>>(m_type, [=] (Args&&... args) { return builder(args...); });
+        m_creator = std::make_unique<ResourceBuilder<Args...>>(m_type, [=] (const ResourceContext& context, Args&&... args)
+        {
+            return builder(context, args...);
+        });
     }
 
     template<typename T>
     template<typename... Args>
-    std::unique_ptr<T> ResourceLoader<T>::ResourceBuilderBase::Build(Args&&... args) const
+    std::unique_ptr<T> ResourceLoader<T>::ResourceBuilderBase::Build(const ResourceContext& context, Args&&... args) const
     {
         if (auto creator = dynamic_cast<const ResourceBuilder<Args...>*>(this); creator)
-            return creator->Create(args...);
+            return creator->Create(context, args...);
 
         throw ArgumentException("The specified arguments cannot be used to construct the " + std::string(Type.name()));
     }

@@ -32,7 +32,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     if (metadata == nullptr)
         return nullptr;
 
-    auto state = Create();
+    auto state = Create(context);
     state->SetName(meta.Name);
     state->SetViewport(metadata->Viewport);
 

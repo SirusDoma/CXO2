@@ -1,9 +1,10 @@
-#include <Genode/IO/ResourceLoaderFactory.hpp>
-#include <Genode/IO/Resource.hpp>
-#include <Genode/System/Context.hpp>
+#pragma once
 
+#include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/Graphics/Font.hpp>
+#include <Genode/System/Context.hpp>
 #include <Genode/System/Exception.hpp>
+
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
@@ -29,7 +30,7 @@ namespace Gx
             else
                 loader = std::make_unique<L>();
 
-            loader->SetResourceCreator(std::function{[]
+            loader->SetResourceCreator(std::function{[] (const ResourceContext& ctx)
             {
                 if constexpr (!std::is_default_constructible_v<R>)
                 {
@@ -62,7 +63,7 @@ namespace Gx
     template<typename B, typename R>
     void ResourceLoaderFactory::RegisterDerived()
     {
-        RegisterDerived<B, R>(std::function{[]
+        RegisterDerived<B, R>(std::function<std::unique_ptr<R>(const ResourceContext&)>{[] (const ResourceContext&)
         {
             if constexpr (!std::is_default_constructible_v<R>)
             {
@@ -77,7 +78,7 @@ namespace Gx
     }
 
     template<typename B, typename R, typename ... Args>
-    void ResourceLoaderFactory::RegisterDerived(const std::function<std::unique_ptr<R>(Args...)>& creator)
+    void ResourceLoaderFactory::RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& creator)
     {
         static_assert(std::is_base_of_v<B, R>, "Parameter R must be a B");
 

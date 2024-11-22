@@ -24,7 +24,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata& met
     if (metadata == nullptr)
         return nullptr;
 
-    auto state = Create();
+    auto state = Create(context);
     state->SetName(meta.Name);
 
     for (auto [key, value] : meta.Require)

@@ -24,7 +24,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& m
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto list = Create();
+    auto list = Create(context);
     list->SetName(metadata->Name);
     list->SetVerticalRepeat(metadata->VerticalCount, metadata->VerticalSpacing);
     list->SetHorizontalRepeat(metadata->HorizontalCount, metadata->HorizontalSpacing);

@@ -11,7 +11,7 @@ namespace Gx
     {
     public:
         template <typename R, typename... Args>
-        using ResourceCreator = std::function<std::unique_ptr<R>(Args...)>;
+        using ResourceCreator = std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>;
 
         ResourceLoader() = default;
         ResourceLoader(ResourceLoader& copy) :
@@ -30,7 +30,7 @@ namespace Gx
 
     protected:
         template<class... Args>
-        std::unique_ptr<T> Create(Args&&... args) const;
+        std::unique_ptr<T> Create(const ResourceContext& context, Args&&... args) const;
 
         template<typename R, typename... Args>
         void SetResourceCreator(const ResourceCreator<R, Args...>& builder);
@@ -45,7 +45,7 @@ namespace Gx
             virtual ~ResourceBuilderBase() = default;
 
             template<typename... Args>
-            std::unique_ptr<T> Build(Args&&... args) const;
+            std::unique_ptr<T> Build(const ResourceContext&, Args&&... args) const;
 
             virtual std::unique_ptr<ResourceBuilderBase> Clone() = 0;
         };

@@ -10,6 +10,7 @@ namespace Gx
 {
     template<typename T>
     class ResourceLoader;
+    class ResourceContext;
     class Context;
     class ResourceLoaderFactory final
     {
@@ -30,7 +31,7 @@ namespace Gx
         static void RegisterDerived();
 
         template<typename B, typename R, typename ... Args>
-        static void RegisterDerived(const std::function<std::unique_ptr<R>(Args...)>& creator);
+        static void RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& creator);
 
         template<typename R>
         static bool Remove();
