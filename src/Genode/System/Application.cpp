@@ -96,6 +96,7 @@ namespace Gx
             // Calculate delta
             const double now   = timer.getElapsedTime().asMilliseconds();
             const double delta = now - last;
+            last = now;
 
             // Perform update before rendering objects
             Update(delta);
@@ -124,9 +125,6 @@ namespace Gx
 
                 fpsDelta -= 1000.f;
             }
-
-            // Update starting point of delta time
-            last = now;
 
             // Update fps counter
             m_frames++;

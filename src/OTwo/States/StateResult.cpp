@@ -9,9 +9,12 @@
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 
 #include <Genode/Tasks/Sequence.hpp>
-#include <Genode/Utilities/Randomizer.hpp>
 #include <Genode/Tween/Move.hpp>
-#include <Genode/UI.hpp>
+#include <Genode/UI/List.hpp>
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
+#include <Genode/UI/Label.hpp>
+#include <Genode/Utilities/Randomizer.hpp>
 
 StateResult::StateResult(Gx::Mixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :
     m_mixer(mixer),
@@ -184,22 +187,21 @@ void StateResult::Initialize()
         GetDirector().Present<StateWaiting7K>();
     });
 
-    auto& topFx    = Create<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
-    auto& bottomFx = Create<Gx::Sequence>([=]
+    auto topFx    = Run<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
+    auto bottomFx = Run<Gx::Sequence>([=]
         {
             background->SetVisible(true);
             banner->SetVisible(true);
             btnRetry->SetEnabled(true);
             btnBack->SetEnabled(true);
         },
-        Create<Gx::Move>(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))
+        Gx::Move(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))
     );
 
     if (const auto bgm = Instantiate<sf::Music>("BGM/bgResult.ogg"); bgm)
         m_mixer.Play(bgm, "BGM");
 
-    Run(topFx, bottomFx);
-    Run(Create<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); }));
+    Run<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); });
 }
 
 void StateResult::Update(const double delta)

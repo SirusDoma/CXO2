@@ -5,6 +5,5 @@
 #include <Genode/Tasks/TaskContainer.hpp>
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Delay.hpp>
-#include <Genode/Tasks/Step.hpp>
+#include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/Tasks/Sequence.hpp>
-#include <Genode/Tasks/Timeline.hpp>

@@ -3,10 +3,14 @@
 namespace Gx
 {
     Task::Task() :
-        m_state(TaskState::Initial),
+        m_state(TaskState::Idle),
         m_elapsed(sf::Time::Zero)
     {
         Task::Reset();
+    }
+
+    void Task::Initialize()
+    {
     }
 
     TaskState Task::GetState() const
@@ -44,16 +48,31 @@ namespace Gx
         if (m_state == TaskState::Completed || m_state == TaskState::Stopped)
             return;
 
-        if (m_elapsed == sf::Time::Zero && m_startCallback)
-            m_startCallback();
-        else if (m_elapsed > sf::Time::Zero && m_state == TaskState::Initial)
-            m_state = TaskState::Running;
+        switch (m_state)
+        {
+            case TaskState::Idle:
+            {
+                Initialize();
+                if (m_startCallback)
+                    m_startCallback();
 
-        m_elapsed += sf::milliseconds(delta);
+                m_state = TaskState::Running;
+            }
+            case TaskState::Running:
+            {
+                m_elapsed += sf::milliseconds(delta);
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     void Task::Stop()
     {
+        if (m_state == TaskState::Stopped)
+            return;
+
         m_state   = TaskState::Stopped;
         m_elapsed = sf::Time::Zero;
 
@@ -63,6 +82,9 @@ namespace Gx
 
     void Task::Complete()
     {
+        if (m_state == TaskState::Completed)
+            return;
+
         m_state   = TaskState::Completed;
         m_elapsed = sf::Time::Zero;
 
@@ -72,7 +94,10 @@ namespace Gx
 
     void Task::Reset()
     {
-        m_state   = TaskState::Initial;
-        m_elapsed = sf::Time::Zero;
+        if (m_state == TaskState::Idle)
+            return;
+
+        m_state       = TaskState::Idle;
+        m_elapsed     = sf::Time::Zero;
     }
 }

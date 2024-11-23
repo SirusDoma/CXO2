@@ -12,10 +12,8 @@ ChannelBoard::ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
     m_resources(resources),
     m_channelButton(),
     m_captureImage(),
-    m_tab(ChannelBoard::Tab::Notice),
     m_sequence(),
-    m_moveIn(),
-    m_moveOut(),
+    m_tab(ChannelBoard::Tab::Notice),
     m_transitioning(false),
     m_animationEnabled(true),
     m_selectedChannel(),
@@ -290,10 +288,6 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
         m_transitioning = true;
         const auto position = GetPosition();
         SetPosition(800 + GetLocalBounds().size.x, position.y);
-        Stop(m_sequence);
-
-        m_moveIn  = Gx::Move(*this, position - sf::Vector2f(30, 0), sf::milliseconds(200));
-        m_moveOut = Gx::Move(*this, position, sf::milliseconds(200));
 
         m_sequence = Gx::Sequence([&, callback]
             {
@@ -302,7 +296,8 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
                 if (callback)
                     callback();
             },
-            m_moveIn, m_moveOut
+            Gx::Move(*this, position - sf::Vector2f(30, 0), sf::milliseconds(200)),
+            Gx::Move(*this, position, sf::milliseconds(200))
         );
 
         Run(m_sequence);

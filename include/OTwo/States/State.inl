@@ -95,10 +95,8 @@ R& State::Create(Args&&... args)
 {
     auto resources = m_tempResources.get();
     auto name      = Gx::StringHelper::GetTypeName<R>();
-    auto resource  = Gx::ResourcePtr<R>(new R(std::forward<Args>(args)...), [] (auto ptr) {
-        delete ptr;
-    });
 
+    Gx::ResourcePtr<R> resource = std::make_unique<R>(std::forward<Args>(args)...);
     return resources->Store(GetName() + "/" + name + "_" + std::to_string(resources->Count<R>()), std::move(resource), Gx::CacheMode::None);
 }
 

@@ -1,37 +1,31 @@
 #pragma once
 
 #include <Genode/Tasks/Task.hpp>
-#include <Genode/Tasks/Delay.hpp>
+
 #include <vector>
+#include <memory>
 
 namespace Gx
 {
     class Sequence : public Task
     {
     public:
-        Sequence();
+        template<typename... Tasks, std::enable_if_t<std::conjunction_v<std::is_base_of<Task, std::decay_t<Tasks>>...>, int> = 0>
+        explicit Sequence(Tasks&&... tasks);
 
-        template<typename... Tasks>
-        explicit Sequence(Tasks&... tasks);
-
-        template<typename... Tasks>
-        explicit Sequence(const std::function<void()>& callback, Tasks&... tasks);
-
-        template<typename... Args>
-        Sequence* Add(Task& first, Args&... args);
-        Sequence* Add(Task& task);
-
-        template<typename... Args>
-        Sequence* Remove(const Task& first, Args&... args);
-        Sequence* Remove(const Task& task);
+        template<typename... Tasks, std::enable_if_t<std::conjunction_v<std::is_base_of<Task, std::decay_t<Tasks>>...>, int> = 1>
+        explicit Sequence(const std::function<void()>& callback, Tasks&&... tasks);
 
         void Update(double delta) override;
         void Complete() override;
         void Reset() override;
 
+    protected:
+        void Initialize() override;
+
     private:
-        std::vector<Task*> m_tasks;
-        std::vector<Task*>::iterator m_iterator;
+        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>> m_tasks;
+        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>>::iterator m_iterator;
     };
 }
 

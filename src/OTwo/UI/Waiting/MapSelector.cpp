@@ -1,7 +1,11 @@
 #include <OTwo/UI/Waiting/MapSelector.hpp>
 
-#include <Genode/UI.hpp>
 #include <OTwo/States/State.hpp>
+
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/RadioButton.hpp>
+#include <Genode/UI/Label.hpp>
+#include <Genode/UI/Image.hpp>
 #include <Genode/Graphics/Animation.hpp>
 
 MapSelector::MapSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :

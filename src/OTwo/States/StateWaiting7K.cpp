@@ -18,8 +18,12 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 
-#include <Genode/UI.hpp>
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/RadioButton.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
+#include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
+#include <Genode/Tasks/Delay.hpp>
 
 #include <magic_enum.hpp>
 
@@ -394,10 +398,10 @@ void StateWaiting7K::Initialize()
         m_game.SetMapID(data.MapID);
         m_game.SetEffectID(data.EffectID);
 
-        Run(Create<Gx::Delay>(sf::milliseconds(100.f), [&director]
+        Run<Gx::Delay>(sf::milliseconds(100.f), [&director]
         {
             director.Present<StateLoading>();
-        }));
+        });
     });
 
     bgm->setLooping(true);

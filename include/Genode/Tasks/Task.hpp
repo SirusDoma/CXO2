@@ -10,7 +10,7 @@ namespace Gx
 {
     enum class TaskState
     {
-        Initial,
+        Idle,
         Running,
         Stopped,
         Completed
@@ -35,6 +35,7 @@ namespace Gx
     protected:
         Task();
 
+        virtual void Initialize();
         void SetState(const TaskState& state);
 
     private:

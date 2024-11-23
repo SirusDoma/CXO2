@@ -21,8 +21,11 @@
 #include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <Genode/System/Application.hpp>
-#include <Genode/Tasks/Step.hpp>
-#include <Genode/UI.hpp>
+#include <Genode/Tasks/Scheduler.hpp>
+#include <Genode/UI/Button.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
+#include <Genode/UI/List.hpp>
+#include <Genode/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 StatePlaying7K::StatePlaying7K(
@@ -354,27 +357,27 @@ void StatePlaying7K::Initialize()
     // Setup Score changes
     m_scoreTracker.AddIncrementListener([=, &comboCounter, &judgementIndicator] (auto& ev, auto acc, auto count)
     {
-        // Life System
         if (m_scoreTracker.IsEnabled())
         {
+            // Life System
             m_lifeSystem.Update(acc, count);
             m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
             lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
-        }
 
-        if (m_lifeSystem.GetCurrentLifePoint() == 0)
-        {
-            m_scoreTracker.SetEnabled(false);
-            m_self->Die();
-
-            if (m_context.GetDifficulty() != Difficulty::EX)
+            if (m_lifeSystem.GetCurrentLifePoint() == 0)
             {
-                Run(Create<Gx::Delay>(sf::milliseconds(2000), [this]
-                {
-                    OnRenderComplete();
-                }));
+                m_scoreTracker.SetEnabled(false);
+                m_self->Die();
 
-                return;
+                if (m_context.GetDifficulty() != Difficulty::EX)
+                {
+                    Run<Gx::Delay>(sf::milliseconds(2000), [this]
+                    {
+                        OnRenderComplete();
+                    });
+
+                    return;
+                }
             }
         }
 
@@ -447,29 +450,28 @@ void StatePlaying7K::Initialize()
     });
 
     // Start initial lifebar fill-up animation
-    Run(Create<Gx::Step>
+    Run<Gx::Scheduler>
     (
-        sf::seconds(1.f),
+        sf::seconds(2.f),
         sf::seconds(1.f / 60.f),
-        [this, lifeBar] (const auto& step, auto const)
+        [this, lifeBar] (const auto& task, auto delta)
         {
-            lifeBar->SetValue(lifeBar->GetValue() + static_cast<int>(m_lifeSystem.GetMaxLifePoint() * (1.f / 60.f)));
+            lifeBar->SetValue(lifeBar->GetValue() + m_lifeSystem.GetMaxLifePoint() / (2.f / (delta / 1000.f)));
+
+            // TODO: There's no need to animate avatar life bar?
             for (auto [_, avatar] : m_avatars)
                 avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
 
-            if (step.GetState() == Gx::TaskState::Completed)
+            if (task.GetState() == Gx::TaskState::Completed)
             {
                 lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
-
-                // TODO: There's no need to animate avatar life bar?
                 for (auto [_, avatar] : m_avatars)
                     avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
-
 
                 m_renderer.StartRender();
             }
         }
-    ));
+    );
 }
 
 void StatePlaying7K::OnRenderComplete()

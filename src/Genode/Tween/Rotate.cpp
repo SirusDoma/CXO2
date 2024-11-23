@@ -11,6 +11,14 @@ namespace Gx
     {
     }
 
+    void Rotate::Initialize()
+    {
+        Task::Initialize();
+
+        m_start = m_target->GetRotation();
+        m_diff  = std::abs(m_start - m_end);
+    }
+
     void Rotate::Update(const double delta)
     {
         Task::Update(delta);
@@ -18,12 +26,6 @@ namespace Gx
         const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
-
-        if (state == TaskState::Initial)
-        {
-            m_start = m_target->GetRotation();
-            m_diff  = std::abs(m_start - m_end);
-        }
 
         short rotation = 0;
         auto current   = m_target->GetRotation();
@@ -53,12 +55,18 @@ namespace Gx
 
     void Rotate::Complete()
     {
+        if (GetState() == TaskState::Completed)
+            return;
+
         Task::Complete();
         m_target->SetRotation(m_end);
     }
 
     void Rotate::Reset()
     {
+        if (GetState() == TaskState::Idle)
+            return;
+
         Task::Reset();
         m_target->SetRotation(m_start);
     }

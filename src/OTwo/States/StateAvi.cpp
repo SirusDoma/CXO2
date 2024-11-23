@@ -1,12 +1,9 @@
 ﻿#include <OTwo/States/StateAvi.hpp>
-
-#include <SFML/Audio/Music.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 
 #include <Genode/Tween/Fade.hpp>
-#include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Sequence.hpp>
-
-#include <OTwo/States/StatePlanet.hpp>
+#include <SFML/Audio/Music.hpp>
 
 StateAvi::StateAvi(Gx::Mixer& mixer) :
     m_mixer(mixer)
@@ -25,16 +22,13 @@ void StateAvi::Initialize()
     overlay.SetColor(sf::Color(0, 0, 0, 255));
     AddChild(overlay);
 
-    auto& splash = Create<Gx::Sequence>([&]
+    Run<Gx::Sequence>([&]
         {
             director.Present<StatePlanet>();
         },
-        Create<Gx::Fade>(overlay, 000, sf::seconds(2.5f)),
-        Create<Gx::Fade>(overlay, 255, sf::seconds(2.5f)),
-        Create<Gx::Action>([&] { AddChild(overlay); })
+        Gx::Fade(overlay, 000, sf::seconds(2.5f)),
+        Gx::Fade(overlay, 255, sf::seconds(2.5f))
     );
-
-    Run(splash);
 }
 
 bool StateAvi::Close(bool quit)

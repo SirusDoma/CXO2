@@ -64,13 +64,11 @@ private:
     ChannelButton* m_channelButton;
     Gx::Image m_captureImage;
     sf::RenderTexture m_renderTexture;
+    Gx::Sequence m_sequence;
 
     PlanetInfo m_planetInfo;
     ChannelBoard::Tab m_tab;
     std::function<void(MusicHall, ServerChannel)> m_callback;
-
-    Gx::Sequence m_sequence;
-    Gx::Move m_moveIn, m_moveOut;
 
     bool m_transitioning, m_animationEnabled;
     int m_selectedChannel;

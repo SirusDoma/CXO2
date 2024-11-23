@@ -506,7 +506,7 @@ void StateItemShop::OnExtensionButtonClicked()
     if (m_extensionMenuEffect.GetState() == Gx::TaskState::Running)
         return;
 
-    if (m_extensionMenuEffect.GetState() != Gx::TaskState::Initial)
+    if (m_extensionMenuEffect.GetState() != Gx::TaskState::Idle)
         Stop(m_extensionMenuEffect);
 
     const auto extMenu          = Instantiate<Gx::Image>("IDC_IMAGE_EXT_MENU");
@@ -549,10 +549,10 @@ void StateItemShop::OnExtensionButtonClicked()
             InvalidateShopItemList();
     }
 
-    m_extensionMenuEffect = Gx::Step(
+    m_extensionMenuEffect = Gx::Scheduler(
         sf::seconds(1.f),
         sf::seconds(1.f / 60.f),
-        [=] (auto& task, auto delta)
+        [=] (const auto& task, auto _)
         {
             if (task.GetState() == Gx::TaskState::Completed)
             {
@@ -707,7 +707,7 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
         shopMaster->SetVisible(true);
         if (moveIn)
         {
-            if (m_shopMasterEffect.GetState() != Gx::TaskState::Initial)
+            if (m_shopMasterEffect.GetState() != Gx::TaskState::Idle)
             {
                 Stop(m_shopMasterEffect);
                 m_shopMasterEffect.Complete();

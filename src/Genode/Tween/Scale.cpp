@@ -11,6 +11,16 @@ namespace Gx
     {
     }
 
+    void Scale::Initialize()
+    {
+        Task::Initialize();
+
+        m_start = m_target->GetScale();
+        m_diff = m_start - m_end;
+        m_diff.x = std::abs(m_diff.x);
+        m_diff.y = std::abs(m_diff.y);
+    }
+
     void Scale::Update(const double delta)
     {
         Task::Update(delta);
@@ -18,14 +28,6 @@ namespace Gx
         const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
-
-        if (state == TaskState::Initial)
-        {
-            m_start = m_target->GetScale();
-            m_diff = m_start - m_end;
-            m_diff.x = std::abs(m_diff.x);
-            m_diff.y = std::abs(m_diff.y);
-        }
 
         float scale  = 0.0f;
         auto current = m_target->GetScale();
@@ -72,12 +74,18 @@ namespace Gx
 
     void Scale::Complete()
     {
+        if (GetState() == TaskState::Completed)
+            return;
+
         Task::Complete();
         m_target->SetScale(m_end);
     }
 
     void Scale::Reset()
     {
+        if (GetState() == TaskState::Idle)
+            return;
+
         Task::Reset();
         m_target->SetScale(m_start);
     }

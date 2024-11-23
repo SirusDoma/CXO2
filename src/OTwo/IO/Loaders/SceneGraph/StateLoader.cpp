@@ -3,7 +3,6 @@
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/SceneGraph/StateMetadata.hpp>
 
-#include <Genode/UI.hpp>
 #include <magic_enum.hpp>
 
 Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const

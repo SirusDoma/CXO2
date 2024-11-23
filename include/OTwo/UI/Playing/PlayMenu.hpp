@@ -2,8 +2,15 @@
 
 #include <OTwo/Core/ScoreTracker.hpp>
 
-#include <Genode/SceneGraph/Node.hpp>
-#include <Genode/UI.hpp>
+#include <Genode/Graphics/Animation.hpp>
+#include <Genode/UI/Image.hpp>
+
+namespace Gx
+{
+    class Gauge;
+    class BitmapNumber;
+    class Label;
+}
 
 class ChartRenderer;
 class GameContext;

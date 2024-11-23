@@ -15,6 +15,9 @@ namespace Gx
         void Complete() override;
         void Reset() override;
 
+    protected:
+        void Initialize() override;
+
     private:
         Transformable* m_target;
         float m_start, m_end, m_diff;

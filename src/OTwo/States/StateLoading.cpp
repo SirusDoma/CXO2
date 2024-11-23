@@ -34,37 +34,28 @@ void StateLoading::Initialize()
 
     const auto chart      = m_context.GetChart();
     const auto& resources = GetResources(ResourceScope::Shared);
-    if (chart->GetEventCount(m_context.GetDifficulty()) == 0)
+    auto loader           = ChartLoader(m_context);
+
+    if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
     {
-        auto loader = ChartLoader(m_context);
-        if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
-        {
-            OnCoverLoaded(image);
-        }
-        else
-        {
-            loader.SetCoverLoadCallback([this] (auto cover)
-            {
-                if (cover)
-                    QueueEvent([this, cover] { OnCoverLoaded(cover); });
-            });
-        }
-
-        auto thread = std::thread([=] ()
-        {
-            m_context.SetChart(loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default));
-            QueueEvent([this] { OnChartLoaded(m_context.GetChart()); });
-        });
-
-        thread.detach();
+        OnCoverLoaded(image);
     }
     else
     {
-        if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
-            OnCoverLoaded(image);
-
-        Run(Create<Gx::Delay>(sf::seconds(0.5f), [this] { OnChartLoaded(m_context.GetChart()); }));
+        loader.SetCoverLoadCallback([this] (auto cover)
+        {
+            if (cover)
+                QueueEvent([this, cover] { OnCoverLoaded(cover); });
+        });
     }
+
+    auto thread = std::thread([=] ()
+    {
+        m_context.SetChart(loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default));
+        QueueEvent([this] { OnChartLoaded(m_context.GetChart()); });
+    });
+
+    thread.detach();
 }
 
 void StateLoading::Update(const double delta)
@@ -86,7 +77,7 @@ void StateLoading::OnCoverLoaded(const sf::Image* cover)
 
 void StateLoading::OnChartLoaded(const Chart* chart)
 {
-    auto& transition = Create<Gx::Sequence>([this, chart]
+    Run<Gx::Sequence>([this, chart]
         {
             auto& director = GetDirector();
             auto ctx       = PlayingResourceContext();
@@ -98,8 +89,6 @@ void StateLoading::OnChartLoaded(const Chart* chart)
 
             director.Present<StatePlaying7K>(ctx);
         },
-        Create<Gx::Delay>(sf::seconds(0.5f))
+        Gx::Delay(sf::seconds(0.5f))
     );
-
-    Run(transition);
 }

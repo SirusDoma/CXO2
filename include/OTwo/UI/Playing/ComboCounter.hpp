@@ -6,6 +6,7 @@
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tasks/Action.hpp>
+#include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/TaskGroup.hpp>
 #include <Genode/Tween/Move.hpp>
 
@@ -24,11 +25,7 @@ private:
     void Update(const double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-    Gx::Animation*       m_header;
-    Gx::BitmapNumber*    m_counter;
-    Gx::Sequence         m_sequence;
-    Gx::Action           m_action;
-    Gx::TaskGroup        m_moveGroup;
-    Gx::Move             m_headerMove, m_counterMove;
-    Gx::Delay            m_delay;
+    Gx::Animation*    m_header;
+    Gx::BitmapNumber* m_counter;
+    Gx::Sequence      m_sequence;
 };

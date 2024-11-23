@@ -17,6 +17,9 @@ namespace Gx
         void Complete() override;
         void Reset() override;
 
+    protected:
+        void Initialize() override;
+
     private:
         Transformable* m_target;
         sf::Vector2f m_start, m_end, m_diff;

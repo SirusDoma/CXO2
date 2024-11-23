@@ -2,6 +2,9 @@
 
 #include <Genode/Tasks/Task.hpp>
 
+#include <memory>
+#include <functional>
+
 namespace Gx
 {
     class TaskGroup : public Task
@@ -9,19 +12,22 @@ namespace Gx
     public:
         TaskGroup() = default;
 
-        template<typename... Tasks>
-        explicit TaskGroup(Tasks&... tasks);
+        template<typename... Tasks, std::enable_if_t<std::conjunction_v<std::is_base_of<Task, std::decay_t<Tasks>>...>, int> = 0>
+        explicit TaskGroup(Tasks&&... tasks);
+
+        template<typename... Tasks, std::enable_if_t<std::conjunction_v<std::is_base_of<Task, std::decay_t<Tasks>>...>, int> = 1>
+        explicit TaskGroup(const std::function<void()>& callback, Tasks&&... tasks);
+
+        template<typename T, typename ... Args>
+        std::enable_if_t<std::is_base_of_v<Task, T>, TaskGroup&>
+        Add(Args&&... args);
 
         template<typename... Tasks>
-        explicit TaskGroup(const std::function<void()>& callback, Tasks&... tasks);
+        std::enable_if_t<std::conjunction_v<std::is_base_of<Task, std::decay_t<Tasks>>...>, TaskGroup&>
+        Add(Tasks&&... tasks);
 
-        template<typename... Args>
-        TaskGroup* Add(Task& first, Args&... args);
-        TaskGroup* Add(Task& task);
-
-        template<typename... Args>
-        TaskGroup* Remove(const Task& first, Args&... args);
-        TaskGroup* Remove(const Task& task);
+        TaskGroup& Add(Task& task);
+        TaskGroup& Remove(const Task& task);
 
     protected:
         void Update(double delta) override;
@@ -31,7 +37,7 @@ namespace Gx
 
     private:
         std::function<void()> m_callback;
-        std::vector<Task*> m_tasks;
+        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>> m_tasks;
     };
 }
 

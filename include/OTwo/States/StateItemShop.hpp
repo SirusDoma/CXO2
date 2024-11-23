@@ -11,7 +11,7 @@
 
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tasks/Delay.hpp>
-#include <Genode/Tasks/Step.hpp>
+#include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/Tween/Move.hpp>
 #include <Genode/UI/Image.hpp>
 
@@ -64,7 +64,7 @@ private:
     Item* m_myBagSelectedItem;
     Gx::Image* m_myBagSelectIndicator;
     Gx::Move m_shopMasterEffect;
-    Gx::Step m_extensionMenuEffect;
+    Gx::Scheduler m_extensionMenuEffect;
     std::vector<sf::Sound*> m_shopMasterSpeech;
     std::vector<Item> m_inventory;
     std::vector<ItemMetadata> m_shopItemList;

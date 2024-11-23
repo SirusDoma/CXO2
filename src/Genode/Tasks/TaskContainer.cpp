@@ -1,49 +1,45 @@
-﻿#include <Genode/Tasks/Task.hpp>
+﻿#include <unordered_set>
+#include <Genode/Tasks/Task.hpp>
 #include <Genode/Tasks/TaskContainer.hpp>
 
 namespace Gx
 {
     TaskContainer::TaskContainer() :
-        m_tasks()
+        m_state(TaskState::Idle)
     {
-    }
-
-    void TaskContainer::Run(Task& task)
-    {
-        Stop(task);
-        m_tasks.push_back(&task);
     }
 
     void TaskContainer::Stop(const Task& task)
     {
-        const auto iterator = std::find(m_tasks.begin(), m_tasks.end(), &task);
-        if (iterator != m_tasks.end())
+        const auto it = std::find_if(m_tasks.begin(), m_tasks.end(),
+        [&](const auto& t)
+        {
+            return t.get() == &task;
+        });
+
+        if (it != m_tasks.end())
         {
             // Run update before deleting
-            const auto item = *iterator;
-            if (item->GetState() != TaskState::Completed)
+            if ((*it)->GetState() == TaskState::Running)
             {
-                item->Stop();
-                item->Update(0);
+                (*it)->Update(0);
+                (*it)->Stop();
             }
 
-            m_tasks.erase(iterator);
+            m_tasks.erase(it);
         }
     }
 
     void TaskContainer::StopAll()
     {
-        for (unsigned int i = 0; i < m_tasks.size(); i++)
+        for (const auto& task : m_tasks)
         {
             // Run update before deleting
-            const auto item = m_tasks[i];
-            if (item->GetState() != TaskState::Completed)
+            if (task->GetState() == TaskState::Running)
             {
-                item->Stop();
-                item->Update(0);
+                task->Update(0);
+                task->Stop();
             }
-
-            m_tasks.erase(m_tasks.begin() + i);
         }
 
         m_tasks.clear();
@@ -51,7 +47,30 @@ namespace Gx
 
     void TaskContainer::Update(const double delta)
     {
-        for (const auto task : m_tasks)
-            task->Update(delta);
+        // Tasks can be added or removed to/from the list during the update
+        // The container need to guarantee that:
+        //   1. The newly added tasks gets updated
+        //   2. The non-running tasks are removed
+        //   3. Every task is updated only once
+
+        // This will reject nested Update which prevents:
+        //   1. Updating task more than once in a single frame
+        //   2. Removing non-running tasks that past the pointed task in the root Update loop
+        if (m_state == TaskState::Running)
+            return;
+
+        m_state = TaskState::Running;
+        for (std::size_t i = 0; i < m_tasks.size();)
+        {
+            // Any task may add new tasks into the list.
+            // The newly added tasks will be processed within this frame too.
+            m_tasks[i]->Update(delta);
+            if (m_tasks[i]->GetState() == TaskState::Stopped || m_tasks[i]->GetState() == TaskState::Completed)
+                m_tasks.erase(m_tasks.begin() + i);
+            else
+                ++i;
+        }
+
+        m_state = TaskState::Idle;
     }
 }

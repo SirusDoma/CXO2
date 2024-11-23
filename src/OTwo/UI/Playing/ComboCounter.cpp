@@ -2,16 +2,12 @@
 #include <OTwo/States/State.hpp>
 
 #include <Genode/Tasks/Action.hpp>
-#include <Genode/Tasks/Step.hpp>
+#include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/Tween/Move.hpp>
 
 ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
     m_header(header),
-    m_counter(counter),
-    m_action(),
-    m_headerMove(),
-    m_counterMove(),
-    m_delay(sf::Time::Zero)
+    m_counter(counter)
 {
     if (m_header)
         Gx::Node::AddChild(*m_header);
@@ -24,26 +20,7 @@ void ComboCounter::Initialize()
 {
     Gx::Node::Initialize();
 
-    SetVisible(false);
     SetPosition(sf::Vector2f(0.f, -30.f / 5.f));
-
-    m_action = Gx::Action([this]
-    {
-        if (m_header)
-            m_header->Reset();
-
-        SetVisible(true);
-    });
-
-    m_headerMove  = Gx::Move(*m_header, sf::Vector2f(m_header->GetPosition().x, m_header->GetPosition().y - 8.f), sf::seconds(1.f / 60.f * 5));
-    m_counterMove = Gx::Move(*m_counter, sf::Vector2f(m_counter->GetPosition().x, m_counter->GetPosition().y - 23.f), sf::seconds(1.f / 60.f * 5));
-    m_moveGroup   = Gx::TaskGroup(m_action, m_headerMove, m_counterMove);
-
-    // Make sure initial is recorded now
-    m_headerMove.Update(0);
-    m_counterMove.Update(0);
-
-    m_delay    = Gx::Delay(sf::milliseconds(1000));
     m_sequence = Gx::Sequence([this]
         {
             if (m_header)
@@ -51,10 +28,26 @@ void ComboCounter::Initialize()
 
             SetVisible(false);
         },
-        m_moveGroup, m_delay
+        Gx::TaskGroup
+        (
+            Gx::Action([this]
+            {
+                if (m_header)
+                    m_header->Reset();
+
+                SetVisible(true);
+            }),
+            Gx::Move(*m_header, sf::Vector2f(m_header->GetPosition().x, m_header->GetPosition().y - 8.f), sf::seconds(1.f / 60.f * 5)),
+            Gx::Move(*m_counter, sf::Vector2f(m_counter->GetPosition().x, m_counter->GetPosition().y - 23.f), sf::seconds(1.f / 60.f * 5))
+        ),
+        Gx::Delay(sf::milliseconds(1000))
     );
 
+    // Make sure initial position is recorded now
+    m_sequence.Update(0);
     m_sequence.Stop();
+
+    SetVisible(false);
 }
 
 unsigned int ComboCounter::GetCombo() const

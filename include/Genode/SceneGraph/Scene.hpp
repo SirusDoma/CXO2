@@ -26,6 +26,7 @@ namespace Gx
         friend SceneDirector;
 
         Scene();
+        Scene(const Scene& other);
         explicit Scene(const std::string& name);
 
         ~Scene() override;
@@ -46,6 +47,8 @@ namespace Gx
         T& Require() const;
 
         void QueueEvent(const std::function<void()>& evt);
+
+        Scene& operator=(const Scene& other);
 
     protected:
         void Initialize() override;

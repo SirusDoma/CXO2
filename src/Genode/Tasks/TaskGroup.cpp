@@ -3,19 +3,24 @@
 
 namespace Gx
 {
-    TaskGroup* TaskGroup::Add(Task& task)
+    TaskGroup& TaskGroup::Add(Task& task)
     {
-        m_tasks.push_back(&task);
-        return this;
+        m_tasks.push_back(
+            std::unique_ptr<Task, std::function<void(Task*)>>(&task, [] (auto _) {})
+        );
+
+        return *this;
     }
 
-    TaskGroup* TaskGroup::Remove(const Task& task)
+    TaskGroup& TaskGroup::Remove(const Task& task)
     {
-        const auto iterator = std::find(m_tasks.begin(), m_tasks.end(), &task);
-        if (iterator != m_tasks.end())
-            m_tasks.erase(iterator);
+        m_tasks.erase(std::remove_if(m_tasks.begin(), m_tasks.end(), [&](const auto& t)
+            {
+                return t.get() == &task;
+            }), m_tasks.end()
+        );
 
-        return this;
+        return *this;
     }
 
     void TaskGroup::Update(const double delta)
@@ -29,10 +34,10 @@ namespace Gx
             return;
 
         bool completed = true;
-        for (const auto task : m_tasks)
+        for (size_t i = 0; i < m_tasks.size(); ++i)
         {
-            task->Update(delta);
-            completed = completed && task->GetState() == TaskState::Completed;
+            m_tasks[i]->Update(delta);
+            completed = completed && m_tasks[i]->GetState() == TaskState::Completed;
         }
 
         if (completed)
@@ -41,25 +46,31 @@ namespace Gx
 
     void TaskGroup::Stop()
     {
-        Task::Stop();
+        if (GetState() == TaskState::Stopped)
+            return;
 
-        for (const auto task : m_tasks)
-            task->Stop();
+        Task::Stop();
+        for (size_t i = 0; i < m_tasks.size(); ++i)
+            m_tasks[i]->Stop();
     }
 
     void TaskGroup::Complete()
     {
-        Task::Complete();
+        if (GetState() == TaskState::Completed)
+            return;
 
-        for (const auto task : m_tasks)
-            task->Complete();
+        Task::Complete();
+        for (size_t i = 0; i < m_tasks.size(); ++i)
+            m_tasks[i]->Complete();
     }
 
     void TaskGroup::Reset()
     {
-        Task::Reset();
+        if (GetState() == TaskState::Idle)
+            return;
 
-        for (const auto task : m_tasks)
-            task->Reset();
+        Task::Reset();
+        for (size_t i = 0; i < m_tasks.size(); ++i)
+            m_tasks[i]->Reset();
     }
 }

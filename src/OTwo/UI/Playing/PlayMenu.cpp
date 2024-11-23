@@ -1,7 +1,11 @@
 #include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
-
 #include <OTwo/States/State.hpp>
+
+#include <Genode/UI/List.hpp>
+#include <Genode/UI/BitmapNumber.hpp>
+#include <Genode/UI/Gauge.hpp>
+#include <Genode/UI/Label.hpp>
 
 PlayMenu::PlayMenu(const GameContext& context) :
     m_context(context),

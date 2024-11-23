@@ -9,6 +9,19 @@ namespace Gx
     {
     }
 
+    Scene::Scene(const Scene& other) :
+        Node(other),
+        RenderableContainer(other),
+        UpdatableContainer(other),
+        InputableContainer(other),
+        m_view(other.m_view),
+        m_director(other.m_director),
+        m_overlays(other.m_overlays),
+        m_lastInput(other.m_lastInput),
+        m_events(other.m_events)
+    {
+    }
+
     Scene::Scene(const std::string& name) :
         Node(),
         RenderableContainer(),
@@ -113,6 +126,25 @@ namespace Gx
     {
         if (evt)
             m_events.push(evt);
+    }
+
+    Scene& Scene::operator=(const Scene& other)
+    {
+        if (this != &other)
+        {
+            Node::operator=(other);
+            RenderableContainer::operator=(other);
+            UpdatableContainer::operator=(other);
+            InputableContainer::operator=(other);
+
+            m_view = other.m_view;
+            m_director = other.m_director;
+            m_overlays = other.m_overlays;
+            m_lastInput = other.m_lastInput;
+            m_events = other.m_events;
+        }
+
+        return *this;
     }
 
     void Scene::ProcessEvents()

@@ -17,6 +17,9 @@ namespace Gx
         void Complete() override;
         void Reset() override;
 
+    protected:
+        void Initialize() override;
+
     private:
         Colorable* m_target;
         std::int16_t m_start, m_end, m_diff;

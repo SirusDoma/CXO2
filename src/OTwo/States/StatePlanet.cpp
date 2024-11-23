@@ -5,6 +5,7 @@
 #include <OTwo/States/StateRoom.hpp>
 
 #include <Genode/System/Application.hpp>
+#include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
 
@@ -73,13 +74,12 @@ void StatePlanet::Initialize()
         overlay.SetFillColor(sf::Color::Black);
         AddChild(overlay);
 
-        auto& transition = Create<Gx::Sequence>([&]
+        Run<Gx::Sequence>([&]
             {
                 RemoveChild(overlay);
             },
-            Create<Gx::Fade>(overlay, 0, sf::seconds(1.0f))
+            Gx::Fade(overlay, 0, sf::seconds(1.0f))
         );
-        Run(transition);
     }
 
     bgm->setLooping(true);
@@ -127,13 +127,11 @@ void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& chan
     m_session.SetChannelID(channel.ID);
 
     m_connecting = true;
-    auto& sequence = Create<Gx::Sequence>([&]
+    Run<Gx::Sequence>([&]
         {
             auto& director = GetDirector();
             director.Present<StateRoom>();
         },
-        Create<Gx::Delay>(sf::milliseconds(750))
+        Gx::Delay(sf::milliseconds(750))
     );
-
-    Run(sequence);
 }

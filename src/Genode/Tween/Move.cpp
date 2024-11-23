@@ -10,7 +10,17 @@ namespace Gx
         m_duration(duration)
     {
     }
-    
+
+    void Move::Initialize()
+    {
+        Task::Initialize();
+
+        m_start  = m_target->GetPosition();
+        m_diff   = m_start - m_end;
+        m_diff.x = std::abs(m_diff.x);
+        m_diff.y = std::abs(m_diff.y);
+    }
+
     void Move::Update(const double delta)
     {
         Task::Update(delta);
@@ -18,14 +28,6 @@ namespace Gx
         const auto state = GetState();
         if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
             return;
-
-        if (state == TaskState::Initial)
-        {
-            m_start  = m_target->GetPosition();
-            m_diff   = m_start - m_end;
-            m_diff.x = std::abs(m_diff.x);
-            m_diff.y = std::abs(m_diff.y);
-        }
 
         float offset = 0.0f;
         auto current = m_target->GetPosition();
@@ -72,12 +74,18 @@ namespace Gx
 
     void Move::Complete()
     {
+        if (GetState() == TaskState::Completed)
+            return;
+
         Task::Complete();
         m_target->SetPosition(m_end);
     }
 
     void Move::Reset()
     {
+        if (GetState() == TaskState::Idle)
+            return;
+
         Task::Reset();
         m_target->SetPosition(m_start);
     }

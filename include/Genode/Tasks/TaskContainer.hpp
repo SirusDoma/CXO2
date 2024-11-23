@@ -4,6 +4,7 @@
 #include <Genode/Tasks/Task.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace Gx
 {
@@ -11,15 +12,29 @@ namespace Gx
     {
     public:
         TaskContainer();
+        TaskContainer(const TaskContainer& other) = delete;
 
-        void Run(Task& task);
+        TaskContainer& operator=(const TaskContainer& other) = delete;
+
+        template<typename T, typename... Args>
+        std::enable_if_t<std::is_base_of_v<Task, T>, std::weak_ptr<T>>
+        Run(Args&&... args);
+
+        template<typename T>
+        std::enable_if_t<std::is_base_of_v<Task, T>, T&>
+        Run(T& task);
+
+        template<typename... Tasks>
+        auto Run(Tasks&&... tasks) ->
+            std::enable_if_t<std::conjunction_v<
+                std::is_base_of<Task, std::decay_t<Tasks>>...
+            >, std::tuple<std::weak_ptr<std::decay_t<Tasks>>...>>;
+
         void Stop(const Task& task);
 
-        template<typename... Args>
-        void Run(Task& first, Args&... args);
-
-        template<typename... Args>
-        void Stop(const Task& first, const Args&... args);
+        template<typename... Tasks>
+        std::enable_if_t<std::conjunction_v<std::is_base_of<Task, Tasks>...>, void>
+        Stop(const Tasks&... tasks);
 
         void StopAll();
 
@@ -27,7 +42,8 @@ namespace Gx
         void Update(double delta) override;
 
     private:
-        std::vector<Task*> m_tasks;
+        TaskState m_state;
+        std::vector<std::shared_ptr<Task>> m_tasks;
     };
 }
 
