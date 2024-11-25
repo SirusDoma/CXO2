@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Genode/Tasks/Task.hpp>
+#include <Genode/IO/Resource.hpp>
 
 #include <vector>
 #include <memory>
@@ -24,8 +25,8 @@ namespace Gx
         void Initialize() override;
 
     private:
-        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>> m_tasks;
-        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>>::iterator m_iterator;
+        std::vector<ResourcePtr<Task>> m_tasks;
+        std::vector<ResourcePtr<Task>>::iterator m_iterator;
     };
 }
 

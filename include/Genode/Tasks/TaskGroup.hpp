@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Genode/Tasks/Task.hpp>
+#include <Genode/IO/Resource.hpp>
 
 #include <memory>
 #include <functional>
@@ -37,7 +38,7 @@ namespace Gx
 
     private:
         std::function<void()> m_callback;
-        std::vector<std::unique_ptr<Task, std::function<void(Task*)>>> m_tasks;
+        std::vector<ResourcePtr<Task>> m_tasks;
     };
 }
 

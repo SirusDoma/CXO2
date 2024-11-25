@@ -1,12 +1,11 @@
 #include <Genode/Tasks/TaskGroup.hpp>
-#include <algorithm>
 
 namespace Gx
 {
     TaskGroup& TaskGroup::Add(Task& task)
     {
         m_tasks.push_back(
-            std::unique_ptr<Task, std::function<void(Task*)>>(&task, [] (auto _) {})
+            ResourcePtr<Task>(&task, [] (auto _) {})
         );
 
         return *this;
