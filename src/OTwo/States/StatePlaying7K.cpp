@@ -357,27 +357,27 @@ void StatePlaying7K::Initialize()
     // Setup Score changes
     m_scoreTracker.AddIncrementListener([=, &comboCounter, &judgementIndicator] (auto& ev, auto acc, auto count)
     {
-        if (m_scoreTracker.IsEnabled())
+        if (!m_scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
+            return;
+
+        // Life System
+        m_lifeSystem.Update(acc, count);
+        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
+        lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
+
+        if (m_scoreTracker.IsEnabled() && m_lifeSystem.GetCurrentLifePoint() == 0)
         {
-            // Life System
-            m_lifeSystem.Update(acc, count);
-            m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
-            lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
+            m_scoreTracker.SetEnabled(false);
+            m_self->Die();
 
-            if (m_lifeSystem.GetCurrentLifePoint() == 0)
+            if (m_context.GetDifficulty() != Difficulty::EX)
             {
-                m_scoreTracker.SetEnabled(false);
-                m_self->Die();
-
-                if (m_context.GetDifficulty() != Difficulty::EX)
+                Run<Gx::Delay>(sf::milliseconds(2000), [this]
                 {
-                    Run<Gx::Delay>(sf::milliseconds(2000), [this]
-                    {
-                        OnRenderComplete();
-                    });
+                    OnRenderComplete();
+                });
 
-                    return;
-                }
+                return;
             }
         }
 
@@ -485,6 +485,7 @@ void StatePlaying7K::OnRenderComplete()
 
         return;
     }
+
     auto items = std::array<ScoreResultItem, 8>();
     for (std::size_t i = 0; i < items.size(); i++)
     {
@@ -605,11 +606,11 @@ void StatePlaying7K::Update(const double delta)
                 instruction->SetFrame(4);
             else if (position >= 35.f)
                 instruction->SetFrame(3);
-            else if (position >= 31.f) // 1:15
+            else if (position >= 31.f)
                 instruction->SetFrame(2);
-            else if (position >= 19.5f) // 47
+            else if (position >= 19.5f)
                 instruction->SetFrame(1);
-            else if (position > 9.f) // 21
+            else if (position > 9.f)
                 instruction->SetFrame(0);
         }
     }

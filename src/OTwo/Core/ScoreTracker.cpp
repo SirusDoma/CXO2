@@ -17,8 +17,8 @@ ScoreTracker::ScoreTracker(const Difficulty diff) :
 
 Accuracy ScoreTracker::Increment(const Chart::NoteEvent& ev, Accuracy acc, unsigned int count)
 {
-    if (acc == Accuracy::None)
-        return acc;
+    if ((!m_enabled && m_difficulty != Difficulty::EX) || acc == Accuracy::None)
+        return Accuracy::None;
 
     if (acc == Accuracy::Bad && m_buffer > 0)
     {
