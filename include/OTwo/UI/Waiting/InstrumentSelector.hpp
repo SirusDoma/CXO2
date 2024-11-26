@@ -25,7 +25,7 @@ public:
     const ItemMetadata& GetInstrumentMetadata() const;
     void SetSelectedInstrument(int itemID);
 
-    void SetInstrumentSelectCallack(const std::function<void(const ItemMetadata&)>& callback);
+    void SetInstrumentSelectCallback(const std::function<void(const ItemMetadata&)>& callback) const;
 
     void Invalidate() override;
 

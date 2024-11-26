@@ -271,7 +271,7 @@ void StateWaiting7K::Initialize()
     const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
     if (currentAvatarInfo)
     {
-        instrumentSelector->SetInstrumentSelectCallack([=, &room] (const ItemMetadata& metadata)
+        instrumentSelector->SetInstrumentSelectCallback([=, &room] (const ItemMetadata& metadata)
         {
             auto item = m_items.Create(metadata.ID);
             if (const auto avatar = currentAvatarInfo->GetAvatar(); avatar)

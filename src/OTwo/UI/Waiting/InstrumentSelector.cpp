@@ -204,7 +204,7 @@ void InstrumentSelector::SetSelectedInstrument(int itemID)
     Invalidate();
 }
 
-void InstrumentSelector::SetInstrumentSelectCallack(const std::function<void(const ItemMetadata&)>& callback)
+void InstrumentSelector::SetInstrumentSelectCallback(const std::function<void(const ItemMetadata&)>& callback) const
 {
     if (const auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
         selectButton->SetClickCallback([this, callback] (auto&, auto&) { callback(m_currentItemHeader); });
