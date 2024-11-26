@@ -1,6 +1,7 @@
 #pragma once
 
 #include <OTwo/States/State.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 
 class GameContext;
 class ItemFactory;
@@ -10,7 +11,7 @@ class SessionContext;
 class StateRoom : public State
 {
 public:
-    StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items);
+    StateRoom(Gx::AudioMixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -23,7 +24,7 @@ private:
     void OnTutorialButtonClicked() const;
     void OnBackButtonClicked() const;
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     SessionContext& m_session;
     MusicSelectionContext& m_selection;
     GameContext& m_game;

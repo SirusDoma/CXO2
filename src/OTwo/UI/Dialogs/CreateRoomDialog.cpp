@@ -8,7 +8,7 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/ToolTip.hpp>
 
-CreateRoomDialog::CreateRoomDialog(SessionContext& session, Gx::Mixer& mixer) :
+CreateRoomDialog::CreateRoomDialog(SessionContext& session, Gx::AudioMixer& mixer) :
     m_session(session),
     m_mixer(mixer)
 {
@@ -62,7 +62,7 @@ void CreateRoomDialog::Initialize()
     maxLevelLimitInput->SetNumericModeEnabled(true);
 
     jamModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, "SFX");
     });
 
     jamModeButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -88,7 +88,7 @@ void CreateRoomDialog::Initialize()
     });
 
     versusModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, "SFX");
     });
 
     versusModeButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -102,7 +102,7 @@ void CreateRoomDialog::Initialize()
     });
 
     singleModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, "SFX");
     });
 
     singleModeButton->SetCheckStateChangeCallback([=] (auto& sender)

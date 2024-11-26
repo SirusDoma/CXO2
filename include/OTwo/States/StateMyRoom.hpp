@@ -12,7 +12,7 @@ class ItemFactory;
 class StateMyRoom : public State
 {
 public:
-    StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items);
+    StateMyRoom(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items);
 
     void Initialize() override;
 
@@ -20,7 +20,7 @@ private:
     void Invalidate();
     void InvalidateSlot(Gx::Image* slot, EquipmentType type, RenderPart thumbnail = RenderPart::LargeThumbnail);
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     SessionContext& m_session;
     ItemFactory& m_items;
 

@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Entities.hpp>
 #include <Genode/IO/ResourceContext.hpp>
 

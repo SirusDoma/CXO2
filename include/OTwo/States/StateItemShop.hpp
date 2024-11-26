@@ -20,7 +20,7 @@ class ItemFactory;
 class StateItemShop : public State
 {
 public:
-    explicit StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
+    explicit StateItemShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -44,7 +44,7 @@ private:
     void InvalidateShopItemList(bool rebuildList = false);
     void InvalidateShopSetItemList(bool rebuildList = false);
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     SessionContext& m_session;
     CartContext& m_cart;
     ItemFactory& m_items;

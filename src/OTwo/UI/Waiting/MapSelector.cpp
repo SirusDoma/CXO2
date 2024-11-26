@@ -1,14 +1,14 @@
 #include <OTwo/UI/Waiting/MapSelector.hpp>
-
 #include <OTwo/States/State.hpp>
 
+#include <Genode/Audio/AudioMixer.hpp>
+#include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/Graphics/Animation.hpp>
 
-MapSelector::MapSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :
+MapSelector::MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :
     m_mixer(mixer),
     m_resources(resources),
     m_mapID(mapId),
@@ -129,7 +129,7 @@ void MapSelector::SetMapID(int mapID, const bool silent)
         animation->SetVisible(true);
 
     if (!silent)
-        m_mixer.Play(sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, "SFX");
 
     if (m_mapCallback)
         m_mapCallback(m_mapID);

@@ -1,4 +1,7 @@
+#pragma once
+
 #include <Genode/Utilities/StringHelper.hpp>
+#include <SFML/Audio/SoundSource.hpp>
 
 template<typename R>
 R* State::Instantiate(const std::string& source, const ResourceScope scope)

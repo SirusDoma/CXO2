@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Genode/Audio/Mixer.hpp>
 #include <Genode/Graphics/RenderSurface.hpp>
 #include <Genode/Graphics/RenderSurfaceAdaptor.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>

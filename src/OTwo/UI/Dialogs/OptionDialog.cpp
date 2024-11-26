@@ -3,7 +3,7 @@
 
 #include <Genode/System/Application.hpp>
 
-#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
 
 #include <Genode/UI/Cursor.hpp>
@@ -15,7 +15,7 @@
 
 #include <magic_enum.hpp>
 
-OptionDialog::OptionDialog(Gx::Mixer& mixer, GameConfig& config) :
+OptionDialog::OptionDialog(Gx::AudioMixer& mixer, GameConfig& config) :
     m_parent(),
     m_mixer(mixer),
     m_appConfig(config),
@@ -109,12 +109,12 @@ void OptionDialog::Initialize()
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
-            m_mixer.Play(bgAllTest, "BGTest");
+            m_mixer.Play(*bgAllTest, "BGTest");
         }
 
-        m_mixer.Play(sfxTest, "EFTest");
-        m_mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
-        m_mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.Play(*sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("BGTest").SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("EFTest").SetVolume(masterVolumeGauge->GetValue());
     });
     btnMasterVolumeDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
@@ -130,12 +130,12 @@ void OptionDialog::Initialize()
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
-            m_mixer.Play(bgAllTest, "BGTest");
+            m_mixer.Play(*bgAllTest, "BGTest");
         }
 
-        m_mixer.Play(sfxTest, "EFTest");
-        m_mixer.GetSoundGroup("BGTest")->SetVolume(masterVolumeGauge->GetValue());
-        m_mixer.GetSoundGroup("EFTest")->SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.Play(*sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("BGTest").SetVolume(masterVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("EFTest").SetVolume(masterVolumeGauge->GetValue());
     });
 
     const auto btnMusicUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_MUSIC_UP");
@@ -151,10 +151,10 @@ void OptionDialog::Initialize()
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
-            m_mixer.Play(bgTest, "BGTest");
+            m_mixer.Play(*bgTest, "BGTest");
         }
 
-        m_mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("BGTest").SetVolume(musicVolumeGauge->GetValue());
     });
     btnMusicDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
@@ -166,10 +166,10 @@ void OptionDialog::Initialize()
         {
             m_mixer.Stop("BGTest");
             m_mixer.Stop("EFTest");
-            m_mixer.Play(bgTest, "BGTest");
+            m_mixer.Play(*bgTest, "BGTest");
         }
 
-        m_mixer.GetSoundGroup("BGTest")->SetVolume(musicVolumeGauge->GetValue());
+        m_mixer.GetSoundGroup("BGTest").SetVolume(musicVolumeGauge->GetValue());
     });
 
     const auto btnSoundEffectUp   = musicOption->FindChild<Gx::Button>("IDC_BUTTON_SOUND_UP");
@@ -187,8 +187,8 @@ void OptionDialog::Initialize()
             m_mixer.Stop("EFTest");
         }
 
-        m_mixer.Play(sfxTest, "EFTest");
-        m_mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
+        m_mixer.Play(*sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("EFTest").SetVolume(effectVolumeGauge->GetValue());
     });
     btnSoundEffectDown->SetHoldClickCallback([=] (auto& sender, auto& ev)
     {
@@ -202,8 +202,8 @@ void OptionDialog::Initialize()
             m_mixer.Stop("EFTest");
         }
 
-        m_mixer.Play(sfxTest, "EFTest");
-        m_mixer.GetSoundGroup("EFTest")->SetVolume(effectVolumeGauge->GetValue());
+        m_mixer.Play(*sfxTest, "EFTest");
+        m_mixer.GetSoundGroup("EFTest").SetVolume(effectVolumeGauge->GetValue());
     });
 
     const auto btnSave = FindChild<Gx::Button>("IDC_BUTTON_SAVE");
@@ -228,14 +228,12 @@ void OptionDialog::Initialize()
         m_keyChannel = Chart::Channel::Note1;
         keySelect->SetFrame(0);
 
-        if (const auto bgGroup = m_mixer.GetSoundGroup("BGM"); bgGroup)
-        {
-            bgGroup->SetVolume(m_tempConfig.MusicVolume);
-            bgGroup->SetEnabled(m_tempConfig.UseBGM);
-        }
+        auto& bgGroup = m_mixer.GetSoundGroup("BGM");
+        bgGroup.SetVolume(m_tempConfig.MusicVolume);
+        bgGroup.SetEnabled(m_tempConfig.UseBGM);
 
-        if (const auto sfxGroup = m_mixer.GetSoundGroup("SFX"); sfxGroup)
-            sfxGroup->SetVolume(m_tempConfig.EffectVolume);
+        auto& sfxGroup = m_mixer.GetSoundGroup("SFX");
+        sfxGroup.SetVolume(m_tempConfig.EffectVolume);
 
         toolTip->SetString("Setting has been saved.");
         toolTip->Show(this);
@@ -260,23 +258,28 @@ void OptionDialog::Initialize()
         if (!sender.IsChecked())
             return;
 
-        const auto bgGroup = m_mixer.GetSoundGroup("BGTest");
-        const auto efGroup = m_mixer.GetSoundGroup("EFTest");
-        m_mixer.Play(sfxNavigation, "SFX");
+        auto& bgGroup = m_mixer.GetSoundGroup("BGTest");
+        auto& efGroup = m_mixer.GetSoundGroup("EFTest");
 
-        if ((bgGroup && bgGroup->GetStatus() == sf::SoundSource::Status::Playing) || (efGroup && efGroup->GetStatus() == sf::SoundSource::Status::Playing))
-            m_mixer.Play("BGM");
-        else
-            m_mixer.Resume("BGM");
+        for (auto& source : m_mixer.GetSoundGroup("BGM"))
+        {
+            if (source.getStatus() == sf::SoundSource::Status::Paused)
+            {
+                m_mixer.Play("BGM");
+                break;
+            }
+        }
 
-        m_mixer.Stop(bgGroup);
-        m_mixer.Stop(efGroup);
+        m_mixer.Play(*sfxNavigation, "SFX");
 
-        if (bgGroup)
-            bgGroup->SetVolume(m_tempConfig.MusicVolume);
+        bgGroup.Stop();
+        bgGroup.Reset();
 
-        if (efGroup)
-            efGroup->SetVolume(m_tempConfig.EffectVolume);
+        efGroup.Stop();
+        efGroup.Reset();
+
+        bgGroup.SetVolume(m_tempConfig.MusicVolume);
+        efGroup.SetVolume(m_tempConfig.EffectVolume);
 
         background->SetFrame("KeyOption");
         //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
@@ -287,18 +290,19 @@ void OptionDialog::Initialize()
         musicOption->SetEnabled(false);
         musicOption->SetVisible(false);
     });
+
     soundTab->SetCheckStateChangeCallback([=] (auto& sender)
     {
         if (!sender.IsChecked())
             return;
 
-        m_mixer.Play(sfxNavigation, "SFX");
+        m_mixer.Play(*sfxNavigation, "SFX");
         m_mixer.Pause("BGM");
         m_mixer.Stop("BGTest");
         m_mixer.Stop("EFTest");
 
-        m_mixer.Play(bgAllTest, "BGTest");
-        m_mixer.GetSoundGroup("BGTest")->SetVolume(m_tempConfig.MusicVolume);
+        m_mixer.Play(*bgAllTest, "BGTest");
+        m_mixer.GetSoundGroup("BGTest").SetVolume(m_tempConfig.MusicVolume);
 
         background->SetFrame("SoundOption");
         //SetTexCoords(background->GetFrame("SoundOption")->TexCoords);
@@ -331,9 +335,8 @@ void OptionDialog::OnShown(Gx::Scene& scene)
     background->SetFrame("KeyOption");
     //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
 
-
     keyTab->SetCheckedState(true);
-    m_mixer.Stop(sfxNavigation);
+    sfxNavigation->stop();
 
     soundTab->SetCheckedState(false);
     gameOption->SetEnabled(true);
@@ -359,7 +362,7 @@ void OptionDialog::OnClose()
     else
         m_mixer.Play("BGM");
 
-    m_mixer.Play(sfxNavigation, "SFX");
+    m_mixer.Play(*sfxNavigation, "SFX");
 }
 
 void OptionDialog::Update(const double delta)

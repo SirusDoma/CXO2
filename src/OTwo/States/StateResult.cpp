@@ -16,7 +16,7 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
-StateResult::StateResult(Gx::Mixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :
+StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :
     m_mixer(mixer),
     m_session(session),
     m_scoreTracker(scoreTracker)
@@ -199,7 +199,7 @@ void StateResult::Initialize()
     );
 
     if (const auto bgm = Instantiate<sf::Music>("BGM/bgResult.ogg"); bgm)
-        m_mixer.Play(bgm, "BGM");
+        m_mixer.Play(*bgm, "BGM");
 
     Run<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); });
 }

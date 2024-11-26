@@ -6,11 +6,12 @@
 
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/Image.hpp>
+#include <Genode/Audio//AudioMixer.hpp>
 
 class OptionDialog : public Gx::Dialog
 {
 public:
-    OptionDialog(Gx::Mixer& mixer, GameConfig& config);
+    OptionDialog(Gx::AudioMixer& mixer, GameConfig& config);
     void Initialize() override;
 
 private:
@@ -30,7 +31,7 @@ private:
     ::State* m_parent;
     std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    Gx::Mixer&     m_mixer;
+    Gx::AudioMixer&     m_mixer;
     GameConfig&    m_appConfig;
     GameConfig     m_tempConfig;
     Chart::Channel m_keyChannel;

@@ -16,7 +16,7 @@
 
 #include <magic_enum.hpp>
 
-StateMyRoom::StateMyRoom(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items) :
+StateMyRoom::StateMyRoom(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_items(items),
@@ -71,9 +71,9 @@ void StateMyRoom::Initialize()
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_bagCurrentPage)
-            m_mixer.Play(sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, "SFX");
         else
-            m_mixer.Play(sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, "SFX");
 
         m_bagCurrentPage = static_cast<unsigned int>(value);
         Invalidate();
@@ -126,7 +126,10 @@ void StateMyRoom::Initialize()
     const auto albumButton = statusPanel->FindChild<Gx::Button>("IDC_BUTTON_MY_ALBUM");
     albumButton->SetClickCallback([=] (auto&, auto&)
     {
-        ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=] (auto) { m_mixer.Play(sfxAccept); });
+        ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=] (auto)
+        {
+            m_mixer.Play(*sfxAccept, "SFX");
+        });
     });
 
     const auto sellButton = Instantiate<Gx::Button>("IDC_BUTTON_SELL");
@@ -166,7 +169,7 @@ void StateMyRoom::Initialize()
         {
             if (!accepted)
             {
-                m_mixer.Play(sfxCancel, "SFX");
+                m_mixer.Play(*sfxCancel, "SFX");
                 return;
             }
 
@@ -186,7 +189,7 @@ void StateMyRoom::Initialize()
             else
                 player.Cash += price;
 
-            m_mixer.Play(sfxAccept, "SFX");
+            m_mixer.Play(*sfxAccept, "SFX");
             m_session.Save();
             Invalidate();
         });
@@ -215,7 +218,7 @@ void StateMyRoom::Initialize()
     });
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 
     Invalidate();
 }
@@ -288,7 +291,7 @@ void StateMyRoom::Invalidate()
             m_bagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_bagSelectIndicator);
-            m_mixer.Play(sfxClick, "SFX");
+            m_mixer.Play(*sfxClick, "SFX");
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
@@ -451,7 +454,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
             for (auto [_, item] : avatar->GetEquipedItems())
                 player->EquippedItemIDs.push_back(item->GetID());
 
-            m_mixer.Play(sfxDress, "SFX");
+            m_mixer.Play(*sfxDress, "SFX");
             m_session.Save();
             Invalidate();
         });

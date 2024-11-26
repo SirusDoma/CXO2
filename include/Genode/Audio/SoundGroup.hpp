@@ -1,30 +1,28 @@
 #pragma once
 
-#include <Genode/Entities/Updatable.hpp>
 #include <SFML/Audio.hpp>
 
-#include <memory>
-#include <vector>
+#include <unordered_set>
 #include <string>
 
 namespace Gx
 {
-    class SoundGroup : public Updatable
+    class SoundGroup
     {
     public:
         explicit SoundGroup(const std::string& name);
-        ~SoundGroup() override;
 
         const std::string& GetName() const;
         void SetName(const std::string& name);
 
         sf::SoundSource::Status GetStatus() const;
 
-        void Play();
-        void Resume();
-        void Pause();
-        void Stop();
-        void Clear();
+        void Play() const;
+        void Resume() const;
+        void Pause() const;
+        void Stop() const;
+
+        void SetPlayingOffset(sf::Time timeOffset) const;
 
         float GetVolume() const;
         void SetVolume(float volume);
@@ -35,18 +33,41 @@ namespace Gx
         bool IsEnabled() const;
         void SetEnabled(bool enable);
 
+        void Reset();
+
+        class Iterator
+        {
+        public:
+            using IteratorHandle = std::unordered_set<sf::SoundSource*>::iterator;
+
+            explicit Iterator(SoundGroup& soundGroup, bool end = false);
+
+            IteratorHandle begin() const;
+            IteratorHandle end() const;
+
+            bool             operator!=(const Iterator& other) const;
+            sf::SoundSource& operator*() const;
+            Iterator&        operator++();
+
+        private:
+            SoundGroup& m_soundGroup;
+            IteratorHandle m_iterator;
+        };
+
+    protected:
+        friend class AudioMixer;
+
+        sf::SoundSource& Play(sf::SoundSource& source);
+        bool Remove(const sf::SoundSource& source);
+
     private:
-        friend class Mixer;
-
-        sf::SoundSource* Play(sf::SoundSource* source);
-        bool Remove(sf::SoundSource* source);
-
-        void Update(double delta) override;
-
         std::string m_name;
         float m_volume, m_pan;
         bool m_enabled;
 
-        std::vector<sf::SoundSource*> m_sources;
+        std::unordered_set<sf::SoundSource*> m_sources;
     };
+
+    SoundGroup::Iterator begin(SoundGroup& soundGroup);
+    SoundGroup::Iterator end(SoundGroup& soundGroup);
 }

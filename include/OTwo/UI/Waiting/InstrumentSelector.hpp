@@ -8,7 +8,7 @@
 
 namespace Gx
 {
-    class Mixer;
+    class AudioMixer;
     class ResourceManager;
 }
 
@@ -16,7 +16,7 @@ class ItemFactory;
 class InstrumentSelector : public Gx::UiContainer
 {
 public:
-    InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, ItemFactory& items);
+    InstrumentSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, ItemFactory& items);
 
     void Initialize() override;
 
@@ -30,7 +30,7 @@ public:
     void Invalidate() override;
 
 private:
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_resources;
     ItemFactory& m_items;
 

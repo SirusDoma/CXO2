@@ -185,13 +185,13 @@ void O2Jam::Boot()
         return resources;
     }, Gx::Context::Scope::Singleton);
 
-    context.Provide<Gx::Mixer>([](auto& ctx)
+    context.Provide<Gx::AudioMixer>([](auto& ctx)
     {
-        auto mixer = std::make_unique<Gx::Mixer>();
+        auto mixer = std::make_unique<Gx::AudioMixer>();
         auto& cfg  = ctx.template Require<GameConfig>();
 
-        mixer->GetSoundGroup("BGM")->SetVolume(cfg.MusicVolume);
-        mixer->GetSoundGroup("SFX")->SetVolume(cfg.EffectVolume);
+        mixer->GetSoundGroup("BGM").SetVolume(cfg.MusicVolume);
+        mixer->GetSoundGroup("SFX").SetVolume(cfg.EffectVolume);
 
         return mixer;
     }, Gx::Context::Scope::Singleton);
@@ -329,29 +329,29 @@ void O2Jam::OnFocusChanged(const bool focus)
 
     const auto& context = GetContext();
     const auto& config  = context.Require<GameConfig>();
-    auto& mixer         = context.Require<Gx::Mixer>();
+    auto& mixer         = context.Require<Gx::AudioMixer>();
 
     const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
                          GetSceneDirector().IsPresenting<StatePlaying7K>() ||
                          GetSceneDirector().IsPresenting<StateResult>();
 
-    const auto bgm = mixer.GetSoundGroup("BGM");
-    const auto sfx = mixer.GetSoundGroup("SFX");
+    auto& bgm = mixer.GetSoundGroup("BGM");
+    auto& sfx = mixer.GetSoundGroup("SFX");
     if (focus)
     {
-        bgm->SetVolume(static_cast<float>(config.MusicVolume));
-        sfx->SetVolume(static_cast<float>(config.EffectVolume));
+        bgm.SetVolume(static_cast<float>(config.MusicVolume));
+        sfx.SetVolume(static_cast<float>(config.EffectVolume));
 
         if (ignored)
             return;
 
-        mixer.Resume(sfx);
-        mixer.Play(bgm);
+        sfx.Resume();
+        bgm.Play();
     }
     else
     {
-        bgm->SetVolume(0.f);
-        sfx->SetVolume(0.f);
+        bgm.SetVolume(0.f);
+        sfx.SetVolume(0.f);
 
         if (ignored)
             return;
@@ -373,11 +373,11 @@ int O2Jam::Shutdown()
     Application::Shutdown();
 
     auto& director  = GetSceneDirector();
-    auto& mixer     = GetContext().Require<Gx::Mixer>();
+    auto& mixer     = GetContext().Require<Gx::AudioMixer>();
     auto& resources = GetContext().Require<Gx::ResourceManager>();
 
     director.Unload();
-    mixer.Clear();
+    mixer.Reset(true);
     resources.Clear();
 
     return 0;

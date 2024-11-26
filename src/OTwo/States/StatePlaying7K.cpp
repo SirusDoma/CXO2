@@ -29,7 +29,7 @@
 #include <Genode/Utilities/Randomizer.hpp>
 
 StatePlaying7K::StatePlaying7K(
-    Gx::Mixer& mixer,
+    Gx::AudioMixer& mixer,
     SessionContext& session,
     GameContext& context,
     GameConfig& config,

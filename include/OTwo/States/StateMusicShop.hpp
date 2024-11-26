@@ -10,7 +10,7 @@ class ItemFactory;
 class StateMusicShop : public State
 {
 public:
-    StateMusicShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
+    StateMusicShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -19,7 +19,7 @@ private:
 
     void InvalidateCart();
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     SessionContext& m_session;
     CartContext& m_cart;
     ItemFactory& m_items;

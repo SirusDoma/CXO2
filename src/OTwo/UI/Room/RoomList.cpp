@@ -1,11 +1,12 @@
 #include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/List.hpp>
 
 #include <cmath>
 
-RoomList::RoomList(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+RoomList::RoomList(Gx::AudioMixer& mixer, Gx::ResourceManager& resources) :
     m_mixer(mixer),
     m_resources(resources),
     m_rooms(),
@@ -26,7 +27,7 @@ void RoomList::Initialize()
         {
            if (!button->IsActive())
            {
-               m_mixer.Play(sfx, "SFX");
+               m_mixer.Play(*sfx, "SFX");
                return;
            }
         });

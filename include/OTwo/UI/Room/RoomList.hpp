@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Genode/UI/List.hpp>
 #include <OTwo/UI/Room/RoomButton.hpp>
+
+#include <Genode/UI/List.hpp>
 
 #include <vector>
 #include <memory>
@@ -9,14 +10,14 @@
 
 namespace Gx
 {
-    class Mixer;
+    class AudioMixer;
     class ResourceManager;
 }
 
 class RoomList : public Gx::List
 {
 public:
-    RoomList(Gx::Mixer& mixer, Gx::ResourceManager& resources);
+    RoomList(Gx::AudioMixer& mixer, Gx::ResourceManager& resources);
 
     void Initialize() override;
 
@@ -34,7 +35,7 @@ private:
 
     void Invalidate() override;
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_resources;
 
     std::map<unsigned int, Room> m_rooms;

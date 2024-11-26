@@ -11,7 +11,7 @@
 
 namespace Gx
 {
-    class Mixer;
+    class AudioMixer;
     class ResourceManager;
 }
 
@@ -19,7 +19,7 @@ class SessionContext;
 class SelectMusicDialog : public Gx::Dialog
 {
 public:
-    SelectMusicDialog(Gx::Mixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection);
+    SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection);
 
     void Initialize() override;
 
@@ -47,7 +47,7 @@ private:
     unsigned int m_coverID;
     float        m_speed;
 
-    Gx::Mixer&             m_mixer;
+    Gx::AudioMixer&             m_mixer;
     Gx::ResourceManager&   m_resources;
     SessionContext&        m_session;
     MusicSelectionContext& m_selection;

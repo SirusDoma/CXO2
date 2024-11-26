@@ -27,7 +27,7 @@
 
 #include <magic_enum.hpp>
 
-StateWaiting7K::StateWaiting7K(Gx::Mixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items) :
+StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
     m_game(game),
     m_session(session),
@@ -243,7 +243,7 @@ void StateWaiting7K::Initialize()
                     member->Team = team;
 
                 currentAvatarInfo->Invalidate();
-                m_mixer.Play(sfxTeam);
+                m_mixer.Play(*sfxTeam, "SFX");
             }
         });
     }
@@ -321,7 +321,7 @@ void StateWaiting7K::Initialize()
         {
             selectMusicButton->SetClickCallback([=] (auto& sender, auto& ev)
             {
-                m_mixer.Play(sfxSelectMusic);
+                m_mixer.Play(*sfxSelectMusic, "SFX");
                 selectMusicDialog->Show(this, std::string(), false);
             });
         }
@@ -381,7 +381,7 @@ void StateWaiting7K::Initialize()
 
         sender.SetEnabled(false);
         btnBack->SetEnabled(false);
-        m_mixer.Play(sfxStart, "SFX");
+        m_mixer.Play(*sfxStart, "SFX");
 
         const auto& data = m_session.GetCurrentRoom();
         if (!m_game.GetChart() || m_game.GetChart()->Source != data.ChartMetadata.Source)
@@ -405,7 +405,7 @@ void StateWaiting7K::Initialize()
     });
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }
 
 void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)

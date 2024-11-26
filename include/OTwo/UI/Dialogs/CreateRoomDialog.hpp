@@ -1,14 +1,16 @@
 #pragma once
 
-#include <Genode/UI/Dialog.hpp>
+
 #include <OTwo/Models/Room.hpp>
 
-namespace Gx { class Mixer; }
+#include <Genode/UI/Dialog.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
+
 class SessionContext;
 class CreateRoomDialog : public Gx::Dialog
 {
 public:
-    CreateRoomDialog(SessionContext& session, Gx::Mixer& mixer);
+    CreateRoomDialog(SessionContext& session, Gx::AudioMixer& mixer);
     void Initialize() override;
 
     GameMode GetRoomMode() const;
@@ -24,5 +26,5 @@ protected:
 private:
     bool m_initialized = false;
     SessionContext& m_session;
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
 };

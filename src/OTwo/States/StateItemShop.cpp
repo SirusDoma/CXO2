@@ -18,7 +18,7 @@
 #include <magic_enum.hpp>
 #include <OTwo/States/StatePayment.hpp>
 
-StateItemShop::StateItemShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
+StateItemShop::StateItemShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_cart(cart),
@@ -105,9 +105,9 @@ void StateItemShop::Initialize()
             for (std::size_t i = 0; i < m_shopMasterSpeech.size(); i++)
             {
                 if (i == m_shopMasterSpeechCounter)
-                    m_mixer.Play(m_shopMasterSpeech[i]);
+                    m_mixer.Play(*m_shopMasterSpeech[i], "SFX");
                 else
-                    m_mixer.Stop(m_shopMasterSpeech[i]);
+                    m_shopMasterSpeech[i]->stop();
             }
         });
     };
@@ -196,7 +196,7 @@ void StateItemShop::Initialize()
                 return;
 
             m_shopCategory = category;
-            m_mixer.Play(sfxMenu);
+            m_mixer.Play(*sfxMenu, "SFX");
 
             for (const auto iterator : shopCategoryContainerMap)
             {
@@ -236,7 +236,7 @@ void StateItemShop::Initialize()
                         return;
 
                     m_itemCategory = itemCategoryMap.at(category).at(i);
-                    m_mixer.Play(sfxMenu);
+                    m_mixer.Play(*sfxMenu, "SFX");
 
                     InvalidateShopItemList(true);
                 });
@@ -254,7 +254,7 @@ void StateItemShop::Initialize()
         else
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
 
-        m_mixer.Play(sfxPlanet);
+        m_mixer.Play(*sfxPlanet, "SFX");
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
@@ -266,7 +266,7 @@ void StateItemShop::Initialize()
         else
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
 
-        m_mixer.Play(sfxPlanet);
+        m_mixer.Play(*sfxPlanet, "SFX");
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
@@ -301,7 +301,7 @@ void StateItemShop::Initialize()
                 return;
 
             m_shopPlanetCategory = planet;
-            m_mixer.Play(sfxPlanet);
+            m_mixer.Play(*sfxPlanet, "SFX");
             InvalidateShopMaster(true);
             InvalidateShopItemList(true);
         });
@@ -325,7 +325,7 @@ void StateItemShop::Initialize()
         femaleButton->SetEnabled(true);
         femaleButton->SetVisible(true);
 
-        m_mixer.Play(sfxGender);
+        m_mixer.Play(*sfxGender, "SFX");
 
         if (m_itemCategory == EquipmentType::Costume)
             InvalidateShopSetItemList(true);
@@ -343,7 +343,7 @@ void StateItemShop::Initialize()
         maleButton->SetEnabled(true);
         maleButton->SetVisible(true);
 
-        m_mixer.Play(sfxGender);
+        m_mixer.Play(*sfxGender, "SFX");
         if (m_itemCategory == EquipmentType::Costume)
             InvalidateShopSetItemList(true);
         else
@@ -357,9 +357,9 @@ void StateItemShop::Initialize()
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
-            m_mixer.Play(sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, "SFX");
         else
-            m_mixer.Play(sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, "SFX");
 
         m_shopCurrentPage = static_cast<unsigned int>(value);
         InvalidateShopItemList();
@@ -403,9 +403,9 @@ void StateItemShop::Initialize()
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
-            m_mixer.Play(sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, "SFX");
         else
-            m_mixer.Play(sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, "SFX");
 
         m_myBagCurrentPage = static_cast<unsigned int>(value);
         InvalidateMyBag();
@@ -497,8 +497,8 @@ void StateItemShop::Initialize()
     InvalidateShopItemList(true);
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
-    m_mixer.Play(sfxWelcome);
+    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*sfxWelcome, "SFX");
 }
 
 void StateItemShop::OnExtensionButtonClicked()
@@ -604,11 +604,11 @@ void StateItemShop::OnBuyButtonClicked()
         if (answer)
         {
             m_cart.SetCheckoutType(CartContext::CheckoutType::Item);
-            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/02"));
+            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/02"), "SFX");
             GetDirector().Present<StatePayment>();
         }
         else
-            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/03"));
+            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/03"), "SFX");
     });
 }
 
@@ -660,7 +660,7 @@ void StateItemShop::OnItemSellClicked()
     {
         if (!accepted)
         {
-            m_mixer.Play(sfxCancel, "SFX");
+            m_mixer.Play(*sfxCancel, "SFX");
             return;
         }
 
@@ -680,7 +680,7 @@ void StateItemShop::OnItemSellClicked()
         else
             player.Cash += price;
 
-        m_mixer.Play(sfxAccept, "SFX");
+        m_mixer.Play(*sfxAccept, "SFX");
         m_session.Save();
         InvalidateMyBag();
     });
@@ -806,7 +806,7 @@ void StateItemShop::InvalidateMyBag()
             m_myBagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_myBagSelectIndicator);
-            m_mixer.Play(sfxClick, "SFX");
+            m_mixer.Play(*sfxClick, "SFX");
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)

@@ -3,7 +3,7 @@
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
 
-#include <Genode/Audio/Mixer.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <Genode/Tween/Move.hpp>
 #include <Genode/Tasks/Sequence.hpp>
@@ -27,7 +27,7 @@ public:
         ChannelList
     };
 
-    ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources);
+    ChannelBoard(Gx::AudioMixer& mixer, Gx::ResourceManager& resources);
 
     void Initialize() override;
     sf::FloatRect GetLocalBounds() const override;
@@ -58,7 +58,7 @@ private:
 
     void Invalidate() override;
 
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_resources;
 
     ChannelButton* m_channelButton;

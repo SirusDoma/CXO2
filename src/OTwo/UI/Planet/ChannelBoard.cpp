@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-ChannelBoard::ChannelBoard(Gx::Mixer& mixer, Gx::ResourceManager& resources) :
+ChannelBoard::ChannelBoard(Gx::AudioMixer& mixer, Gx::ResourceManager& resources) :
     m_mixer(mixer),
     m_resources(resources),
     m_channelButton(),
@@ -72,7 +72,7 @@ void ChannelBoard::Initialize()
     enterButton->SetClickCallback(
         [this, sfxEnter] (auto&, auto&)
         {
-            m_mixer.Play(sfxEnter, "SFX");
+            m_mixer.Play(*sfxEnter, "SFX");
             if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
                 m_callback(m_planetInfo.Hall, m_planetInfo.Channels[m_selectedChannel]);
         }
@@ -101,7 +101,7 @@ void ChannelBoard::Initialize()
     leftButton->SetClickCallback(
         [this, sfxNavigate] (auto&, auto&)
         {
-            m_mixer.Play(sfxNavigate, "SFX");
+            m_mixer.Play(*sfxNavigate, "SFX");
             if (m_tab == Tab::ChannelList)
             {
                 if (m_channelPageIndex > 1)
@@ -119,7 +119,7 @@ void ChannelBoard::Initialize()
     rightButton->SetClickCallback(
         [this, sfxNavigate] (auto&, auto&)
         {
-            m_mixer.Play(sfxNavigate, "SFX");
+            m_mixer.Play(*sfxNavigate, "SFX");
             if (m_tab == Tab::ChannelList)
             {
                 if (m_channelPageIndex < m_channelMaxPage)

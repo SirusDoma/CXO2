@@ -6,17 +6,12 @@
 namespace Gx
 {
     SoundGroup::SoundGroup(const std::string& name) :
-        m_sources(),
         m_volume(100.f),
         m_pan(0.f),
-        m_enabled(true)
+        m_enabled(true),
+        m_sources()
     {
         SetName(name);
-    }
-
-    SoundGroup::~SoundGroup()
-    {
-        m_sources.clear();
     }
 
     const std::string& SoundGroup::GetName() const
@@ -29,43 +24,28 @@ namespace Gx
         m_name = name;
     }
 
-    sf::SoundSource::Status SoundGroup::GetStatus() const
-    {
-        bool paused = false;
-        for (const auto source : m_sources)
-        {
-            if (source->getStatus() == sf::SoundSource::Status::Playing)
-                return sf::SoundSource::Status::Playing;
-            else if (source->getStatus() == sf::SoundSource::Status::Paused)
-                paused = true;
-        }
-
-        if (paused)
-            return sf::SoundSource::Status::Paused;
-
-        return sf::SoundSource::Status::Stopped;
-    }
-
-    void SoundGroup::Play()
+    void SoundGroup::Play() const
     {
         if (!m_enabled)
             return;
 
         for (const auto source : m_sources)
         {
-            // TODO: expose playing offset?
-            if (const auto sound = dynamic_cast<sf::Sound*>(source); sound)
-                sound->setPlayingOffset(sf::Time::Zero);
-            else if (const auto music = dynamic_cast<sf::Music*>(source); music)
-                music->setPlayingOffset(sf::Time::Zero);
-            else
-                source->stop(); // isn't thread-safe
+            if (source->getStatus() == sf::SoundSource::Status::Paused)
+            {
+                if (const auto sound = dynamic_cast<sf::Sound*>(source))
+                    sound->setPlayingOffset(sf::Time::Zero);
+                else if (const auto music = dynamic_cast<sf::Music*>(source))
+                    music->setPlayingOffset(sf::Time::Zero);
+                else if (const auto stream = dynamic_cast<sf::SoundStream*>(source))
+                    stream->setPlayingOffset(sf::Time::Zero);
+            }
 
             source->play();
         }
     }
 
-    void SoundGroup::Resume()
+    void SoundGroup::Resume() const
     {
         if (!m_enabled)
             return;
@@ -77,24 +57,38 @@ namespace Gx
         }
     }
 
-    void SoundGroup::Pause()
+    void SoundGroup::Pause() const
     {
         if (!m_enabled)
             return;
 
-        for (const auto source : m_sources)
+        for (const auto& source : m_sources)
             source->pause();
     }
 
-    void SoundGroup::Stop()
+    void SoundGroup::Stop() const
     {
         if (!m_enabled)
             return;
 
         for (const auto source : m_sources)
             source->stop();
+    }
 
-        m_sources.clear();
+    void SoundGroup::SetPlayingOffset(const sf::Time timeOffset) const
+    {
+        if (!m_enabled)
+            return;
+
+        for (const auto source : m_sources)
+        {
+            if (const auto sound = dynamic_cast<sf::Sound*>(source))
+                sound->setPlayingOffset(timeOffset);
+            else if (const auto music = dynamic_cast<sf::Music*>(source))
+                music->setPlayingOffset(timeOffset);
+            else if (const auto stream = dynamic_cast<sf::SoundStream*>(source))
+                stream->setPlayingOffset(timeOffset);
+        }
     }
 
     float SoundGroup::GetVolume() const
@@ -146,30 +140,28 @@ namespace Gx
         m_enabled = enable;
     }
 
-    sf::SoundSource* SoundGroup::Play(sf::SoundSource* source)
+    sf::SoundSource& SoundGroup::Play(sf::SoundSource& source)
     {
-        if (source && m_enabled)
+        if (m_enabled)
         {
-            const auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
-            if (iterator == m_sources.end())
-                m_sources.push_back(source);
+            m_sources.insert(&source);
 
-            source->stop();
-            source->setVolume(m_volume);
-            source->setPosition(sf::Vector3f(m_pan, 0.f, 0.f));
-            source->play();
+            source.stop();
+            source.setVolume(m_volume);
+            source.setPosition(sf::Vector3f(m_pan, 0.f, 0.f));
 
-            return source;
+            if (source.getStatus() != sf::SoundSource::Status::Playing)
+                source.play();
         }
 
-        return nullptr;
+        return source;
     }
 
-    bool SoundGroup::Remove(sf::SoundSource* source)
+    bool SoundGroup::Remove(const sf::SoundSource& source)
     {
-        if (source && m_enabled)
+        if (m_enabled)
         {
-            const auto iterator = std::find(m_sources.begin(), m_sources.end(), source);
+            const auto iterator = std::find(m_sources.begin(), m_sources.end(), &source);
             if (iterator != m_sources.end())
                 return m_sources.erase(iterator) == m_sources.end();
         }
@@ -177,16 +169,53 @@ namespace Gx
         return false;
     }
 
-    void SoundGroup::Update(const double delta)
-    {
-        m_sources.erase(std::remove_if(m_sources.begin(), m_sources.end(), [] (const sf::SoundSource* src)
-        {
-            return !src || src->getStatus() == sf::SoundSource::Status::Stopped;
-        }), m_sources.end());
-    }
-
-    void SoundGroup::Clear()
+    void SoundGroup::Reset()
     {
         m_sources.clear();
+    }
+}
+
+namespace Gx
+{
+    SoundGroup::Iterator::Iterator(SoundGroup& soundGroup, const bool end) :
+        m_soundGroup(soundGroup),
+        m_iterator(end ? soundGroup.m_sources.end() : soundGroup.m_sources.begin())
+    {
+    }
+
+    SoundGroup::Iterator::IteratorHandle SoundGroup::Iterator::begin() const
+    {
+        return m_soundGroup.m_sources.begin();
+    }
+
+    SoundGroup::Iterator::IteratorHandle SoundGroup::Iterator::end() const
+    {
+        return m_soundGroup.m_sources.end();
+    }
+
+    bool SoundGroup::Iterator::operator!=(const Iterator& other) const
+    {
+        return m_iterator != other.m_iterator;
+    }
+
+    sf::SoundSource& SoundGroup::Iterator::operator*() const
+    {
+        return **m_iterator;
+    }
+
+    SoundGroup::Iterator& SoundGroup::Iterator::operator++()
+    {
+        ++m_iterator;
+        return *this;
+    }
+
+    SoundGroup::Iterator begin(SoundGroup& soundGroup)
+    {
+        return SoundGroup::Iterator(soundGroup);
+    }
+
+    SoundGroup::Iterator end(SoundGroup& soundGroup)
+    {
+        return SoundGroup::Iterator(soundGroup, true);
     }
 }

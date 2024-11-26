@@ -39,7 +39,7 @@ State::State(const std::string& name, Gx::ResourceManager& resources) :
 
 State::~State()
 {
-    Require<Gx::Mixer>().StopAll();
+    Require<Gx::AudioMixer>().Reset();
 }
 
 void State::Initialize()
@@ -178,8 +178,8 @@ bool State::Close(const bool quit)
     {
         if (m_popupSound)
         {
-            auto& mixer = Require<Gx::Mixer>();
-            mixer.Play(m_popupSound, "SFX");
+            auto& mixer = Require<Gx::AudioMixer>();
+            mixer.Play(*m_popupSound, "SFX");
         }
 
         m_exitDialog->SetAcceptCallback([&]
@@ -190,9 +190,9 @@ bool State::Close(const bool quit)
 
         m_exitDialog->SetCancelCallback([&]
         {
-            auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::Mixer>();
+            auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::AudioMixer>();
 
-            mixer.Play(m_cancelSound, "SFX");
+            mixer.Play(*m_cancelSound, "SFX");
             m_prompted = false;
         });
         m_exitDialog->Show(this, "Do you really want to exit?", true);

@@ -31,7 +31,7 @@
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
-StateRoom::StateRoom(Gx::Mixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
+StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_selection(selection),
@@ -179,7 +179,7 @@ void StateRoom::Initialize()
     if (const auto createRoomDialog = Instantiate<CreateRoomDialog>("IDC_DIALOG_CREATE_ROOM"); createRoomDialog)
     {
         createRoomButton->SetClickCallback([=, &director] (auto& sender, auto& ev) {
-            m_mixer.Play(sfxAccept, "SFX");
+            m_mixer.Play(*sfxAccept, "SFX");
             createRoomDialog->Show(this, std::string(), false);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = m_session.GetInstalledMusic();
@@ -218,7 +218,7 @@ void StateRoom::Initialize()
     const auto waitingRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_SHOW_WAITING");
 
     showAllButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxToggle, "SFX");
+        m_mixer.Play(*sfxToggle, "SFX");
 
         showAllButton->SetVisible(false);
         showAllButton->SetEnabled(false);
@@ -230,7 +230,7 @@ void StateRoom::Initialize()
     });
 
     waitingRoomButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxToggle, "SFX");
+        m_mixer.Play(*sfxToggle, "SFX");
 
         showAllButton->SetVisible(true);
         showAllButton->SetEnabled(true);
@@ -245,12 +245,12 @@ void StateRoom::Initialize()
     const auto roomRightButton = Instantiate<Gx::Button>("IDC_BUTTON_ROOM_RIGHT");
 
     roomLeftButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, "SFX");
         roomList->PreviousPage();
     });
 
     roomRightButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, "SFX");
         roomList->NextPage();
     });
 
@@ -281,7 +281,7 @@ void StateRoom::Initialize()
     backButton->SetClickCallback([&](auto& , auto& ) { OnBackButtonClicked(); });
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }
 
 void StateRoom::OnKeyPressed(const sf::Event::KeyPressed& ev)

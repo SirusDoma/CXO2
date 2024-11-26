@@ -4,14 +4,14 @@
 
 namespace Gx
 {
-    class Mixer;
+    class AudioMixer;
     class ResourceManager;
 }
 
 class MapSelector : public Gx::UiContainer
 {
 public:
-    MapSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId);
+    MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId);
 
     void Initialize() override;
 
@@ -25,7 +25,7 @@ public:
     void SetEffectChangedCallback(const std::function<void(unsigned int)> &callback);
 
 private:
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_resources;
 
     unsigned int m_mapID;

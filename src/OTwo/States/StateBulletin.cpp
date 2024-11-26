@@ -5,7 +5,7 @@
 
 #include <SFML/Audio/Music.hpp>
 
-StateBulletin::StateBulletin(Gx::Mixer& mixer) :
+StateBulletin::StateBulletin(Gx::AudioMixer& mixer) :
     m_mixer(mixer)
 {
 }
@@ -22,5 +22,5 @@ void StateBulletin::Initialize()
 
     const auto bgm = Instantiate<sf::Music>("BGM/bgLogin.ogg");
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }

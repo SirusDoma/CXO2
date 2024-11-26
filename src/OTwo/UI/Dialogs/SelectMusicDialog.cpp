@@ -1,5 +1,6 @@
 #include <OTwo/UI/Dialogs/SelectMusicDialog.hpp>
 
+#include <OTwo/States/State.hpp>
 #include <OTwo/Models/Game.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
@@ -9,6 +10,7 @@
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
 
 #include <Genode/System/Application.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
@@ -21,9 +23,8 @@
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
-#include <OTwo/States/State.hpp>
 
-SelectMusicDialog::SelectMusicDialog(Gx::Mixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection) :
+SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection) :
     m_coverID(0),
     m_speed(0),
     m_mixer(mixer),
@@ -645,15 +646,15 @@ void SelectMusicDialog::OnAccepted()
     m_selection.SetSpeed(m_speed);
     CacheMusicCover();
 
-    const auto sfx = &m_resources.AddFromFile<sf::Sound>("bgEffect/02");
-    m_mixer.Play(sfx);
+    auto& sfx = m_resources.AddFromFile<sf::Sound>("bgEffect/02");
+    m_mixer.Play(sfx, "SFX");
 }
 
 void SelectMusicDialog::OnCancelled()
 {
     Dialog::OnCancelled();
 
-    const auto sfx = &m_resources.AddFromFile<sf::Sound>("bgEffect/03");
+    auto& sfx = m_resources.AddFromFile<sf::Sound>("bgEffect/03");
     m_mixer.Play(sfx);
 }
 

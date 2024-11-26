@@ -10,7 +10,7 @@
 
 #include <SFML/Audio/Music.hpp>
 
-StatePayment::StatePayment(Gx::Mixer& mixer, SessionContext& session, ItemFactory& items, CartContext& cart) :
+StatePayment::StatePayment(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items, CartContext& cart) :
     m_mixer(mixer),
     m_session(session),
     m_items(items),
@@ -71,5 +71,5 @@ void StatePayment::Initialize()
 
     const auto bgm = Instantiate<sf::Music>("BGM/bgLogin.ogg");
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }

@@ -5,7 +5,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <SFML/Audio/Music.hpp>
 
-StateAvi::StateAvi(Gx::Mixer& mixer) :
+StateAvi::StateAvi(Gx::AudioMixer& mixer) :
     m_mixer(mixer)
 {
 }
@@ -16,7 +16,7 @@ void StateAvi::Initialize()
 
     auto& director = GetDirector();
     const auto bgm = Instantiate<sf::Music>("BGM/bgLogo.ogg");
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 
     auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
     overlay.SetColor(sf::Color(0, 0, 0, 255));

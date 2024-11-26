@@ -11,7 +11,7 @@
 #include <Genode/Utilities/Randomizer.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
 
-ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::Mixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
+ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::AudioMixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
     m_judgement(judgement),
     m_life(life),
     m_scores(scores),
@@ -447,7 +447,7 @@ void ChartRenderer::PlaySample(const Chart::NoteEvent* ev, const std::string& gr
     if (m_equalizer && ev->SampleType == Chart::SampleType::KeySound && ev->Sample->getDuration() < sf::seconds(60.0))
         m_equalizer->Register(*ev, *m_sounds[ev->ID]);
 
-    m_mixer.Play(m_sounds[ev->ID], group);
+    m_mixer.Play(*m_sounds[ev->ID], group);
 }
 
 bool ChartRenderer::EventState::IsRenderable(const double position) const

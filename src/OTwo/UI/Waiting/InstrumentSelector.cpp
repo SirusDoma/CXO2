@@ -1,16 +1,18 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
+#include <OTwo/Avatar/ItemFactory.hpp>
 
 #include <Genode/System/Application.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
-#include <OTwo/Avatar/ItemFactory.hpp>
 
-InstrumentSelector::InstrumentSelector(Gx::Mixer& mixer, Gx::ResourceManager& resources, ItemFactory& items) :
+InstrumentSelector::InstrumentSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, ItemFactory& items) :
     m_mixer(mixer),
     m_resources(resources),
     m_items(items),
+    m_currentItem(),
     m_currentItemHeader(),
     m_currentInstrument(),
     m_currentIndex(0)
@@ -26,7 +28,7 @@ void InstrumentSelector::Initialize()
     {
         previousButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
-            m_mixer.Play(sound);
+            m_mixer.Play(*sound, "SFX");
             if (m_currentInstrument == Instrument::None)
                 return;
 
@@ -39,7 +41,7 @@ void InstrumentSelector::Initialize()
     {
         nextButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
-            m_mixer.Play(sound);
+            m_mixer.Play(*sound, "SFX");
             if (m_currentInstrument == Instrument::None)
                 return;
 

@@ -6,9 +6,9 @@
 class StateBulletin : public State
 {
 public:
-    explicit StateBulletin(Gx::Mixer& mixer);
+    explicit StateBulletin(Gx::AudioMixer& mixer);
     void Initialize() override;
 
 private:
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
 };

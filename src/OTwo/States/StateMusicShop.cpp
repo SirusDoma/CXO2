@@ -16,7 +16,7 @@
 
 #include <SFML/Audio/Music.hpp>
 
-StateMusicShop::StateMusicShop(Gx::Mixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
+StateMusicShop::StateMusicShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_cart(cart),
@@ -173,7 +173,7 @@ void StateMusicShop::Initialize()
     InvalidateCart();
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }
 
 void StateMusicShop::OnBuyButtonClicked()
@@ -189,11 +189,11 @@ void StateMusicShop::OnBuyButtonClicked()
         if (answer)
         {
             m_cart.SetCheckoutType(CartContext::CheckoutType::Music);
-            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/02"));
+            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/02"), "SFX");
             GetDirector().Present<StatePayment>();
         }
         else
-            m_mixer.Play(Instantiate<sf::Sound>("bgEffect/03"));
+            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/03"), "SFX");
     });
 }
 

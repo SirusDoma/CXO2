@@ -9,7 +9,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
 
-StatePlanet::StatePlanet(Gx::Mixer& mixer, SessionContext& session) :
+StatePlanet::StatePlanet(Gx::AudioMixer& mixer, SessionContext& session) :
     m_mixer(mixer),
     m_session(session),
     m_connecting(false)
@@ -55,7 +55,7 @@ void StatePlanet::Initialize()
             if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;
 
-            m_mixer.Play(hoverSfx, "SFX");
+            m_mixer.Play(*hoverSfx, "SFX");
         });
 
         radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)
@@ -63,7 +63,7 @@ void StatePlanet::Initialize()
             if (!sender.IsChecked() || channelBoard->InTransition() || IsConnecting())
                 return;
 
-            m_mixer.Play(clickSfx, "SFX");
+            m_mixer.Play(*clickSfx, "SFX");
             channelBoard->Show(hall, [=] { OnMusicHallSelected(hall); });
         });
     }
@@ -83,7 +83,7 @@ void StatePlanet::Initialize()
     }
 
     bgm->setLooping(true);
-    m_mixer.Play(bgm, "BGM");
+    m_mixer.Play(*bgm, "BGM");
 }
 
 bool StatePlanet::IsConnecting() const

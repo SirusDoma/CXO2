@@ -3,15 +3,15 @@
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Core/JudgementStrategy.hpp>
 #include <OTwo/Core/LifeSystem.hpp>
-#include <OTwo/Core/ScoreTracker.hpp>
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
+#include <Genode/Tasks/Delay.hpp>
 
 #include <unordered_map>
-#include <Genode/Tasks/Delay.hpp>
 
 using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
@@ -53,7 +53,7 @@ public:
         JudgementStrategy& judgement,
         LifeSystem& life,
         ScoreTracker& scores,
-        Gx::Mixer& mixer,
+        Gx::AudioMixer& mixer,
         Gx::ResourceManager& prefabResources,
         const ChannelSet& instantiables
     );
@@ -99,7 +99,7 @@ private:
     JudgementStrategy& m_judgement;
     LifeSystem& m_life;
     ScoreTracker& m_scores;
-    Gx::Mixer& m_mixer;
+    Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_prefabResources;
     ChannelSet m_instantiables;
 
