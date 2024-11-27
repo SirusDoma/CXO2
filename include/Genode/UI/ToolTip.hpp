@@ -11,7 +11,8 @@ namespace Gx
         enum class Alignment { Left, Center, Right };
 
         ToolTip();
-        ToolTip(const sf::String& string, const Font& font, unsigned int characterSize = 30);
+        ToolTip(const Font& font, const sf::String& string, unsigned int characterSize = 30);
+        ToolTip(Font&& font, const sf::String& string, unsigned int characterSize = 30) = delete;
 
         sf::FloatRect GetLocalBounds() const override;
 
@@ -26,8 +27,8 @@ namespace Gx
         sf::Vector2f GetPadding() const;
         void SetPadding(const sf::Vector2f& padding);
 
-        const sf::Color& GetContainerFillColor() const;
-        void SetContainerFillColor(const sf::Color& fillColor);
+        const sf::Color& GetContainerColor() const;
+        void SetContainerColor(const sf::Color& fillColor);
 
         const sf::Color& GetContainerOutlineColor() const;
         void SetContainerOutlineColor(const sf::Color& outlineColor);

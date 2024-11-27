@@ -11,7 +11,8 @@ namespace Gx
     {
     public:
         InputField();
-        InputField(const sf::String& string, const Font& font, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
+        InputField(const Font& font, const sf::String& string, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
+        InputField(Font&& font, const sf::String& string, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect()) = delete;
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;
         sf::FloatRect GetLocalBounds() const override;
@@ -28,8 +29,7 @@ namespace Gx
         void SetStyle(std::uint32_t style);
 
         void SetColor(const sf::Color& color) override;
-        void SetFillColor(const sf::Color& color);
-        virtual void SetHighlightBackColor(const sf::Color& color);
+        void SetHighlightBackColor(const sf::Color& color);
         void SetHighlightTextColor(const sf::Color& color);
         void SetOutlineColor(const sf::Color& color);
         void SetOutlineThickness(float thickness);
@@ -45,8 +45,7 @@ namespace Gx
         std::uint32_t GetStyle() const;
 
         const sf::Color& GetColor() const override;
-        const sf::Color& GetFillColor() const;
-        virtual const sf::Color& GetHighlightBackColor() const;
+        const sf::Color& GetHighlightBackColor() const;
         const sf::Color& GetHighlightTextColor() const;
         const sf::Color& GetOutlineColor() const;
         float GetOutlineThickness() const;

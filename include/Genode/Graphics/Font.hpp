@@ -143,14 +143,15 @@ namespace Gx
         /// thickness will cause distorted rendering.
         ///
         /// \param codePoint        Unicode code point of the character to get
-        /// \param characterSize    Reference character size
+        /// \param characterWidth   Reference character width
+        /// \param characterHeight  Reference character height
         /// \param bold             Retrieve the bold version or the regular one?
         /// \param outlineThickness Thickness of outline (when != 0 the glyph will not be filled)
         ///
         /// \return The glyph corresponding to \a codePoint and \a characterSize
         ///
         ////////////////////////////////////////////////////////////
-        const sf::Glyph& GetGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness = 0, unsigned int characterWidth = 0) const;
+        const sf::Glyph& GetGlyph(std::uint32_t codePoint, unsigned int characterWidth, unsigned int characterHeight, bool bold, float outlineThickness = 0) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Determine if this font has a glyph representing the requested code point
@@ -179,14 +180,16 @@ namespace Gx
         /// closer than other characters. Most of the glyphs pairs have a
         /// kerning offset of zero, though.
         ///
-        /// \param first         Unicode code point of the first character
-        /// \param second        Unicode code point of the second character
-        /// \param characterSize Reference character size
+        /// \param first           Unicode code point of the first character
+        /// \param second          Unicode code point of the second character
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
+        /// \param bold            Retrieve the bold version or the regular one?
         ///
         /// \return Kerning value for \a first and \a second, in pixels
         ///
         ////////////////////////////////////////////////////////////
-        float GetKerning(std::uint32_t first, std::uint32_t second, unsigned int characterSize, bool bold = false, unsigned int characterWidth = 0) const;
+        float GetKerning(std::uint32_t first, std::uint32_t second, unsigned int characterWidth, unsigned int characterHeight, bool bold = false) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the line spacing
@@ -194,12 +197,13 @@ namespace Gx
         /// Line spacing is the vertical offset to apply between two
         /// consecutive lines of text.
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
         /// \return Line spacing, in pixels
         ///
         ////////////////////////////////////////////////////////////
-        float GetLineSpacing(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        float GetLineSpacing(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the position of the underline
@@ -207,28 +211,30 @@ namespace Gx
         /// Underline position is the vertical offset to apply between the
         /// baseline and the underline.
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
         /// \return Underline position, in pixels
         ///
         /// \see GetUnderlineThickness
         ///
         ////////////////////////////////////////////////////////////
-        float GetUnderlinePosition(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        float GetUnderlinePosition(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Get the thickness of the underline
         ///
         /// Underline thickness is the vertical size of the underline.
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
         /// \return Underline thickness, in pixels
         ///
         /// \see GetUnderlinePosition
         ///
         ////////////////////////////////////////////////////////////
-        float GetUnderlineThickness(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        float GetUnderlineThickness(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Retrieve the texture containing the loaded glyphs of a certain size
@@ -237,12 +243,13 @@ namespace Gx
         /// are requested, thus it is not very relevant. It is mainly
         /// used internally by sf::Text.
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
         /// \return Texture containing the glyphs of the requested size
         ///
         ////////////////////////////////////////////////////////////
-        const sf::Texture& GetTexture(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        const sf::Texture& GetTexture(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Enable or disable the smooth filter
@@ -312,25 +319,27 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         /// \brief Find or create the glyphs page corresponding to the given character size
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
-        /// \return The glyphs page corresponding to \a characterSize
+        /// \return The glyphs page corresponding to \a characterHeight and \a characterWidth
         ///
         ////////////////////////////////////////////////////////////
-        Page& LoadPage(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        Page& LoadPage(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Load a new glyph and store it in the cache
         ///
         /// \param codePoint        Unicode code point of the character to load
-        /// \param characterSize    Reference character size
+        /// \param characterWidth   Reference character width
+        /// \param characterHeight  Reference character height
         /// \param bold             Retrieve the bold version or the regular one?
         /// \param outlineThickness Thickness of outline (when != 0 the glyph will not be filled)
         ///
         /// \return The glyph corresponding to \a codePoint and \a characterSize
         ///
         ////////////////////////////////////////////////////////////
-        sf::Glyph LoadGlyph(std::uint32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness, unsigned int characterWidth = 0) const;
+        sf::Glyph LoadGlyph(std::uint32_t codePoint, unsigned int characterWidth, unsigned int characterHeight, bool bold, float outlineThickness) const;
 
         ////////////////////////////////////////////////////////////
         /// \brief Find a suitable rectangle within the texture for a glyph
@@ -346,12 +355,13 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         /// \brief Make sure that the given size is the current one
         ///
-        /// \param characterSize Reference character size
+        /// \param characterWidth  Reference character width
+        /// \param characterHeight Reference character height
         ///
         /// \return True on success, false if any error happened
         ///
         ////////////////////////////////////////////////////////////
-        [[nodiscard]] bool SetCurrentSize(unsigned int characterSize, unsigned int characterWidth = 0) const;
+        [[nodiscard]] bool SetCurrentSize(unsigned int characterWidth, unsigned int characterHeight) const;
 
         ////////////////////////////////////////////////////////////
         // Types

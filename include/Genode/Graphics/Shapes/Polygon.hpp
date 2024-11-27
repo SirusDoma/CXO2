@@ -29,20 +29,88 @@
 
 namespace Gx
 {
+    ////////////////////////////////////////////////////////////
+    /// @brief Specialized shape representing a convex polygon
+    ////////////////////////////////////////////////////////////
     class Polygon : public Shape
     {
     public:
+        ////////////////////////////////////////////////////////////
+        /// @brief Default constructor
+        ///
+        /// @param pointCount Number of points of the polygon
+        ////////////////////////////////////////////////////////////
         explicit Polygon(std::size_t pointCount = 0);
-        Polygon(sf::PrimitiveType primitiveType, std::size_t pointCount = 0);
 
+        ////////////////////////////////////////////////////////////
+        /// @brief Default constructor
+        ///
+        /// @param primitiveType The primitive type of the backend vertices
+        /// @param pointCount Number of points of the polygon
+        ////////////////////////////////////////////////////////////
+        explicit Polygon(sf::PrimitiveType primitiveType, std::size_t pointCount = 0);
+
+        ////////////////////////////////////////////////////////////
+        /// @brief Set the number of points of the polygon
+        ///
+        /// For the shape to be rendered as expected, \a `count` must
+        /// be greater or equal to 3.
+        ///
+        /// @param count New number of points of the polygon
+        ///
+        /// @see `GetPointCount`
+        ////////////////////////////////////////////////////////////
         void SetPointCount(std::size_t count);
-        std::size_t GetPointCount() const override;
 
+        ////////////////////////////////////////////////////////////
+        /// @brief Get the number of points of the polygon
+        ///
+        /// @return Number of points of the polygon
+        ///
+        /// @see `SetPointCount`
+        ////////////////////////////////////////////////////////////
+        [[nodiscard]] std::size_t GetPointCount() const override;
+
+        ////////////////////////////////////////////////////////////
+        /// @brief Set the position of a point
+        ///
+        /// Don't forget that the shape must be convex and the
+        /// order of points matters. Points should not overlap.
+        /// This applies to rendering; it is explicitly allowed
+        /// to temporarily have non-convex or degenerate shapes
+        /// when not drawn (e.g. during shape initialization).
+        ///
+        /// Point count must be specified beforehand. The behavior is
+        /// undefined if \a `index` is greater than or equal to getPointCount.
+        ///
+        /// @param index Index of the point to change, in range [0 .. getPointCount() - 1]
+        /// @param point New position of the point
+        ///
+        /// @see `GetPoint`
+        ////////////////////////////////////////////////////////////
         void SetPoint(std::size_t index, const sf::Vector2f& point);
-        sf::Vector2f GetPoint(std::size_t index) const override;
+
+        ////////////////////////////////////////////////////////////
+        /// @brief Get the position of a point
+        ///
+        /// The returned point is in local coordinates, that is,
+        /// the shape's transforms (position, rotation, scale) are
+        /// not taken into account.
+        /// The result is undefined if \a `index` is out of the valid range.
+        ///
+        /// @param index Index of the point to get, in range [0 .. getPointCount() - 1]
+        ///
+        /// @return Position of the index-th point of the polygon
+        ///
+        /// @see `SetPoint`
+        ////////////////////////////////////////////////////////////
+        [[nodiscard]] sf::Vector2f GetPoint(std::size_t index) const override;
 
     private:
-        std::vector<sf::Vector2f> m_points;
+        ////////////////////////////////////////////////////////////
+        // Member data
+        ////////////////////////////////////////////////////////////
+        std::vector<sf::Vector2f> m_points; //!< Points composing the convex polygon
     };
 
 }

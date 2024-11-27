@@ -116,7 +116,7 @@ Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetad
     toolTip->SetCharacterSize(metadata->FontSize);
     toolTip->SetColor(metadata->Color);
     toolTip->SetPadding(metadata->Padding);
-    toolTip->SetContainerFillColor(metadata->ContainerFillColor);
+    toolTip->SetContainerColor(metadata->ContainerFillColor);
     toolTip->SetContainerOutlineColor(metadata->ContainerOutlineColor);
     toolTip->SetContainerOutlineThickness(metadata->ContainerOutlineThickness);
     toolTip->SetOutlineThickness(metadata->OutlineThickness);

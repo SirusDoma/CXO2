@@ -26,8 +26,7 @@
 
 namespace Gx
 {
-    Polygon::Polygon(const std::size_t pointCount) :
-        Shape()
+    Polygon::Polygon(const std::size_t pointCount)
     {
         SetPointCount(pointCount);
     }
@@ -51,12 +50,14 @@ namespace Gx
 
     void Polygon::SetPoint(const std::size_t index, const sf::Vector2f& point)
     {
+        assert(index < m_points.size() && "Index is out of bounds");
         m_points[index] = point;
         Update();
     }
 
     sf::Vector2f Polygon::GetPoint(const std::size_t index) const
     {
+        assert(index < m_points.size() && "Index is out of bounds");
         return m_points[index];
     }
 }

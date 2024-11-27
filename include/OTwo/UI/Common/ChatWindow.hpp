@@ -16,6 +16,7 @@ public:
     ChatWindow();
     ChatWindow(ChatWindow &&other) noexcept;
     ChatWindow(const Gx::Font& font, const sf::FloatRect& localBounds, unsigned int characterSize = 13);
+    ChatWindow(Gx::Font&& font, const sf::FloatRect& localBounds, unsigned int characterSize = 13) = delete;
 
     sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect& bounds) override;

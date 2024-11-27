@@ -33,21 +33,22 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
 
     std::uint32_t style = 0;
     if (metadata->Bold)
-        style |= static_cast<std::uint32_t>(Gx::Label::Style::Bold);
+        style |= Gx::Label::Style::Bold;
 
     if (metadata->Italic)
-        style |= static_cast<std::uint32_t>(Gx::Label::Style::Italic);
+        style |= Gx::Label::Style::Italic;
 
     if (metadata->Underlined)
-        style |= static_cast<std::uint32_t>(Gx::Label::Style::Underlined);
+        style |= Gx::Label::Style::Underlined;
 
     label->SetName(metadata->Name);
     label->SetStyle(style);
     label->SetCharacterSize(metadata->FontSize);
     label->SetCharacterWidth(metadata->FontWidth);
     label->SetColor(metadata->Color);
-    label->SetOutlineThickness(metadata->OutlineThickness);
     label->SetOutlineColor(metadata->OutlineColor);
+    label->SetOutlineThickness(metadata->OutlineThickness);
+    label->SetOutlineOffset({0.f, 1.f});
     label->SetString(sf::String::fromUtf8(metadata->String.begin(), metadata->String.end()));
     label->SetOrigin(metadata->Origin);
     label->SetPosition(metadata->Position);

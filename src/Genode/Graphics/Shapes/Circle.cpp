@@ -66,4 +66,9 @@ namespace Gx
 
         return {m_radius + x, m_radius + y};
     }
+
+    sf::Vector2f Circle::GetGeometricCenter() const
+    {
+        return {m_radius, m_radius};
+    }
 }

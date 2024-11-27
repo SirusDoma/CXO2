@@ -4,7 +4,7 @@ namespace Gx
 {
     Rotate::Rotate(Transformable& target, const float angle, const sf::Time& duration) :
         m_target(&target),
-        m_start(target.GetRotation()),
+        m_start(target.GetRotation().asDegrees()),
         m_end(angle),
         m_diff(0),
         m_duration(duration)
@@ -15,7 +15,7 @@ namespace Gx
     {
         Task::Initialize();
 
-        m_start = m_target->GetRotation();
+        m_start = m_target->GetRotation().asDegrees();
         m_diff  = std::abs(m_start - m_end);
     }
 
@@ -28,7 +28,7 @@ namespace Gx
             return;
 
         short rotation = 0;
-        auto current   = m_target->GetRotation();
+        auto current   = m_target->GetRotation().asDegrees();
         const auto elapsed   = GetElapsed();
 
         if (m_end < current)

@@ -54,24 +54,18 @@ namespace
     // FreeType callbacks that operate on a sf::InputStream
     unsigned long read(const FT_Stream rec, const unsigned long offset, unsigned char* buffer, const unsigned long count)
     {
-        const auto convertedOffset = static_cast<std::int64_t>(offset);
-        auto*      stream          = static_cast<sf::InputStream*>(rec->descriptor.pointer);
-        if (stream->seek(convertedOffset) == convertedOffset)
+        auto* stream = static_cast<sf::InputStream*>(rec->descriptor.pointer);
+        if (stream->seek(offset) == offset)
         {
             if (count > 0)
-            {
-                const auto read = stream->read(reinterpret_cast<char*>(buffer), static_cast<std::int64_t>(count));
-                if (!read)
-                    return 0;
+                return static_cast<unsigned long>(stream->read(reinterpret_cast<char*>(buffer), count).value());
 
-                return *read;
-            }
-            else
-                return 0;
+            return 0;
         }
-        else
-            return count > 0 ? 0 : 1; // error code is 0 if we're reading, or nonzero if we're seeking
+
+        return count > 0 ? 0 : 1; // error code is 0 if we're reading, or nonzero if we're seeking
     }
+
     void close(FT_Stream)
     {
     }
@@ -92,11 +86,11 @@ namespace
                (static_cast<std::uint64_t>(bold) << 31) | index;
     }
 
-    // Combine characterSize and characterWidth into a single 64-bit key
-    std::uint64_t combine(const std::uint32_t characterSize, const std::uint32_t characterWidth)
+    // Combine characterHeight and characterWidth into a single 64-bit key
+    std::uint64_t combine(const std::uint32_t characterWidth, const std::uint32_t characterHeight)
     {
-        return static_cast<std::uint64_t>(characterSize) << 32 |
-               static_cast<std::uint64_t>(characterWidth);
+        return static_cast<std::uint64_t>(characterWidth) << 32 |
+               static_cast<std::uint64_t>(characterHeight);
     }
 }
 
@@ -156,7 +150,7 @@ namespace Gx
         }
 
         // Load the new font face from the specified file
-        FT_Face face;
+        FT_Face face = nullptr;
         if (FT_New_Face(fontHandles->library, fullName.c_str(), 0, &face) != 0)
         {
             sf::err() << "Failed to load font (failed to create the font face)\n" << filename << std::endl;
@@ -175,7 +169,7 @@ namespace Gx
         if (FT_Select_Charmap(face, FT_ENCODING_UNICODE) != 0)
         {
             sf::err() << "Failed to load font (failed to set the Unicode character set)\n"
-                  << filename << std::endl;
+                      << filename << std::endl;
             return false;
         }
 
@@ -207,7 +201,7 @@ namespace Gx
         }
 
         // Load the new font face from the specified file
-        FT_Face face;
+        FT_Face face = nullptr;
         if (FT_New_Memory_Face(fontHandles->library,
                                reinterpret_cast<const FT_Byte*>(data),
                                static_cast<FT_Long>(sizeInBytes),
@@ -269,7 +263,7 @@ namespace Gx
 
         // Prepare a wrapper for our stream, that we'll pass to FreeType callbacks
         fontHandles->streamRec.base               = nullptr;
-        fontHandles->streamRec.size               = static_cast<unsigned long>(*stream.getSize());
+        fontHandles->streamRec.size               = static_cast<unsigned long>(stream.getSize().value());
         fontHandles->streamRec.pos                = 0;
         fontHandles->streamRec.descriptor.pointer = &stream;
         fontHandles->streamRec.read               = &read;
@@ -282,7 +276,7 @@ namespace Gx
         args.driver = nullptr;
 
         // Load the new font face from the specified stream
-        FT_Face face;
+        FT_Face face = nullptr;
         if (FT_Open_Face(fontHandles->library, &args, 0, &face) != 0)
         {
             sf::err() << "Failed to load font from stream (failed to create the font face)" << std::endl;
@@ -322,10 +316,10 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    const sf::Glyph& Font::GetGlyph(std::uint32_t codePoint, const unsigned int characterSize, const bool bold, const float outlineThickness, const unsigned int characterWidth) const
+    const sf::Glyph& Font::GetGlyph(std::uint32_t codePoint, const unsigned int characterWidth, const unsigned int characterHeight, const bool bold, const float outlineThickness) const
     {
         // Get the page corresponding to the character size
-        Page& page = LoadPage(characterSize, characterWidth);
+        Page& page = LoadPage(characterWidth, characterHeight);
         GlyphTable& glyphs = page.glyphs;
 
         // Build the key by combining the glyph index (based on code point), bold flag, and outline thickness
@@ -342,7 +336,7 @@ namespace Gx
         else
         {
             // Not found: we have to load it
-            const sf::Glyph glyph = LoadGlyph(codePoint, characterSize, bold, outlineThickness, characterWidth);
+            const sf::Glyph glyph = LoadGlyph(codePoint, characterWidth, characterHeight, bold, outlineThickness);
             return glyphs.emplace(key, glyph).first->second;
         }
     }
@@ -356,7 +350,7 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetKerning(std::uint32_t first, std::uint32_t second, const unsigned int characterSize, const bool bold, const unsigned int characterWidth) const
+    float Font::GetKerning(std::uint32_t first, std::uint32_t second, const unsigned int characterWidth, const unsigned int characterHeight, const bool bold) const
     {
         // Special case where first or second is 0 (null character)
         if (first == 0 || second == 0)
@@ -364,15 +358,15 @@ namespace Gx
 
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize, characterWidth))
+        if (face && SetCurrentSize(characterWidth, characterHeight))
         {
             // Convert the characters to indices
             const FT_UInt index1 = FT_Get_Char_Index(face, first);
             const FT_UInt index2 = FT_Get_Char_Index(face, second);
 
             // Retrieve position compensation deltas generated by FT_LOAD_FORCE_AUTOHINT flag
-            const auto firstRsbDelta  = static_cast<float>(GetGlyph(first, characterSize, bold).rsbDelta);
-            const auto secondLsbDelta = static_cast<float>(GetGlyph(second, characterSize, bold).lsbDelta);
+            const auto firstRsbDelta  = static_cast<float>(GetGlyph(first, characterWidth, characterHeight, bold).rsbDelta);
+            const auto secondLsbDelta = static_cast<float>(GetGlyph(second, characterWidth, characterHeight, bold).lsbDelta);
 
             // Get the kerning vector if present
             FT_Vector kerning{0, 0};
@@ -397,11 +391,11 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetLineSpacing(const unsigned int characterSize, const unsigned int characterWidth) const
+    float Font::GetLineSpacing(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize, characterWidth))
+        if (face && SetCurrentSize(characterWidth, characterHeight))
         {
             return static_cast<float>(face->size->metrics.height) / static_cast<float>(1 << 6);
         }
@@ -413,15 +407,15 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetUnderlinePosition(const unsigned int characterSize, const unsigned int characterWidth) const
+    float Font::GetUnderlinePosition(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize, characterWidth))
+        if (face && SetCurrentSize(characterWidth, characterHeight))
         {
             // Return a fixed position if font is a bitmap font
             if (!FT_IS_SCALABLE(face))
-                return static_cast<float>(characterSize) / 10.f;
+                return static_cast<float>(characterHeight) / 10.f;
 
             return -static_cast<float>(FT_MulFix(face->underline_position, face->size->metrics.y_scale)) /
                    static_cast<float>(1 << 6);
@@ -434,15 +428,15 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    float Font::GetUnderlineThickness(const unsigned int characterSize, const unsigned int characterWidth) const
+    float Font::GetUnderlineThickness(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
         FT_Face face = m_fontHandles ? m_fontHandles->face : nullptr;
 
-        if (face && SetCurrentSize(characterSize, characterWidth))
+        if (face && SetCurrentSize(characterWidth, characterHeight))
         {
             // Return a fixed thickness if font is a bitmap font
             if (!FT_IS_SCALABLE(face))
-                return static_cast<float>(characterSize) / 14.f;
+                return static_cast<float>(characterHeight) / 14.f;
 
             return static_cast<float>(FT_MulFix(face->underline_thickness, face->size->metrics.y_scale)) /
                    static_cast<float>(1 << 6);
@@ -455,9 +449,9 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    const sf::Texture& Font::GetTexture(const unsigned int characterSize, const unsigned int characterWidth) const
+    const sf::Texture& Font::GetTexture(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
-        return LoadPage(characterSize, characterWidth).texture;
+        return LoadPage(characterWidth, characterHeight).texture;
     }
 
     ////////////////////////////////////////////////////////////
@@ -494,14 +488,14 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    Font::Page& Font::LoadPage(const unsigned int characterSize, const unsigned int characterWidth) const
+    Font::Page& Font::LoadPage(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
-        return m_pages.try_emplace(combine(characterSize, characterWidth), m_isSmooth).first->second;
+        return m_pages.try_emplace(combine(characterWidth, characterHeight), m_isSmooth).first->second;
     }
 
 
     ////////////////////////////////////////////////////////////
-    sf::Glyph Font::LoadGlyph(std::uint32_t codePoint, const unsigned int characterSize, const bool bold, const float outlineThickness, const unsigned int characterWidth) const
+    sf::Glyph Font::LoadGlyph(std::uint32_t codePoint, const unsigned int characterWidth, const unsigned int characterHeight, const bool bold, const float outlineThickness) const
     {
         // The glyph to return
         sf::Glyph glyph;
@@ -516,7 +510,7 @@ namespace Gx
             return glyph;
 
         // Set the character size
-        if (!SetCurrentSize(characterSize, characterWidth))
+        if (!SetCurrentSize(characterWidth, characterHeight))
             return glyph;
 
         // Load the glyph corresponding to the code point
@@ -593,7 +587,7 @@ namespace Gx
             height += 2 * padding;
 
             // Get the glyphs page corresponding to the character size
-            Page& page = LoadPage(characterSize, characterWidth);
+            Page& page = LoadPage(characterWidth, characterHeight);
 
             // Find a good position for the new glyph into the texture
             glyph.textureRect = FindGlyphRect(page, {width, height});
@@ -741,7 +735,7 @@ namespace Gx
 
 
     ////////////////////////////////////////////////////////////
-    bool Font::SetCurrentSize(unsigned int characterSize, unsigned int characterWidth) const
+    bool Font::SetCurrentSize(const unsigned int characterWidth, const unsigned int characterHeight) const
     {
         // FT_Set_Pixel_Sizes is an expensive function, so we must call it
         // only when necessary to avoid killing performances
@@ -751,9 +745,9 @@ namespace Gx
         const FT_UShort currentWidth  = face->size->metrics.x_ppem;
         const FT_UShort currentHeight = face->size->metrics.y_ppem;
 
-        if ((characterWidth != 0 && characterWidth != currentWidth) || characterSize != currentHeight)
+        if ((characterWidth != 0 && characterWidth != currentWidth) || characterHeight != currentHeight)
         {
-            const FT_Error result = FT_Set_Pixel_Sizes(face, characterWidth, characterSize);
+            const FT_Error result = FT_Set_Pixel_Sizes(face, characterWidth, characterHeight);
 
             if (result == FT_Err_Invalid_Pixel_Size)
             {
@@ -761,7 +755,7 @@ namespace Gx
                 // fail if the requested size is not available
                 if (!FT_IS_SCALABLE(face))
                 {
-                    sf::err() << "Failed to set bitmap font size to " << characterSize << '\n' << "Available sizes are: ";
+                    sf::err() << "Failed to set bitmap font size to " << characterHeight << '\n' << "Available sizes are: ";
                     for (unsigned int i = 0; i < face->num_fixed_sizes; ++i)
                     {
                         const long size = (face->available_sizes[i].y_ppem + 32) >> 6;
@@ -771,7 +765,7 @@ namespace Gx
                 }
                 else
                 {
-                    sf::err() << "Failed to set font size to " << characterSize << std::endl;
+                    sf::err() << "Failed to set font size to " << characterHeight << std::endl;
                 }
             }
 

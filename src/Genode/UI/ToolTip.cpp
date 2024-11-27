@@ -9,20 +9,20 @@ namespace Gx
         m_fillColor(sf::Color::White),
         m_outlineColor(sf::Color::Black),
         m_outlineThickness(1.f),
-        m_elapsed(),
-        m_duration()
+        m_duration(),
+        m_elapsed()
     {
     }
 
-    ToolTip::ToolTip(const sf::String& string, const Font& font, unsigned int characterSize) :
-        Text(string, font, characterSize),
+    ToolTip::ToolTip(const Font& font, const sf::String& string, const unsigned int characterSize) :
+        Text(font, string, characterSize),
         m_rectangle(),
         m_padding(characterSize * (10.f / 100.f), characterSize * (10.f / 100.f)),
         m_fillColor(sf::Color::White),
         m_outlineColor(sf::Color::Black),
         m_outlineThickness(1.f),
-        m_elapsed(),
-        m_duration()
+        m_duration(),
+        m_elapsed()
     {
     }
 
@@ -102,12 +102,12 @@ namespace Gx
         }
     }
 
-    const sf::Color& ToolTip::GetContainerFillColor() const
+    const sf::Color& ToolTip::GetContainerColor() const
     {
         return m_fillColor;
     }
 
-    void ToolTip::SetContainerFillColor(const sf::Color& fillColor)
+    void ToolTip::SetContainerColor(const sf::Color& fillColor)
     {
         if (m_fillColor != fillColor)
         {
@@ -174,7 +174,7 @@ namespace Gx
         auto bounds = Text::GetLocalBounds();
         m_rectangle.SetSize(sf::Vector2f(bounds.size.x, bounds.size.y) + (m_padding * 2.f));
         m_rectangle.SetPosition(sf::Vector2f(0, m_padding.y * 1.5f));
-        m_rectangle.SetFillColor(m_fillColor);
+        m_rectangle.SetColor(m_fillColor);
         m_rectangle.SetOutlineColor(m_outlineColor);
         m_rectangle.SetOutlineThickness(m_outlineThickness);
 

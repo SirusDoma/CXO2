@@ -93,17 +93,6 @@ namespace Gx
         return m_textureRect;
     }
 
-    void Shape::SetFillColor(const sf::Color& color)
-    {
-        m_fillColor = color;
-        UpdateFillColors();
-    }
-
-    const sf::Color& Shape::GetFillColor() const
-    {
-        return m_fillColor;
-    }
-
     void Shape::SetOutlineColor(const sf::Color& color)
     {
         m_outlineColor = color;
@@ -128,7 +117,7 @@ namespace Gx
 
     const sf::Color& Shape::GetColor() const
     {
-        return GetFillColor();
+        return m_fillColor;
     }
 
     const sf::Color& Shape::GetColor(const unsigned int index) const
@@ -136,19 +125,64 @@ namespace Gx
         if (const auto it = m_colorMap.find(index); it != m_colorMap.end())
            return it->second;
 
-        return GetFillColor();
+        return m_fillColor;
     }
 
     void Shape::SetColor(const sf::Color& color)
     {
-        SetFillColor(color);
-        //SetOutlineColor(color);
+        m_fillColor = color;
+        UpdateFillColors();
     }
 
     void Shape::SetColor(const unsigned int index, const sf::Color& color)
     {
         m_colorMap[index] = color;
-        //SetOutlineColor(color);
+    }
+
+    sf::Vector2f Shape::GetGeometricCenter() const
+    {
+        switch (const auto count = GetPointCount())
+        {
+            case 0:
+                assert(false && "Cannot calculate geometric center of shape with no points");
+            return sf::Vector2f{};
+            case 1:
+                return GetPoint(0);
+            case 2:
+                return (GetPoint(0) + GetPoint(1)) / 2.f;
+            default: // more than two points
+                sf::Vector2f centroid;
+                float    twiceArea = 0;
+
+                auto previousPoint = GetPoint(count - 1);
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    const auto  currentPoint = GetPoint(i);
+                    const float product      = previousPoint.cross(currentPoint);
+                    twiceArea += product;
+                    centroid += (currentPoint + previousPoint) * product;
+
+                    previousPoint = currentPoint;
+                }
+
+                if (twiceArea != 0.f)
+                {
+                    return centroid / 3.f / twiceArea;
+                }
+
+                // Fallback for no area - find the center of the bounding box
+                auto minPoint = GetPoint(0);
+                auto maxPoint = minPoint;
+                for (std::size_t i = 1; i < count; ++i)
+                {
+                    const auto currentPoint = GetPoint(i);
+                    minPoint.x              = std::min(minPoint.x, currentPoint.x);
+                    maxPoint.x              = std::max(maxPoint.x, currentPoint.x);
+                    minPoint.y              = std::min(minPoint.y, currentPoint.y);
+                    maxPoint.y              = std::max(maxPoint.y, currentPoint.y);
+                }
+                return (maxPoint + minPoint) / 2.f;
+        }
     }
 
     sf::FloatRect Shape::GetLocalBounds() const

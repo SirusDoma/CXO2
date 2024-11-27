@@ -211,7 +211,7 @@ void ChatWindow::Invalidate()
 
             if (i == 0)
             {
-                SetVerticalRepeat(max, m_lineSpacing > 0 ? m_lineSpacing : label->GetCharacterSize() + 5.5f);
+                SetVerticalRepeat(max, m_lineSpacing > 0 ? m_lineSpacing : label->GetCharacterHeight() + 5.5f);
                 SetHorizontalRepeat(1, 0);
             }
 

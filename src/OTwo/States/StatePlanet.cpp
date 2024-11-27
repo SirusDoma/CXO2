@@ -71,7 +71,7 @@ void StatePlanet::Initialize()
     if (m_session.GetMusicHall() == MusicHall::None)
     {
         auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
-        overlay.SetFillColor(sf::Color::Black);
+        overlay.SetColor(sf::Color::Black);
         AddChild(overlay);
 
         Run<Gx::Sequence>([&]

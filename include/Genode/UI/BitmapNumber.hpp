@@ -12,7 +12,7 @@
 
 namespace Gx
 {
-    class BitmapNumber : public virtual Control, public Colorable
+    class BitmapNumber : public virtual Control, public virtual Colorable
     {
     public:
         enum class Alignment { None, Left, Center, Right };

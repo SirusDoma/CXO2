@@ -1,7 +1,7 @@
 ﻿////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2018 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2024 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -22,13 +22,16 @@
 //
 ////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
 #include <Genode/Graphics/Sprite.hpp>
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-#include <cstdlib>
+#include <cmath>
 
 namespace Gx
 {
@@ -74,8 +77,7 @@ namespace Gx
         if (rectangle != m_texcoords)
         {
             m_texcoords = rectangle;
-            UpdatePositions();
-            UpdateTexCoords();
+            UpdateVertices();
         }
     }
 
@@ -160,26 +162,23 @@ namespace Gx
         return RenderableContainer::Render(surface, states);
     }
 
-    void Sprite::UpdatePositions()
+    void Sprite::UpdateVertices()
     {
-        const sf::FloatRect bounds = Sprite::GetLocalBounds();
+        const auto [position, size] = sf::FloatRect(m_texcoords);
 
-        m_vertices[0].position = sf::Vector2f(0, 0);
-        m_vertices[1].position = sf::Vector2f(0, bounds.size.y);
-        m_vertices[2].position = sf::Vector2f(bounds.size.x, 0);
-        m_vertices[3].position = sf::Vector2f(bounds.size.x, bounds.size.y);
-    }
+        // Absolute value is used to support negative texture rect sizes
+        const sf::Vector2f absSize(std::abs(size.x), std::abs(size.y));
 
-    void Sprite::UpdateTexCoords()
-    {
-        const auto left = static_cast<float>(m_texcoords.position.x);
-        const float right = left + static_cast<float>(m_texcoords.size.x);
-        const auto top = static_cast<float>(m_texcoords.position.y);
-        const float bottom = top + static_cast<float>(m_texcoords.size.y);
+        // Update positions
+        m_vertices[0].position = {0.f, 0.f};
+        m_vertices[1].position = {0.f, absSize.y};
+        m_vertices[2].position = {absSize.x, 0.f};
+        m_vertices[3].position = absSize;
 
-        m_vertices[0].texCoords = sf::Vector2f(left, top);
-        m_vertices[1].texCoords = sf::Vector2f(left, bottom);
-        m_vertices[2].texCoords = sf::Vector2f(right, top);
-        m_vertices[3].texCoords = sf::Vector2f(right, bottom);
+        // Update texture coordinates
+        m_vertices[0].texCoords = position;
+        m_vertices[1].texCoords = position + sf::Vector2f(0.f, size.y);
+        m_vertices[2].texCoords = position + sf::Vector2f(size.x, 0.f);
+        m_vertices[3].texCoords = position + size;
     }
 }

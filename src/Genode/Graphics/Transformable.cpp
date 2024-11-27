@@ -27,18 +27,6 @@
 
 namespace Gx
 {
-    Transformable::Transformable() :
-        m_origin(0, 0),
-        m_position(0, 0),
-        m_rotation(0),
-        m_scale(1, 1),
-        m_transform(),
-        m_transformNeedUpdate(true),
-        m_inverseTransform(),
-        m_inverseTransformNeedUpdate(true)
-    {
-    }
-
     Transformable::~Transformable()
     {
     }
@@ -48,27 +36,39 @@ namespace Gx
         if (x == m_position.x && y == m_position.y)
             return;
 
-        m_position.x = x;
-        m_position.y = y;
-        m_transformNeedUpdate = true;
+        m_position.x                 = x;
+        m_position.y                 = y;
+        m_transformNeedUpdate        = true;
         m_inverseTransformNeedUpdate = true;
     }
 
     void Transformable::SetPosition(const sf::Vector2f& position)
     {
-        SetPosition(position.x, position.y);
+        if (m_position == position)
+            return;
+
+        m_position                   = position;
+        m_transformNeedUpdate        = true;
+        m_inverseTransformNeedUpdate = true;
     }
 
     void Transformable::SetRotation(const float angle)
     {
-        if (angle == m_rotation)
+        if (m_rotation == sf::degrees(angle))
             return;
 
-        m_rotation = static_cast<float>(fmod(angle, 360));
-        if (m_rotation < 0)
-            m_rotation += 360.f;
+        m_rotation                   = sf::degrees(angle);
+        m_transformNeedUpdate        = true;
+        m_inverseTransformNeedUpdate = true;
+    }
 
-        m_transformNeedUpdate = true;
+    void Transformable::SetRotation(const sf::Angle& angle)
+    {
+        if (m_rotation == angle)
+            return;
+
+        m_rotation                   = angle;
+        m_transformNeedUpdate        = true;
         m_inverseTransformNeedUpdate = true;
     }
 
@@ -77,15 +77,20 @@ namespace Gx
         if (factorX == m_position.x && factorY == m_position.y)
             return;
 
-        m_scale.x = factorX;
-        m_scale.y = factorY;
-        m_transformNeedUpdate = true;
+        m_scale.x                    = factorX;
+        m_scale.y                    = factorY;
+        m_transformNeedUpdate        = true;
         m_inverseTransformNeedUpdate = true;
     }
 
     void Transformable::SetScale(const sf::Vector2f& factors)
     {
-        SetScale(factors.x, factors.y);
+        if (m_scale == factors)
+            return;
+
+        m_scale                      = factors;
+        m_transformNeedUpdate        = true;
+        m_inverseTransformNeedUpdate = true;
     }
 
     void Transformable::SetOrigin(const float x, const float y)
@@ -101,7 +106,12 @@ namespace Gx
 
     void Transformable::SetOrigin(const sf::Vector2f& origin)
     {
-        SetOrigin(origin.x, origin.y);
+        if (m_origin == origin)
+            return;
+
+        m_origin                     = origin;
+        m_transformNeedUpdate        = true;
+        m_inverseTransformNeedUpdate = true;
     }
 
     const sf::Vector2f& Transformable::GetPosition() const
@@ -109,7 +119,7 @@ namespace Gx
         return m_position;
     }
 
-    float Transformable::GetRotation() const
+    const sf::Angle& Transformable::GetRotation() const
     {
         return m_rotation;
     }
@@ -131,10 +141,15 @@ namespace Gx
 
     void Transformable::Move(const sf::Vector2f& offset)
     {
-        SetPosition(m_position.x + offset.x, m_position.y + offset.y);
+        SetPosition(m_position + offset);
     }
 
     void Transformable::Rotate(const float angle)
+    {
+        SetRotation(m_rotation + sf::degrees(angle));
+    }
+
+    void Transformable::Rotate(const sf::Angle& angle)
     {
         SetRotation(m_rotation + angle);
     }
@@ -146,7 +161,7 @@ namespace Gx
 
     void Transformable::Scale(const sf::Vector2f& factor)
     {
-        SetScale(m_scale.x * factor.x, m_scale.y * factor.y);
+        SetScale({m_scale.x * factor.x, m_scale.y * factor.y});
     }
 
     const sf::Transform& Transformable::GetTransform() const
@@ -154,19 +169,21 @@ namespace Gx
         // Recompute the combined transform if needed
         if (m_transformNeedUpdate)
         {
-            const float angle = -m_rotation * 3.141592654f / 180.f;
-            const float cosine = static_cast<float>(std::cos(angle));
-            const float sine = static_cast<float>(std::sin(angle));
-            const float sxc = m_scale.x * cosine;
-            const float syc = m_scale.y * cosine;
-            const float sxs = m_scale.x * sine;
-            const float sys = m_scale.y * sine;
-            const float tx = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
-            const float ty = m_origin.x * sxs - m_origin.y * syc + m_position.y;
+            const float angle  = -m_rotation.asRadians();
+            const float cosine = std::cos(angle);
+            const float sine   = std::sin(angle);
+            const float sxc    = m_scale.x * cosine;
+            const float syc    = m_scale.y * cosine;
+            const float sxs    = m_scale.x * sine;
+            const float sys    = m_scale.y * sine;
+            const float tx     = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
+            const float ty     = m_origin.x * sxs - m_origin.y * syc + m_position.y;
 
-            m_transform = sf::Transform(sxc, sys, tx,
-                -sxs, syc, ty,
-                0.f, 0.f, 1.f);
+            // clang-format off
+            m_transform = sf::Transform( sxc, sys, tx,
+                                        -sxs, syc, ty,
+                                         0.f, 0.f, 1.f);
+            // clang-format on
             m_transformNeedUpdate = false;
         }
 

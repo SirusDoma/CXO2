@@ -18,8 +18,8 @@ namespace Gx
     {
     }
 
-    InputField::InputField(const sf::String& string, const Font& font, const unsigned int characterSize, sf::FloatRect bounds) :
-        m_text(string, font, characterSize),
+    InputField::InputField(const Font& font, const sf::String& string, const unsigned int characterSize, sf::FloatRect bounds) :
+        m_text(font, string, characterSize),
         m_caret(*this),
         m_bounds(bounds),
         m_maxLength(0),
@@ -100,11 +100,6 @@ namespace Gx
         m_text.SetColor(color);
     }
 
-    void InputField::SetFillColor(const sf::Color& color)
-    {
-        m_text.SetFillColor(color);
-    }
-
     void InputField::SetHighlightBackColor(const sf::Color& color)
     {
         m_caret.SetHighlightColor(color);
@@ -170,10 +165,6 @@ namespace Gx
         return m_text.GetColor();
     }
 
-    const sf::Color& InputField::GetFillColor() const
-    {
-        return m_text.GetFillColor();
-    }
     const sf::Color& InputField::GetHighlightBackColor() const
     {
         return m_caret.GetHighlight().GetColor();
@@ -515,13 +506,13 @@ namespace Gx
         {
             m_caret.Index--;
             m_caret.SelectionLength = 0;
-            m_text.SetFillColor(m_text.GetFillColor());
+            m_text.SetColor(m_text.GetColor());
         }
         else if (ev.code == sf::Keyboard::Key::Right)
         {
             m_caret.Index++;
             m_caret.SelectionLength = 0;
-            m_text.SetFillColor(m_text.GetFillColor());
+            m_text.SetColor(m_text.GetColor());
         }
         else
             return;
@@ -563,13 +554,13 @@ namespace Gx
         if (m_caret.SelectionLength < 0)
             start += m_caret.SelectionLength;
 
-        m_text.SetFillColor(m_text.GetFillColor());
+        m_text.SetColor(m_text.GetColor());
         if (m_caret.SelectionLength != 0)
         {
             for (size_t index = 0; index < m_text.GetString().getSize(); index++)
             {
                 if (index >= start && index < start + std::abs(m_caret.SelectionLength))
-                    m_text.SetFillColor(m_highlightColor, index);
+                    m_text.SetColor(m_highlightColor, index);
             }
         }
     }
@@ -635,12 +626,12 @@ namespace Gx
 
         if (Instance.GetFont())
         {
-            const auto glyph = Instance.GetFont()->GetGlyph('|', Instance.GetCharacterSize(), false);
+            const auto glyph = Instance.GetFont()->GetGlyph('|', 0, Instance.GetCharacterSize(), false);
             m_cursor.SetSize(sf::Vector2f(glyph.bounds.size.x * 0.65f, static_cast<float>(Instance.GetCharacterSize())));
         }
 
         m_cursor.SetPosition(Instance.FindCharacterPosition(Index) + sf::Vector2f(0.f, 1.5f));
-        m_cursor.SetFillColor(Instance.GetColor());
+        m_cursor.SetColor(Instance.GetColor());
 
         if (SelectionLength != 0)
         {
