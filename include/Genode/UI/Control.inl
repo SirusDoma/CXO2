@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Gx
 {
     template<typename... Args>

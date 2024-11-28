@@ -1,3 +1,5 @@
+#pragma once
+
 template<typename T>
 void SceneDirectorDecorator::Register(const std::string& fileName)
 {

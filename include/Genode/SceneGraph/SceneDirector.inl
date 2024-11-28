@@ -1,4 +1,4 @@
-#include <Genode/SceneGraph/SceneDirector.hpp>
+#pragma once
 
 namespace Gx
 {

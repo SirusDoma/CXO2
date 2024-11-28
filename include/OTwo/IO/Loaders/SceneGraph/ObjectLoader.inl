@@ -1,4 +1,4 @@
-#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#pragma once
 
 template<typename R>
 Gx::ResourcePtr<R> ObjectLoader::LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context)

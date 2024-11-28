@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/IO/IOException.hpp>
 

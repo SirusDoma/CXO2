@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Genode/System/Exception.hpp>
 
 namespace Gx

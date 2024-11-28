@@ -1,4 +1,4 @@
-#include <Genode/IO/ResourceContainer.hpp>
+#pragma once
 
 namespace Gx
 {

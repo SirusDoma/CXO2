@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/IO/ResourceLoader.hpp>
 

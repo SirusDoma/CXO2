@@ -1,4 +1,4 @@
-#include <OTwo/IO/Serializable.hpp>
+#pragma once
 
 template<typename T>
 std::vector<std::uint8_t> Serializable<T>::Serialize() const

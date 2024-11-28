@@ -1,4 +1,5 @@
-#include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
+#pragma once
+
 #include <OTwo/States/State.hpp>
 
 template<typename R>
