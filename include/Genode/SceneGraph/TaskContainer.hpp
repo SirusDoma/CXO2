@@ -47,4 +47,4 @@ namespace Gx
     };
 }
 
-#include <Genode/Tasks/TaskContainer.inl>
+#include <Genode/SceneGraph/TaskContainer.inl>
