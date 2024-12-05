@@ -169,8 +169,11 @@ namespace Gx
         return false;
     }
 
-    void SoundGroup::Reset()
+    void SoundGroup::Reset(const bool stop)
     {
+        if (stop)
+            Stop();
+
         m_sources.clear();
     }
 }

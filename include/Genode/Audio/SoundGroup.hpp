@@ -33,7 +33,7 @@ namespace Gx
         bool IsEnabled() const;
         void SetEnabled(bool enable);
 
-        void Reset();
+        void Reset(bool stop = false);
 
         class Iterator
         {

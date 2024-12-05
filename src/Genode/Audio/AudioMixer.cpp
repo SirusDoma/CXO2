@@ -149,11 +149,6 @@ namespace Gx
 
         m_masterGroup->Reset();
         for (auto& [_, group] : m_groups)
-        {
-            if (stop)
-                group->Stop();
-
-            group->Reset();
-        }
+            group->Reset(stop);
     }
 }
