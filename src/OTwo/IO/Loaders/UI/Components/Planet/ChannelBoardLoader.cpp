@@ -33,7 +33,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto channelBoard = Create(context);
+    auto channelBoard = Instantiate(context);
     if (metadata->Frames.size() > 0)
     {
         for (const auto& frame : metadata->Frames)
@@ -54,7 +54,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
         {
             Gx::ResourcePtr<ChannelButton> resource;
             auto channelButtonData = std::any_cast<Gx::Json>(it->second);
-            auto ctx = Gx::ResourceContext::Rebind(name, acquirer);
+            auto ctx = Gx::ResourceContext::Rebind(acquirer, name);
 
             if (channelButtonData.type() == Gx::Json::value_t::string)
                 resource = channelButtonLoader.LoadFromFile(channelButtonData.get<std::string>(), ctx);
@@ -78,7 +78,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext::Rebind(name, context);
+        auto ctx  = Gx::ResourceContext::Rebind(context, name);
 
         ObjectLoader::Load(name, object, container, ctx);
     }

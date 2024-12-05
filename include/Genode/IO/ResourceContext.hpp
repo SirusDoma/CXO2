@@ -17,8 +17,13 @@ namespace Gx
 
         virtual ~ResourceContext() = default;
 
-        static ResourceContext Rebind(const std::string& id, const ResourceContext& ctx);
-        static const ResourceContext& MakeAvailable(const ResourceContext& ctx, ResourceManager& resources);
+        template<typename Ctx>
+        static std::enable_if_t<std::is_base_of_v<ResourceContext, Ctx>, Ctx>
+        Rebind(const Ctx& ctx, const std::string& id);
+
+        template<typename Ctx>
+        std::enable_if_t<std::is_base_of_v<ResourceContext, Ctx>, Ctx>
+        Rebind(const Ctx& ctx, ResourceManager& resources);
 
         const std::string& GetID() const;
         bool Available() const;
@@ -46,6 +51,10 @@ namespace Gx
 
         CacheMode GetCacheMode() const;
 
+        void Bind(ResourceManager& resources);
+
+        void Unbind();
+
     protected:
         ResourceContext();
 
@@ -54,9 +63,9 @@ namespace Gx
     private:
         ResourceContext(const std::string& id, ResourceManager* resources, CacheMode mode = CacheMode::None);
 
-        const std::string m_id;
-        const CacheMode m_cacheMode = CacheMode::None;
-        mutable ResourceManager* m_resources;
+        std::string m_id;
+        CacheMode m_cacheMode = CacheMode::None;
+        ResourceManager* m_resources;
     };
 }
 

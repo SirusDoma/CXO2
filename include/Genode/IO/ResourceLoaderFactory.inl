@@ -16,8 +16,8 @@ namespace Gx
         static_assert(std::is_base_of_v<ResourceLoader<R>, L>, "Parameter L must be a Gx::ResourceLoader<R>");
         Remove<R>();
 
-        auto factory = std::make_unique<LoaderFactory<R>>();
-        factory->Create = []
+        auto factory = std::make_unique<LoaderBuilder<R>>();
+        factory->Instantiate = []
         {
             std::unique_ptr<L> loader;
             if constexpr (!std::is_default_constructible_v<L>)
@@ -30,7 +30,7 @@ namespace Gx
             else
                 loader = std::make_unique<L>();
 
-            loader->SetResourceCreator(std::function{[] (const ResourceContext& ctx)
+            loader->SetResourceInstantiator(std::function{[] (const ResourceContext& ctx)
             {
                 if constexpr (!std::is_default_constructible_v<R>)
                 {
@@ -54,8 +54,8 @@ namespace Gx
     {
         Remove<R>();
 
-        auto factory = std::make_unique<LoaderFactory<R>>();
-        factory->Create = builder;
+        auto factory = std::make_unique<LoaderBuilder<R>>();
+        factory->Instantiate = builder;
 
         m_loaders[typeid(R)] = std::move(factory);
     }
@@ -78,21 +78,21 @@ namespace Gx
     }
 
     template<typename B, typename R, typename ... Args>
-    void ResourceLoaderFactory::RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& creator)
+    void ResourceLoaderFactory::RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& instantiator)
     {
         static_assert(std::is_base_of_v<B, R>, "Parameter R must be a B");
 
         Remove<R>();
 
-        auto factory = std::make_unique<LoaderFactory<B>>();
-        factory->Create = [=]
+        auto factory = std::make_unique<LoaderBuilder<B>>();
+        factory->Instantiate = [=]
         {
             const auto it = m_loaders.find(typeid(B));
             if (it == m_loaders.end())
                 throw Exception("Base loader is not registered");
 
-            auto loader = static_cast<LoaderFactory<B>*>(it->second.get())->Create();
-            loader->SetResourceCreator(creator);
+            auto loader = static_cast<LoaderBuilder<B>*>(it->second.get())->Instantiate();
+            loader->SetResourceInstantiator(instantiator);
 
             return loader;
         };
@@ -115,7 +115,7 @@ namespace Gx
         if (it == m_loaders.end())
             return nullptr;
 
-        auto factory = static_cast<LoaderFactory<R>*>(it->second.get());
-        return factory->Create();
+        auto factory = static_cast<LoaderBuilder<R>*>(it->second.get());
+        return factory->Instantiate();
     }
 }

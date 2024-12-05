@@ -91,7 +91,7 @@ Gx::ResourcePtr<Gx::InputField> InputFieldLoader::LoadFromMetadata(const Resourc
         for (auto [key, object] : metadata->Objects)
         {
             auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
             ObjectLoader::Load(name, object, container, objectCtx);
         }

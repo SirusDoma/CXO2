@@ -33,23 +33,6 @@ namespace Gx
     {
     }
 
-    ResourceContext ResourceContext::Rebind(const std::string& id, const ResourceContext& ctx)
-    {
-        if (!ctx.Available())
-            return ResourceContext(id);
-
-        return {id, ctx.m_resources, ctx.m_cacheMode};
-    }
-
-    const ResourceContext& ResourceContext::MakeAvailable(const ResourceContext& ctx, ResourceManager& resources)
-    {
-        if (ctx.Available())
-            throw NotSupportedException("The specified context is already available");
-
-        ctx.m_resources = &resources;
-        return ctx;
-    }
-
     const std::string& ResourceContext::GetID() const
     {
         return m_id;
@@ -68,5 +51,18 @@ namespace Gx
     CacheMode ResourceContext::GetCacheMode() const
     {
         return m_cacheMode;
+    }
+
+    void ResourceContext::Bind(ResourceManager& resources)
+    {
+        if (m_resources)
+            throw InvalidOperationException("Context is already bound to a resource manager");
+
+        m_resources = &resources;
+    }
+
+    void ResourceContext::Unbind()
+    {
+        m_resources = nullptr;
     }
 }

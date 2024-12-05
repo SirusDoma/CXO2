@@ -5,6 +5,28 @@
 
 namespace Gx
 {
+    template<typename Ctx>
+    inline std::enable_if_t<std::is_base_of_v<ResourceContext, Ctx>, Ctx>
+    ResourceContext::Rebind(const Ctx& ctx, const std::string& id)
+    {
+        auto pctx       = Ctx(ctx);
+        const auto rctx = static_cast<ResourceContext*>(&pctx);
+        rctx->m_id      = id;
+
+        return pctx;
+    }
+
+    template<typename Ctx>
+    inline std::enable_if_t<std::is_base_of_v<ResourceContext, Ctx>, Ctx>
+    ResourceContext::Rebind(const Ctx& ctx, ResourceManager& resources)
+    {
+        auto pctx       = Ctx(const_cast<Ctx&>(ctx));
+        const auto rctx = static_cast<ResourceContext*>(&pctx);
+        rctx->m_resources = &resources;
+
+        return pctx;
+    }
+
     template<typename R>
     R* ResourceContext::Find(const std::string& id) const
     {
@@ -58,7 +80,7 @@ namespace Gx
     R& ResourceContext::Store(const std::string& id, R& resource) const
     {
         if (!m_resources)
-            throw ResourceAccessException(id, "ResourceManager is not available within this context.");
+            throw ResourceStoreException(id, "ResourceManager is not available within this context.");
 
         return m_resources->Store(id, resource, CacheMode::Update);
     }
@@ -67,7 +89,7 @@ namespace Gx
     R& ResourceContext::Store(const std::string& id, ResourcePtr<R> resource) const
     {
         if (!m_resources)
-            throw ResourceAccessException(id, "ResourceManager is not available within this context.");
+            throw ResourceStoreException(id, "ResourceManager is not available within this context.");
 
         return m_resources->Store(id, std::move(resource), CacheMode::Update);
     }

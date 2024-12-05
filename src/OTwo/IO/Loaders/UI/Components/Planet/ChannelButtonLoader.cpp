@@ -80,7 +80,7 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const Resou
     for (auto [key, object] : metadata->Objects)
     {
         auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext::Rebind(name, context);
+        auto ctx  = Gx::ResourceContext::Rebind(context, name);
 
         ObjectLoader::Load(name, object, container, ctx);
     }

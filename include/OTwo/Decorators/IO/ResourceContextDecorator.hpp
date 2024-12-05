@@ -6,8 +6,6 @@
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/ResourceContext.hpp>
 
-// TODO: Consider using ContextBuilder from ResourceManager
-
 class ResourceContextDecorator : public Gx::ResourceContext
 {
 public:

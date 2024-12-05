@@ -32,11 +32,13 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     if (metadata == nullptr)
         return nullptr;
 
-    auto state = Create(context);
+    auto state = Instantiate(context);
     state->SetName(meta.Name);
     state->SetViewport(metadata->Viewport);
 
-    auto ctx  = static_cast<const PlayingResourceContext&>(Gx::ResourceContext::MakeAvailable(context, state->GetResources()));
+    auto ctx  = static_cast<const PlayingResourceContext&>(context);
+    ctx.Bind(state->GetResources());
+
     auto maps = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
@@ -174,7 +176,7 @@ void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const
     {
         const auto name      = container.GetName() + "/" + key;
         const auto reference = std::any_cast<Gx::Json>(it->second);
-        auto ctx             = Gx::ResourceContext::Rebind(name, context);
+        auto ctx             = Gx::ResourceContext::Rebind(context, name);
 
         if (count > 1)
         {

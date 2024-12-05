@@ -15,10 +15,7 @@ namespace Gx
         using ContextBuilder = std::function<std::unique_ptr<ResourceContext>(const std::string&, ResourceManager&, const CacheMode)>;
 
         ResourceManager();
-        ResourceManager(ResourceManager &&other) noexcept;
-        virtual ~ResourceManager() = default;
-
-        ResourceManager& operator=(ResourceManager&& right) noexcept;
+        ~ResourceManager() = default;
 
         template<typename R>
         void Register();
@@ -80,11 +77,7 @@ namespace Gx
         template<typename R>
         bool Destroy(const R& resource);
 
-        // TODO: This seems to be counter-intuitive because other modules (e.g Scene, Mixer) are using separate resource manager
-        //       And therefore, they need to be configured separately as well.
-        //       Consider turn this builder into static.
-
-        void ConfigureContextBuilder(const ContextBuilder& builder);
+        void SetContextBuilder(const ContextBuilder& builder);
 
         void Clear();
 
@@ -104,8 +97,8 @@ namespace Gx
         };
         using ContainerMap = std::unordered_map<std::type_index, std::unique_ptr<ContainerBase>>;
 
-        ContainerMap   m_containers;
-        ContextBuilder m_contextBuilder;
+        ContainerMap   m_containers{};
+        ContextBuilder m_contextBuilder{};
     };
 }
 

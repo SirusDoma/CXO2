@@ -4,20 +4,18 @@
 #include <Genode/IO/ResourceContext.hpp>
 #include <SFML/System/InputStream.hpp>
 
+#include <typeindex>
+
 namespace Gx
 {
     template<typename T>
     class ResourceLoader
     {
     public:
-        template <typename R, typename... Args>
-        using ResourceCreator = std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>;
+        template <typename R>
+        using ResourceInstantiator = std::function<std::unique_ptr<R>(const ResourceContext&)>;
 
         ResourceLoader() = default;
-        ResourceLoader(ResourceLoader& copy) :
-            m_type(copy.m_type),
-            m_creator(copy.m_creator ? copy.m_creator->Clone() : nullptr) {}
-
         virtual ~ResourceLoader() = default;
 
         virtual bool IsStreaming() const { return false; }
@@ -29,41 +27,24 @@ namespace Gx
         virtual ResourcePtr<T> LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const = 0;
 
     protected:
-        template<class... Args>
-        std::unique_ptr<T> Create(const ResourceContext& context, Args&&... args) const;
+        std::unique_ptr<T> Instantiate(const ResourceContext& context) const
+        {
+            if (m_instantiator)
+                return m_instantiator(context);
 
-        template<typename R, typename... Args>
-        void SetResourceCreator(const ResourceCreator<R, Args...>& builder);
+            if constexpr (std::is_default_constructible_v<T>)
+                return std::make_unique<T>();
+
+            throw ResourceLoadException("Resource cannot be constructed without instantiator");
+        }
+
+        void SetResourceInstantiator(const ResourceInstantiator<T>& instantiator) { m_instantiator = instantiator; }
 
     private:
         friend class ResourceLoaderFactory;
-        struct ResourceBuilderBase
-        {
-            std::type_index Type;
-
-            explicit ResourceBuilderBase(const std::type_index& type) : Type(type) {};
-            virtual ~ResourceBuilderBase() = default;
-
-            template<typename... Args>
-            std::unique_ptr<T> Build(const ResourceContext&, Args&&... args) const;
-
-            virtual std::unique_ptr<ResourceBuilderBase> Clone() = 0;
-        };
-
-        template <typename... Args>
-        struct ResourceBuilder : ResourceBuilderBase
-        {
-            ResourceCreator<T, Args...> Create;
-
-            explicit ResourceBuilder(const std::type_index& type, ResourceCreator<T, Args...> builder) :
-                ResourceBuilderBase(type), Create(builder) { };
-
-            std::unique_ptr<ResourceBuilderBase> Clone() override { return std::make_unique<ResourceBuilder>(*this); }
-        };
 
         std::type_index m_type = typeid(T);
-        std::unique_ptr<ResourceBuilderBase> m_creator;
+        ResourceInstantiator<T> m_instantiator{};
     };
-}
 
-#include <Genode/IO/ResourceLoader.inl>
+}

@@ -21,7 +21,7 @@ Gx::ResourcePtr<R> ObjectLoader::LoadResource(const std::string& name, const Gx:
         return nullptr;
 
     Gx::ResourcePtr<B> resource;
-    auto ctx = Gx::ResourceContext::Rebind(name, context);
+    auto ctx = Gx::ResourceContext::Rebind(context, name);
     if (json.type() == Gx::Json::value_t::string)
         resource = loader->LoadFromFile(json.get<std::string>(), ctx);
     else

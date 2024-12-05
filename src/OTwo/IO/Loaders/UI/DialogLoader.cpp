@@ -19,7 +19,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, con
     if (const auto label = attributes.find("label"); label != attributes.end())
     {
         MetadataLoader::Parse(label.value(), metadata.PromptLabelMetadata, context);
-        LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_TEXT_PROMPT", context));
+        LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_TEXT_PROMPT"));
     }
 
     if (const auto buttons = attributes.find("buttons"); buttons != attributes.end())
@@ -43,8 +43,8 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, con
                 target = &metadata.CancelButtonMetadata;
             }
 
-            MetadataLoader::Parse(button.value(), *target, Gx::ResourceContext::Rebind(name, context));
-            ButtonLoader::ParseMetadata(button.value().at("attributes"), *target, Gx::ResourceContext::Rebind(name, context));
+            MetadataLoader::Parse(button.value(), *target, Gx::ResourceContext::Rebind(context, name));
+            ButtonLoader::ParseMetadata(button.value().at("attributes"), *target, Gx::ResourceContext::Rebind(context, name));
         }
     }
 
@@ -57,7 +57,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto dialog = Create(context);
+    auto dialog = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
     if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
         dialog->SetTexture(*texture);
@@ -68,7 +68,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
         for (auto [key, object] : metadata->Objects)
         {
             auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
             ObjectLoader::Load(name, object, container, objectCtx);
         }
@@ -77,13 +77,13 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
     const auto labelLoader = LabelLoader();
     const auto buttonLoader = ButtonLoader();
 
-    if (auto label = labelLoader.LoadFromMetadata(metadata->PromptLabelMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_TEXT_PROMPT", context)); label)
+    if (auto label = labelLoader.LoadFromMetadata(metadata->PromptLabelMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_TEXT_PROMPT")); label)
         dialog->SetLabel(context.Store(context.GetID() + "/IDC_TEXT_PROMPT", std::move(label)));
 
-    if (auto accept = buttonLoader.LoadFromMetadata(metadata->AcceptButtonMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_BUTTON_ACCEPT", context)); accept)
+    if (auto accept = buttonLoader.LoadFromMetadata(metadata->AcceptButtonMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_BUTTON_ACCEPT")); accept)
         dialog->SetAcceptButton(context.Store(context.GetID() + "/IDC_BUTTON_ACCEPT", std::move(accept)));
 
-    if (auto cancel = buttonLoader.LoadFromMetadata(metadata->CancelButtonMetadata, Gx::ResourceContext::Rebind(context.GetID() + "/IDC_BUTTON_CANCEL", context)); cancel)
+    if (auto cancel = buttonLoader.LoadFromMetadata(metadata->CancelButtonMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_BUTTON_CANCEL")); cancel)
         dialog->SetCancelButton(context.Store(context.GetID() + "/IDC_BUTTON_CANCEL", std::move(cancel)));
 
     dialog->SetName(metadata->Name);

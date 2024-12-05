@@ -112,7 +112,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata&
         for (auto [key, object] : metadata->Objects)
         {
             auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
             ObjectLoader::Load(name, object, container, objectCtx);
         }

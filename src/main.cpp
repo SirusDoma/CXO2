@@ -3,6 +3,7 @@
 
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/System/Exception.hpp>
+#include <Genode/IO/IOException.hpp>
 #include <Genode/Utilities/Debugger.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 

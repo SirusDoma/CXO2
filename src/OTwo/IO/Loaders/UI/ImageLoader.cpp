@@ -28,7 +28,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata&
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto image = Create(context);
+    auto image = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
 
     if (!metadata->Frames.empty())
@@ -55,7 +55,7 @@ Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata&
         for (auto [key, object] : metadata->Objects)
         {
             auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
             ObjectLoader::Load(name, object, container, objectCtx);
         }

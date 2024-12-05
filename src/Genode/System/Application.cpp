@@ -31,7 +31,7 @@ namespace Gx
         m_closeRequested(false)
     {
         CreateMainWindow();
-        ResourceLoaderFactory::SetApplicationContext(*m_context);
+        ResourceLoaderFactory::BindContext(*m_context);
     }
 
     Application& Application::Instance()

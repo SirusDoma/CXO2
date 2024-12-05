@@ -80,7 +80,7 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
         for (auto [key, object] : metadata->Objects)
         {
             auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(name, context);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
             ObjectLoader::Load(name, object, container, objectCtx);
         }

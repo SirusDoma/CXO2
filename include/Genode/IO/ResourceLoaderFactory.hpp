@@ -18,8 +18,7 @@ namespace Gx
         ResourceLoaderFactory() = delete;
         ~ResourceLoaderFactory() = delete;
 
-        static const Context* GetApplicationContext();
-        static void SetApplicationContext(const Context& context);
+        static void BindContext(const Context& context);
 
         template<typename R, typename L>
         static void Register();
@@ -31,7 +30,7 @@ namespace Gx
         static void RegisterDerived();
 
         template<typename B, typename R, typename ... Args>
-        static void RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& creator);
+        static void RegisterDerived(const std::function<std::unique_ptr<R>(const ResourceContext&, Args...)>& instantiator);
 
         template<typename R>
         static bool Remove();
@@ -41,14 +40,14 @@ namespace Gx
 
     private:
         static void EnsureDefaultLoadersRegistered();
-        struct BaseLoaderFactory {};
+        struct BaseLoaderBuilder {};
 
         template<typename R>
-        struct LoaderFactory : BaseLoaderFactory
+        struct LoaderBuilder : BaseLoaderBuilder
         {
-            std::function<std::unique_ptr<ResourceLoader<R>>()> Create;
+            std::function<std::unique_ptr<ResourceLoader<R>>()> Instantiate;
         };
-        using LoaderMap = std::unordered_map<std::type_index, std::unique_ptr<BaseLoaderFactory>>;
+        using LoaderMap = std::unordered_map<std::type_index, std::unique_ptr<BaseLoaderBuilder>>;
 
         inline static const Context* m_context;
         inline static LoaderMap      m_loaders;

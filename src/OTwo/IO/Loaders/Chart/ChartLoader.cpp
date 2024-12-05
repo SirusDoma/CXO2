@@ -25,7 +25,7 @@ Gx::ResourcePtr<Chart> ChartLoader::LoadFromFile(const std::string& fileName, co
         throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
 
     auto& inputStream = *stream.get();
-    auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(fileName, ctx));
+    auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName));
     chart->Source     = fileName;
 
     return chart;
