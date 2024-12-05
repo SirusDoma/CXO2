@@ -102,7 +102,7 @@ namespace Gx
             return fileName;
         }
 
-        static sf::String ToString(int value, int totalLength = 0)
+        static sf::String ToString(const int value, const int totalLength = 0)
         {
             int threshold = static_cast<int>(pow(10, totalLength));
             if (value < threshold)
@@ -117,7 +117,7 @@ namespace Gx
             return std::to_string(value);
         }
 
-        static sf::String ToString(float value, int precision = 0)
+        static sf::String ToString(const float value, const int precision = 0)
         {
             if (precision == 0)
                 return std::to_string(value);
@@ -132,15 +132,13 @@ namespace Gx
         static sf::String GetTypeName(T& obj, const bool withNamespace = true)
         {
             auto name = std::string(typeid(obj).name());
-            if (const auto pos = name.find(' '); pos != std::string::npos) {
+            if (const auto pos = name.find(' '); pos != std::string::npos)
                 name = name.substr(pos + 1);
-            }
 
             if (!withNamespace)
             {
-                if (const auto pos = name.find_last_of(':'); pos != std::string::npos) {
+                if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
                     name = name.substr(pos + 1);
-                }
             }
 
             return name;
@@ -150,21 +148,34 @@ namespace Gx
         static sf::String GetTypeName(const bool withNamespace = true)
         {
             auto name = std::string(typeid(T).name());
-            if (const auto pos = name.find(' '); pos != std::string::npos) {
+            if (const auto pos = name.find(' '); pos != std::string::npos)
                 name = name.substr(pos + 1);
-            }
 
             if (!withNamespace)
             {
-                if (const auto pos = name.find_last_of(':'); pos != std::string::npos) {
+                if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
                     name = name.substr(pos + 1);
-                }
             }
 
             return name;
         }
 
-        static bool StartsWith(std::string string, std::string prefix)
+        static sf::String GetTypeName(const std::type_info& type, const bool withNamespace = true)
+        {
+            auto name = std::string(type.name());
+            if (const auto pos = name.find(' '); pos != std::string::npos)
+                name = name.substr(pos + 1);
+
+            if (!withNamespace)
+            {
+                if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
+                    name = name.substr(pos + 1);
+            }
+
+            return name;
+        }
+
+        static bool StartsWith(const std::string& string, const std::string& prefix)
         {
             return string.rfind(prefix, 0) != std::string::npos;
         }
