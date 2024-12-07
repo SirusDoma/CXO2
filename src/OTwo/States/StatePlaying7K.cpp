@@ -361,23 +361,26 @@ void StatePlaying7K::Initialize()
             return;
 
         // Life System
-        m_lifeSystem.Update(acc, count);
-        m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
-        lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
-
-        if (m_scoreTracker.IsEnabled() && m_lifeSystem.GetCurrentLifePoint() == 0)
+        if (m_scoreTracker.IsEnabled())
         {
-            m_scoreTracker.SetEnabled(false);
-            m_self->Die();
+            m_lifeSystem.Update(acc, count);
+            m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
+            lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
 
-            if (m_context.GetDifficulty() != Difficulty::EX)
+            if (m_lifeSystem.GetCurrentLifePoint() == 0)
             {
-                Run<Gx::Delay>(sf::milliseconds(2000), [this]
-                {
-                    OnRenderComplete();
-                });
+                m_scoreTracker.SetEnabled(false);
+                m_self->Die();
 
-                return;
+                if (m_context.GetDifficulty() != Difficulty::EX)
+                {
+                    Run<Gx::Delay>(sf::milliseconds(2000), [this]
+                    {
+                        OnRenderComplete();
+                    });
+
+                    return;
+                }
             }
         }
 
@@ -443,10 +446,7 @@ void StatePlaying7K::Initialize()
     const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
     exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
-        if (m_context.GetMode() == GameMode::Tutorial)
-            GetDirector().Present<StateRoom>();
-        else
-            GetDirector().Present<StateWaiting7K>();
+        GetDirector().Dismiss();
     });
 
     // Start initial lifebar fill-up animation
@@ -478,11 +478,7 @@ void StatePlaying7K::OnRenderComplete()
 {
     if (m_context.GetMode() == GameMode::Tutorial)
     {
-        QueueEvent([this]
-        {
-            GetDirector().Present<StateRoom>();
-        });
-
+        GetDirector().Dismiss();
         return;
     }
 
@@ -522,11 +518,8 @@ void StatePlaying7K::OnRenderComplete()
 
     CaptureScreen();
 
-    QueueEvent([this, items]
-    {
-        m_session.SetLatestScoreResults(items);
-        GetDirector().Present<StateResult>();
-    });
+    m_session.SetLatestScoreResults(items);
+    GetDirector().Present<StateResult>();
 }
 
 unsigned int StatePlaying7K::GetViewport() const

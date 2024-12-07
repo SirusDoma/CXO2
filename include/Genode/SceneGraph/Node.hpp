@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_set>
 
 #include <Genode/Graphics/Transformable.hpp>
 
@@ -24,10 +25,11 @@ namespace Gx
         std::vector<Node*> GetChildrenByTag(const std::string& tag) const;
         Node* GetChildByName(const std::string& name) const;
         Node* GetChildByTag(const std::string& tag) const;
+        std::size_t GetChildrenCount() const;
 
-        virtual void AddChild(Node& child);
-        virtual void RemoveChild(Node& child);
-        virtual void ClearChildren();
+        void AddChild(Node& child);
+        void RemoveChild(Node& child);
+        void ClearChildren();
 
         template<typename T>
         T* GetParent() const;
@@ -35,24 +37,37 @@ namespace Gx
         template<typename T>
         T* FindChild(const std::string& name) const;
 
-        template<typename... Args>
-        void AddChild(Node& first, Args&... args);
+        template<typename... Nodes>
+        std::enable_if_t<std::conjunction_v<std::is_base_of<Node, std::remove_reference_t<Nodes>>...>, void>
+        AddChild(Nodes&... nodes);
 
-        template<typename... Args>
-        void RemoveChild(Node& first, Args&... args);
+        template<typename... Nodes>
+        std::enable_if_t<std::conjunction_v<std::is_base_of<Node, std::remove_reference_t<Nodes>>...>, void>
+        RemoveChild(Nodes&... nodes);
 
-        protected:
-            Node();
-            virtual void SetParent(Node* node);
-            virtual void Initialize();
+    protected:
+        Node() = default;
 
-        private:
-            Node* m_parent;
-            std::string m_name;
-            std::string m_tag;
-            std::vector<Node*> m_children;
-            bool m_initialized;
-            mutable bool m_pristine;
+        virtual void Initialize();
+        virtual void Finalize();
+
+        virtual void OnChildAdded(Node& node);
+        virtual void OnChildRemove(Node& node);
+
+    private:
+        enum class State
+        {
+            Unintialized,
+            Initialized,
+            Finalized
+        };
+
+        Node* m_parent{nullptr};
+        State m_state{State::Unintialized};
+        std::string m_name{};
+        std::string m_tag{};
+        std::vector<Node*> m_children{};
+        mutable std::unordered_set<Node*> m_pending{};
     };
 }
 

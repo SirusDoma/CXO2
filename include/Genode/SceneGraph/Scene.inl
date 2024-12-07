@@ -3,7 +3,7 @@
 namespace Gx
 {
     template<typename T>
-    T& Scene::Require() const
+    T& Scene::Require()
     {
         return GetContext().Require<T>();
     }

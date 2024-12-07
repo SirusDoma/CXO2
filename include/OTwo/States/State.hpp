@@ -27,8 +27,6 @@ public:
     explicit State(const std::string& name);
     State(const std::string& name, Gx::ResourceManager& resources);
 
-    ~State() override;
-
     template<typename R>
     R* Instantiate(const std::string& source, ResourceScope scope = ResourceScope::Local);
 
@@ -47,13 +45,15 @@ public:
     template<typename R>
     R* FindResource(const std::string& id, ResourceScope scope = ResourceScope::Local);
 
-    Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local) const;
-    bool Close(bool quit) override;
+    Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local);
+    bool OnAppClose() override;
 
 protected:
     void Initialize() override;
-    void ShowDialog(const std::string& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
-    void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop, const std::function<void(bool)> &callback);
+    void Finalize() override;
+
+    void ShowDialog(const std::string& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+    void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
 
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 

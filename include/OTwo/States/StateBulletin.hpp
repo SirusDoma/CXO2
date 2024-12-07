@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Genode/SceneGraph.hpp>
 #include <OTwo/States/State.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 
 class StateBulletin : public State
 {

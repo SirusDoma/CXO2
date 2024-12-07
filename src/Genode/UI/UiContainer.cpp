@@ -38,6 +38,20 @@ namespace Gx
         m_useBatching = batchingEnabled;
     }
 
+
+    void UiContainer::Apply(const std::function<void(Control&)>& fun) const
+    {
+        if (!fun)
+            return;
+
+        for (const auto child : GetChildren())
+        {
+            if (const auto control = dynamic_cast<Control*>(child))
+                fun(*control);
+        }
+    }
+
+
     void UiContainer::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
         if (!IsEnabled())

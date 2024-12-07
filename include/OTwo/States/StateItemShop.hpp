@@ -1,15 +1,13 @@
 #pragma once
 
-#include <mutex>
 #include <OTwo/States/State.hpp>
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
-
 #include <OTwo/Serializable.g.hpp>
 
-#include <Genode/SceneGraph.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/Tween/Move.hpp>

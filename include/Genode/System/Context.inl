@@ -15,9 +15,9 @@ namespace Gx
     void Context::Provide(Builder<T> builder, const Scope scope)
     {
         const std::type_index type = typeid(T);
-        std::unique_ptr<Factory<T>> factory = std::make_unique<Factory<T>>(builder, scope);
+        auto factory = std::make_shared<Factory<T>>(builder, scope);
 
-        m_instances[type] = std::make_unique<Instance<T>>(std::move(factory->Create(*this)), scope);
+        m_instances[type] = std::make_shared<Instance<T>>(std::move(factory->Create(*this)), scope);
         m_factories[type] = std::move(factory);
     }
 
@@ -45,9 +45,9 @@ namespace Gx
         if constexpr (Constructible<T>::value)
         {
             const std::type_index type = typeid(T);
-            std::unique_ptr<Factory<T>> factory = std::make_unique<Factory<T>>(As<T>(), Scope::Local);
+            auto factory = std::make_shared<Factory<T>>(As<T>(), Scope::Local);
 
-            m_instances[type] = std::make_unique<Instance<T>>(std::move(factory->Create(*this)), Scope::Local);
+            m_instances[type] = std::make_shared<Instance<T>>(std::move(factory->Create(*this)), Scope::Local);
             m_factories[type] = std::move(factory);
 
             return static_cast<T&>(*(static_cast<Instance<T>*>(m_instances[type].get()))->Handle.get());
@@ -69,7 +69,7 @@ namespace Gx
         if (const auto it = m_factories.find(type); it != m_factories.end())
         {
             auto factory      = static_cast<Factory<R>*>(it->second.get());
-            m_instances[type] = std::make_unique<Instance<R>>(std::move(factory->Create(*this)), Scope::Local);
+            m_instances[type] = std::make_shared<Instance<R>>(std::move(factory->Create(*this)), Scope::Local);
 
             return static_cast<T>((static_cast<Instance<R>*>(m_instances[type].get()))->Handle.get());
         }
@@ -91,6 +91,17 @@ namespace Gx
         }
         else
             return std::make_unique<T>();
+    }
+
+    template<typename T, typename... Args>
+    T Context::Invoke(std::function<T(Args&&...)> func) const
+    {
+        static_assert((Constructible<std::decay_t<Args>>::value && ...), "Function parameters cannot be constructed");
+
+        return std::apply([func](auto&&... args)
+        {
+            return func(std::forward<Args>(args)...);
+        }, BuildParameters<std::tuple<std::decay_t<Args>...>>());
     }
 
     template <typename T>

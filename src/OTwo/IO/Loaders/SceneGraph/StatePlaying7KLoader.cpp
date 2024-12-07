@@ -36,7 +36,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     state->SetName(meta.Name);
     state->SetViewport(metadata->Viewport);
 
-    auto ctx  = static_cast<const PlayingResourceContext&>(context);
+    auto ctx = static_cast<const PlayingResourceContext&>(context);
     ctx.Bind(state->GetResources());
 
     auto maps = std::unordered_set<std::string>();

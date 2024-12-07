@@ -316,7 +316,7 @@ void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
     const auto channelList = container->FindChild<Gx::List>("IDC_LIST_CHANNEL");
 
     m_planetInfo = planet;
-    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildren().size()));
+    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildrenCount()));
 
     const auto maxPageNumber = FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_CHANNEL_PAGE");
     maxPageNumber->SetValue(m_channelMaxPage);

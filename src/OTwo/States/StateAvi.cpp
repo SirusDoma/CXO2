@@ -31,7 +31,7 @@ void StateAvi::Initialize()
     );
 }
 
-bool StateAvi::Close(bool quit)
+bool StateAvi::OnAppClose()
 {
     return true;
 }

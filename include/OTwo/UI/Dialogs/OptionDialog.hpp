@@ -17,8 +17,8 @@ public:
 private:
     bool ValidateConfig();
 
-    void OnShown(Gx::Scene& scene) override;
-    void OnClose() override;
+    void OnPresented(Parent& parent, const Gx::PresentationContext& context) override;
+    void OnDismissed(Parent& parent) override;
 
     void Update(double delta) override;
 
@@ -31,10 +31,10 @@ private:
     ::State* m_parent;
     std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;
 
-    Gx::AudioMixer&     m_mixer;
-    GameConfig&    m_appConfig;
-    GameConfig     m_tempConfig;
-    Chart::Channel m_keyChannel;
+    Gx::AudioMixer& m_mixer;
+    GameConfig&     m_appConfig;
+    GameConfig      m_tempConfig;
+    Chart::Channel  m_keyChannel;
 
     bool m_initialized = false;
     bool m_keyTestEnabled = false;

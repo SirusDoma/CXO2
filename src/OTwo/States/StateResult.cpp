@@ -36,7 +36,7 @@ void StateResult::Initialize()
         }
     }
 
-    auto const view = GetInitialView();
+    auto const view = GetDefaultView();
     const auto background = Instantiate<Gx::Sprite>("IDC_IMAGE_STATE_RESULT");
     background->SetVisible(false);
 
@@ -184,7 +184,7 @@ void StateResult::Initialize()
         sender.SetEnabled(false);
 
         m_mixer.StopAll();
-        GetDirector().Present<StateWaiting7K>();
+        GetDirector().Dismiss<StateWaiting7K>();
     });
 
     auto topFx    = Run<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));

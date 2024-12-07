@@ -20,7 +20,7 @@ public:
     unsigned int GetMaxLevelLimit() const;
 
 protected:
-    void OnShown(Gx::Scene& scene) override;
+    void OnPresented(Parent& parent, const Gx::PresentationContext& context) override;
     void OnAccepted() override;
 
 private:

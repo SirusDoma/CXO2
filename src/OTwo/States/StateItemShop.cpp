@@ -353,7 +353,7 @@ void StateItemShop::Initialize()
     m_shopCurrentPage = 0;
     const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
     const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
-    shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildren().size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildren().size()) / itemList->GetVerticalCount())));
+    shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildrenCount() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildrenCount()) / itemList->GetVerticalCount())));
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -488,7 +488,7 @@ void StateItemShop::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([this] (auto&, auto&)
     {
-        GetDirector().Present<StateRoom>();
+        GetDirector().Dismiss<StateRoom>();
     });
 
     myBagButton->PerformClick();
@@ -595,7 +595,7 @@ void StateItemShop::OnBuyButtonClicked()
 {
     if (m_cart.GetItems().size() == 0)
     {
-        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
+        ShowDialog("Shopping bag is empty", DialogStyle::Information);
         return;
     }
 
@@ -616,11 +616,11 @@ void StateItemShop::OnGiftButtonClicked()
 {
     if (m_cart.GetItems().size() == 0)
     {
-        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
+        ShowDialog("Shopping bag is empty", DialogStyle::Information);
         return;
     }
 
-    ShowDialog("Gift is currently not available", DialogStyle::Information, false, [] (bool) {});
+    ShowDialog("Gift is currently not available", DialogStyle::Information);
 }
 
 void StateItemShop::OnItemSellClicked()
@@ -631,7 +631,7 @@ void StateItemShop::OnItemSellClicked()
 
     if (!m_myBagSelectedItem)
     {
-        ShowDialog("No selected item.", DialogStyle::Information, false, [] (auto) {});
+        ShowDialog("No selected item.", DialogStyle::Information);
         return;
     }
 
@@ -648,7 +648,7 @@ void StateItemShop::OnItemSellClicked()
 
     if (price <= 0)
     {
-        ShowDialog("Selected item cannot be sold.", DialogStyle::Information, false, [] (auto) {});
+        ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
         return;
     }
 
@@ -857,7 +857,7 @@ void StateItemShop::InvalidateMyBag()
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
                         thumbnail->SetTexture(*texture, true);
 
-                    dialog->Show(this, std::string(), false);
+                    Present(*dialog);
                 }
             }
             else
@@ -1165,7 +1165,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         {
             if (metadata.EquipmentType == EquipmentType::AttributiveItem)
             {
-                ShowDialog("Skill item is currently not available", DialogStyle::Information, false, [] (bool) {});
+                ShowDialog("Skill item is currently not available", DialogStyle::Information);
                 return;
             }
 
@@ -1190,7 +1190,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             const auto& player = m_session.GetCurrentPlayer();
             if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
             {
-                ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information, false, [](const bool){});
+                ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
                 return;
             }
 
@@ -1456,7 +1456,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             const auto& player = m_session.GetCurrentPlayer();
             if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
             {
-                ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information, false, [](const bool){});
+                ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
                 return;
             }
 

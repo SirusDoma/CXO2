@@ -30,7 +30,7 @@ void OptionDialog::Initialize()
     if (m_initialized)
         return;
 
-    m_parent                 = GetParent<::State>();
+    m_parent                 = dynamic_cast<::State*>(GetPresentableParent());
     const auto bgAllTest     = m_parent->Instantiate<sf::Music>("bgEffect/MusicVolumn");
     const auto bgTest        = m_parent->Instantiate<sf::Music>("bgEffect/SampleSong.ogg");
     const auto sfxTest       = m_parent->Instantiate<sf::Sound>("bgEffect/38");
@@ -84,7 +84,6 @@ void OptionDialog::Initialize()
 
         keyDown->SetFrame("Note" + std::to_string(i));
         m_keyDowns[channel] = keyDown;
-        // AddChild(keyDown);
     }
 
     const auto bgmToggleButton       = musicOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_BGM");
@@ -317,9 +316,11 @@ void OptionDialog::Initialize()
     m_initialized = true;
 }
 
-void OptionDialog::OnShown(Gx::Scene& scene)
+void OptionDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
 {
-    Dialog::OnShown(scene);
+    Dialog::OnPresented(parent, context);
+
+    m_parent = dynamic_cast<::State*>(&parent);
     Initialize();
 
     m_tempConfig             = GameConfig(m_appConfig);
@@ -348,10 +349,14 @@ void OptionDialog::OnShown(Gx::Scene& scene)
     m_keyTestEnabled = false;
     m_keyChannel = Chart::Channel::Note1;
     keySelect->SetFrame(0);
+
+    Invalidate();
 }
 
-void OptionDialog::OnClose()
+void OptionDialog::OnDismissed(Parent& parent)
 {
+    Dialog::OnDismissed(parent);
+
     const auto keyTab        = FindChild<Gx::RadioButton>("IDC_BUTTON_KEY_TAB");
     const auto sfxNavigation = m_parent->Instantiate<sf::Sound>("bgEffect/01");
 
@@ -459,14 +464,14 @@ void OptionDialog::Invalidate()
     const auto gameOption  = FindChild<Gx::UiContainer>("IDC_CONTAINER_GAME_OPTION");
     const auto musicOption = FindChild<Gx::UiContainer>("IDC_CONTAINER_MUSIC_OPTION");
 
-    const auto gfxToggleButton       = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_GFX");
-    const auto cursorToggleButton    = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_CURSOR");
-    const auto keyTestToggleButton   = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_KEY_TEST");
-    const auto keySelect         = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
-    const auto bgmToggleButton       = musicOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_BGM");
-    const auto masterVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
-    const auto musicVolumeGauge  = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
-    const auto effectVolumeGauge = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
+    const auto gfxToggleButton     = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_GFX");
+    const auto cursorToggleButton  = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_CURSOR");
+    const auto keyTestToggleButton = gameOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_KEY_TEST");
+    const auto keySelect           = gameOption->FindChild<Gx::Image>("IDC_IMAGE_KEY_SELECT");
+    const auto bgmToggleButton     = musicOption->FindChild<Gx::ToggleButton>("IDC_TOGGLE_BGM");
+    const auto masterVolumeGauge   = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MASTER_VOLUME");
+    const auto musicVolumeGauge    = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_MUSIC_VOLUME");
+    const auto effectVolumeGauge   = musicOption->FindChild<Gx::Gauge>("IDC_GAUGE_SOUND_VOLUME");
 
     gfxToggleButton->SetCheckedState(m_tempConfig.UseFx);
     cursorToggleButton->SetCheckedState(m_tempConfig.UseWindowCursor);

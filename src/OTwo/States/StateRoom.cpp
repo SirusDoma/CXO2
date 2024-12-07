@@ -30,6 +30,7 @@
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
+#include <OTwo/States/StateAvi.hpp>
 
 StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
@@ -90,6 +91,7 @@ void StateRoom::Initialize()
     chatWindow->PushSystemMessage("F7                 : Effect 2D/3D mode setting");
     chatWindow->PushSystemMessage("F8                 : Cursor mode setting");
     chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
+    chatWindow->PushSystemMessage("F10               : Toggle Vsync on/off");
 
     const auto userList = Instantiate<UserList>("IDC_USER_LIST");
     auto users = std::vector<Player>();
@@ -180,7 +182,7 @@ void StateRoom::Initialize()
     {
         createRoomButton->SetClickCallback([=, &director] (auto& sender, auto& ev) {
             m_mixer.Play(*sfxAccept, "SFX");
-            createRoomDialog->Show(this, std::string(), false);
+            Present(*createRoomDialog);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = m_session.GetInstalledMusic();
                 const auto music = !m_selection.GetMetadata().Source.empty() ? m_selection.GetMetadata() : musicList[musicList.size() - 1];
@@ -273,7 +275,7 @@ void StateRoom::Initialize()
     {
         const auto optionButton = FindChild<Gx::Button>("IDC_BUTTON_OPTION");
         optionButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            optionDialog->Show(this, std::string(), false);
+            Present(*optionDialog);
         });
     }
 
@@ -313,7 +315,7 @@ void StateRoom::OnBulletinButtonClicked() const
     director.Present<StateBulletin>();
 }
 
-void StateRoom::OnTutorialButtonClicked() const
+void StateRoom::OnTutorialButtonClicked()
 {
     auto chart    = std::make_unique<Chart>();
     chart->Source = "Tutorial.ojn";
@@ -342,5 +344,5 @@ void StateRoom::OnTutorialButtonClicked() const
 void StateRoom::OnBackButtonClicked() const
 {
     auto& director = GetDirector();
-    director.Present<StatePlanet>();
+    director.Dismiss<StatePlanet>();
 }

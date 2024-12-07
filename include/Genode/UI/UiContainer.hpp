@@ -25,6 +25,8 @@ namespace Gx
         virtual bool IsBatchingEnabled() const;
         virtual void SetBatchingEnabled(bool batchingEnabled);
 
+        void Apply(const std::function<void(Control&)>& fun) const;
+
     protected:
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;

@@ -5,8 +5,14 @@
 namespace Gx
 {
     Scene::Scene() :
-        Scene::Scene(typeid(this).name())
+        Scene::Scene(Gx::StringHelper::GetTypeName(typeid(this)))
     {
+    }
+
+    Scene::Scene(const std::string& name)
+    {
+        SetName(name);
+        SetTag("Scene");
     }
 
     Scene::Scene(const Scene& other) :
@@ -14,30 +20,32 @@ namespace Gx
         RenderableContainer(other),
         UpdatableContainer(other),
         InputableContainer(other),
-        m_view(other.m_view),
         m_director(other.m_director),
-        m_overlays(other.m_overlays),
         m_lastInput(other.m_lastInput),
         m_events(other.m_events)
     {
     }
 
-    Scene::Scene(const std::string& name) :
-        Node(),
-        RenderableContainer(),
-        UpdatableContainer(),
-        InputableContainer(),
-        m_director(nullptr),
-        m_overlays(),
-        m_events()
+    Scene& Scene::operator=(const Scene& other)
     {
-        SetName(name);
-        SetTag("Scene");
+        if (this != &other)
+        {
+            Node::operator=(other);
+            RenderableContainer::operator=(other);
+            UpdatableContainer::operator=(other);
+            InputableContainer::operator=(other);
+
+            m_director  = other.m_director;
+            m_lastInput = other.m_lastInput;
+            m_events    = other.m_events;
+        }
+
+        return *this;
     }
 
-    Scene::~Scene()
+    bool Scene::IsTrackable()
     {
-        m_overlays.clear();
+        return true;
     }
 
     void Scene::Initialize()
@@ -45,7 +53,20 @@ namespace Gx
         Node::Initialize();
     }
 
-    bool Scene::Close(bool quit)
+    void Scene::Finalize()
+    {
+        Node::Finalize();
+    }
+
+    void Scene::OnAppFocusChanged(bool focus)
+    {
+    }
+
+    void Scene::OnAppResized(const sf::Vector2u& size)
+    {
+    }
+
+    bool Scene::OnAppClose()
     {
         return true;
     }
@@ -58,93 +79,103 @@ namespace Gx
         return m_director->GetApplication();
     }
 
-    Context& Scene::GetContext() const
+    Context& Scene::GetContext()
     {
-        return GetApplication().GetContext();
+        if (m_context.has_value())
+            return m_context.value();
+
+        return GetDirector().GetContext();
     }
 
     SceneDirector& Scene::GetDirector() const
     {
         if (!m_director)
-            throw Exception("SceneDirector is not ready yet");
+            throw InvalidOperationException("SceneDirector is not ready yet");
 
         return *m_director;
     }
 
     void Scene::SetDirector(SceneDirector& director)
     {
-        m_director =& director;
+        m_director = &director;
     }
 
-    sf::View Scene::GetView() const
+    void Scene::SetContext(Context&& context)
     {
-        return GetApplication().GetView();
+        m_context = std::move(context);
     }
 
-    sf::View Scene::GetInitialView() const
+    const sf::View& Scene::GetView() const
     {
-        return GetApplication().GetInitialView();
+        return GetDirector().GetView();
     }
 
-    sf::View Scene::GetDefaultView() const
+    const sf::View& Scene::GetDefaultView() const
     {
-        const sf::RenderTarget& target = GetApplication();
-        return target.getDefaultView();
+        return GetDirector().GetDefaultView();
     }
 
-    void Scene::SetView(const sf::View& view)
+    void Scene::SetView(const sf::View& view) const
     {
-        GetApplication().SetView(view);
+        GetDirector().SetView(view);
     }
 
-    Node* Scene::GetCurrentOverlay() const
+    bool Scene::IsPresenting(Presentable& presentable) const
     {
-        if (m_overlays.size() > 0)
-            return m_overlays.back();
-
-        return nullptr;
+        return !m_presentables.empty() && &presentable == *m_presentables.rbegin();
     }
 
-    void Scene::PushOverlay(Node& overlay)
+    void Scene::Present(Presentable& presentable, const PresentationContext& context)
     {
-        AddChild(overlay);
-        m_overlays.push_back(&overlay);
-    }
-
-    void Scene::CloseOverlay()
-    {
-        if (!m_overlays.empty())
+        if (auto [_, success] = m_presentables.insert(&presentable); success)
         {
-            RemoveChild(*m_overlays.back());
-            m_overlays.pop_back();
+            if (&context == &PresentationContext::Default)
+            {
+                auto ctx = GraphicalPresentationContext();
+                ctx.Bounds      = sf::FloatRect{{0, 0}, GetView().getSize()};
+                ctx.IsCentered  = true;
+
+                Parent::Present(presentable, ctx);
+            }
+            else
+                Parent::Present(presentable, context);
+
+            if (const auto inputable = dynamic_cast<Inputable*>(&presentable))
+            {
+                if (m_lastInput.has_value())
+                    inputable->Input(m_lastInput.value());
+            }
+        }
+    }
+
+    bool Scene::Dismiss(Presentable& presentable)
+    {
+        if (!IsPresenting(presentable))
+            return false;
+
+        if (m_presentables.erase(&presentable) > 0)
+        {
+            Parent::Dismiss(presentable);
+
+            // Apply last mouse movement input so that objects are properly highlighted after dismissing the presentable
+            if (m_lastInput.has_value())
+                Input(m_lastInput.value());
+
+            return true;
         }
 
-        Input(m_lastInput.value());
+        return false;
+    }
+
+    bool Scene::Dismiss()
+    {
+        return Dismiss(**m_presentables.rbegin());
     }
 
     void Scene::QueueEvent(const std::function<void()>& evt)
     {
         if (evt)
             m_events.push(evt);
-    }
-
-    Scene& Scene::operator=(const Scene& other)
-    {
-        if (this != &other)
-        {
-            Node::operator=(other);
-            RenderableContainer::operator=(other);
-            UpdatableContainer::operator=(other);
-            InputableContainer::operator=(other);
-
-            m_view = other.m_view;
-            m_director = other.m_director;
-            m_overlays = other.m_overlays;
-            m_lastInput = other.m_lastInput;
-            m_events = other.m_events;
-        }
-
-        return *this;
     }
 
     void Scene::ProcessEvents()
@@ -158,7 +189,7 @@ namespace Gx
             if (event)
                 event();
 
-            if (&director.GetPresentedScene() != this)
+            if (&director.GetPresentingScene() != this)
                 return;
         }
     }
@@ -166,11 +197,11 @@ namespace Gx
     RenderStates Scene::Render(RenderSurface& surface, RenderStates states) const
     {
         states = RenderableContainer::Render(surface, states);
-        if (!m_overlays.empty())
+        if (!m_presentables.empty())
         {
-            for (const auto overlay : m_overlays)
+            for (const auto presentable : m_presentables)
             {
-                if (const auto renderable = dynamic_cast<Renderable*>(overlay))
+                if (const auto renderable = dynamic_cast<Renderable*>(presentable))
                     renderable->Render(surface, states);
             }
         }
@@ -182,14 +213,25 @@ namespace Gx
     {
         UpdatableContainer::Update(delta);
         TaskContainer::Update(delta);
+
+        if (!m_presentables.empty())
+        {
+            for (const auto presentable : m_presentables)
+            {
+                if (const auto updatable = dynamic_cast<Updatable*>(presentable))
+                    updatable->Update(delta);
+            }
+        }
     }
 
     bool Scene::Input(const sf::Event& ev)
     {
-        m_lastInput = ev;
-        if (!m_overlays.empty())
+        if (ev.is<sf::Event::MouseMoved>())
+            m_lastInput = ev;
+
+        if (!m_presentables.empty())
         {
-            if (const auto inputable = dynamic_cast<Inputable*>(m_overlays.back()))
+            if (const auto inputable = dynamic_cast<Inputable*>(*m_presentables.rbegin()))
                 return inputable->Input(ev);
 
             return false;

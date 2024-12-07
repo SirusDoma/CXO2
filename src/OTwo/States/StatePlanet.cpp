@@ -119,7 +119,7 @@ void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& chan
 {
     if (channel.Population >= channel.MaxPopulation)
     {
-        ShowDialog("Channel is full.", DialogStyle::Information, false, [] (auto _) {});
+        ShowDialog("Channel is full.", DialogStyle::Information);
         return;
     }
 

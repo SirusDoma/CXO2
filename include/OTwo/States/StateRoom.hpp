@@ -21,7 +21,7 @@ private:
     void OnItemShopButtonClicked() const;
     void OnMyRoomButtonClicked() const;
     void OnBulletinButtonClicked() const;
-    void OnTutorialButtonClicked() const;
+    void OnTutorialButtonClicked();
     void OnBackButtonClicked() const;
 
     Gx::AudioMixer& m_mixer;

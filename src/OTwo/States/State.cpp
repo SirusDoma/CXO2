@@ -37,9 +37,13 @@ State::State(const std::string& name, Gx::ResourceManager& resources) :
     LoadCommonResources();
 }
 
-State::~State()
+void State::Finalize()
 {
-    Require<Gx::AudioMixer>().Reset();
+    Scene::Finalize();
+    Require<Gx::AudioMixer>().Reset(true);
+
+    m_prompted = false;
+    m_exitDialog->Dismiss();
 }
 
 void State::Initialize()
@@ -65,7 +69,7 @@ void State::LoadCommonResources()
     loaded = true;
 }
 
-void State::ShowDialog(const std::string& content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
+void State::ShowDialog(const std::string& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
@@ -76,13 +80,21 @@ void State::ShowDialog(const std::string& content, const DialogStyle style, cons
     const auto label = dialog->GetLabel();
     label->SetVisible(true);
 
+    if (!callback)
+        callback = [] (bool) {};
+
     dialog->SetAcceptCallback([=] () { callback(true); });
     dialog->SetCancelCallback([=] () { callback(false); });
 
-    dialog->Show(this, content, backdrop);
+    auto ctx        = Gx::DialogPresentationContext();
+    ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
+    ctx.Prompt      = content;
+    ctx.UseBackdrop = backdrop;
+
+    Present(*dialog, ctx);
 }
 
-void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool backdrop, const std::function<void(bool)>& callback)
+void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)
@@ -98,10 +110,17 @@ void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool ba
     dialog->AddChild(*label, *acceptButton, *cancelButton, content);
     label->SetVisible(false);
 
+    if (!callback)
+        callback = [] (bool) {};
+
     dialog->SetAcceptCallback([=] () { callback(true); });
     dialog->SetCancelCallback([=] () { callback(false); });
 
-    dialog->Show(this, std::string(), backdrop);
+    auto ctx        = Gx::DialogPresentationContext();
+    ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
+    ctx.UseBackdrop = backdrop;
+
+    Present(*dialog, ctx);
 }
 
 void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -144,7 +163,7 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
                     GetApplication().InvalidateCursor();
                 }
 
-                ShowDialog("Changed to image cursor.\nTo change back to window cursor press F8\nagain", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Changed to image cursor.\nTo change back to window cursor press F8\nagain", DialogStyle::Information);
             }
         }
         else if (ev.code == sf::Keyboard::Key::F9)
@@ -152,9 +171,9 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
             config.UseEqualizer = !config.UseEqualizer;
             config.Save();
             if (config.UseEqualizer)
-                ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Activating equalizer.\n( To deactive press F9 again. )", DialogStyle::Information);
             else
-                ShowDialog("Equalizer deactivated.\n( To active press F9 again. )", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Equalizer deactivated.\n( To active press F9 again. )", DialogStyle::Information);
         }
         else if (ev.code == sf::Keyboard::Key::F10)
         {
@@ -165,16 +184,16 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
             window.setVerticalSyncEnabled(config.UseVsync);
 
             if (config.UseVsync)
-                ShowDialog("Vsync enabled.\n( Press F10 again to disable. )", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Vsync enabled.\n( Press F10 again to disable. )", DialogStyle::Information);
             else
-                ShowDialog("Vsync disabled.\n( Press F10 again to enable. )", DialogStyle::Information, false, [] (auto) {});
+                ShowDialog("Vsync disabled.\n( Press F10 again to enable. )", DialogStyle::Information);
         }
     }
 }
 
-bool State::Close(const bool quit)
+bool State::OnAppClose()
 {
-    if (quit && !m_prompted)
+    if (!m_prompted)
     {
         if (m_popupSound)
         {
@@ -195,14 +214,20 @@ bool State::Close(const bool quit)
             mixer.Play(*m_cancelSound, "SFX");
             m_prompted = false;
         });
-        m_exitDialog->Show(this, "Do you really want to exit?", true);
+
+        auto ctx        = Gx::DialogPresentationContext();
+        ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
+        ctx.Prompt      = "Do you really want to exit?";
+        ctx.UseBackdrop = true;
+        Present(*m_exitDialog, ctx);
+
         return false;
     }
 
-    return Scene::Close(quit);
+    return Scene::OnAppClose();
 }
 
-Gx::ResourceManager& State::GetResources(const ResourceScope scope) const
+Gx::ResourceManager& State::GetResources(const ResourceScope scope)
 {
     switch (scope)
     {

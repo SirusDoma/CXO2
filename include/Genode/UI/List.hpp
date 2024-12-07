@@ -43,15 +43,8 @@ namespace Gx
         void AddLayout(const LayoutItem& layout);
         void ClearLayouts();
 
-        void AddChild(Node& node) override;
-        void RemoveChild(Node& child) override;
-
-        using Control::AddChild;
-        using Control::RemoveChild;
-
-        void ClearChildren() override;
-
-        void Apply(const std::function<void(Control*)>& fun) const;
+        void OnChildAdded(Node& node) override;
+        void OnChildRemove(Node& node) override;
 
     protected:
         bool IsSpaceAvailable() const;

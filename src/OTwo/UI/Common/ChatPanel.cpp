@@ -74,7 +74,11 @@ void ChatPanel::Initialize()
                         fallbackCheckStateCallback(radio);
                     });
 
-                    dialog->Show(parent, "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.", false);
+                    auto ctx   = Gx::DialogPresentationContext();
+                    ctx.Bounds = {{}, parent->GetView().getSize()};
+                    ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
+
+                    parent->Present(*dialog, ctx);
                     nicknameInput->SetString(std::string());
                     nicknameInput->SetFocus(true);
                     nicknameInput->SelectAll();

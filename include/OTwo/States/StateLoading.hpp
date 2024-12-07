@@ -13,6 +13,8 @@ public:
     explicit StateLoading(GameContext& game);
     void Initialize() override;
 
+    static bool IsTrackable();
+
 private:
     void Update(double delta) override;
     void OnCoverLoaded(const sf::Image* cover);

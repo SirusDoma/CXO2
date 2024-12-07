@@ -5,6 +5,7 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Room.hpp>
 
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Image.hpp>
 
 class SessionContext;

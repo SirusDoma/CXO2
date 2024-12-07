@@ -5,7 +5,8 @@
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 #include <Genode/UI/Cursor.hpp>
-#include <Genode/Utilities/Debugger.hpp>
+
+#include <mutex>
 
 namespace Gx
 {
@@ -15,9 +16,8 @@ namespace Gx
     }
 
     Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
-        m_adaptor(*this),
         m_director(SceneDirector(*this)),
-        m_context(std::make_unique<Context>()),
+        m_context(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
         m_mode(mode),
         m_view(view),
@@ -25,13 +25,12 @@ namespace Gx
         m_cursor(),
         m_title(title),
         m_frameID(0),
-        m_frames(0),
         m_renderFreq(0),
         m_fullScreen(fullScreen),
         m_closeRequested(false)
     {
         CreateMainWindow();
-        ResourceLoaderFactory::BindContext(*m_context);
+        ResourceLoaderFactory::BindContext(m_context);
     }
 
     Application& Application::Instance()
@@ -44,11 +43,14 @@ namespace Gx
 
     int Application::Start()
     {
-        if (m_instance && m_instance != this)
-            throw Exception("Only single application instance allowed");
+        {
+            static std::recursive_mutex mutex;
+            const std::lock_guard lock(mutex);
+            if (m_instance && m_instance != this)
+                throw Exception("Only single application instance allowed");
 
-        // Initialize application instance and director
-        m_instance = this;
+            m_instance = this;
+        }
 
         // Bootstrap the game
         Boot();
@@ -57,10 +59,13 @@ namespace Gx
         UpdateCursor(sf::Event::Closed());
 
         // Setup timer
-        const auto timer  = sf::Clock();
-        double last = timer.getElapsedTime().asMilliseconds(), fpsDelta = 0;
+        const auto timer   = sf::Clock();
+        double last        = timer.getElapsedTime().asMilliseconds();
+        std::size_t frames = 0;
+        double fpsDelta    = 0;
 
         // Main game loop
+        bool initial = true;
         while (m_window->isOpen())
         {
             // Poll window event
@@ -69,10 +74,26 @@ namespace Gx
                 // Call window event handlers based on received event
                 if (event.has_value() && !event->is<sf::Event::MouseMovedRaw>())
                 {
-                    if      (event->is<sf::Event::Closed>())                    { OnClose(); }
-                    else if (event->is<sf::Event::FocusGained>())               { OnFocusChanged(true); }
-                    else if (event->is<sf::Event::FocusLost>())                 { OnFocusChanged(false); }
-                    else if (const auto e = event->getIf<sf::Event::Resized>()) { OnResized(*e); }
+                    if (event->is<sf::Event::Closed>())
+                    {
+                        // Ask game permission first before closing
+                        Close();
+                    }
+                    else if (event->is<sf::Event::FocusGained>())
+                    {
+                        OnFocusChanged(true);
+                        m_director.Focus(true);
+                    }
+                    else if (event->is<sf::Event::FocusLost>())
+                    {
+                        OnFocusChanged(false);
+                        m_director.Focus(false);
+                    }
+                    else if (const auto e = event->getIf<sf::Event::Resized>())
+                    {
+                        OnResized(e->size);
+                        m_director.Resize(e->size);
+                    }
                     else
                     {
                         if (event->is<sf::Event::MouseButtonPressed>() || event->is<sf::Event::MouseButtonReleased>())
@@ -95,8 +116,21 @@ namespace Gx
 
             // Calculate delta
             const double now   = timer.getElapsedTime().asMilliseconds();
-            const double delta = now - last;
+            const double delta = initial ? 0 : now - last;
             last = now;
+
+            // Update fps counter
+            frames++;
+
+            // Track the number of frames rendered in a second
+            fpsDelta += delta;
+            if (fpsDelta >= 1000)
+            {
+                m_renderFreq = frames;
+                frames       = 0;
+
+                fpsDelta -= 1000.f;
+            }
 
             // Perform update before rendering objects
             Update(delta);
@@ -112,32 +146,12 @@ namespace Gx
             // Execute post-processing events
             m_director.ProcessEvents();
 
-            // TODO: Move this to outside engine code
-            // Track the number of frames rendered in a second
-            fpsDelta += delta;
-            if (fpsDelta >= 1000)
-            {
-                m_renderFreq = m_frames;
-                m_frames = 0;
-
-                if (Debugger::IsDebuggerAttached())
-                    m_window->setTitle(m_title + " [FPS: " + std::to_string(m_renderFreq) + "]");
-
-                fpsDelta -= 1000.f;
-            }
-
-            // Update fps counter
-            m_frames++;
+            // Mark initial frame has been processed
+            initial = false;
         }
 
         // Clean up with application exit code
         return Shutdown();
-    }
-
-    int Application::Start(Scene& scene)
-    {
-        m_director.Present(scene);
-        return Start();
     }
 
     sf::RenderWindow& Application::GetMainWindow() const
@@ -171,17 +185,26 @@ namespace Gx
 
     RenderStates Application::Render(RenderSurface& surface, const RenderStates states) const
     {
-        return m_director.Render(surface, states);
+        surface.Render(m_director, states);
+        return states;
     }
 
     void Application::Close()
     {
         OnClose();
+
+        // Ask game permission first before closing
+        m_closeRequested = m_director.Close();
+    }
+
+    const std::string& Application::GetTitle() const
+    {
+        return m_title;
     }
 
     Context& Application::GetContext() const
     {
-        return *m_context;
+        return m_context;
     }
 
     unsigned int Application::GetRenderFrequency() const
@@ -211,7 +234,7 @@ namespace Gx
     {
     }
 
-    void Application::OnResized(const sf::Event::Resized& ev)
+    void Application::OnResized(const sf::Vector2u& size)
     {
     }
 
@@ -273,9 +296,6 @@ namespace Gx
 
     void Application::OnClose()
     {
-        // Ask game permission first before closing
-        if (m_director.Close())
-            m_closeRequested = true;
     }
 
     void Application::CreateMainWindow()
@@ -311,7 +331,6 @@ namespace Gx
         m_window->setVerticalSyncEnabled(true);
         m_window->setView(m_view);
 
-        m_adaptor = RenderSurfaceAdaptor(*m_window);
         UpdateCursor(sf::Event::Closed());
         OnWindowCreated(*m_window);
     }
@@ -363,7 +382,7 @@ namespace Gx
         return m_mode;
     }
 
-    const sf::View& Application::GetInitialView() const
+    const sf::View& Application::GetDefaultView() const
     {
         return m_view;
     }
@@ -378,6 +397,36 @@ namespace Gx
         m_window->setView(view);
     }
 
+    void Application::Clear(const sf::Color clearColor)
+    {
+        m_window->clear(clearColor);
+    }
+
+    void Application::Clear(const sf::Color clearColor, const sf::StencilValue stencilValue)
+    {
+        m_window->clear(clearColor, stencilValue);
+    }
+
+    void Application::Render(const Renderable& renderable, const RenderStates& states)
+    {
+        renderable.Render(*this, states);
+    }
+
+    void Application::Render(const sf::Vertex* vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates& states)
+    {
+        m_window->draw(vertices, vertexCount, type, states);
+    }
+
+    void Application::Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states)
+    {
+        m_window->draw(vertexBuffer, states);
+    }
+
+    void Application::Render(const sf::VertexBuffer& vertexBuffer, const std::size_t firstVertex, const std::size_t vertexCount, const RenderStates& states)
+    {
+        m_window->draw(vertexBuffer, firstVertex, vertexCount, states);
+    }
+
     Application::operator sf::RenderTarget&() const
     {
         return *m_window;
@@ -386,11 +435,6 @@ namespace Gx
     Application::operator sf::RenderWindow&() const
     {
         return *m_window;
-    }
-
-    Application::operator RenderSurface&() const
-    {
-        return m_adaptor;
     }
 
     sf::VideoMode Application::GetDesktopVideoMode()

@@ -4,7 +4,8 @@
 #include <OTwo/UI/Planet/ChannelButton.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
-#include <Genode/SceneGraph.hpp>
+#include <Genode/SceneGraph/TaskContainer.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Tween/Move.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/UI/Image.hpp>

@@ -21,7 +21,7 @@ void CreateRoomDialog::Initialize()
     if (m_initialized)
         return;
 
-    const auto parent   = GetParent<::State>();
+    const auto parent   = dynamic_cast<::State*>(GetPresentableParent());
     const auto sfxClick = parent->Instantiate<sf::Sound>("bgEffect/10");
 
     const auto titleInput    = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
@@ -126,9 +126,9 @@ void CreateRoomDialog::Initialize()
     m_initialized = true;
 }
 
-void CreateRoomDialog::OnShown(Gx::Scene& scene)
+void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
 {
-    Dialog::OnShown(scene);
+    Dialog::OnPresented(parent, context);
 
     Initialize();
 

@@ -63,10 +63,7 @@ void StatePayment::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([this] (auto&, auto&)
     {
-        if (m_cart.GetCheckoutType() == CartContext::CheckoutType::Music)
-            GetDirector().Present<StateMusicShop>();
-        else
-            GetDirector().Present<StateItemShop>();
+        GetDirector().Dismiss();
     });
 
     const auto bgm = Instantiate<sf::Music>("BGM/bgLogin.ogg");

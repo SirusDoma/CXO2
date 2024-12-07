@@ -1,7 +1,8 @@
 #pragma once
 
 #include <OTwo/States/State.hpp>
-#include <Genode/SceneGraph.hpp>
+
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Image.hpp>
 
 class CartContext;

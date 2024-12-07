@@ -6,7 +6,7 @@
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
-#include <Genode/SceneGraph.hpp>
+#include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/InputField.hpp>

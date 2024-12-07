@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Genode/System/Application.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 #include <SFML/Audio/SoundSource.hpp>
 
@@ -20,7 +21,7 @@ R* State::Instantiate(const std::string& source, const ResourceScope scope)
 
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)
-        resources = &Require<Gx::ResourceManager>();
+        resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
 
     if (!resources)
         return nullptr;
@@ -48,7 +49,7 @@ R* State::Instantiate(const R& prefab, const ResourceScope scope)
 
     auto resources = m_tempResources.get();
     if (scope == ResourceScope::Shared)
-        resources = &Require<Gx::ResourceManager>();
+        resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
     else if (scope == ResourceScope::Local)
         resources = m_resources.get();
 
@@ -84,7 +85,7 @@ R* State::Import(const std::string& id, Gx::ResourcePtr<R> resource, const Resou
 
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)
-        resources = &Require<Gx::ResourceManager>();
+        resources = &GetContext().Require<Gx::ResourceManager>();
 
     if (!resources)
         return nullptr;
@@ -108,7 +109,7 @@ R* State::FindResource(const std::string& id, const ResourceScope scope)
 {
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)
-        resources = &Require<Gx::ResourceManager>();
+        resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
     else if (scope == ResourceScope::Immediate)
         resources = m_tempResources.get();
 

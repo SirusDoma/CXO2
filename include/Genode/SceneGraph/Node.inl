@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Gx
 {
     template<typename T>
@@ -28,17 +30,17 @@ namespace Gx
         return dynamic_cast<T*>(child);
     }
 
-    template<typename... Args>
-    void Node::AddChild(Node& first, Args&... args)
+    template<typename... Nodes>
+    std::enable_if_t<std::conjunction_v<std::is_base_of<Node, std::remove_reference_t<Nodes>>...>, void>
+    Node::AddChild(Nodes&... nodes)
     {
-        AddChild(first);
-        AddChild(args...);
+        (AddChild(static_cast<Node&>(nodes)), ...);
     }
 
-    template<typename... Args>
-    void Node::RemoveChild(Node& first, Args&... args)
+    template<typename... Nodes>
+    std::enable_if_t<std::conjunction_v<std::is_base_of<Node, std::remove_reference_t<Nodes>>...>, void>
+    Node::RemoveChild(Nodes&... nodes)
     {
-        RemoveChild(first);
-        RemoveChild(args...);
+        (RemoveChild(static_cast<Node&>(nodes)), ...);
     }
 }

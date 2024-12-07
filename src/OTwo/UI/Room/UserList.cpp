@@ -69,7 +69,7 @@ void UserList::Invalidate()
     if (!list)
         return;
 
-    unsigned int max = static_cast<unsigned int>(std::ceil(static_cast<float>(m_users.size()) / list->GetChildren().size()));
+    unsigned int max = static_cast<unsigned int>(std::ceil(static_cast<float>(m_users.size()) / list->GetChildrenCount()));
     max    = std::max(max, static_cast<unsigned int>(1));
     m_page = std::min(m_page, max);
     m_page = std::max(m_page, static_cast<unsigned int>(1));
@@ -85,7 +85,7 @@ void UserList::Invalidate()
         if (!userButton)
             continue;
 
-        const size_t index = ((m_page - 1) * list->GetChildren().size()) + i;
+        const size_t index = ((m_page - 1) * list->GetChildrenCount()) + i;
         if (index < m_users.size())
         {
             const auto userNickLabel = userButton->FindChild<Gx::Label>("IDC_TEXT_USER_NAME");

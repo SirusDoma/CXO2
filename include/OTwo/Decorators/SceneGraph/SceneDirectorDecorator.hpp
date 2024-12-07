@@ -11,13 +11,12 @@ public:
     static SceneDirectorDecorator Decorate(Gx::SceneDirector& director);
 
     template<typename T>
-    void Register(const std::string& fileName);
+    std::enable_if_t<std::is_base_of_v<State, T>, void>
+    Register(const std::string& fileName);
 
     template<typename T>
-    void Register(State& state);
-
-    template<typename T>
-    void Present(const Gx::ResourceContext& context = Gx::ResourceContext(typeid(T).name())) const;
+    std::enable_if_t<std::is_base_of_v<State, T>, void>
+    Present(const Gx::ResourceContext& context = Gx::ResourceContext(typeid(T).name())) const;
 
 private:
     explicit SceneDirectorDecorator(Gx::SceneDirector& director);

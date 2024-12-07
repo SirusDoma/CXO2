@@ -14,7 +14,8 @@ namespace Gx
     {
         if (Inputable::Input(ev))
         {
-            for (const auto node : GetChildren())
+            const auto inputables = GetChildren();
+            for (const auto node : inputables)
             {
                 if (const auto inputable = dynamic_cast<Inputable *>(node); inputable)
                     inputable->Input(ev);

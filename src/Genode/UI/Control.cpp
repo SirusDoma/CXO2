@@ -166,38 +166,6 @@ namespace Gx
         return m_onScrollWheel;
     }
 
-    void Control::AddChild(Control& node)
-    {
-        Node::AddChild(node);
-        OnControlChildAdded(node);
-
-        Invalidate();
-    }
-
-    void Control::AddChild(Node& node)
-    {
-        if (const auto control = dynamic_cast<Control*>(&node); control)
-            AddChild(*control);
-        else
-            Node::AddChild(node);
-    }
-
-    void Control::RemoveChild(Control& node)
-    {
-        OnControlChildRemove(node);
-        Node::RemoveChild(node);
-
-        Invalidate();
-    }
-
-    void Control::RemoveChild(Node& node)
-    {
-        if (const auto control = dynamic_cast<Control*>(&node); control)
-            RemoveChild(*control);
-        else
-            Node::RemoveChild(node);
-    }
-
     RenderStates Control::Render(RenderSurface& surface, RenderStates states) const
     {
         if (!IsVisible())
@@ -345,6 +313,24 @@ namespace Gx
 
         m_doubleClicked = false;
         InputableContainer::OnMouseButtonReleased(ev);
+    }
+
+    void Control::OnChildAdded(Node& node)
+    {
+        if (const auto control = dynamic_cast<Control*>(&node); control)
+        {
+            OnControlChildAdded(*control);
+            // Invalidate();
+        }
+    }
+
+    void Control::OnChildRemove(Node& node)
+    {
+        if (const auto control = dynamic_cast<Control*>(&node); control)
+        {
+            OnControlChildAdded(*control);
+            // Invalidate();
+        }
     }
 
     void Control::OnControlChildAdded(Control& control)

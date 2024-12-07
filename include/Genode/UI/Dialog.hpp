@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Genode/Entities/Presentable.hpp>
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
@@ -7,27 +8,44 @@
 
 namespace Gx
 {
+    struct DialogPresentationContext : GraphicalPresentationContext
+    {
+        bool UseBackdrop{false};
+        std::string Prompt{};
+    };
+
     class Scene;
     class Label;
     class Button;
-    class Dialog : public virtual UiContainer
+    class Dialog : public Presentable, public UiContainer, public virtual Colorable, private Sprite
     {
     public:
-        Dialog();
+        Dialog() = default;
         explicit Dialog(const Dialog& copy);
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        const sf::Texture* GetTexture() const;
-        void SetTexture(const sf::Texture& texture);
+        ~Dialog() override = default;
 
-        const sf::IntRect& GetTexCoords() const;
-        void SetTexCoords(const sf::IntRect& rectangle);
+        Parent* GetPresentableParent() const;
 
+        using Control::GetGlobalBounds;
+        using Sprite::GetLocalBounds;
+
+        using Sprite::GetTexture;
+        using Sprite::SetTexture;
+
+        using Sprite::GetTexCoords;
+        using Sprite::SetTexCoords;
+
+        using Sprite::GetColor;
+        using Sprite::SetColor;
+
+        bool IsShown() const;
         bool IsAccepted() const;
-        sf::FloatRect GetLocalBounds() const override;
 
         Label* GetLabel() const;
+        std::string GetPromptString() const;
         Button* GetAcceptButton() const;
         Button* GetCancelButton() const;
 
@@ -39,36 +57,31 @@ namespace Gx
         void SetAcceptCallback(std::function<void()> callback);
         void SetCancelCallback(std::function<void()> callback);
 
-        void Show(Scene* scene);
-        void Show(Scene* scene, const std::string& prompt = std::string(), bool enableBackdrop = true);
-        bool IsShown() const;
-
-        void Close();
+        bool Dismiss() override;
 
     protected:
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
-        virtual void OnShown(Scene& scene);
-        virtual void OnClose();
+        void OnPresented(Parent& parent, const PresentationContext& context) override;
+        void OnDismissed(Parent& parent) override;
 
         virtual void OnAccepted();
         virtual void OnCancelled();
 
-        const Scene* GetScene();
-
         void Invalidate() override;
 
     private:
-        mutable Gx::Sprite m_sprite;
+        Button* m_acceptButton{};
+        Button* m_cancelButton{};
+        Label* m_promptLabel{};
 
-        Button* m_acceptButton, *m_cancelButton;
-        Label* m_promptText;
+        Presentable::Parent* m_parent{};
+        Rectangle m_backdrop{};
 
-        Scene* m_scene;
-        Rectangle m_backdrop;
-
-        bool m_accepted, m_shown;
-        std::function<void()> m_onAccepted, m_onCancelled;
+        bool m_accepted{};
+        bool m_shown{};
+        std::function<void()> m_onAccepted{};
+        std::function<void()> m_onCancelled{};
     };
 }

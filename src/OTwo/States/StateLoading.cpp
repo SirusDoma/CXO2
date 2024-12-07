@@ -21,7 +21,7 @@ void StateLoading::Initialize()
     State::Initialize();
 
     std::size_t index = 0;
-    const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildren().size()) - 1);
+    const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildrenCount()) - 1);
 
     for (const auto child : GetChildren())
     {
@@ -45,7 +45,7 @@ void StateLoading::Initialize()
         loader.SetCoverLoadCallback([this] (auto cover)
         {
             if (cover)
-                QueueEvent([this, cover] { OnCoverLoaded(cover); });
+                OnCoverLoaded(cover);
         });
     }
 
@@ -56,6 +56,11 @@ void StateLoading::Initialize()
     });
 
     thread.detach();
+}
+
+bool StateLoading::IsTrackable()
+{
+    return false;
 }
 
 void StateLoading::Update(const double delta)

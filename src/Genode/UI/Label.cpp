@@ -50,8 +50,8 @@ namespace Gx
         if (m_alignmentUpdated)
             return;
 
-        auto bounds = GetLocalBounds();
-        auto origin = GetOrigin();
+        const auto bounds = GetLocalBounds();
+        const auto origin = GetOrigin();
 
         if (m_alignment == Alignment::Left)
             SetOrigin(bounds.position.x, origin.y);

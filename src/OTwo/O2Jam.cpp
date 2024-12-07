@@ -173,7 +173,7 @@ void O2Jam::Boot()
         config->Load();
 
         return config;
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     context.Provide<Gx::ResourceManager>([](auto& ctx)
     {
@@ -183,7 +183,7 @@ void O2Jam::Boot()
         resources->Register<ItemData>();
 
         return resources;
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     context.Provide<Gx::AudioMixer>([](auto& ctx)
     {
@@ -194,7 +194,7 @@ void O2Jam::Boot()
         mixer->GetSoundGroup("SFX").SetVolume(cfg.EffectVolume);
 
         return mixer;
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     context.Provide<SessionContext>([&](auto& ctx)
     {
@@ -215,17 +215,17 @@ void O2Jam::Boot()
         session->Load();
 
         return session;
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     context.Provide<CartContext>([&] (auto& ctx)
     {
         return std::make_unique<CartContext>();
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     context.Provide<ScoreTracker>([] (auto& ctx)
     {
         return std::make_unique<ScoreTracker>();
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     // Initialize local providers
     context.Provide<JudgementStrategy>([] (auto& ctx)
@@ -235,9 +235,9 @@ void O2Jam::Boot()
 
     // Load global interface assets
     auto& resources = context.Require<Gx::ResourceManager>();
-    auto& image   = resources.Create<OpiArchive>("Interface");
-    auto& playing = resources.Create<OpiArchive>("Playing");
-    auto& avatar  = resources.Create<OpiArchive>("Avatar");
+    auto& image     = resources.Create<OpiArchive>("Interface");
+    auto& playing   = resources.Create<OpiArchive>("Playing");
+    auto& avatar    = resources.Create<OpiArchive>("Avatar");
 
     if (image.LoadFromFile("Interface.opi"))
         Gx::FileSystem::Mount(image);
@@ -275,7 +275,7 @@ void O2Jam::Boot()
     {
         auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
         return factory;
-    }, Gx::Context::Scope::Singleton);
+    }, Gx::Context::Scope::Shared);
 
     auto _ = context.Require<SessionContext>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})
@@ -376,7 +376,7 @@ int O2Jam::Shutdown()
     auto& mixer     = GetContext().Require<Gx::AudioMixer>();
     auto& resources = GetContext().Require<Gx::ResourceManager>();
 
-    director.Unload();
+    director.Reset();
     mixer.Reset(true);
     resources.Clear();
 
@@ -386,6 +386,9 @@ int O2Jam::Shutdown()
 void O2Jam::Update(const double delta)
 {
     Application::Update(delta);
+
+    if (Gx::Debugger::IsDebuggerAttached())
+        GetMainWindow().setTitle(GetTitle() + " [FPS: " + std::to_string(GetRenderFrequency()) + "]");
 
     if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_windowStateSwitched)
     {
@@ -403,7 +406,7 @@ void O2Jam::Update(const double delta)
             if (Gx::Application::GetView().getViewport() ==  sf::FloatRect({0.f, 0.f}, {1.f, 1.f}))
                 Gx::Application::SetView(GetLetterBoxView(Gx::Application::GetView(), GetMainWindow().getSize()));
             else
-                Gx::Application::SetView(GetInitialView());
+                Gx::Application::SetView(GetDefaultView());
         }
     }
     else if (m_letterboxSwitched && !isKeyPressed(sf::Keyboard::Key::Up))
@@ -425,8 +428,7 @@ Gx::RenderStates O2Jam::Render(Gx::RenderSurface& surface, Gx::RenderStates stat
         m_layeredTarget->display();
 
         const auto buffer = Gx::Sprite(m_layeredTarget->getTexture());
-        auto& app = Application::operator Gx::RenderSurface&();
-        app.Render(buffer, Gx::RenderStates::Default);
+        surface.Render(buffer, Gx::RenderStates::Default);
     }
     else
     {

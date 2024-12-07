@@ -14,7 +14,7 @@ namespace Gx
     class Scene;
     class Cursor;
     class Context;
-    class Application : protected Renderable, protected Updatable
+    class Application : public RenderSurface, protected Renderable, protected Updatable
     {
     public:
         static Application& Instance();
@@ -25,9 +25,9 @@ namespace Gx
         ~Application() override = default;
 
         int Start();
-        int Start(Scene& scene);
         void Close();
 
+        const std::string& GetTitle() const;
         Context& GetContext() const;
 
         SceneDirector& GetSceneDirector() const;
@@ -45,14 +45,20 @@ namespace Gx
 
         sf::VideoMode GetCurrentVideoMode() const;
 
-        const sf::View& GetInitialView() const;
-        virtual const sf::View& GetView() const;
-        virtual void SetView(const sf::View& view);
+        const sf::View& GetDefaultView() const override;
+        const sf::View& GetView() const override;
+        void SetView(const sf::View& view) override;
+
+        void Clear(const sf::Color clearColor) override;
+        void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
+        void Render(const Renderable& renderable, const RenderStates& states) override;
+        void Render(const sf::Vertex* vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates& states) override;
+        void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states) override;
+        void Render(const sf::VertexBuffer& vertexBuffer, const std::size_t firstVertex, const std::size_t vertexCount,const RenderStates& states) override;
 
         // ReSharper disable CppNonExplicitConversionOperator
         virtual operator sf::RenderTarget&() const;
         virtual operator sf::RenderWindow&() const;
-        virtual operator RenderSurface&() const;
         // ReSharper restore CppNonExplicitConversionOperator
 
         static sf::VideoMode GetDesktopVideoMode();
@@ -69,7 +75,7 @@ namespace Gx
 
         virtual void OnWindowCreated(sf::RenderWindow& window);
         virtual void OnFocusChanged(bool focus);
-        virtual void OnResized(const sf::Event::Resized& ev);
+        virtual void OnResized(const sf::Vector2u& size);
         virtual void OnInputReceived(sf::Event& ev);
         virtual void OnClose();
 
@@ -80,10 +86,8 @@ namespace Gx
         inline static Application* m_instance = nullptr;
 
         mutable std::unique_ptr<sf::RenderWindow> m_window;
-        mutable RenderSurfaceAdaptor m_adaptor;
         mutable SceneDirector m_director;
-
-        std::unique_ptr<Context> m_context;
+        mutable Context m_context;
 
         sf::State m_state;
         sf::VideoMode m_mode;
@@ -93,7 +97,6 @@ namespace Gx
 
         const std::string m_title;
         unsigned int m_frameID;
-        unsigned int m_frames;
         unsigned int m_renderFreq;
         bool m_fullScreen;
         bool m_closeRequested;

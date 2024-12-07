@@ -19,11 +19,25 @@ namespace Gx
         enum class Scope
         {
             Local,
-            Singleton
+            Shared
         };
 
         Context() = default;
+        Context(Context&& other) noexcept
+        {
+            m_factories = std::exchange(other.m_factories, {});
+            m_instances = std::exchange(other.m_instances, {});
+        }
+
         virtual ~Context() = default;
+
+        Context& operator=(Context&& other) noexcept
+        {
+            m_factories = std::exchange(other.m_factories, {});
+            m_instances = std::exchange(other.m_instances, {});
+
+            return *this;
+        }
 
         template<typename T>
         void Provide(Scope scope = Scope::Local);
@@ -43,23 +57,29 @@ namespace Gx
         template<typename T>
         std::unique_ptr<T> Create() const;
 
-        Context CreateScope() const { return Context(*this); }
+        template<typename T, typename... Args>
+        T Invoke(std::function<T(Args&&...)> func) const;
+
+        Context Capture() const
+        {
+            return Context(*this);
+        }
+
+        bool Empty() const { return m_factories.empty() && m_instances.empty(); }
 
     private:
-        Context(const Context& other) :
-            m_factories(),
-            m_instances()
+        Context(const Context& other)
         {
             for (auto& [type, factory] : other.m_factories)
             {
-                if (auto clone = factory->Clone(); clone)
-                    m_factories[type] = std::move(clone);
+                if (factory->Scope == Scope::Shared)
+                    m_factories[type] = std::shared_ptr(factory);
             }
 
             for (auto& [type, instance] : other.m_instances)
             {
-                if (auto clone = instance->Clone(); clone)
-                    m_instances[type] = std::move(clone);
+                if (instance->Scope == Scope::Shared)
+                    m_instances[type] = std::shared_ptr(instance);
             }
         }
 
@@ -67,23 +87,17 @@ namespace Gx
         {
             explicit Scoppable(const Scope scope) : Scoppable::Scope(scope) {};
             virtual ~Scoppable() = default;
-            virtual std::unique_ptr<Scoppable> Clone() = 0;
 
             Context::Scope Scope;
         };
-        using ScoppableMap = std::unordered_map<std::type_index, std::unique_ptr<Scoppable>>;
+
+        using ScoppableMap = std::unordered_map<std::type_index, std::shared_ptr<Scoppable>>;
 
         template<typename T>
         struct Instance final : Scoppable
         {
-            explicit Instance(std::unique_ptr<T> handle, const Context::Scope scope) : Scoppable(scope), Handle(std::move(handle)) {};
-            std::unique_ptr<Scoppable> Clone() override
-            {
-                if (Scoppable::Scope == Scope::Local)
-                    return nullptr;
-
-                return std::make_unique<Instance>(std::unique_ptr<T>(Handle.get()), Scope);
-            }
+            explicit Instance(std::unique_ptr<T> handle, const Context::Scope scope) :
+                Scoppable(scope), Handle(std::move(handle)) {};
 
             std::unique_ptr<T> Handle;
         };
@@ -91,14 +105,8 @@ namespace Gx
         template<typename T>
         struct Factory final : Scoppable
         {
-            Factory(Builder<T> builder, Context::Scope scope) : Scoppable(std::move(scope)), Create(std::move(builder)) {};
-            std::unique_ptr<Scoppable> Clone() override
-            {
-                if (Scoppable::Scope == Scope::Singleton)
-                    return nullptr;
-
-                return std::make_unique<Factory>(Create, Scope);
-            }
+            Factory(Builder<T> builder, Context::Scope scope) :
+                Scoppable(std::move(scope)), Create(std::move(builder)) {};
 
             Context::Builder<T> Create;
         };

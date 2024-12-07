@@ -180,7 +180,7 @@ void StateMusicShop::OnBuyButtonClicked()
 {
     if (m_cart.GetItems().size() == 0)
     {
-        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
+        ShowDialog("Shopping bag is empty", DialogStyle::Information);
         return;
     }
 
@@ -201,11 +201,11 @@ void StateMusicShop::OnGiftButtonClicked()
 {
     if (m_cart.GetItems().size() == 0)
     {
-        ShowDialog("Shopping bag is empty", DialogStyle::Information, false, [=] (const bool){});
+        ShowDialog("Shopping bag is empty", DialogStyle::Information);
         return;
     }
 
-    ShowDialog("Gift is currently not available", DialogStyle::Information, false, [] (bool) {});
+    ShowDialog("Gift is currently not available", DialogStyle::Information);
 }
 
 

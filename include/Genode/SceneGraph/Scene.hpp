@@ -1,79 +1,90 @@
 #pragma once
 
-#include <Genode/System/Context.hpp>
-
-#include <Genode/Audio/Mixer.hpp>
-
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
+#include <Genode/SceneGraph/TaskContainer.hpp>
 
-#include <Genode/Tasks/TaskContainer.hpp>
+#include <Genode/Entities/Presentable.hpp>
+
+#include <Genode/System/Context.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include <queue>
+#include <set>
 
 namespace Gx
 {
     class Application;
-    class SceneDirector;
-    class Scene : public virtual Node, public virtual RenderableContainer, public virtual UpdatableContainer, public virtual InputableContainer, public virtual TaskContainer
+    class Scene : public virtual Node, public RenderableContainer, public UpdatableContainer,
+                  public InputableContainer, public TaskContainer, public Presentable::Parent
     {
     public:
-        friend SceneDirector;
+        friend class SceneDirector;
 
-        Scene();
         Scene(const Scene& other);
-        explicit Scene(const std::string& name);
+        ~Scene() override = default;
 
-        ~Scene() override;
-
-        Application& GetApplication() const;
-        Context& GetContext() const;
-        SceneDirector& GetDirector() const;
-
-        sf::View GetView() const;
-        sf::View GetInitialView() const;
-        sf::View GetDefaultView() const;
-
-        Node* GetCurrentOverlay() const;
-        void PushOverlay(Node& overlay);
-        void CloseOverlay();
-
-        template<typename T>
-        T& Require() const;
-
-        void QueueEvent(const std::function<void()>& evt);
+        static bool IsTrackable();
 
         Scene& operator=(const Scene& other);
 
+        Application& GetApplication() const;
+        SceneDirector& GetDirector() const;
+        Context& GetContext();
+
+        const sf::View& GetView() const;
+        const sf::View& GetDefaultView() const;
+        void SetView(const sf::View& view) const;
+
+        bool IsPresenting(Presentable& presentable) const override;
+        void Present(Presentable& presentable, const PresentationContext& context = PresentationContext::Default) override;
+        bool Dismiss(Presentable& presentable) override;
+        bool Dismiss() override;
+
+        template<typename T>
+        T& Require();
+
+        void QueueEvent(const std::function<void()>& evt);
+
     protected:
+        Scene();
+        explicit Scene(const std::string& name);
+
         void Initialize() override;
-        virtual bool Close(bool quit);
+        void Finalize() override;
+
+        virtual void OnAppFocusChanged(bool focus);
+        virtual void OnAppResized(const sf::Vector2u& size);
+        virtual bool OnAppClose();
 
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(const sf::Event& ev) override;
 
-        virtual void ProcessEvents();
-
     private:
         bool IsVisible() const override { return true; }
         void SetVisible(const bool visible) override {}
 
-        mutable sf::View m_view;
-
-        SceneDirector*     m_director;
-        std::vector<Node*> m_overlays;
-
-        std::optional<sf::Event> m_lastInput;
-        std::queue<std::function<void()>> m_events;
-
         void SetDirector(SceneDirector& director);
-        void SetView(const sf::View& view);
+        void SetContext(Context&& context);
+
+        void ProcessEvents();
+
+        mutable sf::View m_view{};
+
+        SceneDirector*         m_director{nullptr};
+        std::set<Presentable*> m_presentables;
+
+        std::optional<sf::Event> m_lastInput{};
+        std::queue<std::function<void()>> m_events{};
+
+        bool m_initialized{};
+        std::optional<Context> m_context;
+
     };
 }
 

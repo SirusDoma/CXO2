@@ -35,7 +35,7 @@ public:
 protected:
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
-    void OnShown(Gx::Scene& scene) override;
+    void OnPresented(Parent& parent, const Gx::PresentationContext& context) override;
     void OnAccepted() override;
     void OnCancelled() override;
 
@@ -47,7 +47,7 @@ private:
     unsigned int m_coverID;
     float        m_speed;
 
-    Gx::AudioMixer&             m_mixer;
+    Gx::AudioMixer&        m_mixer;
     Gx::ResourceManager&   m_resources;
     SessionContext&        m_session;
     MusicSelectionContext& m_selection;

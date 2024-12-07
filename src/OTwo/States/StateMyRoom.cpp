@@ -140,7 +140,7 @@ void StateMyRoom::Initialize()
 
         if (!m_selectedItem)
         {
-            ShowDialog("No selected item.", DialogStyle::Information, false, [] (auto) {});
+            ShowDialog("No selected item.", DialogStyle::Information);
             return;
         }
 
@@ -157,7 +157,7 @@ void StateMyRoom::Initialize()
 
         if (price <= 0)
         {
-            ShowDialog("Selected item cannot be sold.", DialogStyle::Information, false, [] (auto) {});
+            ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
             return;
         }
 
@@ -214,7 +214,7 @@ void StateMyRoom::Initialize()
     const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     backButton->SetClickCallback([this] (auto&, auto&)
     {
-        GetDirector().Present<StateRoom>();
+        GetDirector().Dismiss<StateRoom>();
     });
 
     bgm->setLooping(true);
@@ -342,7 +342,7 @@ void StateMyRoom::Invalidate()
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
                         skillThumbnail->SetTexture(*texture, true);
 
-                    dialog->Show(this, std::string(), false);
+                    Present(*dialog);
                 }
 
                 return;

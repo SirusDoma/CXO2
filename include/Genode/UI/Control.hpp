@@ -2,7 +2,6 @@
 
 #include <SFML/Window/Event.hpp>
 
-#include <Genode/Entities.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
 #include <Genode/SceneGraph/InputableContainer.hpp>
@@ -41,18 +40,6 @@ namespace Gx
 
         void SetVisible(bool visible) override;
 
-        virtual void AddChild(Control& node);
-        virtual void RemoveChild(Control& node);
-
-        void AddChild(Gx::Node& node) override;
-        void RemoveChild(Gx::Node& node) override;
-
-        template<typename... Args>
-        void AddChild(Control& first, Args&... args);
-
-        template<typename... Args>
-        void RemoveChild(Control& first, Args&... args);
-
     protected:
         Control();
 
@@ -76,6 +63,9 @@ namespace Gx
         void OnMouseButtonReleased(const sf::Event::MouseButtonReleased& ev) override;
         void OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev) override;
 
+        void OnChildAdded(Node& node) override;
+        void OnChildRemove(Node& node) override;
+
         virtual void OnControlChildAdded(Control& control);
         virtual void OnControlChildRemove(Control& control);
 
@@ -98,5 +88,3 @@ namespace Gx
                                               m_onFocusChanged, m_onGainFocus, m_onLostFocus;
     };
 }
-
-#include <Genode/UI/Control.inl>

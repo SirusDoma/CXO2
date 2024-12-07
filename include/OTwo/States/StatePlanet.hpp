@@ -2,6 +2,7 @@
 
 #include <OTwo/States/State.hpp>
 #include <OTwo/Models/Planet.hpp>
+
 #include <Genode/Audio/AudioMixer.hpp>
 
 class SessionContext;

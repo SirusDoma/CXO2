@@ -9,25 +9,14 @@
 
 namespace Gx
 {
-    Dialog::Dialog() :
-        m_sprite(),
-        m_acceptButton(),
-        m_cancelButton(),
-        m_promptText(),
-        m_scene(),
-        m_accepted(false),
-        m_shown(false)
-    {
-    }
-
     Dialog::Dialog(const Dialog& copy) :
-        UiContainer(copy),
         Node(copy),
-        m_sprite(copy.m_sprite),
+        UiContainer(copy),
+        Sprite(copy),
         m_acceptButton(copy.m_acceptButton),
         m_cancelButton(copy.m_cancelButton),
-        m_promptText(copy.m_promptText),
-        m_scene(copy.m_scene),
+        m_promptLabel(copy.m_promptLabel),
+        m_parent(copy.m_parent),
         m_accepted(copy.m_accepted),
         m_shown(copy.m_shown)
     {
@@ -40,45 +29,18 @@ namespace Gx
     }
 
     Dialog::Dialog(const sf::Texture& texture) :
-        Dialog()
+        Sprite(texture)
     {
-        m_sprite = Sprite(texture);
     }
 
     Dialog::Dialog(const sf::Texture& texture, const sf::IntRect& rectangle) :
-        Dialog()
+        Sprite(texture, rectangle)
     {
-        m_sprite = Sprite(texture, rectangle);
     }
 
-    sf::FloatRect Dialog::GetLocalBounds() const
+    Presentable::Parent* Dialog::GetPresentableParent() const
     {
-        return m_sprite.GetLocalBounds();
-    }
-
-    const sf::Texture* Dialog::GetTexture() const
-    {
-        return m_sprite.GetTexture();
-    }
-
-    void Dialog::SetTexture(const sf::Texture& texture)
-    {
-        m_sprite.SetTexture(texture);
-    }
-
-    const sf::IntRect& Dialog::GetTexCoords() const
-    {
-        return m_sprite.GetTexCoords();
-    }
-
-    void Dialog::SetTexCoords(const sf::IntRect& rectangle)
-    {
-        m_sprite.SetTexCoords(rectangle);
-    }
-
-    bool Dialog::IsAccepted() const
-    {
-        return m_accepted;
+        return m_parent;
     }
 
     bool Dialog::IsShown() const
@@ -86,21 +48,27 @@ namespace Gx
         return m_shown;
     }
 
+    bool Dialog::IsAccepted() const
+    {
+        return m_accepted;
+    }
+
     void Dialog::SetLabel(Label& label)
     {
-        if (m_promptText)
-            RemoveChild(*m_promptText);
+        if (m_promptLabel)
+            RemoveChild(*m_promptLabel);
 
-        m_promptText = &label;
+        m_promptLabel = &label;
         AddChild(label);
     }
 
+    // ReSharper disable once CppMemberFunctionMayBeConst
     void Dialog::SetPromptString(const std::string& prompt)
     {
-        if (!m_promptText)
+        if (!m_promptLabel)
             return;
 
-        m_promptText->SetString(prompt);
+        m_promptLabel->SetString(prompt);
     }
 
     void Dialog::SetAcceptButton(Button& acceptButton)
@@ -135,63 +103,56 @@ namespace Gx
         m_onCancelled = std::move(callback);
     }
 
-    void Dialog::Show(Scene* scene)
-    {
-        Show(scene, std::string(), true);
-    }
-
-    void Dialog::Show(Scene* scene, const std::string& prompt, bool enableBackDrop)
+    void Dialog::OnPresented(Parent& parent, const PresentationContext& context)
     {
         if (m_shown)
             return;
 
-        m_scene = scene;
-        if (m_scene)
+        if (const auto ctx = dynamic_cast<const GraphicalPresentationContext*>(&context))
         {
-            const auto view      = m_scene->GetView();
-            const auto center    = view.getCenter();
+            const auto center    = ctx->Bounds.size / 2.f;
             const unsigned int x = static_cast<unsigned int>(center.x - (GetLocalBounds().size.x / 2.f));
             const unsigned int y = static_cast<unsigned int>(center.y - (GetLocalBounds().size.y / 2.f));
 
             SetOrigin(0.f, 0.f);
             SetPosition(x, y);
-            if (enableBackDrop)
+
+            if (const auto dctx = dynamic_cast<const DialogPresentationContext*>(ctx))
             {
-                m_backdrop = Rectangle(view.getSize());
-                m_backdrop.SetColor(sf::Color(0, 0, 0, 255 / 2));
+                if (dctx->UseBackdrop)
+                {
+                    m_backdrop = Rectangle(ctx->Bounds.size);
+                    m_backdrop.SetColor(sf::Color(0, 0, 0, 255 / 2));
+                }
+                else
+                    m_backdrop = Rectangle(sf::Vector2f(0, 0));
+
+                if (!dctx->Prompt.empty() && m_promptLabel)
+                    m_promptLabel->SetString(dctx->Prompt);
             }
-            else
-                m_backdrop = Rectangle(sf::Vector2f(0, 0));
-
-            if (m_promptText)
-                m_promptText->SetString(prompt);
-
-            m_scene->PushOverlay(*this);
-            m_shown = true;
-
-            const sf::RenderWindow& target = m_scene->GetApplication();
-            const auto mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(target));
-
-            if (m_acceptButton)
-                m_acceptButton->SetFocus(m_acceptButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
-
-            if (m_cancelButton)
-                m_cancelButton->SetFocus(m_cancelButton->GetGlobalBounds().contains(sf::Vector2f(mousePosition.x, mousePosition.y)));
-
-            OnShown(*scene);
-            Invalidate();
         }
+
+        m_parent = &parent;
+        m_shown  = true;
+        Invalidate();
     }
 
-    void Dialog::Close()
+    void Dialog::OnDismissed(Parent& parent)
     {
-        if (!m_scene || m_scene->GetCurrentOverlay() != this)
-            return;
-
-        m_scene->CloseOverlay();
         m_shown = false;
+    }
 
-        OnClose();
+    bool Dialog::Dismiss()
+    {
+        if (!m_parent || !m_parent->IsPresenting(*this))
+            return false;
+
+        const bool result = m_parent->Dismiss();
+
+        m_shown  = false;
+        m_parent = nullptr;
+
+        return result;
     }
 
     RenderStates Dialog::Render(RenderSurface& surface, RenderStates states) const
@@ -202,10 +163,7 @@ namespace Gx
         if (m_backdrop.GetSize().x > 0 && m_backdrop.GetSize().y > 0)
             surface.Render(m_backdrop, sf::Transform::Identity);
 
-        states.transform *= GetTransform();
-        surface.Render(m_sprite, states);
-
-        return RenderableContainer::Render(surface, states);
+        return Sprite::Render(surface, states);
     }
 
     void Dialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -218,21 +176,13 @@ namespace Gx
             OnCancelled();
     }
 
-    void Dialog::OnShown(Scene& scene)
-    {
-    }
-
-    void Dialog::OnClose()
-    {
-    }
-
     void Dialog::OnAccepted()
     {
         m_accepted = true;
         if (m_onAccepted)
             m_onAccepted();
 
-        Close();
+        Dismiss();
     }
 
     void Dialog::OnCancelled()
@@ -241,17 +191,20 @@ namespace Gx
         if (m_onCancelled)
             m_onCancelled();
 
-        Close();
+        Dismiss();
     }
 
-    const Scene* Dialog::GetScene()
+    std::string Dialog::GetPromptString() const
     {
-        return m_scene;
+        if (m_promptLabel)
+            return m_promptLabel->GetString();
+
+        return {};
     }
 
     Label* Dialog::GetLabel() const
     {
-        return m_promptText;
+        return m_promptLabel;
     }
 
     Button* Dialog::GetAcceptButton() const

@@ -83,18 +83,6 @@ namespace Gx
         m_layouts.clear();
     }
 
-    void List::Apply(const std::function<void(Control*)>& fun) const
-    {
-        if (!fun)
-            return;
-
-        for (const auto child : GetChildren())
-        {
-            if (const auto control = dynamic_cast<Control*>(child))
-                fun(control);
-        }
-    }
-
     bool List::IsSpaceAvailable() const
     {
         return m_verticalCounter <= m_verticalCount && m_horizontalCounter <= m_horizontalCount;
@@ -168,46 +156,61 @@ namespace Gx
         return UiContainer::Render(surface, states);
     }
 
-    void List::AddChild(Node& node)
+    void List::OnChildAdded(Node& node)
     {
-        if ((!m_layouts.empty() && GetChildren().size() >= m_layouts.size()) || (m_layouts.empty() && m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount) || (m_layouts.empty() && m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount))
-            return;
-
         if (m_layouts.empty())
         {
+            // Case 1: List use vertical ordering and ran out horizontal slots
+            if (m_order == Order::Vertical && m_horizontalCounter >= m_horizontalCount)
+                return;
+
+            // Case 2: List use horizontal ordering and ran out vertical slots
+            if (m_order == Order::Horizontal && m_verticalCounter >= m_verticalCount)
+                return;
+
             node.SetPosition(GetNextItemPosition());
             IncreaseSpacingCounter();
         }
         else
         {
-            const auto& [origin, position, rotation, scale] = m_layouts[GetChildren().size()];
+            // Case 3: List use predetermined layouts and all slots are preoccupied
+            if (GetChildrenCount() - 1 >= m_layouts.size())
+                return;
+
+            const auto& [origin, position, rotation, scale] = m_layouts[GetChildrenCount() - 1];
             node.SetOrigin(origin);
             node.SetPosition(position);
             node.SetRotation(rotation);
             node.SetScale(scale);
         }
 
-        UiContainer::AddChild(node);
+        UiContainer::OnChildAdded(node);
     }
 
-    void List::RemoveChild(Node& child)
+    void List::OnChildRemove(Node& node)
     {
-        const auto size = GetChildren().size();
-        UiContainer::RemoveChild(child);
-
-        if (m_layouts.empty() && size != GetChildren().size())
+        if (!m_layouts.empty())
+        {
+            // Re-arrange the layouts so empty slots that were used by old node is backfilled
+            const auto children = GetChildren();
+            for (std::size_t i = 0; i < children.size(); i++)
+            {
+                const auto& [origin, position, rotation, scale] = m_layouts[i];
+                children[i]->SetOrigin(origin);
+                children[i]->SetPosition(position);
+                children[i]->SetRotation(rotation);
+                children[i]->SetScale(scale);
+            }
+        }
+        else
             DecreaseSpacingCounter();
+
+
+        UiContainer::OnChildRemove(node);
     }
 
     void List::Invalidate()
     {
         UiContainer::Invalidate();
-    }
-
-    void List::ClearChildren()
-    {
-        Control::ClearChildren();
-        m_verticalCounter   = 0;
-        m_horizontalCounter = 0;
     }
 }

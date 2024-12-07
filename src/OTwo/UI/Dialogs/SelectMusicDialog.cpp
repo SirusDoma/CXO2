@@ -546,9 +546,9 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
     }
 }
 
-void SelectMusicDialog::OnShown(Gx::Scene& scene)
+void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
 {
-    Dialog::OnShown(scene);
+    Dialog::OnPresented(parent, context);
 
     m_musicList = m_session.GetInstalledMusic(true);
     m_displayList.clear();
@@ -818,7 +818,7 @@ void SelectMusicDialog::Invalidate()
                         activeHighlighter->SetVisible(false);
 
                     Gx::Label* infoLabel = nullptr;
-                    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildren().size())
+                    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildrenCount())
                         infoLabel = dynamic_cast<Gx::Label*>(infoList->GetChildren()[r - 1]);
 
                     if (isRandomActivated)

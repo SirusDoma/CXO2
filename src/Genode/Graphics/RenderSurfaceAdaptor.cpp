@@ -33,7 +33,7 @@ void Gx::RenderSurfaceAdaptor::Clear(const sf::Color clearColor, const sf::Stenc
 
 void Gx::RenderSurfaceAdaptor::Render(const Renderable& renderable, const RenderStates& states)
 {
-    m_target->draw(renderable, states);
+    renderable.Render(*this, states);
 }
 
 void Gx::RenderSurfaceAdaptor::Render(const sf::Vertex* vertices, const std::size_t vertexCount, const sf::PrimitiveType type, const RenderStates& states)

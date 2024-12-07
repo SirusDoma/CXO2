@@ -26,6 +26,8 @@
 #include <Genode/Tasks/Delay.hpp>
 
 #include <magic_enum.hpp>
+#include <OTwo/IO/PlayingResourceContext.hpp>
+#include <OTwo/States/StatePlaying7K.hpp>
 
 StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
@@ -110,7 +112,7 @@ void StateWaiting7K::Initialize()
         const auto emoticonHelpButton = Instantiate<Gx::Button>("IDC_BUTTON_EMOTICON");
         emoticonHelpButton->SetClickCallback([=] (auto& sender, auto& ev)
         {
-            dialog->Show(this, std::string(), false);
+            Present(*dialog);
         });
     }
 
@@ -135,11 +137,15 @@ void StateWaiting7K::Initialize()
         {
             if (r->RoomMasterID != s->GetCurrentPlayer().ID)
             {
-                ShowDialog("Only Room master can change the room title.", DialogStyle::Information, false, [] (auto _) {});
+                ShowDialog("Only Room master can change the room title.", DialogStyle::Information);
                 return;
             }
 
-            dialog->Show(this, "Please enter a room name.", false);
+            auto ctx   = Gx::DialogPresentationContext();
+            ctx.Bounds = {{}, GetView().getSize()};
+            ctx.Prompt = "Please enter a room name.";
+
+            Present(*dialog, ctx);
             changeTitleButton->SetFocus(false);
 
             titleBox->SetString(roomName->GetString());
@@ -322,7 +328,7 @@ void StateWaiting7K::Initialize()
             selectMusicButton->SetClickCallback([=] (auto& sender, auto& ev)
             {
                 m_mixer.Play(*sfxSelectMusic, "SFX");
-                selectMusicDialog->Show(this, std::string(), false);
+                Present(*selectMusicDialog);
             });
         }
 
@@ -359,7 +365,8 @@ void StateWaiting7K::Initialize()
 
     const auto btnBack = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
     btnBack->SetClickCallback([&] (auto&, auto&) {
-        director.Present<StateRoom>();
+        director.Dismiss();
+        //director.Present<StateRoom>();
     });
 
     const auto readyButton = Instantiate<Gx::ToggleButton>("IDC_BUTTON_READY");
