@@ -9,18 +9,18 @@
 
 namespace Gx
 {
-    Dialog::Dialog(const Dialog& copy) :
-        Node(copy),
-        UiContainer(copy),
-        Sprite(copy),
-        m_acceptButton(copy.m_acceptButton),
-        m_cancelButton(copy.m_cancelButton),
-        m_promptLabel(copy.m_promptLabel),
-        m_parent(copy.m_parent),
-        m_accepted(copy.m_accepted),
-        m_shown(copy.m_shown)
+    Dialog::Dialog(Dialog&& other) noexcept :
+        Node(std::move(other)),
+        UiContainer(std::move(other)),
+        Sprite(std::move(other)),
+        m_acceptButton(std::exchange(other.m_acceptButton, nullptr)),
+        m_cancelButton(std::exchange(other.m_cancelButton, nullptr)),
+        m_promptLabel(std::exchange(other.m_promptLabel, nullptr)),
+        m_parent(std::exchange(other.m_parent, nullptr)),
+        m_accepted(std::exchange(other.m_accepted, false)),
+        m_shown(std::exchange(other.m_shown, false))
     {
-        // Rewire callbacks due to copy constructor
+        // Rewire callbacks due to move constructor
         if (m_acceptButton)
             SetAcceptButton(*m_acceptButton);
 
@@ -36,6 +36,32 @@ namespace Gx
     Dialog::Dialog(const sf::Texture& texture, const sf::IntRect& rectangle) :
         Sprite(texture, rectangle)
     {
+    }
+
+    Dialog& Dialog::operator=(Dialog&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Node::operator=(std::move(other));
+            UiContainer::operator=(std::move(other));
+            Sprite::operator=(std::move(other));
+
+            m_acceptButton = std::exchange(other.m_acceptButton, nullptr);
+            m_cancelButton = std::exchange(other.m_cancelButton, nullptr);
+            m_promptLabel  = std::exchange(other.m_promptLabel, nullptr);
+            m_parent       = std::exchange(other.m_parent, nullptr);
+            m_accepted     = std::exchange(other.m_accepted, false);
+            m_shown        = std::exchange(other.m_shown, false);
+
+            // Rewire callbacks due to move constructor
+            if (m_acceptButton)
+                SetAcceptButton(*m_acceptButton);
+
+            if (m_cancelButton)
+                SetCancelButton(*m_cancelButton);
+        }
+
+        return *this;
     }
 
     Presentable::Parent* Dialog::GetPresentableParent() const

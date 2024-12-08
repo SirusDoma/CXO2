@@ -7,11 +7,8 @@ namespace Gx
 {
     class UpdatableContainer : public virtual Node, public virtual Updatable
     {
-    public:
-        ~UpdatableContainer() override;
-
     protected:
-        UpdatableContainer();
+        UpdatableContainer() = default;
         void Update(const double delta) override;
     };
 }

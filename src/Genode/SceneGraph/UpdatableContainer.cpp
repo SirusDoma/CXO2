@@ -2,14 +2,6 @@
 
 namespace Gx
 {
-    UpdatableContainer::UpdatableContainer()
-    {
-    }
-
-    UpdatableContainer::~UpdatableContainer()
-    {
-    }
-
     void UpdatableContainer::Update(const double delta)
     {
         const auto updatables = GetChildren();

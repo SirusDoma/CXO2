@@ -9,11 +9,8 @@ namespace Gx
 {
     class InputableContainer : public virtual Node, public virtual Inputable
     {
-    public:
-        ~InputableContainer() override;
-
     protected:
-        InputableContainer();
+        InputableContainer() = default;
         bool Input(const sf::Event& ev) override;
     };
 }

@@ -15,34 +15,6 @@ namespace Gx
         SetTag("Scene");
     }
 
-    Scene::Scene(const Scene& other) :
-        Node(other),
-        RenderableContainer(other),
-        UpdatableContainer(other),
-        InputableContainer(other),
-        m_director(other.m_director),
-        m_lastInput(other.m_lastInput),
-        m_events(other.m_events)
-    {
-    }
-
-    Scene& Scene::operator=(const Scene& other)
-    {
-        if (this != &other)
-        {
-            Node::operator=(other);
-            RenderableContainer::operator=(other);
-            UpdatableContainer::operator=(other);
-            InputableContainer::operator=(other);
-
-            m_director  = other.m_director;
-            m_lastInput = other.m_lastInput;
-            m_events    = other.m_events;
-        }
-
-        return *this;
-    }
-
     bool Scene::IsTrackable()
     {
         return true;

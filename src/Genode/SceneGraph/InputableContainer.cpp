@@ -2,14 +2,6 @@
 
 namespace Gx
 {
-    InputableContainer::InputableContainer()
-    {
-    }
-
-    InputableContainer::~InputableContainer()
-    {
-    }
-
     bool InputableContainer::Input(const sf::Event& ev)
     {
         if (Inputable::Input(ev))

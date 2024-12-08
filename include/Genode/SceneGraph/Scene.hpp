@@ -25,12 +25,9 @@ namespace Gx
     public:
         friend class SceneDirector;
 
-        Scene(const Scene& other);
         ~Scene() override = default;
 
         static bool IsTrackable();
-
-        Scene& operator=(const Scene& other);
 
         Application& GetApplication() const;
         SceneDirector& GetDirector() const;

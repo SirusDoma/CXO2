@@ -1,9 +1,37 @@
 ﻿#include <Genode/SceneGraph/Node.hpp>
 
 #include <algorithm>
+#include <Genode/System/Exception.hpp>
 
 namespace Gx
 {
+    Node::Node(const Node& other) :
+        Transformable(other),
+        m_state(other.m_state),
+        m_name(other.m_name),
+        m_tag(other.m_tag)
+    {
+        if (other.GetChildrenCount() > 0)
+            throw InvalidOperationException("Cannot copy a Node with children.");
+    }
+
+    Node& Node::operator=(const Node& other)
+    {
+        if (this != &other)
+        {
+            Transformable::operator=(other);
+            m_parent = nullptr;
+            m_state  = other.m_state;
+            m_name   = other.m_name;
+            m_tag    = other.m_tag;
+
+            if (other.GetChildrenCount() > 0)
+                throw InvalidOperationException("Cannot copy a Node with children.");
+        }
+
+        return *this;
+    }
+
     void Node::Initialize()
     {
         m_state = State::Initialized;

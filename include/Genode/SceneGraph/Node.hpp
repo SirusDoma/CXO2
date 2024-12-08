@@ -14,6 +14,12 @@ namespace Gx
     public:
         ~Node() override = default;
 
+        Node(const Node& other);
+        Node& operator=(const Node& other);
+
+        Node(Node&&) noexcept = default;
+        Node& operator=(Node&&) = default;
+
         const std::string& GetName() const;
         void SetName(const std::string& name);
 

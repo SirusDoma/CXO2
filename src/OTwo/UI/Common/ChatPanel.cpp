@@ -63,13 +63,13 @@ void ChatPanel::Initialize()
                 {
                     const auto nicknameInput = dialog->FindChild<Gx::InputField>("IDC_EDIT_NICKNAME");
                     nicknameInput->SetMaximumTextLength(20);
-                    dialog->SetAcceptCallback([=]
+                    dialog->SetAcceptCallback([=, &radio]
                     {
                         if (nicknameInput->GetString().isEmpty())
                             fallbackCheckStateCallback(radio);
                     });
 
-                    dialog->SetCancelCallback([=]
+                    dialog->SetCancelCallback([=, &radio]
                     {
                         fallbackCheckStateCallback(radio);
                     });

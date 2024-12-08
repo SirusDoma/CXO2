@@ -21,11 +21,14 @@ namespace Gx
     {
     public:
         Dialog() = default;
-        explicit Dialog(const Dialog& copy);
         explicit Dialog(const sf::Texture& texture);
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        ~Dialog() override = default;
+        Dialog(const Dialog&) = delete;
+        Dialog& operator=(Dialog&) noexcept;
+
+        Dialog(Dialog&& other) noexcept;
+        Dialog& operator=(Dialog&& other) noexcept;
 
         Parent* GetPresentableParent() const;
 
