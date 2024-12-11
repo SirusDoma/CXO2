@@ -2,11 +2,10 @@
 #include <Genode/IO/IOException.hpp>
 
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 
 #include <magic_enum.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-
-#include "../../../build/cmake-build-release/_deps/sfml-src/include/SFML/Graphics/RenderTexture.hpp"
 
 namespace Gx
 {
