@@ -26,17 +26,17 @@ namespace Gx
     {
         Task::Update(delta);
 
-        if (m_tasks.size() == 0)
+        if (m_tasks.empty())
             return Complete();
 
         if (GetState() != TaskState::Running)
             return;
 
         bool completed = true;
-        for (size_t i = 0; i < m_tasks.size(); ++i)
+        for (const auto& m_task : m_tasks)
         {
-            m_tasks[i]->Update(delta);
-            completed = completed && m_tasks[i]->GetState() == TaskState::Completed;
+            m_task->Update(delta);
+            completed = completed && m_task->GetState() == TaskState::Completed;
         }
 
         if (completed)
@@ -49,8 +49,8 @@ namespace Gx
             return;
 
         Task::Stop();
-        for (size_t i = 0; i < m_tasks.size(); ++i)
-            m_tasks[i]->Stop();
+        for (const auto& m_task : m_tasks)
+            m_task->Stop();
     }
 
     void TaskGroup::Complete()
@@ -59,8 +59,8 @@ namespace Gx
             return;
 
         Task::Complete();
-        for (size_t i = 0; i < m_tasks.size(); ++i)
-            m_tasks[i]->Complete();
+        for (const auto& m_task : m_tasks)
+            m_task->Complete();
     }
 
     void TaskGroup::Reset()
@@ -69,7 +69,7 @@ namespace Gx
             return;
 
         Task::Reset();
-        for (size_t i = 0; i < m_tasks.size(); ++i)
-            m_tasks[i]->Reset();
+        for (const auto & m_task : m_tasks)
+            m_task->Reset();
     }
 }

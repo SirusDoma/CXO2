@@ -45,7 +45,7 @@ namespace Gx
         void SetDuration(const sf::Time& duration);
 
         float GetSpeed() const;
-        void SetSpeed(const float speed);
+        void SetSpeed(float speed);
 
         unsigned int GetRepeatCount() const;
         void SetRepeatCount(unsigned int repeatCount);

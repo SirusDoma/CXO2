@@ -16,7 +16,7 @@ namespace Gx
 
         virtual RenderStates Render(RenderSurface& surface, RenderStates states) const = 0;
 
-        virtual bool IsVisible() const { return m_visible; }
+        [[nodiscard]] virtual bool IsVisible() const { return m_visible; }
         virtual void SetVisible(const bool visible) { m_visible = visible; }
 
     protected:

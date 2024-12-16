@@ -27,10 +27,6 @@
 
 namespace Gx
 {
-    Transformable::~Transformable()
-    {
-    }
-
     void Transformable::SetPosition(const float x, const float y)
     {
         if (x == m_position.x && y == m_position.y)

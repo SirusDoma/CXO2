@@ -36,8 +36,8 @@ namespace Gx
         R& Get(const std::string& id) const;
         void Each(const std::function<void(const std::string&, R&)> &callback);
 
-        bool Contains(const std::string& id) const;
-        std::uint64_t Count() const;
+        [[nodiscard]] bool Contains(const std::string& id) const;
+        [[nodiscard]] std::uint64_t Count() const;
         void Clear();
 
     private:

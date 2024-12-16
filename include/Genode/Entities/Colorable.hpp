@@ -8,7 +8,7 @@ namespace Gx
     {
     public:
         virtual void SetColor(const sf::Color& color) = 0;
-        virtual const sf::Color& GetColor() const = 0;
+        [[nodiscard]] virtual const sf::Color& GetColor() const = 0;
 
     protected:
         virtual ~Colorable() = default;

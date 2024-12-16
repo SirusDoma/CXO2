@@ -19,10 +19,10 @@ namespace Gx
         sf::FloatRect GetLocalBounds() const override;
 
         bool IsFlickering() const;
-        void SetFlickering(const bool flicker);
+        void SetFlickering(bool flicker);
 
         bool IsSlanted() const;
-        void SetSlanted(const bool slanted);
+        void SetSlanted(bool slanted);
 
         Animation::AnimationState GetAnimationState() const;
 
@@ -53,7 +53,7 @@ namespace Gx
         void SetValue(float value);
 
     protected:
-        void Update(const double delta) override;
+        void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void Invalidate() override;

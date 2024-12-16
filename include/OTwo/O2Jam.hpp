@@ -5,7 +5,7 @@
 class O2Jam : public Gx::Application
 {
 public:
-    using Gx::Application::Application;
+    O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
 
     // ReSharper disable once CppNonExplicitConversionOperator
     operator sf::RenderTarget&() const override;
@@ -25,8 +25,8 @@ private:
     void SetupLayeredTarget() const;
     static sf::View GetLetterBoxView(sf::View view, const sf::Vector2u& windowSize);
 
-    bool m_windowStateSwitched;
-    bool m_letterboxSwitched;
+    bool m_windowStateSwitched{false};
+    bool m_letterboxSwitched{false};
 
     mutable std::unique_ptr<sf::RenderTexture> m_layeredTarget = std::make_unique<sf::RenderTexture>();
     mutable Gx::RenderSurfaceAdaptor m_layeredAdaptor = Gx::RenderSurfaceAdaptor(*m_layeredTarget);

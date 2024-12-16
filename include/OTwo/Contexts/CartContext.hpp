@@ -28,6 +28,8 @@ public:
     CheckoutType GetCheckoutType() const;
     void SetCheckoutType(CheckoutType checkoutType);
 
+    void Clear();
+
 private:
     CheckoutType m_checkoutType;
 };

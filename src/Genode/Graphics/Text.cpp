@@ -31,6 +31,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <cmath>
+#include <utility>
 
 namespace
 {
@@ -100,8 +101,8 @@ namespace
 
 namespace Gx
 {
-    Text::Text(const Font& font, const sf::String& string, const unsigned int characterSize) :
-        m_string             (string),
+    Text::Text(const Font& font, sf::String  string, const unsigned int characterSize) :
+        m_string             (std::move(string)),
         m_font               (&font),
         m_characterHeight    (characterSize),
         m_geometryNeedUpdate (true)
@@ -465,11 +466,11 @@ namespace Gx
         const float whitespaceWidth = m_font->GetGlyph(U' ', m_characterWidth, m_characterHeight, isBold, 0).advance;
         const float lineSpacing     = m_font->GetLineSpacing(m_characterWidth, m_characterHeight) + m_lineSpacing;
         float x                     = 0.f;
-        float y                     = static_cast<float>(m_characterHeight);
+        auto y                     = static_cast<float>(m_characterHeight);
 
         // Create one quad for each character
-        float minX = static_cast<float>(m_characterWidth);
-        float minY = static_cast<float>(m_characterHeight);
+        auto minX = static_cast<float>(m_characterWidth);
+        auto minY = static_cast<float>(m_characterHeight);
         float maxX = 0.f;
         float maxY = 0.f;
         std::uint32_t prevChar = 0;

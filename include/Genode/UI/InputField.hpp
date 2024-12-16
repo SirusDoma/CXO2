@@ -11,7 +11,7 @@ namespace Gx
     {
     public:
         InputField();
-        InputField(const Font& font, const sf::String& string, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect());
+        InputField(const Font& font, const sf::String& string, unsigned int characterSize = 30, const sf::FloatRect& bounds = sf::FloatRect());
         InputField(Font&& font, const sf::String& string, unsigned int characterSize = 30, sf::FloatRect bounds = sf::FloatRect()) = delete;
 
         sf::Vector2f FindCharacterPosition(std::size_t index) const;

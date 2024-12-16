@@ -52,6 +52,7 @@ void StatePayment::Initialize()
                 player.Inventory.push_back(itemID);
         }
     }
+    m_cart.Clear();
     m_session.Save();
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");

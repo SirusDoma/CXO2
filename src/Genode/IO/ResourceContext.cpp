@@ -12,22 +12,22 @@ namespace Gx
     {
     }
 
-    ResourceContext::ResourceContext(const std::string& id) :
-        m_id(id),
+    ResourceContext::ResourceContext(std::string  id) :
+        m_id(std::move(id)),
         m_cacheMode(CacheMode::None),
         m_resources(nullptr)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string& id, ResourceManager& resources, const CacheMode mode) :
-        m_id(id),
+    ResourceContext::ResourceContext(std::string  id, ResourceManager& resources, const CacheMode mode) :
+        m_id(std::move(id)),
         m_cacheMode(mode),
         m_resources(&resources)
     {
     }
 
-    ResourceContext::ResourceContext(const std::string& id, ResourceManager* resources, const CacheMode mode) :
-        m_id(id),
+    ResourceContext::ResourceContext(std::string  id, ResourceManager* resources, const CacheMode mode) :
+        m_id(std::move(id)),
         m_cacheMode(mode),
         m_resources(resources)
     {

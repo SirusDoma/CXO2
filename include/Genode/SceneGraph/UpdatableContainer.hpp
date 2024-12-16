@@ -9,6 +9,6 @@ namespace Gx
     {
     protected:
         UpdatableContainer() = default;
-        void Update(const double delta) override;
+        void Update(double delta) override;
     };
 }

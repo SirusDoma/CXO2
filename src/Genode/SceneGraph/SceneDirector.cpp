@@ -16,10 +16,6 @@ namespace Gx
     {
     }
 
-    SceneDirector::~SceneDirector()
-    {
-    }
-
     void SceneDirector::Stage()
     {
         if (m_nextScene && !m_staged)

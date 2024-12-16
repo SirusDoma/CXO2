@@ -11,7 +11,7 @@ namespace Gx
         explicit Delay(sf::Time duration);
         Delay(sf::Time duration, const std::function<void()>& callback);
 
-        sf::Time GetDuration() const;
+        [[nodiscard]] sf::Time GetDuration() const;
         void SetDuration(const sf::Time& duration);
 
     protected:

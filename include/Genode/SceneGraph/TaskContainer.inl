@@ -46,7 +46,7 @@ namespace Gx
                 static_assert(std::is_copy_constructible_v<std::decay_t<decltype(task)>>, "Specified r-value Task must be a copy constructible type.");
 
                 return std::static_pointer_cast<std::decay_t<decltype(task)>>(
-                    m_tasks.emplace_back(std::make_shared<std::decay_t<decltype(task)>>(std::move(task)))
+                    m_tasks.emplace_back(std::make_shared<std::decay_t<decltype(task)>>(std::forward<decltype(task)>(task)))
                 );
             }
             else

@@ -2,7 +2,7 @@
 
 namespace Gx
 {
-    std::vector<std::unique_ptr<FileInfo>> FileSystemController::Scan(const std::string& pattern, bool recrusive) const
+    std::vector<std::unique_ptr<FileInfo>> FileSystemController::Scan(const std::string& pattern, bool recursive) const
     {
         return {};
     }

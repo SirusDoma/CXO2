@@ -7,15 +7,16 @@
 #include <Genode/UI/Cursor.hpp>
 
 #include <mutex>
+#include <utility>
 
 namespace Gx
 {
-    Application::Application(const std::string& title, const sf::VideoMode& mode, const bool fullScreen, const sf::ContextSettings& settings)
-        : Application(title, mode, sf::View({mode.size.x / 2.f, mode.size.y / 2.f}, {static_cast<float>(mode.size.x), static_cast<float>(mode.size.y)}), fullScreen)
+    Application::Application(std::string title, const sf::VideoMode& mode, const bool fullScreen, const sf::ContextSettings& settings)
+        : Application(std::move(title), mode, sf::View({mode.size.x / 2.f, mode.size.y / 2.f}, {static_cast<float>(mode.size.x), static_cast<float>(mode.size.y)}), fullScreen)
     {
     }
 
-    Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
+    Application::Application(std::string  title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
         m_director(SceneDirector(*this)),
         m_context(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),
@@ -23,7 +24,7 @@ namespace Gx
         m_view(view),
         m_settings(settings),
         m_cursor(),
-        m_title(title),
+        m_title(std::move(title)),
         m_frameID(0),
         m_renderFreq(0),
         m_fullScreen(fullScreen),
@@ -169,15 +170,6 @@ namespace Gx
         return m_director;
     }
 
-    void Application::Boot()
-    {
-    }
-
-    int Application::Shutdown()
-    {
-        return 0;
-    }
-
     void Application::Update(const double delta)
     {
         m_director.Update(delta);
@@ -191,10 +183,8 @@ namespace Gx
 
     void Application::Close()
     {
-        OnClose();
-
         // Ask game permission first before closing
-        m_closeRequested = m_director.Close();
+        m_closeRequested = OnClose() && m_director.Close();
     }
 
     const std::string& Application::GetTitle() const
@@ -294,8 +284,9 @@ namespace Gx
         m_director.Input(ev);
     }
 
-    void Application::OnClose()
+    bool Application::OnClose()
     {
+        return true;
     }
 
     void Application::CreateMainWindow()

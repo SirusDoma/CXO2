@@ -35,7 +35,7 @@ namespace Gx
             self->Invalidate();
         }
 
-        return sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(m_width, m_height));
+        return { {0, 0}, {m_width, m_height} };
     }
 
     const sf::Texture* BitmapNumber::GetTexture() const

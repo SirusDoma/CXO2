@@ -5,8 +5,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
-#include <magic_enum.hpp>
-
 namespace Gx
 {
     Cursor::Cursor() :
@@ -88,13 +86,17 @@ namespace Gx
         auto target = sf::RenderTexture();
         for (auto& [type, cursor] : m_cursors)
         {
-            const auto targetSize = sf::Vector2u(cursor.InitialSize.x * scale, cursor.InitialSize.y * scale);
+            const auto targetSize = sf::Vector2u(
+                cursor.InitialSize.x * scale,
+                cursor.InitialSize.y * scale
+            );
+
             if (!target.resize(targetSize))
-                throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to create render texture");
+                throw ResourceLoadException("Failed to create render texture");
 
             auto texture = sf::Texture();
             if (!texture.loadFromImage(cursor.Source))
-                throw ResourceLoadException(std::string(magic_enum::enum_name(type)), "Failed to load cursor texture");
+                throw ResourceLoadException("Failed to load cursor texture");
 
             target.clear(sf::Color::Transparent);
             {
@@ -108,7 +110,10 @@ namespace Gx
             const auto size = result.getSize();
             const auto data = const_cast<unsigned char*>(result.getPixelsPtr());
 
-            cursor.Handle = sf::Cursor(&data[0], size, sf::Vector2u(cursor.Hotspot.x * scale, cursor.Hotspot.y * scale));
+            cursor.Handle = sf::Cursor(&data[0], size, sf::Vector2u(
+                cursor.Hotspot.x * scale,
+                cursor.Hotspot.y * scale)
+            );
         }
 
         return true;

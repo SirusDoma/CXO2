@@ -13,7 +13,7 @@ namespace Gx
     void Sequence::Update(const double delta)
     {
         Task::Update(delta);
-        if (m_tasks.size() == 0)
+        if (m_tasks.empty())
             return Complete();
 
         if (GetState() != TaskState::Running)

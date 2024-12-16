@@ -13,7 +13,7 @@ namespace Gx
         Fade() = default;
         Fade(Colorable& target, std::uint8_t opacity, const sf::Time& duration);
 
-        void Update(const double delta) override;
+        void Update(double delta) override;
         void Complete() override;
         void Reset() override;
 

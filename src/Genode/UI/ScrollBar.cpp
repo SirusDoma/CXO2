@@ -7,30 +7,31 @@ namespace Gx
     ScrollBar::ScrollBar() :
         m_sprite(),
         m_bounds(),
-        m_step(1.f),
         m_value(),
         m_maxValue(100.f),
+        m_step(1.f),
         m_scrollDelta(),
         m_dragging(false),
-        m_anchorPoint()
+        m_anchorPoint(),
+        m_orientation()
     {
     }
 
-    ScrollBar::ScrollBar(const sf::Texture& texture, sf::FloatRect bounds, ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, const sf::FloatRect& bounds, const ScrollOrientation orientation) :
         m_sprite(texture),
         m_bounds(),
-        m_step(1.f),
         m_value(),
         m_maxValue(100.f),
+        m_step(1.f),
         m_scrollDelta(),
-        m_orientation(orientation),
         m_dragging(false),
-        m_anchorPoint()
+        m_anchorPoint(),
+        m_orientation(orientation)
     {
         SetLocalBounds(bounds);
     }
 
-    ScrollBar::ScrollBar(const sf::Texture& texture, sf::IntRect texCoords, sf::FloatRect bounds, ScrollOrientation orientation) :
+    ScrollBar::ScrollBar(const sf::Texture& texture, const sf::IntRect& texCoords, const sf::FloatRect& bounds, const ScrollOrientation orientation) :
         m_sprite(texture, texCoords),
         m_bounds(),
         m_step(1.f),
@@ -68,7 +69,7 @@ namespace Gx
         return m_sprite.GetTexture();
     }
 
-    void ScrollBar::SetTexture(const sf::Texture& texture, bool resetRect)
+    void ScrollBar::SetTexture(const sf::Texture& texture, const bool resetRect)
     {
         m_sprite.SetTexture(texture, resetRect);
         Invalidate();
@@ -103,7 +104,7 @@ namespace Gx
         return m_orientation;
     }
 
-    void ScrollBar::SetScrollOrientation(ScrollOrientation orientation)
+    void ScrollBar::SetScrollOrientation(const ScrollOrientation orientation)
     {
         m_orientation = orientation;
     }
@@ -138,7 +139,7 @@ namespace Gx
         return m_step;
     }
 
-    void ScrollBar::SetStep(float step)
+    void ScrollBar::SetStep(const float step)
     {
         m_step = step;
     }
@@ -212,8 +213,8 @@ namespace Gx
 
         if (m_dragging)
         {
-            auto bounds   = GetGlobalBounds();
-            auto mpos     = sf::Vector2f(ev.position.x, ev.position.y);
+            const auto bounds   = GetGlobalBounds();
+            const auto mpos     = sf::Vector2f(ev.position.x, ev.position.y);
             auto position = m_sprite.GetPosition();
             float value   = 0.f;
             if (m_orientation == ScrollOrientation::Horizontal)
@@ -241,7 +242,7 @@ namespace Gx
                 if (std::abs(m_value - value) < m_step)
                     return;
 
-                float step = value > m_value ? m_step : -m_step;
+                const float step = value > m_value ? m_step : -m_step;
                 value = m_value + step;
                 value = std::min(value, m_maxValue);
                 value = std::max(value, 0.f);
@@ -267,7 +268,7 @@ namespace Gx
 
         if (!m_dragging && m_maxValue > 0.f && GetScrollBarGlobalBounds().contains(sf::Vector2f(ev.position.x, ev.position.y)))
         {
-            auto bounds   = GetScrollBarGlobalBounds();
+            const auto bounds   = GetScrollBarGlobalBounds();
             m_dragging    = true;
             m_anchorPoint = sf::Vector2f(ev.position.x - bounds.position.x, ev.position.y - bounds.position.y);
         }
@@ -286,8 +287,8 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        auto position = sf::Vector2f(ev.position.x, ev.position.y);
-        float delta   = ev.delta;
+        const auto position = sf::Vector2f(ev.position.x, ev.position.y);
+        float delta = ev.delta;
         if (m_orientation == ScrollOrientation::Vertical)
             delta *= -1;
 
@@ -314,7 +315,7 @@ namespace Gx
         if (m_maxValue <= 0.f)
             return;
 
-        auto barBounds = m_sprite.GetLocalBounds();
+        const auto barBounds = m_sprite.GetLocalBounds();
         m_maxBounds    = sf::Vector2f(
           std::abs(m_bounds.size.x  - barBounds.size.x),
           std::abs(m_bounds.size.y - barBounds.size.y)

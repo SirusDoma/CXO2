@@ -69,7 +69,7 @@ namespace Gx
         void Each(const std::function<void(const std::string&, R&)> &callback);
 
         template<typename R>
-        unsigned int Count() const;
+        [[nodiscard]] unsigned int Count() const;
 
         template<typename R>
         bool Destroy(const std::string& id);

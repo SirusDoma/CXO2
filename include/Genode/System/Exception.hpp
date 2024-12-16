@@ -29,7 +29,7 @@ namespace Gx
         explicit ArgumentException(const std::string& message = "Value does not fall within the expected range.") : Exception(message) {};
         explicit ArgumentException(const std::string& parameter, const std::string& message ) : Exception("\"" + parameter +"\": " + message), m_parameter(parameter) {};
 
-        const std::string& GetParameterName() const { return m_parameter; }
+        [[nodiscard]] const std::string& GetParameterName() const { return m_parameter; }
 
     private:
         std::string m_parameter;
@@ -41,7 +41,7 @@ namespace Gx
         explicit ArgumentOutOfRangeException(const std::string& message = "Specified argument was out of the range of valid values.") : Exception(message) {};
         explicit ArgumentOutOfRangeException(const std::string& parameter, const std::string& message) : Exception("\"" + parameter +"\": " + message), m_parameter(parameter) {};
 
-        const std::string& GetParameterName() const { return m_parameter; }
+        [[nodiscard]] const std::string& GetParameterName() const { return m_parameter; }
 
     private:
         std::string m_parameter;

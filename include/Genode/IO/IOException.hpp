@@ -16,7 +16,7 @@ namespace Gx
     {
     public:
         explicit ResourceLoadException(const std::string& message) : IOException(message) {};
-        ResourceLoadException(const std::string& id, const std::string& message) : IOException(message), m_resourceID(id) {};
+        ResourceLoadException(std::string  id, const std::string& message) : IOException(message), m_resourceID(std::move(id)) {};
 
     private:
         std::string m_resourceID;
@@ -25,10 +25,10 @@ namespace Gx
     class ResourceStoreException final : public IOException
     {
     public:
-        explicit ResourceStoreException(const std::string& id) : IOException("[" + id +"]\nFailed to store specified resource."), m_resourceID(id) {};
-        ResourceStoreException(const std::string& id, const std::string& message) : IOException("[" + id +"]\n" + message), m_resourceID(id) {};
+        explicit ResourceStoreException(const std::string& id) : IOException("Failed to store specified resource id (" + id + ")"), m_resourceID(id) {};
+        ResourceStoreException(const std::string& id, const std::string& message) : IOException(message), m_resourceID(id) {};
 
-        const std::string& GetResourceID() const { return m_resourceID; }
+        [[nodiscard]] const std::string& GetResourceID() const { return m_resourceID; }
 
     private:
         std::string m_resourceID;
@@ -37,10 +37,10 @@ namespace Gx
     class ResourceAccessException final : public IOException
     {
     public:
-        explicit ResourceAccessException(const std::string& id) : IOException("[" + id +"]\nResource with specified id is not found."), m_resourceID(id) {};
-        ResourceAccessException(const std::string& id, const std::string& message) : IOException("[" + id +"]\n" + message), m_resourceID(id) {};
+        explicit ResourceAccessException(const std::string& id) : IOException("Resource with specified resource id (" + id + ") is not found"), m_resourceID(id) {};
+        ResourceAccessException(const std::string& id, const std::string& message) : IOException(message), m_resourceID(id) {};
 
-        const std::string& GetResourceID() const { return m_resourceID; }
+        [[nodiscard]] const std::string& GetResourceID() const { return m_resourceID; }
 
     private:
         std::string m_resourceID;

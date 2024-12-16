@@ -43,7 +43,7 @@ namespace Gx
 
     Scheduler Scheduler::Once(const sf::Time schedule, const std::function<void(const Scheduler&, double)>& update)
     {
-        return Scheduler(1, schedule, update);
+        return {1, schedule, update};
     }
 
     sf::Time Scheduler::GetDuration() const

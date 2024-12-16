@@ -84,6 +84,11 @@
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Utilities/Console.hpp>
 
+O2Jam::O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
+    Gx::Application(std::move(title), mode, view, fullScreen, settings)
+{
+}
+
 void O2Jam::Boot()
 {
     // Render Settings
@@ -370,8 +375,6 @@ void O2Jam::OnInputReceived(sf::Event& ev)
 
 int O2Jam::Shutdown()
 {
-    Application::Shutdown();
-
     auto& director  = GetSceneDirector();
     auto& mixer     = GetContext().Require<Gx::AudioMixer>();
     auto& resources = GetContext().Require<Gx::ResourceManager>();

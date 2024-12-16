@@ -15,7 +15,7 @@ namespace Gx
     public:
         AudioMixer();
 
-        SoundGroup& GetMasterSoundGroup() const;
+        [[nodiscard]] SoundGroup& GetMasterSoundGroup() const;
         SoundGroup& GetSoundGroup(const std::string& groupName);
 
         sf::SoundSource& Play(sf::SoundSource& source);

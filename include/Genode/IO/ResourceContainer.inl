@@ -40,7 +40,7 @@ namespace Gx
         if (current)
         {
             if (mode == CacheMode::None)
-                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists");
+                throw ResourceStoreException(id, "Resource with same resource id (" + id + ") is already exists");
 
             if (mode == CacheMode::Reuse)
                 return *current;
@@ -48,7 +48,7 @@ namespace Gx
 
         auto resource = deserializer();
         if (!resource)
-            throw ResourceStoreException(id, "[" + id + "]\nCannot store empty resource.");
+            throw ResourceStoreException(id, "Cannot store empty resource");
 
         m_caches[id] = std::move(resource);
         return *m_caches[id];
@@ -83,7 +83,8 @@ namespace Gx
     template<typename R>
     R& ResourceContainer<R>::Get(const std::string& id) const
     {
-        assert(m_caches.contains(id));
+        if (!m_caches.contains(id))
+            throw ResourceAccessException(id);
 
         return *m_caches[id];
     }

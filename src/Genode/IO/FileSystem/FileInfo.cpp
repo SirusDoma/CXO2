@@ -1,12 +1,13 @@
 #include <Genode/IO/FileSystem/FileInfo.hpp>
 
 #include <Genode/IO/FileSystem/FileSystemController.hpp>
+#include <utility>
 
 namespace Gx
 {
-    FileInfo::FileInfo(const FileSystemController& parent, const std::string& name, const std::size_t size) :
+    FileInfo::FileInfo(const FileSystemController& parent, std::string  name, const std::size_t size) :
         m_parent(&parent),
-        m_name(name),
+        m_name(std::move(name)),
         m_size(size)
     {
     }

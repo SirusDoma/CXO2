@@ -15,25 +15,25 @@ namespace Gx
         void SetClearColorResolver(const std::function<sf::Color()>& resolver);
 
         void Clear() override;
-        void Clear(const sf::Color clearColor) override;
-        void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
+        void Clear(sf::Color clearColor) override;
+        void Clear(sf::Color clearColor, sf::StencilValue stencilValue) override;
 
         void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) override;
-        void Render(const sf::Vertex*       vertices,
-                    const std::size_t       vertexCount,
-                    const sf::PrimitiveType type,
-                    const RenderStates&     states = RenderStates::Default
+        void Render(const sf::Vertex*   vertices,
+                    std::size_t         vertexCount,
+                    sf::PrimitiveType   type,
+                    const RenderStates& states = RenderStates::Default
         ) override;
 
         void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states = RenderStates::Default) override;
         void Render(const sf::VertexBuffer& vertexBuffer,
-                    const std::size_t       firstVertex,
-                    const std::size_t       vertexCount,
+                    std::size_t             firstVertex,
+                    std::size_t             vertexCount,
                     const RenderStates&     states = RenderStates::Default
         ) override;
 
-        const sf::View& GetDefaultView() const override;
-        const sf::View& GetView() const override;
+        [[nodiscard]] const sf::View& GetDefaultView() const override;
+        [[nodiscard]] const sf::View& GetView() const override;
         void SetView(const sf::View& view) override;
 
     private:

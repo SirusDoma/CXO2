@@ -19,8 +19,8 @@ namespace Gx
     class Task : public Updatable
     {
     public:
-        TaskState GetState() const;
-        virtual const sf::Time& GetElapsed() const;
+        [[nodiscard]] TaskState GetState() const;
+        [[nodiscard]] virtual const sf::Time& GetElapsed() const;
 
         void SetStartCallback(const std::function<void()>& callback);
         void SetStoppedCallback(const std::function<void()>& callback);

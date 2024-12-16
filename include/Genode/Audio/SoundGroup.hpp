@@ -12,10 +12,10 @@ namespace Gx
     public:
         explicit SoundGroup(const std::string& name);
 
-        const std::string& GetName() const;
+        [[nodiscard]] const std::string& GetName() const;
         void SetName(const std::string& name);
 
-        sf::SoundSource::Status GetStatus() const;
+        [[nodiscard]] sf::SoundSource::Status GetStatus() const;
 
         void Play() const;
         void Resume() const;
@@ -24,13 +24,13 @@ namespace Gx
 
         void SetPlayingOffset(sf::Time timeOffset) const;
 
-        float GetVolume() const;
+        [[nodiscard]] float GetVolume() const;
         void SetVolume(float volume);
 
-        float GetPan() const;
+        [[nodiscard]] float GetPan() const;
         void SetPan(float pan);
 
-        bool IsEnabled() const;
+        [[nodiscard]] bool IsEnabled() const;
         void SetEnabled(bool enable);
 
         void Reset(bool stop = false);

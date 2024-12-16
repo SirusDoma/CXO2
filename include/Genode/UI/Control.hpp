@@ -54,7 +54,7 @@ namespace Gx
         const std::function<void(Control&, Event&)>& GetDoubleClickCallback() const;
         const std::function<void(Control&, Event&)>& GetScrollWheelCallback() const;
 
-        void Update(const double delta) override;
+        void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         bool Input(const sf::Event& ev) override;
 
@@ -69,7 +69,7 @@ namespace Gx
         virtual void OnControlChildAdded(Control& control);
         virtual void OnControlChildRemove(Control& control);
 
-        virtual void OnControlStateChanged(Control& sender, const State state);
+        virtual void OnControlStateChanged(Control& sender, State state);
         virtual void OnControlPress(Control& sender, const sf::Event::MouseButtonPressed& ev);
         virtual void OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev);
         virtual void OnControlDoubleClick(Control& sender, const sf::Event::MouseButtonPressed& ev);

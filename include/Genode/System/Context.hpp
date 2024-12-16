@@ -10,7 +10,7 @@
 
 namespace Gx
 {
-    class Context
+    class Context final
     {
     public:
         template<typename T>
@@ -62,7 +62,7 @@ namespace Gx
 
         Context Capture() const
         {
-            return Context(*this);
+            return {*this};
         }
 
         bool Empty() const { return m_factories.empty() && m_instances.empty(); }

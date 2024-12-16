@@ -44,7 +44,7 @@ namespace Gx
 
         bool IsEnabled() const;
 
-        void SetEnabled(const bool enabled);
+        void SetEnabled(bool enabled);
 
         void Register(Type type, const sf::Texture& texture, sf::Vector2u hotspot = sf::Vector2u());
         void Register(Type type, const sf::Image& image, sf::Vector2u hotspot = sf::Vector2u());

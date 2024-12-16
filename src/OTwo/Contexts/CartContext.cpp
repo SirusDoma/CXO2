@@ -51,6 +51,11 @@ void CartContext::SetCheckoutType(const CheckoutType checkoutType)
     m_checkoutType = checkoutType;
 }
 
+void CartContext::Clear()
+{
+    Record.Items.clear();
+}
+
 bool CartContext::Contains(CartItemType type, unsigned int id)
 {
    return std::find_if(Record.Items.begin(), Record.Items.end(), [type, id] (const CartItem& item)

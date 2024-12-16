@@ -54,7 +54,7 @@ namespace Gx
         void IncreaseSpacingCounter();
         void DecreaseSpacingCounter();
 
-        void Update(const double delta) override;
+        void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
         void Invalidate() override;

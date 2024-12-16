@@ -37,8 +37,6 @@ namespace Gx
         template<typename T, typename... Args>
         SceneDirector(Application& app, T&& scene, Args&&... args) = delete;
 
-        ~SceneDirector() override;
-
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
         void Update(double delta) override;
         bool Input(const sf::Event& ev) override;

@@ -29,7 +29,7 @@ namespace Gx
         void SetColor(const sf::Color& color) override;
 
         float GetKerning() const;
-        void SetKerning(const float value);
+        void SetKerning(float value);
 
         int GetDigitCount() const;
         void SetDigitCount(int count);

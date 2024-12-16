@@ -12,7 +12,7 @@ namespace Gx
         void SetBatchMode(SpriteBatch::BatchMode batchMode) const;
 
     protected:
-        void Update(const double delta) override;
+        void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
     private:

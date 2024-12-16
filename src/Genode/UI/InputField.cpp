@@ -18,7 +18,7 @@ namespace Gx
     {
     }
 
-    InputField::InputField(const Font& font, const sf::String& string, const unsigned int characterSize, sf::FloatRect bounds) :
+    InputField::InputField(const Font& font, const sf::String& string, const unsigned int characterSize, const sf::FloatRect& bounds) :
         m_text(font, string, characterSize),
         m_caret(*this),
         m_bounds(bounds),

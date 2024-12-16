@@ -17,11 +17,11 @@ namespace Gx
         static const RenderStates Default;
 
         // ReSharper disable CppNonExplicitConvertingConstructor
-        RenderStates(const sf::BlendMode& blendMode);
-        RenderStates(const sf::StencilMode& stencilMode);
-        RenderStates(const sf::Transform& transform);
-        RenderStates(const sf::Texture* texture);
-        RenderStates(const sf::Shader* shader);
+        RenderStates(const sf::BlendMode& blendMode);     // NOLINT(*-explicit-constructor)
+        RenderStates(const sf::StencilMode& stencilMode); // NOLINT(*-explicit-constructor)
+        RenderStates(const sf::Transform& transform);     // NOLINT(*-explicit-constructor)
+        RenderStates(const sf::Texture* texture);         // NOLINT(*-explicit-constructor)
+        RenderStates(const sf::Shader* shader);           // NOLINT(*-explicit-constructor)
         // ReSharper restore CppNonExplicitConvertingConstructor
 
         explicit RenderStates(const sf::RenderStates& states, unsigned int frameID = 0, double delta = 0);

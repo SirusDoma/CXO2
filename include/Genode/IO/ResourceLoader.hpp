@@ -18,9 +18,9 @@ namespace Gx
         ResourceLoader() = default;
         virtual ~ResourceLoader() = default;
 
-        virtual bool IsStreaming() const { return false; }
+        [[nodiscard]] virtual bool IsStreaming() const { return false; }
 
-        std::type_index GetResourceType() const { return m_type; }
+        [[nodiscard]] std::type_index GetResourceType() const { return m_type; }
 
         virtual ResourcePtr<T> LoadFromFile(const std::string& fileName, const ResourceContext& ctx) const = 0;
         virtual ResourcePtr<T> LoadFromMemory(void* data, std::size_t size, const ResourceContext& ctx) const = 0;

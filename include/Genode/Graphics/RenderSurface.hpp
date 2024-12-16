@@ -17,8 +17,8 @@ namespace Gx
         virtual ~RenderSurface() = default;
 
         virtual void Clear() { Clear(sf::Color::Black); }
-        virtual void Clear(const sf::Color clearColor) = 0;
-        virtual void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) = 0;
+        virtual void Clear(sf::Color clearColor) = 0;
+        virtual void Clear(sf::Color clearColor, sf::StencilValue stencilValue) = 0;
 
         virtual void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) = 0;
 
@@ -29,20 +29,20 @@ namespace Gx
         }
 
         virtual void Render(const sf::Vertex*       vertices,
-                            const std::size_t       vertexCount,
-                            const sf::PrimitiveType type,
+                            std::size_t       vertexCount,
+                            sf::PrimitiveType type,
                             const RenderStates&     states = RenderStates::Default
         ) = 0;
 
         virtual void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states = RenderStates::Default) = 0;
         virtual void Render(const sf::VertexBuffer& vertexBuffer,
-                            const std::size_t       firstVertex,
-                            const std::size_t       vertexCount,
+                            std::size_t       firstVertex,
+                            std::size_t       vertexCount,
                             const RenderStates&     states = RenderStates::Default
         ) = 0;
 
-        virtual const sf::View& GetDefaultView() const = 0;
-        virtual const sf::View& GetView() const = 0;
+        [[nodiscard]] virtual const sf::View& GetDefaultView() const = 0;
+        [[nodiscard]] virtual const sf::View& GetView() const = 0;
         virtual void SetView(const sf::View& view) = 0;
     };
 }

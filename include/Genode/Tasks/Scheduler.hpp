@@ -14,8 +14,8 @@ namespace Gx
 
         static Scheduler Once(sf::Time schedule, const std::function<void(const Scheduler&, double)> &update);
 
-        sf::Time GetDuration() const;
-        sf::Time GetInterval() const;
+        [[nodiscard]] sf::Time GetDuration() const;
+        [[nodiscard]] sf::Time GetInterval() const;
 
         void Complete() override;
         void Reset() override;

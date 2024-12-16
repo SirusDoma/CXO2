@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 
 #include <Genode/IO/IOException.hpp>
@@ -42,13 +43,10 @@ namespace Gx
     {
         EnsureDefaultFileSystemsRegistered();
 
-        for (auto const& controller : m_controllers)
+        return std::any_of(m_controllers.begin(), m_controllers.end(), [=] (auto controller)
         {
-            if (controller->Contains(fileName))
-                return true;
-        }
-
-        return false;
+            return controller->Contains(fileName);
+        });
     }
 
     std::vector<std::unique_ptr<FileInfo>> FileSystem::Scan(const std::string& pattern)

@@ -45,7 +45,7 @@ namespace Gx
         Show(position, alignment);
     }
 
-    void ToolTip::Show(sf::Vector2f position, Alignment alignment)
+    void ToolTip::Show(const sf::Vector2f position, const Alignment alignment)
     {
         if (alignment == Alignment::Center || alignment == Alignment::Right)
         {
@@ -82,7 +82,7 @@ namespace Gx
     {
         if (m_duration != duration)
         {
-            bool visible = m_elapsed < m_duration;
+            const bool visible = m_elapsed < m_duration;
             m_duration = duration;
             m_elapsed = visible ? sf::Time::Zero : duration;
         }
@@ -135,7 +135,7 @@ namespace Gx
         return m_outlineThickness;
     }
 
-    void ToolTip::SetContainerOutlineThickness(float outlineThickness)
+    void ToolTip::SetContainerOutlineThickness(const float outlineThickness)
     {
         if (m_outlineThickness != outlineThickness)
         {
@@ -144,7 +144,7 @@ namespace Gx
         }
     }
 
-    RenderStates ToolTip::Render(RenderSurface& surface, RenderStates states) const
+    RenderStates ToolTip::Render(RenderSurface& surface, const RenderStates states) const
     {
         if (IsVisible() && !GetString().isEmpty())
         {
@@ -171,7 +171,7 @@ namespace Gx
     {
         Label::Invalidate();
 
-        auto bounds = Text::GetLocalBounds();
+        const auto bounds = Text::GetLocalBounds();
         m_rectangle.SetSize(sf::Vector2f(bounds.size.x, bounds.size.y) + (m_padding * 2.f));
         m_rectangle.SetPosition(sf::Vector2f(0, m_padding.y * 1.5f));
         m_rectangle.SetColor(m_fillColor);

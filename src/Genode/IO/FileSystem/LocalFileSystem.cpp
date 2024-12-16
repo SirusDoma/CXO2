@@ -40,8 +40,11 @@ namespace Gx
         auto workingDir = std::filesystem::current_path().string();
 
 #ifdef __APPLE__
-        // On the other hand, macOS "security" fuckery modify the working directory out of developer / user will.
+        // On the other hand, macOS "security" modify the working directory out of developer / user will.
         // Context: https://lapcatsoftware.com/articles/app-translocation.html
+
+        // TODO: This "de-translocation" may not desirable for general use cases.
+        //       Consider to remove this particular handling from public repo
 
         // Get the current bundle
         CFBundleRef mainBundle;
@@ -155,7 +158,7 @@ namespace Gx
     std::vector<std::string> LocalFileSystem::GetAssetPaths()
     {
         auto paths = std::vector<std::string>();
-        for (auto p : m_paths)
+        for (const auto& p : m_paths)
             paths.push_back(weakly_canonical(path(p)).string());
 
         return paths;
@@ -200,14 +203,11 @@ namespace Gx
         if (const auto filePath = path(fileName.c_str()); exists(filePath))
             return true;
 
-        for (std::string& path : m_paths)
+        return std::any_of(m_paths.begin(), m_paths.end(), [fileName] (const std::string& path)
         {
-            std::string fullPath = std::string(path).append("/").append(fileName);
-            if (exists(fullPath.c_str()))
-                return true;
-        }
-
-        return false;
+            const std::string fullPath = std::string(path).append("/").append(fileName);
+            return exists(fullPath.c_str());
+        });
     }
 
     std::string LocalFileSystem::GetFileName(const std::string& fullPath, const bool withExtension) const

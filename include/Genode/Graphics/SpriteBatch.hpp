@@ -114,7 +114,7 @@ namespace Gx
                    const sf::Transform&   transform = sf::Transform::Identity,
                    float                  layer     = 0.f);
 
-        void Update(const double delta) override;
+        void Update(double delta) override;
 
         ////////////////////////////////////////////////////////////
         /// \brief Renders the batch to the render target
@@ -125,21 +125,21 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;
 
-        void Clear(const sf::Color clearColor) override;
-        void Clear(const sf::Color clearColor, sf::StencilValue stencilValue) override;
+        void Clear(sf::Color clearColor) override;
+        void Clear(sf::Color clearColor, sf::StencilValue stencilValue) override;
 
-        void Render(const Renderable& renderable, const RenderStates& states = RenderStates::Default) override;
-        void Render(const sf::Vertex*       vertices,
-                    const std::size_t       vertexCount,
-                    const sf::PrimitiveType type,
-                    const RenderStates&     states = RenderStates::Default
+        void Render(const Renderable& renderable, const RenderStates& states) override;
+        void Render(const sf::Vertex*   vertices,
+                    std::size_t         vertexCount,
+                    sf::PrimitiveType   type,
+                    const RenderStates& states
         ) override;
 
-        void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states = RenderStates::Default) override;
+        void Render(const sf::VertexBuffer& vertexBuffer, const RenderStates& states) override;
         void Render(const sf::VertexBuffer& vertexBuffer,
-                    const std::size_t       firstVertex,
-                    const std::size_t       vertexCount,
-                    const RenderStates&     states = RenderStates::Default
+                    std::size_t             firstVertex,
+                    std::size_t             vertexCount,
+                    const RenderStates&     states
         ) override;
 
         const sf::View& GetDefaultView() const override;
@@ -152,13 +152,6 @@ namespace Gx
         ///
         ////////////////////////////////////////////////////////////
         void ClearBatch(bool force = false);
-
-        ////////////////////////////////////////////////////////////
-        /// \brief If true, Sprite Batch is empty
-        ///        added
-        ///
-        ////////////////////////////////////////////////////////////
-        bool Empty();
 
     private:
         ////////////////////////////////////////////////////////////

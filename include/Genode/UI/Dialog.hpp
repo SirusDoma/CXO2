@@ -25,7 +25,7 @@ namespace Gx
         Dialog(const sf::Texture& texture, const sf::IntRect& rectangle);
 
         Dialog(const Dialog&) = delete;
-        Dialog& operator=(Dialog&) noexcept;
+        Dialog& operator=(const Dialog&) = delete;
 
         Dialog(Dialog&& other) noexcept;
         Dialog& operator=(Dialog&& other) noexcept;

@@ -62,7 +62,7 @@ namespace Gx
             }
         }
 
-        return sf::FloatRect({ 0.f, 0.f }, bounds);
+        return { { 0.f, 0.f }, bounds };
     }
 
     void Button::SetTexture(const sf::Texture& texture)

@@ -12,8 +12,8 @@ namespace Gx
     public:
         static const ResourceContext Default;
 
-        explicit ResourceContext(const std::string& id);
-        ResourceContext(const std::string& id, ResourceManager& resources, CacheMode mode = CacheMode::None);
+        explicit ResourceContext(std::string  id);
+        ResourceContext(std::string  id, ResourceManager& resources, CacheMode mode = CacheMode::None);
 
         virtual ~ResourceContext() = default;
 
@@ -25,8 +25,8 @@ namespace Gx
         std::enable_if_t<std::is_base_of_v<ResourceContext, Ctx>, Ctx>
         Rebind(const Ctx& ctx, ResourceManager& resources);
 
-        const std::string& GetID() const;
-        bool Available() const;
+        [[nodiscard]] const std::string& GetID() const;
+        [[nodiscard]] bool Available() const;
 
         template<typename R>
         R* Find(const std::string& id) const;
@@ -49,7 +49,7 @@ namespace Gx
         template<typename R>
         R& Store(const std::string& id, ResourcePtr<R> resource) const;
 
-        CacheMode GetCacheMode() const;
+        [[nodiscard]] CacheMode GetCacheMode() const;
 
         void Bind(ResourceManager& resources);
 
@@ -58,10 +58,10 @@ namespace Gx
     protected:
         ResourceContext();
 
-        ResourceManager* GetResourceManager() const;
+        [[nodiscard]] ResourceManager* GetResourceManager() const;
 
     private:
-        ResourceContext(const std::string& id, ResourceManager* resources, CacheMode mode = CacheMode::None);
+        ResourceContext(std::string  id, ResourceManager* resources, CacheMode mode = CacheMode::None);
 
         std::string m_id;
         CacheMode m_cacheMode = CacheMode::None;
