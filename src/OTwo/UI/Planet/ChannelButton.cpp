@@ -2,19 +2,23 @@
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/StringTable/Identifiers/Planet.hpp>
+
 #include <cmath>
+
+using namespace StringTable::Identifiers;
 
 ChannelButton::ChannelButton() :
     Gx::RadioButton(),
-    m_initialized(false),
-    m_hall(),
-    m_population(),
-    m_numberIndicator(),
     m_nameIndicator(),
     m_fullIndicator(),
     m_focusIndicator(),
+    m_numberIndicator(),
     m_populationCounter(),
-    m_states()
+    m_states(),
+    m_hall(),
+    m_population(),
+    m_initialized(false)
 {
 }
 
@@ -25,11 +29,11 @@ void ChannelButton::Initialize()
     if (!GetParent<::State>() || m_initialized)
         return;
 
-    m_numberIndicator   = FindChild<Gx::BitmapNumber>("IDC_NUMBER_CHANNEL_ID");
-    m_nameIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_NAME");
-    m_fullIndicator     = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FULL");
-    m_focusIndicator    = FindChild<Gx::Image>("IDC_IMAGE_CHANNEL_FOCUS");
-    m_populationCounter = FindChild<Gx::Gauge>("IDC_GAUGE_CHANNEL_COUNTER");
+    m_numberIndicator   = FindChild<Gx::BitmapNumber>(Resource::Planet::ChannelBoard::ChannelButton::IDC_NUMBER_CHANNEL_ID);
+    m_nameIndicator     = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_NAME);
+    m_fullIndicator     = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_FULL);
+    m_focusIndicator    = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_FOCUS);
+    m_populationCounter = FindChild<Gx::Gauge>(Resource::Planet::ChannelBoard::ChannelButton::IDC_GAUGE_CHANNEL_COUNTER);
 
     if (m_focusIndicator)
     {
@@ -51,6 +55,7 @@ unsigned int ChannelButton::GetChannelNumber() const
     return m_numberIndicator->GetValue();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ChannelButton::SetChannelNumber(const unsigned int channelNumber)
 {
     if (!m_numberIndicator)
@@ -98,7 +103,6 @@ void ChannelButton::SetMusicHall(const MusicHall hall)
     Mode mode;
     m_hall = hall;
 
-    // TODO: Load all and put inside a map
     switch (m_hall)
     {
         case MusicHall::Kalliope:

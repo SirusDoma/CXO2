@@ -143,16 +143,7 @@ Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromMetadata(const Res
     number->SetBlendMode(metadata->BlendMode);
 
     auto container = ObjectContainer::Decorate(number.get());
-    if (!metadata->Objects.empty())
-    {
-        for (auto [key, object] : metadata->Objects)
-        {
-            auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
-
-            ObjectLoader::Load(name, object, container, objectCtx);
-        }
-    }
+    LoadChildren(container, meta, context);
 
     return number;
 }

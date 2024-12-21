@@ -1,5 +1,9 @@
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Models/Equipment.hpp>
+
+#include <OTwo/StringTable/Identifiers/Avatar.hpp>
+using namespace StringTable::Identifiers;
+
 static constexpr std::array<std::pair<EquipmentType, RenderPart>, 100> RenderLayerOrder =
 {
     {
@@ -281,7 +285,7 @@ void Avatar::ResetRenderables() const
 
 AvatarInfo* Avatar::GetAvatarInfo() const
 {
-    return FindChild<AvatarInfo>("IDC_AVATAR_INFO");
+    return FindChild<AvatarInfo>(Resource::Avatar::IDC_AVATAR_INFO);
 }
 
 const Instrument& Avatar::GetEquipedInstrumentType() const
@@ -312,8 +316,8 @@ std::unordered_map<EquipmentType, const Item*> Avatar::GetEquipedItems(const boo
 
 void Avatar::Update(const double delta)
 {
-    const auto ohmEffect = FindChild<Gx::Animation>("IDC_ANIMATION_OHM_EFFECT");
-    const auto ohm = FindChild<Gx::Animation>("IDC_ANIMATION_OHM");
+    const auto ohmEffect = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM_EFFECT);
+    const auto ohm = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM);
 
     if (m_alive)
     {

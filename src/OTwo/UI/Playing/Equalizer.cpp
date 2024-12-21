@@ -1,4 +1,5 @@
 #include <OTwo/UI/Playing/Equalizer.hpp>
+#include <OTwo/StringTable/Identifiers/Game.hpp>
 
 #include <Genode/UI/List.hpp>
 
@@ -7,6 +8,8 @@
 
 #include <algorithm>
 #include <cmath>
+
+using namespace StringTable::Identifiers;
 
 Equalizer::Equalizer(const unsigned int sampleBufferCount) :
     m_bufferSampleCount(sampleBufferCount),
@@ -20,7 +23,7 @@ void Equalizer::Initialize()
 
     if (m_bars.empty())
     {
-        const auto list = FindChild<Gx::List>("IDC_LIST_BAR");
+        const auto list = FindChild<Gx::List>(Resource::Game::Equalizer::IDC_LIST_BAR);
         if (!list)
             return;
 

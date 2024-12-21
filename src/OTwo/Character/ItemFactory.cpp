@@ -71,7 +71,7 @@ Item ItemFactory::Create(const unsigned int id) const
         return {};
 
     const ItemMetadata metadata = iterator->second;
-    const auto name   = "Avatar/Items/" + std::to_string(id);
+    const auto name   = fmt::format("Avatar/Items/{}", id);
     const auto loader = ItemLoader();
 
     return std::move(*m_resources->Instantiate<Item>(name, [&]

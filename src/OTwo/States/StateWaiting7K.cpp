@@ -2,6 +2,7 @@
 
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateLoading.hpp>
+#include <OTwo/States/StatePlaying7K.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 
@@ -11,6 +12,10 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/Models/Room.hpp>
+
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Waiting7K.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
@@ -26,8 +31,8 @@
 #include <Genode/Tasks/Delay.hpp>
 
 #include <magic_enum.hpp>
-#include <OTwo/IO/PlayingResourceContext.hpp>
-#include <OTwo/States/StatePlaying7K.hpp>
+
+using namespace StringTable::Identifiers;
 
 StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
@@ -47,12 +52,12 @@ void StateWaiting7K::Initialize()
     auto& player    = m_session.GetCurrentPlayer();
     auto& room      = m_session.GetCurrentRoom();
 
-    const auto bgm            = Instantiate<sf::Music>("BGM/bgWaiting.ogg");
-    const auto sfxStart       = Instantiate<sf::Sound>("bgEffect/33");
-    const auto sfxTeam        = Instantiate<sf::Sound>("bgEffect/34");
-    const auto sfxSelectMusic = Instantiate<sf::Sound>("bgEffect/35");
+    const auto bgm            = Instantiate<sf::Music>(Sound::BGM::BG_WAITING);
+    const auto sfxStart       = Instantiate<sf::Sound>(Sound::Effects::EF_33);
+    const auto sfxTeam        = Instantiate<sf::Sound>(Sound::Effects::EF_34);
+    const auto sfxSelectMusic = Instantiate<sf::Sound>(Sound::Effects::EF_35);
 
-    const auto channelCategory = Instantiate<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelCategory = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_CHANNEL_CATEGORY);
     switch (m_session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
@@ -64,28 +69,28 @@ void StateWaiting7K::Initialize()
         default: break;
     }
 
-    const auto channelNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Instantiate<Gx::BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_CHANNEL_ID);
     channelNumber->SetValue(m_session.GetChannelID());
 
-    const auto roomNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_ROOM_ID");
+    const auto roomNumber = Instantiate<Gx::BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_ROOM_ID);
     roomNumber->SetValue(room.ID);
 
-    const auto roomName = Instantiate<Gx::Label>("IDC_TEXT_ROOM_NAME");
+    const auto roomName = Instantiate<Gx::Label>(Resource::Waiting7K::IDC_TEXT_ROOM_NAME);
     roomName->SetString(room.Title);
 
-    const auto musicName = Instantiate<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-    musicName->SetString(room.ChartMetadata.Title + " [BPM: " + Gx::StringHelper::ToString(room.ChartMetadata.BPM, 2) + "]");
+    const auto musicName = Instantiate<Gx::Label>(Resource::Waiting7K::IDC_TEXT_MUSIC_NAME);
+    musicName->SetString(sf::String(fmt::format(L"{} [BPM: {:.2f}]", room.ChartMetadata.Title, room.ChartMetadata.BPM)));
 
-    const auto level = Instantiate<Gx::Image>("IDC_IMAGE_ROOM_LEVEL");
+    const auto level = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_ROOM_LEVEL);
     level->SetFrame(room.GetRoomLevelCode());
 
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_EMOTICON"); dialog)
+    if (const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON); dialog)
     {
-        const auto content     = dialog->FindChild<Gx::Image>("IDC_IMAGE_CONTENT");
-        const auto currentPage = dialog->FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_PAGE");
-        const auto maxPage     = dialog->FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_PAGE");
-        const auto prevButton  = dialog->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
-        const auto nextButton  = dialog->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+        const auto content     = dialog->FindChild<Gx::Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
+        const auto currentPage = dialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
+        const auto maxPage     = dialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_MAX_PAGE);
+        const auto prevButton  = dialog->FindChild<Gx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_LEFT);
+        const auto nextButton  = dialog->FindChild<Gx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_RIGHT);
 
         content->SetFrame(0);
         currentPage->SetValue(1);
@@ -109,16 +114,16 @@ void StateWaiting7K::Initialize()
             }
         });
 
-        const auto emoticonHelpButton = Instantiate<Gx::Button>("IDC_BUTTON_EMOTICON");
+        const auto emoticonHelpButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_EMOTICON);
         emoticonHelpButton->SetClickCallback([=] (auto& sender, auto& ev)
         {
             Present(*dialog);
         });
     }
 
-    if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_CHANGE_TITLE"); dialog)
+    if (const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE); dialog)
     {
-        const auto titleBox = dialog->FindChild<Gx::InputField>("IDC_EDIT_TITLE");
+        const auto titleBox = dialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
         titleBox->SetMaximumTextLength(21);
         dialog->SetAcceptCallback([=, r = &room, s = &m_session]
         {
@@ -132,7 +137,7 @@ void StateWaiting7K::Initialize()
             roomName->SetString(data.Title);
         });
 
-        const auto changeTitleButton = Instantiate<Gx::Button>("IDC_BUTTON_CHANGE_TITLE");
+        const auto changeTitleButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_CHANGE_TITLE);
         changeTitleButton->SetClickCallback([=, r = &room, s = &m_session] (auto& sender, auto& ev)
         {
             if (r->RoomMasterID != s->GetCurrentPlayer().ID)
@@ -154,7 +159,7 @@ void StateWaiting7K::Initialize()
         });
     }
 
-    const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
+    const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
     AvatarInfo* currentAvatarInfo = nullptr;
     auto currentMember = RoomMember();
@@ -171,11 +176,11 @@ void StateWaiting7K::Initialize()
 
         m_avatars.push_back(avatar);
         auto& emoticonContainer = Create<Gx::UiContainer>();
-        emoticonContainer.SetName("IDC_CONTAINER_EMOTICON");
+        emoticonContainer.SetName(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
         emoticonContainer.SetVisible(false);
         avatar->AddChild(emoticonContainer);
 
-        const auto avatarInfo = avatar->FindChild<AvatarInfo>("IDC_AVATAR_INFO");
+        const auto avatarInfo = avatar->FindChild<AvatarInfo>(Resource::Waiting7K::Avatar::IDC_AVATAR_INFO);
         auto& member = room.Members[memberIndex];
         if (member.ID == 0)
         {
@@ -194,8 +199,8 @@ void StateWaiting7K::Initialize()
             m_playerAvatar = avatar;
         }
 
-        const auto bossMark = avatar->FindChild<Gx::Sprite>("IDC_IMAGE_BOSS_MARK");
-        const auto noMusic  = avatar->FindChild<Gx::Sprite>("IDC_IMAGE_NO_MUSIC");
+        const auto bossMark = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_BOSS_MARK);
+        const auto noMusic  = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_NO_MUSIC);
 
         bossMark->SetVisible(member.ID == room.RoomMasterID);
         noMusic->SetVisible(false);
@@ -212,20 +217,20 @@ void StateWaiting7K::Initialize()
         memberIndex++;
     }
 
-    const auto teamButtons = Instantiate<Gx::UiContainer>("IDC_CONTAINER_TEAM_BUTTONS");
+    const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
     auto teamButtonMatcher = [=] (const RoomTeam team) -> Gx::RadioButton*
     {
         switch (team)
         {
             default:
-            case RoomTeam::A: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_A");
-            case RoomTeam::B: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_B");
-            case RoomTeam::C: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_C");
-            case RoomTeam::D: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_D");
-            case RoomTeam::E: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_E");
-            case RoomTeam::F: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_F");
-            case RoomTeam::G: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_G");
-            case RoomTeam::H: return teamButtons->FindChild<Gx::RadioButton>("IDC_RADIO_TEAM_H");
+            case RoomTeam::A: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_A);
+            case RoomTeam::B: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_B);
+            case RoomTeam::C: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_C);
+            case RoomTeam::D: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_D);
+            case RoomTeam::E: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_E);
+            case RoomTeam::F: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_F);
+            case RoomTeam::G: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_G);
+            case RoomTeam::H: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_H);
         }
     };
 
@@ -249,12 +254,12 @@ void StateWaiting7K::Initialize()
                     member->Team = team;
 
                 currentAvatarInfo->Invalidate();
-                m_mixer.Play(*sfxTeam, "SFX");
+                m_mixer.Play(*sfxTeam, Sound::Channel::SFX);
             }
         });
     }
 
-    const auto mapSelector = Instantiate<MapSelector>("IDC_CONTAINER_MAP_SELECTOR");
+    const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
     mapSelector->SetMapChangedCallback([=, s = &m_session, r = &room] (const unsigned int mapID)
     {
         auto data = Room(*r);
@@ -274,7 +279,7 @@ void StateWaiting7K::Initialize()
     mapSelector->SetMapID(room.MapID, true);
     mapSelector->SetEffectID(room.EffectID);
 
-    const auto instrumentSelector = Instantiate<InstrumentSelector>("IDC_CONTAINER_INSTRUMENT_SELECTOR");
+    const auto instrumentSelector = Instantiate<InstrumentSelector>(Resource::Waiting7K::IDC_CONTAINER_INSTRUMENT_SELECTOR);
     if (currentAvatarInfo)
     {
         instrumentSelector->SetInstrumentSelectCallback([=, &room] (const ItemMetadata& metadata)
@@ -313,21 +318,21 @@ void StateWaiting7K::Initialize()
     for (const auto id : player.Inventory)
         instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(id));
 
-    const auto chatPanel  = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
+    const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
     chatPanel->SetMaximumTextLength(50);
 
     const auto chatWindow = chatPanel->GetChatWindow();
     chatWindow->PushSystemMessage("Welcome to O2Jam!");
     chatWindow->PushSystemMessage("Let's play together~");
 
-    if (const auto selectMusicDialog = Instantiate<SelectMusicDialog>("IDC_DIALOG_SELECT_MUSIC"); selectMusicDialog)
+    if (const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC); selectMusicDialog)
     {
         selectMusicDialog->Initialize(); // force load the cover art
-        if (const auto selectMusicButton = Instantiate<Gx::Button>("IDC_BUTTON_SELECT_MUSIC"); selectMusicButton)
+        if (const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC); selectMusicButton)
         {
             selectMusicButton->SetClickCallback([=] (auto& sender, auto& ev)
             {
-                m_mixer.Play(*sfxSelectMusic, "SFX");
+                m_mixer.Play(*sfxSelectMusic, Sound::Channel::SFX);
                 Present(*selectMusicDialog);
             });
         }
@@ -347,7 +352,7 @@ void StateWaiting7K::Initialize()
                 data.SongMode      = SongMode::Normal;
                 data.ChartMetadata = meta;
 
-                musicName->SetString(meta.Title + " [BPM: " + Gx::StringHelper::ToString(meta.BPM, 2) + "]");
+                musicName->SetString(sf::String(fmt::format(L"{} [BPM: {:.2f}]", meta.Title, meta.BPM)));
             }
             else if (random)
             {
@@ -363,13 +368,13 @@ void StateWaiting7K::Initialize()
     }
 
 
-    const auto btnBack = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto btnBack = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
     btnBack->SetClickCallback([&] (auto&, auto&) {
         director.Dismiss();
         //director.Present<StateRoom>();
     });
 
-    const auto readyButton = Instantiate<Gx::ToggleButton>("IDC_BUTTON_READY");
+    const auto readyButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
     readyButton->SetVisible(m_session.GetCurrentPlayer().ID != room.RoomMasterID);
     readyButton->SetEnabled(readyButton->IsVisible());
     readyButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -378,7 +383,7 @@ void StateWaiting7K::Initialize()
             return;
     });
 
-    const auto btnStart = Instantiate<Gx::ToggleButton>("IDC_BUTTON_START");
+    const auto btnStart = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
     btnStart->SetVisible(m_session.GetCurrentPlayer().ID == room.RoomMasterID);
     btnStart->SetEnabled(btnStart->IsVisible());
     btnStart->SetCheckStateChangeCallback([=, &director] (auto& sender)
@@ -388,7 +393,7 @@ void StateWaiting7K::Initialize()
 
         sender.SetEnabled(false);
         btnBack->SetEnabled(false);
-        m_mixer.Play(*sfxStart, "SFX");
+        m_mixer.Play(*sfxStart, Sound::Channel::SFX);
 
         const auto& data = m_session.GetCurrentRoom();
         if (!m_game.GetChart() || m_game.GetChart()->Source != data.ChartMetadata.Source)
@@ -412,7 +417,7 @@ void StateWaiting7K::Initialize()
     });
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 }
 
 void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -421,7 +426,7 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
     if (ev.code == sf::Keyboard::Key::F3)
     {
-        if (const auto btnStart = Instantiate<Gx::ToggleButton>("IDC_BUTTON_START"))
+        if (const auto btnStart = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START))
             btnStart->SetCheckedState(true);
     }
 
@@ -431,16 +436,16 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
         {
             switch (ev.code)
             {
-                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_HI");          break;
-                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_GO");          break;
-                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_READY");       break;
-                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_APPROVAL");    break;
-                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OBJECTION");   break;
-                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_SMILE");   break;
-                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_HAHA");    break;
-                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_VICTORY"); break;
-                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_OHM_LOSE");    break;
-                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_BY_DEGREES");  break;
+                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);          break;
+                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);          break;
+                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);       break;
+                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);    break;
+                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);   break;
+                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);   break;
+                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);    break;
+                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY); break;
+                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);    break;
+                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);  break;
                 default: break;
             }
         }
@@ -448,16 +453,16 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
         {
             switch (ev.code)
             {
-                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK");  break;
-                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_QUESTION");          break;
-                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_HEART");             break;
-                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_COUNT");             break;
-                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_NOTE");              break;
-                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2"); break;
-                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_BROKEN_HEART");      break;
-                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_CLOVER");            break;
-                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_FLOWER");            break;
-                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, "IDC_ANIMATION_EMOTICON_IDEA");              break;
+                case sf::Keyboard::Key::Num1: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);  break;
+                case sf::Keyboard::Key::Num2: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);          break;
+                case sf::Keyboard::Key::Num3: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);             break;
+                case sf::Keyboard::Key::Num4: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);             break;
+                case sf::Keyboard::Key::Num5: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);              break;
+                case sf::Keyboard::Key::Num6: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2); break;
+                case sf::Keyboard::Key::Num7: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);      break;
+                case sf::Keyboard::Key::Num8: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);            break;
+                case sf::Keyboard::Key::Num9: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);            break;
+                case sf::Keyboard::Key::Num0: ShowEmoticon(m_playerAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);              break;
                 default: break;
             }
         }
@@ -471,7 +476,7 @@ void StateWaiting7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
 
 void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoticonID)
 {
-    const auto container = avatar->FindChild<Gx::UiContainer>("IDC_CONTAINER_EMOTICON");
+    const auto container = avatar->FindChild<Gx::UiContainer>(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
     if (container->IsVisible())
         return;
 

@@ -3,9 +3,13 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/StringTable/Identifiers/ChatPanel.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/InputField.hpp>
+
+using namespace StringTable::Identifiers;
 
 ChatPanel::ChatPanel(SessionContext& session) :
     m_session(session)
@@ -17,30 +21,30 @@ void ChatPanel::Initialize()
     Gx::UiContainer::Initialize();
 
     const auto chatWindow = GetChatWindow();
-    const auto scrollChat = FindChild<Gx::ScrollBar>("IDC_SCROLL_BAR_CHAT");
-    // scrollChat->SetValueChangedCallback([=] (auto& sender, float value) { chatWindow->SetScrollOffset(static_cast<unsigned int>(value)); });
+    const auto scrollChat = FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
+
     if (scrollChat)
         chatWindow->SetScrollBar(*scrollChat);
 
-    if (const auto btnChatScrollUp = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_UP"))
+    if (const auto btnChatScrollUp = FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_UP))
         btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
 
-    if (const auto btnChatScrollDown = FindChild<Gx::Button>("IDC_BUTTON_SCROLL_DOWN"))
+    if (const auto btnChatScrollDown = FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_DOWN))
         btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
 
-    const auto chatInput = FindChild<Gx::InputField>("IDC_EDIT_CHAT");
+    const auto chatInput = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT);
     chatInput->SetPermanentFocusEnabled(true);
     chatInput->SetTextEnteredCallback([=] (auto& sender, const sf::String& text)
     {
         chatWindow->PushMessage(m_session.GetCurrentPlayer(), text);
     });
 
-    if (const auto chatButtonList = FindChild<Gx::List>("IDC_LIST_CHAT_BUTTON"))
+    if (const auto chatButtonList = FindChild<Gx::List>(Resource::ChatPanel::IDC_LIST_CHAT_BUTTON))
     {
-        const auto btnChatAll     = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_ALL");
-        const auto btnChatFriend  = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_FRIEND");
-        const auto btnChatGuild   = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_GUILD");
-        const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>("IDC_RADIO_CHAT_WHISPER");
+        const auto btnChatAll     = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_ALL);
+        const auto btnChatFriend  = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_FRIEND);
+        const auto btnChatGuild   = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_GUILD);
+        const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER);
 
         btnChatAll->SetCheckedState(true);
         const auto fallbackCheckStateCallback = [=] (const Gx::RadioButton& radio)
@@ -59,9 +63,9 @@ void ChatPanel::Initialize()
 
             if (radio.IsChecked())
             {
-                if (const auto dialog = parent->Instantiate<Gx::Dialog>("IDC_DIALOG_WHISPER"); dialog)
+                if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER); dialog)
                 {
-                    const auto nicknameInput = dialog->FindChild<Gx::InputField>("IDC_EDIT_NICKNAME");
+                    const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME);
                     nicknameInput->SetMaximumTextLength(20);
                     dialog->SetAcceptCallback([=, &radio]
                     {
@@ -90,17 +94,19 @@ void ChatPanel::Initialize()
 
 ChatWindow* ChatPanel::GetChatWindow() const
 {
-    return FindChild<ChatWindow>("IDC_CHAT_WINDOW");
+    return FindChild<ChatWindow>(Resource::ChatPanel::IDC_CHAT_WINDOW);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ChatPanel::SetInputEnabled(const bool enabled)
 {
-    if (const auto chatBox = FindChild<Gx::InputField>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT); chatBox)
         chatBox->SetEnabled(enabled);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ChatPanel::SetMaximumTextLength(const unsigned int length)
 {
-    if (const auto chatBox = FindChild<Gx::InputField>("IDC_EDIT_CHAT"); chatBox)
+    if (const auto chatBox = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT); chatBox)
         chatBox->SetMaximumTextLength(length);
 }

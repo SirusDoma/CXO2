@@ -3,7 +3,10 @@
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Models/Game.hpp>
 
+#include <Genode/IO/Resource.hpp>
+
 #include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Graphics/Image.hpp>
 
 #include <vector>
 #include <memory>

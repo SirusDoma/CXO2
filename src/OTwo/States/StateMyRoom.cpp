@@ -7,6 +7,10 @@
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/MyRoom.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/Label.hpp>
@@ -15,6 +19,9 @@
 #include <Genode/UI/ScrollBar.hpp>
 
 #include <magic_enum.hpp>
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 StateMyRoom::StateMyRoom(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items) :
     m_mixer(mixer),
@@ -30,13 +37,13 @@ void StateMyRoom::Initialize()
     State::Initialize();
     
     auto& player         = m_session.GetCurrentPlayer();
-    const auto bgm       = Instantiate<sf::Music>("BGM/bgMyroom.ogg");
-    const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
-    const auto sfxPrev   = Instantiate<sf::Sound>("bgEffect/19_1");
-    const auto sfxNext   = Instantiate<sf::Sound>("bgEffect/19_2");
+    const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MY_ROOM);
+    const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+    const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
+    const auto sfxPrev   = Instantiate<sf::Sound>(Sound::Effects::EF_19_1);
+    const auto sfxNext   = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
 
-    const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
+    const auto avatar = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
     avatar->SetGender(player.Gender);
     for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(std::move(item));
@@ -50,10 +57,10 @@ void StateMyRoom::Initialize()
             m_inventory.push_back(std::move(item));
     }
 
-    m_bagSelectIndicator = Instantiate<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
+    m_bagSelectIndicator = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_MYBAG_SELECT);
     m_bagSelectIndicator->SetVisible(false);
 
-    const auto bagList = Instantiate<Gx::List>("IDC_LIST_BAG");
+    const auto bagList = Instantiate<Gx::List>(Resource::MyRoom::IDC_LIST_BAG);
     const auto bagSlots = bagList->GetChildren();
 
     m_bagCurrentPage = 0;
@@ -66,23 +73,23 @@ void StateMyRoom::Initialize()
         slot->SetDoubleClickCallback(nullptr);
     }
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
+    const auto bagScrollBar = Instantiate<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
     bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_bagCurrentPage)
-            m_mixer.Play(*sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
         else
-            m_mixer.Play(*sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, Sound::Channel::SFX);
 
         m_bagCurrentPage = static_cast<unsigned int>(value);
         Invalidate();
     });
 
-    const auto bagScrollLeft = Instantiate<Gx::Button>("IDC_BUTTON_SCROLL_LEFT");
+    const auto bagScrollLeft = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_LEFT);
     bagScrollLeft->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
 
-    const auto bagScrollRight = Instantiate<Gx::Button>("IDC_BUTTON_SCROLL_RIGHT");
+    const auto bagScrollRight = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_RIGHT);
     bagScrollRight->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
     bagList->SetScrollWheelCallback([=] (auto&, auto& ev) {
@@ -92,47 +99,47 @@ void StateMyRoom::Initialize()
             bagScrollLeft->PerformClick();
     });
 
-    const auto equipmentsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_EQUIPMENTS");
+    const auto equipmentsContainer = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_EQUIPMENTS);
     equipmentsContainer->SetVisible(true);
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
     currentCash->SetValue(player.Cash);
 
-    const auto statusPanel = Instantiate<Gx::Image>("IDC_IMAGE_STATUS");
+    const auto statusPanel = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_STATUS);
     statusPanel->SetEnabled(false);
     statusPanel->SetVisible(false);
 
-    const auto nickname = statusPanel->FindChild<Gx::Label>("IDC_TEXT_NAME");
-    const auto level    = statusPanel->FindChild<Gx::Label>("IDC_TEXT_LEVEL");
-    const auto epoint   = statusPanel->FindChild<Gx::Label>("IDC_TEXT_EVENT_POINT");
-    const auto exp      = statusPanel->FindChild<Gx::Label>("IDC_TEXT_EXP");
-    const auto nextExp  = statusPanel->FindChild<Gx::Label>("IDC_TEXT_NEXT_EXP");
-    const auto record   = statusPanel->FindChild<Gx::Label>("IDC_TEXT_RECORD");
-    const auto ranking  = statusPanel->FindChild<Gx::Label>("IDC_TEXT_RANKING");
-    const auto guild    = statusPanel->FindChild<Gx::Label>("IDC_TEXT_GUILD");
+    const auto nickname = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_NAME);
+    const auto level    = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_LEVEL);
+    const auto epoint   = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_EVENT_POINT);
+    const auto exp      = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_EXP);
+    const auto nextExp  = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_NEXT_EXP);
+    const auto record   = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_RECORD);
+    const auto ranking  = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_RANKING);
+    const auto guild    = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_GUILD);
 
     nickname->SetString(player.Name);
     level->SetString(std::to_string(player.Level));
     epoint->SetString(std::to_string(player.EventPoint));
     exp->SetString(std::to_string(player.Exp));
     nextExp->SetString(std::to_string(player.NextExp));
-    record->SetString("Wins: " + std::to_string(player.Wins) + " / Draws: " + std::to_string(player.Draws) + " / Loses: " + std::to_string(player.Loses));
+    record->SetString(fmt::format("Wins: {} / Draws: {} / Loses: {}", player.Wins, player.Draws, player.Loses));
     ranking->SetString(std::to_string(player.Rank));
     guild->SetString(player.Guild.Name);
 
-    const auto albumButton = statusPanel->FindChild<Gx::Button>("IDC_BUTTON_MY_ALBUM");
+    const auto albumButton = statusPanel->FindChild<Gx::Button>(Resource::MyRoom::Status::IDC_BUTTON_MY_ALBUM);
     albumButton->SetClickCallback([=] (auto&, auto&)
     {
         ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=] (auto)
         {
-            m_mixer.Play(*sfxAccept, "SFX");
+            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
         });
     });
 
-    const auto sellButton = Instantiate<Gx::Button>("IDC_BUTTON_SELL");
+    const auto sellButton = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SELL);
     sellButton->SetClickCallback([=, &player] (auto&, auto&)
     {
         if (statusPanel->IsVisible())
@@ -161,15 +168,14 @@ void StateMyRoom::Initialize()
             return;
         }
 
-        const auto message = "Item: " + m_selectedItem->GetName() +
-            "\nPrice: " + std::to_string(price) + " " + std::string(magic_enum::enum_name(currency)) +
-            "\n\nAre you sure about selling the item?";
+        const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
+            m_selectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
         ShowDialog(message, DialogStyle::OkCancel, false, [=, &player] (auto accepted)
         {
             if (!accepted)
             {
-                m_mixer.Play(*sfxCancel, "SFX");
+                m_mixer.Play(*sfxCancel, Sound::Channel::SFX);
                 return;
             }
 
@@ -189,13 +195,13 @@ void StateMyRoom::Initialize()
             else
                 player.Cash += price;
 
-            m_mixer.Play(*sfxAccept, "SFX");
+            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
             m_session.Save();
             Invalidate();
         });
     });
 
-    const auto inventoryButton = Instantiate<Gx::ToggleButton>("IDC_TOGGLE_INVENTORY");
+    const auto inventoryButton = Instantiate<Gx::ToggleButton>(Resource::MyRoom::IDC_TOGGLE_INVENTORY);
     inventoryButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         statusPanel->SetVisible(sender.IsChecked());
@@ -205,20 +211,20 @@ void StateMyRoom::Initialize()
         equipmentsContainer->SetEnabled(!sender.IsChecked());
     });
 
-    const auto shopButton = Instantiate<Gx::Button>("IDC_BUTTON_SHOP");
+    const auto shopButton = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SHOP);
     shopButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Present<StateItemShop>();
     });
 
-    const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto backButton = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Dismiss<StateRoom>();
     });
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 
     Invalidate();
 }
@@ -226,11 +232,11 @@ void StateMyRoom::Initialize()
 void StateMyRoom::Invalidate()
 {
     const auto player    = &m_session.GetCurrentPlayer();
-    const auto avatar    = Instantiate<Avatar>("IDC_AVATAR");
-    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_EQUIPMENTS");
-    const auto sfxClick  = Instantiate<sf::Sound>("bgEffect/25");
+    const auto avatar    = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
+    const auto container = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_EQUIPMENTS);
+    const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
 
-    const auto bagList  = Instantiate<Gx::List>("IDC_LIST_BAG");
+    const auto bagList  = Instantiate<Gx::List>(Resource::MyRoom::IDC_LIST_BAG);
     const auto bagSlots = bagList->GetChildren();
 
     Gx::UiContainer* currentSlot = nullptr;
@@ -264,7 +270,7 @@ void StateMyRoom::Invalidate()
             quantity = it->second;
 
         currentSlot = item == m_selectedItem ? slot : currentSlot;
-        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_THUMBNAIL");
+        const auto thumbnail = slot->FindChild<Gx::Image>(Resource::MyRoom::Item::IDC_IMAGE_THUMBNAIL);
         if (item->GetSmallThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
@@ -273,7 +279,7 @@ void StateMyRoom::Invalidate()
         if (const auto texture = thumbnail->GetTexture())
             thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
 
-        if (const auto quantityLabel = slot->FindChild<Gx::Label>("IDC_TEXT_QUANTITY"))
+        if (const auto quantityLabel = slot->FindChild<Gx::Label>(Resource::MyRoom::Item::IDC_TEXT_QUANTITY))
         {
             if (quantity > 0)
                 quantityLabel->SetString(std::to_string(quantity));
@@ -291,7 +297,7 @@ void StateMyRoom::Invalidate()
             m_bagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_bagSelectIndicator);
-            m_mixer.Play(*sfxClick, "SFX");
+            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
@@ -301,13 +307,13 @@ void StateMyRoom::Invalidate()
 
             if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
             {
-                if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_SKILL_INFO"); dialog)
+                if (const auto dialog = Instantiate<Gx::Dialog>(Resource::MyRoom::IDC_DIALOG_SKILL_INFO); dialog)
                 {
-                    const auto nameLabel        = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_NAME");
-                    const auto quantityLabel    = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_QUANTITY");
-                    const auto skillLabel       = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_SKILL");
-                    const auto descriptionLabel = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_DESCRIPTION");
-                    const auto skillThumbnail   = dialog->FindChild<Gx::Image>("IDC_IMAGE_ITEM_THUMBNAIL");
+                    const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_NAME);
+                    const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
+                    const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_SKILL);
+                    const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
+                    const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::MyRoom::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
 
                     nameLabel->SetString(item->GetName());
                     quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-"); // L"\u221E"
@@ -380,7 +386,7 @@ void StateMyRoom::Invalidate()
     }
 
     const auto equippedItems  = avatar->GetEquipedItems();
-    const auto instrument = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUMENT");
+    const auto instrument = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_INSTRUMENT);
     instrument->SetVisible(false);
     instrument->SetDoubleClickCallback(nullptr);
     for (auto type : { EquipmentType::Keyboard, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Guitar })
@@ -393,31 +399,31 @@ void StateMyRoom::Invalidate()
     }
 
     if (const auto it = equippedItems.find(EquipmentType::Costume); it != equippedItems.end())
-        InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR"), EquipmentType::Costume, RenderPart::SmallThumbnail);
+        InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_HAIR), EquipmentType::Costume, RenderPart::SmallThumbnail);
     else
-        InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR"), EquipmentType::Hair);
+        InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_HAIR), EquipmentType::Hair);
 
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_HAIR_ACCESSORIES"),       EquipmentType::HairAccessories);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_WINGS"),                  EquipmentType::Wings);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_ACCESSORIES"),            EquipmentType::Accessories);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT_ACCESSORIES"), EquipmentType::InstrumentAccessories);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_PET"),                    EquipmentType::Pet);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_TOP"),                    EquipmentType::Top);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_PANTS"),                  EquipmentType::Pants);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_SHOES"),                  EquipmentType::Shoes);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_GLASSES"),                EquipmentType::Glasses);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_EARRINGS"),               EquipmentType::Earrings);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_NECKLACE"),               EquipmentType::Necklace);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_GLOVES"),                 EquipmentType::Gloves);
-    InvalidateSlot(container->FindChild<Gx::Image>("IDC_IMAGE_CLOTHES_ACCESSORIES"),    EquipmentType::ClothesAccessories);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_HAIR_ACCESSORIES),       EquipmentType::HairAccessories);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_WINGS),                  EquipmentType::Wings);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_ACCESSORIES),            EquipmentType::Accessories);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_INSTRUMENT_ACCESSORIES), EquipmentType::InstrumentAccessories);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_PET),                    EquipmentType::Pet);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_TOP),                    EquipmentType::Top);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_PANTS),                  EquipmentType::Pants);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_SHOES),                  EquipmentType::Shoes);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_GLASSES),                EquipmentType::Glasses);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_EARRINGS),               EquipmentType::Earrings);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_NECKLACE),               EquipmentType::Necklace);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_GLOVES),                 EquipmentType::Gloves);
+    InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_CLOTHES_ACCESSORIES),    EquipmentType::ClothesAccessories);
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
+    const auto bagScrollBar = Instantiate<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
     bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
     currentGem->SetValue(player->Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
     currentCash->SetValue(player->Cash);
 }
 
@@ -430,9 +436,9 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
         thumbnailType = RenderPart::LargeThumbnail;
 
     const auto player   = &m_session.GetCurrentPlayer();
-    const auto sfxDress = Instantiate<sf::Sound>("bgEffect/27_dress");
+    const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
 
-    const auto avatar        = Instantiate<Avatar>("IDC_AVATAR");
+    const auto avatar        = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
     const auto equippedItems = avatar->GetEquipedItems();
 
     slot->SetVisible(false);
@@ -454,7 +460,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
             for (auto [_, item] : avatar->GetEquipedItems())
                 player->EquippedItemIDs.push_back(item->GetID());
 
-            m_mixer.Play(*sfxDress, "SFX");
+            m_mixer.Play(*sfxDress, Sound::Channel::SFX);
             m_session.Save();
             Invalidate();
         });

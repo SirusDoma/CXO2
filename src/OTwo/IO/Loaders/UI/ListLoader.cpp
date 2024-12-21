@@ -48,7 +48,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& m
             list->SetBatchingEnabled(true);
             for (unsigned int i = 0; i < metadata->ItemCount; i++)
             {
-                auto name = meta.Name + "/" + metadata->ItemName + std::to_string(i + 1);
+                auto name = fmt::format("{}/{}{}", meta.Name, metadata->ItemName, i + 1);
                 auto ctx  = Gx::ResourceContext::Rebind(context, name);
 
                 ObjectLoader::Load(name, metadata->ItemSource, container, ctx);
@@ -57,13 +57,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& m
         else if (!metadata->Objects.empty())
         {
             list->SetBatchingEnabled(false);
-            for (auto [key, object] : metadata->Objects)
-            {
-                auto name = meta.Name + "/" + key;
-                auto ctx  = Gx::ResourceContext::Rebind(context, name);
-
-                ObjectLoader::Load(name, object, container, ctx);
-            }
+            LoadChildren(container, meta, context);
         }
     }
 

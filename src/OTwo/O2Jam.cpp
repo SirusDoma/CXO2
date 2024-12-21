@@ -195,8 +195,8 @@ void O2Jam::Boot()
         auto mixer = std::make_unique<Gx::AudioMixer>();
         auto& cfg  = ctx.template Require<GameConfig>();
 
-        mixer->GetSoundGroup("BGM").SetVolume(cfg.MusicVolume);
-        mixer->GetSoundGroup("SFX").SetVolume(cfg.EffectVolume);
+        mixer->GetSoundGroup(Sound::Channel::BGM).SetVolume(cfg.MusicVolume);
+        mixer->GetSoundGroup(Sound::Channel::SFX).SetVolume(cfg.EffectVolume);
 
         return mixer;
     }, Gx::Context::Scope::Shared);
@@ -340,8 +340,8 @@ void O2Jam::OnFocusChanged(const bool focus)
                          GetSceneDirector().IsPresenting<StatePlaying7K>() ||
                          GetSceneDirector().IsPresenting<StateResult>();
 
-    auto& bgm = mixer.GetSoundGroup("BGM");
-    auto& sfx = mixer.GetSoundGroup("SFX");
+    auto& bgm = mixer.GetSoundGroup(Sound::Channel::BGM);
+    auto& sfx = mixer.GetSoundGroup(Sound::Channel::SFX);
     if (focus)
     {
         bgm.SetVolume(static_cast<float>(config.MusicVolume));
@@ -391,7 +391,7 @@ void O2Jam::Update(const double delta)
     Application::Update(delta);
 
     if (Gx::Debugger::IsDebuggerAttached())
-        GetMainWindow().setTitle(GetTitle() + " [FPS: " + std::to_string(GetRenderFrequency()) + "]");
+        GetMainWindow().setTitle(fmt::format("{} [FPS: {}]", GetTitle(), GetRenderFrequency()));
 
     if ((isKeyPressed(sf::Keyboard::Key::LAlt) || isKeyPressed(sf::Keyboard::Key::RAlt)) && isKeyPressed(sf::Keyboard::Key::Enter) && !m_windowStateSwitched)
     {

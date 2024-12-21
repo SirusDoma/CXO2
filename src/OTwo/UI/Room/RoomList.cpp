@@ -1,10 +1,13 @@
 #include <OTwo/UI/Room/RoomList.hpp>
 #include <OTwo/States/State.hpp>
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/List.hpp>
 
 #include <cmath>
+
+using namespace StringTable::Identifiers;
 
 RoomList::RoomList(Gx::AudioMixer& mixer, Gx::ResourceManager& resources) :
     m_mixer(mixer),
@@ -19,7 +22,7 @@ void RoomList::Initialize()
 {
     Gx::List::Initialize();
 
-    auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>("bgEffect/15");
+    auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
     for (const auto child : GetChildren())
     {
         auto roomButton = dynamic_cast<RoomButton*>(child);
@@ -27,7 +30,7 @@ void RoomList::Initialize()
         {
            if (!button->IsActive())
            {
-               m_mixer.Play(*sfx, "SFX");
+               m_mixer.Play(*sfx, Sound::Channel::SFX);
                return;
            }
         });

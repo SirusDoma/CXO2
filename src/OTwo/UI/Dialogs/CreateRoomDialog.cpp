@@ -2,11 +2,19 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Room.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
+
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/InputField.hpp>
 #include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/ToolTip.hpp>
+
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 CreateRoomDialog::CreateRoomDialog(SessionContext& session, Gx::AudioMixer& mixer) :
     m_session(session),
@@ -22,24 +30,24 @@ void CreateRoomDialog::Initialize()
         return;
 
     const auto parent   = dynamic_cast<::State*>(GetPresentableParent());
-    const auto sfxClick = parent->Instantiate<sf::Sound>("bgEffect/10");
+    const auto sfxClick = parent->Instantiate<sf::Sound>(Sound::Effects::EF_10);
 
-    const auto titleInput    = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
-    const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
+    const auto titleInput    = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE);
+    const auto passwordInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD);
 
-    const auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
-    const auto versusModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
-    const auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
+    const auto jamModeButton    = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_JAM_MODE);
+    const auto versusModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
+    const auto singleModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_SINGLE_MODE);
 
-    const auto jamAnimation    = jamModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_JAM");
-    const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_VERSUS");
-    const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_SINGLE");
+    const auto jamAnimation    = jamModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_JAM);
+    const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_VERSUS);
+    const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_SINGLE);
 
-    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
-    const auto minLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+    const auto minLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
+    const auto maxLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
-    const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
+    const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
     titleInput->SetMaximumTextLength(21);
 
@@ -62,7 +70,7 @@ void CreateRoomDialog::Initialize()
     maxLevelLimitInput->SetNumericModeEnabled(true);
 
     jamModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
     });
 
     jamModeButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -88,7 +96,7 @@ void CreateRoomDialog::Initialize()
     });
 
     versusModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
     });
 
     versusModeButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -102,7 +110,7 @@ void CreateRoomDialog::Initialize()
     });
 
     singleModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxClick, "SFX");
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
     });
 
     singleModeButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -132,24 +140,24 @@ void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext
 
     Initialize();
 
-    const auto titleInput    = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
-    const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
+    const auto titleInput    = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE);
+    const auto passwordInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD);
 
-    const auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
-    const auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
-    const auto versusModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
+    const auto jamModeButton    = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_JAM_MODE);
+    const auto singleModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_SINGLE_MODE);
+    const auto versusModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
 
-    const auto jamAnimation    = jamModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_JAM");
-    const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_SINGLE");
-    const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>("IDC_ANIMATION_VERSUS");
+    const auto jamAnimation    = jamModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_JAM);
+    const auto singleAnimation = singleModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_SINGLE);
+    const auto versusAnimation = versusModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_VERSUS);
 
-    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
-    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton  = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+    const auto minLevelLimitInput      = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
+    const auto maxLevelLimitInput      = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
-    const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
+    const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
-    titleInput->SetString(m_session.GetCurrentPlayer().Name + "'s Room");
+    titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetCurrentPlayer().Name));
     titleInput->SelectAll();
     passwordInput->SetString("");
 
@@ -173,14 +181,14 @@ void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext
 
 void CreateRoomDialog::OnAccepted()
 {
-    const auto titleInput = FindChild<Gx::InputField>("IDC_EDIT_TITLE");
-    auto passwordInput    = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD");
+    const auto titleInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE);
+    auto passwordInput    = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD);
 
-    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
-    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
-    const auto maxLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+    const auto minLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
+    const auto maxLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
-    const auto toolTip = FindChild<Gx::ToolTip>("IDC_TOOLTIP_INFO");
+    const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
     if (titleInput->GetString().isEmpty())
     {
@@ -220,9 +228,9 @@ void CreateRoomDialog::OnAccepted()
 
 GameMode CreateRoomDialog::GetRoomMode() const
 {
-    const auto jamModeButton    = FindChild<Gx::RadioButton>("IDC_RADIO_JAM_MODE");
-    const auto singleModeButton = FindChild<Gx::RadioButton>("IDC_RADIO_SINGLE_MODE");
-    auto versusModeButton       = FindChild<Gx::RadioButton>("IDC_RADIO_VERSUS_MODE");
+    const auto jamModeButton    = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_JAM_MODE);
+    const auto singleModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_SINGLE_MODE);
+    auto versusModeButton       = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
 
     if (jamModeButton && jamModeButton->IsChecked())
         return GameMode::Jam;
@@ -235,7 +243,7 @@ GameMode CreateRoomDialog::GetRoomMode() const
 
 std::string CreateRoomDialog::GetRoomName() const
 {
-    if (const auto titleInput = FindChild<Gx::InputField>("IDC_EDIT_TITLE"); titleInput)
+    if (const auto titleInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE); titleInput)
         return titleInput->GetString();
 
     return {};
@@ -243,7 +251,7 @@ std::string CreateRoomDialog::GetRoomName() const
 
 std::string CreateRoomDialog::GetRoomPassword() const
 {
-    if (const auto passwordInput = FindChild<Gx::InputField>("IDC_EDIT_PASSWORD"); passwordInput)
+    if (const auto passwordInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD); passwordInput)
         return passwordInput->GetString();
 
     return {};
@@ -251,8 +259,8 @@ std::string CreateRoomDialog::GetRoomPassword() const
 
 unsigned int CreateRoomDialog::GetMinLevelLimit() const
 {
-    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
-    const auto minLevelLimitInput = FindChild<Gx::InputField>("IDC_EDIT_MIN_LEVEL_LIMIT");
+    const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+    const auto minLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
 
     if (minLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
         return std::stoi(std::string(minLevelLimitInput->GetString()));
@@ -262,8 +270,8 @@ unsigned int CreateRoomDialog::GetMinLevelLimit() const
 
 unsigned int CreateRoomDialog::GetMaxLevelLimit() const
 {
-    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>("IDC_TOGGLE_LEVEL_LIMIT");
-    const auto maxLevelLimitInput     = FindChild<Gx::InputField>("IDC_EDIT_MAX_LEVEL_LIMIT");
+    const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+    const auto maxLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
     if (maxLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
         return std::stoi(std::string(maxLevelLimitInput->GetString()));

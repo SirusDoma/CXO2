@@ -60,16 +60,7 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
         label->SetLetterSpacing(metadata->Kerning);
 
     auto container = ObjectContainer::Decorate(label.get());
-    if (!metadata->Objects.empty())
-    {
-        for (auto [key, object] : metadata->Objects)
-        {
-            auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
-
-            ObjectLoader::Load(name, object, container, objectCtx);
-        }
-    }
+    LoadChildren(container, meta, context);
 
     return label;
 }

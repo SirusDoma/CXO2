@@ -5,11 +5,13 @@
 #include <OTwo/IO/PlayingResourceContext.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/StringTable/Identifiers/Playing7K.hpp>
 
 #include <Genode/UI/List.hpp>
 
-#include <magic_enum.hpp>
 #include <random>
+
+using namespace StringTable::Identifiers;
 
 Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
@@ -42,7 +44,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     auto maps = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
     {
-        if (Gx::StringHelper::StartsWith(key, "IDC_IMAGE_PLAYING_BG"))
+        if (Gx::StringHelper::StartsWith(key, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG))
             maps.insert(key);
     }
 
@@ -57,26 +59,26 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     if (ctx.GetMode() == GameMode::Tutorial)
     {
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::string(), ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::string(), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::string(), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::string(), ctx);
     }
     else
     {
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_PLAYING_BG", std::to_string(mapID), ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, "IDC_IMAGE_NOTE_BG",    std::to_string(mapID), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::to_string(mapID), ctx);
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::to_string(mapID), ctx);
     }
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_NOTE_CLICK",      std::string(), ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_LIST_LONG_NOTE_EFFECT",std::string(), ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE1",  std::string(), ctx, 1);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_IMAGE_NOTE_MEASURE2",  std::string(), ctx, 1);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK,      std::string(), ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT,std::string(), ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE1,  std::string(), ctx, 1);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE2,  std::string(), ctx, 1);
 
     for (unsigned int i = 1; i <= 7; i++) // Channel
     {
         for (unsigned int s = 0; s <= 1; s++) // Shape (Circle, Square)
         {
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_NORMAL" + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_LONG"   + std::to_string(i) + "_" + std::to_string(s), std::string(), ctx, 1);
+            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_NORMAL, i, s), std::string(), ctx, 1);
+            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_LONG  , i, s), std::string(), ctx, 1);
         }
     }
 
@@ -84,44 +86,44 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     if (ctx.IsFxEnabled())
         sfxSuffix = std::to_string(mapID);
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COMBO", sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_NUMBER_NOTE_COMBO", sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_EFFECT_JAM", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COMBO, sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_NOTE_COMBO, sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix, ctx);
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_COOL", sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_GOOD", sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_BAD", sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_ANIMATION_NOTE_MISS", sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COOL, sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_GOOD, sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_BAD, sfxSuffix, ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_MISS, sfxSuffix, ctx);
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_NUMBER_EFFECT_JAM", std::string(), ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, "IDC_CONTAINER_NOTE_JAM", std::string(), ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM, std::string(), ctx);
+    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_CONTAINER_NOTE_JAM, std::string(), ctx);
 
     auto container = ObjectContainer::Decorate(state.get());
     for (auto [key, object] : metadata->Objects)
     {
         // Rewire resource manager to the local scene
-        auto name = meta.Name + "/" + key;
+        auto name = fmt::format("{}/{}", meta.Name, key);
         auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
         ObjectLoader::Load(name, object, container, ctx);
     }
 
-    if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT"); keyEffectContainer)
+    if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)
     {
         if (ctx.GetMode() == GameMode::Tutorial)
         {
-            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::string(), ctx, 7);
-            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_GUIDE_KEY_EFFECT", std::string(), ctx, 7);
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::string(), ctx, 7);
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_GUIDE_KEY_EFFECT, std::string(), ctx, 7);
         }
         else
-            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, "IDC_IMAGE_KEY_EFFECT", std::to_string(mapID), ctx, 7);
+            LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::to_string(mapID), ctx, 7);
 
         keyEffectContainer->SetBatchingEnabled(true);
     }
     else
-        throw Gx::ResourceAccessException("IDC_CONTAINER_KEY_EFFECT");
+        throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT);
 
-    if (auto longNoteEffectList = state->FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
+    if (auto longNoteEffectList = state->FindResource<Gx::List>(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
     {
         for (auto child :longNoteEffectList->GetChildren())
         {
@@ -139,15 +141,15 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
         longNoteEffectList->SetBatchingEnabled(true);
     }
     else
-        throw Gx::ResourceAccessException("IDC_LIST_LONG_NOTE_EFFECT");
+        throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT);
 
-    if (auto noteClickList = state->FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    if (auto noteClickList = state->FindResource<Gx::List>(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK); noteClickList)
     {
         auto noteClickSuffix = std::string();
         if (ctx.IsFxEnabled())
-            noteClickSuffix = std::to_string(mapID) + "_" + std::to_string(ctx.GetEffectID());
+            noteClickSuffix = fmt::format("{}_{}", mapID, ctx.GetEffectID());
 
-        LoadRequiredResource(ObjectContainer::Decorate(noteClickList),  metadata, "IDC_ANIMATION_NOTE_CLICK", noteClickSuffix, ctx, 7);
+        LoadRequiredResource(ObjectContainer::Decorate(noteClickList),  metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_CLICK, noteClickSuffix, ctx, 7);
         for (auto child :noteClickList->GetChildren())
         {
             if (auto animation = dynamic_cast<Gx::Animation*>(child); animation)
@@ -165,7 +167,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
         noteClickList->SetBatchingEnabled(true);
     }
     else
-        throw Gx::ResourceAccessException("IDC_LIST_NOTE_CLICK");
+        throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK);
 
     return state;
 }
@@ -174,18 +176,18 @@ void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const
 {
     if (const auto it = metadata->Require.find(key + suffix); it != metadata->Require.end())
     {
-        const auto name      = container.GetName() + "/" + key;
+        const auto name      = fmt::format("{}/{}", container.GetName(), key);
         const auto reference = std::any_cast<Gx::Json>(it->second);
         auto ctx             = Gx::ResourceContext::Rebind(context, name);
 
         if (count > 1)
         {
             for (auto i = 1; i <= count; i++)
-                ObjectLoader::Load(name + std::to_string(i), reference, container, ctx);
+                ObjectLoader::Load(fmt::format("{}{}", name, i), reference, container, ctx);
         }
         else
             ObjectLoader::Load(name, reference, container, ctx);
     }
     else
-        throw Gx::Exception(key + " is not found within required resource references");
+        throw Gx::Exception(fmt::format("{} is not found within required resource references", key));
 }

@@ -6,6 +6,9 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
+#include <OTwo/StringTable/Identifiers/Cache.hpp>
+using namespace StringTable::Identifiers;
+
 Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = DialogMetadata();
@@ -19,7 +22,7 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, con
     if (const auto label = attributes.find("label"); label != attributes.end())
     {
         MetadataLoader::Parse(label.value(), metadata.PromptLabelMetadata, context);
-        LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_TEXT_PROMPT"));
+        LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_TEXT_PROMPT)));
     }
 
     if (const auto buttons = attributes.find("buttons"); buttons != attributes.end())
@@ -34,12 +37,12 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, con
             std::string name;
             if (type == "accept")
             {
-                name = context.GetID() + "/IDC_BUTTON_ACCEPT";
+                name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_ACCEPT);
                 target = &metadata.AcceptButtonMetadata;
             }
             else
             {
-                name = context.GetID() + "/IDC_BUTTON_CANCEL";
+                name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL);
                 target = &metadata.CancelButtonMetadata;
             }
 
@@ -63,28 +66,19 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
         dialog->SetTexture(*texture);
 
     auto container = ObjectContainer::Decorate(dialog.get());
-    if (!metadata->Objects.empty())
-    {
-        for (auto [key, object] : metadata->Objects)
-        {
-            auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
-
-            ObjectLoader::Load(name, object, container, objectCtx);
-        }
-    }
+    LoadChildren(container, meta, context);
 
     const auto labelLoader = LabelLoader();
     const auto buttonLoader = ButtonLoader();
 
-    if (auto label = labelLoader.LoadFromMetadata(metadata->PromptLabelMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_TEXT_PROMPT")); label)
-        dialog->SetLabel(context.Store(context.GetID() + "/IDC_TEXT_PROMPT", std::move(label)));
+    if (auto label = labelLoader.LoadFromMetadata(metadata->PromptLabelMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_TEXT_PROMPT))); label)
+        dialog->SetLabel(context.Store(fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_TEXT_PROMPT), std::move(label)));
 
-    if (auto accept = buttonLoader.LoadFromMetadata(metadata->AcceptButtonMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_BUTTON_ACCEPT")); accept)
-        dialog->SetAcceptButton(context.Store(context.GetID() + "/IDC_BUTTON_ACCEPT", std::move(accept)));
+    if (auto accept = buttonLoader.LoadFromMetadata(metadata->AcceptButtonMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_ACCEPT))); accept)
+        dialog->SetAcceptButton(context.Store(fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_ACCEPT), std::move(accept)));
 
-    if (auto cancel = buttonLoader.LoadFromMetadata(metadata->CancelButtonMetadata, Gx::ResourceContext::Rebind(context, context.GetID() + "/IDC_BUTTON_CANCEL")); cancel)
-        dialog->SetCancelButton(context.Store(context.GetID() + "/IDC_BUTTON_CANCEL", std::move(cancel)));
+    if (auto cancel = buttonLoader.LoadFromMetadata(metadata->CancelButtonMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL))); cancel)
+        dialog->SetCancelButton(context.Store(fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL), std::move(cancel)));
 
     dialog->SetName(metadata->Name);
     dialog->SetTexCoords(metadata->TexCoords);

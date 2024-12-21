@@ -9,6 +9,11 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
 
+#include <OTwo/Utilities/StringFormatter.hpp>
+#include <OTwo/StringTable/Identifiers/Cache.hpp>
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/SelectMusic.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
@@ -18,11 +23,12 @@
 #include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/List.hpp>
-#include <Genode/Utilities/StringHelper.hpp>
 
 #include <magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
+
+using namespace StringTable::Identifiers;
 
 SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection) :
     m_coverID(0),
@@ -59,7 +65,7 @@ void SelectMusicDialog::Initialize()
             m_music = m_displayList[m_displayList.size() - 1];
     }
 
-    auto leftButton = FindChild<Gx::Button>("IDC_BUTTON_LEFT");
+    auto leftButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT);
     if (leftButton)
     {
         leftButton->SetClickCallback([this] (auto& sender, auto& ev)
@@ -73,12 +79,12 @@ void SelectMusicDialog::Initialize()
         });
     }
 
-    auto rightButton = FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+    auto rightButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_RIGHT);
     if (rightButton)
     {
         rightButton->SetClickCallback([this] (auto& sender, auto& ev)
         {
-            const auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+            const auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
             if (!musicSelector)
                 return;
 
@@ -93,7 +99,7 @@ void SelectMusicDialog::Initialize()
         });
     }
 
-    if (auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+    if (auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
     {
         auto children = list->GetChildren();
         for (std::size_t i = 0; i < children.size(); i++)
@@ -102,30 +108,30 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
-            if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+            if (auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                 activeHighlighter->SetVisible(false);
 
-            if (auto focusHighlighter = button->FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
+            if (auto focusHighlighter = button->FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
                 focusHighlighter->SetVisible(false);
 
             button->SetFocusChangedCallback([] (auto& sender, auto& ev)
             {
-                if (auto focusHighlighter = sender.template FindChild<Gx::Image>("IDC_IMAGE_MUSIC_HIGHLIGHT"); focusHighlighter)
+                if (auto focusHighlighter = sender.template FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
                     focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
             });
 
             button->SetCheckStateChangeCallback([this, i] (auto& sender)
             {
-                const auto listSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+                const auto listSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
                 if (!sender.IsChecked())
                 {
-                    if (auto activeHighlighter = sender.template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                    if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                         activeHighlighter->SetVisible(false);
 
                     return;
                 }
 
-                if (auto activeHighlighter = sender.template FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                     activeHighlighter->SetVisible(true);
 
                 const unsigned int itemListCount = listSelector->GetVerticalCount() * listSelector->GetHorizontalCount();
@@ -148,9 +154,9 @@ void SelectMusicDialog::Initialize()
         });
     }
 
-    if (auto sortSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SORT_SELECTOR"); sortSelector)
+    if (auto sortSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SORT_SELECTOR); sortSelector)
     {
-        if (auto newButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_NEW"); newButton)
+        if (auto newButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_NEW); newButton)
         {
             newButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
@@ -158,7 +164,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        if (auto titleButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TITLE"); titleButton)
+        if (auto titleButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_TITLE); titleButton)
         {
             titleButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
@@ -166,7 +172,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        if (auto levelButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_DIFF"); levelButton)
+        if (auto levelButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_DIFF); levelButton)
         {
             levelButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
@@ -174,7 +180,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        if (auto durationButton = sortSelector->FindChild<Gx::Button>("IDC_BUTTON_SORT_TIME"); durationButton)
+        if (auto durationButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_TIME); durationButton)
         {
             durationButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
@@ -183,24 +189,24 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+    if (auto genreSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_GENRE_SELECTOR); genreSelector)
     {
-        if (auto allButton = genreSelector->FindChild<Gx::RadioButton>("IDC_RADIO_GENRE_ALL"); allButton)
+        if (auto allButton = genreSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL); allButton)
             allButton->SetCheckedState(true);
 
         std::unordered_map<std::string, Genre> genreMap = {
-            { "IDC_RADIO_GENRE_ALL", static_cast<Genre>(-1) },
-            { "IDC_RADIO_GENRE_BALLAD", Genre::Ballad },
-            { "IDC_RADIO_GENRE_ROCK", Genre::Rock },
-            { "IDC_RADIO_GENRE_DANCE", Genre::Dance },
-            { "IDC_RADIO_GENRE_TECHNO", Genre::Techno },
-            { "IDC_RADIO_GENRE_HIPHOP", Genre::HipHop },
-            { "IDC_RADIO_GENRE_SOUL", Genre::Soul },
-            { "IDC_RADIO_GENRE_JAZZ", Genre::Jazz },
-            { "IDC_RADIO_GENRE_FUNK", Genre::Funk },
-            { "IDC_RADIO_GENRE_CLASSICAL", Genre::Classical },
-            { "IDC_RADIO_GENRE_TRADITIONAL", Genre::Traditional },
-            { "IDC_RADIO_GENRE_ETC", Genre::Etc },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL, static_cast<Genre>(-1) },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD, Genre::Ballad },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK, Genre::Rock },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE, Genre::Dance },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO, Genre::Techno },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP, Genre::HipHop },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL, Genre::Soul },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ, Genre::Jazz },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK, Genre::Funk },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL, Genre::Classical },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TRADITIONAL, Genre::Traditional },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC, Genre::Etc },
         };
 
         for (auto [key, genre] : genreMap)
@@ -235,13 +241,13 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    if (auto randomSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_RANDOM_SELECTOR"); randomSelector)
+    if (auto randomSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_RANDOM_SELECTOR); randomSelector)
     {
         std::unordered_map<std::string, LevelCategory> randomLevelMap = {
-            { "IDC_TOGGLE_RANDOM_DIFF_1", LevelCategory::Level1 },
-            { "IDC_TOGGLE_RANDOM_DIFF_2", LevelCategory::Level2 },
-            { "IDC_TOGGLE_RANDOM_DIFF_3", LevelCategory::Level3 },
-            { "IDC_TOGGLE_RANDOM_DIFF_4", LevelCategory::Level4 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_1, LevelCategory::Level1 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_2, LevelCategory::Level2 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_3, LevelCategory::Level3 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_4, LevelCategory::Level4 },
         };
 
         for (auto [id, level] : randomLevelMap)
@@ -257,21 +263,21 @@ void SelectMusicDialog::Initialize()
                 else
                     m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
 
-                if (const auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+                if (const auto genreSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_GENRE_SELECTOR); genreSelector)
                 {
                     std::unordered_map<std::string, Genre> genreMap = {
-                        {"IDC_RADIO_GENRE_ALL",         static_cast<Genre>(-1)},
-                        {"IDC_RADIO_GENRE_BALLAD",      Genre::Ballad},
-                        {"IDC_RADIO_GENRE_ROCK",        Genre::Rock},
-                        {"IDC_RADIO_GENRE_DANCE",       Genre::Dance},
-                        {"IDC_RADIO_GENRE_TECHNO",      Genre::Techno},
-                        {"IDC_RADIO_GENRE_HIPHOP",      Genre::HipHop},
-                        {"IDC_RADIO_GENRE_SOUL",        Genre::Soul},
-                        {"IDC_RADIO_GENRE_JAZZ",        Genre::Jazz},
-                        {"IDC_RADIO_GENRE_FUNK",        Genre::Funk},
-                        {"IDC_RADIO_GENRE_CLASSICAL",   Genre::Classical},
-                        {"IDC_RADIO_GENRE_TRADITIONAL", Genre::Traditional},
-                        {"IDC_RADIO_GENRE_ETC",         Genre::Etc},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL,         static_cast<Genre>(-1)},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD,      Genre::Ballad},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK,        Genre::Rock},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE,       Genre::Dance},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO,      Genre::Techno},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP,      Genre::HipHop},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL,        Genre::Soul},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ,        Genre::Jazz},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK,        Genre::Funk},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL,   Genre::Classical},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TRADITIONAL, Genre::Traditional},
+                        {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC,         Genre::Etc},
                     };
 
                     for (auto [key, genre]: genreMap)
@@ -287,12 +293,12 @@ void SelectMusicDialog::Initialize()
                     }
                 }
 
-                if (const auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+                if (const auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
                 {
                     std::unordered_map<std::string, Difficulty> diffMap = {
-                        {"IDC_RADIO_NOTE_EX", Difficulty::EX},
-                        {"IDC_RADIO_NOTE_NX", Difficulty::NX},
-                        {"IDC_RADIO_NOTE_HX", Difficulty::HX},
+                        {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX, Difficulty::EX},
+                        {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX, Difficulty::NX},
+                        {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX, Difficulty::HX},
                     };
 
                     for (auto [key, diff]: diffMap)
@@ -313,9 +319,9 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+    if (auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
     {
-        if (auto exButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_EX"); exButton)
+        if (auto exButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX); exButton)
         {
             exButton->SetCheckedState(true);
             exButton->SetCheckStateChangeCallback([this] (auto& sender)
@@ -334,7 +340,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_NX"); nxButton)
+        if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX); nxButton)
         {
             nxButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
@@ -352,7 +358,7 @@ void SelectMusicDialog::Initialize()
             });
         }
 
-        if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>("IDC_RADIO_NOTE_HX"); hxButton)
+        if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX); hxButton)
         {
             hxButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
@@ -371,7 +377,8 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    if (auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
+    // TODO: Create a special `SpeedButton` to declare the speed properties
+    if (auto speedSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SPEED_SELECTOR); speedSelector)
     {
         for (auto child : speedSelector->GetChildren())
         {
@@ -436,7 +443,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
     if (ev.code == sf::Keyboard::Key::Up)
     {
-        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
         {
             const auto children = list->GetChildren();
             Gx::RadioButton* previous = nullptr;
@@ -481,7 +488,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
     }
     else if (ev.code == sf::Keyboard::Key::Down)
     {
-        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
         {
             const auto children = list->GetChildren();
             const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
@@ -530,7 +537,7 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
     }
     else if (ev.code == sf::Keyboard::Key::Right)
     {
-        if (const auto list = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR"); list)
+        if (const auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
         {
             const auto children = list->GetChildren();
             const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(children.size()));
@@ -565,12 +572,12 @@ void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContex
 
     m_random = m_selection.GetRandomLevel();
     m_difficulty = m_selection.GetDifficulty();
-    if (const auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+    if (const auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
     {
         std::unordered_map<std::string, Difficulty> diffMap = {
-            {"IDC_RADIO_NOTE_EX", Difficulty::EX},
-            {"IDC_RADIO_NOTE_NX", Difficulty::NX},
-            {"IDC_RADIO_NOTE_HX", Difficulty::HX},
+            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX, Difficulty::EX},
+            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX, Difficulty::NX},
+            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX, Difficulty::HX},
         };
 
         for (auto [key, diff]: diffMap)
@@ -581,7 +588,7 @@ void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContex
     }
 
     m_speed = m_selection.GetSpeed();
-    if (const auto speedSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_SPEED_SELECTOR"); speedSelector)
+    if (const auto speedSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SPEED_SELECTOR); speedSelector)
     {
         for (const auto child : speedSelector->GetChildren())
         {
@@ -646,15 +653,15 @@ void SelectMusicDialog::OnAccepted()
     m_selection.SetSpeed(m_speed);
     CacheMusicCover();
 
-    auto& sfx = m_resources.AddFromFile<sf::Sound>("bgEffect/02");
-    m_mixer.Play(sfx, "SFX");
+    auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_02);
+    m_mixer.Play(sfx, Sound::Channel::SFX);
 }
 
 void SelectMusicDialog::OnCancelled()
 {
     Dialog::OnCancelled();
 
-    auto& sfx = m_resources.AddFromFile<sf::Sound>("bgEffect/03");
+    auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_03);
     m_mixer.Play(sfx);
 }
 
@@ -665,17 +672,17 @@ void SelectMusicDialog::CacheMusicCover(const bool refresh) const
 
     try
     {
-        if (!refresh && m_resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"))
+        if (!refresh && m_resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER))
             return;
 
         if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
-            m_resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+            m_resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
         else
-            m_resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+            m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
     }
     catch (Gx::Exception)
     {
-        m_resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+        m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
     }
 }
 
@@ -764,7 +771,7 @@ void SelectMusicDialog::Invalidate()
 {
     Dialog::Invalidate();
 
-    auto musicSelector = FindChild<Gx::List>("IDC_LIST_MUSIC_SELECTOR");
+    auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
     if (!musicSelector)
         return;
 
@@ -787,10 +794,10 @@ void SelectMusicDialog::Invalidate()
     }
 
     m_page = static_cast<unsigned int>(std::min(maxPage - 1, m_page));
-    auto pager = FindChild<Gx::Label>("IDC_TEXT_MUSIC_PAGE");
+    auto pager = FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_PAGE);
     if (pager)
     {
-        pager->SetString("[" + Gx::StringHelper::ToString(static_cast<int>(m_page) + 1, 2) + "/" + Gx::StringHelper::ToString(static_cast<int>(maxPage), 2) + "]");
+        pager->SetString(fmt::format("[{0:02}/{1:02}]", static_cast<int>(m_page) + 1, static_cast<int>(maxPage)));
         pager->SetVisible(true);
     }
 
@@ -811,14 +818,14 @@ void SelectMusicDialog::Invalidate()
                 button->SetCheckedState(false);
                 button->SetEnabled(false);
 
-                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
                     button->SetVisible(isRandomActivated);
-                    if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                    if (auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                         activeHighlighter->SetVisible(false);
 
                     Gx::Label* infoLabel = nullptr;
-                    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList && r - 1 < infoList->GetChildrenCount())
+                    if (auto infoList = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_INFO); infoList && r - 1 < infoList->GetChildrenCount())
                         infoLabel = dynamic_cast<Gx::Label*>(infoList->GetChildren()[r - 1]);
 
                     if (isRandomActivated)
@@ -926,10 +933,10 @@ void SelectMusicDialog::Invalidate()
                     }
                 }
 
-                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
                     level->SetString(std::string());
 
-                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
                     duration->SetString(std::string());
             }
         }
@@ -938,30 +945,30 @@ void SelectMusicDialog::Invalidate()
         {
             if (auto button = dynamic_cast<Gx::RadioButton*>(elements[0]); button)
             {
-                if (auto activeHighlighter = button->FindChild<Gx::Shape>("IDC_IMAGE_MUSIC_ACTIVE"); activeHighlighter)
+                if (auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                     activeHighlighter->SetVisible(false);
 
                 button->SetCheckedState(false);
                 button->SetEnabled(false);
                 button->SetVisible(true);
-                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
                     title->SetColor(sf::Color(200, 155, 55));
-                    title->SetString("'Random' is selected (Total: " +
-                        Gx::StringHelper::ToString(static_cast<int>(used), 2) + "/" +
-                        Gx::StringHelper::ToString(static_cast<int>(m_musicList.size()), 2) + ")"
-                    );
+                    title->SetString(fmt::format("'Random' is selected (Total: {0:02}/{1:02})",
+                        static_cast<int>(used),
+                        static_cast<int>(m_musicList.size())
+                    ));
                 }
 
-                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
                     level->SetString(std::string());
 
-                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
                     duration->SetString(std::string());
             }
         }
 
-        if (auto genreSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_GENRE_SELECTOR"); genreSelector)
+        if (auto genreSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_GENRE_SELECTOR); genreSelector)
         {
             for (auto child : genreSelector->GetChildren())
             {
@@ -970,7 +977,7 @@ void SelectMusicDialog::Invalidate()
             }
         }
 
-        if (auto levelSelector = FindChild<Gx::UiContainer>("IDC_CONTAINER_DIFFICULTY_SELECTOR"); levelSelector)
+        if (auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
         {
             for (auto child : levelSelector->GetChildren())
             {
@@ -996,7 +1003,7 @@ void SelectMusicDialog::Invalidate()
             button->SetEnabled(false);
             button->SetVisible(false);
 
-            if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+            if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
             {
                 if (!lastTitle)
                     lastTitle = title;
@@ -1005,7 +1012,7 @@ void SelectMusicDialog::Invalidate()
             if (i == 0 && m_displayList.empty())
             {
                 m_music = ChartMetadata{};
-                if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
+                if (auto infoList = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_INFO); infoList)
                 {
                     for (auto child : infoList->GetChildren())
                     {
@@ -1018,19 +1025,19 @@ void SelectMusicDialog::Invalidate()
                     pager->SetVisible(false);
 
                 button->SetVisible(true);
-                if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+                if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
                     if (!lastTitle)
                         lastTitle = title;
 
-                    title->SetString(std::string(magic_enum::enum_name(m_genre)) + " is not available yet.");
+                    title->SetString(fmt::format("{} is not available yet.", magic_enum::enum_name(m_genre)));
                     title->SetColor(sf::Color(135, 200, 60));
                 }
 
-                if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+                if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
                     level->SetString(std::string());
 
-                if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+                if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
                     duration->SetString(std::string());
             }
 
@@ -1041,7 +1048,7 @@ void SelectMusicDialog::Invalidate()
         if (i == 0 && m_music.Source.empty())
             m_music = m_displayList[index];
 
-        if (auto title = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE"); title)
+        if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
         {
             if (!lastTitle)
                 lastTitle = title;
@@ -1051,16 +1058,16 @@ void SelectMusicDialog::Invalidate()
             title->SetString(metadata.Title);
         }
 
-        if (auto level = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_LEVEL"); level)
+        if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
             level->SetString(std::to_string(metadata.Level));
 
-        if (auto duration = button->FindChild<Gx::Label>("IDC_TEXT_MUSIC_TIME"); duration)
+        if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
         {
             float seconds = metadata.Duration.asSeconds();
             int minute    = std::floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
-            duration->SetString("[" + std::to_string(minute) + ":" + Gx::StringHelper::ToString(remainder, 2) + "]");
+            duration->SetString(fmt::format("[{}:{:02}]", minute, remainder));
         }
 
         button->SetCheckedState(m_music.Source == m_displayList[index].Source);
@@ -1072,15 +1079,15 @@ void SelectMusicDialog::Invalidate()
         return;
 
     auto currentMetadata = m_music.ToChartMetadataView(m_difficulty);
-    if (auto infoList = FindChild<Gx::List>("IDC_LIST_MUSIC_INFO"); infoList)
+    if (auto infoList = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_INFO); infoList)
     {
-        std::vector<std::string> info =
+        std::vector info =
         {
-            "Title: " + currentMetadata.Title,
-            "Artist: " + currentMetadata.Artist,
-            "Note Designer: " + currentMetadata.NoteDesigner,
-            "Total Notes: " + std::to_string(currentMetadata.NoteCount),
-            "BPM: " + Gx::StringHelper::ToString(m_music.BPM, 2)
+            fmt::format(L"Title: {}", currentMetadata.Title),
+            fmt::format(L"Artist: {}", currentMetadata.Artist),
+            fmt::format(L"Note Designer: {}",  currentMetadata.NoteDesigner),
+            fmt::format(L"Total Notes: {}", currentMetadata.NoteCount),
+            fmt::format(L"BPM: {:.2f}", m_music.BPM)
         };
 
         auto children = infoList->GetChildren();
@@ -1097,7 +1104,7 @@ void SelectMusicDialog::Invalidate()
         }
     }
 
-    if (auto thumbnail = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_THUMBNAIL"); thumbnail && m_coverID != m_music.ID)
+    if (auto thumbnail = FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_THUMBNAIL); thumbnail && m_coverID != m_music.ID)
     {
         m_coverID  = m_music.ID;
         if (auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default))

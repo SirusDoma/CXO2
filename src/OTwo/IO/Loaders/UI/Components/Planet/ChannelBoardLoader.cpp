@@ -3,10 +3,14 @@
 #include <OTwo/IO/Loaders/UI/Components/Planet/ChannelButtonLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <OTwo/Metadata/UI/Components/Planet/ChannelBoardMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
+#include <OTwo/StringTable/Identifiers/Planet.hpp>
+
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
@@ -46,9 +50,9 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     if (auto texture = acquirer.Find<sf::Texture>(*metadata); texture)
         channelBoard->SetTexture(*texture);
 
-    if (auto it = metadata->Require.find("IDC_CHANNEL_BUTTON"); it != metadata->Require.end())
+    if (auto it = metadata->Require.find(Resource::Planet::ChannelBoard::Require::IDC_CHANNEL_BUTTON); it != metadata->Require.end())
     {
-        auto name = meta.Name + "/IDC_CHANNEL_BUTTON";
+        auto name = fmt::format("{}/{}", meta.Name, Resource::Planet::ChannelBoard::Require::IDC_CHANNEL_BUTTON);
         auto channelButtonLoader = ChannelButtonLoader();
         if (it->second.type() == typeid(Gx::Json) && it->second.has_value())
         {
@@ -75,13 +79,7 @@ Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromMetadata(const Resourc
     channelBoard->SetRotation(metadata->Rotation);
 
     auto container = ObjectContainer::Decorate(channelBoard.get());
-    for (auto [key, object] : metadata->Objects)
-    {
-        auto name = meta.Name + "/" + key;
-        auto ctx  = Gx::ResourceContext::Rebind(context, name);
-
-        ObjectLoader::Load(name, object, container, ctx);
-    }
+    LoadChildren(container, meta, context);
 
     return channelBoard;
 }

@@ -15,7 +15,7 @@ public:
     UserList();
     void Initialize() override;
 
-    void AddUser(Player user);
+    void AddUser(const Player& user);
     void Clear();
 
 private:

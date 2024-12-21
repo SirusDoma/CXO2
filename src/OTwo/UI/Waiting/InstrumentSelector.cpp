@@ -1,12 +1,17 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Instrument.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
+
+using namespace StringTable::Identifiers;
 
 InstrumentSelector::InstrumentSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, ItemFactory& items) :
     m_mixer(mixer),
@@ -23,12 +28,12 @@ void InstrumentSelector::Initialize()
 {
     Node::Initialize();
 
-    const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
-    if (const auto previousButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_LEFT"); previousButton)
+    const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+    if (const auto previousButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_LEFT); previousButton)
     {
         previousButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
-            m_mixer.Play(*sound, "SFX");
+            m_mixer.Play(*sound, Sound::Channel::SFX);
             if (m_currentInstrument == Instrument::None)
                 return;
 
@@ -37,11 +42,11 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto nextButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_RIGHT"); nextButton)
+    if (const auto nextButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_RIGHT); nextButton)
     {
         nextButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
         {
-            m_mixer.Play(*sound, "SFX");
+            m_mixer.Play(*sound, Sound::Channel::SFX);
             if (m_currentInstrument == Instrument::None)
                 return;
 
@@ -50,7 +55,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto guitar = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); guitar)
+    if (const auto guitar = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR); guitar)
     {
         guitar->SetEnabled(false);
         guitar->SetCheckStateChangeCallback([this] (auto& sender)
@@ -64,7 +69,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto bass = FindChild<Gx::RadioButton>("IDC_RADIO_BASS"); bass)
+    if (const auto bass = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); bass)
     {
         bass->SetEnabled(false);
         bass->SetCheckStateChangeCallback([this] (auto& sender)
@@ -78,7 +83,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto keyboard = FindChild<Gx::RadioButton>("IDC_RADIO_KEYBOARD"); keyboard)
+    if (const auto keyboard = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); keyboard)
     {
         keyboard->SetEnabled(false);
         keyboard->SetCheckStateChangeCallback([this] (auto& sender)
@@ -92,7 +97,7 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto drum = FindChild<Gx::RadioButton>("IDC_RADIO_DRUM"); drum)
+    if (const auto drum = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); drum)
     {
         drum->SetEnabled(false);
         drum->SetCheckStateChangeCallback([this] (auto& sender)
@@ -139,10 +144,10 @@ void InstrumentSelector::AddInstrumentMetadata(const ItemMetadata& item)
     Gx::RadioButton* button = nullptr;
     switch (key)
     {
-        case Instrument::Guitar:   button = FindChild<Gx::RadioButton>("IDC_RADIO_GUITAR"); break;
-        case Instrument::Bass:     button = FindChild<Gx::RadioButton>("IDC_RADIO_BASS"); break;
-        case Instrument::Keyboard: button = FindChild<Gx::RadioButton>("IDC_RADIO_KEYBOARD"); break;
-        case Instrument::Drum:     button = FindChild<Gx::RadioButton>("IDC_RADIO_DRUM"); break;
+        case Instrument::Guitar:   button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR); break;
+        case Instrument::Bass:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); break;
+        case Instrument::Keyboard: button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); break;
+        case Instrument::Drum:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); break;
         default: break;
     }
 
@@ -206,7 +211,7 @@ void InstrumentSelector::SetSelectedInstrument(int itemID)
 
 void InstrumentSelector::SetInstrumentSelectCallback(const std::function<void(const ItemMetadata&)>& callback) const
 {
-    if (const auto selectButton = FindChild<Gx::Button>("IDC_BUTTON_INSTRUMENT_SELECT"); selectButton)
+    if (const auto selectButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_SELECT); selectButton)
         selectButton->SetClickCallback([this, callback] (auto&, auto&) { callback(m_currentItemHeader); });
 }
 
@@ -215,11 +220,11 @@ void InstrumentSelector::Invalidate()
     UiContainer::Invalidate();
 
     const auto items = m_headers[m_currentInstrument];
-    const auto instrumentThumbnail = FindChild<Gx::Image>("IDC_IMAGE_INSTRUMENT");
+    const auto instrumentThumbnail = FindChild<Gx::Image>(Resource::Instrument::IDC_IMAGE_INSTRUMENT);
     if (!instrumentThumbnail)
         return;
 
-    const auto instrumentLabel = FindChild<Gx::Label>("IDC_TEXT_INSTRUMENT_NAME");
+    const auto instrumentLabel = FindChild<Gx::Label>(Resource::Instrument::IDC_TEXT_INSTRUMENT_NAME);
     if (m_currentIndex >= static_cast<int>(items.size()))
         m_currentIndex = 0;
 

@@ -227,16 +227,7 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata&
     shape->SetRotation(metadata->Rotation);
 
     auto container = ObjectContainer::Decorate(shape.get());
-    if (!metadata->Objects.empty())
-    {
-        for (auto [key, object] : metadata->Objects)
-        {
-            auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
-
-            ObjectLoader::Load(name, object, container, objectCtx);
-        }
-    }
+    LoadChildren(container, meta, context);
 
     return shape;
 }

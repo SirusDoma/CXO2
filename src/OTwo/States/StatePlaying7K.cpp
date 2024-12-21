@@ -1,6 +1,5 @@
 #include <OTwo/States/StatePlaying7K.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
-#include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateResult.hpp>
 
 #include <OTwo/Core/LifeSystem.hpp>
@@ -20,6 +19,10 @@
 #include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
 
+#include <OTwo/StringTable/Identifiers/Cache.hpp>
+#include <OTwo/StringTable/Identifiers/Game.hpp>
+#include <OTwo/StringTable/Identifiers/Playing7K.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/UI/Button.hpp>
@@ -27,6 +30,8 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
+
+using namespace StringTable::Identifiers;
 
 StatePlaying7K::StatePlaying7K(
     Gx::AudioMixer& mixer,
@@ -76,15 +81,15 @@ void StatePlaying7K::Initialize()
     m_lifeSystem.Initialize(m_context.GetDifficulty());
 
     // Add chart renderer
-    m_renderer.SetName("IDC_CHART_RENDERER");
+    m_renderer.SetName(Resource::Playing7K::IDC_CHART_RENDERER);
     m_renderer.SetRenderCompleteCallback([this] { OnRenderComplete(); });
     AddChild(m_renderer);
 
     m_renderer.Initialize(*m_context.GetChart(), m_context);
 
     // Setup chat panel
-    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
-    m_chatBox = chatPanel->FindChild<Gx::InputField>("IDC_EDIT_CHAT");
+    const auto chatPanel = Instantiate<ChatPanel>(Resource::Playing7K::IDC_CHAT_PANEL);
+    m_chatBox = chatPanel->FindChild<Gx::InputField>(Resource::Playing7K::IDC_EDIT_CHAT);
     if (m_context.GetMode() != GameMode::Tutorial)
     {
         chatPanel->SetMaximumTextLength(50);
@@ -98,14 +103,14 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Guide
-    if (const auto instructor = Instantiate<Gx::Animation>("IDC_ANIMATION_INSTRUCTOR"))
+    if (const auto instructor = Instantiate<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_INSTRUCTOR))
         instructor->SetVisible(m_context.GetMode() == GameMode::Tutorial);
 
-    if (const auto instruction = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUCTION"))
+    if (const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
         instruction->SetVisible(false);
 
     // Setup avatars + avatars effects'
-    const auto avatarList = Instantiate<Gx::List>("IDC_LIST_AVATAR");
+    const auto avatarList = Instantiate<Gx::List>(Resource::Playing7K::IDC_LIST_AVATAR);
     const auto avaContainers = avatarList->GetChildren();
     for (std::size_t i = 0; i < avaContainers.size(); i++)
     {
@@ -113,7 +118,7 @@ void StatePlaying7K::Initialize()
         if (!container)
             continue;
 
-        const auto avatar = container->FindChild<Avatar>("IDC_AVATAR");
+        const auto avatar = container->FindChild<Avatar>(Resource::Playing7K::Avatar::IDC_AVATAR);
         if (m_context.GetMode() == GameMode::Tutorial)
         {
             container->SetVisible(i == 4);
@@ -156,12 +161,12 @@ void StatePlaying7K::Initialize()
                 avatar->Equip(m_items.Create(id));
 
             auto& effectContainer = Create<Gx::UiContainer>();
-            effectContainer.SetName("IDC_CONTAINER_EFFECT_JAM");
+            effectContainer.SetName(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
 
-            if (const auto fxPrefab = FindResource<Gx::Animation>("IDC_ANIMATION_EFFECT_JAM"); fxPrefab)
+            if (const auto fxPrefab = FindResource<Gx::Animation>(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM); fxPrefab)
             {
                 auto& fx = Create<Gx::Animation>(*fxPrefab);
-                fx.SetName("IDC_ANIMATION_EFFECT_JAM");
+                fx.SetName(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM);
                 fx.Stop();
                 fx.SetAnimationCallback([&] (auto& _) {
                     effectContainer.SetVisible(
@@ -173,10 +178,10 @@ void StatePlaying7K::Initialize()
                 effectContainer.AddChild(fx);
             }
 
-            if (const auto numPrefab = FindResource<Gx::BitmapNumber>("IDC_NUMBER_EFFECT_JAM"); numPrefab)
+            if (const auto numPrefab = FindResource<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM); numPrefab)
             {
                 auto& numEffect = Create<Gx::BitmapNumber>(*numPrefab);
-                numEffect.SetName("IDC_NUMBER_EFFECT_JAM");
+                numEffect.SetName(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
                 numEffect.SetAnimationCallback([&] (auto& _) {
                     numEffect.SetVisible(
                         numEffect.GetAnimationState() == Gx::Animation::AnimationState::Playing ||
@@ -204,24 +209,24 @@ void StatePlaying7K::Initialize()
     }
 
     // Key down & effects
-    const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
-    const auto keyDownContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_DOWN");
+    const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
+    const auto keyDownContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_DOWN);
     for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
     {
-        const int id = static_cast<int>(channel) - 1;
-        if (id < 1 || id > 7)
+        const int id = static_cast<int>(channel) - 2;
+        if (id < 0 || id > 6)
             continue;
 
-        const auto keyDown = keyDownContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_DOWN" + std::to_string(id));
+        const auto keyDown = keyDownContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_KEY_DOWN[id]);
         keyDown->SetVisible(false);
 
-        const auto keyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_KEY_EFFECT" + std::to_string(id));
-        keyEffect->SetFrame(id - 1);
+        const auto keyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_KEY_EFFECT[id]);
+        keyEffect->SetFrame(id);
         keyEffect->SetVisible(false);
 
         if (m_context.GetMode() == GameMode::Tutorial)
         {
-            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_GUIDE_KEY_EFFECT" + std::to_string(id));
+            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
             guideKeyEffect->SetVisible(false);
             m_guideKeyEffects[channel] = guideKeyEffect;
         }
@@ -231,14 +236,14 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Play Menu
-    const auto playMenu = Instantiate<PlayMenu>("IDC_PLAY_MENU");
+    const auto playMenu = Instantiate<PlayMenu>(Resource::Playing7K::IDC_PLAY_MENU);
     playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
     playMenu->SetScoreTracker(m_scoreTracker);
 
     // Setup Score Counter
-    const auto scoreNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_POINT_NUMBER");
-    const auto jamGauge = Instantiate<Gx::Gauge>("IDC_GAUGE_JAM_BAR");
-    const auto bufferContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_BUFFER");
+    const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
+    const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
+    const auto bufferContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_BUFFER);
     const auto buffers = bufferContainer->GetChildren();
     for (std::size_t i = 0; i < buffers.size(); i++)
     {
@@ -247,16 +252,16 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Life Bar
-    const auto lifeBar = Instantiate<Gx::Gauge>("IDC_GAUGE_LIFE_BAR");
+    const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
     lifeBar->SetSlanted(true);
     lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
     lifeBar->SetValue(0);
 
       // Setup Jam Combo
-    const auto jamContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_NOTE_JAM");
+    const auto jamContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
     jamContainer->SetVisible(false);
-    const auto jamAnimation = jamContainer->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_JAM");
-    const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>("IDC_NUMBER_NOTE_JAM");
+    const auto jamAnimation = jamContainer->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_JAM);
+    const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
 
     jamContainer->SetVisible(false);
     jamAnimation->Stop();
@@ -266,35 +271,35 @@ void StatePlaying7K::Initialize()
 
     // Setup Combo Counter
     auto& comboCounter = Create<ComboCounter>(
-        FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COMBO"),
-        FindResource<Gx::BitmapNumber>("IDC_NUMBER_NOTE_COMBO")
+        FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COMBO),
+        FindResource<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
     );
-    comboCounter.SetName("IDC_CONTAINER_COMBO");
+    comboCounter.SetName(Resource::Playing7K::IDC_CONTAINER_COMBO);
     AddChild(comboCounter);
 
     // Setup Judgement Indicator
     auto& judgementIndicator = Create<JudgementIndicator>(
         std::unordered_map<Accuracy, Gx::Animation*>
         {
-            { Accuracy::Cool, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_COOL") },
-            { Accuracy::Good, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_GOOD") },
-            { Accuracy::Bad,  FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_BAD")  },
-            { Accuracy::Miss, FindResource<Gx::Animation>("IDC_ANIMATION_NOTE_MISS") },
+            { Accuracy::Cool, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COOL) },
+            { Accuracy::Good, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_GOOD) },
+            { Accuracy::Bad,  FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_BAD)  },
+            { Accuracy::Miss, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_MISS) },
         }, m_config.UseFx
     );
-    judgementIndicator.SetName("IDC_NOTE_JUDGEMENT_INDICATOR");
+    judgementIndicator.SetName(Resource::Playing7K::IDC_NOTE_JUDGEMENT_INDICATOR);
     AddChild(judgementIndicator);
 
     // Setup Long Note effects
-    if (const auto longNoteEffectList = FindResource<Gx::List>("IDC_LIST_LONG_NOTE_EFFECT"); longNoteEffectList)
+    if (const auto longNoteEffectList = FindResource<Gx::List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
     {
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
-            const int id = static_cast<int>(channel) - 1;
-            if (id < 1 || id > 7)
+            const int id = static_cast<int>(channel) - 2;
+            if (id < 0 || id > 6)
                 continue;
 
-            if (const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>("IDC_ANIMATION_LONG_NOTE_EFFECT" + std::to_string(id)); longNoteEffect)
+            if (const auto longNoteEffect = longNoteEffectList->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_LONG_NOTE_EFFECT[id]); longNoteEffect)
             {
                 longNoteEffect->SetVisible(false);
                 m_longNoteEffects[channel] = longNoteEffect;
@@ -305,15 +310,15 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Note Clicks
-    if (const auto noteClickList = FindResource<Gx::List>("IDC_LIST_NOTE_CLICK"); noteClickList)
+    if (const auto noteClickList = FindResource<Gx::List>(Resource::Playing7K::IDC_LIST_NOTE_CLICK); noteClickList)
     {
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
-            const int id = static_cast<int>(channel) - 1;
-            if (id < 1 || id > 7)
+            const int id = static_cast<int>(channel) - 2;
+            if (id < 0 || id > 6)
                 continue;
 
-            if (const auto noteClick = noteClickList->FindChild<Gx::Animation>("IDC_ANIMATION_NOTE_CLICK" + std::to_string(id)); noteClick)
+            if (const auto noteClick = noteClickList->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_CLICK[id]); noteClick)
             {
                 noteClick->SetVisible(false);
                 noteClick->Stop();
@@ -330,7 +335,7 @@ void StatePlaying7K::Initialize()
     // Setup equalizer
     if (m_config.UseEqualizer)
     {
-        if (const auto equalizer = playMenu->FindChild<Equalizer>("IDC_EQUALIZER"))
+        if (const auto equalizer = playMenu->FindChild<Equalizer>(Resource::Game::Menu::IDC_EQUALIZER))
             m_renderer.SetEqualizer(*equalizer);
     }
 
@@ -345,9 +350,9 @@ void StatePlaying7K::Initialize()
         {
             guideKeyEffect->second->SetVisible(state);
             if (state)
-                guideKeyEffect->second->SetFrame(std::to_string(static_cast<int>(channel) - 2) + "B");
+                guideKeyEffect->second->SetFrame(fmt::format("{}B", static_cast<int>(channel) - 2));
             else
-                guideKeyEffect->second->SetFrame(std::to_string(static_cast<int>(channel) - 2) + "A");
+                guideKeyEffect->second->SetFrame(fmt::format("{}A", static_cast<int>(channel) - 2));
         }
 
         if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
@@ -425,7 +430,7 @@ void StatePlaying7K::Initialize()
         jamAnimation->Reset();
         jamContainer->SetVisible(true);
 
-        const auto effectContainer = m_self->FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_JAM");
+        const auto effectContainer = m_self->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
         if (!effectContainer)
             return;
 
@@ -443,7 +448,7 @@ void StatePlaying7K::Initialize()
     });
 
     // Exit button
-    const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
+    const auto exitButton = Instantiate<Gx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
     exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
         GetDirector().Dismiss();
@@ -538,7 +543,7 @@ void StatePlaying7K::Update(const double delta)
 
     if (m_context.GetMode() == GameMode::Tutorial)
     {
-        const auto keyEffectContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_KEY_EFFECT");
+        const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
         const auto frontBuffers = m_renderer.GetFrontBuffers();
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
@@ -546,8 +551,8 @@ void StatePlaying7K::Update(const double delta)
             if (id < 0|| id > 6)
                 continue;
 
-            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>("IDC_IMAGE_GUIDE_KEY_EFFECT" + std::to_string(id + 1));
-            const auto frameName      = std::to_string(id) + "A";
+            const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
+            const auto frameName      = fmt::format("{}A", id);
             if (auto buffer = frontBuffers.find(channel); buffer != frontBuffers.end() && buffer->second)
             {
                 const double position = buffer->second->Event->Position - m_renderer.GetRenderPosition();
@@ -574,7 +579,7 @@ void StatePlaying7K::Update(const double delta)
             }
         }
 
-        const auto instruction = Instantiate<Gx::Image>("IDC_IMAGE_INSTRUCTION");
+        const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION);
         const double position  = m_renderer.GetRenderPosition();
         if (instruction && position >= 9.f)
         {
@@ -665,5 +670,5 @@ void StatePlaying7K::CaptureScreen()
     target.display();
 
     auto texture = std::make_unique<sf::Texture>(target.getTexture());
-    resources->Store<sf::Texture>("IDC_TEXTURE_STATE_PLAYING", std::move(texture), Gx::CacheMode::Update);
+    resources->Store<sf::Texture>(Resource::Cache::IDC_TEXTURE_STATE_PLAYING, std::move(texture), Gx::CacheMode::Update);
 }

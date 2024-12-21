@@ -41,8 +41,8 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto equalizer = std::make_unique<Equalizer>();
-    auto populator  = ObjectContainer::Decorate(equalizer.get());
+    auto equalizer  = std::make_unique<Equalizer>();
+    auto container  = ObjectContainer::Decorate(equalizer.get());
     auto ctx        = ResourceContextDecorator::Decorate(context);
     equalizer->SetName(metadata->Name);
     equalizer->SetOrigin(metadata->Origin);
@@ -58,15 +58,11 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
         if (reference.type() != Gx::Json::value_t::string)
             continue;
 
-        auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, reference, populator, ctx);
+        auto name = fmt::format("{}/{}", meta.Name, key);
+        ObjectLoader::Load(name, reference, container, ctx);
     }
 
-    for (auto [key, object] : metadata->Objects)
-    {
-        auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, populator, ctx);
-    }
+    LoadChildren(container, meta, context);
 
     return equalizer;
 }

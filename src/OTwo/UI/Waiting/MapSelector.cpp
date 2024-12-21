@@ -1,12 +1,17 @@
 #include <OTwo/UI/Waiting/MapSelector.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Map.hpp>
+
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
+
+using namespace StringTable::Identifiers;
 
 MapSelector::MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :
     m_mixer(mixer),
@@ -20,50 +25,50 @@ void MapSelector::Initialize()
 {
     Node::Initialize();
 
-    const auto map = FindChild<Gx::Image>("IDC_IMAGE_MAP");
+    const auto map = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
     map->SetFrame(0);
 
-    const auto mapName = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
+    const auto mapName = FindChild<Gx::Label>(Resource::Map::IDC_TEXT_MAP_NAME);
     mapName->SetString("Random");
 
-    const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
+    const auto effectGroup1 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_1);
     for (const auto effect : effectGroup1->GetChildren())
     {
         if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
-    const auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
+    const auto effectGroup2 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_2);
     for (const auto effect : effectGroup2->GetChildren())
     {
         if (const auto control = dynamic_cast<Gx::Animation*>(effect); control)
             control->SetVisible(false);
     }
 
-    if (const auto effect1 = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_1"); effect1)
+    if (const auto effect1 = effectGroup1->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT0_1); effect1)
         effect1->SetVisible(true);
 
-    if (const auto effect2 = effectGroup2->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_2"); effect2)
+    if (const auto effect2 = effectGroup2->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT0_2); effect2)
         effect2->SetVisible(true);
 
-    const auto mapLeftButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_LEFT");
+    const auto mapLeftButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_LEFT);
     mapLeftButton->SetClickCallback([=] (auto& sender, auto& ev){
         SetMapID(static_cast<int>(m_mapID) - 1);
     });
 
-    const auto mapRightButton = FindChild<Gx::Button>("IDC_BUTTON_MAP_RIGHT");
+    const auto mapRightButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_RIGHT);
     mapRightButton->SetClickCallback([=] (auto& sender, auto& ev){
        SetMapID(static_cast<int>(m_mapID) + 1);
     });
 
-    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
+    const auto mapEffectTopButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_TOP);
     mapEffectTopButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         if (sender.IsChecked())
             SetEffectID(1);
     });
 
-    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
+    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_BOTTOM);
     mapEffectBottomButton->SetCheckStateChangeCallback([=] (auto& sender)
     {
         if (sender.IsChecked())
@@ -83,11 +88,11 @@ unsigned int MapSelector::GetEffectID() const
 
 void MapSelector::SetMapID(int mapID, const bool silent)
 {
-    const auto sfxNavigate  = &m_resources.AddFromFile<sf::Sound>("bgEffect/07");
-    const auto map          = FindChild<Gx::Image>("IDC_IMAGE_MAP");
-    const auto mapName      = FindChild<Gx::Label>("IDC_TEXT_MAP_NAME");
-    const auto effectGroup1 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_1");
-    const auto effectGroup2 = FindChild<Gx::UiContainer>("IDC_CONTAINER_EFFECT_2");
+    const auto sfxNavigate  = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+    const auto map          = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
+    const auto mapName      = FindChild<Gx::Label>(Resource::Map::IDC_TEXT_MAP_NAME);
+    const auto effectGroup1 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_1);
+    const auto effectGroup2 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_2);
 
     if (mapID < 0)
         mapID = static_cast<unsigned int>(map->GetFrameCount() - 1);
@@ -114,22 +119,22 @@ void MapSelector::SetMapID(int mapID, const bool silent)
     map->SetFrame(m_mapID);
     mapName->SetString(map->GetCurrentFrameName());
 
-    auto animation = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT" + std::to_string(m_mapID) + "_1");
+    auto animation = effectGroup1->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT_I_1(m_mapID));
     if (!animation)
-        animation = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_1");
+        animation = effectGroup1->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT0_1);
 
     if (animation)
         animation->SetVisible(true);
 
-    animation = effectGroup2->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT" + std::to_string(m_mapID) + "_2");
+    animation = effectGroup2->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT_I_2(m_mapID));
     if (!animation)
-        animation = effectGroup1->FindChild<Gx::Animation>("IDC_IMAGE_EFFECT0_2");
+        animation = effectGroup1->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT0_2);
 
     if (animation)
         animation->SetVisible(true);
 
     if (!silent)
-        m_mixer.Play(*sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
 
     if (m_mapCallback)
         m_mapCallback(m_mapID);
@@ -137,8 +142,8 @@ void MapSelector::SetMapID(int mapID, const bool silent)
 
 void MapSelector::SetEffectID(const unsigned int effectID)
 {
-    const auto mapEffectTopButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_TOP");
-    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>("IDC_RADIO_MAP_SELECT_BOTTOM");
+    const auto mapEffectTopButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_TOP);
+    const auto mapEffectBottomButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_BOTTOM);
 
     mapEffectTopButton->SetCheckedState(effectID <= 1);
     mapEffectBottomButton->SetCheckedState(effectID == 2);

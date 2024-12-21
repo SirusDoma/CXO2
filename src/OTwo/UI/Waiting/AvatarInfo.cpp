@@ -1,9 +1,15 @@
 #include <OTwo/UI/Waiting/AvatarInfo.hpp>
 #include <OTwo/Avatar/Avatar.hpp>
+#include <OTwo/StringTable/Identifiers/Avatar.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/Image.hpp>
+
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 void AvatarInfo::Initialize()
 {
@@ -18,7 +24,7 @@ Avatar* AvatarInfo::GetAvatar() const
 
 Gx::Gauge* AvatarInfo::GetLifeBar() const
 {
-    return FindChild<Gx::Gauge>("IDC_GAUGE_AVATAR_INFO_LIFE");
+    return FindChild<Gx::Gauge>(Resource::Avatar::Info::IDC_GAUGE_AVATAR_INFO_LIFE);
 }
 
 
@@ -53,7 +59,7 @@ void AvatarInfo::Invalidate()
 {
     UiContainer::Invalidate();
 
-    if (const auto plate = FindChild<Gx::Colorable>("IDC_IMAGE_AVATAR_INFO_PLATE"); plate)
+    if (const auto plate = FindChild<Gx::Colorable>(Resource::Avatar::Info::IDC_IMAGE_AVATAR_INFO_PLATE); plate)
     {
         if (m_member && m_member->ID != 0)
         {
@@ -70,17 +76,17 @@ void AvatarInfo::Invalidate()
             plate->SetColor(sf::Color::Transparent);
     }
 
-    if (const auto readyIndicator = FindChild<Gx::Image>("IDC_IMAGE_AVATAR_READY_INDICATOR"); readyIndicator)
+    if (const auto readyIndicator = FindChild<Gx::Image>(Resource::Avatar::Info::IDC_IMAGE_AVATAR_READY_INDICATOR); readyIndicator)
         readyIndicator->SetVisible(m_member && m_member->Ready);
 
-    if (const auto level = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_LEVEL"); level)
+    if (const auto level = FindChild<Gx::Label>(Resource::Avatar::Info::IDC_TEXT_AVATAR_INFO_LEVEL); level)
     {
         if (m_member)
-            level->SetString("Lv." + std::to_string(m_member->Level));
+            level->SetString(fmt::format("Lv.{}", m_member->Level));
         else
             level->SetString(std::string());
 
-        if (const auto name = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); name)
+        if (const auto name = FindChild<Gx::Label>(Resource::Avatar::Info::IDC_TEXT_AVATAR_INFO_NAME); name)
         {
             if (m_member)
             {
@@ -99,10 +105,10 @@ void AvatarInfo::Invalidate()
                 name->SetString(std::string());
         }
     }
-    else if (const auto label = FindChild<Gx::Label>("IDC_TEXT_AVATAR_INFO_NAME"); label)
+    else if (const auto label = FindChild<Gx::Label>(Resource::Avatar::Info::IDC_TEXT_AVATAR_INFO_NAME); label)
     {
         if (m_member)
-            label->SetString("Lv:" + std::to_string(m_member->Level) + " " + m_member->Name);
+            label->SetString(fmt::format(L"Lv:{} {}", m_member->Level, m_member->Name));
         else
             label->SetString(std::string());
     }

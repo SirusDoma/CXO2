@@ -1,9 +1,16 @@
 ﻿#include <OTwo/UI/Room/RoomButton.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Models/Game.hpp>
+
+#include <OTwo/StringTable/Identifiers/Room.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Image.hpp>
-#include <OTwo/Models/Game.hpp>
+
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 RoomButton::RoomButton() :
     m_room(),
@@ -16,17 +23,7 @@ void RoomButton::Initialize()
 {
     Gx::Image::Initialize();
 
-    auto number   = FindChild<Gx::BitmapNumber>("IDC_NUMBER_ROOM_ID");
-    auto title    = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
-    auto music    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-    auto capacity = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
-    auto speed    = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
-    auto state    = FindChild<Gx::Image>("IDC_IMAGE_STATE");
-    auto gameMode = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
-    auto ohmLevel = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
-    auto lock     = FindChild<Gx::Image>("IDC_IMAGE_PASSWORD");
-
-    m_hover  = FindChild<Gx::Image>("IDC_IMAGE_ROOM_HOVER");
+    m_hover = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_ROOM_HOVER);
     m_hover->SetVisible(false);
     Reset();
 
@@ -81,17 +78,17 @@ void RoomButton::Invalidate()
     if (!m_active)
         return;
 
-    const auto number     = FindChild<Gx::BitmapNumber>("IDC_NUMBER_ROOM_ID");
-    const auto title      = FindChild<Gx::Label>("IDC_TEXT_ROOM_NAME");
-    const auto capacity   = FindChild<Gx::Label>("IDC_TEXT_CAPACITY");
-    const auto speed      = FindChild<Gx::Image>("IDC_IMAGE_GAME_SPEED");
-    const auto state      = FindChild<Gx::Image>("IDC_IMAGE_STATE");
-    const auto gameMode   = FindChild<Gx::Image>("IDC_IMAGE_GAME_MODE");
-    const auto ohmLevel   = FindChild<Gx::Image>("IDC_IMAGE_OHM_LEVEL");
-    const auto lock       = FindChild<Gx::Image>("IDC_IMAGE_PASSWORD");
-    const auto levelLimit = FindChild<Gx::Image>("IDC_IMAGE_LEVEL_LIMIT");
-    const auto levelRange = FindChild<Gx::Label>("IDC_TEXT_LEVEL_RANGE");
-    const auto noMusic    = FindChild<Gx::Image>("IDC_IMAGE_NOT_HAVE");
+    const auto number     = FindChild<Gx::BitmapNumber>(Resource::Room::Button::IDC_NUMBER_ROOM_ID);
+    const auto title      = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_ROOM_NAME);
+    const auto capacity   = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_CAPACITY);
+    const auto speed      = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_GAME_SPEED);
+    const auto state      = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_STATE);
+    const auto gameMode   = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_GAME_MODE);
+    const auto ohmLevel   = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_OHM_LEVEL);
+    const auto lock       = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_PASSWORD);
+    const auto levelLimit = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_LEVEL_LIMIT);
+    const auto levelRange = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_LEVEL_RANGE);
+    const auto noMusic    = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_NOT_HAVE);
 
     unsigned int memberCount = 0;
     for (const auto member : m_room.Members)
@@ -101,7 +98,7 @@ void RoomButton::Invalidate()
     }
 
     title->SetString(m_room.Title);
-    capacity->SetString("(" + std::to_string(memberCount) + "/" + std::to_string(m_room.Capacity) + ")");
+    capacity->SetString(fmt::format("({}/{})", memberCount, m_room.Capacity));
 
     number->SetValue(m_room.ID);
     number->SetDigitCount(3);
@@ -146,30 +143,30 @@ void RoomButton::Invalidate()
             case LevelCategory::Level4: ohmLevel->SetFrame("Master"); break;
         }
 
-        auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-        const auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
+        auto music = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_MUSIC_NAME);
+        const auto newIndicator = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_NEW_MUSIC);
         newIndicator->SetVisible(m_room.ChartMetadata.New);
         if (m_room.ChartMetadata.New)
         {
             music->SetVisible(false);
 
-            music = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
+            music = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_NEW_MUSIC_NAME);
             music->SetVisible(true);
         }
         else
         {
-            const auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
+            const auto newMusic = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_NEW_MUSIC_NAME);
             newMusic->SetVisible(false);
         }
 
-        music->SetString("Lv." + std::to_string(m_room.ChartMetadata.Level) + " - " + m_room.ChartMetadata.Title);
+        music->SetString(fmt::format(L"Lv.{} - {}", m_room.ChartMetadata.Level, m_room.ChartMetadata.Title));
         speed->SetFrame(diffName + speedStr);
     }
     else if (m_room.SongMode == SongMode::Random)
     {
-        const auto music = FindChild<Gx::Label>("IDC_TEXT_MUSIC_NAME");
-        const auto newMusic = FindChild<Gx::Label>("IDC_TEXT_NEW_MUSIC_NAME");
-        const auto newIndicator = FindChild<Gx::Image>("IDC_IMAGE_NEW_MUSIC");
+        const auto music = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_MUSIC_NAME);
+        const auto newMusic = FindChild<Gx::Label>(Resource::Room::Button::IDC_TEXT_NEW_MUSIC_NAME);
+        const auto newIndicator = FindChild<Gx::Image>(Resource::Room::Button::IDC_IMAGE_NEW_MUSIC);
 
         music->SetString("Random");
         speed->SetFrame("RX" + speedStr);
@@ -184,7 +181,7 @@ void RoomButton::Invalidate()
         levelLimit->SetVisible(true);
         levelRange->SetVisible(true);
 
-        levelRange->SetString("Lv." + std::to_string(m_room.MinLevelLimit) + " ~ Lv." + std::to_string(m_room.MaxLevelLimit));
+        levelRange->SetString(fmt::format("Lv.{} ~ Lv.{}", m_room.MinLevelLimit, m_room.MaxLevelLimit));
     }
     else
     {

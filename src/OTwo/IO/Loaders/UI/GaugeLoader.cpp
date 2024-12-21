@@ -107,16 +107,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata&
     gauge->SetRotation(metadata->Rotation);
 
     auto container = ObjectContainer::Decorate(gauge.get());
-    if (!metadata->Objects.empty())
-    {
-        for (auto [key, object] : metadata->Objects)
-        {
-            auto name = meta.Name + "/" + key;
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
-
-            ObjectLoader::Load(name, object, container, objectCtx);
-        }
-    }
+    LoadChildren(container, meta, context);
 
     return gauge;
 }

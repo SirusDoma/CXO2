@@ -1,14 +1,14 @@
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateMusicShop.hpp>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StateBulletin.hpp>
 #include <OTwo/States/StateLoading.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
 
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-
-#include <OTwo/States/StatePlanet.hpp>
-#include <OTwo/States/StateWaiting7K.hpp>
+#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
 #include <OTwo/UI/Common/Marquee.hpp>
 #include <OTwo/UI/Common/ChatPanel.hpp>
@@ -27,10 +27,15 @@
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Models/Room.hpp>
 
+#include <OTwo/StringTable/Identifiers/Cache.hpp>
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Room.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
+
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
-#include <OTwo/States/StateAvi.hpp>
+
+using namespace StringTable::Identifiers;
 
 StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, MusicSelectionContext& selection, GameContext& game, ItemFactory& items) :
     m_mixer(mixer),
@@ -46,16 +51,16 @@ void StateRoom::Initialize()
     State::Initialize();
 
     auto& director         = GetDirector();
-    const auto bgm         = Instantiate<sf::Music>("BGM/bgRoom.ogg");
-    const auto sfxAccept   = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxNavigate = Instantiate<sf::Sound>("bgEffect/07");
-    const auto sfxToggle   = Instantiate<sf::Sound>("bgEffect/14");
+    const auto bgm         = Instantiate<sf::Music>(Sound::BGM::BG_ROOM);
+    const auto sfxAccept   = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+    const auto sfxNavigate = Instantiate<sf::Sound>(Sound::Effects::EF_07);
+    const auto sfxToggle   = Instantiate<sf::Sound>(Sound::Effects::EF_14);
 
     const auto player = m_session.GetCurrentPlayer();
-    const auto nicknameLabel = Instantiate<Gx::Label>("IDC_TEXT_NICKNAME");
-    nicknameLabel->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
+    const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
+    nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", player.Level, player.Name));
 
-    const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
+    const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
     avatar->SetGender(player.Gender);
     for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(std::move(item));
@@ -63,10 +68,10 @@ void StateRoom::Initialize()
     for (const auto id : player.EquippedItemIDs)
         avatar->Equip(m_items.Create(id));
 
-    const auto notice = Instantiate<Marquee>("IDC_TEXT_NOTICE");
+    const auto notice = Instantiate<Marquee>(Resource::Room::IDC_TEXT_NOTICE);
     notice->SetString("Welcome to O2Jam! Let's play together~");
 
-    const auto channelCategory = Instantiate<Gx::Image>("IDC_IMAGE_CHANNEL_CATEGORY");
+    const auto channelCategory = Instantiate<Gx::Image>(Resource::Room::IDC_IMAGE_CHANNEL_CATEGORY);
     switch (m_session.GetMusicHall())
     {
         case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
@@ -78,10 +83,10 @@ void StateRoom::Initialize()
         default: break;
     }
 
-    const auto channelNumber = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CHANNEL_ID");
+    const auto channelNumber = Instantiate<Gx::BitmapNumber>(Resource::Room::IDC_NUMBER_CHANNEL_ID);
     channelNumber->SetValue(m_session.GetChannelID());
 
-    const auto chatPanel = Instantiate<ChatPanel>("IDC_CHAT_PANEL");
+    const auto chatPanel = Instantiate<ChatPanel>(Resource::Room::IDC_CHAT_PANEL);
     chatPanel->SetMaximumTextLength(50);
 
     const auto chatWindow = chatPanel->GetChatWindow();
@@ -93,14 +98,14 @@ void StateRoom::Initialize()
     chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
     chatWindow->PushSystemMessage("F10               : Toggle Vsync on/off");
 
-    const auto userList = Instantiate<UserList>("IDC_USER_LIST");
+    const auto userList = Instantiate<UserList>(Resource::Room::IDC_USER_LIST);
     auto users = std::vector<Player>();
     userList->AddUser(m_session.GetCurrentPlayer());
 
     for (unsigned int i = 0; i < 34; i++)
-        userList->AddUser(Player{i + 3, Role::Normal, "Dummy " + std::to_string(i), static_cast<signed short>(i) });
+        userList->AddUser(Player{i + 3, Role::Normal, fmt::format("Dummy {}", i), static_cast<signed short>(i) });
 
-    const auto roomList = Instantiate<RoomList>("IDC_ROOM_LIST");
+    const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
     Room rooms[] = {
         Room{
             /* .ID           = */ 0,
@@ -177,11 +182,11 @@ void StateRoom::Initialize()
     for (auto& room : rooms)
         roomList->Add(room);
 
-    const auto createRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_CREATE_ROOM");
-    if (const auto createRoomDialog = Instantiate<CreateRoomDialog>("IDC_DIALOG_CREATE_ROOM"); createRoomDialog)
+    const auto createRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_CREATE_ROOM);
+    if (const auto createRoomDialog = Instantiate<CreateRoomDialog>(Resource::Room::IDC_DIALOG_CREATE_ROOM); createRoomDialog)
     {
         createRoomButton->SetClickCallback([=, &director] (auto& sender, auto& ev) {
-            m_mixer.Play(*sfxAccept, "SFX");
+            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
             Present(*createRoomDialog);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = m_session.GetInstalledMusic();
@@ -216,11 +221,11 @@ void StateRoom::Initialize()
         });
     }
 
-    const auto showAllButton     = Instantiate<Gx::Button>("IDC_BUTTON_SHOW_ALL");
-    const auto waitingRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_SHOW_WAITING");
+    const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
+    const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
 
     showAllButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxToggle, "SFX");
+        m_mixer.Play(*sfxToggle, Sound::Channel::SFX);
 
         showAllButton->SetVisible(false);
         showAllButton->SetEnabled(false);
@@ -232,7 +237,7 @@ void StateRoom::Initialize()
     });
 
     waitingRoomButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxToggle, "SFX");
+        m_mixer.Play(*sfxToggle, Sound::Channel::SFX);
 
         showAllButton->SetVisible(true);
         showAllButton->SetEnabled(true);
@@ -243,47 +248,47 @@ void StateRoom::Initialize()
         roomList->ShowAll();
     });
 
-    const auto roomLeftButton  = Instantiate<Gx::Button>("IDC_BUTTON_ROOM_LEFT");
-    const auto roomRightButton = Instantiate<Gx::Button>("IDC_BUTTON_ROOM_RIGHT");
+    const auto roomLeftButton  = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ROOM_LEFT);
+    const auto roomRightButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ROOM_RIGHT);
 
     roomLeftButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
         roomList->PreviousPage();
     });
 
     roomRightButton->SetClickCallback([=] (auto& sender, auto& ev) {
-        m_mixer.Play(*sfxNavigate, "SFX");
+        m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
         roomList->NextPage();
     });
 
-    const auto musicShopButton = Instantiate<Gx::Button>("IDC_BUTTON_MUSIC_SHOP");
+    const auto musicShopButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_MUSIC_SHOP);
     musicShopButton->SetClickCallback([this](auto& , auto& ) { OnMusicShopButtonClicked(); });
 
-    const auto itemShopButton = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SHOP");
+    const auto itemShopButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ITEM_SHOP);
     itemShopButton->SetClickCallback([this](auto& , auto& ) { OnItemShopButtonClicked(); });
 
-    const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
+    const auto myRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_MY_ROOM);
     myRoomButton->SetClickCallback([this](auto& , auto& ) { OnMyRoomButtonClicked(); });
 
-    const auto bulletinButton = Instantiate<Gx::Button>("IDC_BUTTON_BULLETIN");
+    const auto bulletinButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_BULLETIN);
     bulletinButton->SetClickCallback([this](auto& , auto& ) { OnBulletinButtonClicked(); });
 
-    const auto tutorialButton = Instantiate<Gx::Button>("IDC_BUTTON_TUTORIAL");
+    const auto tutorialButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_TUTORIAL);
     tutorialButton->SetClickCallback([this](auto& , auto& ) { OnTutorialButtonClicked(); });
 
-    if (const auto optionDialog = Instantiate<OptionDialog>("IDC_DIALOG_OPTION"); optionDialog)
+    if (const auto optionDialog = Instantiate<OptionDialog>(Resource::Room::IDC_DIALOG_OPTION); optionDialog)
     {
-        const auto optionButton = FindChild<Gx::Button>("IDC_BUTTON_OPTION");
+        const auto optionButton = FindChild<Gx::Button>(Resource::Room::IDC_BUTTON_OPTION);
         optionButton->SetClickCallback([=] (auto& sender, auto& ev) {
             Present(*optionDialog);
         });
     }
 
-    const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto backButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_BACK);
     backButton->SetClickCallback([&](auto& , auto& ) { OnBackButtonClicked(); });
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 }
 
 void StateRoom::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -324,9 +329,9 @@ void StateRoom::OnTutorialButtonClicked()
     if (const auto metadata = ChartMetadataLoader().LoadFromFile(chart->Source, Gx::ResourceContext::Default))
     {
         if (auto image = ChartLoader::LoadCoverArt(*metadata, Gx::ResourceContext::Default); image)
-            resources.Store<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER", std::move(image), Gx::CacheMode::Update);
+            resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
         else
-            resources.Destroy<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER");
+            resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
     }
 
     m_game.GetConfig().KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];

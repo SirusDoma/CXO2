@@ -10,10 +10,10 @@ ComboCounter::ComboCounter(Gx::Animation* header, Gx::BitmapNumber* counter) :
     m_counter(counter)
 {
     if (m_header)
-        Gx::Node::AddChild(*m_header);
+        AddChild(*m_header);
 
     if (m_counter)
-        Gx::Node::AddChild(*m_counter);
+        AddChild(*m_counter);
 }
 
 void ComboCounter::Initialize()

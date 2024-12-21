@@ -1,12 +1,15 @@
-#include <emmintrin.h>
-#include <future>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
+#include <OTwo/States/StatePayment.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
+
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/ItemShop.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/List.hpp>
@@ -16,7 +19,9 @@
 #include <Genode/UI/RadioButton.hpp>
 
 #include <magic_enum.hpp>
-#include <OTwo/States/StatePayment.hpp>
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 StateItemShop::StateItemShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
@@ -34,24 +39,24 @@ void StateItemShop::Initialize()
     State::Initialize();
 
     const auto& player    = m_session.GetCurrentPlayer();
-    const auto bgm        = Instantiate<sf::Music>("BGM/bgItemShop.ogg");
-    const auto sfxWelcome = Instantiate<sf::Sound>("O2PlanetNPC/1");
-    const auto sfxAccept  = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxCancel  = Instantiate<sf::Sound>("bgEffect/03");
-    const auto sfxPrev    = Instantiate<sf::Sound>("bgEffect/19_1");
-    const auto sfxNext    = Instantiate<sf::Sound>("bgEffect/19_2");
-    const auto sfxMenu    = Instantiate<sf::Sound>("bgEffect/11");
-    const auto sfxGender  = Instantiate<sf::Sound>("bgEffect/15");
-    const auto sfxPlanet  = Instantiate<sf::Sound>("bgEffect/24_");
+    const auto bgm        = Instantiate<sf::Music>(Sound::BGM::BG_ITEM_SHOP);
+    const auto sfxWelcome = Instantiate<sf::Sound>(Sound::Speech::NPC_1);
+    const auto sfxAccept  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+    const auto sfxCancel  = Instantiate<sf::Sound>(Sound::Effects::EF_03);
+    const auto sfxPrev    = Instantiate<sf::Sound>(Sound::Effects::EF_19_1);
+    const auto sfxNext    = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
+    const auto sfxMenu    = Instantiate<sf::Sound>(Sound::Effects::EF_11);
+    const auto sfxGender  = Instantiate<sf::Sound>(Sound::Effects::EF_15);
+    const auto sfxPlanet  = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
 
-    for (auto id : { "O2PlanetNPC/5", "O2PlanetNPC/6", "O2PlanetNPC/7" })
+    for (auto id : { Sound::Speech::NPC_5, Sound::Speech::NPC_6, Sound::Speech::NPC_7 })
         m_shopMasterSpeech.push_back(Instantiate<sf::Sound>(id));
 
     m_genderCategory = player.Gender;
     m_shopCategory   = ShopCategory::Special;
     m_itemCategory   = EquipmentType::Costume;
 
-    const auto avatar = Instantiate<Avatar>("IDC_AVATAR");
+    const auto avatar = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
     avatar->SetGender(player.Gender);
     for (auto& [_, item] : m_items.GetDefaultItems(player.Gender))
         avatar->SetDefaultItem(std::move(item));
@@ -59,16 +64,16 @@ void StateItemShop::Initialize()
     for (const auto id : player.EquippedItemIDs)
         avatar->Equip(m_items.Create(id));
 
-    const auto nicknameText = Instantiate<Gx::Label>("IDC_TEXT_NICKNAME");
-    nicknameText->SetString("Lv." + std::to_string(player.Level) + ": " + player.Name);
+    const auto nicknameText = Instantiate<Gx::Label>(Resource::ItemShop::IDC_TEXT_NICKNAME);
+    nicknameText->SetString(fmt::format(L"Lv.{}: {}", player.Level, player.Name));
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
     currentCash->SetValue(player.Cash);
 
-    const auto myRoomButton = Instantiate<Gx::Button>("IDC_BUTTON_MY_ROOM");
+    const auto myRoomButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MY_ROOM);
     myRoomButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Present<StateMyRoom>();
@@ -87,7 +92,7 @@ void StateItemShop::Initialize()
         if (!shopMaster)
             return;
 
-        if (const auto speech = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_SPEECH"))
+        if (const auto speech = shopMaster->FindChild<Gx::Animation>(Resource::ItemShop::ShopMaster::IDC_ANIMATION_SPEECH))
         {
             speech->SetAnimationCallback(shopMasterLipsAnimationCallback);
             speech->Stop();
@@ -105,31 +110,31 @@ void StateItemShop::Initialize()
             for (std::size_t i = 0; i < m_shopMasterSpeech.size(); i++)
             {
                 if (i == m_shopMasterSpeechCounter)
-                    m_mixer.Play(*m_shopMasterSpeech[i], "SFX");
+                    m_mixer.Play(*m_shopMasterSpeech[i], Sound::Channel::SFX);
                 else
                     m_shopMasterSpeech[i]->stop();
             }
         });
     };
 
-    const auto shopMasterContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP_MASTER");
-    const auto shopMasterMain = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_MAIN");
+    const auto shopMasterContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SHOP_MASTER);
+    const auto shopMasterMain = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_MAIN);
     shopMasterWireAnimation(shopMasterMain);
     shopMasterWireSpeech(shopMasterMain);
 
-    const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_O2P");
+    const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_O2P);
     shopMasterO2P->SetVisible(false);
     shopMasterWireAnimation(shopMasterO2P);
 
-    const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_AQUA");
+    const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_AQUA);
     shopMasterAqua->SetVisible(false);
     shopMasterWireAnimation(shopMasterAqua);
 
-    const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_GRAFFITI");
+    const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_GRAFFITI);
     shopMasterGraffiti->SetVisible(false);
     shopMasterWireAnimation(shopMasterGraffiti);
 
-    const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::Image>("IDC_IMAGE_SHOP_MASTER_EVENT");
+    const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_EVENT);
     shopMasterEvent->SetVisible(false);
     shopMasterWireAnimation(shopMasterEvent);
 
@@ -145,10 +150,10 @@ void StateItemShop::Initialize()
         { Planet::Event,      shopMasterEvent    }
     };
 
-    const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+    const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
     tooltip->SetVisible(false);
 
-    const auto defaultButton = Instantiate<Gx::Button>("IDC_BUTTON_DEFAULT");
+    const auto defaultButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_DEFAULT);
     defaultButton->SetClickCallback([=] (auto&, auto&)
     {
         avatar->ClearEquipments();
@@ -156,23 +161,23 @@ void StateItemShop::Initialize()
             avatar->Equip(m_items.Create(id));
     });
 
-    const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CATEGORY_BUTTONS");
+    const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CATEGORY_BUTTONS);
     const std::unordered_map<ShopCategory, Gx::RadioButton*> shopCategoryButtonMap =
     {
-        { ShopCategory::Special,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_SPECIAL") },
-        { ShopCategory::Fashion,    categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_FASHION") },
-        { ShopCategory::Accessory,  categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_ACCESSORY") },
-        { ShopCategory::Beauty,     categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_BEAUTY") },
-        { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>("IDC_BUTTON_INSTRUMENT") },
+        { ShopCategory::Special,    categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_SPECIAL) },
+        { ShopCategory::Fashion,    categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_FASHION) },
+        { ShopCategory::Accessory,  categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_ACCESSORY) },
+        { ShopCategory::Beauty,     categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_BEAUTY) },
+        { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_INSTRUMENT) },
    };
 
     const std::unordered_map<ShopCategory, Gx::UiContainer*> shopCategoryContainerMap =
     {
-        { ShopCategory::Special,    Instantiate<Gx::UiContainer>("IDC_CONTAINER_SPECIAL_CATEGORY") },
-        { ShopCategory::Fashion,    Instantiate<Gx::UiContainer>("IDC_CONTAINER_FASHION_CATEGORY") },
-        { ShopCategory::Accessory,  Instantiate<Gx::UiContainer>("IDC_CONTAINER_ACCESSORY_CATEGORY") },
-        { ShopCategory::Beauty,     Instantiate<Gx::UiContainer>("IDC_CONTAINER_BEAUTY_CATEGORY") },
-        { ShopCategory::Instrument, Instantiate<Gx::UiContainer>("IDC_CONTAINER_INSTRUMENT_CATEGORY") },
+        { ShopCategory::Special,    Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SPECIAL_CATEGORY) },
+        { ShopCategory::Fashion,    Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_FASHION_CATEGORY) },
+        { ShopCategory::Accessory,  Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ACCESSORY_CATEGORY) },
+        { ShopCategory::Beauty,     Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_BEAUTY_CATEGORY) },
+        { ShopCategory::Instrument, Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_INSTRUMENT_CATEGORY) },
     };
 
     const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap =
@@ -196,7 +201,7 @@ void StateItemShop::Initialize()
                 return;
 
             m_shopCategory = category;
-            m_mixer.Play(*sfxMenu, "SFX");
+            m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
 
             for (const auto iterator : shopCategoryContainerMap)
             {
@@ -236,7 +241,7 @@ void StateItemShop::Initialize()
                         return;
 
                     m_itemCategory = itemCategoryMap.at(category).at(i);
-                    m_mixer.Play(*sfxMenu, "SFX");
+                    m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
 
                     InvalidateShopItemList(true);
                 });
@@ -244,8 +249,8 @@ void StateItemShop::Initialize()
         }
     }
 
-    const auto planetPrevButton = Instantiate<Gx::Button>("IDC_BUTTON_PLANET_UP");
-    const auto planetNextButton = Instantiate<Gx::Button>("IDC_BUTTON_PLANET_DOWN");
+    const auto planetPrevButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_PLANET_UP);
+    const auto planetNextButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_PLANET_DOWN);
 
     planetPrevButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -254,7 +259,7 @@ void StateItemShop::Initialize()
         else
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
 
-        m_mixer.Play(*sfxPlanet, "SFX");
+        m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
@@ -266,31 +271,31 @@ void StateItemShop::Initialize()
         else
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
 
-        m_mixer.Play(*sfxPlanet, "SFX");
+        m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
     });
 
-    const auto extButton = Instantiate<Gx::Button>("IDC_BUTTON_EXT_MENU");
+    const auto extButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_EXT_MENU);
     extButton->SetClickCallback([this] (auto&, auto&) { OnExtensionButtonClicked(); });
 
-    const auto planetExt = Instantiate<Gx::Image>("IDC_IMAGE_EXT_MENU");
+    const auto planetExt = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_EXT_MENU);
     planetExt->SetTexCoords({});
     planetExt->SetEnabled(false);
     const std::unordered_map<Planet, Gx::Button*> shopPlanetExtMap =
     {
-        { Planet::Unknown,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_ALL") },
-        { Planet::O2Planet,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_NORMAL") },
-        { Planet::Aqua,       planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_AQUA") },
-        { Planet::Eliten,     planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_ELITEN") },
-        { Planet::Graffiti,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_GRAFFITI") },
-        { Planet::Bikini,     planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_BIKINI") },
-        { Planet::Crush,      planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_CRUSH") },
-        { Planet::Wonderland, planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_WONDERLAND") },
-        { Planet::Meganut,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_MEGANUT") },
-        { Planet::Crystal,    planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_CRYSTAL") },
-        { Planet::Draconic,   planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_DRACONIC") },
-        { Planet::Event,      planetExt->FindChild<Gx::Button>("IDC_BUTTON_EXT_EVENT") },
+        { Planet::Unknown,    planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_ALL) },
+        { Planet::O2Planet,   planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_NORMAL) },
+        { Planet::Aqua,       planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_AQUA) },
+        { Planet::Eliten,     planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_ELITEN) },
+        { Planet::Graffiti,   planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_GRAFFITI) },
+        { Planet::Bikini,     planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_BIKINI) },
+        { Planet::Crush,      planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_CRUSH) },
+        { Planet::Wonderland, planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_WONDERLAND) },
+        { Planet::Meganut,    planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_MEGANUT) },
+        { Planet::Crystal,    planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_CRYSTAL) },
+        { Planet::Draconic,   planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_DRACONIC) },
+        { Planet::Event,      planetExt->FindChild<Gx::Button>(Resource::ItemShop::ExtensionMenu::IDC_BUTTON_EXT_EVENT) },
    };
 
     for (auto [planet, button] : shopPlanetExtMap)
@@ -301,14 +306,14 @@ void StateItemShop::Initialize()
                 return;
 
             m_shopPlanetCategory = planet;
-            m_mixer.Play(*sfxPlanet, "SFX");
+            m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
             InvalidateShopMaster(true);
             InvalidateShopItemList(true);
         });
     }
 
-    const auto maleButton   = Instantiate<Gx::Button>("IDC_BUTTON_MALE");
-    const auto femaleButton = Instantiate<Gx::Button>("IDC_BUTTON_FEMALE");
+    const auto maleButton   = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MALE);
+    const auto femaleButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_FEMALE);
 
     maleButton->SetEnabled(m_genderCategory == Gender::Male);
     maleButton->SetVisible(m_genderCategory == Gender::Male);
@@ -325,7 +330,7 @@ void StateItemShop::Initialize()
         femaleButton->SetEnabled(true);
         femaleButton->SetVisible(true);
 
-        m_mixer.Play(*sfxGender, "SFX");
+        m_mixer.Play(*sfxGender, Sound::Channel::SFX);
 
         if (m_itemCategory == EquipmentType::Costume)
             InvalidateShopSetItemList(true);
@@ -343,7 +348,7 @@ void StateItemShop::Initialize()
         maleButton->SetEnabled(true);
         maleButton->SetVisible(true);
 
-        m_mixer.Play(*sfxGender, "SFX");
+        m_mixer.Play(*sfxGender, Sound::Channel::SFX);
         if (m_itemCategory == EquipmentType::Costume)
             InvalidateShopSetItemList(true);
         else
@@ -351,27 +356,27 @@ void StateItemShop::Initialize()
     });
 
     m_shopCurrentPage = 0;
-    const auto shopScrollBar = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
-    const auto itemList      = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto shopScrollBar = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const auto itemList      = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
     shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildrenCount() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildrenCount()) / itemList->GetVerticalCount())));
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
-            m_mixer.Play(*sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
         else
-            m_mixer.Play(*sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, Sound::Channel::SFX);
 
         m_shopCurrentPage = static_cast<unsigned int>(value);
         InvalidateShopItemList();
     });
 
-    const auto shopScrollLeft = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SCROLL_LEFT");
+    const auto shopScrollLeft = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_LEFT);
     shopScrollLeft->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Decrease(); });
 
-    const auto shopScrollRight = Instantiate<Gx::Button>("IDC_BUTTON_ITEM_SCROLL_RIGHT");
+    const auto shopScrollRight = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_RIGHT);
     shopScrollRight->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Increase(); });
 
-    const auto shopItemList = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto shopItemList = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
     shopItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
     {
         if (ev.Delta > 0)
@@ -380,8 +385,8 @@ void StateItemShop::Initialize()
             shopScrollLeft->PerformClick();
     });
 
-    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
-    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
+    const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
     setItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
     {
         if (ev.Delta > 0)
@@ -390,31 +395,31 @@ void StateItemShop::Initialize()
             shopScrollLeft->PerformClick();
     });
 
-    const auto myBagContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
-    m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>("IDC_IMAGE_MYBAG_SELECT");
+    const auto myBagContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+    m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>(Resource::ItemShop::MyBag::IDC_IMAGE_MYBAG_SELECT);
     m_myBagSelectIndicator->SetVisible(false);
 
-    const auto bagList = myBagContainer->FindChild<Gx::List>("IDC_LIST_BAG");
+    const auto bagList = myBagContainer->FindChild<Gx::List>(Resource::ItemShop::MyBag::IDC_LIST_BAG);
     const auto bagSlots = bagList->GetChildren();
 
     m_myBagCurrentPage = 0;
-    const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
+    const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
     bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
-            m_mixer.Play(*sfxPrev, "SFX");
+            m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
         else
-            m_mixer.Play(*sfxNext, "SFX");
+            m_mixer.Play(*sfxNext, Sound::Channel::SFX);
 
         m_myBagCurrentPage = static_cast<unsigned int>(value);
         InvalidateMyBag();
     });
 
-    const auto bagScrollLeftButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_LEFT");
+    const auto bagScrollLeftButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_LEFT);
     bagScrollLeftButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
 
-    const auto bagScrollRightButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_MYBAG_SCROLL_RIGHT");
+    const auto bagScrollRightButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_RIGHT);
     bagScrollRightButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
     bagList->SetScrollWheelCallback([=] (auto&, auto& ev)
@@ -425,21 +430,21 @@ void StateItemShop::Initialize()
             bagScrollLeftButton->PerformClick();
     });
 
-    const auto sellButton = myBagContainer->FindChild<Gx::Button>("IDC_BUTTON_SELL");
+    const auto sellButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_SELL);
     sellButton->SetClickCallback([this] (auto&, auto&) { OnItemSellClicked(); });
 
     m_cartCurrentPage = 0;
-    const auto cartContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
+    const auto cartContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
 
-    const auto buyButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_BUY");
+    const auto buyButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_BUY);
     buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
 
-    const auto giftButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_GIFT");
+    const auto giftButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_GIFT);
     giftButton->SetClickCallback([this] (auto&, auto&) { OnGiftButtonClicked(); });
 
-    const auto cartList           = cartContainer->FindChild<Gx::List>("IDC_LIST_CART");
-    const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
-    const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+    const auto cartList           = cartContainer->FindChild<Gx::List>(Resource::ItemShop::Cart::IDC_LIST_CART);
+    const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_LEFT);
+    const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_RIGHT);
 
     cartPrevPageButton->SetClickCallback([this] (auto&, auto&)
     {
@@ -464,8 +469,8 @@ void StateItemShop::Initialize()
             cartPrevPageButton->PerformClick();
     });
 
-    const auto myBagButton = Instantiate<Gx::Button>("IDC_BUTTON_MYBAG");
-    const auto cartButton  = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+    const auto myBagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
+    const auto cartButton  = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
 
     myBagButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -485,7 +490,7 @@ void StateItemShop::Initialize()
         cartContainer->SetVisible(true);
     });
 
-    const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto backButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Dismiss<StateRoom>();
@@ -497,8 +502,8 @@ void StateItemShop::Initialize()
     InvalidateShopItemList(true);
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
-    m_mixer.Play(*sfxWelcome, "SFX");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
+    m_mixer.Play(*sfxWelcome, Sound::Channel::SFX);
 }
 
 void StateItemShop::OnExtensionButtonClicked()
@@ -509,12 +514,12 @@ void StateItemShop::OnExtensionButtonClicked()
     if (m_extensionMenuEffect.GetState() != Gx::TaskState::Idle)
         Stop(m_extensionMenuEffect);
 
-    const auto extMenu          = Instantiate<Gx::Image>("IDC_IMAGE_EXT_MENU");
+    const auto extMenu          = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_EXT_MENU);
     const auto extDefaultFrame  = extMenu->GetFrame(0);
-    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
-    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
-    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+    const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
+    const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
 
     bool open = true;
     const bool invalidate = shopScrollBar->GetValue() == 0;
@@ -604,11 +609,11 @@ void StateItemShop::OnBuyButtonClicked()
         if (answer)
         {
             m_cart.SetCheckoutType(CartContext::CheckoutType::Item);
-            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/02"), "SFX");
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_02), Sound::Channel::SFX);
             GetDirector().Present<StatePayment>();
         }
         else
-            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/03"), "SFX");
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_03), Sound::Channel::SFX);
     });
 }
 
@@ -626,8 +631,8 @@ void StateItemShop::OnGiftButtonClicked()
 void StateItemShop::OnItemSellClicked()
 {
     auto& player         = m_session.GetCurrentPlayer();
-    const auto sfxAccept = Instantiate<sf::Sound>("bgEffect/02");
-    const auto sfxCancel = Instantiate<sf::Sound>("bgEffect/03");
+    const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+    const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
 
     if (!m_myBagSelectedItem)
     {
@@ -652,15 +657,14 @@ void StateItemShop::OnItemSellClicked()
         return;
     }
 
-    const auto message = "Item: " + m_myBagSelectedItem->GetName() +
-        "\nPrice: " + std::to_string(price) + " " + std::string(magic_enum::enum_name(currency)) +
-        "\n\nAre you sure about selling the item?";
+    const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
+        m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
     ShowDialog(message, DialogStyle::OkCancel, false, [=, &player] (auto accepted)
     {
         if (!accepted)
         {
-            m_mixer.Play(*sfxCancel, "SFX");
+            m_mixer.Play(*sfxCancel, Sound::Channel::SFX);
             return;
         }
 
@@ -680,7 +684,7 @@ void StateItemShop::OnItemSellClicked()
         else
             player.Cash += price;
 
-        m_mixer.Play(*sfxAccept, "SFX");
+        m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
         m_session.Save();
         InvalidateMyBag();
     });
@@ -688,7 +692,7 @@ void StateItemShop::OnItemSellClicked()
 
 void StateItemShop::InvalidateShopMaster(const bool moveIn)
 {
-    const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+    const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
     Gx::Image* shopMaster = nullptr;
 
     for (auto [planet, master] : m_shopMasters)
@@ -720,7 +724,7 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
             Run(m_shopMasterEffect);
         }
 
-        if (const auto speech = shopMaster->FindChild<Gx::Animation>("IDC_ANIMATION_SPEECH"))
+        if (const auto speech = shopMaster->FindChild<Gx::Animation>(Resource::ItemShop::ShopMaster::IDC_ANIMATION_SPEECH))
         {
             if (tooltip->IsVisible())
                 speech->Reset();
@@ -733,10 +737,10 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
 void StateItemShop::InvalidateMyBag()
 {
     const auto& player   = m_session.GetCurrentPlayer();
-    const auto avatar    = Instantiate<Avatar>("IDC_AVATAR");
-    const auto sfxClick  = Instantiate<sf::Sound>("bgEffect/25");
-    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MYBAG");
-    const auto bagList   = container->FindChild<Gx::List>("IDC_LIST_BAG");
+    const auto avatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+    const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
+    const auto container = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+    const auto bagList   = container->FindChild<Gx::List>(Resource::ItemShop::MyBag::IDC_LIST_BAG);
     const auto bagSlots  = bagList->GetChildren();
 
     if (m_inventory.empty())
@@ -779,7 +783,7 @@ void StateItemShop::InvalidateMyBag()
             quantity = it->second;
 
         currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
-        const auto thumbnail = slot->FindChild<Gx::Image>("IDC_IMAGE_THUMBNAIL");
+        const auto thumbnail = slot->FindChild<Gx::Image>(Resource::ItemShop::MyBag::Item::IDC_IMAGE_THUMBNAIL);
         if (item->GetSmallThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
@@ -788,7 +792,7 @@ void StateItemShop::InvalidateMyBag()
         if (const auto texture = thumbnail->GetTexture())
             thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
 
-        if (const auto quantityLabel = slot->FindChild<Gx::Label>("IDC_TEXT_QUANTITY"))
+        if (const auto quantityLabel = slot->FindChild<Gx::Label>(Resource::ItemShop::MyBag::Item::IDC_TEXT_QUANTITY))
         {
             if (quantity > 0)
                 quantityLabel->SetString(std::to_string(quantity));
@@ -806,7 +810,7 @@ void StateItemShop::InvalidateMyBag()
             m_myBagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_myBagSelectIndicator);
-            m_mixer.Play(*sfxClick, "SFX");
+            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
@@ -816,13 +820,13 @@ void StateItemShop::InvalidateMyBag()
 
             if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
             {
-                if (const auto dialog = Instantiate<Gx::Dialog>("IDC_DIALOG_SKILL_INFO"); dialog)
+                if (const auto dialog = Instantiate<Gx::Dialog>(Resource::ItemShop::IDC_DIALOG_SKILL_INFO); dialog)
                 {
-                    const auto nameLabel        = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_NAME");
-                    const auto quantityLabel    = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_QUANTITY");
-                    const auto skillLabel       = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_SKILL");
-                    const auto descriptionLabel = dialog->FindChild<Gx::Label>("IDC_TEXT_ITEM_DESCRIPTION");
-                    const auto thumbnail        = dialog->FindChild<Gx::Image>("IDC_IMAGE_ITEM_THUMBNAIL");
+                    const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_NAME);
+                    const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
+                    const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_SKILL);
+                    const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
+                    const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::ItemShop::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
 
                     nameLabel->SetString(item->GetName());
                     quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-");
@@ -855,14 +859,14 @@ void StateItemShop::InvalidateMyBag()
                     }
 
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
-                        thumbnail->SetTexture(*texture, true);
+                        skillThumbnail->SetTexture(*texture, true);
 
                     Present(*dialog);
                 }
             }
             else
             {
-                const auto sellButton = container->FindChild<Gx::Button>("IDC_BUTTON_SELL");
+                const auto sellButton = container->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_SELL);
                 sellButton->PerformClick();
             }
         });
@@ -881,20 +885,20 @@ void StateItemShop::InvalidateMyBag()
         m_myBagSelectIndicator->SetVisible(true);
     }
 
-    const auto bagScrollBar = container->FindChild<Gx::ScrollBar>("IDC_SCROLL_MYBAG");
+    const auto bagScrollBar = container->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
     bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
     currentCash->SetValue(player.Cash);
 }
 
 void StateItemShop::InvalidateCart()
 {
-    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
-    const auto cartList  = container->FindChild<Gx::List>("IDC_LIST_CART");
+    const auto container = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
+    const auto cartList  = container->FindChild<Gx::List>(Resource::ItemShop::Cart::IDC_LIST_CART);
     const auto slots     = cartList->GetChildren();
     const auto cartItems = m_cart.GetItems();
     const int maxPage    = static_cast<unsigned int>(std::ceil(static_cast<float>(cartItems.size()) / static_cast<float>(slots.size())));
@@ -965,11 +969,11 @@ void StateItemShop::InvalidateCart()
         slot->SetVisible(true);
 
         auto item               = cartItems[j++];
-        const auto id           = slot->FindChild<Gx::Label>("IDC_TEXT_NUMBER");
-        const auto name         = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
-        const auto type         = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM_TYPE");
-        const auto price        = slot->FindChild<Gx::Label>("IDC_TEXT_PRICE");
-        const auto deleteButton = slot->FindChild<Gx::Button>("IDC_BUTTON_DELETE");
+        const auto id           = slot->FindChild<Gx::Label>(Resource::ItemShop::Cart::Item::IDC_TEXT_NUMBER);
+        const auto name         = slot->FindChild<Gx::Label>(Resource::ItemShop::Cart::Item::IDC_TEXT_NAME);
+        const auto type         = slot->FindChild<Gx::Image>(Resource::ItemShop::Cart::Item::IDC_IMAGE_ITEM_TYPE);
+        const auto price        = slot->FindChild<Gx::Label>(Resource::ItemShop::Cart::Item::IDC_TEXT_PRICE);
+        const auto deleteButton = slot->FindChild<Gx::Button>(Resource::ItemShop::Cart::Item::IDC_BUTTON_DELETE);
 
         id->SetString(std::to_string(j));
         if (item.Type == CartItemType::EquipmentSet)
@@ -1006,9 +1010,9 @@ void StateItemShop::InvalidateCart()
                 }
 
                 if (setPriceGem > 0)
-                    price->SetString(std::to_string(setPriceGem) + "G");
+                    price->SetString(fmt::format("{}G", setPriceGem));
                 else
-                    price->SetString(std::to_string(setPriceCash) + "M");
+                    price->SetString(fmt::format("{}M", setPriceCash));
             }
 
             type->SetFrame("EquipmentSet");
@@ -1020,9 +1024,9 @@ void StateItemShop::InvalidateCart()
                 auto metadata = it->second;
                 name->SetString(metadata.Name);
                 if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
-                    price->SetString(std::to_string(gemPrice->second) + "G");
+                    price->SetString(fmt::format("{}G", gemPrice->second));
                 else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
-                    price->SetString(std::to_string(cashPrice->second) + "M");
+                    price->SetString(fmt::format("{}M", cashPrice->second));
             }
 
             type->SetFrame("Equipment");
@@ -1039,10 +1043,10 @@ void StateItemShop::InvalidateCart()
         });
     }
 
-    const auto currentPage = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_PAGE");
-    const auto totalPage   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_PAGE");
-    const auto totalGem    = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_GEM");
-    const auto totalCash   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_CASH");
+    const auto currentPage = container->FindChild<Gx::BitmapNumber>(Resource::ItemShop::Cart::IDC_NUMBER_CURRENT_PAGE);
+    const auto totalPage   = container->FindChild<Gx::BitmapNumber>(Resource::ItemShop::Cart::IDC_NUMBER_MAX_PAGE);
+    const auto totalGem    = container->FindChild<Gx::BitmapNumber>(Resource::ItemShop::Cart::IDC_NUMBER_TOTAL_GEM);
+    const auto totalCash   = container->FindChild<Gx::BitmapNumber>(Resource::ItemShop::Cart::IDC_NUMBER_TOTAL_CASH);
 
     currentPage->SetValue(maxPage > 0 ? m_cartCurrentPage + 1 : 0);
     totalPage->SetValue(maxPage);
@@ -1052,21 +1056,21 @@ void StateItemShop::InvalidateCart()
 
 void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 {
-    const auto avatar           = Instantiate<Avatar>("IDC_AVATAR");
-    const auto planet           = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
-    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
+    const auto avatar           = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+    const auto planet           = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
+    const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
     const auto slots            = itemList->GetChildren();
     const std::size_t slotCount = itemList->GetVerticalCount() * itemList->GetHorizontalCount();
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
 
-    Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP")->SetVisible(false);
+    Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP)->SetVisible(false);
     if (m_itemCategory == EquipmentType::Costume)
     {
         InvalidateShopSetItemList(rebuildList);
         return;
     }
 
-    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
+    const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
     itemList->SetVisible(true);
     itemList->SetEnabled(true);
     setItemContainer->SetVisible(false);
@@ -1141,12 +1145,12 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         slot->SetEnabled(true);
         slot->SetVisible(true);
 
-        const auto name          = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
-        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
-        const auto currencyTag   = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
-        const auto addButton     = slot->FindChild<Gx::Button>("IDC_BUTTON_ADD");
-        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
-        const auto thumbnail     = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
+        const auto name          = slot->FindChild<Gx::Label>(Resource::ItemShop::ItemList::IDC_TEXT_NAME);
+        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>(Resource::ItemShop::ItemList::IDC_NUMBER_PRICE);
+        const auto currencyTag   = slot->FindChild<Gx::Image>(Resource::ItemShop::ItemList::IDC_IMAGE_CURRENCY);
+        const auto addButton     = slot->FindChild<Gx::Button>(Resource::ItemShop::ItemList::IDC_BUTTON_ADD);
+        const auto previewButton = slot->FindChild<Gx::Button>(Resource::ItemShop::ItemList::IDC_BUTTON_PREVIEW);
+        const auto thumbnail     = slot->FindChild<Gx::Image>(Resource::ItemShop::ItemList::IDC_IMAGE_ITEM);
 
         name->SetString(metadata.Name);
         priceTag->SetValue(price);
@@ -1169,7 +1173,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                 return;
             }
 
-            const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
             bool updated = false;
             if (metadata.EquipmentType == EquipmentType::Costume)
                 updated = m_cart.AddEquipmentSet(metadata.ID);
@@ -1221,13 +1225,13 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         thumbnail->SetFocusChangedCallback([=, description = metadata.Description] (auto& sender, auto&)
         {
-            const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+            const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
             Stop(m_tooltipDelay);
             if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
             {
                 m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
                 {
-                    const auto message = tooltip->FindChild<Gx::Label>("IDC_TEXT_MESSAGE");
+                    const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
                     message->SetString(description);
 
                     const auto  bounds = tooltip->GetGlobalBounds();
@@ -1284,12 +1288,12 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
 void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 {
-    const auto currentAvatar    = Instantiate<Avatar>("IDC_AVATAR");
-    const auto planet           = Instantiate<Gx::Image>("IDC_IMAGE_PLANET");
-    const auto itemList         = Instantiate<Gx::List>("IDC_LIST_ITEM");
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>("IDC_SCROLL_ITEM");
-    const auto setItemContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SET_ITEM");
-    const auto setItemList      = setItemContainer->FindChild<Gx::List>("IDC_LIST_SET_ITEM");
+    const auto currentAvatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+    const auto planet           = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
+    const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
+    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
+    const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
     const auto slots            = setItemList->GetChildren();
     const std::size_t slotCount = setItemList->GetVerticalCount() * setItemList->GetHorizontalCount();
 
@@ -1408,14 +1412,14 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         slot->SetEnabled(true);
         slot->SetVisible(true);
 
-        const auto name          = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
-        const auto avatar        = slot->FindChild<Avatar>("IDC_AVATAR");
-        const auto thumbnail     = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM");
-        const auto pieceList     = slot->FindChild<Gx::List>("IDC_LIST_ITEM_PIECE");
-        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>("IDC_NUMBER_PRICE");
-        const auto currencyTag   = slot->FindChild<Gx::Image>("IDC_IMAGE_CURRENCY");
-        const auto addButton     = slot->FindChild<Gx::Button>("IDC_BUTTON_ADD");
-        const auto previewButton = slot->FindChild<Gx::Button>("IDC_BUTTON_PREVIEW");
+        const auto name          = slot->FindChild<Gx::Label>(Resource::ItemShop::SetItemList::IDC_TEXT_NAME);
+        const auto avatar        = slot->FindChild<Avatar>(Resource::ItemShop::SetItemList::IDC_AVATAR);
+        const auto thumbnail     = slot->FindChild<Gx::Image>(Resource::ItemShop::SetItemList::IDC_IMAGE_ITEM);
+        const auto pieceList     = slot->FindChild<Gx::List>(Resource::ItemShop::SetItemList::IDC_LIST_ITEM_PIECE);
+        const auto priceTag      = slot->FindChild<Gx::BitmapNumber>(Resource::ItemShop::SetItemList::IDC_NUMBER_PRICE);
+        const auto currencyTag   = slot->FindChild<Gx::Image>(Resource::ItemShop::SetItemList::IDC_IMAGE_CURRENCY);
+        const auto addButton     = slot->FindChild<Gx::Button>(Resource::ItemShop::SetItemList::IDC_BUTTON_ADD);
+        const auto previewButton = slot->FindChild<Gx::Button>(Resource::ItemShop::SetItemList::IDC_BUTTON_PREVIEW);
 
         name->SetString(sf::String::fromUtf8(metadata.Name->begin(), metadata.Name->end()));
         avatar->SetGender(m_genderCategory);
@@ -1441,7 +1445,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
-            const auto cartButton = Instantiate<Gx::Button>("IDC_BUTTON_CART");
+            const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
             if (m_cart.AddEquipmentSet(*metadata.ID))
             {
                 m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
@@ -1475,19 +1479,19 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             pieceName->SetVisible(true);
             pieceName->SetString(std::to_string(p + 1));
             if (p < itemSetList.size())
-                pieceName->SetString(pieceName->GetString() + " " + itemSetList[p].Name);
+                pieceName->SetString(fmt::format(L"{} {}", p + 1, itemSetList[p].Name));
         }
 
         thumbnail->SetVisible(false);
         thumbnail->SetFocusChangedCallback([=, description = metadata.Description.value_or(std::string())] (auto& sender, auto&)
         {
-            const auto tooltip = Instantiate<Gx::Image>("IDC_IMAGE_TOOLTIP");
+            const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
             Stop(m_tooltipDelay);
             if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
             {
                 m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
                 {
-                    const auto message = tooltip->FindChild<Gx::Label>("IDC_TEXT_MESSAGE");
+                    const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
                     message->SetString(sf::String::fromUtf8(description.begin(), description.end()));
 
                     const auto  bounds = tooltip->GetGlobalBounds();

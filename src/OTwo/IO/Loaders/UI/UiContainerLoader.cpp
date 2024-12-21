@@ -55,15 +55,11 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
         if (reference.type() != Gx::Json::value_t::string)
             continue;
 
-        auto name = meta.Name + "/" + key;
+        auto name = fmt::format("{}/{}", meta.Name, key);
         ObjectLoader::Load(name, reference, populator, ctx);
     }
 
-    for (auto [key, object] : metadata->Objects)
-    {
-        auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, populator, ctx);
-    }
+    LoadChildren(populator, meta, context);
 
     return container;
 }

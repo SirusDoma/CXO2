@@ -1,4 +1,7 @@
 #include <OTwo/UI/Common/ChatWindow.hpp>
+#include <OTwo/Utilities/StringFormatter.hpp>
+
+#include <fmt/format.h>
 #include <utility>
 
 ChatWindow::ChatWindow() :
@@ -259,13 +262,13 @@ void ChatWindow::Invalidate()
         if (chat.Sender.ID != 0)
         {
             auto nickname = chat.Sender.Name;
-            if (constexpr size_t nickLength = 16; nickname.length() < nickLength)
+            if (constexpr size_t nickLength = 16; nickname.getSize() < nickLength)
             {
-                for (size_t j = 0; j < nickLength - nickname.length(); j++)
-                    nickname = " " + nickname;
+                for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
+                    nickname = fmt::format(L" {}", nickname);
             }
 
-            m_labels[index]->SetString(sf::String("[" + nickname + "] ") + chat.Content);
+            m_labels[index]->SetString(fmt::format(L"[{}] {}", nickname, chat.Content));
         }
         else
             m_labels[index]->SetString(chat.Content);

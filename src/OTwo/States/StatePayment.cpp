@@ -1,14 +1,17 @@
 ﻿#include <OTwo/States/StatePayment.hpp>
-#include <OTwo/States/StateItemShop.hpp>
-#include <OTwo/States/StateMusicShop.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
+
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Payment.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 
 #include <SFML/Audio/Music.hpp>
+
+using namespace StringTable::Identifiers;
 
 StatePayment::StatePayment(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items, CartContext& cart) :
     m_mixer(mixer),
@@ -55,19 +58,19 @@ void StatePayment::Initialize()
     m_cart.Clear();
     m_session.Save();
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_CASH);
     currentCash->SetValue(player.Cash);
 
-    const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto backButton = Instantiate<Gx::Button>(Resource::Payment::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Dismiss();
     });
 
-    const auto bgm = Instantiate<sf::Music>("BGM/bgLogin.ogg");
+    const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_LOGIN);
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 }

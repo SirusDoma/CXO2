@@ -2,10 +2,14 @@
 #include <OTwo/Core/ChartRenderer.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/StringTable/Identifiers/Game.hpp>
+
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/Label.hpp>
+
+using namespace StringTable::Identifiers;
 
 PlayMenu::PlayMenu(const GameContext& context) :
     m_context(context),
@@ -26,17 +30,17 @@ void PlayMenu::Initialize()
 {
     Gx::Image::Initialize();
 
-    m_renderer = GetParent<::State>()->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
-    m_title    = FindChild<Gx::Label>("IDC_TEXT_MUSIC_TITLE");
-    m_playIcon = FindChild<Gx::Animation>("IDC_ANIMATION_PLAY_ICON");
-    m_level    = FindChild<Gx::Image>("IDC_IMAGE_MUSIC_LEVEL");
-    m_wave     = FindChild<Gx::Gauge>("IDC_GAUGE_WAVE");
-    m_minutes  = FindChild<Gx::BitmapNumber>("IDC_NUMBER_PLAY_TIME_MINUTE");
-    m_seconds  = FindChild<Gx::BitmapNumber>("IDC_NUMBER_PLAY_TIME_SECOND");
-    m_bgmVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_MUSIC");
-    m_sfxVol   = FindChild<Gx::Gauge>("IDC_GAUGE_VOLUME_EFFECT");
+    m_renderer = GetParent<::State>()->FindChild<ChartRenderer>(Resource::Game::Menu::IDC_CHART_RENDERER);
+    m_title    = FindChild<Gx::Label>(Resource::Game::Menu::IDC_TEXT_MUSIC_TITLE);
+    m_playIcon = FindChild<Gx::Animation>(Resource::Game::Menu::IDC_ANIMATION_PLAY_ICON);
+    m_level    = FindChild<Gx::Image>(Resource::Game::Menu::IDC_IMAGE_MUSIC_LEVEL);
+    m_wave     = FindChild<Gx::Gauge>(Resource::Game::Menu::IDC_GAUGE_WAVE);
+    m_minutes  = FindChild<Gx::BitmapNumber>(Resource::Game::Menu::IDC_NUMBER_PLAY_TIME_MINUTE);
+    m_seconds  = FindChild<Gx::BitmapNumber>(Resource::Game::Menu::IDC_NUMBER_PLAY_TIME_SECOND);
+    m_bgmVol   = FindChild<Gx::Gauge>(Resource::Game::Menu::IDC_GAUGE_VOLUME_MUSIC);
+    m_sfxVol   = FindChild<Gx::Gauge>(Resource::Game::Menu::IDC_GAUGE_VOLUME_EFFECT);
 
-    if (const auto pointList = FindChild<Gx::List>("IDC_LIST_NOTE_POINT_NUMBER"); pointList)
+    if (const auto pointList = FindChild<Gx::List>(Resource::Game::Menu::IDC_LIST_NOTE_POINT_NUMBER); pointList)
     {
         const auto children = pointList->GetChildren();
         for (std::size_t i = 0; i < children.size(); i++)
@@ -114,7 +118,7 @@ const ScoreTracker* PlayMenu::GetScoreTracker() const
 void PlayMenu::Update(const double delta)
 {
     if (!m_renderer)
-        m_renderer = GetParent<::State>()->FindChild<ChartRenderer>("IDC_CHART_RENDERER");
+        m_renderer = GetParent<::State>()->FindChild<ChartRenderer>(Resource::Game::Menu::IDC_CHART_RENDERER);
 
     if (m_renderer && m_renderer->IsRendering())
     {

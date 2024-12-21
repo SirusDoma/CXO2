@@ -5,11 +5,15 @@
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/IO/PlayingResourceContext.hpp>
 
+#include <OTwo/StringTable/Identifiers/Cache.hpp>
+
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 #include <thread>
+
+using namespace StringTable::Identifiers;
 
 StateLoading::StateLoading(GameContext& game) :
     m_context(game)
@@ -36,7 +40,7 @@ void StateLoading::Initialize()
     const auto& resources = GetResources(ResourceScope::Shared);
     auto loader           = ChartLoader(m_context);
 
-    if (const auto image = resources.Find<sf::Image>("IDC_IMAGE_STATE_LOADING_COVER"); image)
+    if (const auto image = resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER); image)
     {
         OnCoverLoaded(image);
     }

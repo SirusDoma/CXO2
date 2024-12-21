@@ -6,6 +6,9 @@
 #include <OTwo/Contexts/CartContext.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/MusicShop.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/Image.hpp>
@@ -15,6 +18,10 @@
 #include <Genode/UI/ToggleButton.hpp>
 
 #include <SFML/Audio/Music.hpp>
+
+#include <fmt/format.h>
+
+using namespace StringTable::Identifiers;
 
 StateMusicShop::StateMusicShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
@@ -31,23 +38,23 @@ void StateMusicShop::Initialize()
     State::Initialize();
 
     const auto& player = m_session.GetCurrentPlayer();
-    const auto bgm     = Instantiate<sf::Music>("BGM/bgMusicShop.ogg");
+    const auto bgm     = Instantiate<sf::Music>(Sound::BGM::BG_MUSIC_SHOP);
 
-    const auto currentGem = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_GEM");
+    const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MusicShop::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
 
-    const auto currentCash = Instantiate<Gx::BitmapNumber>("IDC_NUMBER_CASH");
+    const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MusicShop::IDC_NUMBER_CASH);
     currentCash->SetValue(player.Cash);
 
-    const auto shopContainer     = Instantiate<Gx::UiContainer>("IDC_CONTAINER_SHOP");
-    const auto musicContainer    = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MUSIC");
-    const auto downloadContainer = Instantiate<Gx::UiContainer>("IDC_CONTAINER_DOWNLOAD");
-    const auto cartContainer     = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
-    const auto downloadTabButton = Instantiate<Gx::Button>("IDC_BUTTON_DOWNLOAD_TAB");
-    const auto cartTabButton     = Instantiate<Gx::Button>("IDC_BUTTON_CART_TAB");
+    const auto shopContainer     = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_SHOP);
+    const auto musicContainer    = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_MUSIC);
+    const auto downloadContainer = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_DOWNLOAD);
+    const auto cartContainer     = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_CART);
+    const auto downloadTabButton = Instantiate<Gx::Button>(Resource::MusicShop::IDC_BUTTON_DOWNLOAD_TAB);
+    const auto cartTabButton     = Instantiate<Gx::Button>(Resource::MusicShop::IDC_BUTTON_CART_TAB);
 
-    const auto showAllButton     = shopContainer->FindChild<Gx::Button>("IDC_BUTTON_SHOW_ALL");
-    const auto showBuyableButton = shopContainer->FindChild<Gx::Button>("IDC_BUTTON_SHOW_BUYABLE");
+    const auto showAllButton     = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_ALL);
+    const auto showBuyableButton = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_BUYABLE);
 
     showAllButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -86,24 +93,24 @@ void StateMusicShop::Initialize()
         cartContainer->SetVisible(true);
     });
 
-    const auto musicList = musicContainer->FindChild<Gx::List>("IDC_LIST_MUSIC");
+    const auto musicList = musicContainer->FindChild<Gx::List>(Resource::MusicShop::IDC_LIST_MUSIC);
     for (const auto child : musicList->GetChildren())
     {
         const auto item = dynamic_cast<Gx::UiContainer*>(child);
         if (!item)
             continue;
 
-        if (const auto selector = item->FindChild<Gx::Image>("IDC_IMAGE_SELECTOR"))
+        if (const auto selector = item->FindChild<Gx::Image>(Resource::MusicShop::MusicItem::IDC_IMAGE_SELECTOR))
         {
             selector->SetVisible(false);
             item->SetFocusChangedCallback([=] (auto& sender, auto&)
             {
                 selector->SetVisible(sender.IsFocused());
-                if (const auto toggleButton = item->FindChild<Gx::ToggleButton>("IDC_TOGGLE_SELECT"); sender.IsFocused() && toggleButton)
+                if (const auto toggleButton = item->FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT); sender.IsFocused() && toggleButton)
                     toggleButton->SetFocus(sender.IsFocused());
             });
 
-            if (const auto toggleButton = item->FindChild<Gx::ToggleButton>("IDC_TOGGLE_SELECT"))
+            if (const auto toggleButton = item->FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT))
             {
                 toggleButton->SetClickCallback([=] (auto&, auto& ev)
                 {
@@ -123,21 +130,21 @@ void StateMusicShop::Initialize()
         }
     }
 
-    const auto musicGauge = downloadContainer->FindChild<Gx::Gauge>("IDC_TEXT_DOWNLOAD_MUSIC_GAUGE");
-    const auto totalGauge = downloadContainer->FindChild<Gx::Gauge>("IDC_TEXT_DOWNLOAD_TOTAL_GAUGE");
+    const auto musicGauge = downloadContainer->FindChild<Gx::Gauge>(Resource::MusicShop::Download::IDC_TEXT_DOWNLOAD_MUSIC_GAUGE);
+    const auto totalGauge = downloadContainer->FindChild<Gx::Gauge>(Resource::MusicShop::Download::IDC_TEXT_DOWNLOAD_TOTAL_GAUGE);
 
     musicGauge->SetValue(70);
     totalGauge->SetValue(35);
 
-    const auto buyButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_BUY");
+    const auto buyButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_BUY);
     buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
 
-    const auto giftButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_GIFT");
+    const auto giftButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_GIFT);
     giftButton->SetClickCallback([this] (auto&, auto&) { OnGiftButtonClicked(); });
 
-    const auto cartList           = cartContainer->FindChild<Gx::List>("IDC_LIST_CART");
-    const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_LEFT");
-    const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>("IDC_BUTTON_RIGHT");
+    const auto cartList           = cartContainer->FindChild<Gx::List>(Resource::MusicShop::Cart::IDC_LIST_CART);
+    const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_LEFT);
+    const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_RIGHT);
 
     cartPrevPageButton->SetClickCallback([this] (auto&, auto&)
     {
@@ -162,7 +169,7 @@ void StateMusicShop::Initialize()
             cartPrevPageButton->PerformClick();
     });
 
-    const auto backButton = Instantiate<Gx::Button>("IDC_BUTTON_BACK");
+    const auto backButton = Instantiate<Gx::Button>(Resource::MusicShop::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         GetDirector().Present<StateRoom>();
@@ -173,7 +180,7 @@ void StateMusicShop::Initialize()
     InvalidateCart();
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 }
 
 void StateMusicShop::OnBuyButtonClicked()
@@ -189,11 +196,11 @@ void StateMusicShop::OnBuyButtonClicked()
         if (answer)
         {
             m_cart.SetCheckoutType(CartContext::CheckoutType::Music);
-            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/02"), "SFX");
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_02), Sound::Channel::SFX);
             GetDirector().Present<StatePayment>();
         }
         else
-            m_mixer.Play(*Instantiate<sf::Sound>("bgEffect/03"), "SFX");
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_03), Sound::Channel::SFX);
     });
 }
 
@@ -211,8 +218,8 @@ void StateMusicShop::OnGiftButtonClicked()
 
 void StateMusicShop::InvalidateCart()
 {
-    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_CART");
-    const auto cartList  = container->FindChild<Gx::List>("IDC_LIST_CART");
+    const auto container = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_CART);
+    const auto cartList  = container->FindChild<Gx::List>(Resource::MusicShop::Cart::IDC_LIST_CART);
     const auto slots     = cartList->GetChildren();
     const auto cartItems = m_cart.GetItems();
     const int maxPage    = static_cast<unsigned int>(std::ceil(static_cast<float>(cartItems.size()) / static_cast<float>(slots.size())));
@@ -283,11 +290,11 @@ void StateMusicShop::InvalidateCart()
         slot->SetVisible(true);
 
         auto item               = cartItems[j++];
-        const auto id           = slot->FindChild<Gx::Label>("IDC_TEXT_NUMBER");
-        const auto name         = slot->FindChild<Gx::Label>("IDC_TEXT_NAME");
-        const auto type         = slot->FindChild<Gx::Image>("IDC_IMAGE_ITEM_TYPE");
-        const auto price        = slot->FindChild<Gx::Label>("IDC_TEXT_PRICE");
-        const auto deleteButton = slot->FindChild<Gx::Button>("IDC_BUTTON_DELETE");
+        const auto id           = slot->FindChild<Gx::Label>(Resource::MusicShop::Cart::Item::IDC_TEXT_NUMBER);
+        const auto name         = slot->FindChild<Gx::Label>(Resource::MusicShop::Cart::Item::IDC_TEXT_NAME);
+        const auto type         = slot->FindChild<Gx::Image>(Resource::MusicShop::Cart::Item::IDC_IMAGE_ITEM_TYPE);
+        const auto price        = slot->FindChild<Gx::Label>(Resource::MusicShop::Cart::Item::IDC_TEXT_PRICE);
+        const auto deleteButton = slot->FindChild<Gx::Button>(Resource::MusicShop::Cart::Item::IDC_BUTTON_DELETE);
 
         id->SetString(std::to_string(j));
         if (item.Type == CartItemType::EquipmentSet)
@@ -324,9 +331,9 @@ void StateMusicShop::InvalidateCart()
                 }
 
                 if (setPriceGem > 0)
-                    price->SetString(std::to_string(setPriceGem) + "G");
+                    price->SetString(fmt::format("{}G", setPriceGem));
                 else
-                    price->SetString(std::to_string(setPriceCash) + "M");
+                    price->SetString(fmt::format("{}M", setPriceCash));
             }
 
             type->SetFrame("EquipmentSet");
@@ -338,9 +345,9 @@ void StateMusicShop::InvalidateCart()
                 auto metadata = it->second;
                 name->SetString(metadata.Name);
                 if (auto gemPrice = metadata.Prices.find(Currency::Gem); gemPrice != metadata.Prices.end())
-                    price->SetString(std::to_string(gemPrice->second) + "G");
+                    price->SetString(fmt::format("{}G", gemPrice->second));
                 else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
-                    price->SetString(std::to_string(cashPrice->second) + "M");
+                    price->SetString(fmt::format("{}M", cashPrice->second));
             }
 
             type->SetFrame("Equipment");
@@ -357,10 +364,10 @@ void StateMusicShop::InvalidateCart()
         });
     }
 
-    const auto currentPage = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_CURRENT_PAGE");
-    const auto totalPage   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_MAX_PAGE");
-    const auto totalGem    = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_GEM");
-    const auto totalCash   = container->FindChild<Gx::BitmapNumber>("IDC_NUMBER_TOTAL_CASH");
+    const auto currentPage = container->FindChild<Gx::BitmapNumber>(Resource::MusicShop::Cart::IDC_NUMBER_CURRENT_PAGE);
+    const auto totalPage   = container->FindChild<Gx::BitmapNumber>(Resource::MusicShop::Cart::IDC_NUMBER_MAX_PAGE);
+    const auto totalGem    = container->FindChild<Gx::BitmapNumber>(Resource::MusicShop::Cart::IDC_NUMBER_TOTAL_GEM);
+    const auto totalCash   = container->FindChild<Gx::BitmapNumber>(Resource::MusicShop::Cart::IDC_NUMBER_TOTAL_CASH);
 
     currentPage->SetValue(maxPage > 0 ? m_cartCurrentPage + 1 : 0);
     totalPage->SetValue(maxPage);

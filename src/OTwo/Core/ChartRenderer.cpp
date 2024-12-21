@@ -5,11 +5,14 @@
 #include <OTwo/Core/NoteContainer.hpp>
 #include <OTwo/Core/NoteFactory.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+#include <OTwo/UI/Playing/Equalizer.hpp>
+#include <OTwo/StringTable/Identifiers/Game.hpp>
 
 #include <Genode/Tween/Fade.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <OTwo/UI/Playing/Equalizer.hpp>
+
+using namespace StringTable::Identifiers;
 
 ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::AudioMixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
     m_judgement(judgement),
@@ -46,7 +49,7 @@ ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, Sco
 ChartRenderer::~ChartRenderer()
 {
     m_rendering = false;
-    m_mixer.StopAll();
+    m_mixer.Reset(true);
 }
 
 void ChartRenderer::Initialize(const Chart& chart, const GameContext& context)
@@ -92,7 +95,7 @@ void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& setting
     // Create Note Container with Note Factory
     const auto factory = NoteFactory(m_resources, m_prefabResources, m_instantiables);
     m_container = &factory.Generate(settings);
-    m_container->SetName("IDC_NOTE_CONTAINER");
+    m_container->SetName(Resource::Game::Renderer::IDC_NOTE_CONTAINER);
     m_container->Initialize(*this, chart, settings.Difficulty);
     if (const auto container = FindChild<NoteContainer>(m_container->GetName()); container)
         RemoveChild(*container);
@@ -300,7 +303,7 @@ Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderSta
             else if (ev->Channel != Chart::Channel::Measure)
             {
                 if (const auto bgm = static_cast<Chart::NoteEvent*>(ev.Event); bgm)
-                    PlaySample(bgm, bgm->SampleType == Chart::SampleType::Background ? "BGM" : "SFX");
+                    PlaySample(bgm, bgm->SampleType == Chart::SampleType::Background ? Sound::Channel::BGM : Sound::Channel::SFX);
             }
         }
     }
@@ -339,9 +342,9 @@ void ChartRenderer::Input(const Chart::Channel channel, const bool pressed) cons
             }
 
             if (front->LastEvent && front->Tap.Accuracy == Accuracy::None)
-                PlaySample(static_cast<Chart::NoteEvent*>(front->LastEvent), "SFX");
+                PlaySample(static_cast<Chart::NoteEvent*>(front->LastEvent), Sound::Channel::SFX);
             else
-                PlaySample(note, "SFX");
+                PlaySample(note, Sound::Channel::SFX);
         }
         else if (note->Length > 0 && front->Tap.Accuracy != Accuracy::None)
         {

@@ -6,14 +6,18 @@
 #include <OTwo/States/StateResult.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Button.hpp>
+#include <Genode/UI/Cursor.hpp>
 
 #include <memory>
-#include <Genode/UI/Cursor.hpp>
+
+using namespace StringTable::Identifiers;
 
 State::State() :
     State(typeid(this).name())
@@ -63,8 +67,8 @@ void State::LoadCommonResources()
     m_dialog1     = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
     m_dialog2     = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
     m_exitDialog  = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-    m_cancelSound = Instantiate<sf::Sound>("bgEffect/03", ResourceScope::Shared);
-    m_popupSound  = Instantiate<sf::Sound>("bgEffect/06", ResourceScope::Shared);
+    m_cancelSound = Instantiate<sf::Sound>(Sound::Effects::EF_03, ResourceScope::Shared);
+    m_popupSound  = Instantiate<sf::Sound>(Sound::Effects::EF_06, ResourceScope::Shared);
 
     loaded = true;
 }
@@ -198,7 +202,7 @@ bool State::OnAppClose()
         if (m_popupSound)
         {
             auto& mixer = Require<Gx::AudioMixer>();
-            mixer.Play(*m_popupSound, "SFX");
+            mixer.Play(*m_popupSound, Sound::Channel::SFX);
         }
 
         m_exitDialog->SetAcceptCallback([&]
@@ -211,7 +215,7 @@ bool State::OnAppClose()
         {
             auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::AudioMixer>();
 
-            mixer.Play(*m_cancelSound, "SFX");
+            mixer.Play(*m_cancelSound, Sound::Channel::SFX);
             m_prompted = false;
         });
 

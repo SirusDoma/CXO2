@@ -3,8 +3,6 @@
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
-#include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <SFML/System/Time.hpp>

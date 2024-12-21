@@ -4,10 +4,15 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/StateRoom.hpp>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+#include <OTwo/StringTable/Identifiers/Planet.hpp>
+
 #include <Genode/System/Application.hpp>
 #include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
+
+using namespace StringTable::Identifiers;
 
 StatePlanet::StatePlanet(Gx::AudioMixer& mixer, SessionContext& session) :
     m_mixer(mixer),
@@ -20,22 +25,22 @@ void StatePlanet::Initialize()
 {
     State::Initialize();
 
-    const auto bgm = Instantiate<sf::Music>("BGM/bgMainRoom.ogg");
-    auto clickSfx  = Instantiate<sf::Sound>("bgEffect/02");
-    auto hoverSfx  = Instantiate<sf::Sound>("Planet/BEEppq");
+    const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_MAIN_ROOM);
+    auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+    auto hoverSfx  = Instantiate<sf::Sound>(Sound::Effects::PLANET_BEEP);
 
-    const auto container = Instantiate<Gx::UiContainer>("IDC_CONTAINER_MUSIC_HALL");
-    auto euta     = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_01");
-    auto thalo    = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_02");
-    auto melpomin = container->FindChild<Gx::RadioButton>("IDC_RADIO_BEGINNER_03");
-    auto kalliope = container->FindChild<Gx::RadioButton>("IDC_RADIO_HIGH_01");
-    auto kleo     = container->FindChild<Gx::RadioButton>("IDC_RADIO_INTERMEDIATE_01");
-    auto philix   = container->FindChild<Gx::RadioButton>("IDC_RADIO_PREMIUM_01");
+    const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+    auto euta     = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_01);
+    auto thalo    = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_02);
+    auto melpomin = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_03);
+    auto kalliope = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_HIGH_01);
+    auto kleo     = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_INTERMEDIATE_01);
+    auto philix   = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_PREMIUM_01);
 
-    const auto exitButton = Instantiate<Gx::Button>("IDC_BUTTON_EXIT");
-    exitButton->SetClickCallback([&] (auto& sender, auto& ev) { GetApplication().Close(); });
+    const auto exitButton = Instantiate<Gx::Button>(Resource::Planet::IDC_BUTTON_EXIT);
+    exitButton->SetClickCallback([&] (auto&, auto&) { GetApplication().Close(); });
 
-    auto channelBoard = Instantiate<ChannelBoard>("IDC_CHANNEL_BOARD");
+    auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
     channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
 
     std::unordered_map<MusicHall, Gx::RadioButton*> planets =
@@ -50,12 +55,12 @@ void StatePlanet::Initialize()
 
     for (auto [musicHall, radio] : planets)
     {
-        radio->SetFocusChangedCallback([&, hoverSfx] (auto& sender, auto& ev)
+        radio->SetFocusChangedCallback([&, hoverSfx] (auto& sender, auto&)
         {
             if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;
 
-            m_mixer.Play(*hoverSfx, "SFX");
+            m_mixer.Play(*hoverSfx, Sound::Channel::SFX);
         });
 
         radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)
@@ -63,7 +68,7 @@ void StatePlanet::Initialize()
             if (!sender.IsChecked() || channelBoard->InTransition() || IsConnecting())
                 return;
 
-            m_mixer.Play(*clickSfx, "SFX");
+            m_mixer.Play(*clickSfx, Sound::Channel::SFX);
             channelBoard->Show(hall, [=] { OnMusicHallSelected(hall); });
         });
     }
@@ -83,7 +88,7 @@ void StatePlanet::Initialize()
     }
 
     bgm->setLooping(true);
-    m_mixer.Play(*bgm, "BGM");
+    m_mixer.Play(*bgm, Sound::Channel::BGM);
 }
 
 bool StatePlanet::IsConnecting() const
@@ -94,7 +99,7 @@ bool StatePlanet::IsConnecting() const
 void StatePlanet::OnMusicHallSelected(const MusicHall hall)
 {
     m_connecting = true;
-    const auto channelBoard = Instantiate<ChannelBoard>("IDC_CHANNEL_BOARD");
+    const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
 
     auto planetInfo = PlanetInfo();
     planetInfo.Hall = hall;

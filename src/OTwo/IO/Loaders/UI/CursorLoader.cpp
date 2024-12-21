@@ -76,7 +76,7 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadat
             {
                 auto image = sf::Image(sf::Vector2u(state.TexCoords.size.x, state.TexCoords.size.y), sf::Color::Transparent);
                 if (!image.copy(source, sf::Vector2u(), state.TexCoords, true))
-                    throw Gx::ResourceLoadException(context.GetID(), "Failed to load cursor state (" + std::string(magic_enum::enum_name(state.Type)) + ")");
+                    throw Gx::ResourceLoadException(context.GetID(), fmt::format("Failed to load cursor state ({})", magic_enum::enum_name(state.Type)));
 
                 cursor->Register(state.Type, image, state.Hotspot);
             }

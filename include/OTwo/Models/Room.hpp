@@ -49,7 +49,7 @@ struct Player
 
     std::uint32_t ID;
     ::Role        Role;
-    std::string   Name;
+    sf::String    Name;
     std::int16_t  Level;
     std::uint32_t Rank;
     std::uint32_t Exp;

@@ -57,15 +57,11 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMet
         if (reference.type() != Gx::Json::value_t::string)
             continue;
 
-        auto name = meta.Name + "/" + key;
+        auto name = fmt::format("{}/{}", meta.Name, key);
         ObjectLoader::Load(name, reference, container, ctx);
     }
 
-    for (auto [key, object] : metadata->Objects)
-    {
-        auto name = meta.Name + "/" + key;
-        ObjectLoader::Load(name, object, container, ctx);
-    }
+    LoadChildren(container, meta, context);
 
     avatarinfo->SetOrigin(metadata->Origin);
     avatarinfo->SetPosition(metadata->Position);

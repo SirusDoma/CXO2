@@ -1,11 +1,13 @@
 #pragma once
 
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
+#include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 
 #include <SFML/System/MemoryInputStream.hpp>
 
+#include <fmt/format.h>
 #include <string>
 
 template<typename R>
@@ -59,4 +61,19 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream& stream, co
     delete[] data;
 
     return LoadFromJson(json, ctx);
+}
+
+template<typename R>
+void ResourceLoader<R>::LoadChildren(ObjectContainer& container, const ResourceMetadata& metadata, const Gx::ResourceContext& context)
+{
+    if (!metadata.Objects.empty())
+    {
+        for (auto [key, object] : metadata.Objects)
+        {
+            auto name = fmt::format("{}/{}", metadata.Name, key);
+            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
+
+            ObjectLoader::Load(name, object, container, objectCtx);
+        }
+    }
 }

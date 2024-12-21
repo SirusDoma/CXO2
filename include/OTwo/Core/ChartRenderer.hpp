@@ -13,6 +13,9 @@
 
 #include <unordered_map>
 
+#include <OTwo/StringTable/Identifiers/Sound.hpp>
+using namespace StringTable::Identifiers;
+
 using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 
 using ChannelSet = std::unordered_set<Chart::Channel>;
@@ -88,7 +91,7 @@ private:
     // Measure interval per millisecond @ 60bpm in 1/4 note
     static constexpr double TickSignature = 60000.f * 4.f;
 
-    void PlaySample(const Chart::NoteEvent* ev, const std::string& group = "BGM") const;
+    void PlaySample(const Chart::NoteEvent* ev, const std::string& group = Sound::Channel::BGM) const;
 
     using AnimationMap   = std::unordered_map<Chart::Channel, Gx::Animation*>;
     using EventStateList = std::vector<EventState>;
