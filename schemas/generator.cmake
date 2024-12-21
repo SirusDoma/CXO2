@@ -60,7 +60,7 @@ function(Bebop_Generate target_name)
         FetchContent_Declare(${_bebopc_prefix}
                 URL "${_bebopc_zip_url}"
         )
-        FetchContent_Populate(${_bebopc_prefix})
+        FetchContent_MakeAvailable(${_bebopc_prefix})
     endif()
     set(_bebopc "${${_bebopc_prefix}_SOURCE_DIR}/${_bebopc_executable_name}")
 
