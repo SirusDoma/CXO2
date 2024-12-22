@@ -56,7 +56,6 @@ struct ResourceMetadata
         ChatWindow,
         ChannelBoard,
         ChannelButton,
-        UserList,
         RoomList,
         RoomButton,
         AvatarInfo,

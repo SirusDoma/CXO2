@@ -175,11 +175,6 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<ChannelBoard>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::UserList:
-        {
-            container.Add(name, LoadResource<Gx::UiContainer, UserList>(name, json, ctx), ctx);
-            break;
-        }
         case ResourceMetadata::ResourceType::RoomList:
         {
             container.Add(name, LoadResource<Gx::List, RoomList>(name, json, ctx), ctx);

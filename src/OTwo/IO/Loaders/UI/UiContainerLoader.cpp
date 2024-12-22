@@ -2,8 +2,11 @@
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
-
 #include <OTwo/Metadata/UI/UiContainerMetadata.hpp>
+#include <OTwo/UI/Room/UserList.hpp>
+
+#include <OTwo/StringTable/Identifiers/Room.hpp>
+using namespace StringTable::Identifiers;
 
 Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
@@ -39,6 +42,9 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
         return nullptr;
 
     auto container = Instantiate(context);
+    if (context.GetID() == Resource::Room::IDC_USER_LIST)
+        container = std::make_unique<UserList>();
+
     auto populator = ObjectContainer::Decorate(container.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     container->SetName(metadata->Name);
