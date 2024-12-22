@@ -2,10 +2,13 @@
 
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
+#include <OTwo/Utilities/StringTranscoder.hpp>
 
 #include <Genode/Utilities/StringHelper.hpp>
 
 #include <SFML/System/Time.hpp>
+
+#include <libiconv/iconv.h>
 
 enum class Genre
 {
@@ -115,9 +118,9 @@ struct ChartMetadata
         return ChartMetadataView{
             /* .ID           = */ std::to_string(ID),
             /* .New          = */ false,
-            /* .Title        = */ Gx::StringHelper::Trim(Title),
-            /* .Artist       = */ Gx::StringHelper::Trim(Artist),
-            /* .NoteDesigner = */ Gx::StringHelper::Trim(NoteArranger),
+            /* .Title        = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Title[0], 64)),
+            /* .Artist       = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Artist[0], 32)),
+            /* .NoteDesigner = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&NoteArranger[0], 32)),
             /* .BPM          = */ BPM,
             /* .Genre        = */ genre,
             /* .Difficulty   = */ diff,

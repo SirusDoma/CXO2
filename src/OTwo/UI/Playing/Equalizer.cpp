@@ -3,8 +3,7 @@
 
 #include <Genode/UI/List.hpp>
 
-#include <kissfft/kiss_fft.c>
-#include <kissfft/kiss_fftr.c>
+#include <kissfft/kiss_fft.h>
 
 #include <algorithm>
 #include <cmath>

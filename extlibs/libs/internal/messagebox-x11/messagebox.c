@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+#ifdef USE_X11
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -323,3 +324,5 @@ int Messagebox(const char* title, const wchar_t* text, const Button* buttons, in
 
     return res;
 }
+
+#endif

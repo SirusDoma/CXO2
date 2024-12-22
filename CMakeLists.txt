@@ -20,11 +20,18 @@ set(CMAKE_DISABLE_SOURCE_CHANGES OFF)
 set(TARGET "OTwo")
 
 # Sources and Headers
-file(GLOB_RECURSE SRCS src/*.cpp extlibs/headers/*.cpp)
+file(GLOB_RECURSE SRCS
+    src/*.cpp
+    extlibs/libs/internal/*.c
+    extlibs/libs/internal/*.cc
+    extlibs/libs/internal/*.cpp
+)
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.h)
+file(GLOB_RECURSE HEADERS extlibs/libs/internal/*.hpp)
+file(GLOB_RECURSE HEADERS extlibs/libs/internal/*.h)
 file(GLOB_RECURSE HEADERS schemas/headers/*.hpp)
 
 # Schema
@@ -98,7 +105,13 @@ if(WIN32 OR APPLE OR GTK_AVAILABLE)
     )
     FetchContent_MakeAvailable(Boxer)
 else()
-    message("-- System message box: MessageBox-X11")
+    Check_Include_Files("X11/Xlib.h" X11_AVAILABLE)
+    if(X11_AVAILABLE)
+        add_compile_definitions(USE_X11)
+        message("-- System message box: MessageBox-X11")
+    else()
+        message("-- Warning: No system message box implementation compatible.")
+    endif()
 endif()
 
 # Specific OS Directories and Flags
@@ -122,8 +135,12 @@ if(WIN32)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # External Libs Compiler Flags
+    # External libs compiler flags
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-msvc/libiconv/libiconv$<$<CONFIG:Debug>:d>.lib)
+
+    add_compile_definitions(USE_LIBICONV)
+    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
 elseif(APPLE)
     # App Arch
     if (NOT CMAKE_OSX_ARCHITECTURES)
@@ -183,7 +200,7 @@ else()
     if(UNIX OR __linux__)
         set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux/${CMAKE_BUILD_TYPE}")
     else()
-        set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/windows/${CMAKE_BUILD_TYPE}")
+        message(FATAL_ERROR "Platform is not supported.")
     endif()
 
     file(MAKE_DIRECTORY ${OUTPUT_DIR})
@@ -196,8 +213,12 @@ else()
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # Libraries
+    # External libs
+    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
+    add_compile_definitions(USE_LIBICONV)
+
     target_link_libraries(${TARGET} PRIVATE stdc++fs)
+    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
 endif()
 
 message("-- Output Directory: " ${OUTPUT_DIR})
@@ -206,6 +227,7 @@ message("-- Output Directory: " ${OUTPUT_DIR})
 target_include_directories(${TARGET} PRIVATE src)
 target_include_directories(${TARGET} PRIVATE include)
 target_include_directories(${TARGET} PRIVATE extlibs/headers)
+target_include_directories(${TARGET} PRIVATE extlibs/libs/internal)
 target_include_directories(${TARGET} PRIVATE schemas/headers)
 
 # Link JSON
