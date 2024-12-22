@@ -739,25 +739,25 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
         case MusicSortMode::Level:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a.ToChartMetadataView(m_difficulty);
-                auto y = b.ToChartMetadataView(m_difficulty);
+                auto x = a.GetLevel(m_difficulty);
+                auto y = b.GetLevel(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
-                    return x.Level < y.Level;
+                    return x < y;
 
-                return x.Level > y.Level;
+                return x > y;
             });
             break;
         case MusicSortMode::Duration:
             std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
             {
-                auto x = a.ToChartMetadataView(m_difficulty);
-                auto y = b.ToChartMetadataView(m_difficulty);
+                auto x = a.GetDuration(m_difficulty);
+                auto y = b.GetDuration(m_difficulty);
 
                 if (m_order == MusicSortOrder::Ascending)
-                    return x.Duration < y.Duration;
+                    return x < y;
 
-                return x.Duration > y.Duration;
+                return x > y;
             });
             break;
         default:
@@ -841,8 +841,10 @@ void SelectMusicDialog::Invalidate()
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
-                                                                            m.ToChartMetadataView(diff).Level <= 5; });
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    {
+                                        return m.GetLevel(diff) <= 5;
+                                    });
 
                                     if (result)
                                     {
@@ -864,7 +866,7 @@ void SelectMusicDialog::Invalidate()
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        const int level = m.ToChartMetadataView(diff).Level;
+                                        const int level = m.GetLevel(diff);
                                         return level > 5 && level <= 9;
                                     });
 
@@ -888,7 +890,7 @@ void SelectMusicDialog::Invalidate()
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        const int level = m.ToChartMetadataView(diff).Level;
+                                        const int level = m.GetLevel(diff);
                                         return level > 9 && level <= 13;
                                     });
 
@@ -910,8 +912,10 @@ void SelectMusicDialog::Invalidate()
                                 used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
-                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff) { return
-                                                                            m.ToChartMetadataView(diff).Level > 13; });
+                                    const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
+                                    {
+                                        return m.GetLevel(diff) > 13;
+                                    });
 
                                     if (result)
                                     {
@@ -986,6 +990,9 @@ void SelectMusicDialog::Invalidate()
             }
         }
 
+        if (auto thumbnail = FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_THUMBNAIL))
+            thumbnail->SetVisible(false);
+
         return;
     }
 
@@ -1044,7 +1051,6 @@ void SelectMusicDialog::Invalidate()
             continue;
         }
 
-        auto metadata = m_displayList[index].ToChartMetadataView(m_difficulty);
         if (i == 0 && m_music.Source.empty())
             m_music = m_displayList[index];
 
@@ -1055,15 +1061,20 @@ void SelectMusicDialog::Invalidate()
             else
                 title->SetColor(lastTitle->GetColor());
 
-            title->SetString(metadata.Title);
+            auto name = StringTranscoder::Transcode(m_displayList[index].Title);
+            title->SetString(name);
+            title->Truncate(150);
+
+            if (title->GetString() != name)
+                title->SetString(fmt::format(L"{}..", title->GetString()));
         }
 
         if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
-            level->SetString(std::to_string(metadata.Level));
+            level->SetString(std::to_string(m_displayList[index].GetLevel(m_difficulty)));
 
         if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
         {
-            float seconds = metadata.Duration.asSeconds();
+            float seconds = m_displayList[index].GetDuration(m_difficulty).asSeconds();
             int minute    = std::floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
@@ -1104,19 +1115,20 @@ void SelectMusicDialog::Invalidate()
         }
     }
 
-    if (auto thumbnail = FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_THUMBNAIL); thumbnail && m_coverID != m_music.ID)
+    if (auto thumbnail = FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_THUMBNAIL))
     {
-        m_coverID  = m_music.ID;
-        if (auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default))
+        thumbnail->SetVisible(true);
+        if (m_coverID != m_music.ID)
         {
-            m_thumbnail = std::make_unique<sf::Texture>();
-            if (m_thumbnail->loadFromImage(*image))
+            m_coverID  = m_music.ID;
+            if (auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default))
             {
-                thumbnail->SetVisible(true);
-                thumbnail->SetTexture(*m_thumbnail);
+                m_thumbnail = std::make_unique<sf::Texture>();
+                if (m_thumbnail->loadFromImage(*image))
+                    thumbnail->SetTexture(*m_thumbnail);
             }
+            else
+                thumbnail->SetVisible(false);
         }
-        else
-            thumbnail->SetVisible(false);
     }
 }

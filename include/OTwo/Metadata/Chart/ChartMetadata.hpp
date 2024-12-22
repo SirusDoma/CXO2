@@ -70,7 +70,33 @@ struct ChartMetadata
 
     std::string Source;
 
-    ChartMetadataView ToChartMetadataView(Difficulty difficulty) const
+    unsigned int GetLevel(const Difficulty difficulty) const
+    {
+        switch (difficulty)
+        {
+            case Difficulty::EX: return LevelEx;
+            case Difficulty::NX: return LevelNx;
+            case Difficulty::HX:
+            case Difficulty::MX: return LevelHx;
+        }
+
+        return 0;
+    }
+
+    sf::Time GetDuration(const Difficulty difficulty) const
+    {
+        switch (difficulty)
+        {
+            case Difficulty::EX: return sf::seconds(static_cast<float>(DurationEx));
+            case Difficulty::NX: return sf::seconds(static_cast<float>(DurationNx));
+            case Difficulty::HX:
+            case Difficulty::MX: return sf::seconds(static_cast<float>(DurationHx));
+        }
+
+        return sf::Time::Zero;
+    }
+
+    ChartMetadataView ToChartMetadataView(const Difficulty difficulty) const
     {
         sf::String genre;
         switch (Genre)
