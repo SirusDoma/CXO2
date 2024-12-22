@@ -52,7 +52,7 @@ protected:
     void Initialize() override;
     void Finalize() override;
 
-    void ShowDialog(const std::string& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+    void ShowDialog(const sf::String& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
     void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
 
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;

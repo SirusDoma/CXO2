@@ -4,6 +4,8 @@
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
+#include <SFML/System/String.hpp>
+
 #include <functional>
 
 namespace Gx
@@ -11,7 +13,7 @@ namespace Gx
     struct DialogPresentationContext : GraphicalPresentationContext
     {
         bool UseBackdrop{false};
-        std::string Prompt{};
+        sf::String Prompt{};
     };
 
     class Scene;

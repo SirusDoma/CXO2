@@ -73,7 +73,7 @@ void State::LoadCommonResources()
     loaded = true;
 }
 
-void State::ShowDialog(const std::string& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
+void State::ShowDialog(const sf::String& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
 {
     auto dialog = m_dialogInfo;
     if (style == DialogStyle::OkCancel)

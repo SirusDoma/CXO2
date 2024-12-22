@@ -153,7 +153,7 @@ namespace Gx
                 else
                     m_backdrop = Rectangle(sf::Vector2f(0, 0));
 
-                if (!dctx->Prompt.empty() && m_promptLabel)
+                if (!dctx->Prompt.isEmpty() && m_promptLabel)
                     m_promptLabel->SetString(dctx->Prompt);
             }
         }
