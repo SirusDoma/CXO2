@@ -390,6 +390,61 @@ namespace Gx
         return GetTransform().transformPoint(position);
     }
 
+    void Text::Truncate(const std::size_t maxWidth)
+    {
+        if (maxWidth == 0)
+        {
+            SetString(sf::String());
+            return;
+        }
+
+        EnsureGeometryUpdate();
+        if (m_bounds.size.x < maxWidth)
+            return;
+
+        // Precompute the variables needed by the algorithm
+        const bool  isBold          = m_style & static_cast<std::uint32_t>(Bold);
+        const float whitespaceWidth = m_font->GetGlyph(U' ', m_characterWidth, m_characterHeight, isBold, 0).advance;
+        const float lineSpacing     = m_font->GetLineSpacing(m_characterWidth, m_characterHeight) + m_lineSpacing;
+
+        // Compute the position
+        std::uint32_t width    = 0;
+        std::uint32_t prevChar = 0;
+        std::uint32_t index    = 0;
+        for (std::size_t i = 0; i < m_string.getSize(); ++i)
+        {
+            std::uint32_t curChar = m_string[i];
+            if (m_masked)
+                curChar = U'\u25CF';
+
+            // Apply the kerning offset
+            width += m_font->GetKerning(prevChar, curChar, m_characterWidth, m_characterHeight, isBold);
+            prevChar = curChar;
+
+            if (width >= maxWidth)
+                break;
+
+            // Handle special characters
+            switch (curChar)
+            {
+                case ' ':  width += whitespaceWidth;          continue;
+                case '\t': width += whitespaceWidth * 4;      continue;
+                case '\n': width  = 0;                        continue;
+                default: break;
+            }
+
+            // For regular characters, add the advance offset of the glyph
+            width += m_font->GetGlyph(curChar, m_characterWidth, m_characterHeight, isBold, 0).advance + m_letterSpacing;
+            if (width >= maxWidth)
+                break;
+
+            index = i;
+        }
+
+        if (m_string.getSize() - (index + 1) > 1)
+            SetString(m_string.substring(0, index + 1));
+    }
+
     sf::FloatRect Text::GetLocalBounds() const
     {
         EnsureGeometryUpdate();

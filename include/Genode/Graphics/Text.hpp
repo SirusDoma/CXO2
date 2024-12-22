@@ -464,6 +464,8 @@ namespace Gx
         ////////////////////////////////////////////////////////////
         [[nodiscard]] sf::Vector2f FindCharacterPosition(std::size_t index) const;
 
+        void Truncate(std::size_t maxWidth);
+
         ////////////////////////////////////////////////////////////
         /// @brief Get the local bounding rectangle of the entity
         ///
