@@ -24,9 +24,6 @@ namespace Gx
     T* Node::FindChild(const std::string& name) const
     {
         auto child = GetChildByName(name);
-        if (!child)
-            child = GetChildByName(GetName() + "/" + name);
-
         return dynamic_cast<T*>(child);
     }
 

@@ -20,6 +20,10 @@ namespace Gx
         Node(Node&&) noexcept = default;
         Node& operator=(Node&&) = default;
 
+        static bool Match(const std::string& id, const std::string& pattern);
+        static bool Match(const Node& node, const std::string& pattern);
+        bool Match(const std::string& pattern) const;
+
         const std::string& GetName() const;
         void SetName(const std::string& name);
 

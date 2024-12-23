@@ -1,7 +1,10 @@
 ﻿#include <Genode/SceneGraph/Node.hpp>
+#include <Genode/System/Exception.hpp>
 
 #include <algorithm>
-#include <Genode/System/Exception.hpp>
+#include <regex>
+#include <string>
+#include <fmt/format.h>
 
 namespace Gx
 {
@@ -48,6 +51,24 @@ namespace Gx
 
     void Node::OnChildRemove(Node& node)
     {
+    }
+
+    bool Node::Match(const std::string& id, const std::string& pattern)
+    {
+        const std::string rxp = fmt::format("^{}$", std::regex_replace(pattern, std::regex("\\*"), "[^/]*"));
+        const std::regex regex(rxp);
+
+        return std::regex_match(id, regex);
+    }
+
+    bool Node::Match(const Node& node, const std::string& pattern)
+    {
+        return Match(node.m_name, pattern) || (node.m_parent && Match(node.m_name, fmt::format("{}/{}", node.m_parent->m_name, pattern)));
+    }
+
+    bool Node::Match(const std::string& pattern) const
+    {
+        return Match(*this, pattern);
     }
 
     const std::string& Node::GetName() const
@@ -120,7 +141,7 @@ namespace Gx
     {
         for (const auto& child : m_children)
         {
-            if (child->m_name == name)
+            if (child->Match(name))
             {
                 if (m_state == State::Initialized && child->m_state != State::Initialized)
                 {
