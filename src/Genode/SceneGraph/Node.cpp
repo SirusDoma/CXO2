@@ -1,10 +1,10 @@
 ﻿#include <Genode/SceneGraph/Node.hpp>
 #include <Genode/System/Exception.hpp>
 
+#include <fmt/format.h>
 #include <algorithm>
 #include <regex>
 #include <string>
-#include <fmt/format.h>
 
 namespace Gx
 {
@@ -55,9 +55,25 @@ namespace Gx
 
     bool Node::Match(const std::string& id, const std::string& pattern)
     {
-        const std::string rxp = fmt::format("^{}$", std::regex_replace(pattern, std::regex("\\*"), "[^/]*"));
-        const std::regex regex(rxp);
+        const static std::unordered_set reserved =
+        {
+            '.', '^', '$', '*', '+', '?', '(', ')', '[', ']', '{', '}', '\\', '|'
+        };
 
+        std::string rxp;
+        for (const char& ch : pattern)
+        {
+            if (ch == '*')
+                rxp += "[^/]*";
+            else if (ch == '?')
+                rxp += "[^/]";
+            else if (reserved.count(ch))
+                rxp += fmt::format("\\{}", ch);
+            else
+                rxp += ch;
+        }
+
+        const std::regex regex(fmt::format("^{}$", rxp));
         return std::regex_match(id, regex);
     }
 
