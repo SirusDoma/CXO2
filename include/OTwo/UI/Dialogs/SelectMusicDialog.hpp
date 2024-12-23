@@ -5,6 +5,7 @@
 #include <OTwo/Metadata/Chart/ChartMetadata.hpp>
 #include <OTwo/Contexts/MusicSelectionContext.hpp>
 
+#include <Genode/IO/Resource.hpp>
 #include <Genode/UI/Dialog.hpp>
 
 #include <vector>

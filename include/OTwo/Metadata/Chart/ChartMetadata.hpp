@@ -8,8 +8,6 @@
 
 #include <SFML/System/Time.hpp>
 
-#include <libiconv/iconv.h>
-
 enum class Genre
 {
     Ballad      = 0,

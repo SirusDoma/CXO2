@@ -1,8 +1,8 @@
 #pragma once
 
-#include <OTwo/Core/Chart.hpp>
 #include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Game.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
 #include <SFML/System/String.hpp>
 #include <SFML/Graphics/Color.hpp>

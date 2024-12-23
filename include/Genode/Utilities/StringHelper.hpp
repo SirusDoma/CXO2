@@ -179,5 +179,10 @@ namespace Gx
         {
             return string.rfind(prefix, 0) != std::string::npos;
         }
+
+        static bool EndsWith(const std::string& string, const std::string& suffix)
+        {
+            return suffix.size() <= string.size() && string.rfind(suffix, string.size() - suffix.size()) == string.size() - suffix.size();
+        }
     };
 }
