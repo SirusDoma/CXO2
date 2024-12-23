@@ -19,10 +19,19 @@
 #include <OTwo/UI/Waiting/InstrumentSelector.hpp>
 #include <OTwo/UI/Playing/PlayMenu.hpp>
 #include <OTwo/UI/Playing/Equalizer.hpp>
-#include <OTwo/UI/Playing/Equalizer.hpp>
+
+#include <OTwo/StringTable/Identifiers/Room.hpp>
+#include <OTwo/StringTable/Identifiers/Option.hpp>
+#include <OTwo/StringTable/Identifiers/SelectMusic.hpp>
+#include <OTwo/StringTable/Identifiers/ChatPanel.hpp>
+#include <OTwo/StringTable/Identifiers/Instrument.hpp>
+#include <OTwo/StringTable/Identifiers/Map.hpp>
+#include <OTwo/StringTable/Identifiers/Game.hpp>
 
 #include <Genode/Graphics.hpp>
 #include <Genode/UI.hpp>
+
+using namespace StringTable::Identifiers;
 
 void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& ctx)
 {
@@ -62,7 +71,12 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::Image:
         {
-            container.Add(name, LoadResource<Gx::Image>(name, json, ctx), ctx);
+            if (Gx::Node::Match(ctx.GetID(), Resource::Room::IDC_ROOM_BUTTON))
+                container.Add(name, LoadResource<RoomButton>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::Game::Menu::IDC_PLAY_MENU))
+                container.Add(name, LoadResource<PlayMenu>(name, json, ctx), ctx);
+            else
+                container.Add(name, LoadResource<Gx::Image>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Animation:
@@ -77,7 +91,11 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::List:
         {
-            container.Add(name, LoadResource<Gx::List>(name, json, ctx), ctx);
+            if (ctx.GetID() == Resource::Room::IDC_ROOM_LIST)
+                container.Add(name, LoadResource<RoomList>(name, json, ctx), ctx);
+            else
+                container.Add(name, LoadResource<Gx::List>(name, json, ctx), ctx);
+
             break;
         }
         case ResourceMetadata::ResourceType::Label:
@@ -127,37 +145,35 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
         }
         case ResourceMetadata::ResourceType::Dialog:
         {
-            container.Add(name, LoadResource<Gx::Dialog>(name, json, ctx), ctx);
+            if (Gx::Node::Match(ctx.GetID(), Resource::Option::IDC_DIALOG_OPTION))
+                container.Add(name, LoadResource<OptionDialog>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::SelectMusic::IDC_DIALOG_SELECT_MUSIC))
+                container.Add(name, LoadResource<SelectMusicDialog>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::Room::IDC_DIALOG_CREATE_ROOM))
+                container.Add(name, LoadResource<CreateRoomDialog>(name, json, ctx), ctx);
+            else
+                container.Add(name, LoadResource<Gx::Dialog>(name, json, ctx), ctx);
+
             break;
         }
         case ResourceMetadata::ResourceType::UiContainer:
         {
-            container.Add(name, LoadResource<Gx::UiContainer>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::OptionDialog:
-        {
-            container.Add(name, LoadResource<Gx::Dialog, OptionDialog>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::CreateRoomDialog:
-        {
-            container.Add<CreateRoomDialog>(name, LoadResource<CreateRoomDialog>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::SelectMusicDialog:
-        {
-            container.Add(name, LoadResource<Gx::Dialog, SelectMusicDialog>(name, json, ctx), ctx);
+            if (ctx.GetID() == Resource::Room::IDC_USER_LIST)
+                container.Add(name, LoadResource<UserList>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::ChatPanel::IDC_CHAT_PANEL))
+                container.Add(name, LoadResource<ChatPanel>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::Map::IDC_CONTAINER_MAP_SELECTOR))
+                container.Add(name, LoadResource<MapSelector>(name, json, ctx), ctx);
+            else if (Gx::Node::Match(ctx.GetID(), Resource::Instrument::IDC_CONTAINER_INSTRUMENT_SELECTOR))
+                container.Add(name, LoadResource<InstrumentSelector>(name, json, ctx), ctx);
+            else
+                container.Add(name, LoadResource<Gx::UiContainer>(name, json, ctx), ctx);
+
             break;
         }
         case ResourceMetadata::ResourceType::Marquee:
         {
             container.Add(name, LoadResource<Marquee>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::ChatPanel:
-        {
-            container.Add(name, LoadResource<Gx::UiContainer, ChatPanel>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::ChatWindow:
@@ -175,34 +191,9 @@ void ObjectLoader::Load(const std::string& name, const Gx::Json& json, ObjectCon
             container.Add(name, LoadResource<ChannelBoard>(name, json, ctx), ctx);
             break;
         }
-        case ResourceMetadata::ResourceType::RoomList:
-        {
-            container.Add(name, LoadResource<Gx::List, RoomList>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::RoomButton:
-        {
-            container.Add(name, LoadResource<Gx::Image, RoomButton>(name, json, ctx), ctx);
-            break;
-        }
         case ResourceMetadata::ResourceType::AvatarInfo:
         {
             container.Add(name, LoadResource<AvatarInfo>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::MapSelector:
-        {
-            container.Add(name, LoadResource<Gx::UiContainer, MapSelector>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::InstrumentSelector:
-        {
-            container.Add(name, LoadResource<Gx::UiContainer, InstrumentSelector>(name, json, ctx), ctx);
-            break;
-        }
-        case ResourceMetadata::ResourceType::PlayMenu:
-        {
-            container.Add(name, LoadResource<Gx::Image, PlayMenu>(name, json, ctx), ctx);
             break;
         }
         case ResourceMetadata::ResourceType::Equalizer:

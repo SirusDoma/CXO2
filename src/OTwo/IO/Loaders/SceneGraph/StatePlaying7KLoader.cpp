@@ -103,9 +103,9 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     {
         // Rewire resource manager to the local scene
         auto name = fmt::format("{}/{}", meta.Name, key);
-        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
+        auto rctx = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
-        ObjectLoader::Load(name, object, container, ctx);
+        ObjectLoader::Load(name, object, container, rctx);
     }
 
     if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)

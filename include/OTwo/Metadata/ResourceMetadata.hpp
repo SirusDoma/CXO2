@@ -45,23 +45,12 @@ struct ResourceMetadata
         Dialog,
         UiContainer,
 
-        // Dialogs
-        OptionDialog,
-        CreateRoomDialog,
-        SelectMusicDialog,
-
         // Custom Components
         Marquee,
-        ChatPanel,
         ChatWindow,
         ChannelBoard,
         ChannelButton,
-        RoomList,
-        RoomButton,
         AvatarInfo,
-        MapSelector,
-        InstrumentSelector,
-        PlayMenu,
         Equalizer,
 
         // Avatar

@@ -38,6 +38,7 @@ namespace StringTable::Identifiers::Resource::Game
 
     namespace Menu
     {
+        constexpr static auto IDC_PLAY_MENU               = "*/IDC_PLAY_MENU";
         constexpr static auto IDC_CHART_RENDERER          = "IDC_CHART_RENDERER";
         constexpr static auto IDC_EQUALIZER               = "IDC_EQUALIZER";
         constexpr static auto IDC_TEXT_MUSIC_TITLE        = "IDC_TEXT_MUSIC_TITLE";

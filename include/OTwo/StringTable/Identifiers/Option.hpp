@@ -3,6 +3,7 @@
 
 namespace StringTable::Identifiers::Resource::Option
 {
+    constexpr static auto IDC_DIALOG_OPTION          = "*/IDC_DIALOG_OPTION";
     constexpr static auto IDC_IMAGE_DIALOG_OPTION    = "IDC_IMAGE_DIALOG_OPTION";
     constexpr static auto IDC_TOOLTIP_INFO           = "IDC_TOOLTIP_INFO";
     constexpr static auto IDC_CONTAINER_GAME_OPTION  = "IDC_CONTAINER_GAME_OPTION";

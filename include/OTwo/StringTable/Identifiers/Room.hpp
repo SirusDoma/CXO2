@@ -10,6 +10,7 @@ namespace StringTable::Identifiers::Resource::Room
     constexpr static auto IDC_CHAT_PANEL             = "STATE_ROOM/IDC_CHAT_PANEL";
     constexpr static auto IDC_USER_LIST              = "STATE_ROOM/IDC_USER_LIST";
     constexpr static auto IDC_ROOM_LIST              = "STATE_ROOM/IDC_ROOM_LIST";
+    constexpr static auto IDC_ROOM_BUTTON            = "STATE_ROOM/IDC_ROOM_LIST/IDC_ROOM_BUTTON*";
     constexpr static auto IDC_BUTTON_CREATE_ROOM     = "STATE_ROOM/IDC_BUTTON_CREATE_ROOM";
     constexpr static auto IDC_DIALOG_CREATE_ROOM     = "STATE_ROOM/IDC_DIALOG_CREATE_ROOM";
     constexpr static auto IDC_BUTTON_SHOW_ALL        = "STATE_ROOM/IDC_BUTTON_SHOW_ALL";

@@ -42,9 +42,6 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
         return nullptr;
 
     auto container = Instantiate(context);
-    if (context.GetID() == Resource::Room::IDC_USER_LIST)
-        container = std::make_unique<UserList>();
-
     auto populator = ObjectContainer::Decorate(container.get());
     auto ctx       = ResourceContextDecorator::Decorate(context);
     container->SetName(metadata->Name);
