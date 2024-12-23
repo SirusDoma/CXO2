@@ -79,8 +79,14 @@ public:
             case Encoding::ISO_8859_10:
                 fromEncoding = "ISO-8859-10";
                 break;
+            case Encoding::ISO_8859_13:
+                fromEncoding = "ISO-8859-13";
+            break;
             case Encoding::JAPANESE_EUC_JP:
-                fromEncoding = "EUC-JP";
+                if (length >= 2 && text[0] == static_cast<char>(0xA2) && text[1] == static_cast<char>(0xA3))
+                    fromEncoding = "EUC-KR";
+                else
+                    fromEncoding = "EUC-JP";
                 break;
             case Encoding::JAPANESE_SHIFT_JIS:
             case Encoding::KDDI_SHIFT_JIS:
@@ -91,7 +97,7 @@ public:
             case Encoding::KDDI_ISO_2022_JP:
             case Encoding::SOFTBANK_ISO_2022_JP:
                 fromEncoding = "ISO-2022-JP";
-            break;
+                break;
             case Encoding::CHINESE_BIG5:
                 fromEncoding = "BIG5";
                 break;
@@ -101,8 +107,18 @@ public:
             case Encoding::CHINESE_EUC_DEC:
             case Encoding::CHINESE_EUC_CN:
                 fromEncoding = reliable ? "EUC-CN" : "EUC-KR";
+                break;
+            case Encoding::GBK:
+                fromEncoding = "GBK";
+                break;
+            case Encoding::ISO_2022_CN:
+                fromEncoding = "ISO-2022-CN";
+                break;
             case Encoding::KOREAN_EUC_KR:
                 fromEncoding = "EUC-KR";
+                break;
+            case Encoding::ISO_2022_KR:
+                fromEncoding = "ISO-2022-KR";
                 break;
             case Encoding::UTF8:
                 fromEncoding = "UTF-8";
@@ -152,23 +168,11 @@ public:
             case Encoding::MSFT_CP1253:
                 fromEncoding = "CP1253";
                 break;
-            case Encoding::ISO_8859_13:
-                fromEncoding = "ISO-8859-13";
-                break;
-            case Encoding::ISO_2022_KR:
-                fromEncoding = "ISO-2022-KR";
-                break;
-            case Encoding::GBK:
-                fromEncoding = "GBK";
-                break;
             case Encoding::GB18030:
                 fromEncoding = "GB18030";
                 break;
             case Encoding::BIG5_HKSCS:
                 fromEncoding = "BIG5-HKSCS";
-                break;
-            case Encoding::ISO_2022_CN:
-                fromEncoding = "ISO-2022-CN";
                 break;
             case Encoding::UTF16BE:
                 fromEncoding = "UTF-16BE";
