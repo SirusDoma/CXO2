@@ -73,8 +73,8 @@ namespace Gx
 
         mutable sf::View m_view{};
 
-        SceneDirector*         m_director{nullptr};
-        std::set<Presentable*> m_presentables;
+        SceneDirector*            m_director{nullptr};
+        std::vector<Presentable*> m_presentables;
 
         std::optional<sf::Event> m_lastInput{};
         std::queue<std::function<void()>> m_events{};

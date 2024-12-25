@@ -99,8 +99,9 @@ namespace Gx
 
     void Scene::Present(Presentable& presentable, const PresentationContext& context)
     {
-        if (auto [_, success] = m_presentables.insert(&presentable); success)
+        if (std::find(m_presentables.begin(), m_presentables.end(), &presentable) == m_presentables.end())
         {
+            m_presentables.push_back(&presentable);
             if (&context == &PresentationContext::Default)
             {
                 auto ctx = GraphicalPresentationContext();
@@ -125,8 +126,9 @@ namespace Gx
         if (!IsPresenting(presentable))
             return false;
 
-        if (m_presentables.erase(&presentable) > 0)
+        if (const auto it = std::find(m_presentables.begin(), m_presentables.end(), &presentable); it != m_presentables.end())
         {
+            m_presentables.erase(it);
             Parent::Dismiss(presentable);
 
             // Apply last mouse movement input so that objects are properly highlighted after dismissing the presentable
