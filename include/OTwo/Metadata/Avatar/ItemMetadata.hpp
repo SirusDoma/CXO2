@@ -1,8 +1,10 @@
 #pragma once
 
 #include <OTwo/Metadata/ResourceMetadata.hpp>
-#include <OTwo/Serializable.g.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Equipment.hpp>
+#include <OTwo/Models/Shop.hpp>
 
 #include <SFML/System/String.hpp>
 

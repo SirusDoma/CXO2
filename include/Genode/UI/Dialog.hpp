@@ -46,6 +46,9 @@ namespace Gx
         using Sprite::GetColor;
         using Sprite::SetColor;
 
+        using Sprite::GetBlendMode;
+        using Sprite::SetBlendMode;
+
         bool IsShown() const;
         bool IsAccepted() const;
 

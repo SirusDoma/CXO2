@@ -14,7 +14,7 @@ struct ButtonMetadata : public SpriteMetadata
         ButtonState() = default;
         ButtonState(const SpriteMetadata& sprite) : SpriteMetadata(sprite) {}
 
-        sf::Vector2f LocalBounds;
+        sf::IntRect LocalBounds;
     };
 
     bool Enabled = true;

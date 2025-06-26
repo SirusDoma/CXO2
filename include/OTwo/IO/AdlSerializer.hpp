@@ -1,6 +1,5 @@
 #pragma once
 
-#include <OTwo/Serializable.g.hpp>
 #include <Genode/IO/Json.hpp>
 
 #include <magic_enum.hpp>

@@ -4,8 +4,8 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/Metadata/Avatar/ItemMetadata.hpp>
+#include <OTwo/Metadata/Avatar/SetInfoMetadata.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
-#include <OTwo/Serializable.g.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Tasks/Delay.hpp>

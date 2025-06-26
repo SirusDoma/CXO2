@@ -17,6 +17,11 @@ struct ResourceMetadata
     {
         None,
 
+        // Root
+        ControlList,
+        ItemData,
+        SetInfoData,
+
         // SceneGraph
         State,
 
@@ -26,6 +31,7 @@ struct ResourceMetadata
 
         // Graphics
         Sprite,
+        Text,
         Shape,
         Image,
         Animation,
@@ -55,8 +61,8 @@ struct ResourceMetadata
 
         // Avatar
         Avatar,
-        ItemData,
-        Item
+        Item,
+        SetInfo
     };
 
     virtual ~ResourceMetadata() = default;

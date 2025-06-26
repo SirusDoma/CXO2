@@ -1,7 +1,10 @@
 #include <OTwo/IO/Loaders/Avatar/SetInfoDataLoader.hpp>
+#include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/AdlSerializer.hpp>
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
-#include <OTwo/Serializable.g.hpp>
+#include <OTwo/Metadata/Avatar/SetInfoData.hpp>
+#include <OTwo/Models/Character.hpp>
+#include <OTwo/Models/Planet.hpp>
 
 Gx::ResourcePtr<SetInfoData> SetInfoDataLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
@@ -9,37 +12,62 @@ Gx::ResourcePtr<SetInfoData> SetInfoDataLoader::LoadFromJson(const Gx::Json& jso
         return nullptr;
 
     auto metadata = SetInfoData();
-    if (const auto attributes = json.find("attributes"); attributes != json.end())
+    if (!MetadataLoader::Parse(json, metadata, context))
+        return nullptr;
+
+    if (auto attributes = json.find("attributes"); attributes != json.end())
     {
-        if (const auto version = attributes->find("version"); version != attributes->end())
-            metadata.Attributes = { version->get<std::string>() };
+        if (auto version = attributes->find("version"); version != attributes->end())
+            metadata.Version = version->get<std::string>();
     }
 
-    metadata.Require = SetInfoDependency{std::map<std::uint32_t, SetInfoItem>()};
-    for (const auto [key, data] : json.at("require").at("sets").items())
+    metadata.Sets = std::map<unsigned int, SetInfoMetadata>();
+    auto sets = std::any_cast<Gx::Json>(metadata.Require["sets"]);
+    for (auto [key, resource] : sets.items())
     {
-        if (data.empty())
+        unsigned int id = std::stoi(key);
+        auto setInfoData = std::any_cast<Gx::Json>(resource);
+
+        auto setInfoMetadata = SetInfoMetadata();
+        if (!MetadataLoader::Parse(setInfoData, setInfoMetadata, context))
             continue;
 
-        auto setInfo = SetInfoItem();
-        setInfo.Require = { data.at("require").at("items").get<std::vector<std::uint32_t>>() };
-        if (setInfo.Require->Items->empty())
+        const auto& require = setInfoMetadata.Require;
+        if (require.empty())
             continue;
 
-        const auto attributes = data.at("attributes");
-        setInfo.Attributes = {
-            attributes.at("id").get<std::uint32_t>(),
-            attributes.at("name").get<std::string>(),
-            attributes.at("description").get<std::string>(),
-            attributes.at("gender").get<Gender>(),
-            attributes.at("origin").get<Planet>(),
-            attributes.at("discounts").get<std::map<std::uint32_t, std::map<Currency, std::uint32_t>>>()
-        };
+        if (const auto it = require.find("items"); it != require.end() && it->second.type() == typeid(Gx::Json))
+        {
+            auto table = std::any_cast<Gx::Json>(it->second);
+            for (const auto& itemID : table.items())
+                setInfoMetadata.ItemsIDs.insert(itemID.value().get<unsigned int>());
+        }
 
-        if (setInfo.Attributes->ID != std::stoi(key))
-            throw Gx::ResourceLoadException("Inconsistent Set Info ID: " + key);
+        if (setInfoMetadata.ItemsIDs.empty())
+            continue;
 
-        metadata.Require->Sets->insert_or_assign(std::stoi(key), setInfo);
+
+        if (auto attributes = setInfoData.find("attributes"); attributes != setInfoData.end())
+        {
+            setInfoMetadata.ID   = attributes->at("id").get<unsigned int>();
+            setInfoMetadata.Type = ResourceMetadata::ResourceType::SetInfo;
+
+            auto name                   = attributes->at("name").get<std::string>();
+            auto description            = attributes->at("description").get<std::string>();
+            setInfoMetadata.Name        = sf::String::fromUtf8(name.begin(), name.end());
+            setInfoMetadata.Description = sf::String::fromUtf8(description.begin(), description.end());
+
+            if (auto gender = magic_enum::enum_cast<Gender>(attributes->at("gender").get<std::string>()); gender.has_value())
+                setInfoMetadata.Gender = gender.value();
+
+            if (auto origin = magic_enum::enum_cast<Planet>(attributes->at("origin").get<std::string>()); origin.has_value())
+                setInfoMetadata.Origin = origin.value();
+
+            if (auto discounts = attributes->find("discounts"); discounts != attributes->end())
+                setInfoMetadata.Discounts = discounts.value().get<std::map<std::uint32_t, std::unordered_map<Currency, std::uint32_t>>>();
+        }
+
+        metadata.Sets[id] = setInfoMetadata;
     }
 
     return std::make_unique<SetInfoData>(metadata);

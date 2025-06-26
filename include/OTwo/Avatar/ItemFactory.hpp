@@ -2,8 +2,10 @@
 
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Metadata/Avatar/ItemData.hpp>
+#include <OTwo/Metadata/Avatar/SetInfoData.hpp>
+
 #include <OTwo/Models/Equipment.hpp>
-#include <OTwo/Serializable.g.hpp>
+#include <OTwo/Models/Character.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 

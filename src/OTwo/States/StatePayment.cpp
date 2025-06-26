@@ -34,10 +34,10 @@ void StatePayment::Initialize()
         auto itemIDs = std::vector<unsigned int>();
         if (cartItem.Type == CartItemType::EquipmentSet)
         {
-            const auto& sets = setInfoData.Require->Sets.value();
+            const auto& sets = setInfoData.Sets;
             if (auto set = sets.find(cartItem.ID); set != sets.end())
             {
-                for (const auto itemID : set->second.Require->Items.value())
+                for (const auto itemID : set->second.ItemsIDs)
                     itemIDs.push_back(itemID);
             }
         }

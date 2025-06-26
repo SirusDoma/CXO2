@@ -83,10 +83,7 @@ public:
                 fromEncoding = "ISO-8859-13";
             break;
             case Encoding::JAPANESE_EUC_JP:
-                if (length >= 2 && text[0] == static_cast<char>(0xA2) && text[1] == static_cast<char>(0xA3))
-                    fromEncoding = "EUC-KR";
-                else
-                    fromEncoding = "EUC-JP";
+                fromEncoding = "EUC-JP";
                 break;
             case Encoding::JAPANESE_SHIFT_JIS:
             case Encoding::KDDI_SHIFT_JIS:
@@ -199,6 +196,10 @@ public:
             default:
                 break;
         }
+
+        // Special cases: upside A
+        if (length == 2 && text[0] == static_cast<char>(0xA2) && text[1] == static_cast<char>(0xA3))
+            fromEncoding = "EUC-KR";
 
         iconv_t cd = iconv_open("UTF-8", fromEncoding.c_str());
         if (cd == reinterpret_cast<libiconv_t>(-1))

@@ -246,18 +246,18 @@ void StateMusicShop::InvalidateCart()
     {
         if (item.Type == CartItemType::EquipmentSet)
         {
-            const auto& sets = setInfoData.Require->Sets.value();
+            const auto& sets = setInfoData.Sets;
             if (auto set = sets.find(item.ID); set != sets.end())
             {
-                for (const auto itemID : set->second.Require->Items.value())
+                for (const auto itemID : set->second.ItemsIDs)
                 {
                     calculateItem(itemID);
 
-                    if (!set->second.Attributes->Discounts.has_value())
+                    if (set->second.Discounts.empty())
                         continue;
 
-                    auto discounts = set->second.Attributes->Discounts->find(itemID);
-                    if (discounts == set->second.Attributes->Discounts->end())
+                    auto discounts = set->second.Discounts.find(itemID);
+                    if (discounts == set->second.Discounts.end())
                         continue;
 
                     if (auto gemDiscount = discounts->second.find(Currency::Gem); gemDiscount != discounts->second.end())
@@ -267,7 +267,7 @@ void StateMusicShop::InvalidateCart()
                 }
             }
         }
-        if (item.Type == CartItemType::Equipment)
+        else if (item.Type == CartItemType::Equipment)
             calculateItem(item.ID);
 
         // TODO: Music
@@ -299,14 +299,14 @@ void StateMusicShop::InvalidateCart()
         id->SetString(std::to_string(j));
         if (item.Type == CartItemType::EquipmentSet)
         {
-            const auto& sets = setInfoData.Require->Sets.value();
+            const auto& sets = setInfoData.Sets;
             if (auto set = sets.find(item.ID); set != sets.end())
             {
-                name->SetString(sf::String::fromUtf8(set->second.Attributes->Name->begin(), set->second.Attributes->Name->end()));
+                name->SetString(set->second.Name);
                 unsigned int setPriceGem  = 0;
                 unsigned int setPriceCash = 0;
 
-                for (const auto itemID : set->second.Require->Items.value())
+                for (const auto itemID : set->second.ItemsIDs)
                 {
                     if (auto it = itemData.Items.find(itemID); it != itemData.Items.end())
                     {
@@ -316,11 +316,11 @@ void StateMusicShop::InvalidateCart()
                         else if (auto cashPrice = metadata.Prices.find(Currency::Cash); cashPrice != metadata.Prices.end())
                             setPriceCash += cashPrice->second;
 
-                        if (!set->second.Attributes->Discounts.has_value())
+                        if (set->second.Discounts.empty())
                             continue;
 
-                        auto discounts = set->second.Attributes->Discounts->find(itemID);
-                        if (discounts == set->second.Attributes->Discounts->end())
+                        auto discounts = set->second.Discounts.find(itemID);
+                        if (discounts == set->second.Discounts.end())
                             continue;
 
                         if (auto gemDiscount = discounts->second.find(Currency::Gem); gemDiscount != discounts->second.end())

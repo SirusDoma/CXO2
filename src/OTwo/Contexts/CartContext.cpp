@@ -1,11 +1,12 @@
 #include <OTwo/Contexts/CartContext.hpp>
+#include <OTwo/Models/Shop.hpp>
 
 bool CartContext::AddEquipment(const unsigned int id)
 {
     if (Contains(CartItemType::Equipment, id))
         return false;
 
-    Record.Items.push_back({id, CartItemType::Equipment });
+    m_cart.Items.push_back({id, CartItemType::Equipment });
     return true;
 }
 
@@ -14,7 +15,7 @@ bool CartContext::AddMusic(const unsigned int id)
     if (Contains(CartItemType::Music, id))
         return false;
 
-    Record.Items.push_back({id, CartItemType::Music });
+    m_cart.Items.push_back({id, CartItemType::Music });
     return true;
 }
 
@@ -23,22 +24,22 @@ bool CartContext::AddEquipmentSet(const unsigned int id)
     if (Contains(CartItemType::EquipmentSet, id))
         return false;
 
-    Record.Items.push_back({id, CartItemType::EquipmentSet });
+    m_cart.Items.push_back({id, CartItemType::EquipmentSet });
     return true;
 }
 
 bool CartContext::Remove(const std::size_t index)
 {
-    if (index >= Record.Items.size())
+    if (index >= m_cart.Items.size())
         return false;
 
-    Record.Items.erase(Record.Items.begin() + index);
+    m_cart.Items.erase(m_cart.Items.begin() + index);
     return true;
 }
 
 const std::vector<CartItem>& CartContext::GetItems() const
 {
-    return Record.Items;
+    return m_cart.Items;
 }
 
 CartContext::CheckoutType CartContext::GetCheckoutType() const
@@ -53,13 +54,13 @@ void CartContext::SetCheckoutType(const CheckoutType checkoutType)
 
 void CartContext::Clear()
 {
-    Record.Items.clear();
+    m_cart.Items.clear();
 }
 
 bool CartContext::Contains(CartItemType type, unsigned int id)
 {
-   return std::find_if(Record.Items.begin(), Record.Items.end(), [type, id] (const CartItem& item)
+   return std::find_if(m_cart.Items.begin(), m_cart.Items.end(), [type, id] (const CartItem& item)
    {
        return item.ID == id && item.Type == type;
-   }) != Record.Items.end();
+   }) != m_cart.Items.end();
 }

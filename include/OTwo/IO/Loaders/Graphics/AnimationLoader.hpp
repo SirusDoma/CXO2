@@ -1,8 +1,6 @@
 #pragma once
 
 #include <OTwo/IO/ResourceLoader.hpp>
-#include <OTwo/Metadata/ResourceMetadata.hpp>
-
 #include <Genode/IO/ResourceContext.hpp>
 #include <Genode/Graphics/Animation.hpp>
 

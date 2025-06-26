@@ -8,7 +8,6 @@ endif()
 # CMake Modules
 include(CheckIncludeFiles)
 include(FetchContent)
-include(schemas/generator.cmake)
 
 # CMake Config
 set(CMAKE_CXX_STANDARD 17)
@@ -33,20 +32,6 @@ file(GLOB_RECURSE HEADERS extlibs/headers/*.h)
 file(GLOB_RECURSE HEADERS extlibs/libs/internal/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/libs/internal/*.h)
 file(GLOB_RECURSE HEADERS schemas/headers/*.hpp)
-
-# Schema
-file(GLOB_RECURSE SCHEMA_FILES schemas/**/*.bop)
-if (SCHEMA_FILES)
-    message("-- Configuring schema generator --")
-    set(SCHEMA_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/schemas/headers/OTwo/Serializable.g.hpp)
-    Bebop_Generate(
-        Application-Schema
-        VERSION "v3.0.14"
-        LANGUAGE cpp
-        OUTPUT ${SCHEMA_OUTPUT}
-        BOPS ${SCHEMA_FILES}
-    )
-endif()
 
 # Default flags
 if (NOT CMAKE_BUILD_TYPE)
@@ -228,7 +213,6 @@ target_include_directories(${TARGET} PRIVATE src)
 target_include_directories(${TARGET} PRIVATE include)
 target_include_directories(${TARGET} PRIVATE extlibs/headers)
 target_include_directories(${TARGET} PRIVATE extlibs/libs/internal)
-target_include_directories(${TARGET} PRIVATE schemas/headers)
 
 # Link JSON
 target_link_libraries(${TARGET} PRIVATE nlohmann_json::nlohmann_json)
@@ -251,5 +235,4 @@ if(WIN32)
 endif()
 
 # Include FreeType
-find_package(Freetype REQUIRED)
 target_link_libraries(${TARGET} PRIVATE Freetype::Freetype)

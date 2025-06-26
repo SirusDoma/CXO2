@@ -34,35 +34,41 @@ namespace Gx
     {
         // Use frame for active state first before looking for other frames
         const auto state = m_frames[GetControlState()];
-        auto bounds = state.Bounds;
-        if (bounds == sf::Vector2f())
+        auto bounds = sf::FloatRect(state.Bounds);
+        if (bounds == sf::FloatRect())
         {
             bounds = {
-                static_cast<float>(state.TexCoords.size.x),
-                static_cast<float>(state.TexCoords.size.y)
+                { 0, 0 },
+                {
+                    static_cast<float>(state.TexCoords.size.x),
+                    static_cast<float>(state.TexCoords.size.y)
+                }
             };
         }
 
-        if (bounds == sf::Vector2f())
+        if (bounds == sf::FloatRect())
         {
             // There's no frame for active state, look for valid frame
             for (auto [_, frame] : m_frames)
             {
-                bounds = frame.Bounds;
-                if (bounds != sf::Vector2f())
+                bounds = sf::FloatRect(frame.Bounds);
+                if (bounds != sf::FloatRect())
                     break;
 
                 bounds = {
-                    static_cast<float>(frame.TexCoords.size.x),
-                    static_cast<float>(frame.TexCoords.size.y)
+                    { 0, 0 },
+                    {
+                        static_cast<float>(frame.TexCoords.size.x),
+                        static_cast<float>(frame.TexCoords.size.y),
+                    }
                 };
 
-                if (bounds != sf::Vector2f())
+                if (bounds != sf::FloatRect())
                     break;
             }
         }
 
-        return { { 0.f, 0.f }, bounds };
+        return bounds;
     }
 
     void Button::SetTexture(const sf::Texture& texture)
@@ -147,8 +153,6 @@ namespace Gx
         if (!IsEnabled())
             return;
 
-        const auto frame = GetCurrentFrame();
-        SetColor(frame.Color);
         UpdatePositions();
         UpdateTexCoords();
     }

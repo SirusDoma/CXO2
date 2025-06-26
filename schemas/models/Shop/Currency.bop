@@ -1,6 +1,0 @@
-enum Currency
-{
-    Any  = 0;
-    Gem  = 1;
-    Cash = 2;
-}

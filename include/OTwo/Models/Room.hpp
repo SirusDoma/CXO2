@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OTwo/Serializable.g.hpp>
+#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Game.hpp>
 #include <OTwo/Metadata/Chart/ChartMetadataView.hpp>
 
@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 enum class KeyMode : std::size_t
 {

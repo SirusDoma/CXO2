@@ -1,11 +1,10 @@
 #pragma once
 
-#include <OTwo/IO/Serializable.hpp>
-#include <OTwo/Serializable.g.hpp>
+#include <OTwo/Models/Shop.hpp>
 
 #include <functional>
 
-class CartContext : public Serializable<Cart>
+class CartContext
 {
 public:
     enum class CheckoutType
@@ -31,5 +30,6 @@ public:
     void Clear();
 
 private:
+    Cart m_cart;
     CheckoutType m_checkoutType;
 };

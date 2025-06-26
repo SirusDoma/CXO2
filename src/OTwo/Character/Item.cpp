@@ -1,5 +1,4 @@
 #include <OTwo/Avatar/Item.hpp>
-#include <OTwo/Serializable.g.hpp>
 #include <OTwo/Models/Planet.hpp>
 #include <OTwo/Models/Equipment.hpp>
 

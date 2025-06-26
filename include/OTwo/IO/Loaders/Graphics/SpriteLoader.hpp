@@ -6,7 +6,7 @@
 struct SpriteMetadata;
 class SpriteLoader : public ResourceLoader<Gx::Sprite>
 {
-public :
+public:
     SpriteLoader() = default;
 
     Gx::ResourcePtr<Gx::Sprite> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const override;

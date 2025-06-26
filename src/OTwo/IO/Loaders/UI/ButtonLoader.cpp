@@ -33,7 +33,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadat
 
     auto spriteLoader = SpriteLoader();
     for (auto [state, frame] : metadata->States)
-        button->SetFrame(state, {frame.TexCoords, frame.Color, frame.LocalBounds});
+        button->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
 
     button->SetName(metadata->Name);
     button->SetOrigin(metadata->Origin);
@@ -89,18 +89,23 @@ bool ButtonLoader::ParseMetadata(const Gx::Json& attributes, ButtonMetadata& met
         if (!SpriteLoader::ParseMetadata(stateData, stateMeta, context))
             continue;
 
-        if (auto b = stateData.find("bounds"); b != stateData.end())
+        if (auto bounds = stateData.find("bounds"); bounds != stateData.end())
         {
-            float width  = b->at("width").get<float>();
-            float height = b->at("height").get<float>();
+            int x      = bounds->find("x") != bounds->end() ? bounds->at("x").get<int>() : 0;
+            int y      = bounds->find("y") != bounds->end() ? bounds->at("y").get<int>() : 0;
+            int width  = bounds->at("width").get<int>();
+            int height = bounds->at("height").get<int>();
 
-            stateMeta.LocalBounds = { width, height };
+            stateMeta.LocalBounds = sf::IntRect{ { x, y }, { width, height } };
         }
         else
         {
-            stateMeta.LocalBounds = {
-                static_cast<float>(stateMeta.TexCoords.size.x),
-                static_cast<float>(stateMeta.TexCoords.size.y)
+            stateMeta.LocalBounds = sf::IntRect{
+                { 0, 0 },
+                {
+                    metadata.TexCoords.size.x,
+                    metadata.TexCoords.size.y
+                }
             };
         }
 

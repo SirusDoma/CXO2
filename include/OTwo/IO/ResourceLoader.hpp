@@ -1,10 +1,7 @@
 #pragma once
 
-#include <OTwo/Metadata/ResourceMetadata.hpp>
-
 #include <Genode/IO/Json.hpp>
 #include <Genode/IO/ResourceContext.hpp>
-#include <Genode/IO/ResourceLoaderFactory.hpp>
 
 class ObjectContainer;
 struct ResourceMetadata;
