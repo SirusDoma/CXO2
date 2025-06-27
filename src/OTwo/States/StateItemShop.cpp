@@ -711,17 +711,17 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
         shopMaster->SetVisible(true);
         if (moveIn)
         {
-            if (m_shopMasterEffect.GetState() != Gx::TaskState::Idle)
+            if (m_shopMasterEffect.has_value() && m_shopMasterEffect->GetState() != Gx::TaskState::Idle)
             {
-                Stop(m_shopMasterEffect);
-                m_shopMasterEffect.Complete();
+                Stop(*m_shopMasterEffect);
+                m_shopMasterEffect->Complete();
             }
 
             m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.15f));
             shopMaster->SetPosition(shopMaster->GetPosition().x - 100, shopMaster->GetPosition().y);
 
             m_shopMasterSpeechCounter = 0;
-            Run(m_shopMasterEffect);
+            Run(*m_shopMasterEffect);
         }
 
         if (const auto speech = shopMaster->FindChild<Gx::Animation>(Resource::ItemShop::ShopMaster::IDC_ANIMATION_SPEECH))
@@ -861,7 +861,7 @@ void StateItemShop::InvalidateMyBag()
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
                         skillThumbnail->SetTexture(*texture, true);
 
-                    Present(*dialog);
+                    Present(*dialog, Gx::PresentationContext::Default);
                 }
             }
             else

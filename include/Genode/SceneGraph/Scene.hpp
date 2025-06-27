@@ -38,7 +38,7 @@ namespace Gx
         void SetView(const sf::View& view) const;
 
         bool IsPresenting(Presentable& presentable) const override;
-        void Present(Presentable& presentable, const PresentationContext& context = PresentationContext::Default) override;
+        void Present(Presentable& presentable, const PresentationContext& context) override;
         bool Dismiss(Presentable& presentable) override;
         bool Dismiss() override;
 

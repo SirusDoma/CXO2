@@ -13,6 +13,8 @@
 #include <Genode/Tween/Move.hpp>
 #include <Genode/UI/Image.hpp>
 
+#include <optional>
+
 class SessionContext;
 class ItemFactory;
 class StateItemShop : public State
@@ -61,7 +63,7 @@ private:
 
     Item* m_myBagSelectedItem;
     Gx::Image* m_myBagSelectIndicator;
-    Gx::Move m_shopMasterEffect;
+    std::optional<Gx::Move> m_shopMasterEffect;
     Gx::Scheduler m_extensionMenuEffect;
     std::vector<sf::Sound*> m_shopMasterSpeech;
     std::vector<Item> m_inventory;

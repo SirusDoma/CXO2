@@ -36,7 +36,7 @@ namespace Gx
             if constexpr (std::is_rvalue_reference_v<decltype(task)>)
             {
                 m_tasks.emplace_back(
-                    ResourcePtr<Task>(new TaskType(std::move(task)), [](auto ptr) { delete ptr; })
+                    ResourcePtr<Task>(new TaskType(std::forward<decltype(task)>(task)), [](auto ptr) { delete ptr; })
                 );
             }
             else

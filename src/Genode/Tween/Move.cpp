@@ -2,12 +2,11 @@
 
 namespace Gx
 {
-    Move::Move(Transformable& target, const sf::Vector2f position, const sf::Time& duration) :
-        m_target(&target),
+    Move::Move(Transformable& target, const sf::Vector2f position, const sf::Time& duration, MotionFunc motion) :
+        Tween(target, duration, std::move(motion)),
         m_start(),
         m_end(position),
-        m_diff(),
-        m_duration(duration)
+        m_diff()
     {
     }
 
@@ -15,10 +14,8 @@ namespace Gx
     {
         Task::Initialize();
 
-        m_start  = m_target->GetPosition();
-        m_diff   = m_start - m_end;
-        m_diff.x = std::abs(m_diff.x);
-        m_diff.y = std::abs(m_diff.y);
+        m_start  = GetTarget().GetPosition();
+        m_diff   = m_end - m_start;
     }
 
     void Move::Update(const double delta)
@@ -26,49 +23,16 @@ namespace Gx
         Task::Update(delta);
 
         const auto state = GetState();
-        if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
+        if (state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
-        float offset = 0.0f;
-        auto current = m_target->GetPosition();
         const auto elapsed = GetElapsed();
+        GetTarget().SetPosition(
+            m_start.x + (Compute(elapsed / GetDuration()) * m_diff.x),
+            m_start.y + (Compute(elapsed / GetDuration()) * m_diff.y)
+        );
 
-        if (m_end.x < current.x)
-        {
-            offset = m_start.x - ((elapsed / m_duration) * m_diff.x);
-            if (offset < m_end.x)
-                current.x = m_end.x;
-            else
-                current.x = offset;
-        }
-        else
-        {
-            offset = m_start.x + ((elapsed / m_duration) * m_diff.x);
-            if (offset > m_end.x)
-                current.x = m_end.x;
-            else
-                current.x = offset;
-        }
-
-        if (m_end.y < current.y)
-        {
-            offset = m_start.y - ((elapsed / m_duration) * m_diff.y);
-            if (offset < m_end.y)
-                current.y = m_end.y;
-            else
-                current.y = offset;
-        }
-        else
-        {
-            offset = m_start.y + ((elapsed / m_duration) * m_diff.y);
-            if (offset > m_end.y)
-                current.y = m_end.y;
-            else
-                current.y = offset;
-        }
-
-        m_target->SetPosition(current);
-        if (current == m_end)
+        if (elapsed >= GetDuration())
             Complete();
     }
 
@@ -78,7 +42,7 @@ namespace Gx
             return;
 
         Task::Complete();
-        m_target->SetPosition(m_end);
+        GetTarget().SetPosition(m_end);
     }
 
     void Move::Reset()
@@ -87,6 +51,6 @@ namespace Gx
             return;
 
         Task::Reset();
-        m_target->SetPosition(m_start);
+        GetTarget().SetPosition(m_start);
     }
 }

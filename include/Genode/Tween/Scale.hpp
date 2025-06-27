@@ -2,16 +2,16 @@
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>
+#include <Genode/Tween/Tween.hpp>
 
 #include <SFML/System/Vector2.hpp>
 
 namespace Gx
 {
-    class Scale : public Task
+    class Scale : public Tween<Transformable>
     {
     public:
-        Scale() = default;
-        Scale(Transformable& target, sf::Vector2f scale, const sf::Time& duration);
+        Scale(Transformable& target, sf::Vector2f scale, const sf::Time& duration, MotionFunc motion = Motion::Linear);
 
         void Update(double delta) override;
         void Complete() override;
@@ -21,8 +21,6 @@ namespace Gx
         void Initialize() override;
 
     private:
-        Transformable* m_target;
         sf::Vector2f m_start, m_end, m_diff;
-        sf::Time m_duration;
     };
 }

@@ -85,11 +85,11 @@ namespace Gx
         if (m_state == TaskState::Completed)
             return;
 
-        m_state   = TaskState::Completed;
-        m_elapsed = sf::Time::Zero;
-
+        m_state = TaskState::Completed;
         if (m_completeCallback)
             m_completeCallback();
+
+        m_elapsed = sf::Time::Zero;
     }
 
     void Task::Reset()

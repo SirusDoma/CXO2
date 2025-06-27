@@ -2,12 +2,11 @@
 
 namespace Gx
 {
-    Fade::Fade(Colorable& target, const std::uint8_t opacity, const sf::Time& duration) :
-        m_target(&target),
+    Fade::Fade(Colorable& target, const std::uint8_t opacity, const sf::Time& duration, MotionFunc motion) :
+        Tween(target, duration, std::move(motion)),
         m_start(target.GetColor().a),
         m_end(opacity),
-        m_diff(0),
-        m_duration(duration)
+        m_diff(0)
     {
     }
 
@@ -15,8 +14,8 @@ namespace Gx
     {
         Task::Initialize();
 
-        m_start = m_target->GetColor().a;
-        m_diff  = std::abs(m_start - m_end);
+        m_start = GetTarget().GetColor().a;
+        m_diff  = static_cast<std::int16_t>(std::abs(m_start - m_end));
     }
 
     void Fade::Update(const double delta)
@@ -24,16 +23,16 @@ namespace Gx
         Task::Update(delta);
 
         const auto state = GetState();
-        if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
+        if (state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
-        short alpha  = 0;
-        auto current = m_target->GetColor();
+        std::int16_t alpha  = 0;
+        auto current = GetTarget().GetColor();
         const auto elapsed = GetElapsed();
 
         if (m_end < current.a)
         {
-            alpha = m_start - ((elapsed / m_duration) * m_diff);
+            alpha = m_start - (Compute(elapsed / GetDuration()) * m_diff);
             if (alpha < m_end)
                 current.a = m_end;
             else
@@ -41,15 +40,15 @@ namespace Gx
         }
         else
         {
-            alpha = m_start + ((elapsed / m_duration) * m_diff);
+            alpha = m_start + (Compute(elapsed / GetDuration()) * m_diff);
             if (alpha > m_end)
                 current.a = m_end;
             else
                 current.a = alpha;
         }
 
-        m_target->SetColor(current);
-        if (current.a == m_end)
+        GetTarget().SetColor(current);
+        if (GetElapsed() >= GetDuration())
             Complete();
     }
 
@@ -60,10 +59,10 @@ namespace Gx
 
         Task::Complete();
 
-        auto color = m_target->GetColor();
+        auto color = GetTarget().GetColor();
         color.a = m_end;
 
-        m_target->SetColor(color);
+        GetTarget().SetColor(color);
     }
 
     void Fade::Reset()
@@ -73,9 +72,9 @@ namespace Gx
 
         Task::Reset();
 
-        auto color = m_target->GetColor();
+        auto color = GetTarget().GetColor();
         color.a = m_start;
 
-        m_target->SetColor(color);
+        GetTarget().SetColor(color);
     }
 }

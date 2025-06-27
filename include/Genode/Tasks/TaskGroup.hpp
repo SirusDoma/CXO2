@@ -30,7 +30,6 @@ namespace Gx
         TaskGroup& Add(Task& task);
         TaskGroup& Remove(const Task& task);
 
-    protected:
         void Update(double delta) override;
         void Stop() override;
         void Complete() override;

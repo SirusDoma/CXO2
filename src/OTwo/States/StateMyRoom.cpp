@@ -348,7 +348,7 @@ void StateMyRoom::Invalidate()
                     if (const auto texture = item->GetLargeThumbnail().GetTexture())
                         skillThumbnail->SetTexture(*texture, true);
 
-                    Present(*dialog);
+                    Present(*dialog, Gx::PresentationContext::Default);
                 }
 
                 return;

@@ -44,7 +44,9 @@ void JudgementIndicator::Play(const Accuracy accuracy)
 
             if (m_useFx)
             {
-                m_scale.Stop();
+                if (m_scale.has_value())
+                    m_scale->Stop();
+
                 m_target->SetScale(sf::Vector2f(0.5f, 0.5f));
                 m_scale = Gx::Scale(*m_target, sf::Vector2f(1.f, 1.f), sf::seconds(0.12083333f));
             }
@@ -59,10 +61,10 @@ void JudgementIndicator::Update(const double delta)
     if (!m_target)
         return;
 
-    if (m_useFx)
+    if (m_useFx && m_scale.has_value())
     {
-        m_scale.Update(delta);
-        if (m_scale.GetState() == Gx::TaskState::Completed)
+        m_scale->Update(delta);
+        if (m_scale->GetState() == Gx::TaskState::Completed)
             m_elapsed += delta;
     }
 

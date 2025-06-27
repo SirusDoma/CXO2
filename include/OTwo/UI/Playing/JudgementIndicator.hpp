@@ -28,5 +28,5 @@ private:
 
     double m_elapsed;
     Gx::Animation* m_target;
-    Gx::Scale m_scale;
+    std::optional<Gx::Scale> m_scale;
 };

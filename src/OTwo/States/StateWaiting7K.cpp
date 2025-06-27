@@ -117,7 +117,7 @@ void StateWaiting7K::Initialize()
         const auto emoticonHelpButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_EMOTICON);
         emoticonHelpButton->SetClickCallback([=] (auto& sender, auto& ev)
         {
-            Present(*dialog);
+            Present(*dialog, Gx::PresentationContext::Default);
         });
     }
 
@@ -333,7 +333,7 @@ void StateWaiting7K::Initialize()
             selectMusicButton->SetClickCallback([=] (auto& sender, auto& ev)
             {
                 m_mixer.Play(*sfxSelectMusic, Sound::Channel::SFX);
-                Present(*selectMusicDialog);
+                Present(*selectMusicDialog, Gx::PresentationContext::Default);
             });
         }
 

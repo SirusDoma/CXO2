@@ -2,12 +2,11 @@
 
 namespace Gx
 {
-    Rotate::Rotate(Transformable& target, const float angle, const sf::Time& duration) :
-        m_target(&target),
+    Rotate::Rotate(Transformable& target, const float angle, const sf::Time& duration, MotionFunc motion) :
+        Tween(target, duration, std::move(motion)),
         m_start(target.GetRotation().asDegrees()),
         m_end(angle),
-        m_diff(0),
-        m_duration(duration)
+        m_diff(0)
     {
     }
 
@@ -15,8 +14,8 @@ namespace Gx
     {
         Task::Initialize();
 
-        m_start = m_target->GetRotation().asDegrees();
-        m_diff  = std::abs(m_start - m_end);
+        m_start = GetTarget().GetRotation().asDegrees();
+        m_diff  = m_end - m_start;
     }
 
     void Rotate::Update(const double delta)
@@ -24,32 +23,15 @@ namespace Gx
         Task::Update(delta);
 
         const auto state = GetState();
-        if (!m_target || state == TaskState::Stopped || state == TaskState::Completed)
+        if (state == TaskState::Stopped || state == TaskState::Completed)
             return;
 
-        short rotation = 0;
-        auto current   = m_target->GetRotation().asDegrees();
         const auto elapsed   = GetElapsed();
+        GetTarget().SetRotation(
+            m_start + (Compute(elapsed / GetDuration()) * m_diff)
+        );
 
-        if (m_end < current)
-        {
-            rotation = m_start - ((elapsed / m_duration) * m_diff);
-            if (rotation < m_end)
-                current = m_end;
-            else
-                current = rotation;
-        }
-        else
-        {
-            rotation = m_start + ((elapsed / m_duration) * m_diff);
-            if (rotation > m_end)
-                current = m_end;
-            else
-                current = rotation;
-        }
-
-        m_target->SetRotation(current);
-        if (current == m_end)
+        if (elapsed >= GetDuration())
             Complete();
     }
 
@@ -59,7 +41,7 @@ namespace Gx
             return;
 
         Task::Complete();
-        m_target->SetRotation(m_end);
+        GetTarget().SetRotation(m_end);
     }
 
     void Rotate::Reset()
@@ -68,6 +50,6 @@ namespace Gx
             return;
 
         Task::Reset();
-        m_target->SetRotation(m_start);
+        GetTarget().SetRotation(m_start);
     }
 }

@@ -2,14 +2,14 @@
 
 #include <Genode/Tasks/Task.hpp>
 #include <Genode/Graphics/Transformable.hpp>
+#include <Genode/Tween/Tween.hpp>
 
 namespace Gx
 {
-    class Move : public Task
+    class Move : public Tween<Transformable>
     {
     public:
-        Move() = default;
-        Move(Transformable& target, sf::Vector2f position, const sf::Time& duration);
+        Move(Transformable& target, sf::Vector2f position, const sf::Time& duration, MotionFunc motion = Motion::Linear);
 
         void Update(double delta) override;
         void Complete() override;
@@ -19,8 +19,6 @@ namespace Gx
         void Initialize() override;
 
     private:
-        Transformable* m_target;
         sf::Vector2f m_start, m_end, m_diff;
-        sf::Time m_duration;
     };
 }

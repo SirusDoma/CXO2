@@ -187,7 +187,7 @@ void StateRoom::Initialize()
     {
         createRoomButton->SetClickCallback([=, &director] (auto& sender, auto& ev) {
             m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
-            Present(*createRoomDialog);
+            Present(*createRoomDialog, Gx::PresentationContext::Default);
             createRoomDialog->SetAcceptCallback([&] () {
                 const auto musicList = m_session.GetInstalledMusic();
                 const auto music = !m_selection.GetMetadata().Source.empty() ? m_selection.GetMetadata() : musicList[musicList.size() - 1];
@@ -280,7 +280,7 @@ void StateRoom::Initialize()
     {
         const auto optionButton = FindChild<Gx::Button>(Resource::Room::IDC_BUTTON_OPTION);
         optionButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            Present(*optionDialog);
+            Present(*optionDialog, Gx::PresentationContext::Default);
         });
     }
 
