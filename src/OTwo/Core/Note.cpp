@@ -7,13 +7,10 @@ Note::Note(const Chart::NoteEvent& ev) :
 }
 
 Note::Note(const double position, const Chart::Channel channel) :
-    m_vertices(),
     m_position(position),
     m_channel(channel),
     m_line(*this)
 {
-    for (std::size_t i = 0; i < m_vertices.size(); i++)
-        m_vertices[i] = nullptr;
 }
 
 double Note::GetRenderPosition() const
@@ -41,14 +38,19 @@ NoteGuideLine* Note::GetGuideLine()
     return &m_line;
 }
 
-const std::array<sf::Vertex*, 6>& Note::GetVertices() const
+const Gx::VertexSpan& Note::GetVertices() const
 {
-    return m_vertices;
+    return m_span.value();
 }
 
-void Note::SetVertices(const std::array<sf::Vertex*, 6> &vertices)
+Gx::VertexSpan& Note::GetVertices()
 {
-    m_vertices = vertices;
+    return m_span.value();
+}
+
+void Note::SetVertices(Gx::VertexSpan&& vertices) noexcept
+{
+    m_span = std::move(vertices);
 }
 
 const Gx::Sprite* Note::GetPrefab(const NoteShape shape) const
@@ -69,35 +71,34 @@ void Note::SetPrefabs(const PrefabMap& prefabs)
 
 bool Note::IsVisible() const
 {
-    return m_vertices[0] && m_vertices[5]->color.a > 0;
+    return m_span.has_value() && !m_span->empty() && m_span.value()[5].color.a > 0;
 }
 
 void Note::SetVisible(const bool visible)
 {
-    if (IsVisible() == visible)
+    if (!m_span.has_value() || m_span->empty() || IsVisible() == visible)
         return;
 
     GetGuideLine()->SetVisible(visible);
-    for (const auto v : m_vertices)
+    for (auto& v : m_span.value())
     {
-        if (!v)
-            break;
-
         if (!visible)
         {
-            v->position  = sf::Vector2f();
-            v->texCoords = sf::Vector2f();
-            v->color     = sf::Color::Transparent;
+            v.position  = sf::Vector2f();
+            v.texCoords = sf::Vector2f();
+            v.color     = sf::Color::Transparent;
         }
         else
-            v->color = sf::Color::White;
+            v.color = sf::Color::White;
     }
 }
 
 void Note::UpdateGeometry(const ChartRenderer& renderer, const double delta)
 {
-    if (!m_vertices[0])
+    if (!m_span.has_value() || m_span->empty())
         return;
+
+    auto& span = m_span.value();
 
     const double latency = m_position - renderer.GetRenderPosition();
     if (latency > 5.f || latency < -0.5f)
@@ -124,43 +125,40 @@ void Note::UpdateGeometry(const ChartRenderer& renderer, const double delta)
     const auto position  = transform.transformPoint(sf::Vector2f(0, renderer.MapRenderPositionToPixels(GetChannel(), latency)));
     const auto bounds    = transform.transformRect(sprite->GetLocalBounds());
 
-    UpdatePositions(m_vertices, position, bounds);
-    UpdateTexCoords(m_vertices, sprite->GetTexCoords());
+    UpdatePositions(span, position, bounds);
+    UpdateTexCoords(span, sprite->GetTexCoords());
 }
 
-void Note::UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f& position, const sf::FloatRect& bounds)
+void Note::UpdatePositions(Gx::VertexSpan& span, const sf::Vector2f& position, const sf::FloatRect& bounds)
 {
-    vertices[0]->position = sf::Vector2f(position.x, position.y);
-    vertices[1]->position = sf::Vector2f(position.x + bounds.size.x, position.y);
-    vertices[2]->position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
-    vertices[3]->position = sf::Vector2f(position.x, position.y);
-    vertices[4]->position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
-    vertices[5]->position = sf::Vector2f(position.x, position.y + bounds.size.y);
+    span[0].position = sf::Vector2f(position.x, position.y);
+    span[1].position = sf::Vector2f(position.x + bounds.size.x, position.y);
+    span[2].position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
+    span[3].position = sf::Vector2f(position.x, position.y);
+    span[4].position = sf::Vector2f(position.x + bounds.size.x, position.y + bounds.size.y);
+    span[5].position = sf::Vector2f(position.x, position.y + bounds.size.y);
 }
 
-void Note::UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect& texcoords)
+void Note::UpdateTexCoords(Gx::VertexSpan& span, const sf::IntRect& texcoords)
 {
     const float left     = static_cast<float>(texcoords.position.x);
     const float right    = left + static_cast<float>(texcoords.size.x);
     const float top      = static_cast<float>(texcoords.position.y);
     const float bottom   = top + static_cast<float>(texcoords.size.y);
 
-    vertices[0]->texCoords = sf::Vector2f(left, top);
-    vertices[1]->texCoords = sf::Vector2f(right, top);
-    vertices[2]->texCoords = sf::Vector2f(right, bottom);
-    vertices[3]->texCoords = sf::Vector2f(left, top);
-    vertices[4]->texCoords = sf::Vector2f(right, bottom);
-    vertices[5]->texCoords = sf::Vector2f(left, bottom);
+    span[0].texCoords = sf::Vector2f(left, top);
+    span[1].texCoords = sf::Vector2f(right, top);
+    span[2].texCoords = sf::Vector2f(right, bottom);
+    span[3].texCoords = sf::Vector2f(left, top);
+    span[4].texCoords = sf::Vector2f(right, bottom);
+    span[5].texCoords = sf::Vector2f(left, bottom);
 }
 
 Gx::RenderStates Note::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    for (const auto v : m_vertices)
-    {
-        if (!v)
-            return states;
-    }
+    if (!m_span.has_value() || m_span->empty())
+        return states;
 
-    surface.Render(m_vertices[0], m_vertices.size(), sf::PrimitiveType::Triangles, states);
+    surface.Render(m_span->data(), m_span->size(), sf::PrimitiveType::Triangles, states);
     return states;
 }

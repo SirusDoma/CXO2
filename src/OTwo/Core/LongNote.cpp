@@ -21,33 +21,18 @@ bool LongNote::IsVisible() const
 
 void LongNote::SetVisible(const bool visible)
 {
-    if (IsVisible() == visible)
+    if (!m_headVertices.has_value() || !m_tailVertices.has_value() || IsVisible() == visible)
         return;
 
     GetGuideLine()->SetVisible(visible);
-    for (const auto v : m_headVertices)
-    {
-        if (!v)
-            break;
+    for (auto& v : m_headVertices.value())
+        v.color = visible ? sf::Color::White : sf::Color::Transparent;
 
-        v->color = visible ? sf::Color::White : sf::Color::Transparent;
-    }
+    for (auto& v : m_tailVertices.value())
+        v.color = visible ? sf::Color::White : sf::Color::Transparent;
 
-    for (const auto v : m_tailVertices)
-    {
-        if (!v)
-            break;
-
-        v->color = visible ? sf::Color::White : sf::Color::Transparent;
-    }
-
-    for (const auto v : GetVertices())
-    {
-        if (!v)
-            break;
-
-        v->color = visible ? sf::Color::White : sf::Color::Transparent;
-    }
+    for (auto& v : GetVertices())
+        v.color = visible ? sf::Color::White : sf::Color::Transparent;
 }
 
 double LongNote::GetLength() const
@@ -60,24 +45,24 @@ void LongNote::SetLength(const double length)
     m_length = length;
 }
 
-Note::VerticesPtr LongNote::GetHeadVertices() const
+Gx::VertexSpan& LongNote::GetHeadVertices()
 {
-    return m_headVertices;
+    return m_headVertices.value();
 }
 
-void LongNote::SetHeadVertices(const std::array<sf::Vertex*, 6>& vertices)
+void LongNote::SetHeadVertices(Gx::VertexSpan&& vertices)
 {
-    m_headVertices = vertices;
+    m_headVertices = std::move(vertices);
 }
 
-Note::VerticesPtr LongNote::GetTailVertices() const
+Gx::VertexSpan& LongNote::GetTailVertices()
 {
-    return m_tailVertices;
+    return m_tailVertices.value();
 }
 
-void LongNote::SetTailVertices(const std::array<sf::Vertex*, 6>& vertices)
+void LongNote::SetTailVertices(Gx::VertexSpan&& vertices)
 {
-    m_tailVertices = vertices;
+    m_tailVertices = std::move(vertices);
 }
 
 const Gx::Sprite* LongNote::GetEdgePrefab(const NoteShape shape) const
@@ -115,9 +100,8 @@ void LongNote::UpdateGeometry(const ChartRenderer& renderer, const double delta)
 
         return;
     }
-    else
-        SetVisible(true);
 
+    SetVisible(true);
     GetGuideLine()->Render(renderer, delta);
 
     const auto edge = GetEdgePrefab(renderer.GetRenderSettings().Config.NoteShapeType);
@@ -129,7 +113,7 @@ void LongNote::UpdateGeometry(const ChartRenderer& renderer, const double delta)
     UpdatePositions(GetVertices(), position, bounds);
     UpdateTexCoords(GetVertices(), sprite->GetTexCoords());
 
-    if (edge)
+    if (edge && m_headVertices.has_value() && m_tailVertices.has_value())
     {
         transform = edge->GetTransform();
         position  = transform.transformPoint(sf::Vector2f(0, renderer.MapRenderPositionToPixels(GetChannel(), distance)));

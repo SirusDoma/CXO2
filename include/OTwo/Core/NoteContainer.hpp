@@ -4,6 +4,7 @@
 #include <OTwo/Config/GameConfig.hpp>
 
 #include <Genode/SceneGraph.hpp>
+#include <Genode/Graphics/VertexPool.hpp>
 
 class ChartRenderer;
 class Note;
@@ -22,17 +23,14 @@ public:
     sf::FloatRect GetViewport() const;
     void SetViewport(const sf::FloatRect& viewport);
 
-    sf::VertexArray& GetNoteVertices();
-    sf::VertexArray& GetMeasureVertices();
-    sf::VertexArray& GetGuideLineVertices();
+    Gx::VertexPool& GetNoteVertexPool();
+    Gx::VertexPool& GetGuideLineVertexPool();
 
     const sf::Texture* GetTexture(NoteShape shape);
     void SetTexture(NoteShape shape, const sf::Texture& texture);
 
     void RegisterPrefab(Gx::Updatable& prefab);
     std::unordered_set<Gx::Updatable*> GetRegisteredPrefabs();
-
-    unsigned int GetLastMeasure() const;
 
     void UpdateGeometry(const Chart::NoteEvent& ev, double delta) const;
     void UpdateMeasures(double delta) const;
@@ -47,9 +45,9 @@ private:
     const Chart*          m_chart;
     Difficulty            m_difficulty;
     sf::FloatRect         m_viewport;
-    sf::VertexArray       m_noteVertices;
-    sf::VertexArray       m_measureVertices;
-    sf::VertexArray       m_guideLineVertices;
+
+    Gx::VertexPool m_noteVertices;
+    Gx::VertexPool m_guideVertices;
 
     std::vector<Note*> m_notes;
     std::vector<LongNote*> m_longNotes;

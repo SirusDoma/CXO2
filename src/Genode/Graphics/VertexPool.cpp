@@ -4,10 +4,21 @@
 
 namespace Gx
 {
+    VertexPool::VertexPool(const sf::PrimitiveType primitiveType) :
+        m_primitive(primitiveType)
+    {
+    }
+
     VertexPool::VertexPool(std::size_t capacity)
     {
         m_vertices.reserve(capacity);
         m_segments.emplace_back(0, capacity, false);
+    }
+
+    VertexPool::VertexPool(sf::PrimitiveType primitiveType, const std::size_t capacity) :
+        VertexPool(capacity)
+    {
+        m_primitive = primitiveType;
     }
 
     VertexPool::Segment::Segment(const std::size_t offset, const std::size_t size, const bool inUse) :
@@ -144,6 +155,12 @@ namespace Gx
         return m_vertices.data();
     }
 
+    RenderStates VertexPool::Render(RenderSurface& surface, RenderStates states) const
+    {
+        surface.Render(m_vertices.data(), m_vertices.size(), m_primitive, states);
+        return states;
+    }
+
     std::optional<std::size_t> VertexPool::Scan(const std::size_t size) const
     {
         for (std::size_t i = 0; i < m_segments.size(); ++i)
@@ -195,6 +212,18 @@ namespace Gx
         m_offset(offset),
         m_size(size)
     {
+    }
+
+    VertexSpan& VertexSpan::operator=(VertexSpan&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        m_pool   = other.m_pool;
+        m_offset = other.m_offset;
+        m_size   = other.m_size;
+
+        return *this;
     }
 
     VertexSpan::reference VertexSpan::operator[](const size_type idx)

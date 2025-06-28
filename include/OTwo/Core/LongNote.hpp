@@ -14,11 +14,11 @@ public:
     double GetLength() const;
     void SetLength(double length);
 
-    VerticesPtr GetHeadVertices() const;
-    void SetHeadVertices(const std::array<sf::Vertex*, 6> &vertices);
+    Gx::VertexSpan& GetHeadVertices();
+    void SetHeadVertices(Gx::VertexSpan&& vertices);
 
-    VerticesPtr GetTailVertices() const;
-    void SetTailVertices(const std::array<sf::Vertex*, 6> &vertices);
+    Gx::VertexSpan& GetTailVertices();
+    void SetTailVertices(Gx::VertexSpan&& vertices);
 
     const Gx::Sprite* GetEdgePrefab(NoteShape) const;
     void SetEdgePrefabs(const PrefabMap& prefabs);
@@ -26,9 +26,9 @@ public:
     void UpdateGeometry(const ChartRenderer& renderer, double delta) override;
 
 private:
-    VerticesPtr m_headVertices;
-    VerticesPtr m_tailVertices;
-    PrefabMap   m_edgePrefabs;
-    double      m_length;
+    std::optional<Gx::VertexSpan> m_headVertices;
+    std::optional<Gx::VertexSpan> m_tailVertices;
+    PrefabMap                     m_edgePrefabs;
+    double                        m_length;
 
 };

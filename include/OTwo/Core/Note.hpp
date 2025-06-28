@@ -26,8 +26,8 @@ public:
 
     NoteGuideLine* GetGuideLine();
 
-    const std::array<sf::Vertex*, 6>& GetVertices() const;
-    void SetVertices(const std::array<sf::Vertex*, 6>& vertices);
+    const Gx::VertexSpan& GetVertices() const;
+    void SetVertices(Gx::VertexSpan&& vertices) noexcept;
 
     const Gx::Sprite* GetPrefab(NoteShape shape) const;
     void SetPrefabs(const PrefabMap& prefabs);
@@ -38,15 +38,15 @@ public:
     virtual void UpdateGeometry(const ChartRenderer& renderer, double delta);
 
 protected:
-    using VerticesPtr = std::array<sf::Vertex*, 6>;
+    Gx::VertexSpan& GetVertices();
 
-    static void UpdatePositions(const VerticesPtr& vertices, const sf::Vector2f& position, const sf::FloatRect& bounds);
-    static void UpdateTexCoords(const VerticesPtr& vertices, const sf::IntRect& texcoords);
+    static void UpdatePositions(Gx::VertexSpan& span, const sf::Vector2f& position, const sf::FloatRect& bounds);
+    static void UpdateTexCoords(Gx::VertexSpan& span, const sf::IntRect& texcoords);
 
 private:
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-    VerticesPtr    m_vertices;
+    std::optional<Gx::VertexSpan> m_span;
     PrefabMap      m_prefabs;
     double         m_position;
     Chart::Channel m_channel;

@@ -82,18 +82,10 @@ NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
 
     // TODO: Apply Arrangement Modifiers
 
-    // Initializes vertices and reserve the array to prevent vertex address from shifting
-    auto& vertices = container.GetNoteVertices();
-    auto& guideLineVertices = container.GetGuideLineVertices();
-
-    // Resize the vertices to buffer size
+    // Initializes vertices by using vertex pool
     constexpr unsigned int bufferSize = 192 * 20 * 2;
-    vertices.resize((bufferSize * 6 * 3) + (20 * 6));
-    guideLineVertices.resize(bufferSize * 2 * 4);
-
-    // TODO: Better vertices index tracking and allocation
-    unsigned int vi = 0;
-    unsigned int vg = 0;
+    auto& vertices = container.GetNoteVertexPool();
+    auto& guideLineVertices = container.GetGuideLineVertexPool();
 
     // Prepare  measure prefabs
     auto measurePrefabs = PrefabMap();
@@ -106,22 +98,13 @@ NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     container.RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);
     container.RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Circle]);
 
-    // Set-up temp vertices
-    auto vx = std::array<sf::Vertex*, 6>();
-    auto vz = std::array<sf::Vertex*, 8>();
-
     // Configure measure vertices
     for (unsigned int m = 1; m <= 20; m++)
     {
         auto& measure = m_resources->Create<Measure>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_MEASURE(m)), m, Chart::Channel::Background);
 
-        for (std::size_t v = 0; v < vx.size(); v++)
-            vx[v] = &vertices[vi + v];
-
-        vi += 6;
-        measure.SetVertices(vx);
+        measure.SetVertices(vertices.Rent(6));
         measure.SetPrefabs(measurePrefabs);
-
 
         container.AddMeasure(measure);
     }
@@ -132,57 +115,30 @@ NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
         if (i < bufferSize / 2)
         {
             auto& note = m_resources->Create<Note>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_TAP_NOTE(i)), 0, Chart::Channel::Note4);
-            for (std::size_t v = 0; v < vx.size(); v++)
-                vx[v] = &vertices[vi + v];
 
-            vi += 6;
-            note.SetVertices(vx);
+            note.SetVertices(vertices.Rent(6));
             note.SetPrefabs(tapNotePrefabs);
 
-            for (std::size_t v = 0; v < vz.size(); v++)
-                vz[v] = &guideLineVertices[vg + v];
-
-            vg += 8;
-            note.GetGuideLine()->SetVertices(vz);
+            note.GetGuideLine()->SetVertices(guideLineVertices.Rent(8));
 
             container.AddNote(note);
         }
         else
         {
             auto& longNote = m_resources->Create<LongNote>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_LONG_NOTE(i)), 0, 1, Chart::Channel::Note4);
-            for (std::size_t v = 0; v < vx.size(); v++)
-                vx[v] = &vertices[vi + v];
 
-            vi += 6;
-            longNote.SetVertices(vx);
+            longNote.SetVertices(vertices.Rent(6));
             longNote.SetPrefabs(longNotePrefabs);
 
-            for (std::size_t v = 0; v < vx.size(); v++)
-                vx[v] = &vertices[vi + v];
+            longNote.SetHeadVertices(vertices.Rent(6));
+            longNote.SetTailVertices(vertices.Rent(6));
 
-            vi += 6;
-            longNote.SetHeadVertices(vx);
-
-            for (std::size_t v = 0; v < vx.size(); v++)
-                vx[v] = &vertices[vi + v];
-
-            vi += 6;
-            longNote.SetTailVertices(vx);
-
-            for (std::size_t v = 0; v < vz.size(); v++)
-                vz[v] = &guideLineVertices[vg + v];
-
-            vg += 8;
-            longNote.GetGuideLine()->SetVertices(vz);
+            longNote.GetGuideLine()->SetVertices(guideLineVertices.Rent(8));
 
             longNote.SetEdgePrefabs(tapNotePrefabs);
             container.AddNote(longNote);
         }
     }
-
-    // Reduce the vertices number to actual usage
-    vertices.resize(vi);
-    guideLineVertices.resize(vg);
 
     return container;
 }

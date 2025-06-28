@@ -3,66 +3,61 @@
 #include <OTwo/Core/LongNote.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-NoteGuideLine::NoteGuideLine(const NoteGuideLine& copy) :
-    m_parent(copy.m_parent),
-    m_guideLength(),
-    m_delta(),
-    m_vertices(copy.m_vertices)
-{
-}
+// NoteGuideLine::NoteGuideLine(const NoteGuideLine& copy) :
+//     m_parent(copy.m_parent),
+//     m_guideLength(),
+//     m_delta(),
+//     m_vertices(copy.m_vertices)
+// {
+// }
 
 NoteGuideLine::NoteGuideLine(const Note& parent) :
     m_parent(&parent),
     m_guideLength(),
-    m_delta(),
-    m_vertices()
+    m_delta()
 {
 }
 
 NoteGuideLine::NoteGuideLine(const LongNote& parent) :
     m_parent(&parent),
     m_guideLength(),
-    m_delta(),
-    m_vertices()
+    m_delta()
 {
 }
 
 bool NoteGuideLine::IsVisible() const
 {
-    return m_vertices[0] && m_vertices[7]->color.a > 0;
+    return m_span.has_value() && m_span.value()[7].color.a > 0;
 }
 
 void NoteGuideLine::SetVisible(const bool visible)
 {
-    if (IsVisible() == visible)
+    if (!m_span.has_value() || IsVisible() == visible)
         return;
 
-    for (const auto v : m_vertices)
-    {
-        if (!v)
-            break;
-
-        v->color.a = visible ? 255 : 0;
-    }
+    for (auto& v : m_span.value())
+        v.color.a = visible ? 255 : 0;
 }
 
-const std::array<sf::Vertex*, 8>& NoteGuideLine::GetVertices() const
+const Gx::VertexSpan& NoteGuideLine::GetVertices() const
 {
-    return m_vertices;
+    return m_span.value();
 }
 
-void NoteGuideLine::SetVertices(const std::array<sf::Vertex*, 8> &vertices)
+void NoteGuideLine::SetVertices(Gx::VertexSpan&& vertices) noexcept
 {
-    m_vertices = vertices;
+    m_span = std::move(vertices);
 }
 
 void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
 {
-    if (!m_vertices[0] || !m_parent->IsVisible())
+    if (!m_span.has_value() || !m_parent->IsVisible())
     {
         SetVisible(false);
         return;
     }
+
+    auto& span = m_span.value();
 
     // Special thanks to MATERIALIZER
     // For reversing the original behavior of note guide-line on original O2Jam Client!
@@ -146,37 +141,31 @@ void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
         const float pixels  = renderer.MapRenderPositionToPixels(m_parent->GetChannel(), target) + (height / 2.0f) - 0.1f;
         const auto position = transform.transformPoint(sf::Vector2f(1.f, pixels));
 
-        m_vertices[i + 0]->position = sf::Vector2f(position.x, position.y);
-        m_vertices[i + 1]->position = sf::Vector2f(position.x, position.y + bounds.size.y);
+        span[i + 0].position = sf::Vector2f(position.x, position.y);
+        span[i + 1].position = sf::Vector2f(position.x, position.y + bounds.size.y);
 
-        m_vertices[i + 0]->texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
-        m_vertices[i + 1]->texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        span[i + 0].texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        span[i + 1].texCoords = sf::Vector2f(texCoords.position.x, texCoords.position.y);
 
-        m_vertices[i + 0]->color = sf::Color(153, 153, 153, 230);
-        m_vertices[i + 1]->color = sf::Color::Black;
+        span[i + 0].color = sf::Color(153, 153, 153, 230);
+        span[i + 1].color = sf::Color::Black;
     }
 
     for (unsigned int i = 4; i < 8; i++)
     {
-        m_vertices[i]->position    = m_vertices[i - 4]->position;
-        m_vertices[i]->position.x += width - 1; // let the grid occupy 1px of the note
-        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
-        m_vertices[i]->texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
-        m_vertices[i]->color       = m_vertices[i - 4]->color;
+        span[i].position    = span[i - 4].position;
+        span[i].position.x += width - 1; // let the grid occupy 1px of the note
+        span[i].texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        span[i].texCoords   = sf::Vector2f(texCoords.position.x, texCoords.position.y);
+        span[i].color       = span[i - 4].color;
     }
 }
 
 Gx::RenderStates NoteGuideLine::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
-    std::size_t count = 0;
-    for (const auto v : m_vertices)
-    {
-        if (!v)
-            break;
+    if (!m_span.has_value())
+        return states;
 
-        count++;
-    }
-
-    surface.Render(m_vertices[0], count, sf::PrimitiveType::Triangles, states);
+    surface.Render(&m_span.value()[0], m_span->size(), sf::PrimitiveType::Triangles, states);
     return states;
 }

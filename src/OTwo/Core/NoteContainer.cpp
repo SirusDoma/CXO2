@@ -9,8 +9,7 @@ NoteContainer::NoteContainer() :
     m_chart(),
     m_difficulty(),
     m_noteVertices(sf::PrimitiveType::Triangles),
-    m_measureVertices(sf::PrimitiveType::Triangles),
-    m_guideLineVertices(sf::PrimitiveType::Lines),
+    m_guideVertices(sf::PrimitiveType::Lines),
     m_notes(),
     m_measures(),
     m_shape(NoteShape::Square),
@@ -60,19 +59,14 @@ void NoteContainer::SetViewport(const sf::FloatRect& viewport)
     m_viewport = viewport;
 }
 
-sf::VertexArray& NoteContainer::GetNoteVertices()
+Gx::VertexPool& NoteContainer::GetNoteVertexPool()
 {
     return m_noteVertices;
 }
 
-sf::VertexArray& NoteContainer::GetMeasureVertices()
+Gx::VertexPool& NoteContainer::GetGuideLineVertexPool()
 {
-    return m_measureVertices;
-}
-
-sf::VertexArray& NoteContainer::GetGuideLineVertices()
-{
-    return m_guideLineVertices;
+    return m_guideVertices;
 }
 
 const sf::Texture* NoteContainer::GetTexture(NoteShape shape)
@@ -189,7 +183,7 @@ Gx::RenderStates NoteContainer::Render(Gx::RenderSurface& surface, Gx::RenderSta
         surface.Render(m_noteVertices, states);
 
         states.texture = nullptr;
-        surface.Render(m_guideLineVertices, states);
+        surface.Render(m_guideVertices, states);
 
         surface.SetView(currentView);
     }
