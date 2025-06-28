@@ -12,6 +12,23 @@ namespace Gx
     class StringHelper
     {
     public:
+        template<typename TId>
+        static std::string ToString(const TId& id)
+        {
+            if constexpr (std::is_same_v<TId, std::string>)
+            {
+                return id;
+            }
+            else
+            {
+                std::stringstream ss;
+                ss << id;
+
+                return ss.str();
+            }
+        }
+
+
         static sf::String ToPascalCase(const sf::String& input)
         {
             sf::String result = "";

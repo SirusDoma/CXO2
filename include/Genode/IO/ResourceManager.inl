@@ -20,8 +20,8 @@ namespace Gx
         return m_containers.erase(typeid(R)) != 0;
     }
 
-    template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id)
+    template<typename R, typename U>
+    ResourcePtr<R> ResourceManager::Instantiate(const type_identity_t<U>& id)
     {
         Register<R>();
 
@@ -32,8 +32,8 @@ namespace Gx
         return Instantiate<R>(id, id);
     }
 
-    template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, const std::string& fileName)
+    template<typename R, typename U>
+    ResourcePtr<R> ResourceManager::Instantiate(const type_identity_t<U>& id, const std::string& fileName)
     {
         Register<R>();
 
@@ -41,8 +41,8 @@ namespace Gx
         return std::make_unique<R>(*resource);
     }
 
-    template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, void* data, std::size_t size)
+    template<typename R, typename U>
+    ResourcePtr<R> ResourceManager::Instantiate(const type_identity_t<U>& id, void* data, std::size_t size)
     {
         Register<R>();
 
@@ -50,8 +50,8 @@ namespace Gx
         return std::make_unique<R>(*resource);
     }
 
-    template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, sf::InputStream& stream)
+    template<typename R, typename U>
+    ResourcePtr<R> ResourceManager::Instantiate(const type_identity_t<U>& id, sf::InputStream& stream)
     {
         Register<R>();
 
@@ -59,8 +59,8 @@ namespace Gx
         return std::make_unique<R>(*resource);
     }
 
-    template<typename R>
-    ResourcePtr<R> ResourceManager::Instantiate(const std::string& id, std::function<ResourcePtr<R>()> deserializer)
+    template<typename R, typename U>
+    ResourcePtr<R> ResourceManager::Instantiate(const type_identity_t<U>& id, std::function<ResourcePtr<R>()> deserializer)
     {
         Register<R>();
 
@@ -68,8 +68,8 @@ namespace Gx
         return std::make_unique<R>(*resource);
     }
 
-    template<typename R>
-    R& ResourceManager::AddFromFile(const std::string& idOrFileName, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::AddFromFile(const type_identity_t<U>& idOrFileName, CacheMode mode)
     {
         Register<R>();
 
@@ -77,7 +77,7 @@ namespace Gx
         if (!loader)
             throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(idOrFileName, *this, mode));
             return loader->LoadFromFile(idOrFileName, *ctx);
@@ -86,8 +86,8 @@ namespace Gx
         return managed->Container->Store(idOrFileName, deserializer, mode);
     }
 
-    template<typename R>
-    R& ResourceManager::AddFromFile(const std::string& id, const std::string& fileName, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::AddFromFile(const type_identity_t<U>& id, const std::string& fileName, CacheMode mode)
     {
         Register<R>();
 
@@ -95,7 +95,7 @@ namespace Gx
         if (!loader)
             throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromFile(fileName, *ctx);
@@ -104,8 +104,8 @@ namespace Gx
         return managed->Container->Store(id, deserializer, mode);
     }
 
-    template<typename R>
-    R& ResourceManager::AddFromMemory(const std::string& id, void* data, std::size_t size, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::AddFromMemory(const type_identity_t<U>& id, void* data, std::size_t size, CacheMode mode)
     {
         Register<R>();
 
@@ -113,7 +113,7 @@ namespace Gx
         if (!loader)
             throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type");
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromMemory(data, size, *ctx);
@@ -122,8 +122,8 @@ namespace Gx
         return managed->Container->Store(id, deserializer, mode);
     }
 
-    template<typename R>
-    R& ResourceManager::AddFromStream(const std::string& id, sf::InputStream& stream, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::AddFromStream(const type_identity_t<U>& id, sf::InputStream& stream, CacheMode mode)
     {
         Register<R>();
 
@@ -131,7 +131,7 @@ namespace Gx
         if (!loader)
             throw ResourceLoadException("There's no [ResourceLoader] for [" + std::string(typeid(R).name()) + "] type.");
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         auto deserializer = [&, this] () {
             auto ctx = std::move(m_contextBuilder(id, *this, mode));
             return loader->LoadFromStream(stream, *ctx);
@@ -140,71 +140,71 @@ namespace Gx
         return managed->Container->Store(id, deserializer, mode);
     }
 
-    template<typename R>
-    R& ResourceManager::AddFromDeserializer(const std::string& id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::AddFromDeserializer(const type_identity_t<U>& id, std::function<ResourcePtr<R>()> deserializer, CacheMode mode)
     {
         Register<R>();
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         auto& result = managed->Container->Store(id, deserializer, mode);
 
         return result;
     }
 
-    template<typename R, class... Args>
-    R& ResourceManager::Create(const std::string& id, Args&&... args)
+    template<typename R, typename U, class... Args>
+    R& ResourceManager::Create(const type_identity_t<U>& id, Args&&... args)
     {
         Register<R>();
 
         ResourcePtr<R> resource = std::make_unique<R>(std::forward<Args>(args)...);
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::move(resource), CacheMode::None);
     }
 
-    template<typename R>
-    R& ResourceManager::Store(const std::string& id, R& resource, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::Store(const type_identity_t<U>& id, R& resource, CacheMode mode)
     {
         Register<R>();
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::make_unique<R>(resource), mode);
     }
 
-    template<typename R>
-    R& ResourceManager::Store(const std::string& id, ResourcePtr<R> resource, CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceManager::Store(const type_identity_t<U>& id, ResourcePtr<R> resource, CacheMode mode)
     {
         if (!resource)
             throw ResourceStoreException("[" + id + "]\nCannot store empty resource.");
 
         Register<R>();
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         return managed->Container->Store(id, std::move(resource), mode);
     }
 
-    template<typename R>
-    R* ResourceManager::Find(const std::string& id) const
+    template<typename R, typename U>
+    R* ResourceManager::Find(const type_identity_t<U>& id) const
     {
         const auto it = m_containers.find(typeid(R));
         if (it == m_containers.end())
             return nullptr;
 
-        auto managed = dynamic_cast<ContainerWrapper<R>*>(it->second.get());
+        auto managed = dynamic_cast<ContainerWrapper<R, U>*>(it->second.get());
         if (!managed)
             return nullptr;
 
         return managed->Container->Find(id);
     }
 
-    template<typename R>
-    void ResourceManager::Each(const std::function<void(const std::string& , R&)> &callback)
+    template<typename R, typename U>
+    void ResourceManager::Each(const std::function<void(const type_identity_t<U>& , R&)> &callback)
     {
         const auto it = m_containers.find(typeid(R));
         if (it == m_containers.end())
             return;
 
-        auto managed = dynamic_cast<ContainerWrapper<R>*>(it->second.get());
+        auto managed = dynamic_cast<ContainerWrapper<R, U>*>(it->second.get());
         if (!managed)
             return;
 
@@ -222,19 +222,19 @@ namespace Gx
         return managed->Container->Destroy(resource);
     }
 
-    template<typename R>
-    bool ResourceManager::Destroy(const std::string& id)
+    template<typename R, typename U>
+    bool ResourceManager::Destroy(const type_identity_t<U>& id)
     {
         Register<R>();
 
-        auto managed = static_cast<ContainerWrapper<R>*>(m_containers[typeid(R)].get());
+        auto managed = static_cast<ContainerWrapper<R, U>*>(m_containers[typeid(R)].get());
         return managed->Container->Destroy(id);
     }
 
     template<typename R>
     unsigned int ResourceManager::Count() const
     {
-        if (auto it = m_containers.find(typeid(R)); it != m_containers.end())
+        if (const auto it = m_containers.find(typeid(R)); it != m_containers.end())
         {
             auto managed = dynamic_cast<const ContainerWrapper<R>*>(it->second.get());
             return managed->Container->Count();

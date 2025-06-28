@@ -4,4 +4,4 @@
 #include <Genode/Utilities/Debugger.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 #include <Genode/Utilities/Reflection.hpp>
-#include <Genode/Utilities/Span.hpp>
+#include <Genode/Utilities/Extensions.hpp>

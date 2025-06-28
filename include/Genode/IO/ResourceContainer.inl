@@ -1,46 +1,48 @@
 #pragma once
 
+#include <Genode/Utilities/StringHelper.hpp>
+
 namespace Gx
 {
-    template<typename R>
-    ResourceContainer<R>::ResourceContainer() :
+    template<typename R, typename U>
+    ResourceContainer<R, U>::ResourceContainer() :
         m_caches()
     {
     }
 
-    template<typename R>
-    ResourceContainer<R>::~ResourceContainer()
+    template<typename R, typename U>
+    ResourceContainer<R, U>::~ResourceContainer()
     {
     }
 
-    template<typename R>
-    R& ResourceContainer<R>::Store(const std::string& id, ResourcePtr<R> resource, const CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceContainer<R, U>::Store(const U& id, ResourcePtr<R> resource, const CacheMode mode)
     {
         auto current = Find(id);
         if (current)
         {
             if (mode == CacheMode::None)
-                throw ResourceStoreException(id, "[" + id + "]\nResource with same ID is already exists");
+                throw ResourceStoreException(StringHelper::ToString(id), "[" + StringHelper::ToString(id) + "]\nResource with same ID is already exists");
 
             if (mode == CacheMode::Reuse)
                 return *current;
         }
 
         if (!resource)
-            throw ResourceStoreException(id, "[" + id + "]\nCannot store empty resource");
+            throw ResourceStoreException(StringHelper::ToString(id), "[" + StringHelper::ToString(id) + "]\nCannot store empty resource");
 
         m_caches[id] = std::move(resource);
         return *m_caches[id];
     }
 
-    template<typename R>
-    R& ResourceContainer<R>::Store(const std::string& id, std::function<ResourcePtr<R>()> deserializer, const CacheMode mode)
+    template<typename R, typename U>
+    R& ResourceContainer<R, U>::Store(const U& id, std::function<ResourcePtr<R>()> deserializer, const CacheMode mode)
     {
         auto current = Find(id);
         if (current)
         {
             if (mode == CacheMode::None)
-                throw ResourceStoreException(id, "Resource with same resource id (" + id + ") is already exists");
+                throw ResourceStoreException(StringHelper::ToString(id), "Resource with same resource id (" + StringHelper::ToString(id) + ") is already exists");
 
             if (mode == CacheMode::Reuse)
                 return *current;
@@ -48,14 +50,14 @@ namespace Gx
 
         auto resource = deserializer();
         if (!resource)
-            throw ResourceStoreException(id, "Cannot store empty resource");
+            throw ResourceStoreException(StringHelper::ToString(id), "Cannot store empty resource");
 
         m_caches[id] = std::move(resource);
         return *m_caches[id];
     }
 
-    template<typename R>
-    bool ResourceContainer<R>::Destroy(R* resource)
+    template<typename R, typename U>
+    bool ResourceContainer<R, U>::Destroy(R* resource)
     {
         if (!resource)
             return false;
@@ -70,8 +72,8 @@ namespace Gx
         return false;
     }
 
-    template<typename R>
-    R* ResourceContainer<R>::Find(const std::string& id) const
+    template<typename R, typename U>
+    R* ResourceContainer<R, U>::Find(const U& id) const
     {
         auto iterator = m_caches.find(id);
         if (iterator != m_caches.end())
@@ -80,17 +82,17 @@ namespace Gx
         return nullptr;
     }
 
-    template<typename R>
-    R& ResourceContainer<R>::Get(const std::string& id) const
+    template<typename R, typename U>
+    R& ResourceContainer<R, U>::Get(const U& id) const
     {
         if (!m_caches.contains(id))
-            throw ResourceAccessException(id);
+            throw ResourceAccessException(StringHelper::ToString(id));
 
         return *m_caches[id];
     }
 
-    template<typename R>
-    void ResourceContainer<R>::Each(const std::function<void(const std::string& , R &)> &callback)
+    template<typename R, typename U>
+    void ResourceContainer<R, U>::Each(const std::function<void(const U& , R &)> &callback)
     {
         if (!callback)
             return;
@@ -99,26 +101,26 @@ namespace Gx
             callback(key, *resource.get());
     }
 
-    template<typename R>
-    bool ResourceContainer<R>::Contains(const std::string& id) const
+    template<typename R, typename U>
+    bool ResourceContainer<R, U>::Contains(const U& id) const
     {
         return m_caches.contains(id);
     }
 
-    template<typename R>
-    std::uint64_t ResourceContainer<R>::Count() const
+    template<typename R, typename U>
+    std::uint64_t ResourceContainer<R, U>::Count() const
     {
         return m_caches.size();
     }
 
-    template<typename R>
-    bool ResourceContainer<R>::Destroy(const std::string& id)
+    template<typename R, typename U>
+    bool ResourceContainer<R, U>::Destroy(const U& id)
     {
         return m_caches.erase(id) != 0;
     }
 
-    template<typename R>
-    void ResourceContainer<R>::Clear()
+    template<typename R, typename U>
+    void ResourceContainer<R, U>::Clear()
     {
         m_caches.clear();
     }
