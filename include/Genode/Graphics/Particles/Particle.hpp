@@ -8,8 +8,8 @@ namespace Gx
     class Particle : public Updatable
     {
     public:
-        explicit Particle(const VertexSpan& vertices) :
-            m_vertices(vertices),
+        explicit Particle(VertexSpan&& vertices) noexcept :
+            m_vertices(std::move(vertices)),
             m_active{true}
         {}
 

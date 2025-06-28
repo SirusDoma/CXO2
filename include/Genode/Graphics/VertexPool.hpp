@@ -8,6 +8,7 @@
 #include <vector>
 #include <optional>
 #include <iterator>
+#include <Genode/Entities/Renderable.hpp>
 
 namespace Gx
 {
@@ -25,6 +26,8 @@ namespace Gx
         using const_iterator         = std::vector<sf::Vertex>::const_iterator;
         using reverse_iterator       = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+        VertexSpan(VertexSpan&& other) noexcept = default;
 
         reference operator[](size_type idx);
         const_reference operator[](size_type idx) const;
@@ -54,6 +57,8 @@ namespace Gx
 
         [[nodiscard]] const std::vector<sf::Vertex>& container() const noexcept;
 
+        VertexSpan& operator=(VertexSpan&& other) noexcept;
+
         bool operator==(const VertexSpan& other) const noexcept;
         bool operator!=(const VertexSpan& other) const noexcept;
 
@@ -67,11 +72,13 @@ namespace Gx
         size_type   m_size   = {};
     };
 
-    class VertexPool : public Poolable<VertexSpan>
+    class VertexPool : public Poolable<VertexSpan>, public Renderable
     {
     public:
         VertexPool() = default;
+        explicit VertexPool(sf::PrimitiveType primitiveType);
         explicit VertexPool(std::size_t capacity);
+        explicit VertexPool(sf::PrimitiveType primitiveType, std::size_t capacity);
 
         [[nodiscard]] VertexSpan Rent(std::size_t size) override;
         void Return(VertexSpan& span) override;
@@ -90,6 +97,8 @@ namespace Gx
         [[nodiscard]] const sf::Vertex* GetData() const noexcept;
         [[nodiscard]] sf::Vertex* GetData() noexcept;
 
+        RenderStates Render(RenderSurface& surface, RenderStates states) const override;
+
     private:
         friend class VertexSpan;
 
@@ -105,6 +114,7 @@ namespace Gx
         [[nodiscard]] std::optional<std::size_t> Scan(std::size_t size) const;
         void Defragment();
 
+        sf::PrimitiveType m_primitive = sf::PrimitiveType::Triangles;
         std::vector<sf::Vertex> m_vertices = {};
         std::vector<Segment> m_segments    = {};
     };
