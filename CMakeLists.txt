@@ -126,6 +126,12 @@ if(WIN32)
 
     add_compile_definitions(USE_LIBICONV)
     target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message("-- Configuring compiler flags for hot reload")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Gm- /hotpatch /Gy /Gw")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /FUNCTIONPADMIN /OPT:NOREF /OPT:NOICF /DEBUG:FULL")
+    endif()
 elseif(APPLE)
     # App Arch
     if (NOT CMAKE_OSX_ARCHITECTURES)
