@@ -12,22 +12,41 @@ namespace Gx
     class StringHelper
     {
     public:
-        template<typename TId>
-        static std::string ToString(const TId& id)
+        template<typename T>
+        static std::string ToString(const T& value)
         {
-            if constexpr (std::is_same_v<TId, std::string>)
+            if constexpr (std::is_same_v<T, std::string>)
             {
-                return id;
+                return value;
+            }
+            else if constexpr (std::is_same_v<T, sf::String>)
+            {
+                return value.toAnsiString();
             }
             else
             {
                 std::stringstream ss;
-                ss << id;
+                ss << value;
 
                 return ss.str();
             }
         }
 
+        static bool EqualsCaseInsensitive(const std::string& a, const std::string& b)
+        {
+            if (a.length() != b.length())
+                return false;
+
+            for (size_t i = 0; i < a.length(); ++i)
+            {
+                if (std::tolower(a[i]) != std::tolower(b[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         static sf::String ToPascalCase(const sf::String& input)
         {
@@ -149,13 +168,35 @@ namespace Gx
         static sf::String GetTypeName(T& obj, const bool withNamespace = true)
         {
             auto name = std::string(typeid(obj).name());
-            if (const auto pos = name.find(' '); pos != std::string::npos)
-                name = name.substr(pos + 1);
-
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
                     name = name.substr(pos + 1);
+            }
+
+            if (name.find(' ') != std::string::npos)
+            {
+                std::istringstream iss(name);
+                std::vector<std::string> parts;
+                std::string word;
+
+                while (iss >> word) {
+                    parts.push_back(word);
+                }
+
+                if (StartsWith(parts.back(), "*") || StartsWith(parts.back(), "&"))
+                    parts.pop_back();
+
+                return parts.back();
+            }
+
+            if (!name.empty() && std::isdigit(name[0]))
+            {
+                size_t i = 0;
+                while (i < name.length() && std::isdigit(name[i])) {
+                    ++i;
+                }
+                return name.substr(i);
             }
 
             return name;
@@ -165,13 +206,35 @@ namespace Gx
         static sf::String GetTypeName(const bool withNamespace = true)
         {
             auto name = std::string(typeid(T).name());
-            if (const auto pos = name.find(' '); pos != std::string::npos)
-                name = name.substr(pos + 1);
-
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
                     name = name.substr(pos + 1);
+            }
+
+            if (name.find(' ') != std::string::npos)
+            {
+                std::istringstream iss(name);
+                std::vector<std::string> parts;
+                std::string word;
+
+                while (iss >> word) {
+                    parts.push_back(word);
+                }
+
+                if (StartsWith(parts.back(), "*") || StartsWith(parts.back(), "&"))
+                    parts.pop_back();
+
+                return parts.back();
+            }
+
+            if (!name.empty() && std::isdigit(name[0]))
+            {
+                size_t i = 0;
+                while (i < name.length() && std::isdigit(name[i])) {
+                    ++i;
+                }
+                return name.substr(i);
             }
 
             return name;
@@ -180,13 +243,35 @@ namespace Gx
         static sf::String GetTypeName(const std::type_info& type, const bool withNamespace = true)
         {
             auto name = std::string(type.name());
-            if (const auto pos = name.find(' '); pos != std::string::npos)
-                name = name.substr(pos + 1);
-
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
                     name = name.substr(pos + 1);
+            }
+
+            if (name.find(' ') != std::string::npos)
+            {
+                std::istringstream iss(name);
+                std::vector<std::string> parts;
+                std::string word;
+
+                while (iss >> word) {
+                    parts.push_back(word);
+                }
+
+                if (StartsWith(parts.back(), "*") || StartsWith(parts.back(), "&"))
+                    parts.pop_back();
+
+                return parts.back();
+            }
+
+            if (!name.empty() && std::isdigit(name[0]))
+            {
+                size_t i = 0;
+                while (i < name.length() && std::isdigit(name[i])) {
+                    ++i;
+                }
+                return name.substr(i);
             }
 
             return name;
