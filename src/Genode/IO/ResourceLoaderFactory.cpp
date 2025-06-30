@@ -14,13 +14,16 @@ void Gx::ResourceLoaderFactory::EnsureDefaultLoadersRegistered()
     static bool registered = false;
     if (!registered)
     {
-        if (m_loaders.find(typeid(sf::Texture)) == m_loaders.end())
+        auto it = m_loaders.find(typeid(sf::Texture));
+        if (it == m_loaders.end() || it->second.empty())
             Register<sf::Texture, TextureLoader>();
 
-        if (m_loaders.find(typeid(Font)) == m_loaders.end())
+        it = m_loaders.find(typeid(Font));
+        if (it == m_loaders.end() || it->second.empty())
             Register<Font, FontLoader>();
 
-        if (m_loaders.find(typeid(sf::SoundBuffer)) == m_loaders.end())
+        it = m_loaders.find(typeid(sf::SoundBuffer));
+        if (it == m_loaders.end() || it->second.empty())
             Register<sf::SoundBuffer, SoundBufferLoader>();
 
         registered = true;

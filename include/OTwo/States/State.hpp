@@ -4,6 +4,8 @@
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
+#include <SFML/Audio/Sound.hpp>
+
 #include <memory>
 
 enum class ResourceScope

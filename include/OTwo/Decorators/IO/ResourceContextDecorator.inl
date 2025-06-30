@@ -5,6 +5,7 @@
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/Graphics/Font.hpp>
 
+#include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Music.hpp>
 
 #include <any>

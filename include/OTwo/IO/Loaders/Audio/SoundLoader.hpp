@@ -2,6 +2,7 @@
 
 #include <OTwo/IO/ResourceLoader.hpp>
 #include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 class SoundLoader : public ResourceLoader<sf::Sound>
 {
