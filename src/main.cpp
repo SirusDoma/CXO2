@@ -62,7 +62,7 @@ int main(int argc , char** argv)
 
         auto message = std::string(std::string(ex.what()) + details);
         if (Gx::Debugger::IsDebuggerAttached())
-            message = "[" + Gx::StringHelper::GetTypeName(ex).toAnsiString() + "]\n" + message;
+            message = "[" + Gx::StringHelper::GetTypeName(ex) + "]\n" + message;
 
         SystemMessageBox::ShowError(message, "Fatal Error");
         return -1;

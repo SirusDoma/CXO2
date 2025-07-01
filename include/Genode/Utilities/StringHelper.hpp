@@ -165,7 +165,7 @@ namespace Gx
         }
 
         template<typename T>
-        static sf::String GetTypeName(T& obj, const bool withNamespace = true)
+        static std::string GetTypeName(T& obj, const bool withNamespace = true)
         {
             auto name = std::string(typeid(obj).name());
             if (!withNamespace)
@@ -203,7 +203,7 @@ namespace Gx
         }
 
         template<typename T>
-        static sf::String GetTypeName(const bool withNamespace = true)
+        static std::string GetTypeName(const bool withNamespace = true)
         {
             auto name = std::string(typeid(T).name());
             if (!withNamespace)
@@ -240,7 +240,7 @@ namespace Gx
             return name;
         }
 
-        static sf::String GetTypeName(const std::type_info& type, const bool withNamespace = true)
+        static std::string GetTypeName(const std::type_info& type, const bool withNamespace = true)
         {
             auto name = std::string(type.name());
             if (!withNamespace)
