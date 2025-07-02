@@ -73,7 +73,7 @@ void ResourceLoader<R>::LoadChildren(ObjectContainer& container, const ResourceM
             auto name = fmt::format("{}/{}", metadata.Name, key);
             auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
-            ObjectLoader::Load(name, object, container, objectCtx);
+            ObjectLoader::LoadFromJson(name, object, container, objectCtx);
         }
     }
 }

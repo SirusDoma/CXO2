@@ -7,9 +7,8 @@ namespace StringTable::Identifiers::Resource::Cache
 
     namespace Dialog
     {
-
-    constexpr static auto IDC_TEXT_PROMPT   = "IDC_TEXT_PROMPT";
-    constexpr static auto IDC_BUTTON_ACCEPT = "IDC_BUTTON_ACCEPT";
-    constexpr static auto IDC_BUTTON_CANCEL = "IDC_BUTTON_CANCEL";
+        constexpr static auto IDC_TEXT_PROMPT   = "IDC_TEXT_PROMPT";
+        constexpr static auto IDC_BUTTON_ACCEPT = "IDC_BUTTON_ACCEPT";
+        constexpr static auto IDC_BUTTON_CANCEL = "IDC_BUTTON_CANCEL";
     }
 }

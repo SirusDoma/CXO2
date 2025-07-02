@@ -52,12 +52,24 @@ struct ResourceMetadata
         UiContainer,
 
         // Custom Components
-        Marquee,
+        AvatarInfo,
+        ChatPanel,
         ChatWindow,
         ChannelBoard,
         ChannelButton,
-        AvatarInfo,
+        InstrumentSelector,
+        UserList,
         Equalizer,
+        PlayMenu,
+        RoomList,
+        RoomButton,
+        MapSelector,
+        Marquee,
+
+        // Custom Dialogs
+        OptionDialog,
+        CreateRoomDialog,
+        SelectMusicDialog,
 
         // Avatar
         Avatar,

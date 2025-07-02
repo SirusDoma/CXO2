@@ -59,7 +59,7 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
             continue;
 
         auto name = fmt::format("{}/{}", meta.Name, key);
-        ObjectLoader::Load(name, reference, container, ctx);
+        ObjectLoader::LoadFromJson(name, reference, container, ctx);
     }
 
     LoadChildren(container, meta, context);

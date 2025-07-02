@@ -2,6 +2,7 @@
 
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/ResourceContext.hpp>
+#include <Genode/IO/Json.hpp>
 #include <SFML/System/InputStream.hpp>
 
 #include <typeindex>
@@ -25,6 +26,8 @@ namespace Gx
         virtual ResourcePtr<T> LoadFromFile(const std::string& fileName, const ResourceContext& ctx) const = 0;
         virtual ResourcePtr<T> LoadFromMemory(void* data, std::size_t size, const ResourceContext& ctx) const = 0;
         virtual ResourcePtr<T> LoadFromStream(sf::InputStream& stream, const ResourceContext& ctx) const = 0;
+
+        virtual ResourcePtr<T> LoadFromJson(const Json& json, const ResourceContext& context) const { throw NotSupportedException(); }
 
     protected:
         std::unique_ptr<T> Instantiate(const ResourceContext& context) const

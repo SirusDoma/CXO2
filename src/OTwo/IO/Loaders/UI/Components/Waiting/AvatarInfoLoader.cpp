@@ -58,7 +58,7 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMet
             continue;
 
         auto name = fmt::format("{}/{}", meta.Name, key);
-        ObjectLoader::Load(name, reference, container, ctx);
+        ObjectLoader::LoadFromJson(name, reference, container, ctx);
     }
 
     LoadChildren(container, meta, context);

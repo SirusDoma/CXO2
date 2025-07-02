@@ -105,7 +105,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
         auto name = fmt::format("{}/{}", meta.Name, key);
         auto rctx = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
-        ObjectLoader::Load(name, object, container, rctx);
+        ObjectLoader::LoadFromJson(name, object, container, rctx);
     }
 
     if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)
@@ -183,10 +183,10 @@ void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const
         if (count > 1)
         {
             for (auto i = 1; i <= count; i++)
-                ObjectLoader::Load(fmt::format("{}{}", name, i), reference, container, ctx);
+                ObjectLoader::LoadFromJson(fmt::format("{}{}", name, i), reference, container, ctx);
         }
         else
-            ObjectLoader::Load(name, reference, container, ctx);
+            ObjectLoader::LoadFromJson(name, reference, container, ctx);
     }
     else
         throw Gx::Exception(fmt::format("{} is not found within required resource references", key));

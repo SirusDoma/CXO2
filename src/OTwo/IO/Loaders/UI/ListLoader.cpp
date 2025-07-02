@@ -51,7 +51,7 @@ Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& m
                 auto name = fmt::format("{}/{}{}", meta.Name, metadata->ItemName, i + 1);
                 auto ctx  = Gx::ResourceContext::Rebind(context, name);
 
-                ObjectLoader::Load(name, metadata->ItemSource, container, ctx);
+                ObjectLoader::LoadFromJson(name, metadata->ItemSource, container, ctx);
             }
         }
         else if (!metadata->Objects.empty())

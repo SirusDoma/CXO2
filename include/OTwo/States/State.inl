@@ -30,7 +30,15 @@ R* State::Instantiate(const std::string& source, const ResourceScope scope)
     if (instance = resources->Find<R>(source); !instance)
     {
         if (instance = resources->Find<R>(GetName() + "/" + source); !instance)
-            instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+        {
+            if constexpr (std::is_base_of_v<Gx::Node, R>)
+            {
+                if (instance = dynamic_cast<R*>(resources->Find<Gx::Node>(source)); !instance)
+                    instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+            }
+            else
+                instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+        }
     }
 
     if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_base_of_v<Gx::Dialog, R>)
@@ -116,8 +124,20 @@ R* State::FindResource(const std::string& id, const ResourceScope scope)
     if (!resources)
         return nullptr;
 
-    if (auto resource = resources->Find<R>(id); resource)
+    if (auto resource = resources->Find<R>(id))
         return resource;
 
-    return resources->Find<R>(GetName() + "/" + id);
+    if (auto resource = resources->Find<R>(GetName() + "/" + id))
+        return resource;
+
+    if constexpr (std::is_base_of_v<Gx::Node, R>)
+    {
+        if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(id)))
+            return resource;
+
+        if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(GetName() + "/" + id)))
+            return resource;
+    }
+
+    return nullptr;
 }

@@ -55,8 +55,8 @@ NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
         {
             const int subKey = static_cast<std::uint8_t>(shape);
 
-            const auto tap   = m_prefabResources->Find<Gx::Animation>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_ANIMATION_NOTE_NORMAL(key, subKey)));
-            const auto hold  = m_prefabResources->Find<Gx::Animation>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_ANIMATION_NOTE_LONG(key, subKey)));
+            const auto tap  = dynamic_cast<Gx::Animation*>(m_prefabResources->Find<Gx::Node>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_ANIMATION_NOTE_NORMAL(key, subKey))));
+            const auto hold = dynamic_cast<Gx::Animation*>(m_prefabResources->Find<Gx::Node>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_ANIMATION_NOTE_LONG(key, subKey))));
 
             container.RegisterPrefab(*tap);
             container.RegisterPrefab(*hold);
@@ -91,8 +91,8 @@ NoteContainer& NoteFactory::Generate(const ChartRenderer::RenderSettings& settin
     auto measurePrefabs = PrefabMap();
     measurePrefabs[Chart::Channel::Background] =
     {
-        { NoteShape::Square, m_prefabResources->Find<Gx::Sprite>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_IMAGE_NOTE_MEASURE1)) },
-        { NoteShape::Circle, m_prefabResources->Find<Gx::Sprite>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_IMAGE_NOTE_MEASURE2)) }
+        { NoteShape::Square, dynamic_cast<Gx::Sprite*>(m_prefabResources->Find<Gx::Node>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_IMAGE_NOTE_MEASURE1))) },
+        { NoteShape::Circle, dynamic_cast<Gx::Sprite*>(m_prefabResources->Find<Gx::Node>(fmt::format("{}/{}", state, Resource::Game::Renderer::IDC_IMAGE_NOTE_MEASURE2))) }
     };
 
     container.RegisterPrefab(*measurePrefabs[Chart::Channel::Background][NoteShape::Square]);

@@ -107,68 +107,70 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Texture, TextureLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Font, FontLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Shape, ShapeLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Cursor, CursorLoader>();
     Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, SoundBufferLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Sound, SoundLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Shape, ShapeLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Sprite, SpriteLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Animation, AnimationLoader>();
     // UI
-    Gx::ResourceLoaderFactory::Register<Gx::Cursor, CursorLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::BitmapNumber, BitmapNumberLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::ToggleButton, ToggleButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::InputField, InputFieldLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
-    Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Image, ImageLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Label, LabelLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ToolTip, ToolTipLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::BitmapNumber, BitmapNumberLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Button, ButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ToggleButton, ToggleButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::RadioButton, RadioButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Gauge, GaugeLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::List, ListLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Dialog, DialogLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::InputField, InputFieldLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ScrollBar, ScrollBarLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::UiContainer, UiContainerLoader>();
     // Avatar
     Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
     Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
     Gx::ResourceLoaderFactory::Register<SetInfoData, SetInfoDataLoader>();
-    Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Avatar, AvatarLoader>();
     // O2Jam Exclusive Components
-    Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
-    Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
-    Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
-    Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
-    Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
-    Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Marquee, MarqueeLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, ChatWindow, ChatWindowLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, ChannelButton, ChannelButtonLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, ChannelBoard, ChannelBoardLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, AvatarInfo, AvatarInfoLoader>();
+    Gx::ResourceLoaderFactory::Register<Gx::Node, Equalizer, EqualizerLoader>();
     // O2Jam Derived Components
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, ChatPanel>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, UserList>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, MapSelector>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::UiContainer, InstrumentSelector>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::List, RoomList>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, RoomButton>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Image, PlayMenu>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, ChatPanel>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, UserList>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, MapSelector>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, InstrumentSelector>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::List, RoomList>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Image, RoomButton>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Image, PlayMenu>();
     // O2Jam Dialogs
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, OptionDialog>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, CreateRoomDialog>();
-    Gx::ResourceLoaderFactory::RegisterDerived<Gx::Dialog, SelectMusicDialog>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, OptionDialog>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, CreateRoomDialog>();
+    Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, SelectMusicDialog>();
     // O2Jam Core Resources
     Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
     Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateAvi>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StatePlanet>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateRoom>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateMusicShop>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateItemShop>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateMyRoom>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateBulletin>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StatePayment>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateWaiting7K>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateLoading>();
-    Gx::ResourceLoaderFactory::RegisterDerived<State, StateResult>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateAvi>();
+    Gx::ResourceLoaderFactory::Reuse<State, StatePlanet>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateRoom>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateMusicShop>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateItemShop>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateMyRoom>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateBulletin>();
+    Gx::ResourceLoaderFactory::Reuse<State, StatePayment>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateWaiting7K>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateLoading>();
+    Gx::ResourceLoaderFactory::Reuse<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
+
+
 
     // Initialize singleton providers
     auto& context = GetContext();
@@ -380,7 +382,7 @@ int O2Jam::Shutdown()
     auto& resources = GetContext().Require<Gx::ResourceManager>();
 
     director.Reset();
-    mixer.Reset(true);
+    mixer.Reset(false);
     resources.Clear();
 
     return 0;

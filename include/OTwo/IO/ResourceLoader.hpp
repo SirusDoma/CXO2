@@ -14,7 +14,6 @@ public:
 
     bool IsStreaming() const override { return Gx::ResourceLoader<R>::IsStreaming(); }
 
-    virtual Gx::ResourcePtr<R> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const = 0;
     virtual Gx::ResourcePtr<R> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const = 0;
 
     Gx::ResourcePtr<R> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const override;

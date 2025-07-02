@@ -51,7 +51,7 @@ Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadat
             auto name = meta.Name + "/" + key;
             auto objectCtx = Gx::ResourceContext::Rebind(context, name);
 
-            ObjectLoader::Load(name, object, container, objectCtx);
+            ObjectLoader::LoadFromJson(name, object, container, objectCtx);
         }
     }
 

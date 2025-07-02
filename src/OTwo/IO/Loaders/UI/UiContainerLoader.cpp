@@ -59,7 +59,7 @@ Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const Resou
             continue;
 
         auto name = fmt::format("{}/{}", meta.Name, key);
-        ObjectLoader::Load(name, reference, populator, ctx);
+        ObjectLoader::LoadFromJson(name, reference, populator, ctx);
     }
 
     LoadChildren(populator, meta, context);

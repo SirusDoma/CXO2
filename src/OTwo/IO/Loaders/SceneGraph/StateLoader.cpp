@@ -37,7 +37,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata& met
         auto name = fmt::format("{}/{}", meta.Name, key);
         auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
-        ObjectLoader::Load(name, reference, container, ctx);
+        ObjectLoader::LoadFromJson(name, reference, container, ctx);
     }
 
     for (auto [key, object] : metadata->Objects)
@@ -47,7 +47,7 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata& met
         auto name = fmt::format("{}/{}", meta.Name, key);
         auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
 
-        ObjectLoader::Load(name, object, container, ctx);
+        ObjectLoader::LoadFromJson(name, object, container, ctx);
     }
 
     return state;

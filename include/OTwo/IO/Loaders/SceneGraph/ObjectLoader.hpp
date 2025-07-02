@@ -8,14 +8,14 @@
 class ObjectLoader
 {
 public:
-    static void Load(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& ctx);
+    static void LoadFromJson(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& ctx);
 
 private:
     template<typename R>
-    static Gx::ResourcePtr<R> LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
+    static Gx::ResourcePtr<R> LoadFromJson(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
 
-    template<typename B, typename R>
-    static Gx::ResourcePtr<R> LoadResource(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context);
+    template<typename R>
+    static Gx::ResourcePtr<R> LoadFromJson(const std::string& name, const std::string& type, const Gx::Json& json, const Gx::ResourceContext& context);
 };
 
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.inl>
