@@ -36,7 +36,7 @@ STATE_LOGO    0x03    0x00
 
 Parameters:
 1. Number of state objects
-2. State ID
+2. Number of `SET` in state objects
 
 ## Object Types
 
