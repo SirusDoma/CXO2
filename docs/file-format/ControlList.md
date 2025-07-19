@@ -23,6 +23,20 @@ Defines the number of `STATE_*` objects that will be present in the file.
 NUMBER_OF_STATES    0x01
 ```
 
+Parameters:
+1. Number of states
+
+### `NUMBER_OF_DIALOGS`
+
+Defines the number of `DIALOG_*` objects that will be present in the file.
+
+```
+NUMBER_OF_DIALOGS    0x01
+```
+
+Parameters:
+1. Number of dialogs
+
 ### `STATE`
 
 States represent states (or also known as scenes) in the game. Each state must have a unique name and typically start with the `STATE_` prefix.

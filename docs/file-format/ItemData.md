@@ -27,10 +27,15 @@ Each item entry follows this structure:
 | 21     | `byte`    | Render Part (see [Render Part](#render-part))                                             |
 
 ### Korean Version (New)
-| Offset | Data Type | Description                                              |
-|--------|-----------|----------------------------------------------------------|
-| 22     | `uint32`  | Special Item Flag (Male) (Value: `0` or `10` (`0x0A`))   |
-| 26     | `uint32`  | Special Item Flag (Female) (Value: `0` or `10` (`0x0A`)) |
+| Offset         | Data Type | Description                                              |
+|----------------|-----------|----------------------------------------------------------|
+| 22             | `uint32`  | Special Item Flag (Male) (Value: `0` or `10` (`0x0A`))   |
+| 26             | `uint32`  | Special Item Flag (Female) (Value: `0` or `10` (`0x0A`)) |
+| 30             | `uint32`  | -                                                        | Name Length (in bytes)                                              |
+| 34             | `char[]`  | Name Length                                              | Item Name (UTF-8 string, may be `EUC-KR` for Korean version)        |
+| 34+Name Length | `uint32`  | -                                                        | Description Length (in bytes)                                       |
+| 38+Name Length | `char[]`  | Description Length                                       | Item Description (UTF-8 string, may be `EUC-KR` for Korean version) |
+
 
 ### e-Games Version (Old)
 | Offset         | Data Type | Length Field       | Description                                                         |
@@ -156,12 +161,13 @@ Describe Attributive (also known as Skills) properties. These properties are onl
 | 2     | Arrangement |
 | 3     | Visibility  |
 
-### Price Kind
-| Value | Description             |
-|-------|-------------------------|
-| 0     | Not for Sale            |
-| 1     | Gem                     |
-| 2     | ePoint / O2Cash / MCash |
+### Buyable Currency
+| Value | Description                |
+|-------|----------------------------|
+| 0     | Not for Sale               |
+| 1     | Gem                        |
+| 2     | ePoint / O2Cash / MCash    |
+| 3     | Both (Korean version only) |
 
 ### Render Part
 | Value | Description         | Item Kind Code |
