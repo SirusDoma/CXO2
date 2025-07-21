@@ -18,7 +18,7 @@ public:
     void SetEffectID(const unsigned int effectID);
 
     GameMode GetMode() const;
-    void SetMode(const GameMode playingMode);
+    void SetMode(const GameMode mode);
 
 private:
     bool m_fxEnabled;

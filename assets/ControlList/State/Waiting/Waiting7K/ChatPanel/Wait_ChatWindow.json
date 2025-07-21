@@ -1,0 +1,11 @@
+﻿{
+  "type": "ChatWindow",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf",
+    "bndID": "0X16800031"
+  },
+  "attributes": {
+    "fontSize": 11,
+    "maximumChatLength": 6
+  }
+}

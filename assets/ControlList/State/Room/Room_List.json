@@ -1,0 +1,18 @@
+﻿{
+  "type": "RoomList",
+  "require": {
+    "bndID": "0X13012021",
+    "template": {
+      "name": "IDC_ROOM_BUTTON",
+      "source": "ControlList/State/Room/Btn_Room.json",
+      "bounds": [
+        "0X13012021",
+        "0X13012022",
+        "0X13012023",
+        "0X13012024",
+        "0X13012025",
+        "0X13012026"
+      ]
+    }
+  }
+}

@@ -6,6 +6,6 @@
 
 struct MarqueeMetadata : public LabelMetadata
 {
-    double        Speed;
-    sf::FloatRect Bounds;
+    double      Speed = 30.0f;
+    sf::IntRect Bounds = sf::IntRect();
 };

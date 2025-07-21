@@ -1,0 +1,13 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X13500033",
+    "bndID": "0X13500033"
+  },
+  "attributes": {
+    "frames": {
+      "Waiting": {},
+      "Playing": {}
+    }
+  }
+}

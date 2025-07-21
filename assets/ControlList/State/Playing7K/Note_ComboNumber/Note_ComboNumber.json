@@ -1,0 +1,19 @@
+{
+  "type": "BitmapNumber",
+  "require": {
+    "refID": "0X1B50005A",
+    "format": "{Name}{MapID}.{Extension}"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 100,
+        "y": 260
+      }
+    },
+    "alignment": "Center",
+    "blend": "additive",
+    "value": 1234,
+    "kerning": -75
+  }
+}

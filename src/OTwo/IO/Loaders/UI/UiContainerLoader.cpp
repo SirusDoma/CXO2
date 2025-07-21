@@ -8,59 +8,110 @@
 #include <OTwo/StringTable/Identifiers/Room.hpp>
 using namespace StringTable::Identifiers;
 
-Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     UiContainerMetadata metadata;
-    if (!MetadataLoader::Parse(json, metadata, ctx))
+    if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
     if (const auto attributes = json.find("attributes"); attributes != json.end())
     {
         if (const auto transform = attributes->find("transform"); transform != attributes->end())
-            TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+            TransformLoader::ParseMetadata(transform.value(), metadata, context);
 
         metadata.Bounds = {};
         if (const auto bounds = attributes->find("bounds"); bounds != attributes->end())
         {
-            metadata.Bounds = {
-                {},
-                {
-                    bounds->at("width"),
-                    bounds->at("height")
-                }
-            };
+            if (bounds->type() == Gx::Json::value_t::object)
+            {
+                metadata.Bounds = {
+                    {},
+                    {
+                        bounds->at("width"),
+                        bounds->at("height")
+                    }
+                };
+            }
+            else if (bounds->type() == Gx::Json::value_t::string)
+            {
+                const auto& bound = context.Acquire<sf::IntRect>(bounds.value().get<std::string>());
+                metadata.Bounds = sf::IntRect{ {}, bound.position };
+            }
         }
     }
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    auto metadata = dynamic_cast<const UiContainerMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const UiContainerMetadata*>(&meta);
     if (metadata == nullptr)
         return nullptr;
 
     auto container = Instantiate(context);
     auto populator = ObjectContainer::Decorate(container.get());
-    auto ctx       = ResourceContextDecorator::Decorate(context);
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+
+    auto bound = sf::IntRect();
+    if (metadata->Position != sf::Vector2f())
+    {
+        container->SetPosition(metadata->Position);
+        container->SetLocalBounds({
+            {
+                static_cast<float>(metadata->Bounds.position.x),
+                static_cast<float>(metadata->Bounds.position.y)
+            },
+            {
+                static_cast<float>(metadata->Bounds.size.x),
+                static_cast<float>(metadata->Bounds.size.y)
+            }
+        });
+    }
+    else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
+    {
+        bound = *bnd;
+        if (metadata->Position != sf::Vector2f())
+        {
+            container->SetPosition(metadata->Position);
+        }
+        else
+        {
+            container->SetPosition(sf::Vector2f{
+                static_cast<float>(bnd->position.x),
+                static_cast<float>(bnd->position.y),
+            });
+        }
+
+        if (metadata->Bounds != sf::IntRect())
+        {
+            container->SetLocalBounds({
+                {
+                    static_cast<float>(metadata->Bounds.position.x),
+                    static_cast<float>(metadata->Bounds.position.y)
+                },
+                {
+                    static_cast<float>(metadata->Bounds.size.x),
+                    static_cast<float>(metadata->Bounds.size.y)
+                }
+            });
+        }
+        else
+        {
+            container->SetLocalBounds({
+                {},
+                {
+                    static_cast<float>(bound.size.x),
+                    static_cast<float>(bound.size.y)
+                }
+            });
+        }
+    }
+
     container->SetName(metadata->Name);
     container->SetOrigin(metadata->Origin);
-    container->SetPosition(metadata->Position);
     container->SetScale(metadata->Scale);
     container->SetRotation(metadata->Rotation);
-    container->SetLocalBounds(metadata->Bounds);
-
-    auto metaLoader = MetadataLoader();
-    for (auto [key, value] : meta.Require)
-    {
-        auto reference = std::any_cast<Gx::Json>(value);
-        if (reference.type() != Gx::Json::value_t::string)
-            continue;
-
-        auto name = fmt::format("{}/{}", meta.Name, key);
-        ObjectLoader::LoadFromJson(name, reference, populator, ctx);
-    }
 
     LoadChildren(populator, meta, context);
 

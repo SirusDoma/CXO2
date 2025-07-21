@@ -1,0 +1,103 @@
+{
+  "type": "State",
+  "name": "STATE_MUSIC_SHOP",
+  "require": {},
+  "attributes": {
+    "objects":{
+      "IDC_IMAGE_STATE_MUSIC_SHOP": "ControlList/State/MusicShop/State_MusicShop.json",
+      "IDC_NUMBER_GEM": "ControlList/State/MusicShop/MusicShop_GemNumber.json",
+      "IDC_NUMBER_CASH": "ControlList/State/MusicShop/MusicShop_CashNumber.json",
+      "IDC_CONTAINER_SHOP": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_CONTAINER_SORT": {
+              "type": "UiContainer",
+              "attributes": {
+                "objects": {
+                  "IDC_BUTTON_SORT_NEW": "ControlList/State/MusicShop/MusicShop_Btn_ShopNew.json",
+                  "IDC_BUTTON_SORT_GENRE": "ControlList/State/MusicShop/MusicShop_Btn_ShopGenre.json",
+                  "IDC_BUTTON_SORT_TITLE": "ControlList/State/MusicShop/MusicShop_Btn_ShopTitle.json",
+                  "IDC_BUTTON_SORT_LEVEL": "ControlList/State/MusicShop/MusicShop_Btn_ShopLevel.json",
+                  "IDC_BUTTON_SORT_BPM": "ControlList/State/MusicShop/MusicShop_Btn_ShopBpm.json",
+                  "IDC_BUTTON_SORT_PRICE": "ControlList/State/MusicShop/MusicShop_Btn_ShopPrice.json"
+                }
+              }
+            },
+            "IDC_LIST_SHOP": "ControlList/State/MusicShop/MusicShop_ShopList.json",
+            "IDC_NUMBER_CURRENT_PAGE": "ControlList/State/MusicShop/MusicShop_ShopCurrentPageNumber.json",
+            "IDC_NUMBER_MAX_PAGE": "ControlList/State/MusicShop/MusicShop_ShopMaxPageNumber.json",
+            "IDC_BUTTON_LEFT": "ControlList/State/MusicShop/MusicShop_Btn_ShopLeft.json",
+            "IDC_BUTTON_RIGHT": "ControlList/State/MusicShop/MusicShop_Btn_ShopRight.json",
+            "IDC_BUTTON_SHOW_ALL": "ControlList/State/MusicShop/MusicShop_Btn_ShowAll.json",
+            "IDC_BUTTON_SHOW_BUYABLE": "ControlList/State/MusicShop/MusicShop_Btn_ShowNotBuy.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_MUSIC": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_CONTAINER_SORT": {
+              "type": "UiContainer",
+              "attributes": {
+                "objects": {
+                  "IDC_BUTTON_SORT_GENRE": "ControlList/State/MusicShop/MusicShop_Btn_MusicGenre.json",
+                  "IDC_BUTTON_SORT_TITLE": "ControlList/State/MusicShop/MusicShop_Btn_MusicTitle.json",
+                  "IDC_BUTTON_SORT_LEVEL": "ControlList/State/MusicShop/MusicShop_Btn_MusicLevel.json",
+                  "IDC_BUTTON_SORT_TIME": "ControlList/State/MusicShop/MusicShop_Btn_MusicTime.json",
+                  "IDC_BUTTON_SORT_STATUS": "ControlList/State/MusicShop/MusicShop_Btn_MusicStatus.json"
+                }
+              }
+            },
+            "IDC_LIST_MUSIC": "ControlList/State/MusicShop/MusicShop_MusicList.json",
+            "IDC_NUMBER_CURRENT_PAGE": "ControlList/State/MusicShop/MusicShop_MusicCurrentPageNumber.json",
+            "IDC_NUMBER_MAX_PAGE": "ControlList/State/MusicShop/MusicShop_MusicMaxPageNumber.json",
+            "IDC_BUTTON_LEFT": "ControlList/State/MusicShop/MusicShop_Btn_MusicLeft.json",
+            "IDC_BUTTON_RIGHT": "ControlList/State/MusicShop/MusicShop_Btn_MusicRight.json",
+            "IDC_BUTTON_DOWNLOAD": "ControlList/State/MusicShop/MusicShop_Btn_Download.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_DOWNLOAD": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_ANIMATION_DOWNLOAD_INDICATOR": "ControlList/State/MusicShop/MusicShop_Download_Indicator.json",
+            "IDC_TEXT_DOWNLOAD_MUSIC": "ControlList/State/MusicShop/MusicShop_Download_Music.json",
+            "IDC_TEXT_DOWNLOAD_SPEED": "ControlList/State/MusicShop/MusicShop_Download_Speed.json",
+            "IDC_TEXT_DOWNLOAD_MUSIC_TIME": "ControlList/State/MusicShop/MusicShop_Download_MusicTime.json",
+            "IDC_TEXT_DOWNLOAD_MUSIC_GAUGE": "ControlList/State/MusicShop/MusicShop_Download_Music_Gauge.json",
+            "IDC_TEXT_DOWNLOAD_COUNT": "ControlList/State/MusicShop/MusicShop_Download_Count.json",
+            "IDC_TEXT_DOWNLOAD_TOTAL_TIME": "ControlList/State/MusicShop/MusicShop_Download_TotalTime.json",
+            "IDC_TEXT_DOWNLOAD_TOTAL_GAUGE": "ControlList/State/MusicShop/MusicShop_Download_Total_Gauge.json",
+            "IDC_TEXT_DOWNLOAD_SIZE": "ControlList/State/MusicShop/MusicShop_Download_Size.json",
+            "IDC_TEXT_DOWNLOAD_STATUS": "ControlList/State/MusicShop/MusicShop_Download_Status.json",
+            "IDC_BUTTON_CANCEL": "ControlList/State/MusicShop/MusicShop_Btn_Cancel.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_CART": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_CART": "ControlList/State/MusicShop/MusicShop_Cart.json",
+            "IDC_LIST_CART": "ControlList/State/MusicShop/MusicShop_Cart_List.json",
+            "IDC_BUTTON_LEFT": "ControlList/State/MusicShop/MusicShop_Btn_Cart_Left.json",
+            "IDC_BUTTON_RIGHT": "ControlList/State/MusicShop/MusicShop_Btn_Cart_Right.json",
+            "IDC_NUMBER_CURRENT_PAGE": "ControlList/State/MusicShop/MusicShop_Cart_CurrentPageNumber.json",
+            "IDC_NUMBER_MAX_PAGE": "ControlList/State/MusicShop/MusicShop_Cart_MaxPageNumber.json",
+            "IDC_NUMBER_TOTAL_GEM": "ControlList/State/MusicShop/MusicShop_Cart_TotalGem.json",
+            "IDC_NUMBER_TOTAL_CASH": "ControlList/State/MusicShop/MusicShop_Cart_TotalCash.json",
+            "IDC_BUTTON_GIFT": "ControlList/State/MusicShop/MusicShop_Btn_Cart_Gift.json",
+            "IDC_BUTTON_BUY": "ControlList/State/MusicShop/MusicShop_Btn_Cart_Buy.json"
+          }
+        }
+      },
+      "IDC_TEXT_NOTICE": "ControlList/State/MusicShop/MusicShop_Notice.json",
+      "IDC_BUTTON_DOWNLOAD_TAB": "ControlList/State/MusicShop/MusicShop_Btn_DownloadTab.json",
+      "IDC_BUTTON_CART_TAB": "ControlList/State/MusicShop/MusicShop_Btn_CartTab.json",
+      "IDC_BUTTON_BACK": "ControlList/State/MusicShop/MusicShop_Btn_Back.json"
+    }
+  }
+}

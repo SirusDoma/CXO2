@@ -1,0 +1,10 @@
+{
+  "type": "Gauge",
+  "require": {
+    "refID": "0X1B500003"
+  },
+  "attributes": {
+    "orientation": "Horizontal",
+    "frame": 27
+  }
+}

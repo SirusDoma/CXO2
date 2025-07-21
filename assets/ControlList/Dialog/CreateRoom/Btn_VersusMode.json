@@ -1,0 +1,12 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "refID": "0X25205006",
+    "bndID": "0X25205006"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_ANIMATION_VERSUS": "ControlList/Dialog/CreateRoom/VersusModeAnimation.json"
+    }
+  }
+}

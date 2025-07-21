@@ -3,6 +3,7 @@
 
 #include <OTwo/Archives/OpiArchive.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
+#include <OTwo/Archives/EmbeddedArchive.hpp>
 
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
@@ -14,6 +15,9 @@
 #include <OTwo/IO/Loaders/Audio/SoundLoader.hpp>
 #include <OTwo/IO/Loaders/Audio/MusicLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/AnimationLoader.hpp>
+
+#include <OTwo/IO/Loaders/Adaptor/ControlListLoader.hpp>
+#include <OTwo/IO/Loaders/Adaptor/O2JamSpriteLoader.hpp>
 
 #include <OTwo/IO/Loaders/UI/CursorLoader.hpp>
 #include <OTwo/IO/Loaders/UI/ImageLoader.hpp>
@@ -46,6 +50,9 @@
 #include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
+
+#include <OTwo/IO/TextureCacheBuilder.hpp>
+#include <OTwo/Metadata/Legacy/ControlList.hpp>
 
 #include <OTwo/UI/Common/ChatPanel.hpp>
 #include <OTwo/UI/Dialogs/CreateRoomDialog.hpp>
@@ -89,6 +96,33 @@ O2Jam::O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view,
 {
 }
 
+bool O2Jam::InCompatibilityMode()
+{
+    return InCompatibilityMode(
+        CompatibilityMode::Interface |
+        CompatibilityMode::Playing |
+        CompatibilityMode::Avatar
+    );
+}
+
+bool O2Jam::InCompatibilityMode(CompatibilityMode modes)
+{
+    static bool image   = Gx::FileSystem::Contains("ControlList_Interface.txt");
+    static bool playing = Gx::FileSystem::Contains("ControlList_Playing.txt");
+    static bool avatar  = Gx::FileSystem::Scan("Itemdata*.dat").size() > 0;
+
+    if (modes & CompatibilityMode::Interface && !image)
+        return false;
+
+    if (modes & CompatibilityMode::Playing && !playing)
+        return false;
+
+    if (modes & CompatibilityMode::Avatar && !avatar)
+        return false;
+
+    return true;
+}
+
 void O2Jam::Boot()
 {
     // Render Settings
@@ -105,6 +139,8 @@ void O2Jam::Boot()
     // -- Register resource metadata loaders
     // Core Resources
     Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<ControlList, ControlListLoader>();
+    Gx::ResourceLoaderFactory::Register<SpriteSheet, O2JamSpriteLoader>();
     Gx::ResourceLoaderFactory::Register<sf::Texture, TextureLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Font, FontLoader>();
     Gx::ResourceLoaderFactory::Register<Gx::Cursor, CursorLoader>();
@@ -169,8 +205,6 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Reuse<State, StateLoading>();
     Gx::ResourceLoaderFactory::Reuse<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
-
-
 
     // Initialize singleton providers
     auto& context = GetContext();
@@ -245,15 +279,31 @@ void O2Jam::Boot()
     auto& image     = resources.Create<OpiArchive>("Interface");
     auto& playing   = resources.Create<OpiArchive>("Playing");
     auto& avatar    = resources.Create<OpiArchive>("Avatar");
+    auto& embedded  = resources.Create<EmbeddedArchive>("Internal");
 
-    if (image.LoadFromFile("Interface.opi"))
-        Gx::FileSystem::Mount(image);
 
-    if (playing.LoadFromFile("Playing.opi"))
-        Gx::FileSystem::Mount(playing);
+    for (std::string name : { "Interface.opi", "Interface1.opi" })
+    {
+        if (image.LoadFromFile(name))
+        {
+            Gx::FileSystem::Mount(image);
+            break;
+        }
+    }
+
+    for (std::string name : { "Playing.opi", "Playing1.opi" })
+    {
+        if (playing.LoadFromFile(name))
+        {
+            Gx::FileSystem::Mount(playing);
+        }
+    }
 
     if (avatar.LoadFromFile("Avatar.opa"))
         Gx::FileSystem::Mount(avatar);
+
+    // Embbeded resources
+    Gx::FileSystem::Mount(embedded);
 
     // Load global music assets
     auto& bgm       = resources.Create<OjmArchive>("BGM");
@@ -277,10 +327,36 @@ void O2Jam::Boot()
     if (npc.LoadFromFile("O2PlanetNPC.ojm"))
         Gx::FileSystem::Mount(npc);
 
-    // Force to load heavy providers during start-up
-    context.Provide<ItemFactory>([&](auto& ctx)
+    // Cache item textures
+    if (InCompatibilityMode(CompatibilityMode::Avatar))
     {
-        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>());
+        auto cache = TextureCacheBuilder(image, resources);
+        cache.BuildCache();
+    }
+
+    // Scan for item data
+    std::string itemDataFileName = []
+    {
+        if (const auto files = Gx::FileSystem::Scan("itemdata*.dat"); !files.empty())
+            return files.front()->GetName();
+
+        return std::string("Avatar/ItemData.json");
+    }();
+    std::string setInfoDataFileName = []
+    {
+        if (const auto files = Gx::FileSystem::Scan("setinfodata.*"); !files.empty())
+            return files.front()->GetName();
+
+        if (Gx::FileSystem::Contains("Avatar/SetInfoData.json"))
+            return std::string("Avatar/SetInfoData.json");
+
+        return std::string();
+    }();
+
+    // Force to load item providers during start-up
+    context.Provide<ItemFactory>([&, itemDataFileName, setInfoDataFileName](auto& ctx)
+    {
+        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>(), itemDataFileName, setInfoDataFileName);
         return factory;
     }, Gx::Context::Scope::Shared);
 
@@ -299,18 +375,56 @@ void O2Jam::Boot()
     Console::Instance().SetMaximumLines(10);
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
-    director.Register<StateAvi>("Interface/State/Avi.json");
-    director.Register<StatePlanet>("Interface/State/Planet.json");
-    director.Register<StateRoom>("Interface/State/Room.json");
-    director.Register<StateMusicShop>("Interface/State/MusicShop.json");
-    director.Register<StateItemShop>("Interface/State/ItemShop.json");
-    director.Register<StateMyRoom>("Interface/State/MyRoom.json");
+    if (InCompatibilityMode(CompatibilityMode::Interface))
+    {
+        // Cache textures
+        auto cache = TextureCacheBuilder(image, resources);
+        cache.BuildCache();
+
+        director.Register<StateAvi>("ControlList/State/Avi.json");
+        director.Register<StatePlanet>("ControlList/State/Planet.json");
+        director.Register<StateRoom>("ControlList/State/Room.json");
+        director.Register<StateWaiting7K>("ControlList/State/Waiting7K.json");
+        director.Register<StateMyRoom>("ControlList/State/MyRoom.json");
+        director.Register<StateItemShop>("ControlList/State/ItemShop.json");
+        director.Register<StateMusicShop>("ControlList/State/MusicShop.json");
+    }
+    else
+    {
+        director.Register<StateAvi>("Interface/State/Avi.json");
+        director.Register<StatePlanet>("Interface/State/Planet.json");
+        director.Register<StateRoom>("Interface/State/Room.json");
+        director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
+        director.Register<StateMyRoom>("Interface/State/MyRoom.json");
+        director.Register<StateItemShop>("Interface/State/ItemShop.json");
+        director.Register<StateMusicShop>("Interface/State/MusicShop.json");
+    }
+
+    if (Gx::FileSystem::Contains("ControlList_Playing.txt"))
+    {
+        auto cache = TextureCacheBuilder(playing, resources);
+        cache.BuildCache();
+
+        director.Register<StateLoading>("ControlList/State/Loading.json");
+        director.Register<StatePlaying7K>("ControlList/State/Playing7K.json");
+    }
+    else
+    {
+        director.Register<StateLoading>("Interface/State/Loading.json");
+        director.Register<StatePlaying7K>("Playing/State/Playing7K.json");
+    }
+
+    if (InCompatibilityMode(CompatibilityMode::Interface) && InCompatibilityMode(CompatibilityMode::Playing))
+    {
+        director.Register<StateResult>("ControlList/State/Result.json");
+    }
+    else
+    {
+        director.Register<StateResult>("Interface/State/Result.json");
+    }
+
     director.Register<StateBulletin>("Interface/State/Bulletin.json");
     director.Register<StatePayment>("Interface/State/Payment.json");
-    director.Register<StateWaiting7K>("Interface/State/Waiting7K.json");
-    director.Register<StateLoading>("Interface/State/Loading.json");
-    director.Register<StatePlaying7K>("Playing/State/Playing7K.json");
-    director.Register<StateResult>("Interface/State/Result.json");
 
     director.Present<StateAvi>();
 }

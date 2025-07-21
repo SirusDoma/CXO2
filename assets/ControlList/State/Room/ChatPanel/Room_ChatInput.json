@@ -1,0 +1,22 @@
+﻿{
+  "type": "InputField",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf",
+    "bndID": "0X1330001B"
+  },
+  "attributes": {
+    "fontSize": 12,
+    "highlightTextColor": {
+      "a": 255,
+      "r": 0,
+      "g": 0,
+      "b": 0
+    },
+    "highlightBackColor": {
+      "a": 255,
+      "r": 150,
+      "g": 185,
+      "b": 215
+    }
+  }
+}

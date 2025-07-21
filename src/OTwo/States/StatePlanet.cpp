@@ -11,6 +11,7 @@
 #include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
+#include <OTwo/O2Jam.hpp>
 
 using namespace StringTable::Identifiers;
 
@@ -73,7 +74,7 @@ void StatePlanet::Initialize()
         });
     }
 
-    if (m_session.GetMusicHall() == MusicHall::None)
+    if (m_session.GetMusicHall() == MusicHall::None && !O2Jam::InCompatibilityMode(CompatibilityMode::Interface))
     {
         auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
         overlay.SetColor(sf::Color::Black);

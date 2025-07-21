@@ -1,0 +1,12 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X27100001"
+  },
+  "attributes": {
+    "frames": {
+      "KeyOption": {},
+      "SoundOption": {}
+    }
+  }
+}

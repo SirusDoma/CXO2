@@ -32,7 +32,7 @@ StateResult::                                                                   
 void StateResult::Initialize()
 {
     State::Initialize();
-                                            if (const auto container = Instantiate<Gx::UiContainer>(Resource::Result::IDC_CONTAINER_BACKGROUND); container)
+    if (const auto container = Instantiate<Gx::UiContainer>(Resource::Result::IDC_CONTAINER_BACKGROUND); container)
     {
         const auto& resources = GetResources(ResourceScope::Shared);
         if (const auto texture = resources.Find<sf::Texture>(Resource::Cache::IDC_TEXTURE_STATE_PLAYING); texture)
@@ -46,8 +46,8 @@ void StateResult::Initialize()
     const auto background = Instantiate<Gx::Sprite>(Resource::Result::IDC_IMAGE_STATE_RESULT);
     background->SetVisible(false);
 
-    auto top = Instantiate<Gx::Sprite>(Resource::Result::IDC_IMAGE_STATE_RESULT_TOP);
-    auto bottom = Instantiate<Gx::Sprite>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM);
+    auto top = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_TOP);
+    auto bottom = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM);
 
     const auto banner = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_WINLOSE);
     banner->SetVisible(false);
@@ -222,7 +222,7 @@ void StateResult::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
     if (ev.code == sf::Keyboard::Key::Enter)
     {
-        if (const auto bottom = Instantiate<Gx::Sprite>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM); bottom)
+        if (const auto bottom = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM); bottom)
         {
             if (const auto btnBack = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK); btnBack)
                 btnBack->PerformClick();

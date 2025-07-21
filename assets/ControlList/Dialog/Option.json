@@ -1,0 +1,28 @@
+﻿{
+  "type": "OptionDialog",
+  "require": {
+    "refID": "0X27100001"
+  },
+  "attributes": {
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X27200004",
+          "bndID": "0X27200004"
+        }
+      }
+    },
+    "objects": {
+      "IDC_IMAGE_DIALOG_OPTION_KEY": "ControlList/Dialog/Option/Dialog_Option_Key.json",
+      "IDC_IMAGE_DIALOG_OPTION_SOUND": "ControlList/Dialog/Option/Dialog_Option_Sound.json",
+      "IDC_BUTTON_KEY_TAB": "ControlList/Dialog/Option/Btn_KeyTab.json",
+      "IDC_BUTTON_SOUND_TAB": "ControlList/Dialog/Option/Btn_SoundTab.json",
+      "IDC_BUTTON_SAVE": "ControlList/Dialog/Option/Btn_Save.json",
+      "IDC_BUTTON_DEFAULT": "ControlList/Dialog/Option/Btn_Default.json",
+      "IDC_TOOLTIP_INFO": "ControlList/Dialog/Option/ToolTip.json",
+      "IDC_CONTAINER_GAME_OPTION": "ControlList/Dialog/Option/Option_Game.json",
+      "IDC_CONTAINER_MUSIC_OPTION": "ControlList/Dialog/Option/Option_Music.json"
+    }
+  }
+}

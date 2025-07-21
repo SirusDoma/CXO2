@@ -31,7 +31,7 @@ namespace Gx
         std::vector<std::unique_ptr<FileInfo>> files;
         for (const auto& entry : GetFileEntries())
         {
-            if (auto fileName = entry->GetName(); StringHelper::IsGlobMatch(fileName, pattern))
+            if (auto fileName = entry->GetName(); StringHelper::IsGlobMatch(fileName, pattern, false))
                 files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName).value_or(0)));
         }
 

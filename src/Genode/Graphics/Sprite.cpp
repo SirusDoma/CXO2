@@ -140,7 +140,7 @@ namespace Gx
         if (!IsVisible())
             return states;
 
-        states.transform     *= GetTransform();
+        states.transform *= GetTransform();
         states.coordinateType = sf::CoordinateType::Pixels;
         switch (m_blendMode)
         {

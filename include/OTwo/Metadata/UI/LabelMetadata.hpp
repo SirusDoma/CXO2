@@ -6,14 +6,14 @@
 struct LabelMetadata : public TransformMetadata
 {
     std::string          String;
-    unsigned int         FontSize;
-    unsigned int         FontWidth;
-    bool                 Bold;
-    bool                 Italic;
-    bool                 Underlined;
-    float                OutlineThickness;
-    float                Kerning;
-    sf::Color            Color;
-    sf::Color            OutlineColor;
-    Gx::Label::Alignment Alignment;
+    unsigned int         FontSize         = 30;
+    unsigned int         FontWidth        = 0;
+    bool                 Bold             = false;
+    bool                 Italic           = false;
+    bool                 Underlined       = false;
+    float                OutlineThickness = 0.f;
+    float                Kerning          = 0.f;
+    sf::Color            Color            = sf::Color::White;
+    sf::Color            OutlineColor     = sf::Color::Transparent;
+    Gx::Label::Alignment Alignment        = Gx::Label::Alignment::None;
 };

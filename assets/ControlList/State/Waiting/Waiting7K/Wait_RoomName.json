@@ -1,0 +1,20 @@
+﻿{
+  "type": "Label",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf",
+    "bndID": "0X1640001C"
+  },
+  "attributes": {
+    "fontSize": 12,
+    "kerning": 1,
+    "outline": {
+      "thickness": 1.45,
+      "color": {
+        "a": 255,
+        "r": 25,
+        "g": 25,
+        "b": 25
+      }
+    }
+  }
+}

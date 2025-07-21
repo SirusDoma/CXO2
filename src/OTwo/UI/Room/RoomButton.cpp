@@ -31,7 +31,11 @@ void RoomButton::Initialize()
 
 sf::FloatRect RoomButton::GetLocalBounds() const
 {
-    return Gx::Image::GetLocalBounds();
+    const auto bounds = Gx::Image::GetLocalBounds();
+    if (bounds == sf::FloatRect() && m_hover)
+        return m_hover->GetLocalBounds();
+
+    return bounds;
 }
 
 const Room& RoomButton::GetRoomInfo() const

@@ -12,10 +12,13 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json& json, con
 {
     SpriteMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    if (!ParseMetadata(json.at("attributes"), metadata, context))
-        return nullptr;
+    if (const auto attributes = json.find("attributes"); attributes != json.end())
+    {
+        if (!ParseMetadata(attributes.value(), metadata, context))
+            return Instantiate(context);
+    }
 
     return LoadFromMetadata(metadata, context);
 }
@@ -27,29 +30,67 @@ Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromMetadata(const ResourceMetadat
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto sprite = std::make_unique<Gx::Sprite>();
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    auto sprite = Instantiate(context);
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
+    {
         sprite->SetTexture(*texture);
+        sprite->SetTexCoords(metadata->TexCoords);
+        sprite->SetPosition(metadata->Position);
+    }
+    else
+    {
+        if (metadata->Position != sf::Vector2f())
+        {
+            sprite->SetPosition(metadata->Position);
+        }
+        else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+        {
+            sprite->SetPosition({
+                static_cast<float>(bound->position.x),
+                static_cast<float>(bound->position.y),
+            });
+        }
+
+        if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+        {
+            sprite->SetTexture(sheet->GetTexture());
+            if (metadata->TexCoords != sf::IntRect())
+                sprite->SetTexCoords(metadata->TexCoords);
+            else if (metadata->FrameID.has_value())
+                sprite->SetTexCoords(sheet->TexCoords[metadata->FrameID.value()]);
+            else
+                sprite->SetTexCoords(sheet->TexCoords[0]);
+
+            if (metadata->FrameID.has_value() && sprite->GetPosition() == sf::Vector2f())
+            {
+                sprite->SetPosition({
+                    static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.x),
+                    static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.y),
+                });
+            }
+        }
+    }
 
     sprite->SetName(metadata->Name);
     sprite->SetBlendMode(metadata->BlendMode);
-    sprite->SetTexCoords(metadata->TexCoords);
     sprite->SetColor(metadata->Color);
     sprite->SetOrigin(metadata->Origin);
-    sprite->SetPosition(metadata->Position);
     sprite->SetScale(metadata->Scale);
     sprite->SetRotation(metadata->Rotation);
 
     return sprite;
 }
 
-bool SpriteLoader::ParseMetadata(Gx::Json attributes, SpriteMetadata& metadata, const Gx::ResourceContext& ctx)
+bool SpriteLoader::ParseMetadata(const Gx::Json& attributes, SpriteMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (attributes.empty())
         return false;
 
     if (const auto transform = attributes.find("transform"); transform != attributes.end())
         TransformLoader::ParseMetadata(transform.value(), metadata, ctx);
+
+    if (const auto id = attributes.find("id"); id != attributes.end())
+        metadata.FrameID = id->get<std::uint32_t>();
 
     metadata.BlendMode = Gx::BlendMode::Auto;
     if (const auto mode = attributes.find("blend"); mode != attributes.end())

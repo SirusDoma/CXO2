@@ -26,10 +26,10 @@ namespace Gx
         struct Frame
         {
             sf::IntRect                 TexCoords;
-            std::optional<sf::Vector2f> Origin;
-            std::optional<sf::Vector2f> Position;
-            std::optional<float>        Rotation;
-            std::optional<sf::Vector2f> Scale;
+            std::optional<sf::Vector2f> Origin    = std::nullopt;
+            std::optional<sf::Vector2f> Position  = std::nullopt;
+            std::optional<float>        Rotation  = std::nullopt;
+            std::optional<sf::Vector2f> Scale     = std::nullopt;
         };
 
         Animation();

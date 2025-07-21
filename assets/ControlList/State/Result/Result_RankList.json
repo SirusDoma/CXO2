@@ -1,0 +1,22 @@
+{
+  "type": "List",
+  "require": {
+    "template": {
+      "name": "IDC_CONTAINER_RANK_ITEM",
+      "count": 8,
+      "source": "ControlList/State/Result/Result_RankItem.json"
+    }
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "vertical": {
+      "count": 8,
+      "spacing": 21
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "Avatar",
+  "attributes": {
+    "offset": {
+      "x": -90,
+      "y": -60
+    },
+    "objects": {
+      "IDC_AVATAR_INFO": "ControlList/State/Waiting/Waiting7K/Wait_AvatarInfo.json",
+      "IDC_IMAGE_BOSS_MARK": "ControlList/State/Waiting/Waiting7K/Wait_BossMark.json",
+      "IDC_IMAGE_NO_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_NoMusic.json"
+    }
+  }
+}

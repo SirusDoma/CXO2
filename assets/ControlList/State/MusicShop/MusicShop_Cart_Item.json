@@ -1,0 +1,21 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_NUMBER": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_IMAGE_ITEM_TYPE": "ControlList/State/MusicShop/MusicShop_Cart_ItemType.json",
+      "IDC_TEXT_NAME": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_TEXT_PRICE": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_BUTTON_DELETE": "ControlList/State/MusicShop/MusicShop_Btn_Cart_Delete.json"
+    }
+  }
+}

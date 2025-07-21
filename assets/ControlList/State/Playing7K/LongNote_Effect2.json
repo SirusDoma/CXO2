@@ -1,0 +1,10 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1B500097"
+  },
+  "attributes": {
+    "blend": "additive",
+    "isLoop": true
+  }
+}

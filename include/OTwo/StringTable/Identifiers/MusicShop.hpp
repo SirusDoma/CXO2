@@ -18,6 +18,7 @@ namespace StringTable::Identifiers::Resource::MusicShop
     namespace MusicItem
     {
         constexpr static auto IDC_IMAGE_SELECTOR = "IDC_IMAGE_SELECTOR";
+        constexpr static auto IDC_IMAGE_STATUS   = "IDC_IMAGE_STATUS";
         constexpr static auto IDC_TOGGLE_SELECT  = "IDC_TOGGLE_SELECT";
     }
 

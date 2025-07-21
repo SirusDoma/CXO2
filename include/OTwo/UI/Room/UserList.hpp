@@ -2,9 +2,6 @@
 
 #include <Genode/UI/UiContainer.hpp>
 
-#include <Genode/UI/List.hpp>
-#include <Genode/UI/Label.hpp>
-
 #include <OTwo/Models/Room.hpp>
 
 #include <vector>

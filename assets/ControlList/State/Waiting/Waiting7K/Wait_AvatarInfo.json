@@ -1,0 +1,63 @@
+{
+  "type": "AvatarInfo",
+  "require": {
+    "bndID": "0X16700034"
+  },
+  "attributes": {
+    "teamColors": {
+      "A": {
+        "a": 255,
+        "r": 255,
+        "g": 0,
+        "b": 21
+      },
+      "B":  {
+        "a": 255,
+        "r": 255,
+        "g": 191,
+        "b": 23
+      },
+      "C": {
+        "a": 255,
+        "r": 255,
+        "g": 246,
+        "b": 0
+      },
+      "D": {
+        "a": 255,
+        "r": 159,
+        "g": 207,
+        "b": 81
+      },
+      "E": {
+        "a": 255,
+        "r": 104,
+        "g": 235,
+        "b": 225
+      },
+      "F": {
+        "a": 255,
+        "r": 15,
+        "g": 100,
+        "b": 180
+      },
+      "G": {
+        "a": 255,
+        "r": 158,
+        "g": 23,
+        "b": 211
+      },
+      "H": {
+        "a": 255,
+        "r": 177,
+        "g": 76,
+        "b": 24
+      }
+    },
+    "objects": {
+      "IDC_IMAGE_AVATAR_READY_INDICATOR": "ControlList/State/Waiting/Waiting7K/Wait_ReadyText.json",
+      "IDC_IMAGE_AVATAR_INFO_PLATE": "ControlList/State/Waiting/Waiting7K/Wait_AvatarPlate.json",
+      "IDC_TEXT_AVATAR_INFO_NAME": "ControlList/State/Waiting/Waiting7K/Wait_AvatarName.json"
+    }
+  }
+}

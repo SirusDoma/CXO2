@@ -1,0 +1,11 @@
+{
+  "type": "BitmapNumber",
+  "require": {
+    "sheet": "Shop_GemFont.ojs",
+    "bndID": "0X15400038"
+  },
+  "attributes": {
+    "alignment": "Right",
+    "kerning": 1
+  }
+}

@@ -1,0 +1,27 @@
+﻿{
+  "type": "Marquee",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf",
+    "bndID": "0X15500063"
+  },
+  "attributes": {
+    "speed": 35,
+    "fontSize": 10,
+    "color": {
+      "a": 255,
+      "r": 135,
+      "g": 200,
+      "b": 60
+    },
+    "outline": {
+      "thickness": 0.300,
+      "color": {
+        "a": 255,
+        "r": 135,
+        "g": 200,
+        "b": 60
+      }
+    },
+    "string": "Welcome to the Music Shop~"
+  }
+}

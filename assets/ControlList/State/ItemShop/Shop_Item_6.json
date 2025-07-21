@@ -1,0 +1,77 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_NAME":  {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1440002D"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "outline": {
+            "thickness": 1,
+            "color": {
+              "a": 255,
+              "r": 25,
+              "g": 25,
+              "b": 25
+            }
+          }
+        }
+      },
+      "IDC_IMAGE_ITEM": {
+        "type": "Image",
+        "require": {
+          "bndID": "0X14600036"
+        },
+        "attributes": {
+          "sizeMode": "Center"
+        }
+      },
+      "IDC_IMAGE_CURRENCY": {
+        "type": "Image",
+        "require": {
+          "sheet": "Shop_ItemGem.ojs"
+        },
+        "attributes": {
+          "transform": {
+            "position": {
+              "x": 375,
+              "y": 322
+            }
+          },
+          "frames": {
+            "Gem": {},
+            "Cash": {}
+          }
+        }
+      },
+      "IDC_NUMBER_PRICE":{
+        "type": "BitmapNumber",
+        "require": {
+          "sheet": "Shop_Font_ItemGem.ojs",
+          "bndID": "0X1450005C"
+        },
+        "attributes": {
+          "alignment": "Right"
+        }
+      },
+      "IDC_BUTTON_ADD": {
+        "type": "Button",
+        "require": {
+          "refID": "0X14200019",
+          "bndID": "0X14200019"
+        }
+      },
+      "IDC_BUTTON_PREVIEW": {
+        "type": "Button",
+        "require": {
+          "refID": "0X14200064",
+          "bndID": "0X14200064"
+        }
+      }
+    }
+  }
+}

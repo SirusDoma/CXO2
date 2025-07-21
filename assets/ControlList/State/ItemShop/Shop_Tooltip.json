@@ -1,0 +1,33 @@
+{
+  "type": "Image",
+  "require": {
+    "bndID": "0X1440007F"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_TIP": {
+        "type": "Image",
+        "require": {
+          "refID": "0X1450007E",
+          "bndID": "0X1450007E"
+        }
+      },
+      "IDC_TEXT_MESSAGE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1440007F"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "color": {
+            "a": 255,
+            "r": 0,
+            "g": 0,
+            "b": 0
+          }
+        }
+      }
+    }
+  }
+}

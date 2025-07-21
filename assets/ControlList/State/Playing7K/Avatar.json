@@ -1,0 +1,131 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_AVATAR_SHADOW": {
+        "type": "Image",
+        "require": {
+          "refID": "0X1B500009"
+        },
+        "attributes": {
+          "transform": {
+            "position": {
+              "x": 120,
+              "y": 187
+            }
+          },
+          "color": {
+            "a": 120,
+            "r": 255,
+            "g": 255,
+            "b": 255
+          },
+          "texCoords": {
+            "x": 0,
+            "y": 0,
+            "width": 58,
+            "height": 22
+          }
+        }
+      },
+      "IDC_AVATAR": {
+        "type": "Avatar",
+        "attributes": {
+          "items": [],
+          "objects": {
+            "IDC_ANIMATION_OHM_EFFECT": "ControlList/State/Playing7K/Ohm_Effect.json",
+            "IDC_ANIMATION_OHM": "ControlList/State/Playing7K/Ohm.json",
+            "IDC_AVATAR_INFO": {
+              "type": "AvatarInfo",
+              "attributes": {
+                "objects": {
+                  "IDC_TEXT_AVATAR_INFO_LEVEL": {
+                    "type": "Label",
+                    "require": {
+                      "font": "Interface/Common/Font.Unicode.ttf"
+                    },
+                    "attributes": {
+                      "transform": {
+                        "position": {
+                          "x": 90,
+                          "y": 47
+                        }
+                      },
+                      "fontSize": 10,
+                      "outline": {
+                        "thickness": 1.25,
+                        "color": {
+                          "a": 255,
+                          "r": 25,
+                          "g": 25,
+                          "b": 25
+                        }
+                      }
+                    }
+                  },
+                  "IDC_TEXT_AVATAR_INFO_NAME": {
+                    "type": "Label",
+                    "require": {
+                      "font": "Interface/Common/Font.Unicode.ttf"
+                    },
+                    "attributes": {
+                      "transform": {
+                        "position": {
+                          "x": 120,
+                          "y": 47
+                        }
+                      },
+                      "fontSize": 10,
+                      "outline": {
+                        "thickness": 1.25,
+                        "color": {
+                          "a": 255,
+                          "r": 25,
+                          "g": 25,
+                          "b": 25
+                        }
+                      }
+                    }
+                  },
+                  "IDC_IMAGE_AVATAR_INFO_LIFE": {
+                    "type": "Image",
+                    "require": {
+                      "refID": "0X1B500029"
+                    },
+                    "attributes": {
+                      "frames": {
+                        "default": {
+                          "position": {
+                            "x": 90,
+                            "y": 65
+                          },
+                          "id": 0
+                        }
+                      }
+                    }
+                  },
+                  "IDC_GAUGE_AVATAR_INFO_LIFE": {
+                    "type": "Gauge",
+                    "require": {
+                      "refID": "0X1B500029"
+                    },
+                    "attributes": {
+                      "transform": {
+                        "position": {
+                          "x": 90,
+                          "y": 65
+                        }
+                      },
+                      "orientation": "HORIZONTAL",
+                      "frame": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

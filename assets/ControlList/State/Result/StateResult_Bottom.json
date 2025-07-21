@@ -1,0 +1,13 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "StateResult_Bottom.ojs"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_BUTTON_BACK": "ControlList/State/Result/Result_Btn_Back.json",
+      "IDC_BUTTON_PLAY_RETRY": "ControlList/State/Result/Result_Btn_PlayRetry.json",
+      "IDC_LIST_RANK_SCORE": "ControlList/State/Result/Result_RankList.json"
+    }
+  }
+}

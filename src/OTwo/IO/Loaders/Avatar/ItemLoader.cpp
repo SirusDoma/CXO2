@@ -52,23 +52,41 @@ Gx::ResourcePtr<Item> ItemLoader::LoadFromMetadata(const ResourceMetadata& meta,
     for (auto [currency, price] : metadata->Prices)
         item->SetPrice(currency, price);
 
-    if (!metadata->SmallThumbnail.isEmpty())
+    if (!metadata->SmallThumbnail.empty())
     {
-        if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx))
-            item->SetSmallThumbnail(std::move(*thumbnail));
+        if (metadata->SmallThumbnail.type() == Gx::Json::value_t::string)
+        {
+            if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx))
+                item->SetSmallThumbnail(std::move(*thumbnail));
+        }
+        else
+        {
+            if (const auto thumbnail = spriteLoader.LoadFromJson(metadata->SmallThumbnail, ctx))
+                item->SetSmallThumbnail(std::move(*thumbnail));
+        }
     }
 
-    if (!metadata->LargeThumbnail.isEmpty())
+    if (!metadata->LargeThumbnail.empty())
     {
-        if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx))
-            item->SetLargeThumbnail(std::move(*thumbnail));
+        if (metadata->LargeThumbnail.type() == Gx::Json::value_t::string)
+        {
+            if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx))
+                item->SetLargeThumbnail(std::move(*thumbnail));
+        }
+        else
+        {
+            if (const auto thumbnail = spriteLoader.LoadFromJson(metadata->LargeThumbnail, ctx))
+                item->SetLargeThumbnail(std::move(*thumbnail));
+        }
     }
 
     if (!m_thumbnailOnly)
     {
         for (const auto& ref : metadata->References)
         {
-            auto animation = animationLoader.LoadFromFile(ref.Reference, ctx);
+            auto animation = ref.Reference.type() == Gx::Json::value_t::string ?
+                animationLoader.LoadFromFile(ref.Reference, ctx) : animationLoader.LoadFromJson(ref.Reference, ctx);
+
             if (!animation)
                 continue;
 

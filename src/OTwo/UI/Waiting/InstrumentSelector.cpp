@@ -57,6 +57,7 @@ void InstrumentSelector::Initialize()
 
     if (const auto guitar = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR); guitar)
     {
+        guitar->SetVisible(false);
         guitar->SetEnabled(false);
         guitar->SetCheckStateChangeCallback([this] (auto& sender)
         {
@@ -71,6 +72,7 @@ void InstrumentSelector::Initialize()
 
     if (const auto bass = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); bass)
     {
+        bass->SetVisible(false);
         bass->SetEnabled(false);
         bass->SetCheckStateChangeCallback([this] (auto& sender)
         {
@@ -83,22 +85,9 @@ void InstrumentSelector::Initialize()
         });
     }
 
-    if (const auto keyboard = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); keyboard)
-    {
-        keyboard->SetEnabled(false);
-        keyboard->SetCheckStateChangeCallback([this] (auto& sender)
-        {
-            if (!sender.IsChecked() || m_currentInstrument == Instrument::Keyboard)
-                return;
-
-            m_currentIndex = 0;
-            m_currentInstrument = Instrument::Keyboard;
-            Invalidate();
-        });
-    }
-
     if (const auto drum = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); drum)
     {
+        drum->SetVisible(false);
         drum->SetEnabled(false);
         drum->SetCheckStateChangeCallback([this] (auto& sender)
         {
@@ -108,6 +97,21 @@ void InstrumentSelector::Initialize()
             m_currentIndex = 0;
             m_currentInstrument = Instrument::Drum;
 
+            Invalidate();
+        });
+    }
+
+    if (const auto keyboard = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); keyboard)
+    {
+        keyboard->SetVisible(false);
+        keyboard->SetEnabled(false);
+        keyboard->SetCheckStateChangeCallback([this] (auto& sender)
+        {
+            if (!sender.IsChecked() || m_currentInstrument == Instrument::Keyboard)
+                return;
+
+            m_currentIndex = 0;
+            m_currentInstrument = Instrument::Keyboard;
             Invalidate();
         });
     }
@@ -144,15 +148,16 @@ void InstrumentSelector::AddInstrumentMetadata(const ItemMetadata& item)
     Gx::RadioButton* button = nullptr;
     switch (key)
     {
-        case Instrument::Guitar:   button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR); break;
-        case Instrument::Bass:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); break;
+        case Instrument::Guitar:   button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR);   break;
+        case Instrument::Bass:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS);     break;
+        case Instrument::Drum:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM);     break;
         case Instrument::Keyboard: button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); break;
-        case Instrument::Drum:     button = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); break;
         default: break;
     }
 
     if (button)
     {
+        button->SetVisible(true);
         button->SetEnabled(true);
 
         bool init = false;

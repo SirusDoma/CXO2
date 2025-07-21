@@ -1,0 +1,17 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TOGGLE_BGM": "ControlList/Dialog/Option/Btn_ToggleBgm.json",
+      "IDC_GAUGE_MASTER_VOLUME": "ControlList/Dialog/Option/MasterVolumeBar.json",
+      "IDC_GAUGE_MUSIC_VOLUME": "ControlList/Dialog/Option/MusicBar.json",
+      "IDC_GAUGE_SOUND_VOLUME": "ControlList/Dialog/Option/SoundEffectBar.json",
+      "IDC_BUTTON_MASTER_UP": "ControlList/Dialog/Option/Btn_MasterVolumeUp.json",
+      "IDC_BUTTON_MASTER_DOWN": "ControlList/Dialog/Option/Btn_MasterVolumeDown.json",
+      "IDC_BUTTON_MUSIC_UP": "ControlList/Dialog/Option/Btn_MusicUp.json",
+      "IDC_BUTTON_MUSIC_DOWN": "ControlList/Dialog/Option/Btn_MusicDown.json",
+      "IDC_BUTTON_SOUND_UP": "ControlList/Dialog/Option/Btn_SoundEffectUp.json",
+      "IDC_BUTTON_SOUND_DOWN": "ControlList/Dialog/Option/Btn_SoundEffectDown.json"
+    }
+  }
+}

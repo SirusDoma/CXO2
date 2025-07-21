@@ -1,0 +1,32 @@
+﻿{
+  "type": "List",
+  "require": {
+    "bndID": "0X1901A01A",
+    "template": {
+      "name": "IDC_CHANNEL_BUTTON",
+      "source": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Btn_Channel.json",
+      "bounds": [
+        "0X1901A01A",
+        "0X1901A01B",
+        "0X1901A01C",
+        "0X1901A01D",
+        "0X1901A01E",
+        "0X1901A01F",
+        "0X1901A020",
+        "0X1901A021",
+        "0X1901A022",
+        "0X1901A023",
+        "0X1901A024",
+        "0X1901A025",
+        "0X1901A026",
+        "0X1901A027",
+        "0X1901A028",
+        "0X1901A029",
+        "0X1901A02A",
+        "0X1901A02B",
+        "0X1901A02C",
+        "0X1901A02D"
+      ]
+    }
+  }
+}

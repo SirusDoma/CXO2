@@ -1,0 +1,11 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1A500020",
+    "bndID": "0X1A500020"
+  },
+  "attributes": {
+    "isLoop": true,
+    "speed": 0.5
+  }
+}

@@ -31,7 +31,7 @@ Gx::ResourcePtr<R> ObjectLoader::LoadFromJson(const std::string& name, const std
         return nullptr;
 
     Gx::ResourcePtr<R> resource;
-    auto ctx = Gx::ResourceContext::Rebind(context, name);
+    auto ctx = ResourceContextDecorator::Rebind(context, name);
     if (json.type() == Gx::Json::value_t::string)
         resource = loader->LoadFromFile(json.get<std::string>(), ctx);
     else

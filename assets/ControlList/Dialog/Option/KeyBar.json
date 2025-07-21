@@ -1,0 +1,13 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X2750000F"
+  },
+  "attributes": {
+    "frames": {
+      "default": {
+        "id": 7
+      }
+    }
+  }
+}

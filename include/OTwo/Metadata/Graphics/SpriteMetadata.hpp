@@ -9,7 +9,8 @@
 
 struct SpriteMetadata : TransformMetadata
 {
-    sf::Color     Color;
-    sf::IntRect   TexCoords;
-    Gx::BlendMode BlendMode;
+    sf::Color     Color     = sf::Color::White;
+    sf::IntRect   TexCoords = sf::IntRect();
+    Gx::BlendMode BlendMode = Gx::BlendMode::Auto;
+    std::optional<std::uint32_t> FrameID = std::nullopt;
 };

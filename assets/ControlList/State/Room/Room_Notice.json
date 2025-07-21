@@ -1,0 +1,31 @@
+﻿{
+  "type": "Marquee",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf"
+  },
+  "attributes": {
+    "speed": 35,
+    "fontSize": 12,
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "color": {
+      "a": 255,
+      "r": 135,
+      "g": 200,
+      "b": 60
+    },
+    "outline": {
+      "thickness": 0.300,
+      "color": {
+        "a": 255,
+        "r": 135,
+        "g": 200,
+        "b": 60
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "List",
+  "require": {
+    "bndID": "0X1560001E",
+    "template": {
+      "name": "IDC_CONTAINER_ITEM",
+      "source": "ControlList/State/MyRoom/MyRoom_Bag_Item.json",
+      "bounds": [
+        "0X1560001E",
+        "0X1560001F",
+        "0X15600020",
+        "0X15600021",
+        "0X15600022",
+        "0X15600023",
+        "0X15600024",
+        "0X15600025",
+        "0X15600026",
+        "0X15600027"
+      ]
+    }
+  }
+}

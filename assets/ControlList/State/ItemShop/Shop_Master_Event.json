@@ -1,0 +1,131 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_MAIN": {
+        "type": "Image",
+        "require": {
+          "sheet": "shop_master_Event_main.ojs"
+        }
+      },
+      "IDC_ANIMATION_EYES": {
+        "type": "Animation",
+        "require": {
+          "sheet": "shop_master_Event_Closeeye.ojs"
+        },
+        "attributes": {
+          "duration": 3000,
+          "isLoop": true,
+          "frames": [
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 43,
+                "height": 32
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 43,
+                "height": 32
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            },
+            {
+              "texCoords": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0
+              }
+            }
+          ]
+        }
+      },
+      "IDC_ANIMATION_SPEECH": {
+        "type": "Animation",
+        "require": {
+          "sheet": "shop_master_Event_Say.ojs"
+        },
+        "attributes": {
+          "duration": 300,
+          "repeatCount": 7
+        }
+      }
+    }
+  }
+}

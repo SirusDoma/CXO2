@@ -1,0 +1,12 @@
+﻿{
+  "type": "ScrollBar",
+  "require": {
+    "refID": "0X1320001F",
+    "localBndID": "0X13200020"
+  },
+  "attributes": {
+    "orientation": "Vertical",
+    "step": 1,
+    "maximum": 50
+  }
+}

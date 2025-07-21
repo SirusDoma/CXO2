@@ -49,7 +49,18 @@ Gx::ResourcePtr<Equalizer> EqualizerLoader::LoadFromMetadata(const ResourceMetad
     equalizer->SetPosition(metadata->Position);
     equalizer->SetScale(metadata->Scale);
     equalizer->SetRotation(metadata->Rotation);
-    equalizer->SetLocalBounds(metadata->Bounds);
+    equalizer->SetLocalBounds(
+        {
+            {
+                static_cast<float>(metadata->Bounds.position.x),
+                static_cast<float>(metadata->Bounds.position.y)
+            },
+            {
+                static_cast<float>(metadata->Bounds.size.x),
+                static_cast<float>(metadata->Bounds.size.y)
+            }
+        }
+    );
 
     auto metaLoader = MetadataLoader();
     for (auto [key, value] : meta.Require)

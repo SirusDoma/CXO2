@@ -1,0 +1,26 @@
+{
+  "type": "ChatPanel",
+  "require": {
+    "bndID": "0X1B000002"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_BACKGROUND": {
+        "type": "Image",
+        "require": {
+          "refID": "0X1B500002"
+        },
+        "attributes": {
+          "color": {
+            "a": 127,
+            "r": 255,
+            "g": 255,
+            "b": 255
+          }
+        }
+      },
+      "IDC_CHAT_WINDOW": "ControlList/State/Playing7K/Playing_ChatWindow.json",
+      "IDC_EDIT_CHAT": "ControlList/State/Playing7K/Playing_ChatInput.json"
+    }
+  }
+}

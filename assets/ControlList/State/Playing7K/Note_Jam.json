@@ -1,0 +1,15 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1B500059"
+  },
+  "attributes": {
+    "alignment": "Center",
+    "transform": {
+      "position": {
+        "x": 96,
+        "y": 130
+      }
+    }
+  }
+}

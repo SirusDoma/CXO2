@@ -20,6 +20,8 @@ public:
     template<typename R>
     void Add(const std::string& name, Gx::ResourcePtr<R> object, Gx::ResourceContext& ctx);
 
+    const Gx::Node& GetNode() const;
+
 private:
     explicit ObjectContainer(Gx::Node* container, bool importOnly = false);
 

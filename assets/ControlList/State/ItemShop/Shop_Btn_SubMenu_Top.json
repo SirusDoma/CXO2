@@ -1,0 +1,13 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "refID": "0X1420800E"
+  },
+  "attributes": {
+    "states": {
+      "normal": { "id": 0 },
+      "hover": { "id": 0 },
+      "active": { "id": 1 }
+    }
+  }
+}

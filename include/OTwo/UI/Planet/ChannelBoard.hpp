@@ -6,16 +6,11 @@
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/TaskContainer.hpp>
 #include <Genode/IO/ResourceManager.hpp>
-#include <Genode/Tween/Move.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/Button.hpp>
 #include <Genode/UI/UiContainer.hpp>
-#include <Genode/UI/List.hpp>
 
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 
 #include <functional>
 

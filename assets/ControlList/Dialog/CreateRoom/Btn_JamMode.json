@@ -1,0 +1,12 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "refID": "0X25205005",
+    "bndID": "0X25205005"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_ANIMATION_JAM": "ControlList/Dialog/CreateRoom/JamModeAnimation.json"
+    }
+  }
+}

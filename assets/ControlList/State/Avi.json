@@ -1,0 +1,16 @@
+{
+  "type": "State",
+  "name": "STATE_AVI",
+  "require": {},
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_STATE_LOGO": {
+        "type": "Image",
+        "require": {
+          "refID": "0X18100001",
+          "bndID": "0X18100001"
+        }
+      }
+    }
+  }
+}

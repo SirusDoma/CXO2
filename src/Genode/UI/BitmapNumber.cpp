@@ -264,6 +264,9 @@ namespace Gx
         m_vertices = sf::VertexArray(sf::PrimitiveType::Triangles, 6 * 10);
         m_width    = 0;
 
+        if (m_texCoords.empty())
+            return;
+
         unsigned digit = 0, digitCount = 0, leadingCount = 0, value = m_value;
         if (value > 0)
         {

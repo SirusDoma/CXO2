@@ -15,7 +15,7 @@ struct ItemMetadata : ResourceMetadata
         ::Gender      Gender;
         ::RenderPart  RenderPart;
         ::Instrument  Instrument;
-        std::string   Reference;
+        Gx::Json      Reference;
     };
 
     unsigned int                     ID;
@@ -23,7 +23,8 @@ struct ItemMetadata : ResourceMetadata
     ::Planet                         Origin;
     ::Gender                         Gender;
     bool                             IsNew;
-    sf::String                       Name, Description, SmallThumbnail, LargeThumbnail;
+    sf::String                       Name, Description;
+    Gx::Json                         SmallThumbnail, LargeThumbnail;
     std::map<Currency, unsigned int> Prices;
     std::vector<ItemSpriteMetadata>  References = std::vector<ItemSpriteMetadata>();
 };

@@ -1,0 +1,43 @@
+{
+  "type": "Dialog",
+  "require": {
+    "refID": "0X22100001"
+  },
+  "attributes": {
+    "label": {
+      "type": "Label",
+      "require": {
+        "font": "Interface/Common/Font.Unicode.ttf"
+      },
+      "attributes": {
+        "fontSize": 10,
+        "transform": {
+          "position": {
+            "x": 174,
+            "y": 105
+          },
+          "origin": {
+            "x": 69,
+            "y": 14
+          }
+        }
+      }
+    },
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X22200002",
+          "bndID": "0X22200002"
+        }
+      },
+      "cancel": {
+        "type": "Button",
+        "require": {
+          "refID": "0X22200003",
+          "bndID": "0X22200003"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X1A50002E",
+    "bndID": "0X1A50002F"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_THUMBNAIL": {
+        "type": "Image",
+        "require": {
+          "bndID": "0X1A500030"
+        }
+      },
+      "IDC_IMAGE_NEW": "ControlList/State/MusicShop/MusicShop_ShopItemNew.json",
+      "IDC_TEXT_TITLE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400031"
+        },
+        "attributes": {
+          "fontSize": 13,
+          "string": "Music Sample Title"
+        }
+      },
+      "IDC_TEXT_ARTIST": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400032"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "Unknown"
+        }
+      },
+      "IDC_TEXT_EDITOR": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400033"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "Unknown"
+        }
+      },
+      "IDC_TEXT_GENRE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400034"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "Etc."
+        }
+      },
+      "IDC_TEXT_BPM": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400035"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "120"
+        }
+      },
+      "IDC_TEXT_TIME": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400036"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "01:35"
+        }
+      },
+      "IDC_TEXT_LEVEL": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A500037"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "05 / 21 / 36"
+        }
+      },
+      "IDC_TEXT_GEM_PRICE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X1A400038"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "15000"
+        }
+      },
+      "IDC_BUTTON_BUY": "ControlList/State/MusicShop/MusicShop_Btn_ShopItemBuy.json"
+    }
+  }
+}

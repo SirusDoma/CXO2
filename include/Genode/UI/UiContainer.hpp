@@ -19,6 +19,8 @@ namespace Gx
     public:
         UiContainer();
 
+        sf::FloatRect GetGlobalBounds() const override;
+
         sf::FloatRect GetLocalBounds() const override;
         virtual void SetLocalBounds(const sf::FloatRect& bounds);
 
@@ -37,7 +39,8 @@ namespace Gx
         void Invalidate() override;
 
     private:
-        sf::FloatRect m_computedBounds;
+        sf::FloatRect m_computedLocalBounds;
+        sf::FloatRect m_computedGlobalBounds;
         sf::FloatRect m_localBounds;
         bool m_useBatching{false};
     };

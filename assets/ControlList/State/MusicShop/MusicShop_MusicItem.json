@@ -1,0 +1,57 @@
+{
+  "type": "UiContainer",
+  "require": {
+    "localBndID": "0X1A01903B"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_TOGGLE_SELECT": "ControlList/State/MusicShop/MusicShop_Btn_MusicItemCheck.json",
+      "IDC_TEXT_GENRE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "localBndID": "0X1A400048"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "Etc."
+        }
+      },
+      "IDC_TEXT_TITLE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "localBndID": "0X1A400049"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "Music Title Sample"
+        }
+      },
+      "IDC_TEXT_LEVEL": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "localBndID": "0X1A40004A"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "16/24/38"
+        }
+      },
+      "IDC_TEXT_TIME": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "localBndID": "0X1A40004B"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "string": "02:35"
+        }
+      },
+      "IDC_IMAGE_STATUS": "ControlList/State/MusicShop/MusicShop_MusicItemStatus.json",
+      "IDC_IMAGE_SELECTOR": "ControlList/State/MusicShop/MusicShop_Select.json"
+    }
+  }
+}

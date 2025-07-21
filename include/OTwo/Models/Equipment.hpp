@@ -1,6 +1,7 @@
 #pragma once
+#include <cstdint>
 
-enum class EquipmentType
+enum class EquipmentType : std::uint8_t
 {
     Body,
     LeftArm,
@@ -18,9 +19,9 @@ enum class EquipmentType
     Pants,
     Shoes,
     Keyboard,
-    Bass,
-    Drum,
     Guitar,
+    Drum,
+    Bass,
     Top,
     Wings,
     InstrumentAccessories,
@@ -33,20 +34,21 @@ enum class EquipmentType
     Costume
 };
 
-enum class RenderPart
+enum class RenderPart : std::uint8_t
 {
-    SmallThumbnail,
     LargeThumbnail,
+    SmallThumbnail,
     Body,
-    RightArm,
     LeftArm,
+    RightArm,
     Back
 };
-enum class Instrument
+
+enum class Instrument : std::uint8_t
 {
     None,
-    Bass,
     Guitar,
+    Bass,
     Keyboard,
     Drum
 };

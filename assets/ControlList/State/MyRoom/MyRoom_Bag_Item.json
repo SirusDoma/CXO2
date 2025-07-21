@@ -1,0 +1,21 @@
+{
+  "type": "UiContainer",
+  "require": {
+    "localBndID": "0X1560001E"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_THUMBNAIL": {
+        "type": "Image",
+        "attributes": {
+          "bounds": "0X1560001E",
+          "sizeMode": "Center"
+        }
+      },
+      "IDC_TEXT_QUANTITY": {
+        "type": "Label",
+        "attributes": {}
+      }
+    }
+  }
+}

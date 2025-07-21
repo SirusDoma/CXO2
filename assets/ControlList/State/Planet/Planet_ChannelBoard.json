@@ -1,0 +1,32 @@
+﻿{
+  "type": "ChannelBoard",
+  "require": {
+    "refID": "0X19500002",
+    "bndID": "0X19500002"
+  },
+  "attributes": {
+    "channelCount": 20,
+    "objects": {
+      "IDC_CONTAINER_CHANNEL_CONTROLS": {
+        "type": "UiContainer",
+        "require": {
+          "bndID": "0X19500002"
+        },
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_CHANNEL_CATEGORY": "ControlList/State/Planet/ChannelBoard/Planet_ChannelCategory.json",
+            "IDC_LIST_CHANNEL": "ControlList/State/Planet/ChannelBoard/Planet_ChannelList.json",
+            "IDC_BUTTON_CHANNEL_ENTER": "ControlList/State/Planet/ChannelBoard/Planet_Btn_ChannelEnter.json"
+          }
+        }
+      },
+      "IDC_IMAGE_CHANNEL_NOTICE": "ControlList/State/Planet/ChannelBoard/Planet_ChannelNotice.json",
+      "IDC_BUTTON_CHANNEL_LEFT": "ControlList/State/Planet/ChannelBoard/Planet_Btn_ChannelLeft.json",
+      "IDC_BUTTON_CHANNEL_RIGHT": "ControlList/State/Planet/ChannelBoard/Planet_Btn_ChannelRight.json",
+      "IDC_BUTTON_CHANNEL_TAB": "ControlList/State/Planet/ChannelBoard/Planet_Tab_Channel.json",
+      "IDC_BUTTON_NOTICE_TAB": "ControlList/State/Planet/ChannelBoard/Planet_Tab_Notice.json",
+      "IDC_NUMBER_CURRENT_CHANNEL_PAGE": "ControlList/State/Planet/ChannelBoard/Planet_Channel_LeftPageNumber.json",
+      "IDC_NUMBER_MAX_CHANNEL_PAGE": "ControlList/State/Planet/ChannelBoard/Planet_Channel_RightPageNumber.json"
+    }
+  }
+}

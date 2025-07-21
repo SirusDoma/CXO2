@@ -21,3 +21,7 @@ const std::string& ObjectContainer::GetName() const
     return m_container->GetName();
 }
 
+const Gx::Node& ObjectContainer::GetNode() const
+{
+    return *m_container;
+}

@@ -5,7 +5,8 @@
 
 struct InputFieldMetadata : public LabelMetadata
 {
-    sf::FloatRect Bounds;
-    unsigned int  MaximumLength;
-    sf::Color     HighlightTextColor, HighlightBackColor;
+    sf::IntRect   Bounds             = sf::IntRect();
+    unsigned int  MaximumLength      = 0;
+    sf::Color     HighlightTextColor = sf::Color::Black;
+    sf::Color     HighlightBackColor = sf::Color::White;
 };

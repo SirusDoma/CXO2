@@ -1,0 +1,14 @@
+﻿{
+  "type": "ChatPanel",
+  "require": {
+    "bndID": "0X16800031"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_CHAT_WINDOW": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatWindow.json",
+      "IDC_EDIT_CHAT": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatInput.json",
+      "IDC_CONTAINER_CHAT_SCROLL_CONTROLS": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatScrollControls.json",
+      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatButtonList.json"
+    }
+  }
+}

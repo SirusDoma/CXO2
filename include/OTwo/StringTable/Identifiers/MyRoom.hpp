@@ -2,36 +2,37 @@
 
 namespace StringTable::Identifiers::Resource::MyRoom
 {
-    constexpr static auto IDC_AVATAR                       = "STATE_MY_ROOM/IDC_AVATAR";
-    constexpr static auto IDC_IMAGE_MYBAG_SELECT           = "STATE_MY_ROOM/IDC_IMAGE_MYBAG_SELECT";
-    constexpr static auto IDC_LIST_BAG                     = "STATE_MY_ROOM/IDC_LIST_BAG";
-    constexpr static auto IDC_SCROLL_MYBAG                 = "STATE_MY_ROOM/IDC_SCROLL_MYBAG";
-    constexpr static auto IDC_BUTTON_SCROLL_LEFT           = "STATE_MY_ROOM/IDC_BUTTON_SCROLL_LEFT";
-    constexpr static auto IDC_BUTTON_SCROLL_RIGHT          = "STATE_MY_ROOM/IDC_BUTTON_SCROLL_RIGHT";
-    constexpr static auto IDC_NUMBER_GEM                   = "STATE_MY_ROOM/IDC_NUMBER_GEM";
-    constexpr static auto IDC_NUMBER_CASH                  = "STATE_MY_ROOM/IDC_NUMBER_CASH";
-    constexpr static auto IDC_IMAGE_STATUS                 = "STATE_MY_ROOM/IDC_IMAGE_STATUS";
-    constexpr static auto IDC_TOGGLE_INVENTORY             = "STATE_MY_ROOM/IDC_TOGGLE_INVENTORY";
-    constexpr static auto IDC_CONTAINER_EQUIPMENTS         = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS";
-    constexpr static auto IDC_IMAGE_INSTRUMENT             = "STATE_MY_ROOM/IDC_IMAGE_INSTRUMENT";
-    constexpr static auto IDC_IMAGE_HAIR                   = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_HAIR";
-    constexpr static auto IDC_IMAGE_HAIR_ACCESSORIES       = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_HAIR_ACCESSORIES";
-    constexpr static auto IDC_IMAGE_WINGS                  = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_WINGS";
-    constexpr static auto IDC_IMAGE_ACCESSORIES            = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_ACCESSORIES";
-    constexpr static auto IDC_IMAGE_INSTRUMENT_ACCESSORIES = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_INSTRUMENT_ACCESSORIES";
-    constexpr static auto IDC_IMAGE_PET                    = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_PET";
-    constexpr static auto IDC_IMAGE_TOP                    = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_TOP";
-    constexpr static auto IDC_IMAGE_PANTS                  = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_PANTS";
-    constexpr static auto IDC_IMAGE_SHOES                  = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_SHOES";
-    constexpr static auto IDC_IMAGE_GLASSES                = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_GLASSES";
-    constexpr static auto IDC_IMAGE_EARRINGS               = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_EARRINGS";
-    constexpr static auto IDC_IMAGE_NECKLACE               = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_NECKLACE";
-    constexpr static auto IDC_IMAGE_GLOVES                 = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_GLOVES";
-    constexpr static auto IDC_IMAGE_CLOTHES_ACCESSORIES    = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_CLOTHES_ACCESSORIES";
-    constexpr static auto IDC_BUTTON_SELL                  = "STATE_MY_ROOM/IDC_BUTTON_SELL";
-    constexpr static auto IDC_BUTTON_SHOP                  = "STATE_MY_ROOM/IDC_BUTTON_SHOP";
-    constexpr static auto IDC_BUTTON_BACK                  = "STATE_MY_ROOM/IDC_BUTTON_BACK";
-    constexpr static auto IDC_DIALOG_SKILL_INFO            = "STATE_MY_ROOM/IDC_DIALOG_SKILL_INFO";
+    constexpr static auto IDC_AVATAR                        = "STATE_MY_ROOM/IDC_AVATAR";
+    constexpr static auto IDC_IMAGE_MYBAG_SELECT            = "STATE_MY_ROOM/IDC_IMAGE_MYBAG_SELECT";
+    constexpr static auto IDC_LIST_BAG                      = "STATE_MY_ROOM/IDC_LIST_BAG";
+    constexpr static auto IDC_CONTAINER_BAG_SCROLL_CONTROLS = "STATE_MY_ROOM/IDC_CONTAINER_BAG_SCROLL_CONTROLS";
+    constexpr static auto IDC_SCROLL_MYBAG                  = "STATE_MY_ROOM/IDC_CONTAINER_BAG_SCROLL_CONTROLS/IDC_SCROLL_MYBAG";
+    constexpr static auto IDC_BUTTON_SCROLL_LEFT            = "STATE_MY_ROOM/IDC_CONTAINER_BAG_SCROLL_CONTROLS/IDC_BUTTON_SCROLL_LEFT";
+    constexpr static auto IDC_BUTTON_SCROLL_RIGHT           = "STATE_MY_ROOM/IDC_CONTAINER_BAG_SCROLL_CONTROLS/IDC_BUTTON_SCROLL_RIGHT";
+    constexpr static auto IDC_NUMBER_GEM                    = "STATE_MY_ROOM/IDC_NUMBER_GEM";
+    constexpr static auto IDC_NUMBER_CASH                   = "STATE_MY_ROOM/IDC_NUMBER_CASH";
+    constexpr static auto IDC_IMAGE_STATUS                  = "STATE_MY_ROOM/IDC_IMAGE_STATUS";
+    constexpr static auto IDC_TOGGLE_INVENTORY              = "STATE_MY_ROOM/IDC_TOGGLE_INVENTORY";
+    constexpr static auto IDC_CONTAINER_EQUIPMENTS          = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS";
+    constexpr static auto IDC_IMAGE_INSTRUMENT              = "STATE_MY_ROOM/IDC_IMAGE_INSTRUMENT";
+    constexpr static auto IDC_IMAGE_HAIR                    = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_HAIR";
+    constexpr static auto IDC_IMAGE_HAIR_ACCESSORIES        = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_HAIR_ACCESSORIES";
+    constexpr static auto IDC_IMAGE_WINGS                   = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_WINGS";
+    constexpr static auto IDC_IMAGE_ACCESSORIES             = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_ACCESSORIES";
+    constexpr static auto IDC_IMAGE_INSTRUMENT_ACCESSORIES  = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_INSTRUMENT_ACCESSORIES";
+    constexpr static auto IDC_IMAGE_PET                     = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_PET";
+    constexpr static auto IDC_IMAGE_TOP                     = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_TOP";
+    constexpr static auto IDC_IMAGE_PANTS                   = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_PANTS";
+    constexpr static auto IDC_IMAGE_SHOES                   = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_SHOES";
+    constexpr static auto IDC_IMAGE_GLASSES                 = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_GLASSES";
+    constexpr static auto IDC_IMAGE_EARRINGS                = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_EARRINGS";
+    constexpr static auto IDC_IMAGE_NECKLACE                = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_NECKLACE";
+    constexpr static auto IDC_IMAGE_GLOVES                  = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_GLOVES";
+    constexpr static auto IDC_IMAGE_CLOTHES_ACCESSORIES     = "STATE_MY_ROOM/IDC_CONTAINER_EQUIPMENTS/IDC_IMAGE_CLOTHES_ACCESSORIES";
+    constexpr static auto IDC_BUTTON_SELL                   = "STATE_MY_ROOM/IDC_BUTTON_SELL";
+    constexpr static auto IDC_BUTTON_SHOP                   = "STATE_MY_ROOM/IDC_BUTTON_SHOP";
+    constexpr static auto IDC_BUTTON_BACK                   = "STATE_MY_ROOM/IDC_BUTTON_BACK";
+    constexpr static auto IDC_DIALOG_SKILL_INFO             = "STATE_MY_ROOM/IDC_DIALOG_SKILL_INFO";
 
     namespace Item
     {

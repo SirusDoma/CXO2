@@ -1,0 +1,65 @@
+{
+  "type": "List",
+  "attributes": {
+    "layouts": [
+      {
+        "position": {
+          "x": 153,
+          "y": 129
+        }
+      },
+      {
+        "position": {
+          "x": 295,
+          "y": 104
+        }
+      },
+      {
+        "position": {
+          "x": 437,
+          "y": 104
+        }
+      },
+      {
+        "position": {
+          "x": 579,
+          "y": 129
+        }
+      },
+      {
+        "position": {
+          "x": 153,
+          "y": 288
+        }
+      },
+      {
+        "position": {
+          "x": 295,
+          "y": 263
+        }
+      },
+      {
+        "position": {
+          "x": 437,
+          "y": 263
+        }
+      },
+      {
+        "position": {
+          "x": 579,
+          "y": 288
+        }
+      }
+    ],
+    "objects": {
+      "IDC_CONTAINER_AVATAR_1": "ControlList/State/Playing7K/Avatar_1.json",
+      "IDC_CONTAINER_AVATAR_2": "ControlList/State/Playing7K/Avatar_2.json",
+      "IDC_CONTAINER_AVATAR_3": "ControlList/State/Playing7K/Avatar_3.json",
+      "IDC_CONTAINER_AVATAR_4": "ControlList/State/Playing7K/Avatar_4.json",
+      "IDC_CONTAINER_AVATAR_5": "ControlList/State/Playing7K/Avatar_5.json",
+      "IDC_CONTAINER_AVATAR_6": "ControlList/State/Playing7K/Avatar_6.json",
+      "IDC_CONTAINER_AVATAR_7": "ControlList/State/Playing7K/Avatar_7.json",
+      "IDC_CONTAINER_AVATAR_8": "ControlList/State/Playing7K/Avatar_8.json"
+    }
+  }
+}

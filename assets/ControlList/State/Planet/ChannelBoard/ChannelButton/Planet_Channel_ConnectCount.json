@@ -1,0 +1,44 @@
+﻿{
+  "type": "UiContainer",
+  "require": {
+    "bndID": "0X19500032"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_CHANNEL_COUNT_01": {
+        "type": "Image",
+        "require": {
+          "refID": "0X19500032"
+        }
+      },
+      "IDC_IMAGE_CHANNEL_COUNT_02": {
+        "type": "Image",
+        "require": {
+          "refID": "0X19500033",
+          "bndID": "0X19500033"
+        }
+      },
+      "IDC_IMAGE_CHANNEL_COUNT_03": {
+        "type": "Image",
+        "require": {
+          "refID": "0X19500034",
+          "bndID": "0X19500034"
+        }
+      },
+      "IDC_IMAGE_CHANNEL_COUNT_04": {
+        "type": "Image",
+        "require": {
+          "refID": "0X19500035",
+          "bndID": "0X19500035"
+        }
+      },
+      "IDC_IMAGE_CHANNEL_COUNT_05": {
+        "type": "Image",
+        "require": {
+          "refID": "0X19500036",
+          "bndID": "0X19500036"
+        }
+      }
+    }
+  }
+}

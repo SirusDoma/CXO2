@@ -5,9 +5,17 @@
 namespace Gx
 {
     UiContainer::UiContainer() :
-        m_computedBounds(),
+        m_computedLocalBounds(),
         m_localBounds()
     {
+    }
+
+    sf::FloatRect UiContainer::GetGlobalBounds() const
+    {
+        if (m_localBounds != sf::FloatRect())
+            return Control::GetGlobalBounds();
+
+        return m_computedGlobalBounds;
     }
 
     sf::FloatRect UiContainer::GetLocalBounds() const
@@ -15,7 +23,7 @@ namespace Gx
         if (m_localBounds != sf::FloatRect())
             return m_localBounds;
 
-        return m_computedBounds;
+        return m_computedLocalBounds;
     }
 
     void UiContainer::SetLocalBounds(const sf::FloatRect& bounds)
@@ -38,7 +46,6 @@ namespace Gx
         m_useBatching = batchingEnabled;
     }
 
-
     void UiContainer::Apply(const std::function<void(Control&)>& fun) const
     {
         if (!fun)
@@ -50,7 +57,6 @@ namespace Gx
                 fun(*control);
         }
     }
-
 
     void UiContainer::OnControlClick(Control& sender, const sf::Event::MouseButtonReleased& ev)
     {
@@ -133,25 +139,31 @@ namespace Gx
             if (!control)
                 continue;
 
+            if (const auto container = dynamic_cast<UiContainer*>(control))
+                container->Invalidate();
+
             const auto bounds = control->GetGlobalBounds();
             if (first)
             {
                 result.position.x = bounds.position.x;
-                result.position.y  = bounds.position.y;
+                result.position.y = bounds.position.y;
                 first = false;
             }
 
             if (result.position.x > bounds.position.x)
                 result.position.x = bounds.position.x;
-            if (result.position.y  > bounds.position.y)
-                result.position.y  = bounds.position.y;
+            if (result.position.y > bounds.position.y)
+                result.position.y = bounds.position.y;
 
-            if (result.size.x  < bounds.position.x + bounds.size.x)
-                result.size.x  = bounds.position.x + bounds.size.x;
-            if (result.size.y < bounds.position.y  + bounds.size.y)
-                result.size.y = bounds.position.y  + bounds.size.y;
+            if (result.size.x < bounds.position.x + bounds.size.x)
+                result.size.x = bounds.position.x + bounds.size.x;
+            if (result.size.y < bounds.position.y + bounds.size.y)
+                result.size.y = bounds.position.y + bounds.size.y;
         }
 
-        m_computedBounds = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(result.size.x - result.position.x, result.size.y - result.position.y));
+        m_computedLocalBounds = sf::FloatRect(sf::Vector2f(0, 0),
+            sf::Vector2f(result.size.x - result.position.x, result.size.y - result.position.y));
+
+        m_computedGlobalBounds = sf::FloatRect(result.position, m_computedLocalBounds.size);
     }
 }

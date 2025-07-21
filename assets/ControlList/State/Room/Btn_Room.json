@@ -1,0 +1,30 @@
+﻿{
+  "type": "RoomButton",
+  "attributes": {
+    "frames": {
+      "normal": {},
+      "o2mi-danger": {},
+      "o2mi-low": {},
+      "o2mo-danger": {},
+      "o2mo-normal": {},
+      "o2mi-normal": {}
+    },
+    "objects": {
+      "IDC_NUMBER_ROOM_ID": "ControlList/State/Room/RoomButton/Room_Number.json",
+      "IDC_IMAGE_STATE": "ControlList/State/Room/RoomButton/Room_State.json",
+      "IDC_IMAGE_NEW_MUSIC": "ControlList/State/Room/RoomButton/Room_NewMusicMark.json",
+      "IDC_IMAGE_GAME_MODE": "ControlList/State/Room/RoomButton/Room_Mode.json",
+      "IDC_IMAGE_GAME_SPEED": "ControlList/State/Room/RoomButton/Room_Speed.json",
+      "IDC_IMAGE_LEVEL_LIMIT": "ControlList/State/Room/RoomButton/Room_LevelLimit.json",
+      "IDC_IMAGE_NOT_HAVE": "ControlList/State/Room/RoomButton/Room_NotHave.json",
+      "IDC_IMAGE_PASSWORD": "ControlList/State/Room/RoomButton/Room_Password.json",
+      "IDC_IMAGE_OHM_LEVEL":"ControlList/State/Room/RoomButton/Room_OhmLevel.json",
+      "IDC_TEXT_ROOM_NAME": "ControlList/State/Room/RoomButton/Room_Name.json",
+      "IDC_TEXT_MUSIC_NAME": "ControlList/State/Room/RoomButton/Room_MusicName.json",
+      "IDC_TEXT_NEW_MUSIC_NAME": "ControlList/State/Room/RoomButton/Room_NewMusicName.json",
+      "IDC_TEXT_CAPACITY": "ControlList/State/Room/RoomButton/Room_Capacity.json",
+      "IDC_TEXT_LEVEL_RANGE": "ControlList/State/Room/RoomButton/Room_LevelRange.json",
+      "IDC_IMAGE_ROOM_HOVER": "ControlList/State/Room/RoomButton/Room_Btn_Hover.json"
+    }
+  }
+}

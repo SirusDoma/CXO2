@@ -1,0 +1,22 @@
+﻿{
+  "type": "List",
+  "require": {
+    "bndID": "0X16201011",
+    "template": {
+      "bounds": [
+        "0X16201011",
+        "0X16201012",
+        "0X16201013",
+        "0X16201014"
+      ]
+    }
+  },
+  "attributes": {
+    "objects": {
+      "IDC_RADIO_CHAT_ALL": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatAll.json",
+      "IDC_RADIO_CHAT_FRIEND": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatFriend.json",
+      "IDC_RADIO_CHAT_GUILD": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatGuild.json",
+      "IDC_RADIO_CHAT_WHISPER": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatWhisper.json"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1B500057",
+    "format": "{Name}{MapID}.{Extension}"
+  },
+  "attributes": {
+    "alignment": "Center",
+    "blend": "additive",
+    "transform": {
+      "position": {
+        "x": 99,
+        "y": 340
+      }
+    }
+  }
+}

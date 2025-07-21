@@ -1,0 +1,23 @@
+{
+  "type": "List",
+  "require": {
+    "bndID": "0X16015028",
+    "template": {
+      "name": "IDC_AVATAR",
+      "source": "ControlList/State/Waiting/Waiting7K/Avatar.json",
+      "bounds": [
+        "0X16015028",
+        "0X16015029",
+        "0X1601502A",
+        "0X1601502B",
+        "0X1601502C",
+        "0X1601502D",
+        "0X1601502E",
+        "0X1601502F"
+      ]
+    }
+  },
+  "attributes": {
+    "order": "Horizontal"
+  }
+}

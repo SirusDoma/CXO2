@@ -1,0 +1,33 @@
+{
+  "type": "Dialog",
+  "require": {
+    "refID": "0X21100001"
+  },
+  "attributes": {
+    "label": {
+      "type": "Label",
+      "require": {
+        "font": "Interface/Common/Font.Unicode.ttf"
+      },
+      "attributes": {
+        "fontSize": 10,
+        "alignment": "Center",
+        "transform": {
+          "position": {
+            "x": 160,
+            "y": 80
+          }
+        }
+      }
+    },
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X21200002",
+          "bndID": "0X21200002"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "UserList",
+  "require": {},
+  "attributes": {
+    "objects": {
+      "IDC_LIST_USER_BUTTON": "ControlList/State/Room/UserList/User_ButtonList.json",
+      "IDC_TEXT_USER_COUNT": "ControlList/State/Room/UserList/User_Count.json",
+      "IDC_BUTTON_REFRESH": "ControlList/State/Room/UserList/User_Btn_Refresh.json",
+      "IDC_BUTTON_USER_LEFT": "ControlList/State/Room/UserList/User_Btn_Left.json",
+      "IDC_BUTTON_USER_RIGHT": "ControlList/State/Room/UserList/User_Btn_Right.json"
+    }
+  }
+}

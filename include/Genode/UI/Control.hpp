@@ -21,10 +21,10 @@ namespace Gx
             double Delta;
         };
 
-        virtual sf::FloatRect GetLocalBounds() const = 0;
-        virtual sf::FloatRect GetGlobalBounds() const;
+        [[nodiscard]] virtual sf::FloatRect GetLocalBounds() const = 0;
+        [[nodiscard]] virtual sf::FloatRect GetGlobalBounds() const;
 
-        virtual bool IsFocused() const;
+        [[nodiscard]] virtual bool IsFocused() const;
         virtual void SetFocus(bool focus);
 
         void SetFocusChangedCallback(std::function<void(Control&, Event&)> callback);
@@ -46,13 +46,13 @@ namespace Gx
         virtual State GetControlState() const;
         virtual void SetControlState(const State& state);
 
-        const std::function<void(Control&, Event&)>& GetFocusChangedCallback() const;
-        const std::function<void(Control&, Event&)>& GetGainFocusCallback() const;
-        const std::function<void(Control&, Event&)>& GetLostFocusCallback() const;
-        const std::function<void(Control&, Event&)>& GetClickCallback() const;
-        const std::function<void(Control&, Event&)>& GetHoldClickCallback() const;
-        const std::function<void(Control&, Event&)>& GetDoubleClickCallback() const;
-        const std::function<void(Control&, Event&)>& GetScrollWheelCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetFocusChangedCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetGainFocusCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetLostFocusCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetClickCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetHoldClickCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetDoubleClickCallback() const;
+        [[nodiscard]] const std::function<void(Control&, Event&)>& GetScrollWheelCallback() const;
 
         void Update(double delta) override;
         RenderStates Render(RenderSurface& surface, RenderStates states) const override;

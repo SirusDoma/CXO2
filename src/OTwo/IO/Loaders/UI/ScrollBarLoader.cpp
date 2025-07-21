@@ -9,38 +9,41 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json& jso
 {
     ScrollBarMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-
-    if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        if (orientation->get<std::string>() == "VERTICAL")
-            metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Vertical;
+        const auto& attributes = it.value();
+        if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
+
+        if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
+        {
+            if (Gx::StringHelper::EqualsCaseInsensitive(orientation->get<std::string>(), "VERTICAL"))
+                metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Vertical;
+            else
+                metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Horizontal;
+        }
+
+        if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
+            metadata.Maximum = maximum->get<float>();
         else
-            metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Horizontal;
-    }
+            metadata.Maximum = 100.0f;
 
-    if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
-        metadata.Maximum = maximum->get<float>();
-    else
-        metadata.Maximum = 100.0f;
+        if (const auto step = attributes.find("step"); step != attributes.end())
+            metadata.Step = step->get<float>();
+        else
+            metadata.Step = 1.0f;
 
-    if (const auto step = attributes.find("step"); step != attributes.end())
-        metadata.Step = step->get<float>();
-    else
-        metadata.Step = 1.0f;
-
-    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
-    {
-        unsigned int x, y, w, h;
-        bounds->at("x").get_to(x);
-        bounds->at("y").get_to(y);
-        bounds->at("width").get_to(w);
-        bounds->at("height").get_to(h);
-        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
+        if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
+        {
+            unsigned int x, y, w, h;
+            bounds->at("x").get_to(x);
+            bounds->at("y").get_to(y);
+            bounds->at("width").get_to(w);
+            bounds->at("height").get_to(h);
+            metadata.Bounds = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
+        }
     }
 
     return LoadFromMetadata(metadata, context);
@@ -52,20 +55,79 @@ Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceM
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto scrollBar = std::make_unique<Gx::ScrollBar>();
+    auto scrollBar =Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
+    {
         scrollBar->SetTexture(*texture);
-    
+        scrollBar->SetTexCoords(metadata->TexCoords);
+        scrollBar->SetPosition(metadata->Position);
+        scrollBar->SetLocalBounds({
+            {
+                static_cast<float>(metadata->Bounds.position.x),
+                static_cast<float>(metadata->Bounds.position.y),
+            },
+            {
+                static_cast<float>(metadata->Bounds.size.x),
+                static_cast<float>(metadata->Bounds.size.y),
+            }
+        });
+    }
+    else
+    {
+        if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+        {
+            scrollBar->SetTexture(sheet->GetTexture());
+            if (metadata->TexCoords != sf::IntRect())
+                scrollBar->SetTexCoords(metadata->TexCoords);
+            else
+                scrollBar->SetTexCoords(sheet->TexCoords[0]);
+        }
+
+        const auto bound = ctx.Require<sf::IntRect>(*metadata);
+        if (metadata->Position != sf::Vector2f())
+        {
+            scrollBar->SetPosition(metadata->Position);
+        }
+        else if (bound)
+        {
+            scrollBar->SetPosition({
+                static_cast<float>(bound->position.x),
+                static_cast<float>(bound->position.y),
+            });
+        }
+
+        if (metadata->Bounds != sf::IntRect())
+        {
+            scrollBar->SetLocalBounds({
+                    {
+                        static_cast<float>(metadata->Bounds.position.x),
+                        static_cast<float>(metadata->Bounds.position.y),
+                    },
+                {
+                    static_cast<float>(metadata->Bounds.size.x),
+                    static_cast<float>(metadata->Bounds.size.y),
+                }
+            });
+        }
+        else if (bound)
+        {
+            scrollBar->SetLocalBounds({
+                {},
+                {
+                    static_cast<float>(bound->size.x),
+                    static_cast<float>(bound->size.y),
+                }
+            });
+        }
+    }
+
     scrollBar->SetName(metadata->Name);
     scrollBar->SetScrollOrientation(metadata->Orientation);
     scrollBar->SetMaximumValue(metadata->Maximum);
     scrollBar->SetStep(metadata->Step);
-    scrollBar->SetLocalBounds(metadata->Bounds);
-    scrollBar->SetTexCoords(metadata->TexCoords);
     scrollBar->SetColor(metadata->Color);
     scrollBar->SetOrigin(metadata->Origin);
-    scrollBar->SetPosition(metadata->Position);
     scrollBar->SetScale(metadata->Scale);
     scrollBar->SetRotation(metadata->Rotation);
 

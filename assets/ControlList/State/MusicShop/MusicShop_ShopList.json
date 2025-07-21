@@ -1,0 +1,17 @@
+{
+  "type": "List",
+  "require": {
+    "bndID": "0X1A018029",
+    "template": {
+      "name": "IDC_IMAGE_SHOP_ITEM",
+      "source": "ControlList/State/MusicShop/MusicShop_ShopItem.json",
+      "bounds": [
+        "0X1A018029",
+        "0X1A01802A",
+        "0X1A01802B",
+        "0X1A01802C",
+        "0X1A01802D"
+      ]
+    }
+  }
+}

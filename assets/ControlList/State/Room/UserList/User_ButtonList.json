@@ -1,0 +1,38 @@
+﻿{
+  "type": "List",
+  "require": {
+    "bndID": "0X13400038",
+    "template": {
+      "name": "IDC_USER_BUTTON",
+      "source": "ControlList/State/Room/UserList/Btn_User.json",
+      "bounds": [
+        "0X13400038",
+        "0X13400039",
+        "0X1340003A",
+        "0X1340003B",
+        "0X1340003C",
+        "0X1340003D",
+        "0X1340003E",
+        "0X1340003F",
+        "0X13400040",
+        "0X13400041"
+      ]
+    }
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 636,
+        "y": 272
+      }
+    },
+    "horizontal": {
+      "count": 1,
+      "spacing": 0
+    },
+    "vertical": {
+      "count": 20,
+      "spacing": 21
+    }
+  }
+}

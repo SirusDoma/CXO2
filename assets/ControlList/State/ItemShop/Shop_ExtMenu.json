@@ -1,0 +1,19 @@
+{
+  "type": "Image",
+  "attributes": {
+    "objects": {
+      "IDC_BUTTON_EXT_ALL": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_All.json",
+      "IDC_BUTTON_EXT_NORMAL": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Normal.json",
+      "IDC_BUTTON_EXT_AQUA": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Aqua.json",
+      "IDC_BUTTON_EXT_ELITEN": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Eliten.json",
+      "IDC_BUTTON_EXT_GRAFFITI": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Graffiti.json",
+      "IDC_BUTTON_EXT_BIKINI": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Bikini.json",
+      "IDC_BUTTON_EXT_CRUSH": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Crush.json",
+      "IDC_BUTTON_EXT_WONDERLAND": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Wonderland.json",
+      "IDC_BUTTON_EXT_MEGANUT": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Meganut.json",
+      "IDC_BUTTON_EXT_CRYSTAL": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Crystal.json",
+      "IDC_BUTTON_EXT_DRACONIC": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Draconic.json",
+      "IDC_BUTTON_EXT_EVENT": "ControlList/State/ItemShop/Shop_Btn_ExtMenu_Event.json"
+    }
+  }
+}

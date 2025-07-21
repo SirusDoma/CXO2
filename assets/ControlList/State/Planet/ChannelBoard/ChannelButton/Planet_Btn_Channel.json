@@ -1,0 +1,21 @@
+﻿{
+  "type": "ChannelButton",
+  "require": {
+    "refID": "0X1950002E",
+    "bndID": "0X1950002E"
+  },
+  "attributes": {
+    "mode": {
+      "beginner": {},
+      "intermediate": {},
+      "high": {}
+    },
+    "objects": {
+      "IDC_IMAGE_CHANNEL_NAME": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Channel_Name.json",
+      "IDC_NUMBER_CHANNEL_ID": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Channel_Number.json",
+      "IDC_IMAGE_CHANNEL_FULL": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Channel_Full.json",
+      "IDC_IMAGE_CHANNEL_FOCUS": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Btn_Channel_Hover.json",
+      "IDC_CONTAINER_CHANNEL_COUNTER": "ControlList/State/Planet/ChannelBoard/ChannelButton/Planet_Channel_ConnectCount.json"
+    }
+  }
+}

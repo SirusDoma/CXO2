@@ -224,6 +224,11 @@ void StateRoom::Initialize()
     const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
     const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
 
+    showAllButton->SetVisible(false);
+    showAllButton->SetEnabled(false);
+    waitingRoomButton->SetVisible(true);
+    waitingRoomButton->SetEnabled(true);
+
     showAllButton->SetClickCallback([=] (auto& sender, auto& ev) {
         m_mixer.Play(*sfxToggle, Sound::Channel::SFX);
 
@@ -233,7 +238,7 @@ void StateRoom::Initialize()
         waitingRoomButton->SetVisible(true);
         waitingRoomButton->SetEnabled(true);
 
-        roomList->ShowWaitingOnly();
+        roomList->ShowAll();
     });
 
     waitingRoomButton->SetClickCallback([=] (auto& sender, auto& ev) {
@@ -245,7 +250,7 @@ void StateRoom::Initialize()
         waitingRoomButton->SetVisible(false);
         waitingRoomButton->SetEnabled(false);
 
-        roomList->ShowAll();
+        roomList->ShowWaitingOnly();
     });
 
     const auto roomLeftButton  = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ROOM_LEFT);

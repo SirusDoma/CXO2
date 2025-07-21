@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <regex>
 #include <string>
+#include <Genode/Utilities/StringHelper.hpp>
 
 namespace Gx
 {
@@ -79,7 +80,9 @@ namespace Gx
 
     bool Node::Match(const Node& node, const std::string& pattern)
     {
-        return Match(node.m_name, pattern) || (node.m_parent && Match(node.m_name, fmt::format("{}/{}", node.m_parent->m_name, pattern)));
+        return Match(node.m_name, pattern) ||
+            (node.m_parent && Match(node.m_name, fmt::format("{}/{}", node.m_parent->m_name, pattern))) ||
+            (pattern.find("/") == std::string::npos && StringHelper::EndsWith(node.m_name, pattern));
     }
 
     bool Node::Match(const std::string& pattern) const

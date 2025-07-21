@@ -7,14 +7,15 @@
 #include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/UI/Room/RoomList.hpp>
 
-void ObjectLoader::LoadFromJson(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& ctx)
+void ObjectLoader::LoadFromJson(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& context)
 {
     const auto metaLoader = MetadataLoader();
     Gx::ResourcePtr<ResourceMetadata> metadata;
+
     if (json.type() == Gx::Json::value_t::string)
-        metadata = metaLoader.LoadFromFile(json.get<std::string>(), ctx);
+        metadata = metaLoader.LoadFromFile(json.get<std::string>(), context);
     else
-        metadata = metaLoader.LoadFromJson(json, ctx);
+        metadata = metaLoader.LoadFromJson(json, context);
 
     if (metadata == nullptr)
         throw Gx::ResourceLoadException("Failed to load metadata");
@@ -28,37 +29,37 @@ void ObjectLoader::LoadFromJson(const std::string& name, const Gx::Json& json, O
         }
         case ResourceMetadata::ResourceType::Sound:
         {
-            container.Add(name, LoadFromJson<sf::Sound>(name, json, ctx), ctx);
+            container.Add(name, LoadFromJson<sf::Sound>(name, json, context), context);
             break;
         }
         case ResourceMetadata::ResourceType::Music:
         {
-            container.Add(name, LoadFromJson<sf::Music>(name, json, ctx), ctx);
+            container.Add(name, LoadFromJson<sf::Music>(name, json, context), context);
             break;
         }
         case ResourceMetadata::ResourceType::OptionDialog:
         {
-            container.Add(name, LoadFromJson<OptionDialog>(name, type, json, ctx), ctx);
+            container.Add(name, LoadFromJson<OptionDialog>(name, type, json, context), context);
             break;
         }
         case ResourceMetadata::ResourceType::CreateRoomDialog:
         {
-            container.Add(name, LoadFromJson<CreateRoomDialog>(name, type, json, ctx), ctx);
+            container.Add(name, LoadFromJson<CreateRoomDialog>(name, type, json, context), context);
             break;
         }
         case ResourceMetadata::ResourceType::SelectMusicDialog:
         {
-            container.Add(name, LoadFromJson<SelectMusicDialog>(name, type, json, ctx), ctx);
+            container.Add(name, LoadFromJson<SelectMusicDialog>(name, type, json, context), context);
             break;
         }
         case ResourceMetadata::ResourceType::Dialog:
         {
-            container.Add(name, LoadFromJson<Gx::Dialog>(name, type, json, ctx), ctx);
+            container.Add(name, LoadFromJson<Gx::Dialog>(name, type, json, context), context);
             break;
         }
         default:
         {
-            container.Add(name, LoadFromJson<Gx::Node>(name, type, json, ctx), ctx);
+            container.Add(name, LoadFromJson<Gx::Node>(name, type, json, context), context);
             break;
         }
     }

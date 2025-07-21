@@ -34,7 +34,12 @@ bool MetadataLoader::Parse(const Gx::Json& json, ResourceMetadata& metadata, con
     if (const auto require = json.find("require"); require != json.end() && !require->empty())
     {
         for (auto [key, resource]: require->items())
-            metadata.Require[key] = resource;
+        {
+            if (Gx::StringHelper::EqualsCaseInsensitive(key, "format"))
+                metadata.SourceFormat = resource.get<std::string>();
+            else
+                metadata.Require[key] = resource;
+        }
     }
 
     if (const auto attributes = json.find("attributes"); attributes != json.end())

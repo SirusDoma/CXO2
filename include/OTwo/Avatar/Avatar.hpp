@@ -30,6 +30,9 @@ public:
     void Unequip(EquipmentType type);
     void ClearEquipments();
 
+    sf::Vector2f GetOffset() const;
+    void SetOffset(const sf::Vector2f& offset);
+
     AvatarInfo* GetAvatarInfo() const;
     const Instrument& GetEquipedInstrumentType() const;
     std::unordered_map<EquipmentType, const Item*> GetEquipedItems(bool includeDefaultItems = false) const;
@@ -44,8 +47,9 @@ private:
     void Update(double delta) override;
     Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-    Gender     m_gender;
-    Instrument m_instrument;
-    bool       m_alive;
+    Gender       m_gender;
+    Instrument   m_instrument;
+    bool         m_alive;
+    sf::Vector2f m_offset;
     mutable ItemMap m_items, m_defaultItems;
 };

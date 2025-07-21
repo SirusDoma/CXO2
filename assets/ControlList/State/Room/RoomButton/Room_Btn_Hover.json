@@ -1,0 +1,14 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "sheet": "Room_MOver.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": -1,
+        "y": -1
+      }
+    }
+  }
+}

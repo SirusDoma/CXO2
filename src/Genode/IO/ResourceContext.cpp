@@ -12,21 +12,21 @@ namespace Gx
     {
     }
 
-    ResourceContext::ResourceContext(std::string  id) :
+    ResourceContext::ResourceContext(const std::string& id) :
         m_id(std::move(id)),
         m_cacheMode(CacheMode::None),
         m_resources(nullptr)
     {
     }
 
-    ResourceContext::ResourceContext(std::string  id, ResourceManager& resources, const CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string& id, ResourceManager& resources, const CacheMode mode) :
         m_id(std::move(id)),
         m_cacheMode(mode),
         m_resources(&resources)
     {
     }
 
-    ResourceContext::ResourceContext(std::string  id, ResourceManager* resources, const CacheMode mode) :
+    ResourceContext::ResourceContext(const std::string& id, ResourceManager* resources, const CacheMode mode) :
         m_id(std::move(id)),
         m_cacheMode(mode),
         m_resources(resources)
@@ -46,6 +46,24 @@ namespace Gx
     bool ResourceContext::Available() const
     {
         return m_resources != nullptr;
+    }
+
+    const std::unordered_map<std::string, std::string>& ResourceContext::GetProperties() const
+    {
+        return m_properties;
+    }
+
+    std::optional<std::string> ResourceContext::GetProperty(const std::string& name) const
+    {
+        if (const auto it = m_properties.find(name); it != m_properties.end())
+            return it->second;
+
+        return std::nullopt;
+    }
+
+    void ResourceContext::SetProperty(const std::string& name, const std::string& value)
+    {
+        m_properties[name] = value;
     }
 
     CacheMode ResourceContext::GetCacheMode() const

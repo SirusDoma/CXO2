@@ -11,71 +11,76 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const
 {
     GaugeMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-
-    if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        if (orientation->get<std::string>() == "VERTICAL")
-            metadata.Orientation = Gx::Gauge::Orientation::Vertical;
-        else
-            metadata.Orientation = Gx::Gauge::Orientation::Horizontal;
-    }
+        const auto& attributes = it.value();
+        if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
 
-    if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
-        metadata.Maximum = maximum->get<float>();
-    else
-        metadata.Maximum = 100.0f;
-
-    if (const auto frames = attributes.find("frames"); frames != attributes.end())
-    {
-        for (const auto& frame : frames->items())
+        if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
         {
-            SpriteMetadata frameMetadata;
-            if (!SpriteLoader::ParseMetadata(frame.value(), frameMetadata, context))
-                continue;
-
-            auto transform = frame.value().find("transform");
-            std::optional position = frameMetadata.Position;
-            if (transform == frame.value().end() || transform.value().find("position") == transform->end())
-                position = std::nullopt;
-
-            std::optional scale = frameMetadata.Scale;
-            if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
-                scale = std::nullopt;
-
-            std::optional rotation = frameMetadata.Rotation;
-            if (transform == frame.value().end() || transform.value().find("rotation") == transform->end())
-                rotation = std::nullopt;
-
-            std::optional origin = frameMetadata.Origin;
-            if (transform == frame.value().end() || transform.value().find("origin") == transform->end())
-                origin = std::nullopt;
-
-            metadata.AnimationFrames.push_back(Gx::Animation::Frame
-            {
-                frameMetadata.TexCoords,
-                origin,
-                position,
-                rotation,
-                scale
-            });
+            if (Gx::StringHelper::EqualsCaseInsensitive(orientation->get<std::string>(), "VERTICAL"))
+                metadata.Orientation = Gx::Gauge::Orientation::Vertical;
+            else
+                metadata.Orientation = Gx::Gauge::Orientation::Horizontal;
         }
+
+        if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
+            metadata.Maximum = maximum->get<float>();
+        else
+            metadata.Maximum = 100.0f;
+
+        if (const auto frames = attributes.find("frames"); frames != attributes.end())
+        {
+            for (const auto& frame : frames->items())
+            {
+                SpriteMetadata frameMetadata;
+                if (!SpriteLoader::ParseMetadata(frame.value(), frameMetadata, context))
+                    continue;
+
+                auto transform = frame.value().find("transform");
+                std::optional position = frameMetadata.Position;
+                if (transform == frame.value().end() || transform.value().find("position") == transform->end())
+                    position = std::nullopt;
+
+                std::optional scale = frameMetadata.Scale;
+                if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
+                    scale = std::nullopt;
+
+                std::optional rotation = frameMetadata.Rotation;
+                if (transform == frame.value().end() || transform.value().find("rotation") == transform->end())
+                    rotation = std::nullopt;
+
+                std::optional origin = frameMetadata.Origin;
+                if (transform == frame.value().end() || transform.value().find("origin") == transform->end())
+                    origin = std::nullopt;
+
+                metadata.AnimationFrames.push_back(Gx::Animation::Frame
+                {
+                    frameMetadata.TexCoords,
+                    origin,
+                    position,
+                    rotation,
+                    scale
+                });
+            }
+        }
+
+        if (const auto duration = attributes.find("duration"); duration != attributes.end())
+            metadata.AnimationDuration = sf::milliseconds(duration->get<unsigned int>());
+        else
+            metadata.AnimationDuration = sf::milliseconds(metadata.AnimationFrames.size() * 60);
+
+        if (const auto flicker = attributes.find("flicker"); flicker != attributes.end())
+            metadata.Flicker = flicker->get<bool>();
+        else
+            metadata.Flicker = false;
+
+        if (const auto frame = attributes.find("frame"); frame != attributes.end())
+            metadata.FrameID = frame->get<std::uint32_t>();
     }
-
-    if (const auto duration = attributes.find("duration"); duration != attributes.end())
-        metadata.AnimationDuration = sf::milliseconds(duration->get<unsigned int>());
-    else
-        metadata.AnimationDuration = sf::milliseconds(metadata.AnimationFrames.size() * 60);
-
-    if (const auto flicker = attributes.find("flicker"); flicker != attributes.end())
-        metadata.Flicker = flicker->get<bool>();
-    else
-        metadata.Flicker = false;
-
 
     return LoadFromMetadata(metadata, context);
 }
@@ -86,23 +91,79 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata&
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto gauge = std::make_unique<Gx::Gauge>();
+    auto gauge = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
+    {
         gauge->SetTexture(*texture);
+        gauge->SetTexCoords(metadata->TexCoords);
+        gauge->SetPosition(metadata->Position);
+
+        for (const auto& frame : metadata->AnimationFrames)
+            gauge->AddAnimationFrame(frame);
+    }
+    else
+    {
+        if (metadata->Position != sf::Vector2f())
+        {
+            gauge->SetPosition(metadata->Position);
+        }
+        else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+        {
+            gauge->SetPosition({
+                static_cast<float>(bound->position.x),
+                static_cast<float>(bound->position.y),
+            });
+        }
+
+        if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+        {
+            auto& sheetTexture = sheet->GetTexture();
+            sheetTexture.setRepeated(true);
+
+            gauge->SetTexture(sheetTexture);
+            if (metadata->TexCoords != sf::IntRect())
+                gauge->SetTexCoords(metadata->TexCoords);
+            else if (metadata->FrameID.has_value())
+                gauge->SetTexCoords(sheet->TexCoords[metadata->FrameID.value()]);
+            else
+                gauge->SetTexCoords(sheet->TexCoords[0]);
+
+            if (gauge->GetPosition() == sf::Vector2f() && !sheet->Frames.empty())
+            {
+                if (metadata->FrameID.has_value())
+                {
+                    gauge->SetPosition({
+                        static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.x),
+                        static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.y),
+                    });
+                }
+                else if (sheet->Frames[0].position != sf::Vector2i())
+                {
+                    gauge->SetPosition({
+                        static_cast<float>(sheet->Frames[0].position.x),
+                        static_cast<float>(sheet->Frames[0].position.y),
+                    });
+                }
+            }
+
+            if (sheet->TexCoords.size() > 1 && !metadata->FrameID.has_value())
+            {
+                for (const auto& frame : sheet->TexCoords)
+                    gauge->AddAnimationFrame(Gx::Animation::Frame{frame});
+            }
+        }
+    }
 
     gauge->SetFlickering(metadata->Flicker);
     gauge->SetAnimationDuration(metadata->AnimationDuration);
-    for (const auto& frame : metadata->AnimationFrames)
-        gauge->AddAnimationFrame(frame);
-    
+
     gauge->SetName(metadata->Name);
     gauge->SetOrientation(metadata->Orientation);
-    gauge->SetTexCoords(metadata->TexCoords);
     gauge->SetMaximumValue(metadata->Maximum);
+    gauge->SetValue(metadata->Maximum / 2);
     gauge->SetColor(metadata->Color);
     gauge->SetOrigin(metadata->Origin);
-    gauge->SetPosition(metadata->Position);
     gauge->SetScale(metadata->Scale);
     gauge->SetRotation(metadata->Rotation);
 

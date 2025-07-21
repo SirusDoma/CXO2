@@ -3,18 +3,18 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/Gauge.hpp>
+#include <Genode/UI/UiContainer.hpp>
 
 #include <OTwo/Models/Planet.hpp>
 
 class ChannelButton : public Gx::RadioButton
 {
 public:
-    enum class Mode
+    enum class Mode : std::uint8_t
     {
-        Beginner,
-        Intermediate,
-        High
+        Beginner     = 0,
+        Intermediate = 1,
+        High         = 2
     };
 
     ChannelButton();
@@ -26,7 +26,7 @@ public:
     void SetChannelNumber(unsigned int channelNumber);
 
     unsigned int GetChannelPopulation() const;
-    void SetChannelPopulation(unsigned int population);
+    void SetChannelPopulation(unsigned int population, unsigned int maxPopulation);
 
     MusicHall GetPlanet() const;
     void SetMusicHall(MusicHall hall);
@@ -41,10 +41,10 @@ private:
 
     Gx::Image* m_nameIndicator, *m_fullIndicator, *m_focusIndicator;
     Gx::BitmapNumber* m_numberIndicator;
-    Gx::Gauge* m_populationCounter;
+    Gx::UiContainer* m_populationCounter;
 
     StateMap m_states;
     MusicHall m_hall;
-    unsigned int m_population;
+    unsigned int m_population, m_maxPopulation;
     bool m_initialized;
 };

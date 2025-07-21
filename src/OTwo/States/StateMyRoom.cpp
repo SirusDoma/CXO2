@@ -73,8 +73,12 @@ void StateMyRoom::Initialize()
         slot->SetDoubleClickCallback(nullptr);
     }
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
-    bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
+    const auto scrollControls = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_BAG_SCROLL_CONTROLS);
+    const auto bagScrollBar = scrollControls->FindChild<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
+
+    // TODO: Detect vertical count?
+    constexpr unsigned int verticalCount = 2; //bagList->GetVerticalCount();
+    bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / verticalCount)));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_bagCurrentPage)
@@ -86,10 +90,10 @@ void StateMyRoom::Initialize()
         Invalidate();
     });
 
-    const auto bagScrollLeft = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_LEFT);
+    const auto bagScrollLeft = scrollControls->FindChild<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_LEFT);
     bagScrollLeft->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
 
-    const auto bagScrollRight = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_RIGHT);
+    const auto bagScrollRight = scrollControls->FindChild<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SCROLL_RIGHT);
     bagScrollRight->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
     bagList->SetScrollWheelCallback([=] (auto&, auto& ev) {
@@ -248,7 +252,9 @@ void StateMyRoom::Invalidate()
             inventory.push_back(&item);
     }
 
-    for (std::size_t i = 0, j = m_bagCurrentPage * bagList->GetVerticalCount(); i < bagSlots.size(); i++)
+    // TODO: Detect vertical count?
+    constexpr unsigned int verticalCount = 2; //bagList->GetVerticalCount();
+    for (std::size_t i = 0, j = m_bagCurrentPage * verticalCount; i < bagSlots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(bagSlots[i]);
         if (!slot)
@@ -275,9 +281,6 @@ void StateMyRoom::Invalidate()
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
-
-        if (const auto texture = thumbnail->GetTexture())
-            thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
 
         if (const auto quantityLabel = slot->FindChild<Gx::Label>(Resource::MyRoom::Item::IDC_TEXT_QUANTITY))
         {
@@ -417,8 +420,10 @@ void StateMyRoom::Invalidate()
     InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_GLOVES),                 EquipmentType::Gloves);
     InvalidateSlot(container->FindChild<Gx::Image>(Resource::MyRoom::IDC_IMAGE_CLOTHES_ACCESSORIES),    EquipmentType::ClothesAccessories);
 
-    const auto bagScrollBar = Instantiate<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
-    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
+    const auto scrollControls = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_BAG_SCROLL_CONTROLS);
+
+    const auto bagScrollBar = scrollControls->FindChild<Gx::ScrollBar>(Resource::MyRoom::IDC_SCROLL_MYBAG);
+    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
     currentGem->SetValue(player->Gem);

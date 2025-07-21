@@ -1,0 +1,14 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "MShop_MMY_Over.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": -3,
+        "y": -4
+      }
+    }
+  }
+}

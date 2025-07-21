@@ -1,0 +1,15 @@
+﻿{
+  "type": "Button",
+  "require": {
+    "refID": "0X17200002",
+    "bndID": "0X17200002"
+  },
+  "attributes": {
+    "transform": {
+      "origin": {
+        "x": 0,
+        "y": 250
+      }
+    }
+  }
+}

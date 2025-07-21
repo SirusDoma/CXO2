@@ -95,6 +95,12 @@ namespace Gx
 
     void Animation::Update(const double delta)
     {
+        if (m_frames.size() == 0)
+        {
+            UpdatableContainer::Update(delta);
+            return;
+        }
+
         if (GetState() == AnimationState::Completed || GetState() == AnimationState::Stopped)
             return UpdatableContainer::Update(delta);
 

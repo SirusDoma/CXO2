@@ -179,7 +179,7 @@ namespace Gx
     {
         Control::Update(delta);
 
-        if (!IsEnabled() || m_frames.empty())
+        if (!IsEnabled() || m_frames.empty() || m_animationDuration == sf::Time::Zero)
             return;
 
         m_animationState    = Animation::AnimationState::Playing;

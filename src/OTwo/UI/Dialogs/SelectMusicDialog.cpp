@@ -88,7 +88,7 @@ void SelectMusicDialog::Initialize()
             if (!musicSelector)
                 return;
 
-            const unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
+            const unsigned int itemListCount = musicSelector->GetChildrenCount();
             const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
             if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
                 return;
@@ -134,7 +134,7 @@ void SelectMusicDialog::Initialize()
                 if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                     activeHighlighter->SetVisible(true);
 
-                const unsigned int itemListCount = listSelector->GetVerticalCount() * listSelector->GetHorizontalCount();
+                const unsigned int itemListCount = listSelector->GetChildrenCount();
                 const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
                 if (m_music.Source == music.Source)
                     return;
@@ -776,7 +776,7 @@ void SelectMusicDialog::Invalidate()
         return;
 
     auto elements = musicSelector->GetChildren();
-    unsigned int itemListCount = musicSelector->GetVerticalCount() * musicSelector->GetHorizontalCount();
+    unsigned int itemListCount = musicSelector->GetChildrenCount();
     unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
 
     if (!m_music.Source.empty())

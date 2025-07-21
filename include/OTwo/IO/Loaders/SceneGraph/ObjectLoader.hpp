@@ -8,7 +8,7 @@
 class ObjectLoader
 {
 public:
-    static void LoadFromJson(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& ctx);
+    static void LoadFromJson(const std::string& name, const Gx::Json& json, ObjectContainer& container, Gx::ResourceContext& context);
 
 private:
     template<typename R>

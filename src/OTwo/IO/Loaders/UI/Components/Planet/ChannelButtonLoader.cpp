@@ -10,41 +10,48 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromJson(const Gx::Json&
 {
     auto metadata = ChannelButtonMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-
-    if (const auto modeAttributes = attributes.find("mode"); modeAttributes != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        for (auto [key, data]: modeAttributes->items())
+        const auto& attributes = it.value();
+        if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
+
+        if (const auto modeAttributes = attributes.find("mode"); modeAttributes != attributes.end())
         {
-            ChannelButton::Mode mode;
-            if (auto parsed = magic_enum::enum_cast<ChannelButton::Mode>(key,magic_enum::case_insensitive); parsed.has_value())
-                mode = parsed.value();
-            else
-                continue;
-
-            auto states = data.at("states");
-            std::unordered_map<std::string, Gx::RadioButton::State> stateMap =
+            for (auto [key, data]: modeAttributes->items())
             {
-                {"normal", Gx::RadioButton::State::Normal},
-                {"hover",  Gx::RadioButton::State::Hover},
-                {"active", Gx::RadioButton::State::Active},
-            };
-
-            auto spriteLoader = SpriteLoader();
-            for (auto [name, state]: stateMap)
-            {
-                if (!states.contains(name))
+                ChannelButton::Mode mode;
+                if (auto parsed = magic_enum::enum_cast<ChannelButton::Mode>(key,magic_enum::case_insensitive); parsed.has_value())
+                    mode = parsed.value();
+                else
                     continue;
 
-                SpriteMetadata stateMeta;
-                if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, context))
-                    continue;
+                metadata.States[mode] = {};
 
-                metadata.States[mode][state] = stateMeta.TexCoords;
+                if (const auto itStates = data.find("states"); itStates != data.end())
+                {
+                    const auto& states = itStates.value();
+                    std::unordered_map<std::string, Gx::RadioButton::State> stateMap =
+                    {
+                        {"normal", Gx::RadioButton::State::Normal},
+                        {"hover",  Gx::RadioButton::State::Hover},
+                        {"active", Gx::RadioButton::State::Active},
+                    };
+
+                    for (auto [name, state]: stateMap)
+                    {
+                        if (!states.contains(name))
+                            continue;
+
+                        SpriteMetadata stateMeta;
+                        if (!SpriteLoader::ParseMetadata(states.at(name), stateMeta, context))
+                            continue;
+
+                        metadata.States[mode][state] = stateMeta.TexCoords;
+                    }
+                }
             }
         }
     }
@@ -58,21 +65,62 @@ Gx::ResourcePtr<ChannelButton> ChannelButtonLoader::LoadFromMetadata(const Resou
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto channelButton = std::make_unique<ChannelButton>();
-    const auto acquirer = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = acquirer.Find<sf::Texture>(*metadata); texture)
-        channelButton->SetTexture(*texture);
-
-    auto spriteLoader = SpriteLoader();
-    for (auto [mode, data] : metadata->States)
+    auto channelButton = Instantiate(context);
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata))
     {
-        for (auto [state, frame] : data)
-            channelButton->AddStateFrame(mode, state, frame);
+        channelButton->SetTexture(*texture);
+        channelButton->SetPosition(metadata->Position);
+
+        for (const auto& [mode, data] : metadata->States)
+        {
+            for (auto [state, frame] : data)
+                channelButton->AddStateFrame(mode, state, frame);
+        }
     }
+    else
+    {
+        if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+        {
+            channelButton->SetTexture(sheet->GetTexture());
+            for (const auto& [mode, data] : metadata->States)
+            {
+                if (data.empty())
+                {
+                    if (sheet->TexCoords.size() > 1)
+                        channelButton->AddStateFrame(mode, Gx::Button::State::Normal, sheet->TexCoords[0]);
+
+                    if (sheet->TexCoords.size() > 2)
+                        channelButton->AddStateFrame(mode, Gx::Button::State::Hover, sheet->TexCoords[1]);
+
+                    const std::size_t index = 2 + static_cast<int>(mode);
+                    if (index < sheet->TexCoords.size())
+                        channelButton->AddStateFrame(mode, Gx::Button::State::Active, sheet->TexCoords[index]);
+                }
+                else
+                {
+                    for (auto [state, frame] : data)
+                        channelButton->AddStateFrame(mode, state, frame);
+                }
+            }
+        }
+
+        if (metadata->Position != sf::Vector2f())
+        {
+            channelButton->SetPosition(metadata->Position);
+        }
+        else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+        {
+            channelButton->SetPosition({
+                static_cast<float>(bound->position.x),
+                static_cast<float>(bound->position.y),
+            });
+        }
+    }
+
 
     channelButton->SetName(metadata->Name);
     channelButton->SetOrigin(metadata->Origin);
-    channelButton->SetPosition(metadata->Position);
     channelButton->SetScale(metadata->Scale);
     channelButton->SetRotation(metadata->Rotation);
 

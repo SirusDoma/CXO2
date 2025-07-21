@@ -1,0 +1,15 @@
+{
+  "type": "Animation",
+  "require": {
+    "sheet": "Emoticon_Idea.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 170,
+        "y": 60
+      }
+    },
+    "speed": 0.5
+  }
+}

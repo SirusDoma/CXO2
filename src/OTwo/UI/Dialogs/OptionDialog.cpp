@@ -45,8 +45,11 @@ void OptionDialog::Initialize()
     bgAllTest->setLooping(true);
     bgTest->setLooping(true);
 
-    const auto background = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION);
-    background->SetFrame("KeyOption");
+    const auto keyBackground = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION_KEY);
+    const auto sndBackground = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION_SOUND);
+
+    keyBackground->SetVisible(true);
+    sndBackground->SetVisible(false);
 
     const auto toolTip     = FindChild<Gx::ToolTip>(Resource::Option::IDC_TOOLTIP_INFO);
     const auto gameOption  = FindChild<Gx::UiContainer>(Resource::Option::IDC_CONTAINER_GAME_OPTION);
@@ -287,8 +290,8 @@ void OptionDialog::Initialize()
         bgGroup.SetVolume(m_tempConfig.MusicVolume);
         efGroup.SetVolume(m_tempConfig.EffectVolume);
 
-        background->SetFrame("KeyOption");
-        //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
+        keyBackground->SetVisible(true);
+        sndBackground->SetVisible(false);
 
         gameOption->SetEnabled(true);
         gameOption->SetVisible(true);
@@ -310,8 +313,8 @@ void OptionDialog::Initialize()
         m_mixer.Play(*bgAllTest, Sound::Channel::BGTest);
         m_mixer.GetSoundGroup(Sound::Channel::BGTest).SetVolume(m_tempConfig.MusicVolume);
 
-        background->SetFrame("SoundOption");
-        //SetTexCoords(background->GetFrame("SoundOption")->TexCoords);
+        keyBackground->SetVisible(false);
+        sndBackground->SetVisible(true);
 
         gameOption->SetEnabled(false);
         gameOption->SetVisible(false);
@@ -331,7 +334,8 @@ void OptionDialog::OnPresented(Parent& parent, const Gx::PresentationContext& co
     Initialize();
 
     m_tempConfig             = GameConfig(m_appConfig);
-    const auto background    = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION);
+    const auto keyBackground = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION_KEY);
+    const auto sndBackground = FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_DIALOG_OPTION_SOUND);
     const auto keyTab        = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_KEY_TAB);
     const auto soundTab      = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_SOUND_TAB);
     const auto gameOption    = FindChild<Gx::UiContainer>(Resource::Option::IDC_CONTAINER_GAME_OPTION);
@@ -340,8 +344,8 @@ void OptionDialog::OnPresented(Parent& parent, const Gx::PresentationContext& co
     const auto keySelect     = gameOption->FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_KEY_SELECT);
     const auto sfxNavigation = m_parent->Instantiate<sf::Sound>(Sound::Effects::EF_01);
 
-    background->SetFrame("KeyOption");
-    //SetTexCoords(background->GetFrame("KeyOption")->TexCoords);
+    keyBackground->SetVisible(true);
+    sndBackground->SetVisible(false);
 
     keyTab->SetCheckedState(true);
     sfxNavigation->stop();

@@ -1,0 +1,20 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X1550002F",
+    "bndID": "0X1550002F"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_NAME": "ControlList/State/MyRoom/MyRoom_Status_Name.json",
+      "IDC_TEXT_LEVEL": "ControlList/State/MyRoom/MyRoom_Status_Level.json",
+      "IDC_TEXT_EVENT_POINT": "ControlList/State/MyRoom/MyRoom_Status_EventPoint.json",
+      "IDC_TEXT_EXP": "ControlList/State/MyRoom/MyRoom_Status_Exp.json",
+      "IDC_TEXT_NEXT_EXP": "ControlList/State/MyRoom/MyRoom_Status_NextExp.json",
+      "IDC_TEXT_RECORD": "ControlList/State/MyRoom/MyRoom_Status_Record.json",
+      "IDC_TEXT_RANKING": "ControlList/State/MyRoom/MyRoom_Status_Ranking.json",
+      "IDC_TEXT_GUILD": "ControlList/State/MyRoom/MyRoom_Status_Guild.json",
+      "IDC_BUTTON_MY_ALBUM": "ControlList/State/MyRoom/MyRoom_Btn_ShowMyAlbum.json"
+    }
+  }
+}

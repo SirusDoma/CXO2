@@ -2,11 +2,14 @@
 #include <OTwo/StringTable/Identifiers/Room.hpp>
 #include <OTwo/Utilities/StringFormatter.hpp>
 
+#include <Genode/UI/List.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
+#include <Genode/UI/Label.hpp>
 
 #include <fmt/format.h>
 #include <cmath>
+#include <Genode/UI/Image.hpp>
 
 using namespace StringTable::Identifiers;
 
@@ -32,6 +35,21 @@ void UserList::Initialize()
             const size_t index = ((m_page - 1) * listChildren.size()) + i;
             if (index < m_users.size() && sender.IsChecked())
                 m_selectedUser = m_users[index].ID;
+        });
+
+        for (const auto child : userButton->GetChildren())
+        {
+            if (const auto subControl = dynamic_cast<Gx::Image*>(child))
+                subControl->SetVisible(false);
+        }
+
+        userButton->SetFocusChangedCallback([=] (auto& sender, auto& ev)
+        {
+            for (auto child : sender.GetChildren())
+            {
+                if (const auto subControl = dynamic_cast<Gx::Image*>(child))
+                    subControl->SetVisible(sender.IsFocused());
+            }
         });
 
         userButton->SetVisible(false);

@@ -13,5 +13,5 @@ public :
     Gx::ResourcePtr<Gx::Button> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
     Gx::ResourcePtr<Gx::Button> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
-    static bool ParseMetadata(const Gx::Json& json, ButtonMetadata& metadata, const Gx::ResourceContext& context);
+    static bool ParseMetadata(const Gx::Json& attributes, ButtonMetadata& metadata, const Gx::ResourceContext& context);
 };

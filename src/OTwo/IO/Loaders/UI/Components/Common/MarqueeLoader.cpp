@@ -8,25 +8,28 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromJson(const Gx::Json& json, const
 {
     MarqueeMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!LabelLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-    
-    if (const auto speed = attributes.find("speed"); speed != attributes.end())
-        metadata.Speed = speed->get<double>();
-    else
-        metadata.Speed = 30.f;
-
-    if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        unsigned int x, y, w, h;
-        bounds->at("x").get_to(x);
-        bounds->at("y").get_to(y);
-        bounds->at("width").get_to(w);
-        bounds->at("height").get_to(h);
-        metadata.Bounds = sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h));
+        const auto& attributes = it.value();
+        if (!LabelLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
+
+        if (const auto speed = attributes.find("speed"); speed != attributes.end())
+            metadata.Speed = speed->get<double>();
+        else
+            metadata.Speed = 30.f;
+
+        if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
+        {
+            unsigned int x, y, w, h;
+            bounds->at("x").get_to(x);
+            bounds->at("y").get_to(y);
+            bounds->at("width").get_to(w);
+            bounds->at("height").get_to(h);
+            metadata.Bounds = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
+        }
     }
 
     return LoadFromMetadata(metadata, context);
@@ -38,12 +41,39 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromMetadata(const ResourceMetadata&
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto marquee = std::make_unique<Marquee>();
+    auto marquee = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
+    if (const auto font = ctx.Require<Gx::Font>(*metadata); font)
         marquee->SetFont(*font);
-    else
-        return nullptr;
+
+    if (metadata->Bounds != sf::IntRect())
+    {
+        marquee->SetLocalBounds({
+            {
+                static_cast<float>(metadata->Bounds.position.x),
+                static_cast<float>(metadata->Bounds.position.y)
+            },
+            {
+                static_cast<float>(metadata->Bounds.size.x),
+                static_cast<float>(metadata->Bounds.size.y),
+            }
+        });
+
+        marquee->SetPosition(metadata->Position);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        marquee->SetLocalBounds({
+            {
+                static_cast<float>(bound->position.x),
+                static_cast<float>(bound->position.y),
+            },
+            {
+                static_cast<float>(bound->size.x),
+                static_cast<float>(bound->size.y),
+            }
+        });
+    }
 
     marquee->SetName(metadata->Name);
     marquee->SetSpeed(metadata->Speed);
@@ -52,10 +82,8 @@ Gx::ResourcePtr<Marquee> MarqueeLoader::LoadFromMetadata(const ResourceMetadata&
     marquee->SetOutlineThickness(metadata->OutlineThickness);
     marquee->SetOutlineColor(metadata->OutlineColor);
     marquee->SetString(metadata->String);
-    marquee->SetLocalBounds(metadata->Bounds);
 
     marquee->SetOrigin(metadata->Origin);
-    marquee->SetPosition(metadata->Position);
     marquee->SetScale(metadata->Scale);
     marquee->SetRotation(metadata->Rotation);
 

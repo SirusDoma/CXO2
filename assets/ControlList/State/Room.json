@@ -1,0 +1,34 @@
+{
+  "type": "State",
+  "name": "STATE_ROOM",
+  "require": {},
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_STATE_ROOM": "ControlList/State/Room/State_Room.json",
+      "IDC_AVATAR": "ControlList/State/Room/Avatar.json",
+      "IDC_TEXT_NOTICE": "ControlList/State/Room/Room_Notice.json",
+      "IDC_IMAGE_CHANNEL_CATEGORY": "ControlList/State/Room/Room_Channel_Category.json",
+      "IDC_NUMBER_CHANNEL_ID": "ControlList/State/Room/Room_Channel_Number.json",
+      "IDC_BUTTON_BULLETIN": "ControlList/State/Room/Room_Btn_Bulletin.json",
+      "IDC_BUTTON_MUSIC_SHOP": "ControlList/State/Room/Room_Btn_MusicShop.json",
+      "IDC_BUTTON_ITEM_SHOP": "ControlList/State/Room/Room_Btn_ItemShop.json",
+      "IDC_BUTTON_MY_ROOM": "ControlList/State/Room/Room_Btn_MyRoom.json",
+      "IDC_BUTTON_TUTORIAL": "ControlList/State/Room/Room_Btn_FirstStep.json",
+      "IDC_BUTTON_OPTION": "ControlList/State/Room/Room_Btn_Option.json",
+      "IDC_BUTTON_ROOM_LEFT": "ControlList/State/Room/Room_Btn_Left.json",
+      "IDC_BUTTON_ROOM_RIGHT": "ControlList/State/Room/Room_Btn_Right.json",
+      "IDC_BUTTON_CREATE_ROOM": "ControlList/State/Room/Room_Btn_Create.json",
+      "IDC_BUTTON_QUICK_JOIN": "ControlList/State/Room/Room_Btn_QuickJoin.json",
+      "IDC_BUTTON_SHOW_ALL": "ControlList/State/Room/Room_Btn_ShowAll.json",
+      "IDC_BUTTON_SHOW_WAITING": "ControlList/State/Room/Room_Btn_WaitingRoom.json",
+      "IDC_TEXT_NICKNAME": "ControlList/State/Room/Room_Nickname.json",
+      "IDC_ROOM_LIST": "ControlList/State/Room/Room_List.json",
+      "IDC_CHAT_PANEL": "ControlList/State/Room/Room_ChatPanel.json",
+      "IDC_USER_LIST": "ControlList/State/Room/Room_UserList.json",
+      "IDC_DIALOG_OPTION": "ControlList/Dialog/Option.json",
+      "IDC_DIALOG_CREATE_ROOM": "ControlList/Dialog/CreateRoom.json",
+      "IDC_DIALOG_WHISPER": "ControlList/Dialog/Whisper.json",
+      "IDC_BUTTON_BACK": "ControlList/State/Room/Room_Btn_Back.json"
+    }
+  }
+}

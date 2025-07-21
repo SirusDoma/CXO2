@@ -11,24 +11,27 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json,
 {
     AvatarInfoMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
-        TransformLoader::ParseMetadata(transform.value(), metadata, context);
-
-    if (auto teamColors = attributes.find("teamColors"); teamColors != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        for (auto& [key, color] : teamColors->items())
+        const auto& attributes = it.value();
+        if (auto transform = attributes.find("transform"); transform != attributes.end())
+            TransformLoader::ParseMetadata(transform.value(), metadata, context);
+
+        if (auto teamColors = attributes.find("teamColors"); teamColors != attributes.end())
         {
-            if (auto team = magic_enum::enum_cast<RoomTeam>(key, magic_enum::case_insensitive); team.has_value() && !color.empty())
+            for (auto& [key, color] : teamColors->items())
             {
-                unsigned int a, r, g, b;
-                color.at("a").get_to(a);
-                color.at("r").get_to(r);
-                color.at("g").get_to(g);
-                color.at("b").get_to(b);
-                metadata.TeamColors[team.value()] = sf::Color(r, g, b, a);
+                if (auto team = magic_enum::enum_cast<RoomTeam>(key, magic_enum::case_insensitive); team.has_value() && !color.empty())
+                {
+                    unsigned int a, r, g, b;
+                    color.at("a").get_to(a);
+                    color.at("r").get_to(r);
+                    color.at("g").get_to(g);
+                    color.at("b").get_to(b);
+                    metadata.TeamColors[team.value()] = sf::Color(r, g, b, a);
+                }
             }
         }
     }
@@ -38,33 +41,33 @@ Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json,
 
 Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
 {
-    auto metadata = dynamic_cast<const AvatarInfoMetadata*>(&meta);
+    const auto metadata = dynamic_cast<const AvatarInfoMetadata*>(&meta);
     if (metadata == nullptr)
-        return nullptr;
+        return Instantiate(context);
 
-    auto avatarinfo = std::make_unique<AvatarInfo>();
+    auto avatarinfo = Instantiate(context);
     auto container  = ObjectContainer::Decorate(avatarinfo.get());
     auto ctx        = ResourceContextDecorator::Decorate(context);
     avatarinfo->SetName(metadata->Name);
 
+    if (metadata->Position != sf::Vector2f())
+    {
+        avatarinfo->SetPosition(metadata->Position);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        avatarinfo->SetPosition({
+            static_cast<float>(bound->position.x),
+            static_cast<float>(bound->position.y),
+        });
+    }
+
     for (auto& [team, color] : metadata->TeamColors)
         avatarinfo->RegisterTeamColor(team, color);
-
-    auto metaLoader = MetadataLoader();
-    for (auto [key, value] : meta.Require)
-    {
-        auto reference = std::any_cast<Gx::Json>(value);
-        if (reference.type() != Gx::Json::value_t::string)
-            continue;
-
-        auto name = fmt::format("{}/{}", meta.Name, key);
-        ObjectLoader::LoadFromJson(name, reference, container, ctx);
-    }
 
     LoadChildren(container, meta, context);
 
     avatarinfo->SetOrigin(metadata->Origin);
-    avatarinfo->SetPosition(metadata->Position);
     avatarinfo->SetScale(metadata->Scale);
     avatarinfo->SetRotation(metadata->Rotation);
 

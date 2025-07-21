@@ -1,0 +1,19 @@
+{
+  "type": "Sprite",
+  "require": {
+    "refID": "0X1B50004E"
+  },
+  "attributes": {
+    "id": 42,
+    "transform": {
+      "position": {
+        "x": 5,
+        "y": 0
+      },
+      "origin": {
+        "x": 0,
+        "y": 3
+      }
+    }
+  }
+}

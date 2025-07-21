@@ -1,0 +1,15 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X1450004D",
+    "bndID": "0X1450004D"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": -6,
+        "y": -6
+      }
+    }
+  }
+}

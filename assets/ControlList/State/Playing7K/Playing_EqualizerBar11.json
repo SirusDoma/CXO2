@@ -1,0 +1,12 @@
+{
+  "type": "Gauge",
+  "require": {
+    "sheet": "equalizer_ani.ojs",
+    "bndID": "0X1B000014"
+  },
+  "attributes": {
+    "frame": 7,
+    "orientation": "Vertical",
+    "maximum": 8
+  }
+}

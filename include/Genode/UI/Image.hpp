@@ -9,9 +9,16 @@
 
 namespace Gx
 {
-    class Image : public Control, public Sprite
+    class Image : public Control, public virtual Colorable
     {
     public:
+        enum class SizeMode
+        {
+            Normal  = 0,
+            Center  = 1,
+            Stretch = 2
+        };
+
         struct Frame final
         {
             sf::IntRect  TexCoords = sf::IntRect();
@@ -21,23 +28,40 @@ namespace Gx
             sf::Vector2f Scale     = sf::Vector2f(1.f, 1.f);
         };
 
-        using Sprite::Sprite;
+        Image();
+        explicit Image(const sf::Texture& texture);
+        Image(const sf::Texture& texture, const sf::IntRect& rectangle);
 
-        sf::FloatRect GetLocalBounds() const override;
-        sf::FloatRect GetGlobalBounds() const override;
+        [[nodiscard]] sf::FloatRect GetLocalBounds() const override;
+        [[nodiscard]] sf::FloatRect GetGlobalBounds() const override;
+
+        [[nodiscard]] const sf::Texture* GetTexture() const;
+        [[nodiscard]] const sf::IntRect& GetTexCoords() const;
+        [[nodiscard]] const sf::Color& GetColor() const override;
+        [[nodiscard]] SizeMode GetSizeMode() const;
+        [[nodiscard]] BlendMode GetBlendMode() const;
+
+        void SetTexture(const sf::Texture& texture, bool resetRect = false);
+        void SetTexCoords(const sf::IntRect& rectangle);
+        void SetLocalBounds(const sf::FloatRect& bounds);
+        void SetColor(const sf::Color& color) override;
+        void SetSizeMode(SizeMode sizeMode);
+        void SetBlendMode(BlendMode blendMode);
 
         unsigned int GetFrameCount() const;
-        const Frame* GetFrame(const std::string& name) const;
-        const Frame* GetFrame(unsigned int index) const;
-        const Frame* GetCurrentFrame() const;
-        const std::string& GetCurrentFrameName() const;
-        const unsigned int &GetCurrentFrameIndex() const;
+
+        void AddFrame(const std::string& name, const sf::IntRect& texCoords);
+        void AddFrame(const std::string& name, const Frame& frame);
+
+        [[nodiscard]] const Frame* GetFrame(const std::string& name) const;
+        [[nodiscard]] const Frame* GetFrame(unsigned int index) const;
+        [[nodiscard]] const Frame* GetCurrentFrame() const;
+        [[nodiscard]] const std::string& GetCurrentFrameName() const;
+        [[nodiscard]] const unsigned int &GetCurrentFrameIndex() const;
 
         bool ContainsFrame(const std::string& name) const;
         bool ContainsFrame(unsigned int index) const;
 
-        void AddFrame(const std::string& name, const sf::IntRect& texCoords);
-        void AddFrame(const std::string& name, const Frame& frame);
         void SetFrame(const std::string& name);
         void SetFrame(unsigned int index);
 
@@ -48,7 +72,15 @@ namespace Gx
         void Invalidate() override;
 
     private:
+        void UpdateVertices();
         void ApplyFrame(const Frame& frame);
+
+        std::array<sf::Vertex, 4> m_vertices;
+        const sf::Texture* m_texture;
+        sf::IntRect m_texcoords;
+        sf::FloatRect m_bounds;
+        SizeMode m_sizeMode;
+        BlendMode m_blendMode;
 
         std::string m_frameName;
         unsigned int m_frameIndex;

@@ -25,8 +25,15 @@ void MapSelector::Initialize()
 {
     Node::Initialize();
 
-    const auto map = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
+    const auto map       = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
+    const auto randomMap = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_RANDOM_MAP);
     map->SetFrame(0);
+
+    if (randomMap)
+    {
+        randomMap->SetVisible(true);
+        map->SetVisible(false);
+    }
 
     const auto mapName = FindChild<Gx::Label>(Resource::Map::IDC_TEXT_MAP_NAME);
     mapName->SetString("Random");
@@ -90,12 +97,13 @@ void MapSelector::SetMapID(int mapID, const bool silent)
 {
     const auto sfxNavigate  = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
     const auto map          = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
+    const auto randomMap    = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_RANDOM_MAP);
     const auto mapName      = FindChild<Gx::Label>(Resource::Map::IDC_TEXT_MAP_NAME);
     const auto effectGroup1 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_1);
     const auto effectGroup2 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_2);
 
     if (mapID < 0)
-        mapID = static_cast<unsigned int>(map->GetFrameCount() - 1);
+        mapID = map->GetFrameCount() - 1;
 
     if (mapID >= map->GetFrameCount())
         mapID = 0;
@@ -116,8 +124,29 @@ void MapSelector::SetMapID(int mapID, const bool silent)
     }
 
     m_mapID = mapID;
-    map->SetFrame(m_mapID);
-    mapName->SetString(map->GetCurrentFrameName());
+    if (randomMap)
+    {
+        if (m_mapID == 0)
+        {
+            randomMap->SetVisible(true);
+            map->SetVisible(false);
+
+            mapName->SetString("Random");
+        }
+        else
+        {
+            randomMap->SetVisible(false);
+            map->SetVisible(true);
+            map->SetFrame(m_mapID - 1);
+
+            mapName->SetString(map->GetCurrentFrameName());
+        }
+    }
+    else
+    {
+        map->SetFrame(m_mapID);
+        mapName->SetString(map->GetCurrentFrameName());
+    }
 
     auto animation = effectGroup1->FindChild<Gx::Animation>(Resource::Map::IDC_IMAGE_EFFECT_I_1(m_mapID));
     if (!animation)

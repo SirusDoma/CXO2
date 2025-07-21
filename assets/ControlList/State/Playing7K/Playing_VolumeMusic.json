@@ -1,0 +1,16 @@
+{
+  "type": "Gauge",
+  "require": {
+    "sheet": "equalizer_ani.ojs"
+  },
+  "attributes": {
+    "orientation": "Vertical",
+    "transform": {
+      "position": {
+        "x": 416,
+        "y": 565
+      }
+    },
+    "frame": 7
+  }
+}

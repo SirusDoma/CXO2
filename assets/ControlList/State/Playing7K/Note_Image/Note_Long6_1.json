@@ -1,0 +1,21 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1B50004E"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 144,
+        "y": 0
+      }
+    },
+    "isLoop": true,
+    "duration": 250,
+    "frames": [
+      { "id": 36 },
+      { "id": 37 },
+      { "id": 38 }
+    ]
+  }
+}

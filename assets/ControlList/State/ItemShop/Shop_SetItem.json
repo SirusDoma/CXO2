@@ -1,0 +1,28 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_NAME":  {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_IMAGE_ITEM": {
+        "type": "Image",
+        "attributes": {}
+      },
+      "IDC_IMAGE_CURRENCY": "ControlList/State/ItemShop/Shop_Item_Set_Currency.json",
+      "IDC_NUMBER_PRICE": "ControlList/State/ItemShop/Shop_Item_Set_Price.json",
+      "IDC_BUTTON_ADD": "ControlList/State/ItemShop/Shop_Btn_Set_Add.json",
+      "IDC_BUTTON_PREVIEW": "ControlList/State/ItemShop/Shop_Btn_Set_Preview.json",
+      "IDC_LIST_ITEM_PIECE": {
+        "type": "List",
+        "require": {},
+        "attributes": {}
+      },
+      "IDC_AVATAR": {
+        "type": "Avatar",
+        "attributes": {}
+      }
+    }
+  }
+}

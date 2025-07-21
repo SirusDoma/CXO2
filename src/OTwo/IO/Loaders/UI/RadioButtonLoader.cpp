@@ -4,59 +4,22 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <OTwo/IO/Loaders/UI/ButtonLoader.hpp>
 
-Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
     auto metadata = RadioButtonMetadata();
-    if (!MetadataLoader::Parse(json, metadata, ctx))
-        return nullptr;
+    if (!MetadataLoader::Parse(json, metadata, context))
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, ctx))
-        return nullptr;
-
-    auto states = attributes.at("states");
-    std::unordered_map<std::string, Gx::RadioButton::State> stateMap = {
-        { "normal", Gx::RadioButton::State::Normal },
-        { "hover",  Gx::RadioButton::State::Hover  },
-        { "active", Gx::RadioButton::State::Active },
-    };
-
-    auto spriteLoader = SpriteLoader();
-    for (auto [name, state] : stateMap)
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        if (!states.contains(name))
-            continue;
-
-        auto stateData = states.at(name);
-        ButtonMetadata::ButtonState stateMeta;
-        if (!SpriteLoader::ParseMetadata(stateData, stateMeta, ctx))
-            continue;
-
-        if (auto bounds = stateData.find("bounds"); bounds != stateData.end())
-        {
-            int x      = bounds->find("x") != bounds->end() ? bounds->at("x").get<int>() : 0;
-            int y      = bounds->find("y") != bounds->end() ? bounds->at("y").get<int>() : 0;
-            int width  = bounds->at("width").get<int>();
-            int height = bounds->at("height").get<int>();
-
-            stateMeta.LocalBounds = sf::IntRect{ { x, y }, { width, height } };
-        }
-        else
-        {
-            stateMeta.LocalBounds = sf::IntRect{
-                { 0, 0 },
-                {
-                    metadata.TexCoords.size.x,
-                    metadata.TexCoords.size.y
-                }
-            };
-        }
-
-        metadata.States[state] = stateMeta;
+        const auto& attributes = it.value();
+        if (!ButtonLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
     }
 
-    return LoadFromMetadata(metadata, ctx);
+    return LoadFromMetadata(metadata, context);
 }
 
 Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
@@ -65,17 +28,133 @@ Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const Resou
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
 
-    auto radio = std::make_unique<Gx::RadioButton>();
+    auto radio = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
+    {
         radio->SetTexture(*texture);
+        radio->SetPosition(metadata->Position);
 
-    for (auto [state, frame] : metadata->States)
-        radio->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
+        for (const auto& [state, frame] : metadata->States)
+            radio->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
+    }
+    else
+    {
+        auto bound = sf::IntRect();
+        if (metadata->Position != sf::Vector2f())
+        {
+            radio->SetPosition(metadata->Position);
+        }
+        else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
+        {
+            bound = *bnd;
+            radio->SetPosition({
+                static_cast<float>(bnd->position.x),
+                static_cast<float>(bnd->position.y),
+            });
+        }
+
+        if (!metadata->States.empty())
+        {
+            for (auto [state, frame] : metadata->States)
+            {
+                if (!frame.ID.has_value())
+                    radio->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
+            }
+        }
+
+        if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+        {
+            radio->SetTexture(sheet->GetTexture());
+            if (sheet->Frames.size() > 1)
+            {
+                if (metadata->Position == sf::Vector2f() && sheet->Frames[0].position != sf::Vector2i())
+                {
+                    auto base = ctx.GetParentBound();
+                    radio->SetPosition(sf::Vector2f{
+                         static_cast<float>(sheet->Frames[0].position.x),
+                         static_cast<float>(sheet->Frames[0].position.y)
+                    } - sf::Vector2f{
+                        static_cast<float>(base.position.x),
+                        static_cast<float>(base.position.y)
+                    });
+                }
+            }
+
+            const auto& frames = sheet->TexCoords;
+            auto bounds = std::vector<sf::IntRect>();
+            for (std::size_t i = 0; i < frames.size(); i++)
+            {
+                if (bound != sf::IntRect())
+                    bounds.push_back({ {}, bound.size });
+                else
+                    bounds.push_back({ {}, frames[i].size });
+            }
+
+            auto states = std::unordered_map<Gx::Button::State, Gx::Button::Frame>();
+            if (!metadata->States.empty())
+            {
+                for (auto [state, frame] : metadata->States)
+                {
+                    if (frame.ID.has_value())
+                    {
+                        std::size_t index = frame.ID.value();
+                        auto texCoord =  index < sheet->TexCoords.size() ? sheet->TexCoords[index]       : sf::IntRect();
+                        auto position =  index < sheet->Frames.size()    ? sheet->Frames[index].position : sf::Vector2i();
+
+                        radio->SetFrame(state, {texCoord, { {}, bound.size } });
+                        radio->SetPosition(sf::Vector2f{
+                            static_cast<float>(position.x),
+                            static_cast<float>(position.y)
+                        });
+                    }
+                }
+            }
+            else if (metadata->States.empty())
+            {
+                if (frames.size() > 3)
+                {
+                    states = {
+                        { Gx::Button::State::Normal, { frames[0], bounds[0] } },
+                        { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
+                        { Gx::Button::State::Active, { frames[frames.size() - 1], bounds[bounds.size() - 1] } },
+                    };
+                }
+                else if (frames.size() == 3)
+                {
+                    states = {
+                        { Gx::Button::State::Normal, { frames[0], bounds[0] } },
+                        { Gx::Button::State::Hover,  { frames[1], bounds[1] } },
+                        { Gx::Button::State::Active, { frames[2], bounds[2] } },
+                    };
+                }
+                else if (frames.size() == 2)
+                {
+                    states = {
+                        { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
+                        { Gx::Button::State::Active, { frames[1], bounds[1] } },
+                    };
+                }
+                else if (frames.size() == 1)
+                {
+                    states = {
+                        { Gx::Button::State::Active, { frames[0], bounds[0] } },
+                    };
+                }
+            }
+
+            for (auto [state, frame] : states)
+                radio->SetFrame(state, frame);
+        }
+        else if (metadata->States.empty() && bound != sf::IntRect())
+        {
+            radio->SetFrame( Gx::Button::State::Active,
+                { {}, { {}, bound.size } } );
+        }
+    }
 
     radio->SetName(metadata->Name);
     radio->SetOrigin(metadata->Origin);
-    radio->SetPosition(metadata->Position);
     radio->SetScale(metadata->Scale);
     radio->SetRotation(metadata->Rotation);
 

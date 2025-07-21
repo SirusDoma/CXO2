@@ -177,6 +177,7 @@ namespace Gx
             if (GetChildrenCount() - 1 >= m_layouts.size())
                 return;
 
+            // TODO: Use optional
             const auto& [origin, position, rotation, scale] = m_layouts[GetChildrenCount() - 1];
             node.SetOrigin(origin);
             node.SetPosition(position);

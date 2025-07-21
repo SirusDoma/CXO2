@@ -1,4 +1,5 @@
 #include <OTwo/IO/PlayingResourceContext.hpp>
+#include <OTwo/IO/Loaders/Avatar/SetInfoDataLoader.hpp>
 
 bool PlayingResourceContext::IsFxEnabled() const
 {
@@ -18,6 +19,7 @@ unsigned int PlayingResourceContext::GetMapID() const
 void PlayingResourceContext::SetMapID(const unsigned int mapID)
 {
     m_mapID = mapID;
+    SetProperty("MapID", std::to_string(m_mapID));
 }
 
 unsigned int PlayingResourceContext::GetEffectID() const
@@ -31,6 +33,7 @@ void PlayingResourceContext::SetEffectID(const unsigned int effectID)
         throw Gx::NotSupportedException("Effect ID must be between 1 and 2");
 
     m_effectID = effectID;
+    SetProperty("EffectID", std::to_string(m_effectID));
 }
 
 GameMode PlayingResourceContext::GetMode() const
@@ -41,4 +44,5 @@ GameMode PlayingResourceContext::GetMode() const
 void PlayingResourceContext::SetMode(const GameMode mode)
 {
     m_mode = mode;
+    SetProperty("GameMode", std::to_string(static_cast<std::uint8_t>(m_mode)));
 }

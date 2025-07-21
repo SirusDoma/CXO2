@@ -1,3 +1,5 @@
+#include <OTwo/O2Jam.hpp>
+
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
@@ -87,7 +89,7 @@ void StateItemShop::Initialize()
         );
     };
 
-    const auto shopMasterWireAnimation = [=] (const Gx::Image* shopMaster)
+    const auto shopMasterWireAnimation = [=] (const Gx::UiContainer* shopMaster)
     {
         if (!shopMaster)
             return;
@@ -99,9 +101,10 @@ void StateItemShop::Initialize()
         }
     };
 
-    const auto shopMasterWireSpeech = [this] (Gx::Image* shopMaster)
+    const auto shopMasterWireSpeech = [this] (Gx::UiContainer* shopMaster)
     {
-        shopMaster->SetClickCallback([this, shopMaster] (auto&, auto&)
+        const auto main = shopMaster->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_MAIN);
+        main->SetClickCallback([this, shopMaster] (auto&, auto&)
         {
             m_shopMasterSpeechCounter++;
             if (m_shopMasterSpeechCounter >= m_shopMasterSpeech.size())
@@ -118,23 +121,23 @@ void StateItemShop::Initialize()
     };
 
     const auto shopMasterContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SHOP_MASTER);
-    const auto shopMasterMain = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_MAIN);
+    const auto shopMasterMain = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_MAIN);
     shopMasterWireAnimation(shopMasterMain);
     shopMasterWireSpeech(shopMasterMain);
 
-    const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_O2P);
+    const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_O2P);
     shopMasterO2P->SetVisible(false);
     shopMasterWireAnimation(shopMasterO2P);
 
-    const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_AQUA);
+    const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_AQUA);
     shopMasterAqua->SetVisible(false);
     shopMasterWireAnimation(shopMasterAqua);
 
-    const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_GRAFFITI);
+    const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_GRAFFITI);
     shopMasterGraffiti->SetVisible(false);
     shopMasterWireAnimation(shopMasterGraffiti);
 
-    const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_EVENT);
+    const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_EVENT);
     shopMasterEvent->SetVisible(false);
     shopMasterWireAnimation(shopMasterEvent);
 
@@ -180,21 +183,44 @@ void StateItemShop::Initialize()
         { ShopCategory::Instrument, Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_INSTRUMENT_CATEGORY) },
     };
 
-    const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap =
+    const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap = []
     {
-        { ShopCategory::Special, { EquipmentType::Costume, EquipmentType::Wings, EquipmentType::Pet, EquipmentType::AttributiveItem } },
-        { ShopCategory::Fashion, { EquipmentType::Top, EquipmentType::Pants, EquipmentType::ClothesAccessories, EquipmentType::Shoes } },
-        { ShopCategory::Accessory, { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::Glasses, EquipmentType::Gloves } },
-        { ShopCategory::Beauty, { EquipmentType::Hair, EquipmentType::HairAccessories, EquipmentType::Face } },
-        { ShopCategory::Instrument, { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Keyboard, EquipmentType::Drum, EquipmentType::InstrumentAccessories } },
-    };
+        if (O2Jam::InCompatibilityMode(CompatibilityMode::Avatar))
+        {
+            return std::unordered_map<ShopCategory, std::vector<EquipmentType>>
+            {
+                { ShopCategory::Fashion,    { EquipmentType::Top, EquipmentType::Pants, EquipmentType::Shoes } },
+                { ShopCategory::Accessory,  { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::ClothesAccessories, EquipmentType::Glasses, EquipmentType::Gloves } },
+                { ShopCategory::Beauty,     { EquipmentType::Hair, EquipmentType::HairAccessories, EquipmentType::Face } },
+                { ShopCategory::Instrument, { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Keyboard, EquipmentType::Drum } },
+            };
+        }
+        else
+        {
+            return std::unordered_map<ShopCategory, std::vector<EquipmentType>>
+            {
+                { ShopCategory::Special,    { EquipmentType::Costume, EquipmentType::Wings, EquipmentType::Pet, EquipmentType::AttributiveItem } },
+                { ShopCategory::Fashion,    { EquipmentType::Top, EquipmentType::Pants, EquipmentType::ClothesAccessories, EquipmentType::Shoes } },
+                { ShopCategory::Accessory,  { EquipmentType::Accessories, EquipmentType::Earrings, EquipmentType::Necklace, EquipmentType::Glasses, EquipmentType::Gloves } },
+                { ShopCategory::Beauty,     { EquipmentType::Hair, EquipmentType::HairAccessories, EquipmentType::Face } },
+                { ShopCategory::Instrument, { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Keyboard, EquipmentType::Drum, EquipmentType::InstrumentAccessories } },
+            };
+        }
 
+    }();
+
+    if (const auto it = shopCategoryButtonMap.find(ShopCategory::Special); it != shopCategoryButtonMap.end())
+    {
+        m_shopCategory = !it->second || !it->second->GetTexture() || it->second->GetLocalBounds() == sf::FloatRect() ? ShopCategory::Fashion : m_shopCategory;
+        if (m_shopCategory == ShopCategory::Fashion)
+            m_itemCategory = EquipmentType::Top;
+    }
     for (auto [category, button] : shopCategoryButtonMap)
     {
-        shopCategoryContainerMap.at(category)->SetEnabled(category == ShopCategory::Special);
-        shopCategoryContainerMap.at(category)->SetVisible(category == ShopCategory::Special);
+        shopCategoryContainerMap.at(category)->SetEnabled(category == m_shopCategory);
+        shopCategoryContainerMap.at(category)->SetVisible(category == m_shopCategory);
 
-        button->SetCheckedState(category == ShopCategory::Special);
+        button->SetCheckedState(category == m_shopCategory);
         button->SetCheckStateChangeCallback([this, sfxMenu, category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
         {
             if (!sender.IsChecked())
@@ -234,7 +260,7 @@ void StateItemShop::Initialize()
         {
             if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
             {
-                radio->SetCheckedState(category == ShopCategory::Special && i == 0);
+                radio->SetCheckedState(category == m_shopCategory && i == 0);
                 radio->SetCheckStateChangeCallback([this, i, sfxMenu, category, itemCategoryMap] (auto& sender)
                 {
                     if (!sender.IsChecked())
@@ -254,10 +280,25 @@ void StateItemShop::Initialize()
 
     planetPrevButton->SetClickCallback([=] (auto&, auto&)
     {
+        const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
         if (m_shopPlanetCategory == Planet::Unknown)
+        {
             m_shopPlanetCategory = Planet::Event;
-        else
+        }
+        else if (planet->GetFrameCount() >= 12)
+        {
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
+        }
+        else
+        {
+            auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
+            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
+                return m_shopPlanetCategory == p;
+            });
+
+            if (it && it != categories.end())
+                m_shopPlanetCategory = *(--it);
+        }
 
         m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
@@ -266,10 +307,25 @@ void StateItemShop::Initialize()
 
     planetNextButton->SetClickCallback([=] (auto&, auto&)
     {
+        const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
         if (m_shopPlanetCategory == Planet::Event)
+        {
             m_shopPlanetCategory = Planet::Unknown;
-        else
+        }
+        else if (planet->GetFrameCount() >= 12)
+        {
             m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
+        }
+        else
+        {
+            auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
+            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
+                return m_shopPlanetCategory == p;
+            });
+
+            if (it && it != categories.end())
+                m_shopPlanetCategory = *(++it);
+        }
 
         m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
@@ -356,9 +412,13 @@ void StateItemShop::Initialize()
     });
 
     m_shopCurrentPage = 0;
-    const auto shopScrollBar = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
-    const auto itemList      = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
-    shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildrenCount() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildrenCount()) / itemList->GetVerticalCount())));
+    const auto itemScrollControls = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+    const auto shopScrollBar      = itemScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const auto itemList           = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
+
+    // TODO: Detect vertical count?
+    constexpr int verticalCount = 2; //itemList->GetVerticalCount()
+    shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildrenCount() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildrenCount()) / verticalCount)));
     shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
         if (value < m_myBagCurrentPage)
@@ -370,10 +430,10 @@ void StateItemShop::Initialize()
         InvalidateShopItemList();
     });
 
-    const auto shopScrollLeft = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_LEFT);
+    const auto shopScrollLeft = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_LEFT);
     shopScrollLeft->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Decrease(); });
 
-    const auto shopScrollRight = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_RIGHT);
+    const auto shopScrollRight = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_RIGHT);
     shopScrollRight->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Increase(); });
 
     const auto shopItemList = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
@@ -403,7 +463,8 @@ void StateItemShop::Initialize()
     const auto bagSlots = bagList->GetChildren();
 
     m_myBagCurrentPage = 0;
-    const auto bagScrollBar = myBagContainer->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
+    const auto bagScrollControls = myBagContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
+    const auto bagScrollBar = bagScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
     bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
     bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
     {
@@ -416,10 +477,10 @@ void StateItemShop::Initialize()
         InvalidateMyBag();
     });
 
-    const auto bagScrollLeftButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_LEFT);
+    const auto bagScrollLeftButton = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_LEFT);
     bagScrollLeftButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
 
-    const auto bagScrollRightButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_RIGHT);
+    const auto bagScrollRightButton = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_RIGHT);
     bagScrollRightButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
 
     bagList->SetScrollWheelCallback([=] (auto&, auto& ev)
@@ -519,7 +580,8 @@ void StateItemShop::OnExtensionButtonClicked()
     const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
     const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
     const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const auto scrollControls   = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+    const auto shopScrollBar    = scrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
 
     bool open = true;
     const bool invalidate = shopScrollBar->GetValue() == 0;
@@ -693,7 +755,7 @@ void StateItemShop::OnItemSellClicked()
 void StateItemShop::InvalidateShopMaster(const bool moveIn)
 {
     const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
-    Gx::Image* shopMaster = nullptr;
+    Gx::UiContainer* shopMaster = nullptr;
 
     for (auto [planet, master] : m_shopMasters)
     {
@@ -719,6 +781,7 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
 
             m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.15f));
             shopMaster->SetPosition(shopMaster->GetPosition().x - 100, shopMaster->GetPosition().y);
+            m_shopMasterEffect->Update(0);
 
             m_shopMasterSpeechCounter = 0;
             Run(*m_shopMasterEffect);
@@ -761,7 +824,9 @@ void StateItemShop::InvalidateMyBag()
             inventory.push_back(&item);
     }
 
-    for (std::size_t i = 0, j = m_myBagCurrentPage * 2; i < bagSlots.size(); i++)
+    // TODO: Detect vertical count?
+    constexpr unsigned int verticalCount = 2; // bagList->GetVerticalCount()
+    for (std::size_t i = 0, j = m_myBagCurrentPage * verticalCount; i < bagSlots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(bagSlots[i]);
         if (!slot)
@@ -788,9 +853,6 @@ void StateItemShop::InvalidateMyBag()
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
-
-        if (const auto texture = thumbnail->GetTexture())
-            thumbnail->SetOrigin(static_cast<int>(texture->getSize().x / 2.f), static_cast<int>(texture->getSize().y / 2.f));
 
         if (const auto quantityLabel = slot->FindChild<Gx::Label>(Resource::ItemShop::MyBag::Item::IDC_TEXT_QUANTITY))
         {
@@ -885,8 +947,9 @@ void StateItemShop::InvalidateMyBag()
         m_myBagSelectIndicator->SetVisible(true);
     }
 
-    const auto bagScrollBar = container->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
-    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
+    const auto bagScrollControls = container->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
+    const auto bagScrollBar = bagScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
+    bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
     currentGem->SetValue(player.Gem);
@@ -1061,8 +1124,9 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
     const auto planet           = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
     const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
     const auto slots            = itemList->GetChildren();
-    const std::size_t slotCount = itemList->GetVerticalCount() * itemList->GetHorizontalCount();
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const std::size_t slotCount = slots.size();
+    const auto scrollControls   = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+    const auto shopScrollBar    = scrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
 
     Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP)->SetVisible(false);
     if (m_itemCategory == EquipmentType::Costume)
@@ -1085,8 +1149,10 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
     if (rebuildList)
     {
         m_shopItemList.clear();
-        for (auto& [_, header] : m_items.GetItemData().Items)
+        for (auto it = m_items.GetItemData().Items.rbegin(); it != m_items.GetItemData().Items.rend(); ++it)
         {
+            auto& header = it->second;
+
             // Check price
             if (header.Prices.find(Currency::Gem) == header.Prices.end() && header.Prices.find(Currency::Cash) == header.Prices.end())
                 continue;
@@ -1107,8 +1173,11 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         }
     }
 
+    // TODO: Detect vertical count?
     const auto scrollValue = shopScrollBar->GetValue();
-    shopScrollBar->SetMaximumValue(m_shopItemList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - slots.size()) / itemList->GetVerticalCount())));
+    constexpr int verticalCount = 2; //itemList->GetVerticalCount()
+
+    shopScrollBar->SetMaximumValue(m_shopItemList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - slots.size()) / verticalCount)));
     if (rebuildList && shopScrollBar->GetValue() != 0)
     {
         // This causes 2 times invalidation, but it can't be that bad, right?
@@ -1119,7 +1188,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
     if (scrollValue != shopScrollBar->GetValue())
         return; // Already invalidated via SetMaximumValue (which trigger SetValue)
 
-    for (std::size_t i = 0, j = m_shopCurrentPage * itemList->GetVerticalCount(); i < slots.size(); i++)
+    for (std::size_t i = 0, j = m_shopCurrentPage * verticalCount; i < slots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
         if (!slot)
@@ -1166,8 +1235,30 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             currencyTag->GetPosition().y
         });
 
+
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
+            if (O2Jam::InCompatibilityMode(CompatibilityMode::Interface))
+            {
+                auto& player = m_session.GetCurrentPlayer();
+                const auto it = std::find_if(player.Inventory.begin(), player.Inventory.end(), [itemID = metadata.ID] (auto id)
+                {
+                    return id == itemID;
+                });
+
+                if (it == player.Inventory.end())
+                    player.Inventory.push_back(static_cast<std::uint32_t>(metadata.ID));
+
+                m_session.Save();
+                m_inventory.clear();
+                InvalidateMyBag();
+
+                const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
+                bagButton->PerformClick();
+
+                return;
+            }
+
             if (metadata.EquipmentType == EquipmentType::AttributiveItem)
             {
                 ShowDialog("Skill item is currently not available", DialogStyle::Information);
@@ -1219,10 +1310,6 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
         thumbnail->SetVisible(true);
         thumbnail->SetTexture(*sprite.GetTexture());
         thumbnail->SetTexCoords(sprite.GetTexCoords());
-        thumbnail->SetOrigin({
-            thumbnail->GetTexCoords().size.x / 2.f,
-            thumbnail->GetTexCoords().size.y / 2.f,
-        });
 
         thumbnail->SetFocusChangedCallback([=, description = metadata.Description] (auto& sender, auto&)
         {
@@ -1289,16 +1376,15 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
 void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 {
-    // return;
-
     const auto currentAvatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
     const auto planet           = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
     const auto itemList         = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
-    const auto shopScrollBar    = Instantiate<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+    const auto scrollControls   = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+    const auto shopScrollBar    = scrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
     const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
     const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
     const auto slots            = setItemList->GetChildren();
-    const std::size_t slotCount = setItemList->GetVerticalCount() * setItemList->GetHorizontalCount();
+    const std::size_t slotCount = setItemList->GetChildrenCount();
 
     itemList->SetVisible(false);
     itemList->SetEnabled(false);
@@ -1373,8 +1459,10 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
         }
     }
 
+    // TODO: Detect vertical count?
     const auto scrollValue = shopScrollBar->GetValue();
-    shopScrollBar->SetMaximumValue(m_shopSetList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopSetList.size() - slots.size()) / setItemList->GetVerticalCount())));
+    constexpr int verticalCount = 1; // setItemList->GetVerticalCount()
+    shopScrollBar->SetMaximumValue(m_shopSetList.size() < slots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopSetList.size() - slots.size()) / verticalCount)));
     if (rebuildList && shopScrollBar->GetValue() != 0)
     {
         // This causes 2 times invalidation, but it can't be that bad, right?
@@ -1385,7 +1473,7 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
     if (scrollValue != shopScrollBar->GetValue())
         return; // Already invalidated via SetMaximumValue (which trigger SetValue)
 
-    for (std::size_t i = 0, j = m_shopCurrentPage * setItemList->GetVerticalCount(); i < slots.size(); i++)
+    for (std::size_t i = 0, j = m_shopCurrentPage * verticalCount; i < slots.size(); i++)
     {
         const auto slot = dynamic_cast<Gx::UiContainer*>(slots[i]);
         if (!slot)

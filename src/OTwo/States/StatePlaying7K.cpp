@@ -30,11 +30,13 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
+#include <OTwo/O2Jam.hpp>
 
 using namespace StringTable::Identifiers;
 
 StatePlaying7K::StatePlaying7K(
     Gx::AudioMixer& mixer,
+    Gx::ResourceManager& resources,
     SessionContext& session,
     GameContext& context,
     GameConfig& config,
@@ -160,39 +162,51 @@ void StatePlaying7K::Initialize()
             for (const auto id : member.EquippedItemIDs)
                 avatar->Equip(m_items.Create(id));
 
-            auto& effectContainer = Create<Gx::UiContainer>();
+            auto efc = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
+            auto& effectContainer = efc ? *efc : Create<Gx::UiContainer>();
+
             effectContainer.SetName(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
 
-            if (const auto fxPrefab = FindResource<Gx::Animation>(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM); fxPrefab)
+            auto fx = effectContainer.FindChild<Gx::Animation>(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM);
+            if (const auto fxPrefab = Find<Gx::Animation>(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM); !fx && fxPrefab)
             {
-                auto& fx = Create<Gx::Animation>(*fxPrefab);
-                fx.SetName(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM);
-                fx.Stop();
-                fx.SetAnimationCallback([&] (auto& _) {
-                    effectContainer.SetVisible(
-                        fx.GetState() == Gx::Animation::AnimationState::Playing ||
-                        fx.GetState() == Gx::Animation::AnimationState::Initial
-                    );
-                });
-
-                effectContainer.AddChild(fx);
+                fx = &Create<Gx::Animation>(*fxPrefab);
+                effectContainer.AddChild(*fx);
             }
 
-            if (const auto numPrefab = FindResource<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM); numPrefab)
+            if (fx)
             {
-                auto& numEffect = Create<Gx::BitmapNumber>(*numPrefab);
-                numEffect.SetName(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
-                numEffect.SetAnimationCallback([&] (auto& _) {
-                    numEffect.SetVisible(
-                        numEffect.GetAnimationState() == Gx::Animation::AnimationState::Playing ||
-                        numEffect.GetAnimationState() == Gx::Animation::AnimationState::Initial
+                fx->SetName(Resource::Playing7K::Avatar::IDC_ANIMATION_EFFECT_JAM);
+                fx->Stop();
+                fx->SetAnimationCallback([=, &effectContainer] (auto& _) {
+                    effectContainer.SetVisible(
+                        fx->GetState() == Gx::Animation::AnimationState::Playing ||
+                        fx->GetState() == Gx::Animation::AnimationState::Initial
                     );
                 });
-                effectContainer.AddChild(numEffect);
+            }
+
+            auto numEffect = effectContainer.FindChild<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
+            if (const auto numPrefab = Find<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM); numEffect && numPrefab)
+            {
+                numEffect = &Create<Gx::BitmapNumber>(*numPrefab);
+                effectContainer.AddChild(*numEffect);
+            }
+
+            if (numEffect)
+            {
+                numEffect->SetName(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
+                numEffect->SetAnimationCallback([=] (auto& _) {
+                    numEffect->SetVisible(
+                        numEffect->GetAnimationState() == Gx::Animation::AnimationState::Playing ||
+                        numEffect->GetAnimationState() == Gx::Animation::AnimationState::Initial
+                    );
+                });
             }
 
             effectContainer.SetVisible(false);
-            avatar->AddChild(effectContainer);
+            if (!efc)
+                avatar->AddChild(effectContainer);
 
             const auto info = avatar->GetAvatarInfo();
             info->SetMember(member);
@@ -253,7 +267,9 @@ void StatePlaying7K::Initialize()
 
     // Setup Life Bar
     const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
-    lifeBar->SetSlanted(true);
+    if (!O2Jam::InCompatibilityMode(CompatibilityMode::Playing))
+        lifeBar->SetSlanted(true);
+
     lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
     lifeBar->SetValue(0);
 
@@ -271,8 +287,8 @@ void StatePlaying7K::Initialize()
 
     // Setup Combo Counter
     auto& comboCounter = Create<ComboCounter>(
-        FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COMBO),
-        FindResource<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
+        Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COMBO),
+        Find<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
     );
     comboCounter.SetName(Resource::Playing7K::IDC_CONTAINER_COMBO);
     AddChild(comboCounter);
@@ -281,17 +297,17 @@ void StatePlaying7K::Initialize()
     auto& judgementIndicator = Create<JudgementIndicator>(
         std::unordered_map<Accuracy, Gx::Animation*>
         {
-            { Accuracy::Cool, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COOL) },
-            { Accuracy::Good, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_GOOD) },
-            { Accuracy::Bad,  FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_BAD)  },
-            { Accuracy::Miss, FindResource<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_MISS) },
+            { Accuracy::Cool, Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COOL) },
+            { Accuracy::Good, Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_GOOD) },
+            { Accuracy::Bad,  Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_BAD)  },
+            { Accuracy::Miss, Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_MISS) },
         }, m_config.UseFx
     );
     judgementIndicator.SetName(Resource::Playing7K::IDC_NOTE_JUDGEMENT_INDICATOR);
     AddChild(judgementIndicator);
 
     // Setup Long Note effects
-    if (const auto longNoteEffectList = FindResource<Gx::List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
+    if (const auto longNoteEffectList = Find<Gx::List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
     {
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
@@ -310,7 +326,7 @@ void StatePlaying7K::Initialize()
     }
 
     // Setup Note Clicks
-    if (const auto noteClickList = FindResource<Gx::List>(Resource::Playing7K::IDC_LIST_NOTE_CLICK); noteClickList)
+    if (const auto noteClickList = Find<Gx::List>(Resource::Playing7K::IDC_LIST_NOTE_CLICK); noteClickList)
     {
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {

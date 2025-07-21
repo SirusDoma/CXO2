@@ -19,30 +19,41 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromJson(const Gx::Json& json, const G
 {
     AvatarMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
-    
-    auto attributes = json.at("attributes");
-    if (const auto items = attributes.find("items"); items != attributes.end())
+        return Instantiate(context);
+
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        for (const auto [_, id] : items->items())
+        const auto& attributes = it.value();
+        if (const auto items = attributes.find("items"); items != attributes.end())
         {
-            if (id.empty())
-                continue;
+            for (const auto [_, id] : items->items())
+            {
+                if (id.empty())
+                    continue;
 
-            metadata.ItemIDs.push_back(id.get<unsigned int>());
+                metadata.ItemIDs.push_back(id.get<unsigned int>());
+            }
         }
-    }
 
-    if (const auto gender = attributes.find("gender"); gender != attributes.end())
-    {
-        if (auto parsed = magic_enum::enum_cast<Gender>(gender->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
-            metadata.Gender = parsed.value();
-    }
+        if (const auto gender = attributes.find("gender"); gender != attributes.end())
+        {
+            if (auto parsed = magic_enum::enum_cast<Gender>(gender->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+                metadata.Gender = parsed.value();
+        }
 
-    if (const auto transform = attributes.find("transform"); transform != attributes.end())
-    {
-        if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
-            return nullptr;
+        if (const auto offset = attributes.find("offset"); offset != attributes.end())
+        {
+            metadata.Offset = {
+                offset->at("x").get<float>(),
+                offset->at("y").get<float>()
+            };
+        }
+
+        if (const auto transform = attributes.find("transform"); transform != attributes.end())
+        {
+            if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
+                return Instantiate(context);
+        }
     }
 
     return LoadFromMetadata(metadata, context);
@@ -54,11 +65,24 @@ Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata& m
     const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
+
+    const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (metadata->Position != sf::Vector2f())
+    {
+        avatar->SetPosition(metadata->Position);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        avatar->SetPosition({
+           static_cast<float>(bound->position.x),
+           static_cast<float>(bound->position.y)
+       });
+    }
     
     avatar->SetName(metadata->Name);
     avatar->SetGender(metadata->Gender);
     avatar->SetOrigin(metadata->Origin);
-    avatar->SetPosition(metadata->Position);
+    avatar->SetOffset(metadata->Offset);
     avatar->SetScale(metadata->Scale);
     avatar->SetRotation(metadata->Rotation);
 

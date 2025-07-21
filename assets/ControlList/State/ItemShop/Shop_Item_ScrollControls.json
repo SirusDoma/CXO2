@@ -1,0 +1,13 @@
+{
+  "type": "UiContainer",
+  "require": {
+    "bndID": "0X14022043"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_SCROLL_ITEM": "ControlList/State/ItemShop/Shop_Scroll_Item.json",
+      "IDC_BUTTON_ITEM_SCROLL_LEFT": "ControlList/State/ItemShop/Shop_Btn_Item_ScrollLeft.json",
+      "IDC_BUTTON_ITEM_SCROLL_RIGHT": "ControlList/State/ItemShop/Shop_Btn_Item_ScrollRight.json"
+    }
+  }
+}

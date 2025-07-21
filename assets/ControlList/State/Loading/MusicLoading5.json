@@ -1,0 +1,6 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "sheet": "MusicLoading5.ojs"
+  }
+}

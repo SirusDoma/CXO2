@@ -1,0 +1,12 @@
+{
+  "type": "Avatar",
+  "require": {
+    "bndID": "0X15700012"
+  },
+  "attributes": {
+    "offset": {
+      "x": -90,
+      "y": -60
+    }
+  }
+}

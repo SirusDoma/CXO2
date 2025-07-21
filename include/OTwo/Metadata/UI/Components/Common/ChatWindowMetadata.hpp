@@ -6,9 +6,9 @@
 
 struct ChatWindowMetadata : public TransformMetadata
 {
-    sf::FloatRect Bounds;
-    unsigned int  FontSize;
-    sf::Color     Color;
-    unsigned int  MaximumChatsLength;
-    float         LineSpacing;
+    sf::IntRect   Bounds = sf::IntRect();
+    unsigned int  FontSize = 13;
+    sf::Color     Color = sf::Color::White;
+    unsigned int  MaximumChatsLength = 5;
+    float         LineSpacing = 0;
 };

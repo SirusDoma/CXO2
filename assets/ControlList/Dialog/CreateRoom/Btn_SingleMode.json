@@ -1,0 +1,12 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "refID": "0X25205007",
+    "bndID": "0X25205007"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_ANIMATION_SINGLE": "ControlList/Dialog/CreateRoom/SingleModeAnimation.json"
+    }
+  }
+}

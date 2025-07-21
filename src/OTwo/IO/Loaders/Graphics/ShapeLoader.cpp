@@ -17,162 +17,165 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json& json, const
 {
     auto metadata = std::make_unique<ShapeMetadata>();
 
-    auto attributes = json.at("attributes");
-    auto type = attributes.find("type");
-    if (type == attributes.end())
-        return nullptr;
-
-    if (auto parsed = magic_enum::enum_cast<ShapeMetadata::Type>(type->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
-        metadata->ShapeType = parsed.value();
-    else
-        return nullptr;
-
-    if (metadata->ShapeType == ShapeMetadata::Type::Circle)
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        metadata = std::make_unique<CircleMetadata>();
-        metadata->ShapeType = ShapeMetadata::Type::Circle;
+        const auto& attributes = it.value();
+        auto type = attributes.find("type");
+        if (type == attributes.end())
+            return Instantiate(context);
 
-        auto circle = dynamic_cast<CircleMetadata*>(metadata.get());
-
-        auto radius = attributes.find("radius");
-        if (type != attributes.end())
-            circle->Radius = radius->get<float>();
+        if (auto parsed = magic_enum::enum_cast<ShapeMetadata::Type>(type->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            metadata->ShapeType = parsed.value();
         else
-            circle->Radius = 0;
+            return Instantiate(context);
 
-        if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
-            circle->PointCount = pointCount->get<unsigned int>();
-        else
-            circle->PointCount = 30;
-    }
-    else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
-    {
-        metadata = std::make_unique<PolygonMetadata>();
-        metadata->ShapeType = ShapeMetadata::Type::Polygon;
-
-        auto polygon = dynamic_cast<PolygonMetadata*>(metadata.get());
-        if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
-            polygon->PointCount = pointCount->get<unsigned int>();
-        else
-            polygon->PointCount = 30;
-
-        if (auto points = attributes.find("points"); points != attributes.end())
+        if (metadata->ShapeType == ShapeMetadata::Type::Circle)
         {
-            for (auto& point : points->items())
+            metadata = std::make_unique<CircleMetadata>();
+            metadata->ShapeType = ShapeMetadata::Type::Circle;
+
+            auto circle = dynamic_cast<CircleMetadata*>(metadata.get());
+
+            auto radius = attributes.find("radius");
+            if (type != attributes.end())
+                circle->Radius = radius->get<float>();
+            else
+                circle->Radius = 0;
+
+            if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
+                circle->PointCount = pointCount->get<unsigned int>();
+            else
+                circle->PointCount = 30;
+        }
+        else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
+        {
+            metadata = std::make_unique<PolygonMetadata>();
+            metadata->ShapeType = ShapeMetadata::Type::Polygon;
+
+            auto polygon = dynamic_cast<PolygonMetadata*>(metadata.get());
+            if (auto pointCount = attributes.find("pointCount"); pointCount != attributes.end())
+                polygon->PointCount = pointCount->get<unsigned int>();
+            else
+                polygon->PointCount = 30;
+
+            if (auto points = attributes.find("points"); points != attributes.end())
             {
-                polygon->Points.push_back({
-                    point.value().at("x").get<float>(),
-                    point.value().at("y").get<float>(),
-                });
+                for (auto& point : points->items())
+                {
+                    polygon->Points.push_back({
+                        point.value().at("x").get<float>(),
+                        point.value().at("y").get<float>(),
+                    });
+                }
             }
         }
-    }
-    else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
-    {
-        metadata = std::make_unique<RectangleMetadata>();
-        metadata->ShapeType = ShapeMetadata::Type::Rectangle;
+        else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
+        {
+            metadata = std::make_unique<RectangleMetadata>();
+            metadata->ShapeType = ShapeMetadata::Type::Rectangle;
 
-        auto rectangle = dynamic_cast<RectangleMetadata*>(metadata.get());
-        if (auto width = attributes.find("width"); width != attributes.end())
-            rectangle->Width = width->get<unsigned int>();
+            auto rectangle = dynamic_cast<RectangleMetadata*>(metadata.get());
+            if (auto width = attributes.find("width"); width != attributes.end())
+                rectangle->Width = width->get<unsigned int>();
+            else
+                rectangle->Width = 0;
+
+            if (auto height = attributes.find("height"); height != attributes.end())
+                rectangle->Height = height->get<unsigned int>();
+            else
+                rectangle->Height = 0;
+        }
+        else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
+        {
+            metadata = std::make_unique<RoundedRectangleMetadata>();
+            metadata->ShapeType = ShapeMetadata::Type::RoundedRectangle;
+
+            auto rectangle = dynamic_cast<RoundedRectangleMetadata*>(metadata.get());
+            if (auto width = attributes.find("width"); width != attributes.end())
+                rectangle->Width = width->get<unsigned int>();
+            else
+                rectangle->Width = 0;
+
+            if (auto height = attributes.find("height"); height != attributes.end())
+                rectangle->Height = height->get<unsigned int>();
+            else
+                rectangle->Height = 0;
+
+            auto radius = attributes.find("cornerRadius");
+            if (type != attributes.end())
+                rectangle->CornerRadius = radius->get<float>();
+            else
+                rectangle->CornerRadius = 1.f;
+
+            if (auto pointCount = attributes.find("cornerPointCount"); pointCount != attributes.end())
+                rectangle->CornerPointCount = pointCount->get<unsigned int>();
+            else
+                rectangle->CornerPointCount = 30;
+        }
         else
-            rectangle->Width = 0;
+            return Instantiate(context);
 
-        if (auto height = attributes.find("height"); height != attributes.end())
-            rectangle->Height = height->get<unsigned int>();
-        else
-            rectangle->Height = 0;
-    }
-    else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
-    {
-        metadata = std::make_unique<RoundedRectangleMetadata>();
-        metadata->ShapeType = ShapeMetadata::Type::RoundedRectangle;
+        if (!MetadataLoader::Parse(json, *metadata, context))
+            return Instantiate(context);
 
-        auto rectangle = dynamic_cast<RoundedRectangleMetadata*>(metadata.get());
-        if (auto width = attributes.find("width"); width != attributes.end())
-            rectangle->Width = width->get<unsigned int>();
-        else
-            rectangle->Width = 0;
+        if (auto transform = attributes.find("transform"); transform != attributes.end())
+            TransformLoader::ParseMetadata(transform.value(), *metadata, context);
 
-        if (auto height = attributes.find("height"); height != attributes.end())
-            rectangle->Height = height->get<unsigned int>();
-        else
-            rectangle->Height = 0;
+        if (auto colorMap = attributes.find("colorMap"); colorMap != attributes.end())
+        {
+            unsigned int i = 0;
+            for (auto& color : colorMap->items())
+            {
+                unsigned int a, r, g, b;
+                color.value().at("a").get_to(a);
+                color.value().at("r").get_to(r);
+                color.value().at("g").get_to(g);
+                color.value().at("b").get_to(b);
 
-        auto radius = attributes.find("cornerRadius");
-        if (type != attributes.end())
-            rectangle->CornerRadius = radius->get<float>();
-        else
-            rectangle->CornerRadius = 1.f;
+                metadata->ColorMap[i++] = sf::Color(r, g, b, a);
+            }
+        }
 
-        if (auto pointCount = attributes.find("cornerPointCount"); pointCount != attributes.end())
-            rectangle->CornerPointCount = pointCount->get<unsigned int>();
-        else
-            rectangle->CornerPointCount = 30;
-    }
-    else
-        return nullptr;
-
-    if (!MetadataLoader::Parse(json, *metadata, context))
-        return nullptr;
-
-    if (auto transform = attributes.find("transform"); transform != attributes.end())
-        TransformLoader::ParseMetadata(transform.value(), *metadata, context);
-
-    if (auto colorMap = attributes.find("colorMap"); colorMap != attributes.end())
-    {
-        unsigned int i = 0;
-        for (auto& color : colorMap->items())
+        if (auto color = attributes.find("color"); color != attributes.end())
         {
             unsigned int a, r, g, b;
-            color.value().at("a").get_to(a);
-            color.value().at("r").get_to(r);
-            color.value().at("g").get_to(g);
-            color.value().at("b").get_to(b);
+            color->at("a").get_to(a);
+            color->at("r").get_to(r);
+            color->at("g").get_to(g);
+            color->at("b").get_to(b);
+            metadata->Color = sf::Color(r, g, b, a);
+        }
+        else
+            metadata->Color = sf::Color::Black;
 
-            metadata->ColorMap[i++] = sf::Color(r, g, b, a);
+        if (auto outlineThickness = attributes.find("outlineThickness"); outlineThickness != attributes.end())
+            metadata->OutlineThickness = outlineThickness->get<float>();
+        else
+            metadata->OutlineThickness = 0.f;
+
+        if (auto outlineColor = attributes.find("outlineColor"); outlineColor != attributes.end())
+        {
+            unsigned int a, r, g, b;
+            outlineColor->at("a").get_to(a);
+            outlineColor->at("r").get_to(r);
+            outlineColor->at("g").get_to(g);
+            outlineColor->at("b").get_to(b);
+            metadata->OutlineColor = sf::Color(r, g, b, a);
+        }
+        else
+            metadata->OutlineColor = sf::Color::Transparent;
+
+        if (auto texCoords  = attributes.find("texCoords"); texCoords != attributes.end())
+        {
+            unsigned int x, y, w, h;
+            texCoords->at("x").get_to(x);
+            texCoords->at("y").get_to(y);
+            texCoords->at("width").get_to(w);
+            texCoords->at("height").get_to(h);
+            metadata->TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
         }
     }
 
-    if (auto color = attributes.find("color"); color != attributes.end())
-    {
-        unsigned int a, r, g, b;
-        color->at("a").get_to(a);
-        color->at("r").get_to(r);
-        color->at("g").get_to(g);
-        color->at("b").get_to(b);
-        metadata->Color = sf::Color(r, g, b, a);
-    }
-    else
-        metadata->Color = sf::Color::Black;
-
-    if (auto it = attributes.find("outlineThickness"); it != attributes.end())
-        metadata->OutlineThickness = it->get<float>();
-    else
-        metadata->OutlineThickness = 0.f;
-
-    if (auto outlineColor = attributes.find("outlineColor"); outlineColor != attributes.end())
-    {
-        unsigned int a, r, g, b;
-        outlineColor->at("a").get_to(a);
-        outlineColor->at("r").get_to(r);
-        outlineColor->at("g").get_to(g);
-        outlineColor->at("b").get_to(b);
-        metadata->OutlineColor = sf::Color(r, g, b, a);
-    }
-    else
-        metadata->OutlineColor = sf::Color::Transparent;
-
-    if (auto texCoords  = attributes.find("texCoords"); texCoords != attributes.end())
-    {
-        unsigned int x, y, w, h;
-        texCoords->at("x").get_to(x);
-        texCoords->at("y").get_to(y);
-        texCoords->at("width").get_to(w);
-        texCoords->at("height").get_to(h);
-        metadata->TexCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
-    }
-    
     return LoadFromMetadata(*metadata, context);
 }
 
@@ -212,17 +215,28 @@ Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromMetadata(const ResourceMetadata&
     shape->SetTexCoords(metadata->TexCoords);
 
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         shape->SetTexture(*texture);
 
     for (auto& [i, color] : metadata->ColorMap)
         shape->SetColor(i, color);
 
+    if (metadata->Position != sf::Vector2f())
+    {
+        shape->SetPosition(metadata->Position);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        shape->SetPosition({
+            static_cast<float>(bound->position.x),
+            static_cast<float>(bound->position.y),
+        });
+    }
+
     shape->SetColor(metadata->Color);
     shape->SetOutlineThickness(metadata->OutlineThickness);
     shape->SetOutlineColor(metadata->OutlineColor);
     shape->SetOrigin(metadata->Origin);
-    shape->SetPosition(metadata->Position);
     shape->SetScale(metadata->Scale);
     shape->SetRotation(metadata->Rotation);
 

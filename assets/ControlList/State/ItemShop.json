@@ -1,0 +1,147 @@
+{
+  "type": "State",
+  "name": "STATE_ITEM_SHOP",
+  "require": {},
+  "attributes": {
+    "objects":{
+      "IDC_IMAGE_STATE_ITEM_SHOP": "ControlList/State/ItemShop/State_ItemShop.json",
+      "IDC_AVATAR": "ControlList/State/ItemShop/Avatar.json",
+      "IDC_BUTTON_DEFAULT": "ControlList/State/ItemShop/Shop_Btn_Default.json",
+      "IDC_BUTTON_MY_ROOM": "ControlList/State/ItemShop/Shop_Btn_GoMyRoom.json",
+      "IDC_TEXT_NICKNAME": "ControlList/State/ItemShop/Shop_Nickname.json",
+      "IDC_NUMBER_GEM": "ControlList/State/ItemShop/Shop_CurrentGem.json",
+      "IDC_NUMBER_CASH": "ControlList/State/ItemShop/Shop_CurrentCash.json",
+      "IDC_IMAGE_PLANET": "ControlList/State/ItemShop/Shop_Planets.json",
+      "IDC_BUTTON_PLANET_UP": "ControlList/State/ItemShop/Shop_Btn_Planet_Up.json",
+      "IDC_BUTTON_PLANET_DOWN": "ControlList/State/ItemShop/Shop_Btn_Planet_Down.json",
+      "IDC_BUTTON_FEMALE": "ControlList/State/ItemShop/Shop_Btn_Female.json",
+      "IDC_BUTTON_MALE": "ControlList/State/ItemShop/Shop_Btn_Male.json",
+      "IDC_CONTAINER_CATEGORY_BUTTONS": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_SPECIAL": "ControlList/State/ItemShop/Shop_Btn_Special.json",
+            "IDC_BUTTON_FASHION": "ControlList/State/ItemShop/Shop_Btn_Fashion.json",
+            "IDC_BUTTON_ACCESSORY": "ControlList/State/ItemShop/Shop_Btn_Accessory.json",
+            "IDC_BUTTON_BEAUTY": "ControlList/State/ItemShop/Shop_Btn_Beauty.json",
+            "IDC_BUTTON_INSTRUMENT": "ControlList/State/ItemShop/Shop_Btn_Instrument.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_SPECIAL_CATEGORY": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_SET_ITEM": "ControlList/State/ItemShop/Shop_Btn_SubMenu_SetItem.json",
+            "IDC_BUTTON_WINGS": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Wings.json",
+            "IDC_BUTTON_PET": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Pet.json",
+            "IDC_BUTTON_SKILL": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Skill.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_FASHION_CATEGORY": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_TOP": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Top.json",
+            "IDC_BUTTON_PANTS": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Pants.json",
+            "IDC_BUTTON_SHOES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Shoes.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_ACCESSORY_CATEGORY": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_ACCESSORIES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Accessories.json",
+            "IDC_BUTTON_EARRINGS": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Earrings.json",
+            "IDC_BUTTON_NECKLACE": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Necklace.json",
+            "IDC_BUTTON_CLOTHES_ACCESSORIES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_ClothesAccessories.json",
+            "IDC_BUTTON_GLASSES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Glasses.json",
+            "IDC_BUTTON_GLOVES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Gloves.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_BEAUTY_CATEGORY": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_HAIR": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Hair.json",
+            "IDC_BUTTON_HAIR_ACCESSORIES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_HairAccessories.json",
+            "IDC_BUTTON_FACE": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Face.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_INSTRUMENT_CATEGORY": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_GUITAR": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Guitar.json",
+            "IDC_BUTTON_BASS": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Bass.json",
+            "IDC_BUTTON_KEYBOARD": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Keyboard.json",
+            "IDC_BUTTON_DRUM": "ControlList/State/ItemShop/Shop_Btn_SubMenu_Drum.json",
+            "IDC_BUTTON_INSTRUMENT_ACCESSORIES": "ControlList/State/ItemShop/Shop_Btn_SubMenu_InstrumentAccessories.json"
+          }
+        }
+      },
+      "IDC_LIST_ITEM": "ControlList/State/ItemShop/Shop_List_Item.json",
+      "IDC_CONTAINER_SET_ITEM": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_SET_ITEM_FULL_BACK": "ControlList/State/ItemShop/Shop_SetItem_FullBack.json",
+            "IDC_LIST_SET_ITEM": "ControlList/State/ItemShop/Shop_List_SetItem.json"
+          }
+        }
+      },
+      "IDC_BUTTON_EXT_MENU": "ControlList/State/ItemShop/Shop_Btn_ExtMenu.json",
+      "IDC_IMAGE_EXT_MENU": "ControlList/State/ItemShop/Shop_ExtMenu.json",
+      "IDC_CONTAINER_ITEM_SCROLL_CONTROLS": "ControlList/State/ItemShop/Shop_Item_ScrollControls.json",
+      "IDC_BUTTON_MYBAG": "ControlList/State/ItemShop/Shop_Btn_MyBag.json",
+      "IDC_BUTTON_CART": "ControlList/State/ItemShop/Shop_Btn_Cart.json",
+      "IDC_CONTAINER_MYBAG": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_LIST_BAG": "ControlList/State/ItemShop/Shop_List_Bag.json",
+            "IDC_CONTAINER_MYBAG_SCROLL_CONTROLS": "ControlList/State/ItemShop/Shop_Bag_ScrollControls.json",
+            "IDC_BUTTON_SELL": "ControlList/State/ItemShop/Shop_Btn_ItemSell.json",
+            "IDC_IMAGE_MYBAG_SELECT": "ControlList/State/ItemShop/Shop_MyBagSelect.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_CART": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_CART": "ControlList/State/ItemShop/Shop_Cart.json",
+            "IDC_LIST_CART": "ControlList/State/ItemShop/Shop_Cart_List.json",
+            "IDC_NUMBER_TOTAL_GEM": "ControlList/State/ItemShop/Shop_Cart_TotalGem.json",
+            "IDC_NUMBER_TOTAL_CASH": "ControlList/State/ItemShop/Shop_Cart_TotalCash.json",
+            "IDC_NUMBER_CURRENT_PAGE": "ControlList/State/ItemShop/Shop_Cart_CurrentPageNumber.json",
+            "IDC_NUMBER_MAX_PAGE": "ControlList/State/ItemShop/Shop_Cart_MaxPageNumber.json",
+            "IDC_BUTTON_LEFT": "ControlList/State/ItemShop/Shop_Btn_Cart_Left.json",
+            "IDC_BUTTON_RIGHT": "ControlList/State/ItemShop/Shop_Btn_Cart_Right.json",
+            "IDC_BUTTON_BUY": "ControlList/State/ItemShop/Shop_Btn_Cart_Buy.json",
+            "IDC_BUTTON_GIFT": "ControlList/State/ItemShop/Shop_Btn_Cart_Gift.json"
+          }
+        }
+      },
+      "IDC_IMAGE_TOOLTIP": "ControlList/State/ItemShop/Shop_Tooltip.json",
+      "IDC_CONTAINER_SHOP_MASTER": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_SHOP_MASTER_MAIN": "ControlList/State/ItemShop/Shop_Master_Main.json",
+            "IDC_IMAGE_SHOP_MASTER_O2P": "ControlList/State/ItemShop/Shop_Master_O2P.json",
+            "IDC_IMAGE_SHOP_MASTER_AQUA": "ControlList/State/ItemShop/Shop_Master_Aqua.json",
+            "IDC_IMAGE_SHOP_MASTER_GRAFFITI": "ControlList/State/ItemShop/Shop_Master_Graffiti.json",
+            "IDC_IMAGE_SHOP_MASTER_EVENT": "ControlList/State/ItemShop/Shop_Master_Event.json"
+          }
+        }
+      },
+      "IDC_DIALOG_SKILL_INFO": "ControlList/Dialog/SkillInfo.json",
+      "IDC_BUTTON_BACK": "ControlList/State/ItemShop/Shop_Btn_Back.json"
+    }
+  }
+}

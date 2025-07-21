@@ -1,0 +1,17 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X13500043",
+    "bndID": "0X13500043"
+  },
+  "attributes": {
+    "frames": {
+      "Euta": {},
+      "Thalo": {},
+      "Melpomin": {},
+      "Kleo": {},
+      "Kalliope": {},
+      "Philix": {}
+    }
+  }
+}

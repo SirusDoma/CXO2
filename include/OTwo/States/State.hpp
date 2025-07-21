@@ -45,7 +45,7 @@ public:
     R& Create(Args&&... args);
 
     template<typename R>
-    R* FindResource(const std::string& id, ResourceScope scope = ResourceScope::Local);
+    R* Find(const std::string& id, ResourceScope scope = ResourceScope::Local);
 
     Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local);
     bool OnAppClose() override;

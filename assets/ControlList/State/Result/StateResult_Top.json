@@ -1,0 +1,13 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "StateResult_Top.ojs"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_NUMBER_POINT": "ControlList/State/Result/PointNumber.json",
+      "IDC_CONTAINER_PLAYER_SCORE": "ControlList/State/Result/Result_PlayerScore.json",
+      "IDC_TEXT_GEM": "ControlList/State/Result/Result_GemNum.json"
+    }
+  }
+}

@@ -19,6 +19,7 @@ class StatePlaying7K : public State
 public:
     StatePlaying7K(
         Gx::AudioMixer& mixer,
+        Gx::ResourceManager& resources,
         SessionContext& session,
         GameContext& context,
         GameConfig& config,

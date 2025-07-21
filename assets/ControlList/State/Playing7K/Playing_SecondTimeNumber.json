@@ -1,0 +1,15 @@
+{
+  "type": "BitmapNumber",
+  "require": {
+    "sheet": "PlayTimeNum.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 356,
+        "y": 569
+      }
+    },
+    "digitCount": 2
+  }
+}

@@ -1,0 +1,13 @@
+﻿{
+  "type": "UiContainer",
+  "require": {
+    "bndID": "0X16021030"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_SCROLL_BAR_CHAT": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatScroll.json",
+      "IDC_BUTTON_SCROLL_UP": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatScrollUp.json",
+      "IDC_BUTTON_SCROLL_DOWN": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_Btn_ChatScrollDown.json"
+    }
+  }
+}

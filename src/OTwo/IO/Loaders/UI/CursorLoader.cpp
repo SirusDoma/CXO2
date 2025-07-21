@@ -67,7 +67,7 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadat
     auto cursor = std::make_unique<Gx::Cursor>();
     const auto ctx = ResourceContextDecorator::Decorate(context);
 
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
     {
         const auto source = texture->copyToImage();
         if (!metadata->States.empty())

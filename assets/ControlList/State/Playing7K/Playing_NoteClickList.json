@@ -1,0 +1,86 @@
+{
+  "type": "List",
+  "attributes": {
+    "layouts": [
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 19,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 44,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 69,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 99,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 129,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 154,
+          "y": 476
+        }
+      },
+      {
+        "origin": {
+          "x": 128,
+          "y": 128
+        },
+        "position": {
+          "x": 179,
+          "y": 476
+        }
+      }
+    ],
+    "objects": {
+      "IDC_ANIMATION_NOTE_CLICK1": "ControlList/State/Playing7K/Note_Click/Note_Click_1.json",
+      "IDC_ANIMATION_NOTE_CLICK2": "ControlList/State/Playing7K/Note_Click/Note_Click_2.json",
+      "IDC_ANIMATION_NOTE_CLICK3": "ControlList/State/Playing7K/Note_Click/Note_Click_3.json",
+      "IDC_ANIMATION_NOTE_CLICK4": "ControlList/State/Playing7K/Note_Click/Note_Click_4.json",
+      "IDC_ANIMATION_NOTE_CLICK5": "ControlList/State/Playing7K/Note_Click/Note_Click_5.json",
+      "IDC_ANIMATION_NOTE_CLICK6": "ControlList/State/Playing7K/Note_Click/Note_Click_6.json",
+      "IDC_ANIMATION_NOTE_CLICK7": "ControlList/State/Playing7K/Note_Click/Note_Click_7.json"
+    }
+  }
+}

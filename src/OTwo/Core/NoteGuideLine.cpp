@@ -3,14 +3,6 @@
 #include <OTwo/Core/LongNote.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
-// NoteGuideLine::NoteGuideLine(const NoteGuideLine& copy) :
-//     m_parent(copy.m_parent),
-//     m_guideLength(),
-//     m_delta(),
-//     m_vertices(copy.m_vertices)
-// {
-// }
-
 NoteGuideLine::NoteGuideLine(const Note& parent) :
     m_parent(&parent),
     m_guideLength(),

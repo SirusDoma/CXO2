@@ -13,6 +13,11 @@
 
 using namespace StringTable::Identifiers;
 
+StatePlaying7KLoader::StatePlaying7KLoader(Gx::ResourceManager& resources) :
+    m_resources(resources)
+{
+}
+
 Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
     StatePlayingMetadata metadata;
@@ -39,7 +44,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     state->SetViewport(metadata->Viewport);
 
     auto ctx = static_cast<const PlayingResourceContext&>(context);
-    ctx.Bind(state->GetResources());
+    ctx.Bind(m_resources);
 
     auto maps = std::unordered_set<std::string>();
     for (auto [key, _] : meta.Require)
@@ -49,12 +54,14 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     }
 
     unsigned int mapID = ctx.GetMapID();
-    if (mapID == 0)
+    if (mapID == 0 || mapID > maps.size())
     {
         auto device     = std::random_device();
         auto seeder     = std::mt19937(device());
         auto randomizer = std::uniform_int_distribution<unsigned int>(1, maps.size() - 1);
         mapID           = randomizer(seeder);
+
+        ctx.SetMapID(mapID);
     }
 
     if (ctx.GetMode() == GameMode::Tutorial)
@@ -88,22 +95,28 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
 
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COMBO, sfxSuffix, ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_NOTE_COMBO, sfxSuffix, ctx);
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix, ctx);
+
+    if (metadata->Require.find(fmt::format("{}{}", Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix)) != metadata->Require.end())
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix, ctx);
 
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COOL, sfxSuffix, ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_GOOD, sfxSuffix, ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_BAD, sfxSuffix, ctx);
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_MISS, sfxSuffix, ctx);
 
-    LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM, std::string(), ctx);
+    if (metadata->Require.find(Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM) != metadata->Require.end())
+        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM, std::string(), ctx);
+
     LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_CONTAINER_NOTE_JAM, std::string(), ctx);
 
     auto container = ObjectContainer::Decorate(state.get());
-    for (auto [key, object] : metadata->Objects)
+    for (const auto& [key, object] : metadata->Objects)
     {
         // Rewire resource manager to the local scene
         auto name = fmt::format("{}/{}", meta.Name, key);
-        auto rctx = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
+        auto rctx = Gx::ResourceContext(name, m_resources, ctx.GetCacheMode());
+        for (const auto& [key, value] : ctx.GetProperties())
+            rctx.SetProperty(key, value);
 
         ObjectLoader::LoadFromJson(name, object, container, rctx);
     }
@@ -123,7 +136,7 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     else
         throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT);
 
-    if (auto longNoteEffectList = state->FindResource<Gx::List>(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
+    if (auto longNoteEffectList = state->Find<Gx::List>(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
     {
         for (auto child :longNoteEffectList->GetChildren())
         {
@@ -143,13 +156,15 @@ Gx::ResourcePtr<StatePlaying7K> StatePlaying7KLoader::LoadFromMetadata(const Res
     else
         throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT);
 
-    if (auto noteClickList = state->FindResource<Gx::List>(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK); noteClickList)
+    if (auto noteClickList = state->Find<Gx::List>(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK); noteClickList)
     {
         auto noteClickSuffix = std::string();
         if (ctx.IsFxEnabled())
             noteClickSuffix = fmt::format("{}_{}", mapID, ctx.GetEffectID());
 
-        LoadRequiredResource(ObjectContainer::Decorate(noteClickList),  metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_CLICK, noteClickSuffix, ctx, 7);
+        if (noteClickList->GetChildrenCount() == 0)
+            LoadRequiredResource(ObjectContainer::Decorate(noteClickList),  metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_CLICK, noteClickSuffix, ctx, 7);
+
         for (auto child :noteClickList->GetChildren())
         {
             if (auto animation = dynamic_cast<Gx::Animation*>(child); animation)
@@ -179,6 +194,9 @@ void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const
         const auto name      = fmt::format("{}/{}", container.GetName(), key);
         const auto reference = std::any_cast<Gx::Json>(it->second);
         auto ctx             = Gx::ResourceContext::Rebind(context, name);
+
+        for (const auto& [key, value] : context.GetProperties())
+            ctx.SetProperty(key, value);
 
         if (count > 1)
         {

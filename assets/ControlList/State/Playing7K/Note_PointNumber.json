@@ -1,0 +1,10 @@
+{
+  "type": "BitmapNumber",
+  "require": {
+    "sheet": "NotePointNum.ojs"
+  },
+  "attributes": {
+    "alignment": "Right",
+    "kerning": 1
+  }
+}

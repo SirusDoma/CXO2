@@ -29,7 +29,7 @@ Gx::ResourcePtr<sf::Transform> TransformLoader::LoadFromMetadata(const ResourceM
     return std::make_unique<sf::Transform>(transform);
 }
 
-bool TransformLoader::ParseMetadata(Gx::Json transform, TransformMetadata& metadata, const Gx::ResourceContext& ctx)
+bool TransformLoader::ParseMetadata(const Gx::Json& transform, TransformMetadata& metadata, const Gx::ResourceContext& ctx)
 {
     if (transform.empty())
         return false;

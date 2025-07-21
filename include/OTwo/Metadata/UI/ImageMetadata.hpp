@@ -8,11 +8,13 @@ struct ImageMetadata : public SpriteMetadata
 {
     struct FrameMetadata
     {
-        std::string first;
-        Gx::Image::Frame second;
+        std::string Name = std::string();
+        Gx::Image::Frame Value = {};
+
+        std::optional<std::uint16_t> ID = std::nullopt;
     };
 
-    ImageMetadata() : Frames() {}
-
-    std::vector<FrameMetadata> Frames;
+    Gx::Image::SizeMode SizeMode = Gx::Image::SizeMode::Normal;
+    sf::FloatRect Bounds = sf::FloatRect();
+    std::vector<FrameMetadata> Frames = {};
 };

@@ -1,0 +1,10 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X15600017",
+    "bndID": "0X15600017"
+  },
+  "attributes": {
+    "sizeMode": "Center"
+  }
+}

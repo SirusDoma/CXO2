@@ -2,7 +2,7 @@
 
 #include <vector>
 
-enum class Currency
+enum class Currency : std::uint8_t
 {
     None,
     Gem,

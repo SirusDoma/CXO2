@@ -1,0 +1,44 @@
+{
+  "type": "List",
+  "require": {
+    "template": {
+      "name": "IDC_NUMBER_NOTE_POINT_NUMBER",
+      "count": 5,
+      "source": "ControlList/State/Playing7K/Note_PointNumber.json"
+    }
+  },
+  "attributes": {
+    "layouts": [
+      {
+        "position": {
+          "x": 671,
+          "y": 557
+        }
+      },
+      {
+        "position": {
+          "x": 656,
+          "y": 572
+        }
+      },
+      {
+        "position": {
+          "x": 726,
+          "y": 572
+        }
+      },
+      {
+        "position": {
+          "x": 656,
+          "y": 581
+        }
+      },
+      {
+        "position": {
+          "x": 726,
+          "y": 581
+        }
+      }
+    ]
+  }
+}

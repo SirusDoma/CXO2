@@ -113,6 +113,12 @@ namespace Gx
         throw ResourceAccessException(fileName, "File is not exists or not supported");
     }
 
+    bool FileSystem::IsMounted(const FileSystemController& fileSystem)
+    {
+        const auto it = std::find(m_controllers.begin(), m_controllers.end(), &fileSystem);
+        return it != m_controllers.end();
+    }
+
     void FileSystem::Mount(const FileSystemController& fileSystem)
     {
         m_controllers.push_back(&fileSystem);

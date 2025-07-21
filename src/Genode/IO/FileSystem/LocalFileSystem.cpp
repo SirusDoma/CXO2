@@ -295,7 +295,7 @@ namespace Gx
                 if (auto [_, inserted] = scanned.insert(fileName); !inserted)
                     continue;
 
-                if (StringHelper::IsGlobMatch(entry.path().filename().string(), pattern))
+                if (StringHelper::IsGlobMatch(entry.path().filename().string(), pattern, false))
                     files.push_back(std::make_unique<FileInfo>(*this, fileName, GetFileSize(fileName).value_or(0)));
             }
         }

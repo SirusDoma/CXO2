@@ -1,0 +1,14 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X1A50004C",
+    "localBndID": "0X1A50004C"
+  },
+  "attributes": {
+    "frames": {
+      "NotDownloaded": {},
+      "Downloading": {},
+      "Downloaded": {}
+    }
+  }
+}

@@ -63,10 +63,21 @@ void State::LoadCommonResources()
         return;
 
     m_prompted    = false;
-    m_dialogInfo  = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
-    m_dialog1     = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
-    m_dialog2     = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-    m_exitDialog  = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+    if (Gx::FileSystem::Contains("ControlList_Interface.txt"))
+    {
+        m_dialogInfo = Instantiate<Gx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
+        m_dialog1    = Instantiate<Gx::Dialog>("ControlList/Dialog/Question1.json", ResourceScope::Shared);
+        m_dialog2    = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+        m_exitDialog = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+    }
+    else
+    {
+        m_dialogInfo = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
+        m_dialog1    = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
+        m_dialog2    = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+    }
+
     m_cancelSound = Instantiate<sf::Sound>(Sound::Effects::EF_03, ResourceScope::Shared);
     m_popupSound  = Instantiate<sf::Sound>(Sound::Effects::EF_06, ResourceScope::Shared);
 

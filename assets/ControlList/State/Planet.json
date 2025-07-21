@@ -1,0 +1,26 @@
+{
+  "type": "State",
+  "name": "STATE_PLANET",
+  "require": {},
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_STATE_PLANET": "ControlList/State/Planet/State_Planet.json",
+      "IDC_ANIMATION_TOWER": "ControlList/State/Planet/Planet_Tower.json",
+      "IDC_CONTAINER_MUSIC_HALL": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_RADIO_BEGINNER_01": "ControlList/State/Planet/Planet_Btn_Beginner_01.json",
+            "IDC_RADIO_BEGINNER_02": "ControlList/State/Planet/Planet_Btn_Beginner_02.json",
+            "IDC_RADIO_BEGINNER_03": "ControlList/State/Planet/Planet_Btn_Beginner_03.json",
+            "IDC_RADIO_HIGH_01": "ControlList/State/Planet/Planet_Btn_High_01.json",
+            "IDC_RADIO_INTERMEDIATE_01": "ControlList/State/Planet/Planet_Btn_Intermediate_01.json",
+            "IDC_RADIO_PREMIUM_01": "ControlList/State/Planet/Planet_Btn_Premium_01.json"
+          }
+        }
+      },
+      "IDC_CHANNEL_BOARD": "ControlList/State/Planet/Planet_ChannelBoard.json",
+      "IDC_BUTTON_EXIT": "ControlList/State/Planet/Planet_Btn_Exit.json"
+    }
+  }
+}

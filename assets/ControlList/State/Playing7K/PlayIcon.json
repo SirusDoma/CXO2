@@ -1,0 +1,16 @@
+{
+  "type": "Animation",
+  "require": {
+    "sheet": "PlayIcon.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 285,
+        "y": 575
+      }
+    },
+    "isLoop": true,
+    "duration": 1000
+  }
+}

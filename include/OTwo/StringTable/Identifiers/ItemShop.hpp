@@ -2,45 +2,46 @@
 
 namespace StringTable::Identifiers::Resource::ItemShop
 {
-    constexpr static auto IDC_AVATAR                        = "STATE_ITEM_SHOP/IDC_AVATAR";
-    constexpr static auto IDC_IMAGE_PLANET                  = "STATE_ITEM_SHOP/IDC_IMAGE_PLANET";
-    constexpr static auto IDC_TEXT_NICKNAME                 = "STATE_ITEM_SHOP/IDC_TEXT_NICKNAME";
-    constexpr static auto IDC_NUMBER_GEM                    = "STATE_ITEM_SHOP/IDC_NUMBER_GEM";
-    constexpr static auto IDC_NUMBER_CASH                   = "STATE_ITEM_SHOP/IDC_NUMBER_CASH";
-    constexpr static auto IDC_BUTTON_MY_ROOM                = "STATE_ITEM_SHOP/IDC_BUTTON_MY_ROOM";
-    constexpr static auto IDC_CONTAINER_SHOP_MASTER         = "STATE_ITEM_SHOP/IDC_CONTAINER_SHOP_MASTER";
-    constexpr static auto IDC_IMAGE_TOOLTIP                 = "STATE_ITEM_SHOP/IDC_IMAGE_TOOLTIP";
-    constexpr static auto IDC_TEXT_MESSAGE                  = "STATE_ITEM_SHOP/IDC_IMAGE_TOOLTIP/IDC_TEXT_MESSAGE";
-    constexpr static auto IDC_BUTTON_DEFAULT                = "STATE_ITEM_SHOP/IDC_BUTTON_DEFAULT";
-    constexpr static auto IDC_CONTAINER_CATEGORY_BUTTONS    = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS";
-    constexpr static auto IDC_BUTTON_SPECIAL                = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_SPECIAL";
-    constexpr static auto IDC_BUTTON_FASHION                = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_FASHION";
-    constexpr static auto IDC_BUTTON_ACCESSORY              = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_ACCESSORY";
-    constexpr static auto IDC_BUTTON_BEAUTY                 = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_BEAUTY";
-    constexpr static auto IDC_BUTTON_INSTRUMENT             = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_INSTRUMENT";
-    constexpr static auto IDC_CONTAINER_SPECIAL_CATEGORY    = "STATE_ITEM_SHOP/IDC_CONTAINER_SPECIAL_CATEGORY";
-    constexpr static auto IDC_CONTAINER_FASHION_CATEGORY    = "STATE_ITEM_SHOP/IDC_CONTAINER_FASHION_CATEGORY";
-    constexpr static auto IDC_CONTAINER_ACCESSORY_CATEGORY  = "STATE_ITEM_SHOP/IDC_CONTAINER_ACCESSORY_CATEGORY";
-    constexpr static auto IDC_CONTAINER_BEAUTY_CATEGORY     = "STATE_ITEM_SHOP/IDC_CONTAINER_BEAUTY_CATEGORY";
-    constexpr static auto IDC_CONTAINER_INSTRUMENT_CATEGORY = "STATE_ITEM_SHOP/IDC_CONTAINER_INSTRUMENT_CATEGORY";
-    constexpr static auto IDC_BUTTON_PLANET_UP              = "STATE_ITEM_SHOP/IDC_BUTTON_PLANET_UP";
-    constexpr static auto IDC_BUTTON_PLANET_DOWN            = "STATE_ITEM_SHOP/IDC_BUTTON_PLANET_DOWN";
-    constexpr static auto IDC_BUTTON_EXT_MENU               = "STATE_ITEM_SHOP/IDC_BUTTON_EXT_MENU";
-    constexpr static auto IDC_IMAGE_EXT_MENU                = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU";
-    constexpr static auto IDC_BUTTON_MALE                   = "STATE_ITEM_SHOP/IDC_BUTTON_MALE";
-    constexpr static auto IDC_BUTTON_FEMALE                 = "STATE_ITEM_SHOP/IDC_BUTTON_FEMALE";
-    constexpr static auto IDC_SCROLL_ITEM                   = "STATE_ITEM_SHOP/IDC_SCROLL_ITEM";
-    constexpr static auto IDC_LIST_ITEM                     = "STATE_ITEM_SHOP/IDC_LIST_ITEM";
-    constexpr static auto IDC_BUTTON_ITEM_SCROLL_LEFT       = "STATE_ITEM_SHOP/IDC_BUTTON_ITEM_SCROLL_LEFT";
-    constexpr static auto IDC_BUTTON_ITEM_SCROLL_RIGHT      = "STATE_ITEM_SHOP/IDC_BUTTON_ITEM_SCROLL_RIGHT";
-    constexpr static auto IDC_CONTAINER_SET_ITEM            = "STATE_ITEM_SHOP/IDC_CONTAINER_SET_ITEM";
-    constexpr static auto IDC_LIST_SET_ITEM                 = "STATE_ITEM_SHOP/IDC_CONTAINER_SET_ITEM/IDC_LIST_SET_ITEM";
-    constexpr static auto IDC_CONTAINER_MYBAG               = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG";
-    constexpr static auto IDC_CONTAINER_CART                = "STATE_ITEM_SHOP/IDC_CONTAINER_CART";
-    constexpr static auto IDC_BUTTON_MYBAG                  = "STATE_ITEM_SHOP/IDC_BUTTON_MYBAG";
-    constexpr static auto IDC_BUTTON_CART                   = "STATE_ITEM_SHOP/IDC_BUTTON_CART";
-    constexpr static auto IDC_DIALOG_SKILL_INFO             = "STATE_ITEM_SHOP/IDC_DIALOG_SKILL_INFO";
-    constexpr static auto IDC_BUTTON_BACK                   = "STATE_ITEM_SHOP/IDC_BUTTON_BACK";
+    constexpr static auto IDC_AVATAR                         = "STATE_ITEM_SHOP/IDC_AVATAR";
+    constexpr static auto IDC_IMAGE_PLANET                   = "STATE_ITEM_SHOP/IDC_IMAGE_PLANET";
+    constexpr static auto IDC_TEXT_NICKNAME                  = "STATE_ITEM_SHOP/IDC_TEXT_NICKNAME";
+    constexpr static auto IDC_NUMBER_GEM                     = "STATE_ITEM_SHOP/IDC_NUMBER_GEM";
+    constexpr static auto IDC_NUMBER_CASH                    = "STATE_ITEM_SHOP/IDC_NUMBER_CASH";
+    constexpr static auto IDC_BUTTON_MY_ROOM                 = "STATE_ITEM_SHOP/IDC_BUTTON_MY_ROOM";
+    constexpr static auto IDC_CONTAINER_SHOP_MASTER          = "STATE_ITEM_SHOP/IDC_CONTAINER_SHOP_MASTER";
+    constexpr static auto IDC_IMAGE_TOOLTIP                  = "STATE_ITEM_SHOP/IDC_IMAGE_TOOLTIP";
+    constexpr static auto IDC_TEXT_MESSAGE                   = "STATE_ITEM_SHOP/IDC_IMAGE_TOOLTIP/IDC_TEXT_MESSAGE";
+    constexpr static auto IDC_BUTTON_DEFAULT                 = "STATE_ITEM_SHOP/IDC_BUTTON_DEFAULT";
+    constexpr static auto IDC_CONTAINER_CATEGORY_BUTTONS     = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS";
+    constexpr static auto IDC_BUTTON_SPECIAL                 = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_SPECIAL";
+    constexpr static auto IDC_BUTTON_FASHION                 = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_FASHION";
+    constexpr static auto IDC_BUTTON_ACCESSORY               = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_ACCESSORY";
+    constexpr static auto IDC_BUTTON_BEAUTY                  = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_BEAUTY";
+    constexpr static auto IDC_BUTTON_INSTRUMENT              = "STATE_ITEM_SHOP/IDC_CONTAINER_CATEGORY_BUTTONS/IDC_BUTTON_INSTRUMENT";
+    constexpr static auto IDC_CONTAINER_SPECIAL_CATEGORY     = "STATE_ITEM_SHOP/IDC_CONTAINER_SPECIAL_CATEGORY";
+    constexpr static auto IDC_CONTAINER_FASHION_CATEGORY     = "STATE_ITEM_SHOP/IDC_CONTAINER_FASHION_CATEGORY";
+    constexpr static auto IDC_CONTAINER_ACCESSORY_CATEGORY   = "STATE_ITEM_SHOP/IDC_CONTAINER_ACCESSORY_CATEGORY";
+    constexpr static auto IDC_CONTAINER_BEAUTY_CATEGORY      = "STATE_ITEM_SHOP/IDC_CONTAINER_BEAUTY_CATEGORY";
+    constexpr static auto IDC_CONTAINER_INSTRUMENT_CATEGORY  = "STATE_ITEM_SHOP/IDC_CONTAINER_INSTRUMENT_CATEGORY";
+    constexpr static auto IDC_BUTTON_PLANET_UP               = "STATE_ITEM_SHOP/IDC_BUTTON_PLANET_UP";
+    constexpr static auto IDC_BUTTON_PLANET_DOWN             = "STATE_ITEM_SHOP/IDC_BUTTON_PLANET_DOWN";
+    constexpr static auto IDC_BUTTON_EXT_MENU                = "STATE_ITEM_SHOP/IDC_BUTTON_EXT_MENU";
+    constexpr static auto IDC_IMAGE_EXT_MENU                 = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU";
+    constexpr static auto IDC_BUTTON_MALE                    = "STATE_ITEM_SHOP/IDC_BUTTON_MALE";
+    constexpr static auto IDC_BUTTON_FEMALE                  = "STATE_ITEM_SHOP/IDC_BUTTON_FEMALE";
+    constexpr static auto IDC_CONTAINER_ITEM_SCROLL_CONTROLS = "STATE_ITEM_SHOP/IDC_CONTAINER_ITEM_SCROLL_CONTROLS";
+    constexpr static auto IDC_SCROLL_ITEM                    = "STATE_ITEM_SHOP/IDC_CONTAINER_ITEM_SCROLL_CONTROLS/IDC_SCROLL_ITEM";
+    constexpr static auto IDC_BUTTON_ITEM_SCROLL_LEFT        = "STATE_ITEM_SHOP/IDC_CONTAINER_ITEM_SCROLL_CONTROLS/IDC_BUTTON_ITEM_SCROLL_LEFT";
+    constexpr static auto IDC_BUTTON_ITEM_SCROLL_RIGHT       = "STATE_ITEM_SHOP/IDC_CONTAINER_ITEM_SCROLL_CONTROLS/IDC_BUTTON_ITEM_SCROLL_RIGHT";
+    constexpr static auto IDC_LIST_ITEM                      = "STATE_ITEM_SHOP/IDC_LIST_ITEM";
+    constexpr static auto IDC_CONTAINER_SET_ITEM             = "STATE_ITEM_SHOP/IDC_CONTAINER_SET_ITEM";
+    constexpr static auto IDC_LIST_SET_ITEM                  = "STATE_ITEM_SHOP/IDC_CONTAINER_SET_ITEM/IDC_LIST_SET_ITEM";
+    constexpr static auto IDC_CONTAINER_MYBAG                = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG";
+    constexpr static auto IDC_CONTAINER_CART                 = "STATE_ITEM_SHOP/IDC_CONTAINER_CART";
+    constexpr static auto IDC_BUTTON_MYBAG                   = "STATE_ITEM_SHOP/IDC_BUTTON_MYBAG";
+    constexpr static auto IDC_BUTTON_CART                    = "STATE_ITEM_SHOP/IDC_BUTTON_CART";
+    constexpr static auto IDC_DIALOG_SKILL_INFO              = "STATE_ITEM_SHOP/IDC_DIALOG_SKILL_INFO";
+    constexpr static auto IDC_BUTTON_BACK                    = "STATE_ITEM_SHOP/IDC_BUTTON_BACK";
 
     namespace ShopMaster
     {
@@ -50,32 +51,34 @@ namespace StringTable::Identifiers::Resource::ItemShop
         constexpr static auto IDC_IMAGE_SHOP_MASTER_GRAFFITI = "STATE_ITEM_SHOP/IDC_CONTAINER_SHOP_MASTER/IDC_IMAGE_SHOP_MASTER_GRAFFITI";
         constexpr static auto IDC_IMAGE_SHOP_MASTER_EVENT    = "STATE_ITEM_SHOP/IDC_CONTAINER_SHOP_MASTER/IDC_IMAGE_SHOP_MASTER_EVENT";
         constexpr static auto IDC_ANIMATION_SPEECH           = "IDC_ANIMATION_SPEECH";
+        constexpr static auto IDC_IMAGE_MAIN                 = "IDC_IMAGE_MAIN";
     }
 
     namespace ExtensionMenu
     {
-        constexpr static auto IDC_BUTTON_EXT_ALL                = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_ALL";
-        constexpr static auto IDC_BUTTON_EXT_NORMAL             = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_NORMAL";
-        constexpr static auto IDC_BUTTON_EXT_AQUA               = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_AQUA";
-        constexpr static auto IDC_BUTTON_EXT_ELITEN             = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_ELITEN";
-        constexpr static auto IDC_BUTTON_EXT_GRAFFITI           = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_GRAFFITI";
-        constexpr static auto IDC_BUTTON_EXT_BIKINI             = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_BIKINI";
-        constexpr static auto IDC_BUTTON_EXT_CRUSH              = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_CRUSH";
-        constexpr static auto IDC_BUTTON_EXT_WONDERLAND         = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_WONDERLAND";
-        constexpr static auto IDC_BUTTON_EXT_MEGANUT            = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_MEGANUT";
-        constexpr static auto IDC_BUTTON_EXT_CRYSTAL            = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_CRYSTAL";
-        constexpr static auto IDC_BUTTON_EXT_DRACONIC           = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_DRACONIC";
-        constexpr static auto IDC_BUTTON_EXT_EVENT              = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_EVENT";
+        constexpr static auto IDC_BUTTON_EXT_ALL        = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_ALL";
+        constexpr static auto IDC_BUTTON_EXT_NORMAL     = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_NORMAL";
+        constexpr static auto IDC_BUTTON_EXT_AQUA       = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_AQUA";
+        constexpr static auto IDC_BUTTON_EXT_ELITEN     = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_ELITEN";
+        constexpr static auto IDC_BUTTON_EXT_GRAFFITI   = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_GRAFFITI";
+        constexpr static auto IDC_BUTTON_EXT_BIKINI     = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_BIKINI";
+        constexpr static auto IDC_BUTTON_EXT_CRUSH      = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_CRUSH";
+        constexpr static auto IDC_BUTTON_EXT_WONDERLAND = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_WONDERLAND";
+        constexpr static auto IDC_BUTTON_EXT_MEGANUT    = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_MEGANUT";
+        constexpr static auto IDC_BUTTON_EXT_CRYSTAL    = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_CRYSTAL";
+        constexpr static auto IDC_BUTTON_EXT_DRACONIC   = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_DRACONIC";
+        constexpr static auto IDC_BUTTON_EXT_EVENT      = "STATE_ITEM_SHOP/IDC_IMAGE_EXT_MENU/IDC_BUTTON_EXT_EVENT";
     }
 
     namespace MyBag
     {
-        constexpr static auto IDC_IMAGE_MYBAG_SELECT        = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_IMAGE_MYBAG_SELECT";
-        constexpr static auto IDC_LIST_BAG                  = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_LIST_BAG";
-        constexpr static auto IDC_SCROLL_MYBAG              = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_SCROLL_MYBAG";
-        constexpr static auto IDC_BUTTON_MYBAG_SCROLL_LEFT  = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_BUTTON_MYBAG_SCROLL_LEFT";
-        constexpr static auto IDC_BUTTON_MYBAG_SCROLL_RIGHT = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_BUTTON_MYBAG_SCROLL_RIGHT";
-        constexpr static auto IDC_BUTTON_SELL               = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_BUTTON_SELL";
+        constexpr static auto IDC_IMAGE_MYBAG_SELECT              = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_IMAGE_MYBAG_SELECT";
+        constexpr static auto IDC_LIST_BAG                        = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_LIST_BAG";
+        constexpr static auto IDC_CONTAINER_MYBAG_SCROLL_CONTROLS = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_CONTAINER_MYBAG_SCROLL_CONTROLS";
+        constexpr static auto IDC_SCROLL_MYBAG                    = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_CONTAINER_MYBAG_SCROLL_CONTROLS/IDC_SCROLL_MYBAG";
+        constexpr static auto IDC_BUTTON_MYBAG_SCROLL_LEFT        = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_CONTAINER_MYBAG_SCROLL_CONTROLS/IDC_BUTTON_MYBAG_SCROLL_LEFT";
+        constexpr static auto IDC_BUTTON_MYBAG_SCROLL_RIGHT       = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_CONTAINER_MYBAG_SCROLL_CONTROLS/IDC_BUTTON_MYBAG_SCROLL_RIGHT";
+        constexpr static auto IDC_BUTTON_SELL                     = "STATE_ITEM_SHOP/IDC_CONTAINER_MYBAG/IDC_BUTTON_SELL";
 
         namespace Item
         {

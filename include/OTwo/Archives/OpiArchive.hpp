@@ -1,11 +1,13 @@
 #pragma once
 
+#include <OTwo/Archives/FileInfo.hpp>
+#include <OTwo/Utilities/CaseInsensitiveComparator.hpp>
+
 #include <Genode/IO.hpp>
 #include <SFML/System/FileInputStream.hpp>
 
-#include <OTwo/Archives/FileInfo.hpp>
-
-#include <unordered_map>
+#include <mutex>
+#include <map>
 
 struct OpiItemHeader
 {
@@ -50,9 +52,11 @@ private:
 
     bool ReadStream(void* data, std::uint64_t size) const;
 
+    std::string m_source;
     Signature m_signature;
     std::uint32_t m_count;
 
-    mutable std::unordered_map<std::string, FileInfo> m_entries;
+    mutable std::map<std::string, FileInfo, CaseInsensitiveComparator> m_entries;
+    mutable std::mutex m_mutex;
     mutable sf::FileInputStream m_fileStream;
 };

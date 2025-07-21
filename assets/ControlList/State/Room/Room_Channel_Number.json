@@ -1,0 +1,10 @@
+﻿{
+  "type": "BitmapNumber",
+  "require": {
+    "refID": "0X13500046",
+    "bndID": "0X13500046"
+  },
+  "attributes": {
+    "digitCount": 2
+  }
+}

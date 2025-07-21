@@ -1,0 +1,45 @@
+{
+  "type": "State",
+  "name": "STATE_MY_ROOM",
+  "require": {
+    "IDC_IMAGE_MYBAG_SELECT": "ControlList/State/MyRoom/MyRoom_BagSelect.json"
+  },
+  "attributes": {
+    "objects":{
+      "IDC_IMAGE_STATE_MY_ROOM": "ControlList/State/MyRoom/State_MyRoom.json",
+      "IDC_AVATAR": "ControlList/State/MyRoom/Avatar.json",
+      "IDC_IMAGE_STATUS": "ControlList/State/MyRoom/MyRoom_Status.json",
+      "IDC_LIST_BAG": "ControlList/State/MyRoom/MyRoom_List_Bag.json",
+      "IDC_CONTAINER_BAG_SCROLL_CONTROLS": "ControlList/State/MyRoom/MyRoom_ScrollControls.json",
+      "IDC_TOGGLE_INVENTORY": "ControlList/State/MyRoom/MyRoom_Btn_Inventory.json",
+      "IDC_BUTTON_SHOP": "ControlList/State/MyRoom/MyRoom_Btn_GoShop.json",
+      "IDC_NUMBER_GEM": "ControlList/State/MyRoom/MyRoom_GemNumber.json",
+      "IDC_NUMBER_CASH": "ControlList/State/MyRoom/MyRoom_CashNumber.json",
+      "IDC_BUTTON_SELL": "ControlList/State/MyRoom/MyRoom_Btn_ItemSell.json",
+      "IDC_IMAGE_INSTRUMENT": "ControlList/State/MyRoom/MyRoom_Item_Instrument.json",
+      "IDC_CONTAINER_EQUIPMENTS": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_HAIR_ACCESSORIES": "ControlList/State/MyRoom/MyRoom_Item_HairAccessories.json",
+            "IDC_IMAGE_WINGS": "ControlList/State/MyRoom/MyRoom_Item_Wings.json",
+            "IDC_IMAGE_ACCESSORIES": "ControlList/State/MyRoom/MyRoom_Item_Accessories.json",
+            "IDC_IMAGE_INSTRUMENT_ACCESSORIES": "ControlList/State/MyRoom/MyRoom_Item_InstrumentAccessories.json",
+            "IDC_IMAGE_PET": "ControlList/State/MyRoom/MyRoom_Item_Pet.json",
+            "IDC_IMAGE_HAIR": "ControlList/State/MyRoom/MyRoom_Item_Hair.json",
+            "IDC_IMAGE_TOP": "ControlList/State/MyRoom/MyRoom_Item_Top.json",
+            "IDC_IMAGE_PANTS": "ControlList/State/MyRoom/MyRoom_Item_Pants.json",
+            "IDC_IMAGE_SHOES": "ControlList/State/MyRoom/MyRoom_Item_Shoes.json",
+            "IDC_IMAGE_GLASSES": "ControlList/State/MyRoom/MyRoom_Item_Glasses.json",
+            "IDC_IMAGE_EARRINGS": "ControlList/State/MyRoom/MyRoom_Item_Earrings.json",
+            "IDC_IMAGE_NECKLACE": "ControlList/State/MyRoom/MyRoom_Item_Necklace.json",
+            "IDC_IMAGE_GLOVES": "ControlList/State/MyRoom/MyRoom_Item_Gloves.json",
+            "IDC_IMAGE_CLOTHES_ACCESSORIES": "ControlList/State/MyRoom/MyRoom_Item_ClothesAccessories.json"
+          }
+        }
+      },
+      "IDC_DIALOG_SKILL_INFO": "ControlList/Dialog/SkillInfo.json",
+      "IDC_BUTTON_BACK": "ControlList/State/MyRoom/MyRoom_Btn_Back.json"
+    }
+  }
+}

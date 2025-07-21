@@ -1,0 +1,27 @@
+{
+  "type": "Label",
+  "require": {
+    "font": "Interface/Common/Font.Bold.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 672,
+        "y": 222
+      }
+    },
+    "alignment": "Right",
+    "fontSize": 14,
+    "fontWidth": 18,
+    "kerning": 1,
+    "outline": {
+      "thickness": 1.3,
+      "color": {
+        "a": 255,
+        "r": 0,
+        "g": 0,
+        "b": 0
+      }
+    }
+  }
+}

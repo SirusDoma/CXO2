@@ -1,0 +1,7 @@
+{
+  "type": "Button",
+  "require": {
+    "refID": "0X1B200001",
+    "bndID": "0X1B000001"
+  }
+}

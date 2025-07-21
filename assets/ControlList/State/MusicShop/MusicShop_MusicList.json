@@ -1,0 +1,24 @@
+{
+  "type": "List",
+  "require": {
+    "bndID": "0X1A01903B",
+    "template": {
+      "name": "IDC_CONTAINER_MUSIC_ITEM",
+      "source": "ControlList/State/MusicShop/MusicShop_MusicItem.json",
+      "bounds": [
+        "0X1A01903B",
+        "0X1A01903C",
+        "0X1A01903D",
+        "0X1A01903E",
+        "0X1A01903F",
+        "0X1A019040",
+        "0X1A019041",
+        "0X1A019042",
+        "0X1A019043",
+        "0X1A019044",
+        "0X1A019045",
+        "0X1A019046"
+      ]
+    }
+  }
+}

@@ -83,6 +83,7 @@ struct ResourceMetadata
     using ObjectMap  = std::vector<ObjectMetadata>; //std::unordered_map<std::string, Gx::Json>;
 
     std::string  Name;
+    std::string  SourceFormat;
     ResourceType Type;
     RequireMap   Require;
     ObjectMap    Objects;

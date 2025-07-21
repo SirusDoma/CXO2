@@ -1,0 +1,169 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_PLAYER_COOL": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 181,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      },
+      "IDC_TEXT_PLAYER_GOOD": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 270,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      },
+      "IDC_TEXT_PLAYER_BAD": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 357,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      },
+      "IDC_TEXT_PLAYER_MISS": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 442,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      },
+      "IDC_TEXT_PLAYER_MAX_COMBO": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 530,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      },
+      "IDC_TEXT_PLAYER_MAX_JAM_COMBO": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Bold.ttf"
+        },
+        "attributes": {
+          "alignment": "Center",
+          "transform": {
+            "position": {
+              "x": 617,
+              "y": 132
+            }
+          },
+          "fontSize": 14,
+          "fontWidth": 19,
+          "kerning": 1,
+          "outline": {
+            "thickness": 1.3,
+            "color": {
+              "a": 255,
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

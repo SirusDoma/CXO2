@@ -113,7 +113,7 @@ R& State::Create(Args&&... args)
 }
 
 template<typename R>
-R* State::FindResource(const std::string& id, const ResourceScope scope)
+R* State::Find(const std::string& id, const ResourceScope scope)
 {
     auto resources = m_resources.get();
     if (scope == ResourceScope::Shared)

@@ -1,0 +1,20 @@
+{
+  "type": "Button",
+  "require": {},
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 5,
+        "y": 385
+      }
+    },
+    "states": {
+      "normal": {
+        "bounds": {
+          "width": 92,
+          "height": 22
+        }
+      }
+    }
+  }
+}

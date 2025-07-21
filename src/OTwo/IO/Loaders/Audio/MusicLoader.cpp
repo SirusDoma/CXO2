@@ -8,7 +8,7 @@
 
 Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
-    if (Gx::StringHelper::IsGlobMatch(fileName, "*.json"))
+    if (Gx::StringHelper::IsGlobMatch(fileName, "*.json", false))
         return ResourceLoader::LoadFromFile(fileName, ctx);
 
     auto metadata = MusicMetadata();

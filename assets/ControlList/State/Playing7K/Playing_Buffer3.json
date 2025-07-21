@@ -1,0 +1,13 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "Buffer.ojs",
+    "bndID": "0X1B000006"
+  },
+  "attributes": {
+    "frames": {
+      "0": {},
+      "1": {}
+    }
+  }
+}

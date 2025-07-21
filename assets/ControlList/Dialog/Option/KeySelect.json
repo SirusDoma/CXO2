@@ -1,0 +1,21 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X27500007",
+    "bndID": "0X27500007"
+  },
+  "attributes": {
+    "frames": {
+      "Key1": { "id": 0 },
+      "Key2": { "id": 1 },
+      "Key3": { "id": 2 },
+      "Key4": { "id": 3 },
+      "Key5": { "id": 4 },
+      "Key6": { "id": 5 },
+      "Key7": { "id": 6 }
+    },
+    "objects": {
+      "IDC_IMAGE_KEY_BAR": "ControlList/Dialog/Option/KeyBar.json"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X16500020",
+    "bndID": "0X16500020"
+  },
+  "attributes": {
+    "frames": {
+      "Cricket": {},
+      "Gamic Road": {},
+      "Honky Tonky": {},
+      "King Peaker": {},
+      "Larva House": {},
+      "Aqua": {}
+    }
+  }
+}

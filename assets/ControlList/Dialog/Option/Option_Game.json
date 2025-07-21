@@ -1,0 +1,25 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_TOGGLE_GFX": "ControlList/Dialog/Option/Btn_ToggleGfx.json",
+      "IDC_TOGGLE_CURSOR": "ControlList/Dialog/Option/Btn_ToggleCursor.json",
+      "IDC_TOGGLE_KEY_TEST": "ControlList/Dialog/Option/Btn_KeyTest.json",
+      "IDC_IMAGE_KEY_SELECT": "ControlList/Dialog/Option/KeySelect.json",
+      "IDC_IMAGE_KEY_TEXT_1": "ControlList/Dialog/Option/KeyText1.json",
+      "IDC_IMAGE_KEY_TEXT_2": "ControlList/Dialog/Option/KeyText2.json",
+      "IDC_IMAGE_KEY_TEXT_3": "ControlList/Dialog/Option/KeyText3.json",
+      "IDC_IMAGE_KEY_TEXT_4": "ControlList/Dialog/Option/KeyText4.json",
+      "IDC_IMAGE_KEY_TEXT_5": "ControlList/Dialog/Option/KeyText5.json",
+      "IDC_IMAGE_KEY_TEXT_6": "ControlList/Dialog/Option/KeyText6.json",
+      "IDC_IMAGE_KEY_TEXT_7": "ControlList/Dialog/Option/KeyText7.json",
+      "IDC_IMAGE_KEY_DOWN_1": "ControlList/Dialog/Option/KeyDown1.json",
+      "IDC_IMAGE_KEY_DOWN_2": "ControlList/Dialog/Option/KeyDown2.json",
+      "IDC_IMAGE_KEY_DOWN_3": "ControlList/Dialog/Option/KeyDown3.json",
+      "IDC_IMAGE_KEY_DOWN_4": "ControlList/Dialog/Option/KeyDown4.json",
+      "IDC_IMAGE_KEY_DOWN_5": "ControlList/Dialog/Option/KeyDown5.json",
+      "IDC_IMAGE_KEY_DOWN_6": "ControlList/Dialog/Option/KeyDown6.json",
+      "IDC_IMAGE_KEY_DOWN_7": "ControlList/Dialog/Option/KeyDown7.json"
+    }
+  }
+}

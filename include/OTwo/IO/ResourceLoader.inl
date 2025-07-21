@@ -9,6 +9,7 @@
 
 #include <fmt/format.h>
 #include <string>
+#include <Genode/Utilities/Debugger.hpp>
 
 template<typename R>
 Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
@@ -18,6 +19,9 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string& fileName, 
         if (const auto metadata = ctx.Find<ResourceMetadata>(ctx.GetID()); metadata)
             return LoadFromMetadata(*metadata, ctx);
     }
+
+    // if (!Gx::FileSystem::Contains(fileName))
+    //     return Instantiate(ctx);
 
     const auto stream = Gx::FileSystem::Open(fileName);
     if (!stream)
@@ -50,15 +54,12 @@ Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromStream(sf::InputStream& stream, co
     }
 
     const auto size = stream.getSize().value_or(0) - stream.tell().value_or(0);
-    const auto data = new std::uint8_t[size];
-    if (!stream.read(data, size).has_value())
-    {
-        delete[] data;
-        throw Gx::ResourceLoadException("Failed to load the resource");
-    }
 
-    const auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(data), size));
-    delete[] data;
+    auto bytes = std::vector<std::uint8_t>(size);
+    if (!stream.read(bytes.data(), size).has_value())
+        throw Gx::ResourceLoadException("Failed to load the resource");
+
+    const auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(bytes.data()), size));
 
     return LoadFromJson(json, ctx);
 }
@@ -71,7 +72,7 @@ void ResourceLoader<R>::LoadChildren(ObjectContainer& container, const ResourceM
         for (auto [key, object] : metadata.Objects)
         {
             auto name = fmt::format("{}/{}", metadata.Name, key);
-            auto objectCtx = Gx::ResourceContext::Rebind(context, name);
+            auto objectCtx = ResourceContextDecorator::Decorate(Gx::ResourceContext::Rebind(context, name), metadata);
 
             ObjectLoader::LoadFromJson(name, object, container, objectCtx);
         }

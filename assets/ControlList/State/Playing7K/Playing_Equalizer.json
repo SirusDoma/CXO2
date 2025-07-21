@@ -1,0 +1,39 @@
+{
+  "type": "Equalizer",
+  "require": {},
+  "attributes": {
+    "objects": {
+      "IDC_LIST_BAR": {
+        "type": "List",
+        "attributes": {
+          "order": "Horizontal",
+          "objects": {
+            "IDC_CONTAINER_ITEM1": "ControlList/State/Playing7K/Playing_EqualizerBar1.json",
+            "IDC_CONTAINER_ITEM2": "ControlList/State/Playing7K/Playing_EqualizerBar2.json",
+            "IDC_CONTAINER_ITEM3": "ControlList/State/Playing7K/Playing_EqualizerBar3.json",
+            "IDC_CONTAINER_ITEM4": "ControlList/State/Playing7K/Playing_EqualizerBar4.json",
+            "IDC_CONTAINER_ITEM5": "ControlList/State/Playing7K/Playing_EqualizerBar5.json",
+            "IDC_CONTAINER_ITEM6": "ControlList/State/Playing7K/Playing_EqualizerBar6.json",
+            "IDC_CONTAINER_ITEM7": "ControlList/State/Playing7K/Playing_EqualizerBar7.json",
+            "IDC_CONTAINER_ITEM8": "ControlList/State/Playing7K/Playing_EqualizerBar8.json",
+            "IDC_CONTAINER_ITEM9": "ControlList/State/Playing7K/Playing_EqualizerBar9.json",
+            "IDC_CONTAINER_ITEM10": "ControlList/State/Playing7K/Playing_EqualizerBar10.json",
+            "IDC_CONTAINER_ITEM11": "ControlList/State/Playing7K/Playing_EqualizerBar11.json",
+            "IDC_CONTAINER_ITEM12": "ControlList/State/Playing7K/Playing_EqualizerBar12.json",
+            "IDC_CONTAINER_ITEM13": "ControlList/State/Playing7K/Playing_EqualizerBar13.json",
+            "IDC_CONTAINER_ITEM14": "ControlList/State/Playing7K/Playing_EqualizerBar14.json",
+            "IDC_CONTAINER_ITEM15": "ControlList/State/Playing7K/Playing_EqualizerBar15.json",
+            "IDC_CONTAINER_ITEM16": "ControlList/State/Playing7K/Playing_EqualizerBar16.json",
+            "IDC_CONTAINER_ITEM17": "ControlList/State/Playing7K/Playing_EqualizerBar17.json",
+            "IDC_CONTAINER_ITEM18": "ControlList/State/Playing7K/Playing_EqualizerBar18.json",
+            "IDC_CONTAINER_ITEM19": "ControlList/State/Playing7K/Playing_EqualizerBar19.json",
+            "IDC_CONTAINER_ITEM20": "ControlList/State/Playing7K/Playing_EqualizerBar20.json",
+            "IDC_CONTAINER_ITEM21": "ControlList/State/Playing7K/Playing_EqualizerBar21.json",
+            "IDC_CONTAINER_ITEM22": "ControlList/State/Playing7K/Playing_EqualizerBar22.json",
+            "IDC_CONTAINER_ITEM23": "ControlList/State/Playing7K/Playing_EqualizerBar23.json"
+          }
+        }
+      }
+    }
+  }
+}

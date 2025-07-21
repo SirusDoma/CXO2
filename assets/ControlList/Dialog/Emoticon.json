@@ -1,0 +1,24 @@
+{
+  "type": "Dialog",
+  "require": {
+    "refID": "0X82100001"
+  },
+  "attributes": {
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X82200002",
+          "bndID": "0X82200002"
+        }
+      }
+    },
+    "objects": {
+      "IDC_IMAGE_CONTENT": "ControlList/Dialog/Emoticon/Contents.json",
+      "IDC_NUMBER_CURRENT_PAGE": "ControlList/Dialog/Emoticon/CurrentPage_Number.json",
+      "IDC_NUMBER_MAX_PAGE": "ControlList/Dialog/Emoticon/MaxPage_Number.json",
+      "IDC_BUTTON_LEFT": "ControlList/Dialog/Emoticon/Btn_Left.json",
+      "IDC_BUTTON_RIGHT": "ControlList/Dialog/Emoticon/Btn_Right.json"
+    }
+  }
+}

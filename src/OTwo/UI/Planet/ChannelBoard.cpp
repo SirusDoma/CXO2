@@ -5,6 +5,7 @@
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/Planet.hpp>
 
+#include <Genode/UI/List.hpp>
 #include <Genode/Tasks.hpp>
 #include <Genode/Tween.hpp>
 
@@ -20,7 +21,7 @@ ChannelBoard::ChannelBoard(Gx::AudioMixer& mixer, Gx::ResourceManager& resources
     m_sequence(),
     m_tab(ChannelBoard::Tab::Notice),
     m_transitioning(false),
-    m_animationEnabled(true),
+    m_animationEnabled(false),
     m_selectedChannel(),
     m_channelsPerPage(),
     m_channelPageIndex(),
@@ -171,7 +172,25 @@ void ChannelBoard::SetChannelsPerPage(const unsigned int channelsPerPage)
 
 sf::FloatRect ChannelBoard::GetLocalBounds() const
 {
-    return Gx::Image::GetLocalBounds();
+    const auto bounds = Gx::Image::GetLocalBounds();
+    if (bounds != sf::FloatRect())
+        return bounds;
+
+    for (std::size_t i = 0; i < GetFrameCount(); i++)
+    {
+        if (GetFrame(i)->TexCoords != sf::IntRect())
+        {
+            return sf::FloatRect{
+                {},
+                {
+                    static_cast<float>(GetFrame(i)->TexCoords.size.x),
+                    static_cast<float>(GetFrame(i)->TexCoords.size.y),
+                }
+            };
+        }
+    }
+
+    return bounds;
 }
 
 bool ChannelBoard::InTransition() const
@@ -321,7 +340,10 @@ void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
     const auto channelList = container->FindChild<Gx::List>(Resource::Planet::ChannelBoard::IDC_LIST_CHANNEL);
 
     m_planetInfo = planet;
-    m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildrenCount()));
+    if (channelList->GetChildrenCount() == 0)
+        m_channelMaxPage = 1;
+    else
+        m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildrenCount()));
 
     const auto maxPageNumber = FindChild<Gx::BitmapNumber>(Resource::Planet::ChannelBoard::IDC_NUMBER_MAX_CHANNEL_PAGE);
     maxPageNumber->SetValue(m_channelMaxPage);
@@ -354,6 +376,9 @@ void ChannelBoard::ShowChannelList(unsigned int page)
     channelList->SetVisible(true);
     for (unsigned int i = 0; i < m_channelsPerPage; i++)
     {
+        if (i >= children.size())
+            break;
+
         const auto channelButton = dynamic_cast<ChannelButton*>(children[i]);
         if (!channelButton)
             continue;
@@ -367,10 +392,11 @@ void ChannelBoard::ShowChannelList(unsigned int page)
             continue;
         }
 
+        const auto& channelInfo = m_planetInfo.Channels[channelIndex];
         channelButton->SetChannelNumber(channelIndex + 1);
         channelButton->SetMusicHall(m_planetInfo.Hall);
         channelButton->SetCheckedState(channelIndex == m_selectedChannel);
-        channelButton->SetChannelPopulation(m_planetInfo.Channels[channelIndex].Population);
+        channelButton->SetChannelPopulation(channelInfo.Population, channelInfo.MaxPopulation);
         channelButton->SetVisible(true);
         channelButton->SetEnabled(true);
         channelButton->SetClickCallback([=] (auto& sender, auto& ev)

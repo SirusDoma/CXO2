@@ -1,0 +1,17 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "sheet": "Room_UserList_Over.ojs"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_USER_NAME": "ControlList/State/Room/UserList/User_Name.json",
+      "IDC_IMAGE_HOVER": {
+        "type": "Image",
+        "require": {
+          "sheet": "Room_UserList_Over.ojs"
+        }
+      }
+    }
+  }
+}

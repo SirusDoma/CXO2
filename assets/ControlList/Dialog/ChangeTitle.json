@@ -1,0 +1,58 @@
+{
+  "type": "Dialog",
+  "require": {
+    "refID": "0X81100001"
+  },
+  "attributes": {
+    "label": {
+      "type": "Label",
+      "require": {
+        "font": "Interface/Common/Font.Unicode.ttf",
+        "bndID": "0X81400002"
+      },
+      "attributes": {
+        "fontSize": 10
+      }
+    },
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X81200004",
+          "bndID": "0X81200004"
+        }
+      },
+      "cancel": {
+        "type": "Button",
+        "require": {
+          "refID": "0X81200005",
+          "bndID": "0X81200005"
+        }
+      }
+    },
+    "objects": {
+      "IDC_EDIT_TITLE": {
+        "type": "InputField",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X81300003"
+        },
+        "attributes": {
+          "color": {
+            "a": 255,
+            "r": 0,
+            "g": 0,
+            "b": 0
+          },
+          "highlightBackColor": {
+            "a": 255,
+            "r": 150,
+            "g": 185,
+            "b": 215
+          },
+          "fontSize": 10
+        }
+      }
+    }
+  }
+}

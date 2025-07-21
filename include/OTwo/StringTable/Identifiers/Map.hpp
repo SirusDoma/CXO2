@@ -8,6 +8,7 @@ namespace StringTable::Identifiers::Resource::Map
     constexpr static auto IDC_CONTAINER_MAP_SELECTOR  = "*/IDC_CONTAINER_MAP_SELECTOR";
 
     constexpr static auto IDC_IMAGE_MAP               = "IDC_IMAGE_MAP";
+    constexpr static auto IDC_IMAGE_RANDOM_MAP        = "IDC_IMAGE_RANDOM_MAP";
     constexpr static auto IDC_TEXT_MAP_NAME           = "IDC_TEXT_MAP_NAME";
     constexpr static auto IDC_CONTAINER_EFFECT_1      = "IDC_CONTAINER_EFFECT_1";
     constexpr static auto IDC_CONTAINER_EFFECT_2      = "IDC_CONTAINER_EFFECT_2";

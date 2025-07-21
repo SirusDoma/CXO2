@@ -1,0 +1,18 @@
+{
+  "type": "PlayMenu",
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_PLAY_MENU":  "ControlList/State/Playing7K/Playing_MenuImage.json",
+      "IDC_ANIMATION_PLAY_ICON": "ControlList/State/Playing7K/PlayIcon.json",
+      "IDC_GAUGE_WAVE": "ControlList/State/Playing7K/Wave_Gauge.json",
+      "IDC_TEXT_MUSIC_TITLE": "ControlList/State/Playing7K/Playing_Title.json",
+      "IDC_IMAGE_MUSIC_LEVEL": "ControlList/State/Playing7K/Playing_MusicLevel.json",
+      "IDC_EQUALIZER": "ControlList/State/Playing7K/Playing_Equalizer.json",
+      "IDC_GAUGE_VOLUME_MUSIC": "ControlList/State/Playing7K/Playing_VolumeMusic.json",
+      "IDC_GAUGE_VOLUME_EFFECT": "ControlList/State/Playing7K/Playing_VolumeEffect.json",
+      "IDC_NUMBER_PLAY_TIME_MINUTE": "ControlList/State/Playing7K/Playing_MinuteTimeNumber.json",
+      "IDC_NUMBER_PLAY_TIME_SECOND": "ControlList/State/Playing7K/Playing_SecondTimeNumber.json",
+      "IDC_LIST_NOTE_POINT_NUMBER": "ControlList/State/Playing7K/Note_PointNumberList.json"
+    }
+  }
+}

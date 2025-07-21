@@ -1,0 +1,147 @@
+{
+  "type": "SelectMusicDialog",
+  "require": {
+    "refID": "0X29100001"
+  },
+  "attributes": {
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X29200002",
+          "bndID": "0X29200002"
+        }
+      },
+      "cancel": {
+        "type": "Button",
+        "require": {
+          "refID": "0X29200003",
+          "bndID": "0X29200003"
+        }
+      }
+    },
+    "objects": {
+      "IDC_CONTAINER_GENRE_SELECTOR": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_RADIO_GENRE_ALL": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_All.json",
+            "IDC_RADIO_GENRE_BALLAD": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Ballad.json",
+            "IDC_RADIO_GENRE_ROCK": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Rock.json",
+            "IDC_RADIO_GENRE_DANCE": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Dance.json",
+            "IDC_RADIO_GENRE_TECHNO": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Techno.json",
+            "IDC_RADIO_GENRE_HIPHOP": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Hiphop.json",
+            "IDC_RADIO_GENRE_SOUL": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Soul.json",
+            "IDC_RADIO_GENRE_JAZZ": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Jazz.json",
+            "IDC_RADIO_GENRE_FUNK": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Funk.json",
+            "IDC_RADIO_GENRE_CLASSICAL": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Classical.json",
+            "IDC_RADIO_GENRE_TRADITIONAL": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Traditional.json",
+            "IDC_RADIO_GENRE_ETC": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Etc.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_SORT_SELECTOR": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_BUTTON_SORT_NEW": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_New.json",
+            "IDC_BUTTON_SORT_TITLE": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Title.json",
+            "IDC_BUTTON_SORT_DIFF": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Diff.json",
+            "IDC_BUTTON_SORT_TIME": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Time.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_RANDOM_SELECTOR": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_TOGGLE_RANDOM_DIFF_1": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_RandomDiff1.json",
+            "IDC_TOGGLE_RANDOM_DIFF_2": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_RandomDiff2.json",
+            "IDC_TOGGLE_RANDOM_DIFF_3": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_RandomDiff3.json",
+            "IDC_TOGGLE_RANDOM_DIFF_4": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_RandomDiff4.json"
+          }
+        }
+      },
+      "IDC_LIST_MUSIC_SELECTOR": {
+        "type": "List",
+        "require": {
+          "bndID": "0X29017012",
+          "template": {
+            "name": "IDC_RADIO_MUSIC",
+            "source": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Select.json",
+            "bounds": [
+              "0X29017012",
+              "0X29017013",
+              "0X29017014",
+              "0X29017015",
+              "0X29017016",
+              "0X29017017",
+              "0X29017018",
+              "0X29017019",
+              "0X2901701A",
+              "0X2901701B",
+              "0X2901701C",
+              "0X2901701D",
+              "0X2901701E",
+              "0X2901701F",
+              "0X29017020"
+            ]
+          }
+        }
+      },
+      "IDC_LIST_MUSIC_INFO": {
+        "type": "List",
+        "require": {
+          "bndID": "0X29400035",
+          "template": {
+            "name": "IDC_TEXT_MUSIC_INFO",
+            "source": "ControlList/Dialog/SelectMusic/SelectMusic_Info.json",
+            "bounds": [
+              "0X29400035",
+              "0X29400036",
+              "0X29400037",
+              "0X29400038",
+              "0X29400039",
+              "0X2940003A",
+              "0X2940003B",
+              "0X2940003C",
+              "0X2940003D",
+              "0X2940003E"
+            ]
+          }
+        }
+      },
+      "IDC_CONTAINER_DIFFICULTY_SELECTOR": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_RADIO_NOTE_EX": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_NoteEx.json",
+            "IDC_RADIO_NOTE_NX": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_NoteNx.json",
+            "IDC_RADIO_NOTE_HX": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_NoteHx.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_SPEED_SELECTOR": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_RADIO_SPEED_05": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed05.json",
+            "IDC_RADIO_SPEED_10": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed10.json",
+            "IDC_RADIO_SPEED_15": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed15.json",
+            "IDC_RADIO_SPEED_20": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed20.json",
+            "IDC_RADIO_SPEED_25": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed25.json",
+            "IDC_RADIO_SPEED_30": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed30.json",
+            "IDC_RADIO_SPEED_40": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed40.json",
+            "IDC_RADIO_SPEED_50": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed50.json",
+            "IDC_RADIO_SPEED_60": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed60.json",
+            "IDC_RADIO_SPEED_80": "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Speed80.json"
+          }
+        }
+      },
+      "IDC_IMAGE_MUSIC_THUMBNAIL": "ControlList/Dialog/SelectMusic/SelectMusic_Thumbnail.json",
+      "IDC_BUTTON_LEFT":  "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Left.json",
+      "IDC_BUTTON_RIGHT":  "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Right.json",
+      "IDC_TEXT_MUSIC_PAGE": "ControlList/Dialog/SelectMusic/SelectMusic_Page.json"
+    }
+  }
+}

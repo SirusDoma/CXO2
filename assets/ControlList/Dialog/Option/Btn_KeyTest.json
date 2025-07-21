@@ -1,0 +1,7 @@
+{
+  "type": "ToggleButton",
+  "require": {
+    "refID": "0X2720A010",
+    "bndID": "0X2720A010"
+  }
+}

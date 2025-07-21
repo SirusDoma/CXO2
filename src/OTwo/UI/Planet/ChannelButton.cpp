@@ -1,10 +1,10 @@
 ﻿#include <OTwo/UI/Planet/ChannelButton.hpp>
-#include <OTwo/Metadata/UI/RadioButtonMetadata.hpp>
 #include <OTwo/States/State.hpp>
 
 #include <OTwo/StringTable/Identifiers/Planet.hpp>
 
 #include <cmath>
+#include <iostream>
 
 using namespace StringTable::Identifiers;
 
@@ -33,7 +33,7 @@ void ChannelButton::Initialize()
     m_nameIndicator     = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_NAME);
     m_fullIndicator     = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_FULL);
     m_focusIndicator    = FindChild<Gx::Image>(Resource::Planet::ChannelBoard::ChannelButton::IDC_IMAGE_CHANNEL_FOCUS);
-    m_populationCounter = FindChild<Gx::Gauge>(Resource::Planet::ChannelBoard::ChannelButton::IDC_GAUGE_CHANNEL_COUNTER);
+    m_populationCounter = FindChild<Gx::UiContainer>(Resource::Planet::ChannelBoard::ChannelButton::IDC_CONTAINER_CHANNEL_COUNTER);
 
     if (m_focusIndicator)
     {
@@ -69,16 +69,27 @@ unsigned int ChannelButton::GetChannelPopulation() const
     return m_population;
 }
 
-void ChannelButton::SetChannelPopulation(const unsigned int population)
+void ChannelButton::SetChannelPopulation(const unsigned int population, const unsigned int maxPopulation)
 {
-    m_population = population;
+    m_population    = population;
+    m_maxPopulation = maxPopulation;
+
+    if (m_fullIndicator)
+        m_fullIndicator->SetVisible(m_population >= maxPopulation);
+
     if (!m_populationCounter)
         return;
 
-    const float percentage = static_cast<float>(population) / 20.0f;
-    m_populationCounter->SetValue(std::ceil(percentage) * 20.0f);
+    const std::size_t partition = maxPopulation / m_populationCounter->GetChildrenCount();
+    for (std::size_t i = 0; i < m_populationCounter->GetChildrenCount(); i++)
+    {
+        const auto child = dynamic_cast<Gx::Control*>(m_populationCounter->GetChildren()[i]);
+        if (!child)
+            continue;
 
-    m_fullIndicator->SetVisible(static_cast<float>(m_population) >= m_populationCounter->GetMaximumValue());
+        child->SetVisible(population > i * partition);
+    }
+
     m_populationCounter->SetVisible(!m_fullIndicator->IsVisible());
 }
 

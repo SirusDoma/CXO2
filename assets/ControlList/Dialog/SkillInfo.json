@@ -1,0 +1,31 @@
+{
+  "type": "Dialog",
+  "require": {},
+  "attributes": {
+    "buttons": {
+      "accept": {}
+    },
+    "objects": {
+      "IDC_TEXT_ITEM_NAME": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_TEXT_ITEM_QUANTITY": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_TEXT_ITEM_SKILL": {
+        "type": "Label",
+        "attributes": {}
+      },
+      "IDC_IMAGE_ITEM_THUMBNAIL": {
+        "type": "Image",
+        "attributes": {}
+      },
+      "IDC_TEXT_ITEM_DESCRIPTION": {
+        "type": "Label",
+        "attributes": {}
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 #include <OTwo/O2Jam.hpp>
 #include <OTwo/Utilities/NamedMutex.hpp>
 #include <OTwo/Utilities/SystemMessageBox.hpp>
+#include <OTwo/Utilities/DebugWatcher.hpp>
 
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/System/Exception.hpp>
@@ -35,7 +36,7 @@ int main(int argc , char** argv)
         else
         {
             // Enable Live++ when debugger attached (optional)
-            Gx::Debugger::Watch();
+            DebuggerWatcher::Watch();
         }
 
         auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);

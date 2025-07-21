@@ -1,0 +1,11 @@
+﻿{
+  "type": "Button",
+  "require": {
+    "refID": "0X13202004",
+    "bndID": "0X13202004"
+  },
+  "attributes": {
+    "enabled": false,
+    "visible": false
+  }
+}

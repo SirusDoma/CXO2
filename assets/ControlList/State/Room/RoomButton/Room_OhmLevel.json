@@ -1,0 +1,15 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X1350002F",
+    "bndID": "0X1350002F"
+  },
+  "attributes": {
+    "frames": {
+      "Beginner": {},
+      "Intermediate": {},
+      "High": {},
+      "Master": {}
+    }
+  }
+}

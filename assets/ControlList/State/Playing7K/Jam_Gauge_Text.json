@@ -1,0 +1,14 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X1B500052"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 85,
+        "y": 539
+      }
+    }
+  }
+}

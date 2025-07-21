@@ -1,0 +1,17 @@
+{
+  "type": "State",
+  "name": "STATE_RESULT",
+  "require": {},
+  "attributes": {
+    "objects":{
+      "IDC_CONTAINER_BACKGROUND": {
+        "type": "UiContainer",
+        "attributes": {}
+      },
+      "IDC_IMAGE_STATE_RESULT": "ControlList/State/Result/State_Result.json",
+      "IDC_IMAGE_STATE_RESULT_TOP": "ControlList/State/Result/StateResult_Top.json",
+      "IDC_IMAGE_STATE_RESULT_BOTTOM": "ControlList/State/Result/StateResult_Bottom.json",
+      "IDC_IMAGE_WINLOSE": "ControlList/State/Result/Result_WinLose.json"
+    }
+  }
+}

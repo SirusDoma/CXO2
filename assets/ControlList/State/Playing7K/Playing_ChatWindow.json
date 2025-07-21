@@ -1,0 +1,29 @@
+﻿{
+  "type": "ChatWindow",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 3,
+        "y": 20
+      }
+    },
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 425,
+      "height": 125
+    },
+    "color": {
+      "a": 255,
+      "r": 255,
+      "g": 127,
+      "b": 255
+    },
+    "fontSize": 11,
+    "lineSpacing": 12,
+    "maximumChatLength": 6
+  }
+}

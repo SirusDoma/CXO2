@@ -1,0 +1,88 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "localBndID": "0X29017012"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_TEXT_MUSIC_TITLE": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X29400021"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "outline": {
+            "thickness": 1.25,
+            "color": {
+              "a": 255,
+              "r": 25,
+              "g": 25,
+              "b": 25
+            }
+          }
+        }
+      },
+      "IDC_TEXT_MUSIC_LEVEL": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X29400022"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "outline": {
+            "thickness": 1.25,
+            "color": {
+              "a": 255,
+              "r": 25,
+              "g": 25,
+              "b": 25
+            }
+          }
+        }
+      },
+      "IDC_TEXT_MUSIC_TIME": {
+        "type": "Label",
+        "require": {
+          "font": "Interface/Common/Font.Unicode.ttf",
+          "bndID": "0X29400023"
+        },
+        "attributes": {
+          "fontSize": 10,
+          "outline": {
+            "thickness": 1.25,
+            "color": {
+              "a": 255,
+              "r": 25,
+              "g": 25,
+              "b": 25
+            }
+          }
+        }
+      },
+      "IDC_IMAGE_MUSIC_ACTIVE": {
+        "type": "Shape",
+        "require": {},
+        "attributes": {
+          "type": "Rectangle",
+          "color": {
+            "a": 150,
+            "r": 60,
+            "g": 150,
+            "b": 180
+          },
+          "width": 232,
+          "height": 15
+        }
+      },
+      "IDC_IMAGE_MUSIC_HIGHLIGHT": {
+        "type": "Image",
+        "require": {
+          "sheet": "Dialog_SelectMusicMM.ojs"
+        }
+      }
+    }
+  }
+}

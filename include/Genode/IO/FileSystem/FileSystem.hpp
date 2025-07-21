@@ -28,6 +28,7 @@ namespace Gx
             static std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size);
             static std::optional<std::size_t> GetFileSize(const std::string& fileName);
 
+            static bool IsMounted(const FileSystemController& fileSystem);
             static void Mount(const FileSystemController& fileSystem);
             static void Dismount(const FileSystemController& fileSystem);
 

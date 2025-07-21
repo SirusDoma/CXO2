@@ -1,0 +1,122 @@
+{
+  "type": "State",
+  "name": "STATE_WAITING_7K",
+  "require": {
+    "IDC_ANIMATION_EMOTICON_HI": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Hi.json",
+    "IDC_ANIMATION_EMOTICON_GO": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Go.json",
+    "IDC_ANIMATION_EMOTICON_READY": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Ready.json",
+    "IDC_ANIMATION_EMOTICON_APPROVAL": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Approval.json",
+    "IDC_ANIMATION_EMOTICON_OBJECTION": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Objection.json",
+    "IDC_ANIMATION_EMOTICON_OHM_SMILE": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Ohm_Smile.json",
+    "IDC_ANIMATION_EMOTICON_OHM_HAHA": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Ohm_Haha.json",
+    "IDC_ANIMATION_EMOTICON_OHM_VICTORY": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Ohm_Victory.json",
+    "IDC_ANIMATION_EMOTICON_OHM_LOSE": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Ohm_Lose.json",
+    "IDC_ANIMATION_EMOTICON_BY_DEGREES": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_ByDegrees.json",
+    "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_ExclamationMark.json",
+    "IDC_ANIMATION_EMOTICON_QUESTION": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Question.json",
+    "IDC_ANIMATION_EMOTICON_HEART": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Heart.json",
+    "IDC_ANIMATION_EMOTICON_COUNT": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Count.json",
+    "IDC_ANIMATION_EMOTICON_NOTE": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Note.json",
+    "IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_ExclamationMark2.json",
+    "IDC_ANIMATION_EMOTICON_BROKEN_HEART": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_BrokenHeart.json",
+    "IDC_ANIMATION_EMOTICON_CLOVER": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Clover.json",
+    "IDC_ANIMATION_EMOTICON_FLOWER": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Flower.json",
+    "IDC_ANIMATION_EMOTICON_IDEA": "ControlList/State/Waiting/Waiting7K/Emoticon/Emoticon_Idea.json"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_STATE_WAITING": "ControlList/State/Waiting/Waiting7K/State_Waiting.json",
+      "IDC_IMAGE_CHANNEL_CATEGORY": "ControlList/State/Waiting/Waiting7K/Wait_Channel_Category.json",
+      "IDC_NUMBER_CHANNEL_ID": "ControlList/State/Waiting/Waiting7K/Wait_ChannelNumber.json",
+      "IDC_NUMBER_ROOM_ID": "ControlList/State/Waiting/Waiting7K/Wait_RoomNumber.json",
+      "IDC_IMAGE_ROOM_LEVEL": "ControlList/State/Waiting/Waiting7K/Wait_Level.json",
+      "IDC_BUTTON_CHANGE_TITLE": "ControlList/State/Waiting/Waiting7K/Wait_ChangeTitle.json",
+      "IDC_TEXT_ROOM_NAME": "ControlList/State/Waiting/Waiting7K/Wait_RoomName.json",
+      "IDC_TEXT_MUSIC_NAME": "ControlList/State/Waiting/Waiting7K/Wait_MusicName.json",
+      "IDC_LIST_AVATAR": "ControlList/State/Waiting/Waiting7K/Wait_AvatarList.json",
+      "IDC_CONTAINER_TEAM_BUTTONS": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_RADIO_TEAM_A": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamA.json",
+            "IDC_RADIO_TEAM_B": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamB.json",
+            "IDC_RADIO_TEAM_C": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamC.json",
+            "IDC_RADIO_TEAM_D": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamD.json",
+            "IDC_RADIO_TEAM_E": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamE.json",
+            "IDC_RADIO_TEAM_F": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamF.json",
+            "IDC_RADIO_TEAM_G": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamG.json",
+            "IDC_RADIO_TEAM_H": "ControlList/State/Waiting/Waiting7K/TeamSelector/Wait_Btn_TeamH.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_INSTRUMENT_SELECTOR": {
+        "type": "InstrumentSelector",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_INSTRUMENT": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Instrument.json",
+            "IDC_TEXT_INSTRUMENT_NAME": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_InstrumentName.json",
+            "IDC_RADIO_GUITAR": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_Guitar.json",
+            "IDC_RADIO_BASS": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_Bass.json",
+            "IDC_RADIO_DRUM": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_Drum.json",
+            "IDC_RADIO_KEYBOARD": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_Keyboard.json",
+            "IDC_BUTTON_INSTRUMENT_LEFT": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_InstrumentLeft.json",
+            "IDC_BUTTON_INSTRUMENT_RIGHT": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_InstrumentRight.json",
+            "IDC_BUTTON_INSTRUMENT_SELECT": "ControlList/State/Waiting/Waiting7K/InstrumentSelector/Wait_Btn_InstrumentSelect.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_MAP_SELECTOR": {
+        "type": "MapSelector",
+        "attributes": {
+          "objects": {
+            "IDC_TEXT_MAP_NAME": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_MapName.json",
+            "IDC_IMAGE_MAP": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Map.json",
+            "IDC_IMAGE_RANDOM_MAP": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_MapRandom.json",
+            "IDC_BUTTON_MAP_LEFT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_MapLeft.json",
+            "IDC_BUTTON_MAP_RIGHT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_MapRight.json",
+            "IDC_CONTAINER_EFFECT_1": {
+              "type": "UiContainer",
+              "attributes": {
+                "objects": {
+                  "IDC_IMAGE_EFFECT0_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect0_1.json",
+                  "IDC_IMAGE_EFFECT1_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect1_1.json",
+                  "IDC_IMAGE_EFFECT2_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect2_1.json",
+                  "IDC_IMAGE_EFFECT3_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect3_1.json",
+                  "IDC_IMAGE_EFFECT4_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect4_1.json",
+                  "IDC_IMAGE_EFFECT5_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect5_1.json",
+                  "IDC_IMAGE_EFFECT6_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_1.json"
+                }
+              }
+            },
+            "IDC_CONTAINER_EFFECT_2": {
+              "type": "UiContainer",
+              "attributes": {
+                "objects": {
+                  "IDC_IMAGE_EFFECT0_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect0_2.json",
+                  "IDC_IMAGE_EFFECT1_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect1_2.json",
+                  "IDC_IMAGE_EFFECT2_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect2_2.json",
+                  "IDC_IMAGE_EFFECT3_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect3_2.json",
+                  "IDC_IMAGE_EFFECT4_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect4_2.json",
+                  "IDC_IMAGE_EFFECT5_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect5_2.json",
+                  "IDC_IMAGE_EFFECT6_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_2.json"
+                }
+              }
+            },
+            "IDC_RADIO_MAP_SELECT_TOP": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_Effect_Top.json",
+            "IDC_RADIO_MAP_SELECT_BOTTOM": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_Effect_Bottom.json"
+          }
+        }
+      },
+      "IDC_DIALOG_SELECT_MUSIC": "ControlList/Dialog/SelectMusic.json",
+      "IDC_DIALOG_EMOTICON": "ControlList/Dialog/Emoticon.json",
+      "IDC_DIALOG_CHANGE_TITLE": "ControlList/Dialog/ChangeTitle.json",
+      "IDC_DIALOG_WHISPER": "ControlList/Dialog/Whisper.json",
+      "IDC_BUTTON_SELECT_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_Btn_MusicSelect.json",
+      "IDC_CHAT_PANEL": "ControlList/State/Waiting/Waiting7K/Wait_ChatPanel.json",
+      "IDC_BUTTON_EMOTICON": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Emoticon.json",
+      "IDC_BUTTON_START": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Start.json",
+      "IDC_BUTTON_READY": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Ready.json",
+      "IDC_BUTTON_BACK": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Back.json"
+    }
+  }
+}

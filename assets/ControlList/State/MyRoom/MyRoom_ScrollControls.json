@@ -1,0 +1,13 @@
+{
+  "type": "UiContainer",
+  "require": {
+    "bndID": "0X15021028"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_SCROLL_MYBAG": "ControlList/State/MyRoom/MyRoom_Scroll_MyBag.json",
+      "IDC_BUTTON_SCROLL_LEFT": "ControlList/State/MyRoom/MyRoom_Btn_ScrollLeft.json",
+      "IDC_BUTTON_SCROLL_RIGHT": "ControlList/State/MyRoom/MyRoom_Btn_ScrollRight.json"
+    }
+  }
+}

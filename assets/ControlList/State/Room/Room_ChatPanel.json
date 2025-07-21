@@ -1,0 +1,14 @@
+﻿{
+  "type": "ChatPanel",
+  "require": {
+    "bndID": "0X1380001A"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_CHAT_WINDOW": "ControlList/State/Room/ChatPanel/Room_ChatWindow.json",
+      "IDC_EDIT_CHAT": "ControlList/State/Room/ChatPanel/Room_ChatInput.json",
+      "IDC_CONTAINER_CHAT_SCROLL_CONTROLS": "ControlList/State/Room/ChatPanel/Room_ChatScrollControls.json",
+      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Room/ChatPanel/Room_ChatButtonList.json"
+    }
+  }
+}

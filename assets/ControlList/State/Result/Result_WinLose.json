@@ -1,0 +1,12 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "Result_WinLose.ojs"
+  },
+  "attributes": {
+    "frames": {
+      "win": { "id": 0 },
+      "lose": { "id": 1 }
+    }
+  }
+}

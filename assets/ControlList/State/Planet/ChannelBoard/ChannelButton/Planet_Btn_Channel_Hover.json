@@ -1,0 +1,20 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X1950002E"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "texCoords": {
+      "x": 159,
+      "y": 0,
+      "width": 159,
+      "height": 18
+    }
+  }
+}

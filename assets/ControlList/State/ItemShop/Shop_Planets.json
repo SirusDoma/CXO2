@@ -1,0 +1,22 @@
+{
+  "type": "Image",
+  "require": {
+    "refID": "0X14500027",
+    "bndID": "0X14500027"
+  },
+  "attributes": {
+    "frames": {
+      "O2Planet": {},
+      "Aqua": {},
+      "Eliten": {},
+      "Graffiti": {},
+      "Bikini": {},
+      "Crush": {},
+      "Wonderland": {},
+      "Meganut": {},
+      "Crystal": {},
+      "Event": {},
+      "ShowAll": {}
+    }
+  }
+}

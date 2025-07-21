@@ -483,7 +483,7 @@ void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoti
     auto emoticon = container->FindChild<Gx::Animation>(emoticonID);
     if (!emoticon)
     {
-        emoticon = &Create<Gx::Animation>(*FindResource<Gx::Animation>(emoticonID));
+        emoticon = &Create<Gx::Animation>(*Find<Gx::Animation>(emoticonID));
         emoticon->SetName(emoticonID);
         emoticon->SetAnimationCallback([=] (auto& sender)
         {

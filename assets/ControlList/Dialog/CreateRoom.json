@@ -1,0 +1,35 @@
+{
+  "type": "CreateRoomDialog",
+  "require": {
+    "refID": "0X25100001"
+  },
+  "attributes": {
+    "buttons": {
+      "accept": {
+        "type": "Button",
+        "require": {
+          "refID": "0X25200002",
+          "bndID": "0X25200002"
+        }
+      },
+      "cancel": {
+        "type": "Button",
+        "require": {
+          "refID": "0X25200003",
+          "bndID": "0X25200003"
+        }
+      }
+    },
+    "objects": {
+      "IDC_EDIT_TITLE": "ControlList/Dialog/CreateRoom/TitleInput.json",
+      "IDC_EDIT_PASSWORD": "ControlList/Dialog/CreateRoom/PasswordInput.json",
+      "IDC_EDIT_MIN_LEVEL_LIMIT": "ControlList/Dialog/CreateRoom/MinLevelLimitInput.json",
+      "IDC_EDIT_MAX_LEVEL_LIMIT": "ControlList/Dialog/CreateRoom/MaxLevelLimitInput.json",
+      "IDC_TOGGLE_LEVEL_LIMIT": "ControlList/Dialog/CreateRoom/Btn_ToggleLevelLimit.json",
+      "IDC_RADIO_JAM_MODE": "ControlList/Dialog/CreateRoom/Btn_JamMode.json",
+      "IDC_RADIO_VERSUS_MODE": "ControlList/Dialog/CreateRoom/Btn_VersusMode.json",
+      "IDC_RADIO_SINGLE_MODE": "ControlList/Dialog/CreateRoom/Btn_SingleMode.json",
+      "IDC_TOOLTIP_INFO": "ControlList/Dialog/CreateRoom/ToolTip.json"
+    }
+  }
+}

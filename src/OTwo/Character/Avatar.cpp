@@ -195,10 +195,10 @@ void Avatar::Equip(const Item& item)
     m_items[item.GetType()] = std::move(item);
     switch (item.GetType())
     {
-        case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard;  break;
-        case EquipmentType::Bass:     m_instrument = Instrument::Bass;   break;
-        case EquipmentType::Drum:     m_instrument = Instrument::Drum;   break;
-        case EquipmentType::Guitar:   m_instrument = Instrument::Guitar; break;
+        case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard; break;
+        case EquipmentType::Bass:     m_instrument = Instrument::Bass;     break;
+        case EquipmentType::Drum:     m_instrument = Instrument::Drum;     break;
+        case EquipmentType::Guitar:   m_instrument = Instrument::Guitar;   break;
         default: break;
     }
 
@@ -314,6 +314,17 @@ std::unordered_map<EquipmentType, const Item*> Avatar::GetEquipedItems(const boo
     return itemMap;
 }
 
+sf::Vector2f Avatar::GetOffset() const
+{
+    return m_offset;
+}
+
+void Avatar::SetOffset(const sf::Vector2f& offset)
+{
+    m_offset = offset;
+}
+
+
 void Avatar::Update(const double delta)
 {
     const auto ohmEffect = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM_EFFECT);
@@ -366,6 +377,10 @@ void Avatar::Update(const double delta)
 Gx::RenderStates Avatar::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
     states.transform *= GetTransform();
+
+    auto offset = states;
+    offset.transform.translate(m_offset);
+
     if (!m_alive)
         return RenderableContainer::Render(surface, states);
 
@@ -389,13 +404,14 @@ Gx::RenderStates Avatar::Render(Gx::RenderSurface& surface, Gx::RenderStates sta
         }
 
         if (const auto& animation = iterator->second.GetRenderableItem(m_gender, part, m_instrument))
-            animation->Render(surface, states);
+            animation->Render(surface, offset);
 
-        states.Layer += 1.f;
+        offset.Layer += 1.f;
         if (type == EquipmentType::Costume && part == RenderPart::Body)
             break;
     }
 
+    states.Layer = offset.Layer;
     return RenderableContainer::Render(surface, states);
 }
 

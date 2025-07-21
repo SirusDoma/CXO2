@@ -2,10 +2,36 @@
 
 #include <Genode/System/Application.hpp>
 
+
+enum class CompatibilityMode : int
+{
+    None      = 0,
+    Interface = 1 << 0,
+    Playing   = 1 << 1,
+    Avatar    = 1 << 2
+};
+
+inline CompatibilityMode operator|(CompatibilityMode a, CompatibilityMode b)
+{
+    return static_cast<CompatibilityMode>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+inline bool operator&(CompatibilityMode a, CompatibilityMode b)
+{
+    return (static_cast<int>(a) & static_cast<int>(b)) != 0;
+}
+
+
+
 class O2Jam : public Gx::Application
 {
 public:
+    inline static std::string Version = "3.10";
+
     O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
+
+    static bool InCompatibilityMode();
+    static bool InCompatibilityMode(CompatibilityMode modes);
 
     // ReSharper disable once CppNonExplicitConversionOperator
     operator sf::RenderTarget&() const override;

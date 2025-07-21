@@ -11,11 +11,13 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json& json, const
 {
     LabelMetadata metadata;
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    const auto attributes = json.at("attributes");
-    if (!ParseMetadata(attributes, metadata, context))
-        return nullptr;
+    if (const auto attributes = json.find("attributes"); attributes != json.end())
+    {
+        if (!ParseMetadata(attributes.value(), metadata, context))
+            return Instantiate(context);
+    }
     
     return LoadFromMetadata(metadata, context);
 }
@@ -26,10 +28,22 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
     if (!metadata)
         throw Gx::ResourceLoadException("The specified metadata is incompatible");
     
-    auto label = std::make_unique<Gx::Label>();
+    auto label = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto font = ctx.Find<Gx::Font>(*metadata); font)
+    if (const auto font = ctx.Require<Gx::Font>(*metadata); font)
         label->SetFont(*font);
+
+    if (metadata->Position != sf::Vector2f())
+    {
+        label->SetPosition(metadata->Position);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        label->SetPosition(sf::Vector2f(
+            static_cast<float>(bound->position.x),
+            static_cast<float>(bound->position.y)
+        ));
+    }
 
     std::uint32_t style = 0;
     if (metadata->Bold)
@@ -51,7 +65,6 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
     label->SetOutlineOffset({0.f, 1.f});
     label->SetString(sf::String::fromUtf8(metadata->String.begin(), metadata->String.end()));
     label->SetOrigin(metadata->Origin);
-    label->SetPosition(metadata->Position);
     label->SetScale(metadata->Scale);
     label->SetRotation(metadata->Rotation);
     label->SetAlignment(metadata->Alignment);
@@ -65,13 +78,16 @@ Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata&
     return label;
 }
 
-bool LabelLoader::ParseMetadata(Gx::Json attributes, LabelMetadata& metadata, const Gx::ResourceContext& context)
+bool LabelLoader::ParseMetadata(const Gx::Json& attributes, LabelMetadata& metadata, const Gx::ResourceContext& context)
 {
     if (attributes.empty())
         return false;
 
-    if (!TransformLoader::ParseMetadata(attributes.at("transform"), metadata))
-        return false;
+    if (const auto transform = attributes.find("transform"); transform != attributes.end())
+    {
+        if (!TransformLoader::ParseMetadata(transform.value(), metadata))
+            return false;
+    }
 
     metadata.FontSize = 30;
     if (auto fontSize = attributes.find("fontSize"); fontSize != attributes.end())

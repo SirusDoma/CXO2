@@ -100,6 +100,9 @@ void StateMusicShop::Initialize()
         if (!item)
             continue;
 
+        if (const auto status = item->FindChild<Gx::Image>(Resource::MusicShop::MusicItem::IDC_IMAGE_STATUS))
+            status->SetFrame("Downloaded");
+
         if (const auto selector = item->FindChild<Gx::Image>(Resource::MusicShop::MusicItem::IDC_IMAGE_SELECTOR))
         {
             selector->SetVisible(false);

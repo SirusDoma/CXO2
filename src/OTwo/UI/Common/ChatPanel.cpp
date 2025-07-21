@@ -21,16 +21,18 @@ void ChatPanel::Initialize()
     Gx::UiContainer::Initialize();
 
     const auto chatWindow = GetChatWindow();
-    const auto scrollChat = FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
+    if (const auto controls = FindChild<Gx::UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS))
+    {
+        const auto scrollChat = controls->FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
+        if (scrollChat)
+            chatWindow->SetScrollBar(*scrollChat);
 
-    if (scrollChat)
-        chatWindow->SetScrollBar(*scrollChat);
+        if (const auto btnChatScrollUp = controls->FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_UP))
+            btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
 
-    if (const auto btnChatScrollUp = FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_UP))
-        btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
-
-    if (const auto btnChatScrollDown = FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_DOWN))
-        btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+        if (const auto btnChatScrollDown = controls->FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_DOWN))
+            btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+    }
 
     const auto chatInput = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT);
     chatInput->SetPermanentFocusEnabled(true);

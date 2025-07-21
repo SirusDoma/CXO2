@@ -1,0 +1,10 @@
+{
+  "type": "Sprite",
+  "require": {
+    "refID": "0X1B500049",
+    "format": "{Name}{MapID}.{Extension}"
+  },
+  "attributes": {
+    "id": 0
+  }
+}

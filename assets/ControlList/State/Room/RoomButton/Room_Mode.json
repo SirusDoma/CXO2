@@ -1,0 +1,16 @@
+﻿{
+  "type": "Image",
+  "require": {
+    "refID": "0X1350002E",
+    "bndID": "0X1350002E"
+  },
+  "attributes": {
+    "frames": {
+      "Single": {},
+      "VS": {},
+      "Jam": {},
+      "Album": {},
+      "Couple": {}
+    }
+  }
+}

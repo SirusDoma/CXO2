@@ -1,0 +1,19 @@
+{
+  "type": "State",
+  "name": "STATE_LOADING",
+  "require": {},
+  "attributes": {
+    "objects":{
+      "IDC_IMAGE_STATE_LOADING1": "ControlList/State/Loading/MusicLoading1.json",
+      "IDC_IMAGE_STATE_LOADING2": "ControlList/State/Loading/MusicLoading2.json",
+      "IDC_IMAGE_STATE_LOADING3": "ControlList/State/Loading/MusicLoading3.json",
+      "IDC_IMAGE_STATE_LOADING4": "ControlList/State/Loading/MusicLoading4.json",
+      "IDC_IMAGE_STATE_LOADING5": "ControlList/State/Loading/MusicLoading5.json",
+      "IDC_IMAGE_STATE_LOADING6": "ControlList/State/Loading/MusicLoading6.json",
+      "IDC_IMAGE_STATE_LOADING7": "ControlList/State/Loading/MusicLoading7.json",
+      "IDC_IMAGE_STATE_LOADING8": "ControlList/State/Loading/MusicLoading8.json",
+      "IDC_IMAGE_STATE_LOADING9": "ControlList/State/Loading/MusicLoading9.json",
+      "IDC_IMAGE_STATE_LOADING10": "ControlList/State/Loading/MusicLoading10.json"
+    }
+  }
+}

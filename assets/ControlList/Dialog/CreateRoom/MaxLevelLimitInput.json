@@ -1,0 +1,22 @@
+{
+  "type": "InputField",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 188,
+        "y": 394
+      }
+    },
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 78,
+      "height": 18
+    },
+    "fontSize": 12,
+    "maximumLength": 3
+  }
+}

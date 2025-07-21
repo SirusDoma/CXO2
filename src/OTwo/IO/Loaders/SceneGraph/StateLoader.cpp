@@ -1,9 +1,15 @@
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <OTwo/IO/TextureCacheBuilder.hpp>
 #include <OTwo/Metadata/SceneGraph/StateMetadata.hpp>
 
 #include <magic_enum.hpp>
+
+StateLoader::StateLoader(Gx::ResourceManager& resources)
+    : m_resources(resources)
+{
+}
 
 Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {
@@ -35,17 +41,21 @@ Gx::ResourcePtr<State> StateLoader::LoadFromMetadata(const ResourceMetadata& met
         // Rewire resource manager to the local scene
         auto container = ObjectContainer::Decorate(state.get(), true);
         auto name = fmt::format("{}/{}", meta.Name, key);
-        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
+        auto ctx  = Gx::ResourceContext(name, m_resources, context.GetCacheMode());
+        for (const auto& [key, value] : context.GetProperties())
+            ctx.SetProperty(key, value);
 
         ObjectLoader::LoadFromJson(name, reference, container, ctx);
     }
 
-    for (auto [key, object] : metadata->Objects)
+    for (const auto& [key, object] : metadata->Objects)
     {
         // Rewire resource manager to the local scene
         auto container = ObjectContainer::Decorate(state.get());
         auto name = fmt::format("{}/{}", meta.Name, key);
-        auto ctx  = Gx::ResourceContext(name, state->GetResources(), context.GetCacheMode());
+        auto ctx  = Gx::ResourceContext(name, m_resources, context.GetCacheMode());
+        for (const auto& [key, value] : context.GetProperties())
+            ctx.SetProperty(key, value);
 
         ObjectLoader::LoadFromJson(name, object, container, ctx);
     }

@@ -12,6 +12,7 @@ OpiArchive::Signature OpiArchive::GetSignature() const
 bool OpiArchive::LoadFromFile(const std::string& fileName)
 {
     // Fetch meta data
+    m_source = fileName;
     if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
         return false;
 
@@ -105,13 +106,16 @@ std::optional<std::size_t> OpiArchive::ReadFile(const std::string& fileName, voi
         throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
     const FileInfo header = iterator->second;
-    if (!m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())).has_value())
-        throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive");
-
     if (size > header.GetSize())
         size = header.GetSize();
 
-    return m_fileStream.read(data, size);
+    {
+        auto lock = std::lock_guard(m_mutex);
+        if (!m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())).has_value())
+            throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive");
+
+        return m_fileStream.read(data, size);
+    }
 }
 
 std::optional<std::size_t> OpiArchive::GetFileSize(const std::string& fileName) const

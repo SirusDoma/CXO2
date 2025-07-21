@@ -1,0 +1,15 @@
+{
+  "type": "List",
+  "attributes": {
+    "objects": {
+      "IDC_CONTAINER_SHOP_ITEM_1": "ControlList/State/ItemShop/Shop_Item_1.json",
+      "IDC_CONTAINER_SHOP_ITEM_2": "ControlList/State/ItemShop/Shop_Item_2.json",
+      "IDC_CONTAINER_SHOP_ITEM_3": "ControlList/State/ItemShop/Shop_Item_3.json",
+      "IDC_CONTAINER_SHOP_ITEM_4": "ControlList/State/ItemShop/Shop_Item_4.json",
+      "IDC_CONTAINER_SHOP_ITEM_5": "ControlList/State/ItemShop/Shop_Item_5.json",
+      "IDC_CONTAINER_SHOP_ITEM_6": "ControlList/State/ItemShop/Shop_Item_6.json",
+      "IDC_CONTAINER_SHOP_ITEM_7": "ControlList/State/ItemShop/Shop_Item_7.json",
+      "IDC_CONTAINER_SHOP_ITEM_8": "ControlList/State/ItemShop/Shop_Item_8.json"
+    }
+  }
+}

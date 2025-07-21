@@ -1,0 +1,71 @@
+{
+  "type": "State",
+  "name": "STATE_PLAYING_7K",
+  "require": {
+    "IDC_IMAGE_GUIDE_KEY_EFFECT": "ControlList/State/Playing7K/Guide_KeyEffect.json",
+    "IDC_LIST_NOTE_CLICK": "ControlList/State/Playing7K/Playing_NoteClickList.json",
+    "IDC_LIST_LONG_NOTE_EFFECT": "ControlList/State/Playing7K/LongNote_EffectList.json",
+
+    "IDC_ANIMATION_LONG_NOTE_EFFECT": "ControlList/State/Playing7K/LongNote_Effect.json",
+    "IDC_ANIMATION_NOTE_COMBO": "ControlList/State/Playing7K/Note_Combo/Note_Combo.json",
+    "IDC_NUMBER_NOTE_COMBO": "ControlList/State/Playing7K/Note_ComboNumber/Note_ComboNumber.json",
+    "IDC_CONTAINER_NOTE_JAM": {
+      "type": "UiContainer",
+      "attributes": {
+        "objects": {
+          "IDC_ANIMATION_NOTE_JAM": "ControlList/State/Playing7K/Note_Jam.json",
+          "IDC_NUMBER_NOTE_JAM": "ControlList/State/Playing7K/Note_JamNumber.json"
+        }
+      }
+    }
+  },
+  "attributes": {
+    "viewport": 480,
+    "objects":{
+      "IDC_IMAGE_NOTE_BG": "ControlList/State/Playing7K/Note_BG/Note_BG.json",
+      "IDC_IMAGE_PLAYING_BG": "ControlList/State/Playing7K/Playing_BG/Playing_BG.json",
+      "IDC_CONTAINER_KEY_DOWN": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_KEY_DOWN1": "ControlList/State/Playing7K/KeyDown1.json",
+            "IDC_IMAGE_KEY_DOWN2": "ControlList/State/Playing7K/KeyDown2.json",
+            "IDC_IMAGE_KEY_DOWN3": "ControlList/State/Playing7K/KeyDown3.json",
+            "IDC_IMAGE_KEY_DOWN4": "ControlList/State/Playing7K/KeyDown4.json",
+            "IDC_IMAGE_KEY_DOWN5": "ControlList/State/Playing7K/KeyDown5.json",
+            "IDC_IMAGE_KEY_DOWN6": "ControlList/State/Playing7K/KeyDown6.json",
+            "IDC_IMAGE_KEY_DOWN7": "ControlList/State/Playing7K/KeyDown7.json"
+          }
+        }
+      },
+      "IDC_CONTAINER_BUFFER": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_IMAGE_BUFFER1": "ControlList/State/Playing7K/Playing_Buffer1.json",
+            "IDC_IMAGE_BUFFER2": "ControlList/State/Playing7K/Playing_Buffer2.json",
+            "IDC_IMAGE_BUFFER3": "ControlList/State/Playing7K/Playing_Buffer3.json",
+            "IDC_IMAGE_BUFFER4": "ControlList/State/Playing7K/Playing_Buffer4.json",
+            "IDC_IMAGE_BUFFER5": "ControlList/State/Playing7K/Playing_Buffer5.json"
+          }
+        }
+      },
+      "IDC_IMAGE_LIFE_BAR": "ControlList/State/Playing7K/Life_Gauge_Back.json",
+      "IDC_GAUGE_LIFE_BAR": "ControlList/State/Playing7K/Life_Gauge_Bar.json",
+      "IDC_GAUGE_JAM_BAR": "ControlList/State/Playing7K/Jam_Gauge_Bar.json",
+      "IDC_IMAGE_JAM_BAR": "ControlList/State/Playing7K/Jam_Gauge_Text.json",
+      "IDC_NUMBER_POINT_NUMBER": "ControlList/State/Playing7K/PointNumber.json",
+      "IDC_PLAY_MENU": "ControlList/State/Playing7K/Playing_Menu.json",
+      "IDC_CHAT_PANEL": "ControlList/State/Playing7K/Playing_ChatPanel.json",
+      "IDC_LIST_AVATAR": "ControlList/State/Playing7K/Playing_AvatarList.json",
+      "IDC_IMAGE_KEY_EFFECT": "ControlList/State/Playing7K/Key_Effect/Key_Effect.json",
+      "IDC_ANIMATION_NOTE_COMBO": "ControlList/State/Playing7K/Note_Combo/Note_Combo.json",
+      "IDC_NUMBER_NOTE_COMBO": "ControlList/State/Playing7K/Note_ComboNumber/Note_ComboNumber.json",
+      "IDC_LIST_NOTE_CLICK": "ControlList/State/Playing7K/Playing_NoteClickList.json",
+      "IDC_ANIMATION_NOTE_GOOD": "ControlList/State/Playing7K/Note_Good/Note_Good.json",
+      "IDC_IMAGE_NOTE_MEASURE1": "ControlList/State/Playing7K/Note_Image/Note_Measure1.json",
+      "IDC_IMAGE_NOTE_MEASURE2": "ControlList/State/Playing7K/Note_Image/Note_Measure2.json",
+      "IDC_BUTTON_EXIT": "ControlList/State/Playing7K/Playing_Btn_Exit.json"
+    }
+  }
+}

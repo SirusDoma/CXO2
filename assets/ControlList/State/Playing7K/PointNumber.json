@@ -1,0 +1,15 @@
+{
+  "type": "BitmapNumber",
+  "require": {
+    "sheet": "PointNum.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 195,
+        "y": 567
+      }
+    },
+    "alignment": "Right"
+  }
+}

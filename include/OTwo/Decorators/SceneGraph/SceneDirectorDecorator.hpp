@@ -4,6 +4,7 @@
 
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
+#include <OTwo/IO/TextureCacheBuilder.hpp>
 
 class SceneDirectorDecorator
 {

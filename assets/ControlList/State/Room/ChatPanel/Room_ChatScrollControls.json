@@ -1,0 +1,13 @@
+﻿{
+  "type": "UiContainer",
+  "require": {
+    "bndID": "0X1302101C"
+  },
+  "attributes": {
+    "objects": {
+      "IDC_SCROLL_BAR_CHAT": "ControlList/State/Room/ChatPanel/Room_ChatScroll.json",
+      "IDC_BUTTON_SCROLL_UP": "ControlList/State/Room/ChatPanel/Room_Btn_ChatScrollUp.json",
+      "IDC_BUTTON_SCROLL_DOWN": "ControlList/State/Room/ChatPanel/Room_Btn_ChatScrollDown.json"
+    }
+  }
+}

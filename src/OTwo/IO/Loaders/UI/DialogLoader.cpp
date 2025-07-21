@@ -13,41 +13,46 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, con
 {
     auto metadata = DialogMetadata();
     if (!MetadataLoader::Parse(json, metadata, context))
-        return nullptr;
+        return Instantiate(context);
 
-    auto attributes = json.at("attributes");
-    if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
-        return nullptr;
-
-    if (const auto label = attributes.find("label"); label != attributes.end())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        MetadataLoader::Parse(label.value(), metadata.PromptLabelMetadata, context);
-        LabelLoader::ParseMetadata(label.value().at("attributes"), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_TEXT_PROMPT)));
-    }
+        const auto& attributes = it.value();
+        if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
+            return Instantiate(context);
 
-    if (const auto buttons = attributes.find("buttons"); buttons != attributes.end())
-    {
-        for (std::string type : {"accept", "cancel"})
+        if (const auto label = attributes.find("label"); label != attributes.end())
         {
-            auto button = buttons->find(type);
-            if (button == buttons->end())
-                continue;
+            MetadataLoader::Parse(label.value(), metadata.PromptLabelMetadata, context);
+            if (const auto attr = label.value().find("attributes"); attr != label.value().end())
+                LabelLoader::ParseMetadata(attr.value(), metadata.PromptLabelMetadata, Gx::ResourceContext::Rebind(context, fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_TEXT_PROMPT)));
+        }
 
-            ButtonMetadata* target = nullptr;
-            std::string name;
-            if (type == "accept")
+        if (const auto buttons = attributes.find("buttons"); buttons != attributes.end())
+        {
+            for (std::string type : {"accept", "cancel"})
             {
-                name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_ACCEPT);
-                target = &metadata.AcceptButtonMetadata;
-            }
-            else
-            {
-                name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL);
-                target = &metadata.CancelButtonMetadata;
-            }
+                auto button = buttons->find(type);
+                if (button == buttons->end())
+                    continue;
 
-            MetadataLoader::Parse(button.value(), *target, Gx::ResourceContext::Rebind(context, name));
-            ButtonLoader::ParseMetadata(button.value().at("attributes"), *target, Gx::ResourceContext::Rebind(context, name));
+                ButtonMetadata* target = nullptr;
+                std::string name;
+                if (type == "accept")
+                {
+                    name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_ACCEPT);
+                    target = &metadata.AcceptButtonMetadata;
+                }
+                else
+                {
+                    name = fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL);
+                    target = &metadata.CancelButtonMetadata;
+                }
+
+                MetadataLoader::Parse(button.value(), *target, Gx::ResourceContext::Rebind(context, name));
+                if (const auto attr = button.value().find("attributes"); attr != button.value().end())
+                    ButtonLoader::ParseMetadata(attr.value(), *target, Gx::ResourceContext::Rebind(context, name));
+            }
         }
     }
 
@@ -62,8 +67,26 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
     
     auto dialog = Instantiate(context);
     const auto ctx = ResourceContextDecorator::Decorate(context);
-    if (const auto texture = ctx.Find<sf::Texture>(*metadata); texture)
+    if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
+    {
         dialog->SetTexture(*texture);
+        dialog->SetTexCoords(metadata->TexCoords);
+    }
+    else if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+    {
+        dialog->SetTexture(sheet->GetTexture());
+        if (metadata->TexCoords != sf::IntRect())
+            dialog->SetTexCoords(metadata->TexCoords);
+        else
+            dialog->SetTexCoords(sheet->TexCoords[0]);
+    }
+    else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+    {
+        if (metadata->TexCoords != sf::IntRect())
+            dialog->SetTexCoords(metadata->TexCoords);
+        else
+            dialog->SetTexCoords(*bound);
+    }
 
     auto container = ObjectContainer::Decorate(dialog.get());
     LoadChildren(container, meta, context);
@@ -81,7 +104,6 @@ Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadat
         dialog->SetCancelButton(context.Store(fmt::format("{}/{}", context.GetID(), Resource::Cache::Dialog::IDC_BUTTON_CANCEL), std::move(cancel)));
 
     dialog->SetName(metadata->Name);
-    dialog->SetTexCoords(metadata->TexCoords);
     dialog->SetOrigin(metadata->Origin);
     dialog->SetPosition(metadata->Position);
     dialog->SetScale(metadata->Scale);

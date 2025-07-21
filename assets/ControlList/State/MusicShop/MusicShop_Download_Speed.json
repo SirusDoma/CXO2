@@ -1,0 +1,11 @@
+{
+  "type": "Label",
+  "require": {
+    "font": "Interface/Common/Font.Unicode.ttf",
+    "bndID": "0X1A400018"
+  },
+  "attributes": {
+    "fontSize": 10,
+    "string": "384222"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "UiContainer",
+  "attributes": {
+    "objects": {
+      "IDC_IMAGE_MAIN": {
+        "type": "Image",
+        "attributes": {}
+      },
+      "IDC_ANIMATION_EYES": {
+        "type": "Animation",
+        "attributes": {}
+      },
+      "IDC_ANIMATION_SPEECH": {
+        "type": "Animation",
+        "attributes": {}
+      }
+    }
+  }
+}

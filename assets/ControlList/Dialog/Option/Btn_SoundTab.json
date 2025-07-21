@@ -1,0 +1,6 @@
+{
+  "type": "RadioButton",
+  "require": {
+    "bndID": "0X27200003"
+  }
+}
