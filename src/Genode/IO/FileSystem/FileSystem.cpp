@@ -12,9 +12,8 @@ namespace
         static bool registered = false;
         if (!registered)
         {
-            Gx::FileSystem::Mount(Gx::LocalFileSystem::Instance());
-
             registered = true;
+            Gx::FileSystem::Mount(Gx::LocalFileSystem::Instance());
         }
     }
 }
@@ -121,6 +120,8 @@ namespace Gx
 
     void FileSystem::Mount(const FileSystemController& fileSystem)
     {
+        EnsureDefaultFileSystemsRegistered();
+
         m_controllers.push_back(&fileSystem);
     }
 
