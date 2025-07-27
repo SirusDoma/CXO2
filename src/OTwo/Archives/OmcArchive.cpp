@@ -37,7 +37,10 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const unsigned int index) cons
     const auto header = it->second;
     const auto data = new std::uint8_t[header.GetSize()];
     if (!ReadFile(index, data, header.GetSize()).has_value())
+    {
         delete[] data;
+        return nullptr;
+    }
 
     return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
     {
@@ -48,31 +51,28 @@ Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const unsigned int index) cons
 
 Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) const
 {
-    for (auto const& [index, header] : m_entries)
+    const auto header = GetFileInfo(fileName);
+    if (!header)
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+
+    const auto& entry = static_cast<FileInfo&>(*header);
+    const auto data   = new std::uint8_t[header->GetSize()];
+    if (!ReadFile(entry.GetIndex(), data, header->GetSize()).has_value())
     {
-        if (header.GetName() != fileName)
-            continue;
-
-        const auto data = new std::uint8_t[header.GetSize()];
-        if (!ReadFile(index, data, header.GetSize()).has_value())
-        {
-            delete[] data;
-            throw Gx::ResourceLoadException(fileName, "Failed to load the specified archive entry file");
-        }
-
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        delete[] data;
+        return nullptr;
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
+    {
+        delete[] data;
+        delete ms;
+    });
 }
 
 bool OmcArchive::Contains(const std::string& name) const
 {
-    return std::any_of(m_entries.begin(), m_entries.end(), [name] (auto pair) { return pair.second.GetName() == name; });
+    return GetFileInfo(name) != nullptr;
 }
 
 std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
@@ -130,13 +130,22 @@ std::vector<std::unique_ptr<Gx::FileInfo>> OmcArchive::GetFileEntries() const
 
 std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string& fileName) const
 {
+    if (Gx::StringHelper::StartsWith(fileName, Gx::StringHelper::Split(GetPrefix(), '/').front()) && fileName.find(':') != std::string::npos)
+    {
+        const auto tokens = Gx::StringHelper::Split(fileName, ':');
+        if (tokens.size() != 2)
+            return nullptr;
+
+        return std::make_unique<FileInfo>(m_entries[std::stoi(tokens[1])]);
+    }
+
     for (auto const& [key, header] : m_entries)
     {
         if (header.GetName() == fileName)
             return std::make_unique<FileInfo>(header);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    return nullptr;
 }
 
 std::optional<std::size_t> OmcArchive::ReadFile(const unsigned int index, void* data, std::size_t size) const
@@ -248,35 +257,31 @@ std::optional<std::size_t> OmcArchive::ReadFile(const unsigned int index, void* 
 
 std::optional<std::size_t> OmcArchive::ReadFile(const std::string& fileName, void* data, const std::size_t size) const
 {
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.GetName() == fileName)
-            return ReadFile(key, data, size);
-    }
+    const auto header = GetFileInfo(fileName);
+    if (!header)
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    const auto& entry = static_cast<FileInfo&>(*header);
+    return ReadFile(entry.GetIndex(), data, size);
 }
 
 std::optional<std::size_t> OmcArchive::GetFileSize(const std::string& fileName) const
 {
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.GetName() == fileName)
-            return header.GetSize();
-    }
+    const auto header = GetFileInfo(fileName);
+    if (!header)
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    return header->GetSize();
 }
 
 std::string OmcArchive::GetExtension(const std::string& name) const
 {
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.GetName() == name)
-            return key < 1000 ? ".wav" : ".ogg";
-    }
+    const auto header = GetFileInfo(name);
+    if (!header)
+        return "";
 
-    return "";
+    const auto& entry = static_cast<FileInfo&>(*header);
+    return entry.GetIndex() < 1000 ? ".wav" : ".ogg";
 }
 
 bool OmcArchive::ReadStream(void* data, const std::uint64_t size) const

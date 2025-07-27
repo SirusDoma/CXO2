@@ -15,7 +15,7 @@
       "IDC_TEXT_MESSAGE": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X1440007F"
         },
         "attributes": {

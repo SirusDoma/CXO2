@@ -1,7 +1,7 @@
 ﻿{
   "type": "Marquee",
   "require": {
-    "font": "Interface/Common/Font.Unicode.ttf",
+    "font": "Interface/Common/Font.ttf",
     "bndID": "0X15500063"
   },
   "attributes": {

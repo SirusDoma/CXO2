@@ -42,7 +42,7 @@
                   "IDC_TEXT_AVATAR_INFO_LEVEL": {
                     "type": "Label",
                     "require": {
-                      "font": "Interface/Common/Font.Unicode.ttf"
+                      "font": "Interface/Common/Font.ttf"
                     },
                     "attributes": {
                       "transform": {
@@ -66,7 +66,7 @@
                   "IDC_TEXT_AVATAR_INFO_NAME": {
                     "type": "Label",
                     "require": {
-                      "font": "Interface/Common/Font.Unicode.ttf"
+                      "font": "Interface/Common/Font.ttf"
                     },
                     "attributes": {
                       "transform": {

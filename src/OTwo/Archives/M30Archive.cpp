@@ -31,7 +31,10 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string& fileName) c
 
     const auto data = new std::uint8_t[header->GetSize()];
     if (!ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()).has_value())
+    {
         delete[] data;
+        return nullptr;
+    }
 
     return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
     {
@@ -50,7 +53,10 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const unsigned int index) cons
     const auto data = new std::uint8_t[header->GetSize()];
 
     if (!ReadFile(*header, data, header->GetSize()).has_value())
+    {
         delete[] data;
+        return nullptr;
+    }
 
     return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
     {
@@ -61,13 +67,22 @@ Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const unsigned int index) cons
 
 std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::string& fileName) const
 {
+    if (Gx::StringHelper::StartsWith(fileName, Gx::StringHelper::Split(GetPrefix(), '/').front()) && fileName.find(':') != std::string::npos)
+    {
+        const auto tokens = Gx::StringHelper::Split(fileName, ':');
+        if (tokens.size() != 2)
+            return nullptr;
+
+        return std::make_unique<FileInfo>(m_entries[std::stoi(tokens[1])]);
+    }
+
     for (auto const& [key, header] : m_entries)
     {
         if (header.GetName() == fileName)
             return std::make_unique<FileInfo>(header);
     }
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    return nullptr;
 }
 
 std::optional<std::size_t> M30Archive::ReadFile(const unsigned int index, void* data, const std::size_t size) const
@@ -90,18 +105,16 @@ std::optional<std::size_t> M30Archive::ReadFile(const std::string& fileName, voi
 
 bool M30Archive::Contains(const std::string& name) const
 {
-    return std::any_of(m_entries.begin(), m_entries.end(), [name] (auto pair) { return pair.second.GetName() == name; });
+    return GetFileInfo(name) != nullptr;
 }
 
 std::optional<std::size_t> M30Archive::GetFileSize(const std::string& fileName) const
 {
-    for (auto const& [key, header] : m_entries)
-    {
-        if (header.GetName() == fileName)
-            return header.GetSize();
-    }
+    const auto header = GetFileInfo(fileName);
+    if (!header)
+        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
 
-    throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+    return header->GetSize();
 }
 
 std::vector<std::unique_ptr<Gx::FileInfo>> M30Archive::GetFileEntries() const

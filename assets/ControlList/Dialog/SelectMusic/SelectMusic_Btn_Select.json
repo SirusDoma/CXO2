@@ -8,7 +8,7 @@
       "IDC_TEXT_MUSIC_TITLE": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X29400021"
         },
         "attributes": {
@@ -27,7 +27,7 @@
       "IDC_TEXT_MUSIC_LEVEL": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X29400022"
         },
         "attributes": {
@@ -46,7 +46,7 @@
       "IDC_TEXT_MUSIC_TIME": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X29400023"
         },
         "attributes": {

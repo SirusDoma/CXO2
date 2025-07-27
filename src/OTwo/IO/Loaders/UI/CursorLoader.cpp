@@ -13,46 +13,52 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromJson(const Gx::Json& json, con
     if (!MetadataLoader::Parse(json, metadata, context))
         return nullptr;
 
-    const auto attributes = json.at("attributes");
-    if (attributes.empty())
-        return LoadFromMetadata(metadata, context);
-
-    auto states = attributes.find("states");
-    if (states == attributes.end())
-        return LoadFromMetadata(metadata, context);
-
-    for (auto [name, attr] : states->items())
+    if (const auto it = json.find("attributes"); it != json.end())
     {
-        auto state = CursorMetadata::CursorStateMetadata();
-        if (const auto parse = magic_enum::enum_cast<Gx::Cursor::Type>(name); parse.has_value())
-            state.Type = parse.value();
-        else
-            continue;
+        const auto& attributes = it.value();
+        if (attributes.empty())
+            return LoadFromMetadata(metadata, context);
 
-        auto hs = attr.find("hotspot");
-        auto hotspot = sf::Vector2u();
-        if (hs != attr.end())
+        auto states = attributes.find("states");
+        if (states == attributes.end())
+            return LoadFromMetadata(metadata, context);
+
+        for (auto [name, attr] : states->items())
         {
-            hs->at("x").get_to(hotspot.x);
-            hs->at("y").get_to(hotspot.y);
+            auto state = CursorMetadata::CursorStateMetadata();
+            if (const auto parse = magic_enum::enum_cast<Gx::Cursor::Type>(name); parse.has_value())
+                state.Type = parse.value();
+            else
+                continue;
+
+            if (auto id = attr.find("id"); id != attr.end())
+                state.ID = id->get<std::uint32_t>();
+
+            auto hs = attr.find("hotspot");
+            auto hotspot = sf::Vector2u();
+            if (hs != attr.end())
+            {
+                hs->at("x").get_to(hotspot.x);
+                hs->at("y").get_to(hotspot.y);
+            }
+            state.Hotspot = hotspot;
+
+            auto t = attr.find("texCoords");
+            auto texCoords = sf::IntRect();
+            if (t != attr.end())
+            {
+                unsigned int x, y, w, h;
+                t->at("x").get_to(x);
+                t->at("y").get_to(y);
+                t->at("width").get_to(w);
+                t->at("height").get_to(h);
+
+                texCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
+            }
+
+            state.TexCoords = texCoords;
+            metadata.States.push_back(state);
         }
-        state.Hotspot = hotspot;
-
-        auto t = attr.find("texCoords");
-        auto texCoords = sf::IntRect();
-        if (t != attr.end())
-        {
-            unsigned int x, y, w, h;
-            t->at("x").get_to(x);
-            t->at("y").get_to(y);
-            t->at("width").get_to(w);
-            t->at("height").get_to(h);
-
-            texCoords = sf::IntRect(sf::Vector2i(x, y), sf::Vector2i(w, h));
-        }
-
-        state.TexCoords = texCoords;
-        metadata.States.push_back(state);
     }
 
     return LoadFromMetadata(metadata, context);
@@ -84,6 +90,29 @@ Gx::ResourcePtr<Gx::Cursor> CursorLoader::LoadFromMetadata(const ResourceMetadat
         else
         {
             cursor = std::make_unique<Gx::Cursor>(*texture);
+        }
+    }
+    else if (const auto sheet = ctx.Require<SpriteSheet>(*metadata))
+    {
+        const auto source = sheet->GetTexture().copyToImage();
+        if (!metadata->States.empty())
+        {
+            for (const auto& state : metadata->States)
+            {
+                auto texCoords = state.TexCoords;
+                if (state.ID.has_value())
+                    texCoords = sheet->TexCoords[state.ID.value()];
+
+                auto image = sf::Image(sf::Vector2u(texCoords.size.x, texCoords.size.y), sf::Color::Transparent);
+                if (!image.copy(source, sf::Vector2u(), texCoords, true))
+                    throw Gx::ResourceLoadException(context.GetID(), fmt::format("Failed to load cursor state ({})", magic_enum::enum_name(state.Type)));
+
+                cursor->Register(state.Type, image, state.Hotspot);
+            }
+        }
+        else
+        {
+            cursor = std::make_unique<Gx::Cursor>(sheet->GetTexture());
         }
     }
 

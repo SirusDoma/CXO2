@@ -142,6 +142,8 @@ void Avatar::SetGender(const Gender gender)
 
 void Avatar::SetDefaultItem(const Item& item)
 {
+    ClearEquipments();
+
     if (item.GetID() != 0)
         m_defaultItems[item.GetType()] = item;
 

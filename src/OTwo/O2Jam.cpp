@@ -90,6 +90,7 @@
 
 #include <OTwo/Config/GameConfig.hpp>
 #include <OTwo/Utilities/Console.hpp>
+#include <OTwo/Resources.hpp>
 
 O2Jam::O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
     Gx::Application(std::move(title), mode, view, fullScreen, settings)
@@ -281,6 +282,11 @@ void O2Jam::Boot()
     auto& avatar    = resources.Create<OpiArchive>("Avatar");
     auto& embedded  = resources.Create<EmbeddedArchive>("Internal");
 
+    // Embbeded resources
+    for (const auto& [name, resource] : OTwo::Resources)
+        embedded.WriteFile(std::string(name), resource.data, resource.size);
+
+    Gx::FileSystem::Mount(embedded);
 
     for (std::string name : { "Interface.opi", "Interface1.opi" })
     {
@@ -302,9 +308,6 @@ void O2Jam::Boot()
     if (avatar.LoadFromFile("Avatar.opa"))
         Gx::FileSystem::Mount(avatar);
 
-    // Embbeded resources
-    Gx::FileSystem::Mount(embedded);
-
     // Load global music assets
     auto& bgm       = resources.Create<OjmArchive>("BGM");
     auto& bgEvent   = resources.Create<OjmArchive>("Event");
@@ -312,19 +315,19 @@ void O2Jam::Boot()
     auto& bgPlanet  = resources.Create<OjmArchive>("BgPlanet");
     auto& npc       = resources.Create<OjmArchive>("O2PlanetNPC");
 
-    if (bgm.LoadFromFile("BGM.ojm"))
+    if (Gx::FileSystem::Contains("BGM.ojm") && bgm.LoadFromFile("BGM.ojm"))
         Gx::FileSystem::Mount(bgm);
 
-    if (bgEvent.LoadFromFile("Event.ojm"))
+    if (Gx::FileSystem::Contains("Event.ojm") && bgEvent.LoadFromFile("Event.ojm"))
         Gx::FileSystem::Mount(bgEvent);
 
-    if (bgEffect.LoadFromFile("bgEffect.ojm"))
+    if (Gx::FileSystem::Contains("bgEffect.ojm") && bgEffect.LoadFromFile("bgEffect.ojm"))
         Gx::FileSystem::Mount(bgEffect);
 
-    if (bgPlanet.LoadFromFile("Planet.ojm"))
+    if (Gx::FileSystem::Contains("Planet.ojm") && bgPlanet.LoadFromFile("Planet.ojm"))
         Gx::FileSystem::Mount(bgPlanet);
 
-    if (npc.LoadFromFile("O2PlanetNPC.ojm"))
+    if (Gx::FileSystem::Contains("O2PlanetNPC.ojm") && npc.LoadFromFile("O2PlanetNPC.ojm"))
         Gx::FileSystem::Mount(npc);
 
     // Cache item textures
@@ -364,15 +367,15 @@ void O2Jam::Boot()
     for (auto gender : {Gender::Male, Gender::Female})
         auto __ = context.Require<ItemFactory>().GetDefaultItems(gender);
 
-    // Load and set cursor
-    SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
-
     // Set-up console
-    Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
-    Console::Instance().SetCharacterSize(14);
-    Console::Instance().SetBounds({{0, 0}, {400, 165}});
-    Console::Instance().SetPosition({400, 0});
-    Console::Instance().SetMaximumLines(10);
+    if (Gx::FileSystem::Contains("Interface/Common/Font.Monospace.ttf"))
+    {
+        Console::Instance().SetFont(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Font>("Interface/Common/Font.Monospace.ttf"));
+        Console::Instance().SetCharacterSize(14);
+        Console::Instance().SetBounds({{0, 0}, {400, 165}});
+        Console::Instance().SetPosition({400, 0});
+        Console::Instance().SetMaximumLines(10);
+    }
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
     if (InCompatibilityMode(CompatibilityMode::Interface))
@@ -380,6 +383,9 @@ void O2Jam::Boot()
         // Cache textures
         auto cache = TextureCacheBuilder(image, resources);
         cache.BuildCache();
+
+        // Load and set cursor
+        SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("ControlList/Window_Cursor.json"));
 
         director.Register<StateAvi>("ControlList/State/Avi.json");
         director.Register<StatePlanet>("ControlList/State/Planet.json");
@@ -391,6 +397,9 @@ void O2Jam::Boot()
     }
     else
     {
+        // Load and set cursor
+        SetCursor(context.Require<Gx::ResourceManager>().AddFromFile<Gx::Cursor>("Interface/Common/Window_Cursor.json"));
+
         director.Register<StateAvi>("Interface/State/Avi.json");
         director.Register<StatePlanet>("Interface/State/Planet.json");
         director.Register<StateRoom>("Interface/State/Room.json");

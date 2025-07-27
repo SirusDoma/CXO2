@@ -5,7 +5,7 @@
       "IDC_TEXT_NAME":  {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X1440002F"
         },
         "attributes": {

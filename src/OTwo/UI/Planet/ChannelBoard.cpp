@@ -284,7 +284,7 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     if (m_transitioning || m_planetInfo.Hall == hall)
         return;
 
-    const auto sfxPopup    = &m_resources.AddFromFile<sf::Sound>("Planet/openChannel");
+    const auto sfxPopup    = m_resources.Find<sf::Sound>("Planet/openChannel");
     const auto container   = FindChild<Gx::UiContainer>(Resource::Planet::ChannelBoard::IDC_CONTAINER_CHANNEL_CONTROLS);
     const auto category    = container->FindChild<Gx::Image>(Resource::Planet::ChannelBoard::IDC_IMAGE_CHANNEL_CATEGORY);
     const auto channelList = container->FindChild<Gx::List>(Resource::Planet::ChannelBoard::IDC_LIST_CHANNEL);

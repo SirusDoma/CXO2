@@ -69,34 +69,16 @@ std::unordered_map<EquipmentType, Item> ItemFactory::GetDefaultItems(const Gende
     }
     else
     {
-        auto ids = {
+        const auto ids = {
             30, // Body
             31, // LeftArm
             32, // LeftHand
             33, // RightArm
             34, // RightHand (Drum Stick)
+            gender == Gender::Female ? 36 : 35
         };
 
-        for (const auto& id : ids)
-        {
-            if (auto item = Create(id); item.GetID() != 0)
-                items[item.GetType()] = std::move(item);
-        }
-
-        if (gender == Gender::Male)
-        {
-            ids = {
-                35, // Male (default face)
-            };
-        }
-        else if (gender == Gender::Female)
-        {
-            ids = {
-                36, // Female (default face)
-            };
-        }
-
-        for (const auto& id : ids)
+        for (const auto id : ids)
         {
             if (auto item = Create(id); item.GetID() != 0)
                 items[item.GetType()] = std::move(item);

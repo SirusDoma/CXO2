@@ -6,8 +6,6 @@
   },
   "attributes": {
     "frames": {
-      "RShift": {},
-      "LShift": {},
       "Q": {},
       "W": {},
       "E": {},
@@ -18,6 +16,8 @@
       "I": {},
       "O": {},
       "P": {},
+      "LBracket": {},
+      "RBracket": {},
       "A": {},
       "S": {},
       "D": {},
@@ -27,6 +27,8 @@
       "J": {},
       "K": {},
       "L": {},
+      "Semicolon": {},
+      "Quote": {},
       "Z": {},
       "X": {},
       "C": {},
@@ -34,14 +36,12 @@
       "B": {},
       "N": {},
       "M": {},
-      "Space": {},
-      "Semicolon": {},
-      "Slash": {},
-      "RBracket": {},
-      "LBracket": {},
-      "Quote": {},
       "Comma": {},
-      "Period": {}
+      "Period": {},
+      "Slash": {},
+      "RShift": {},
+      "LShift": {},
+      "Space": {}
     }
   }
 }

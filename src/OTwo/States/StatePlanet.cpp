@@ -1,3 +1,4 @@
+#include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/UI/Planet/ChannelBoard.hpp>
 #include <OTwo/Models/Planet.hpp>
@@ -28,7 +29,7 @@ void StatePlanet::Initialize()
 
     const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_MAIN_ROOM);
     auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
-    auto hoverSfx  = Instantiate<sf::Sound>(Sound::Effects::PLANET_BEEP);
+    auto hoverSfx  = Find<sf::Sound>(Sound::Effects::PLANET_BEEP);
 
     const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
     auto euta     = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_01);
@@ -61,7 +62,8 @@ void StatePlanet::Initialize()
             if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                 return;
 
-            m_mixer.Play(*hoverSfx, Sound::Channel::SFX);
+            if (hoverSfx)
+                m_mixer.Play(*hoverSfx, Sound::Channel::SFX);
         });
 
         radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)

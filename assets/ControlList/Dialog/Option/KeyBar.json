@@ -6,7 +6,13 @@
   "attributes": {
     "frames": {
       "default": {
-        "id": 7
+        "id": 7,
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 20
+          }
+        }
       }
     }
   }

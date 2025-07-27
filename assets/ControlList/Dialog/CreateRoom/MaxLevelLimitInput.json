@@ -1,7 +1,7 @@
 {
   "type": "InputField",
   "require": {
-    "font": "Interface/Common/Font.Unicode.ttf"
+    "font": "Interface/Common/Font.ttf"
   },
   "attributes": {
     "transform": {

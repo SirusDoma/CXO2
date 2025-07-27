@@ -7,7 +7,7 @@
     "label": {
       "type": "Label",
       "require": {
-        "font": "Interface/Common/Font.Unicode.ttf",
+        "font": "Interface/Common/Font.ttf",
         "bndID": "0X2C400002"
       },
       "attributes": {
@@ -34,7 +34,7 @@
       "IDC_EDIT_NICKNAME": {
         "type": "InputField",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "bndID": "0X2C300003"
         },
         "attributes": {

@@ -32,6 +32,18 @@ namespace Gx
             }
         }
 
+        static std::vector<std::string> Split(const std::string& input, const char delimiter = ' ')
+        {
+            std::vector<std::string> tokens;
+            std::istringstream iss(input);
+            std::string token;
+
+            while (std::getline(iss, token, delimiter))
+                tokens.push_back(token);
+
+            return tokens;
+        }
+
         static bool EqualsCaseInsensitive(const std::string& a, const std::string& b)
         {
             if (a.length() != b.length())

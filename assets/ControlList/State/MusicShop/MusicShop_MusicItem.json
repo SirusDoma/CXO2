@@ -9,7 +9,7 @@
       "IDC_TEXT_GENRE": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "localBndID": "0X1A400048"
         },
         "attributes": {
@@ -20,7 +20,7 @@
       "IDC_TEXT_TITLE": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "localBndID": "0X1A400049"
         },
         "attributes": {
@@ -31,7 +31,7 @@
       "IDC_TEXT_LEVEL": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "localBndID": "0X1A40004A"
         },
         "attributes": {
@@ -42,7 +42,7 @@
       "IDC_TEXT_TIME": {
         "type": "Label",
         "require": {
-          "font": "Interface/Common/Font.Unicode.ttf",
+          "font": "Interface/Common/Font.ttf",
           "localBndID": "0X1A40004B"
         },
         "attributes": {

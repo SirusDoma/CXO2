@@ -46,11 +46,14 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileNa
             throw Gx::ResourceLoadException("Failed to load ItemData file");
 
         if (!valid)
-            return Gx::Json();
+            return Gx::Json::object();
 
         std::uint32_t refLength;
         if (input.read(&refLength, sizeof(refLength)) != sizeof(uint32_t))
             throw Gx::ResourceLoadException("Failed to load ItemData file");
+
+        if (refLength == 0)
+            return Gx::Json::object();
 
         auto refBytes = std::vector<char>(refLength);
         if (input.read(refBytes.data(), refLength) != refLength)
@@ -132,11 +135,15 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileNa
             {
                 for (const auto gender : { Gender::Male, Gender::Female })
                 {
+                    auto ref = createRef(Gx::StringHelper::GetTypeName<Gx::Animation>(false), stream);
+                    if (ref.empty())
+                        continue;
+
                     item.References.push_back({
                         gender,
                         renderPart,
                         instrument,
-                        createRef(Gx::StringHelper::GetTypeName<Gx::Animation>(false), stream)
+                        ref
                     });
                 }
             }

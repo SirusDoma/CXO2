@@ -1,0 +1,24 @@
+{
+  "type": "Cursor",
+  "require": {
+    "sheet": "Window_Cursor.ojs-backup"
+  },
+  "attributes": {
+    "states": {
+      "Arrow": {
+        "id": 0,
+        "hotspot": {
+          "x": 0,
+          "y": 7
+        }
+      },
+      "Click": {
+        "id": 1,
+        "hotspot": {
+          "x": 0,
+          "y": 7
+        }
+      }
+    }
+  }
+}

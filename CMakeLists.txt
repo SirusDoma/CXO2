@@ -20,11 +20,14 @@ set(TARGET "OTwo")
 
 # Sources and Headers
 file(GLOB_RECURSE SRCS
-    src/*.cpp
+    src/main.cpp
+    src/Genode/*.cpp
+    src/OTwo/*.cpp
     extlibs/libs/internal/*.c
     extlibs/libs/internal/*.cc
     extlibs/libs/internal/*.cpp
 )
+
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
@@ -124,8 +127,12 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-msvc/libiconv/libiconv$<$<CONFIG:Debug>:d>.lib)
 
+    # Add LIBICONV
     add_compile_definitions(USE_LIBICONV)
     target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+
+    # Allow big obj (for embedded Resource.hpp)
+    target_compile_options(${TARGET} PRIVATE /bigobj)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         message("-- Configuring compiler flags for hot reload")
@@ -242,3 +249,31 @@ endif()
 
 # Include FreeType
 target_link_libraries(${TARGET} PRIVATE Freetype::Freetype)
+
+# Resource Compiler Target (separate from main build)
+add_executable(ResourceCompiler
+    src/Compiler/Compiler.cpp
+)
+
+# Resource Compiler includes and dependencies
+target_include_directories(ResourceCompiler PRIVATE include)
+target_include_directories(ResourceCompiler PRIVATE extlibs/headers)
+target_link_libraries(ResourceCompiler PRIVATE nlohmann_json::nlohmann_json)
+
+# Resource Compiler output directory
+set(COMPILER_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/compiler/${CMAKE_BUILD_TYPE}")
+file(MAKE_DIRECTORY ${COMPILER_OUTPUT_DIR})
+set_target_properties(ResourceCompiler PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${COMPILER_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${COMPILER_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${COMPILER_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${COMPILER_OUTPUT_DIR}
+)
+
+# Custom target to run the resource compiler
+add_custom_target(GenerateResources
+    COMMAND ResourceCompiler
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DEPENDS ResourceCompiler
+    COMMENT "Generating resource files from JSON assets"
+)
