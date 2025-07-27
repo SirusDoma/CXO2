@@ -46,7 +46,8 @@ namespace StringTable::Identifiers::Sound
         constexpr static auto EF_33       = "bgEffect:32"; // "bgEffect/33"
         constexpr static auto EF_34       = "bgEffect:33"; // "bgEffect/34"
         constexpr static auto EF_35       = "bgEffect:34"; // "bgEffect/35"
-        constexpr static auto EF_38       = "bgEffect:35"; // "bgEffect/38"
+        constexpr static auto EF_36       = "bgEffect:35"; // "bgEffect/36"
+        constexpr static auto EF_38       = "bgEffect:38"; // "bgEffect/38"
     }
 
     namespace Speech

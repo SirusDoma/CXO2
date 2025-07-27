@@ -175,7 +175,10 @@ void StateMusicShop::Initialize()
     const auto backButton = Instantiate<Gx::Button>(Resource::MusicShop::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)
     {
-        GetDirector().Present<StateRoom>();
+        if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+            m_mixer.Play(*sfx);
+
+        GetDirector().Dismiss<StateRoom>();
     });
 
     showBuyableButton->PerformClick();

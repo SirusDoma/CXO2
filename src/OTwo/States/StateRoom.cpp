@@ -351,8 +351,11 @@ void StateRoom::OnTutorialButtonClicked()
     director.Present<StateLoading>();
 }
 
-void StateRoom::OnBackButtonClicked() const
+void StateRoom::OnBackButtonClicked()
 {
     auto& director = GetDirector();
+    if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+        m_mixer.Play(*sfx);
+
     director.Dismiss<StatePlanet>();
 }

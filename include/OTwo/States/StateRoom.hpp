@@ -22,7 +22,7 @@ private:
     void OnMyRoomButtonClicked() const;
     void OnBulletinButtonClicked() const;
     void OnTutorialButtonClicked();
-    void OnBackButtonClicked() const;
+    void OnBackButtonClicked();
 
     Gx::AudioMixer& m_mixer;
     SessionContext& m_session;

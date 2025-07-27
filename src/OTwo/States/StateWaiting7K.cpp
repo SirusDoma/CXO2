@@ -369,7 +369,11 @@ void StateWaiting7K::Initialize()
 
 
     const auto btnBack = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
-    btnBack->SetClickCallback([&] (auto&, auto&) {
+    btnBack->SetClickCallback([&] (auto&, auto&)
+    {
+        if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+            m_mixer.Play(*sfx);
+
         director.Dismiss();
         //director.Present<StateRoom>();
     });
