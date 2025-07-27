@@ -1,6 +1,10 @@
 {
   "type": "Image",
   "require": {
-    "bndID": "0X29500040"
+    "localBndID": "0X29500040"
+  },
+  "attributes": {
+    "sizeMode": "Stretch",
+    "bounds": "0X29500040"
   }
 }

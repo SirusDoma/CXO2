@@ -1125,7 +1125,19 @@ void SelectMusicDialog::Invalidate()
             {
                 m_thumbnail = std::make_unique<sf::Texture>();
                 if (m_thumbnail->loadFromImage(*image))
+                {
+                    m_thumbnail->setSmooth(true);
                     thumbnail->SetTexture(*m_thumbnail);
+                }
+            }
+            else if (auto cover = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default))
+            {
+                m_thumbnail = std::make_unique<sf::Texture>();
+                if (m_thumbnail->loadFromImage(*cover))
+                {
+                    m_thumbnail->setSmooth(true);
+                    thumbnail->SetTexture(*m_thumbnail);
+                }
             }
             else
                 thumbnail->SetVisible(false);
