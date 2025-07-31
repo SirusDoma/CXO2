@@ -11,12 +11,12 @@
 
 namespace Gx
 {
-    Application::Application(std::string title, const sf::VideoMode& mode, const bool fullScreen, const sf::ContextSettings& settings)
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const bool fullScreen, const sf::ContextSettings& settings)
         : Application(std::move(title), mode, sf::View({mode.size.x / 2.f, mode.size.y / 2.f}, {static_cast<float>(mode.size.x), static_cast<float>(mode.size.y)}), fullScreen)
     {
     }
 
-    Application::Application(std::string  title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
+    Application::Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
         m_director(SceneDirector(*this)),
         m_context(),
         m_state(fullScreen ? sf::State::Fullscreen : sf::State::Windowed),

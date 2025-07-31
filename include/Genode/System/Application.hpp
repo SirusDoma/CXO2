@@ -58,8 +58,8 @@ namespace Gx
         static sf::VideoMode GetDesktopVideoMode();
 
     protected:
-        Application(std::string title, const sf::VideoMode& mode, bool fullScreen = false, const sf::ContextSettings& settings = {});
-        Application(std::string title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
+        Application(const std::string& title, const sf::VideoMode& mode, bool fullScreen = false, const sf::ContextSettings& settings = {});
+        Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
 
         sf::RenderWindow& GetMainWindow() const;
         const sf::ContextSettings& GetSettings() const;
