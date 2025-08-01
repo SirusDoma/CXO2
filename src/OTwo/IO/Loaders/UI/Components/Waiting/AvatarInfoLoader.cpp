@@ -5,7 +5,7 @@
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <OTwo/Metadata/UI/Components/Waiting/AvatarInfoMetadata.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<AvatarInfo> AvatarInfoLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {

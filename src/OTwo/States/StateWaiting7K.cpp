@@ -30,7 +30,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tasks/Delay.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 using namespace StringTable::Identifiers;
 

@@ -20,7 +20,7 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/RadioButton.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <fmt/format.h>
 
 using namespace StringTable::Identifiers;

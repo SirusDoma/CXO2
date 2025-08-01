@@ -1,6 +1,6 @@
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<ResourceMetadata> MetadataLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const
 {

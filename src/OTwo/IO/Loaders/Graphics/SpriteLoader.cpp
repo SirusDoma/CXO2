@@ -6,7 +6,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/Metadata/Graphics/SpriteMetadata.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::Sprite> SpriteLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {

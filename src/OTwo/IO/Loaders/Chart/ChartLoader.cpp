@@ -2,7 +2,7 @@
 #include <OTwo/Archives/OjmArchive.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 ChartLoader::ChartLoader(const GameContext& context) :
     m_mode(context.GetMode()),

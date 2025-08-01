@@ -18,7 +18,7 @@
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <fmt/format.h>
 
 using namespace StringTable::Identifiers;

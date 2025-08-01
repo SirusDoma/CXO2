@@ -4,7 +4,7 @@
 #include <OTwo/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <OTwo/Metadata/Graphics/AnimationMetadata.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {

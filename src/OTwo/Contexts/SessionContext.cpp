@@ -1,15 +1,21 @@
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
 
-SessionContext::SessionContext(const Player& player) :
+SessionContext::SessionContext(const std::string& token, const Player& player) :
+    m_token(token),
     m_player(player),
     m_hall(MusicHall::None),
     m_channelID(0),
     m_room(),
     m_lastResult()
 {
+}
+
+const std::string& SessionContext::GetToken() const
+{
+    return m_token;
 }
 
 Player& SessionContext::GetCurrentPlayer()

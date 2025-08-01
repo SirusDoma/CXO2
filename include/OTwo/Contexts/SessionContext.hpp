@@ -20,8 +20,9 @@ class SessionContext
 {
 public:
     SessionContext() = default;
-    explicit SessionContext(const Player& player);
+    SessionContext(const std::string& token, const Player& player);
 
+    const std::string& GetToken() const;
     Player& GetCurrentPlayer();
 
     Planet GetPlanet() const;
@@ -45,6 +46,8 @@ public:
     void Save() const;
 
 private:
+    std::string m_token;
+
     Player m_player;
     Planet m_planet = Planet::O2Planet;
     MusicHall m_hall;

@@ -6,7 +6,7 @@
 #include <OTwo/Avatar/Item.hpp>
 #include <OTwo/Utilities/StringTranscoder.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <mutex>
 
 Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const

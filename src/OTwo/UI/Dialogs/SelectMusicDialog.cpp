@@ -24,7 +24,7 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/List.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <cmath>
 #include <unordered_set>
 

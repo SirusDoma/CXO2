@@ -4,7 +4,7 @@
 #include <OTwo/IO/TextureCacheBuilder.hpp>
 #include <OTwo/Metadata/SceneGraph/StateMetadata.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 StateLoader::StateLoader(Gx::ResourceManager& resources)
     : m_resources(resources)

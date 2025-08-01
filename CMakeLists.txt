@@ -74,7 +74,7 @@ FetchContent_MakeAvailable(fmt)
 FetchContent_Declare(
     magic_enum
     GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-    GIT_TAG        v0.9.5
+    GIT_TAG        ecdeb1cea54d87b09bafe9999faf56654646209d
 )
 FetchContent_MakeAvailable(magic_enum)
 
@@ -242,7 +242,7 @@ if(USE_BOXER)
 endif()
 
 # Link SFML
-target_link_libraries(${TARGET} PRIVATE SFML::Audio SFML::Graphics SFML::System SFML::Window)
+target_link_libraries(${TARGET} PRIVATE SFML::Audio SFML::Graphics SFML::System SFML::Window SFML::Network)
 if(WIN32)
     target_link_libraries(${TARGET} PRIVATE SFML::Main)
 endif()

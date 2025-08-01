@@ -1,6 +1,6 @@
 #include <OTwo/Config/GameConfig.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #if _WIN32
 #include <winreg/winreg.hpp>

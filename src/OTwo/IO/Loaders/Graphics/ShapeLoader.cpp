@@ -11,7 +11,7 @@
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 #include <Genode/Graphics/Shapes/RoundedRectangle.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::Shape> ShapeLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {

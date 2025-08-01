@@ -8,7 +8,7 @@
 
 #include <Genode/System/Application.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 AvatarLoader::AvatarLoader(ItemFactory& items) :
     m_items(&items)

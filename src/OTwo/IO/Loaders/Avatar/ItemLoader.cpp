@@ -3,7 +3,7 @@
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <OTwo/IO/Loaders/MetadataLoader.hpp>
 #include <OTwo/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>

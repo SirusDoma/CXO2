@@ -4,7 +4,7 @@
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {

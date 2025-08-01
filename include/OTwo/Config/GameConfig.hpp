@@ -1,11 +1,11 @@
 #pragma once
 
-#include <magic_enum.hpp>
 #include <OTwo/Core/Chart.hpp>
 #include <OTwo/Models/Room.hpp>
 
 #include <SFML/Window/Keyboard.hpp>
 
+#include <magic_enum/magic_enum.hpp>
 #include <map>
 
 enum class NoteShape : std::uint8_t

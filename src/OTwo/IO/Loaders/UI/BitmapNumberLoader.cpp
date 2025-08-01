@@ -5,7 +5,7 @@
 #include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
 {
