@@ -15,12 +15,13 @@
 
 #include <optional>
 
-class SessionContext;
+class ItemShopService;
 class ItemFactory;
+class SessionContext;
 class StateItemShop : public State
 {
 public:
-    explicit StateItemShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items);
+    explicit StateItemShop(Gx::AudioMixer& mixer, ItemShopService& service, SessionContext& session, CartContext& cart, ItemFactory& items);
     void Initialize() override;
 
 private:
@@ -45,6 +46,7 @@ private:
     void InvalidateShopSetItemList(bool rebuildList = false);
 
     Gx::AudioMixer& m_mixer;
+    ItemShopService& m_service;
     SessionContext& m_session;
     CartContext& m_cart;
     ItemFactory& m_items;

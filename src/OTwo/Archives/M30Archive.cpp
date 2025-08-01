@@ -73,7 +73,10 @@ std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::string& fileNam
         if (tokens.size() != 2)
             return nullptr;
 
-        return std::make_unique<FileInfo>(m_entries[std::stoi(tokens[1])]);
+        if (const auto it = m_entries.find(std::stoi(tokens[1])); it != m_entries.end() && it->second.GetSize() > 0)
+            return std::make_unique<FileInfo>(it->second);
+
+        return nullptr;
     }
 
     for (auto const& [key, header] : m_entries)

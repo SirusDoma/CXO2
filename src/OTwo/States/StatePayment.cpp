@@ -25,7 +25,7 @@ void StatePayment::Initialize()
 {
     State::Initialize();
 
-    auto& player            = m_session.GetCurrentPlayer();
+    auto& charInfo          = m_session.GetCharacterInfo();
     const auto& itemData    = m_items.GetItemData();
     const auto& setInfoData = m_items.GetSetInfoData();
 
@@ -46,23 +46,23 @@ void StatePayment::Initialize()
 
         for (auto itemID : itemIDs)
         {
-            const auto it = std::find_if(player.Inventory.begin(), player.Inventory.end(), [itemID] (auto id)
+            const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID] (auto id)
             {
                 return id == itemID;
             });
 
-            if (it == player.Inventory.end())
-                player.Inventory.push_back(itemID);
+            if (it == charInfo.Inventory.end())
+                charInfo.Inventory.push_back(itemID);
         }
     }
     m_cart.Clear();
     m_session.Save();
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_GEM);
-    currentGem->SetValue(player.Gem);
+    currentGem->SetValue(charInfo.Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_CASH);
-    currentCash->SetValue(player.Cash);
+    currentCash->SetValue(charInfo.Wallet.Cash);
 
     const auto backButton = Instantiate<Gx::Button>(Resource::Payment::IDC_BUTTON_BACK);
     backButton->SetClickCallback([this] (auto&, auto&)

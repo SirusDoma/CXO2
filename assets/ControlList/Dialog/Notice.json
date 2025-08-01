@@ -1,0 +1,27 @@
+{
+  "type": "Dialog",
+  "require": {
+    "sheet": "Notice_Base.ojs"
+  },
+  "attributes": {
+    "label": {
+      "type": "Label",
+      "require": {
+        "font": "Interface/Common/Font.ttf"
+      },
+      "attributes": {
+        "fontSize": 10,
+        "transform": {
+          "position": {
+            "x": 22,
+            "y": 55
+          }
+        }
+      }
+    },
+    "buttons": {},
+    "objects": {
+      "IDC_ANIMATION_NOTICE": "ControlList/Dialog/Notice/Notice_Ani.json"
+    }
+  }
+}

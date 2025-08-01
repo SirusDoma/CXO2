@@ -27,7 +27,7 @@ namespace Gx
         // definitions.
         template <typename T, int N>
         struct tag {
-            friend auto loophole(tag<T, N>);
+            friend auto& loophole(tag<T, N>);
             constexpr friend int cloophole(tag<T, N>);
         };
 
@@ -48,7 +48,7 @@ namespace Gx
                       std::remove_cv_t<std::remove_reference_t<T>>,
                       std::remove_cv_t<std::remove_reference_t<U>>>>>
         struct fn_def {
-            friend auto loophole(tag<T, N>) { return activator<U>::activate(); }
+            friend auto& loophole(tag<T, N>) { return activator<U>::activate(); }
             constexpr friend int cloophole(tag<T, N>) { return 0; }
         };
 
@@ -125,16 +125,26 @@ namespace Gx
         template <typename U>
         struct activator<U, std::enable_if_t<std::is_default_constructible_v<U>>>
         {
-            static U activate() { return U(); }
+            static U& activate()
+            {
+                auto t = U{};
+
+                // ReSharper disable once CppDFALocalValueEscapesFunction
+                return t;
+            }
         };
 
         template <typename U>
         struct activator<U, std::enable_if_t<!std::is_default_constructible_v<U>>>
         {
-            static U activate()
+            static U& activate()
             {
-                auto parameters = ConstructorDescriptor<U>(); // temp reference, will be invalid but not used anyway
-                return std::apply([](auto&... args) -> U { return U(std::forward<decltype(args)>(args)...); }, parameters);
+                // TODO: Find cleaner way for abstract and non-public constructor?
+                // auto parameters = ConstructorDescriptor<U>();
+                // return std::apply([](auto&... args) -> U { return U(std::forward<decltype(args)>(args)...); }, parameters);
+
+                // ReSharper disable once CppDFANullDereference
+                return *static_cast<U*>(nullptr); // temp reference, will be invalid but not used anyway
             }
         };
     }

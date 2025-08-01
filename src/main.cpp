@@ -1,7 +1,7 @@
 #include <OTwo/O2Jam.hpp>
+#include <OTwo/Contexts/CommandLineContext.hpp>
 #include <OTwo/Utilities/NamedMutex.hpp>
 #include <OTwo/Utilities/SystemMessageBox.hpp>
-#include <OTwo/Utilities/DebugWatcher.hpp>
 
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/System/Exception.hpp>
@@ -33,13 +33,25 @@ int main(int argc , char** argv)
             if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
                 Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
-        else
+
+        // TODO: Remove validation for offline client
+        const auto ctx = CommandLineContext(argc, argv);
+        if (ctx.GetArgumentCount() < 6 ||
+            ctx.GetAuthToken().empty() ||
+            ctx.GetFtpUrl().empty() ||
+            ctx.GetGame().empty() ||
+            ctx.GetGame().empty())
         {
-            // Enable Live++ when debugger attached (optional)
-            DebuggerWatcher::Watch();
+            SystemMessageBox::ShowInformation("Please try to run O2jam.exe", "[INFO]");
+            return 0;
         }
 
         auto o2jam = O2Jam("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);
+        o2jam.GetContext().Provide<CommandLineContext>([ctx] (const auto&)
+        {
+            return std::make_unique<CommandLineContext>(ctx);
+        }, Gx::Context::Scope::Shared);
+
         return o2jam.Start();
     }
     catch (std::exception &ex)

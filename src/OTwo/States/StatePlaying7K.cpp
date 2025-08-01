@@ -1,13 +1,22 @@
 #include <OTwo/States/StatePlaying7K.hpp>
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateResult.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 
 #include <OTwo/Core/LifeSystem.hpp>
 #include <OTwo/Core/ScoreTracker.hpp>
 #include <OTwo/Core/ChartRenderer.hpp>
 
+#include <OTwo/O2Jam.hpp>
+#include <OTwo/Services/PlayingService.hpp>
+
 #include <OTwo/Contexts/SessionContext.hpp>
+#include <OTwo/Contexts/RoomContext.hpp>
+#include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/Config/GameConfig.hpp>
+
+#include <OTwo/Messages/RoomInfo.hpp>
+#include <OTwo/Messages/Requests/SubmitScoreRequest.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
 #include <OTwo/Avatar/ItemFactory.hpp>
@@ -30,14 +39,20 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <OTwo/O2Jam.hpp>
+#include <OTwo/Messages/Events/GameCompletedEventData.hpp>
+#include <OTwo/Messages/Events/PlayingMemberLeftEventData.hpp>
+#include <OTwo/Messages/Events/PlayingMemberScoreSubmissionEventData.hpp>
+#include <OTwo/Messages/Events/PlayingMemberStatsUpdateEventData.hpp>
+#include <OTwo/States/StateRoom.hpp>
 
 using namespace StringTable::Identifiers;
 
 StatePlaying7K::StatePlaying7K(
     Gx::AudioMixer& mixer,
     Gx::ResourceManager& resources,
+    PlayingService& service,
     SessionContext& session,
+    RoomContext& room,
     GameContext& context,
     GameConfig& config,
     JudgementStrategy& judgementStrategy,
@@ -45,7 +60,9 @@ StatePlaying7K::StatePlaying7K(
     LifeSystem& lifeSystem,
     ItemFactory& items
 ) :
+    m_service(service),
     m_session(session),
+    m_room(room),
     m_context(context),
     m_config(config),
     m_scoreTracker(scoreTracker),
@@ -84,7 +101,16 @@ void StatePlaying7K::Initialize()
 
     // Add chart renderer
     m_renderer.SetName(Resource::Playing7K::IDC_CHART_RENDERER);
-    m_renderer.SetRenderCompleteCallback([this] { OnRenderComplete(); });
+    m_renderer.SetRenderCompleteCallback([this]
+    {
+        if (m_states.size() == 0)
+        {
+            OnRenderComplete();
+            return;
+        }
+
+        SubmitScore();
+    });
     AddChild(m_renderer);
 
     m_renderer.Initialize(*m_context.GetChart(), m_context);
@@ -111,6 +137,26 @@ void StatePlaying7K::Initialize()
     if (const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
         instruction->SetVisible(false);
 
+    // Map user states
+    if (m_context.GetMode() != GameMode::Tutorial)
+    {
+        for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
+        {
+            auto& slot = m_room.GetSlot(i);
+            if (slot.State != RoomSlotState::Occupied || !slot.Member.has_value())
+                continue;
+
+            m_states[i] = UserState
+            {
+                static_cast<std::uint8_t>(i),
+                LifeSystem::DefaultMaxLifePoint,
+                nullptr,
+                true,
+                false
+            };
+        }
+    }
+
     // Setup avatars + avatars effects'
     const auto avatarList = Instantiate<Gx::List>(Resource::Playing7K::IDC_LIST_AVATAR);
     const auto avaContainers = avatarList->GetChildren();
@@ -127,39 +173,42 @@ void StatePlaying7K::Initialize()
             if (!container->IsVisible())
                 continue;
 
-            auto player = m_session.GetCurrentPlayer();
-            for (const auto id : player.EquippedItemIDs)
+            auto charInfo = m_session.GetCharacterInfo();
+            for (const auto id : charInfo.EquippedItemIDs)
                 avatar->Equip(m_items.Create(id));
 
-            auto member  = RoomMember{player};
-            member.Team  = RoomTeam::A;
-            member.Color = sf::Color(255, 0, 21);
+            auto slot = RoomSlot
+            {
+                /* .Member   = */ charInfo,
+                /* .State    = */ RoomSlotState::Occupied,
+                /* .IsMaster = */ true,
+                /* .Ready    = */ true,
+                /* .Team     = */ RoomTeam::A
+            };
 
             const auto info = avatar->GetAvatarInfo();
-            info->SetMember(member);
+            info->SetSlot(slot);
 
-            const auto playerLifeBar = info->GetLifeBar();
-            playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-            playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+            const auto lifeBar = info->GetLifeBar();
+            lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+            lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
 
-            if (m_session.GetCurrentPlayer().ID == member.ID)
-                m_self = avatar;
-
+            m_self = avatar;
             m_avatars[i] = avatar;
         }
         else
         {
-            auto& room = m_session.GetCurrentRoom();
-            if (i >= room.MaxCapacity)
-                break;
+            auto& slot = m_room.GetSlot(i);
+            container->SetVisible(slot.State == RoomSlotState::Occupied);
 
-            auto member = room.Members[i];
-            container->SetVisible(member.ID != 0);
+            if (const auto it = m_states.find(i); it != m_states.end())
+                it->second.Avatar = avatar;
 
             if (!container->IsVisible())
                 continue;
 
-            for (const auto id : member.EquippedItemIDs)
+            slot.Ready = slot.IsMaster; // reset ready state early
+            for (const auto id : slot.Member->EquippedItemIDs)
                 avatar->Equip(m_items.Create(id));
 
             auto efc = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
@@ -209,13 +258,13 @@ void StatePlaying7K::Initialize()
                 avatar->AddChild(effectContainer);
 
             const auto info = avatar->GetAvatarInfo();
-            info->SetMember(member);
+            info->SetSlot(slot);
 
-            const auto playerLifeBar = info->GetLifeBar();
-            playerLifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-            playerLifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+            const auto lifeBar = info->GetLifeBar();
+            lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+            lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
 
-            if (m_session.GetCurrentPlayer().ID == member.ID)
+            if (m_session.GetCharacterInfo().Name == slot.Member->Name)
                 m_self = avatar;
 
             m_avatars[i] = avatar;
@@ -251,7 +300,7 @@ void StatePlaying7K::Initialize()
 
     // Setup Play Menu
     const auto playMenu = Instantiate<PlayMenu>(Resource::Playing7K::IDC_PLAY_MENU);
-    playMenu->SetMetadata(m_context.GetChart()->GetMetadata().ToChartMetadataView(m_context.GetDifficulty()), m_context.GetDifficulty());
+    playMenu->SetMetadata(m_context.GetChart()->GetMetadata(), m_context.GetDifficulty());
     playMenu->SetScoreTracker(m_scoreTracker);
 
     // Setup Score Counter
@@ -267,7 +316,7 @@ void StatePlaying7K::Initialize()
 
     // Setup Life Bar
     const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
-    if (!O2Jam::InCompatibilityMode(CompatibilityMode::Playing))
+    if (!O2Jam::InInteropMode(InteropMode::Playing))
         lifeBar->SetSlanted(true);
 
     lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
@@ -384,7 +433,26 @@ void StatePlaying7K::Initialize()
         // Life System
         if (m_scoreTracker.IsEnabled())
         {
+            const auto lastLife = m_lifeSystem.GetCurrentLifePoint();
             m_lifeSystem.Update(acc, count);
+
+            const auto currentLife = m_lifeSystem.GetCurrentLifePoint();
+            if (lastLife != currentLife)
+            {
+                m_service.UpdateLife(
+                    currentLife,
+                    [] {},
+                    [=] (const auto& ex)
+                    {
+                        Invoke([=]
+                        {
+                            ShowDialog(std::string(ex.what()), DialogStyle::Information, false);
+                            GetDirector().Dismiss<StatePlanet>();
+                        });
+                    }
+                );
+            }
+
             m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
             lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
 
@@ -393,7 +461,8 @@ void StatePlaying7K::Initialize()
                 m_scoreTracker.SetEnabled(false);
                 m_self->Die();
 
-                if (m_context.GetDifficulty() != Difficulty::EX)
+                SubmitScore();
+                if (m_context.GetDifficulty() != Difficulty::EX && m_states.size() == 0)
                 {
                     Run<Gx::Delay>(sf::milliseconds(2000), [this]
                     {
@@ -446,28 +515,39 @@ void StatePlaying7K::Initialize()
         jamAnimation->Reset();
         jamContainer->SetVisible(true);
 
-        const auto effectContainer = m_self->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
-        if (!effectContainer)
-            return;
+        PlayAvatarJamCombo(m_self, jamCombo);
 
-        for (const auto child : effectContainer->GetChildren())
-        {
-            if (const auto number = dynamic_cast<Gx::BitmapNumber*>(child); number)
+        m_service.UpdateJam(
+            jamCombo,
+            [] {},
+            [=] (const auto& ex)
             {
-                number->SetValue(jamCombo);
-                number->Reset();
+                Invoke([=]
+                {
+                    ShowDialog(std::string(ex.what()), DialogStyle::Information, false);
+                    GetDirector().Dismiss<StatePlanet>();
+                });
             }
-
-            if (const auto animation = dynamic_cast<Gx::Animation*>(child); animation)
-                animation->Reset();
-        }
+        );
     });
 
     // Exit button
     const auto exitButton = Instantiate<Gx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
     exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
     {
-        GetDirector().Dismiss();
+        m_service.ExitPlaying([=]
+        {
+            Invoke([=]
+            {
+                if (m_context.GetMode() != GameMode::Single)
+                {
+                    GetDirector().Dismiss<StateRoom>();
+                }
+                else
+                    GetDirector().Dismiss();
+            });
+        });
+
     });
 
     // Start initial lifebar fill-up animation
@@ -503,43 +583,41 @@ void StatePlaying7K::OnRenderComplete()
         return;
     }
 
-    auto items = std::array<ScoreResultItem, 8>();
-    for (std::size_t i = 0; i < items.size(); i++)
+    if (m_states.size() == 0)
     {
-        auto& member = m_session.GetCurrentRoom().Members[i];
-        if (member.ID == m_session.GetCurrentPlayer().ID)
+        auto items = std::array<ScoreEntry, 8>();
+        for (std::size_t i = 0; i < items.size(); i++)
         {
-            items[i] = ScoreResultItem{
-                member,
-                m_scoreTracker.GetPoint(Accuracy::Cool),
-                m_scoreTracker.GetPoint(Accuracy::Good),
-                m_scoreTracker.GetPoint(Accuracy::Bad),
-                m_scoreTracker.GetPoint(Accuracy::Miss),
-                m_scoreTracker.GetMaxCombo(),
-                m_scoreTracker.GetMaxJamCombo(),
-                m_scoreTracker.GetScorePoint()
-            };
+            auto& slot = m_room.GetSlot(i);
+            if (slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name)
+            {
+                items[i] = ScoreEntry
+                {
+                    /* .ID          = */ static_cast<std::uint8_t>(i),
+                    /* .Active      = */ true,
+                    /* .Cool        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Cool)),
+                    /* .Good        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Good)),
+                    /* .Bad         = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Bad)),
+                    /* .Miss        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Miss)),
+                    /* .MaxCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxCombo()),
+                    /* .MaxJamCombo = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxJamCombo()),
+                    /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
+                    /* .Reward      = */ 0,
+                    /* .Level       = */ m_session.GetCharacterInfo().Level,
+                    /* .Experience  = */ m_session.GetCharacterInfo().Experience,
+                    /* .Winning     = */ true,
+                    /* .Reserved    = */ {},
+
+                };
+            }
+            else
+                items[i] = ScoreEntry{};
         }
-        else if (member.ID != 0)
-        {
-            items[i] = ScoreResultItem{
-                member,
-                Gx::Randomizer::Randomize<unsigned int>(100, 500),
-                Gx::Randomizer::Randomize<unsigned int>(100, 500),
-                Gx::Randomizer::Randomize<unsigned int>(0, 10),
-                Gx::Randomizer::Randomize<unsigned int>(5, 20),
-                Gx::Randomizer::Randomize<unsigned int>(0, 200),
-                Gx::Randomizer::Randomize<unsigned int>(1, 20),
-                Gx::Randomizer::Randomize<unsigned int>(10000, 20000),
-            };
-        }
-        else
-            items[i] = ScoreResultItem{};
+
+        m_context.SetScoreEntries(items);
     }
 
     CaptureScreen();
-
-    m_session.SetLatestScoreResults(items);
     GetDirector().Present<StateResult>();
 }
 
@@ -551,6 +629,86 @@ unsigned int StatePlaying7K::GetViewport() const
 void StatePlaying7K::SetViewport(const unsigned int viewport)
 {
     m_viewport = viewport;
+}
+
+void StatePlaying7K::OnMemberStatsUpdate(const PlayingMemberStatsUpdateEventData& ev)
+{
+    if (ev.Type == UpdateStatsType::Life)
+    {
+        const auto it = m_states.find(ev.ID);
+        if (it == m_states.end() || !it->second.Valid)
+            return;
+
+        it->second.Life = ev.Value;
+        if (const auto avatar = it->second.Avatar)
+        {
+            avatar->GetAvatarInfo()->GetLifeBar()->SetValue(ev.Value);
+            if (ev.Value == 0)
+                avatar->Die();
+        }
+
+        if (ev.Value == 0)
+            it->second.Completed = true;
+    }
+    else
+    {
+        const auto it = m_states.find(ev.ID);
+        if (it == m_states.end() || !it->second.Valid)
+            return;
+
+        if (const auto avatar = it->second.Avatar)
+        {
+            if (ev.Value != 0)
+                PlayAvatarJamCombo(avatar, ev.Value);
+        }
+    }
+}
+
+void StatePlaying7K::OnMemberScoreSubmitted(const PlayingMemberScoreSubmissionEventData& ev)
+{
+    const auto it = m_states.find(ev.ID);
+    if (it == m_states.end() || !it->second.Valid)
+        return;
+
+    it->second.Completed = true;
+}
+
+void StatePlaying7K::OnMemberLeft(const PlayingMemberLeftEventData& ev)
+{
+    if (const auto it = m_states.find(ev.ID); it != m_states.end())
+    {
+        it->second.Completed = true;
+        it->second.Valid = false;
+
+        if (it->second.Avatar)
+            it->second.Avatar->SetVisible(false);
+
+        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
+            return;
+
+        auto& slot = m_room.GetSlot(ev.ID);
+        auto name = slot.Member->Name;
+
+        slot.State    = RoomSlotState::Unoccupied;
+        slot.IsMaster = false;
+        slot.Ready    = false;
+        slot.Member   = std::nullopt;
+    }
+}
+
+void StatePlaying7K::OnGameCompleted(const GameCompletedEventData& ev)
+{
+    auto entries = std::array<ScoreEntry, RoomContext::MaxCapacity>();
+
+    const auto& container = ev.Entries.GetContainer();
+    for (std::size_t i = 0; i < entries.size(); i++)
+    {
+        if (i < container.size() && container[i].Active)
+            entries[i] = container[i];
+    }
+
+    m_context.SetScoreEntries(entries);
+    OnRenderComplete();
 }
 
 void StatePlaying7K::Update(const double delta)
@@ -630,6 +788,52 @@ void StatePlaying7K::Update(const double delta)
     }
 }
 
+void StatePlaying7K::PlayAvatarJamCombo(const Avatar* avatar, const std::uint16_t jams)
+{
+    const auto effectContainer = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
+    if (!effectContainer)
+        return;
+
+    for (const auto child : effectContainer->GetChildren())
+    {
+        if (const auto number = dynamic_cast<Gx::BitmapNumber*>(child); number)
+        {
+            number->SetValue(jams);
+            number->Reset();
+        }
+
+        if (const auto animation = dynamic_cast<Gx::Animation*>(child); animation)
+            animation->Reset();
+    }
+}
+
+void StatePlaying7K::SubmitScore()
+{
+    m_service.SubmitScore(SubmitScoreRequest
+    {
+        /* .Cool        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Cool)),
+        /* .Good        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Good)),
+        /* .Bad         = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Bad)),
+        /* .Miss        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Miss)),
+        /* .MaxCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxCombo()),
+        /* .JamCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetJamCombo()),
+        /* .MaxJamCombo = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxJamCombo()),
+        /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
+        /* .Life        = */ static_cast<std::uint8_t>(m_lifeSystem.GetCurrentLifePoint() / m_lifeSystem.GetMaxLifePoint() * 100),
+    },
+    [=]{},
+    [=] (const auto& ex)
+    {
+        Invoke([=]
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+            {
+                GetDirector().Dismiss<StatePlanet>();
+            });
+        });
+    });
+}
+
 void StatePlaying7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
     Inputable::OnKeyPressed(ev);
@@ -665,7 +869,7 @@ void StatePlaying7K::OnKeyReleased(const sf::Event::KeyReleased& ev)
     }
 }
 
-Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
+Gx::RenderStates StatePlaying7K::Render(Gx::RenderSurface& surface, const Gx::RenderStates states) const
 {
     return State::Render(surface, states);
 }

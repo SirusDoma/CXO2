@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 class Avatar;
+class RoomSlot;
 class AvatarInfo : public Gx::UiContainer
 {
 public:
@@ -17,10 +18,11 @@ public:
 
     Avatar* GetAvatar() const;
     Gx::Gauge* GetLifeBar() const;
-    RoomMember* GetMember() const;
+    RoomSlot* GetSlot() const;
     const sf::Color& GetTeamColor(RoomTeam team);
 
-    void SetMember(RoomMember& member);
+    void SetSlot(RoomSlot& slot);
+
     void RegisterTeamColor(RoomTeam team, const sf::Color& color);
 
     void Reset();
@@ -30,7 +32,7 @@ public:
 private:
     using ColorMap = std::unordered_map<RoomTeam, sf::Color>;
 
-    RoomMember* m_member;
-    ColorMap    m_teamColors;
+    RoomSlot* m_slot;
+    ColorMap  m_teamColors;
 
 };

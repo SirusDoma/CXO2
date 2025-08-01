@@ -1,6 +1,8 @@
 #include <OTwo/UI/Waiting/MapSelector.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/Services/WaitingService.hpp>
+
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/Map.hpp>
 
@@ -10,6 +12,7 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Image.hpp>
+#include <Genode/Utilities/Randomizer.hpp>
 
 using namespace StringTable::Identifiers;
 
@@ -59,14 +62,22 @@ void MapSelector::Initialize()
         effect2->SetVisible(true);
 
     const auto mapLeftButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_LEFT);
-    mapLeftButton->SetClickCallback([=] (auto& sender, auto& ev){
+    mapLeftButton->SetClickCallback([=] (auto&, auto&)
+    {
         SetMapID(static_cast<int>(m_mapID) - 1);
     });
 
     const auto mapRightButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_RIGHT);
-    mapRightButton->SetClickCallback([=] (auto& sender, auto& ev){
-       SetMapID(static_cast<int>(m_mapID) + 1);
+    mapRightButton->SetClickCallback([=] (auto&, auto&)
+    {
+        SetMapID(static_cast<int>(m_mapID) + 1);
     });
+
+    if (const auto mapLeftCover = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_COVER_LEFT))
+        mapLeftCover->SetVisible(false);
+
+    if (const auto mapRightCover = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_COVER_RIGHT))
+        mapRightCover->SetVisible(false);
 
     const auto mapEffectTopButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_TOP);
     mapEffectTopButton->SetCheckStateChangeCallback([=] (auto& sender)
@@ -95,6 +106,9 @@ unsigned int MapSelector::GetEffectID() const
 
 void MapSelector::SetMapID(int mapID, const bool silent)
 {
+    if (mapID == m_mapID)
+        return;
+
     const auto sfxNavigate  = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
     const auto map          = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
     const auto randomMap    = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_RANDOM_MAP);
@@ -103,13 +117,10 @@ void MapSelector::SetMapID(int mapID, const bool silent)
     const auto effectGroup2 = FindChild<Gx::UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_2);
 
     if (mapID < 0)
-        mapID = map->GetFrameCount() - 1;
+        mapID = map->GetFrameCount() - (randomMap ? 0 : 1);
 
-    if (mapID >= map->GetFrameCount())
+    if (mapID - (randomMap ? 1 : 0) >= map->GetFrameCount())
         mapID = 0;
-
-    if (mapID == m_mapID)
-        return;
 
     for (const auto effect : effectGroup1->GetChildren())
     {
@@ -163,10 +174,12 @@ void MapSelector::SetMapID(int mapID, const bool silent)
         animation->SetVisible(true);
 
     if (!silent)
+    {
         m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
 
-    if (m_mapCallback)
-        m_mapCallback(m_mapID);
+        if (m_mapCallback)
+            m_mapCallback(m_mapID);
+    }
 }
 
 void MapSelector::SetEffectID(const unsigned int effectID)
@@ -183,6 +196,34 @@ void MapSelector::SetEffectID(const unsigned int effectID)
     m_effectID = effectID;
     if (m_effectCallback)
         m_effectCallback(m_effectID);
+}
+
+void MapSelector::SetControlsEnabled(const bool enabled) const
+{
+    if (const auto leftButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_LEFT))
+    {
+        leftButton->SetEnabled(enabled);
+        leftButton->SetVisible(enabled);
+    }
+
+    if (const auto rightButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_RIGHT))
+    {
+        rightButton->SetEnabled(enabled);
+        rightButton->SetVisible(enabled);
+    }
+
+    if (const auto leftCover = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_COVER_LEFT))
+
+        leftCover->SetVisible(!enabled);
+
+    if (const auto rightCover = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_COVER_RIGHT))
+        rightCover->SetVisible(!enabled);
+}
+
+std::size_t MapSelector::GetMapCount() const
+{
+    const auto map = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_MAP);
+    return !map ? 0 : map->GetFrameCount();
 }
 
 void MapSelector::SetMapChangedCallback(const std::function<void(unsigned int)> &callback)

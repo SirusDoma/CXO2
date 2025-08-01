@@ -74,6 +74,8 @@
             "IDC_IMAGE_RANDOM_MAP": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_MapRandom.json",
             "IDC_BUTTON_MAP_LEFT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_MapLeft.json",
             "IDC_BUTTON_MAP_RIGHT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Btn_MapRight.json",
+            "IDC_IMAGE_COVER_LEFT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Cover_Left.json",
+            "IDC_IMAGE_COVER_RIGHT": "ControlList/State/Waiting/Waiting7K/MapSelector/Wait_Cover_Right.json",
             "IDC_CONTAINER_EFFECT_1": {
               "type": "UiContainer",
               "attributes": {
@@ -84,7 +86,14 @@
                   "IDC_IMAGE_EFFECT3_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect3_1.json",
                   "IDC_IMAGE_EFFECT4_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect4_1.json",
                   "IDC_IMAGE_EFFECT5_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect5_1.json",
-                  "IDC_IMAGE_EFFECT6_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_1.json"
+                  "IDC_IMAGE_EFFECT6_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_1.json",
+                  "IDC_IMAGE_EFFECT7_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect7_1.json",
+                  "IDC_IMAGE_EFFECT8_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect8_1.json",
+                  "IDC_IMAGE_EFFECT9_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect9_1.json",
+                  "IDC_IMAGE_EFFECT10_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect10_1.json",
+                  "IDC_IMAGE_EFFECT11_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect11_1.json",
+                  "IDC_IMAGE_EFFECT12_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect12_1.json",
+                  "IDC_IMAGE_EFFECT13_1": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect13_1.json"
                 }
               }
             },
@@ -98,7 +107,14 @@
                   "IDC_IMAGE_EFFECT3_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect3_2.json",
                   "IDC_IMAGE_EFFECT4_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect4_2.json",
                   "IDC_IMAGE_EFFECT5_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect5_2.json",
-                  "IDC_IMAGE_EFFECT6_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_2.json"
+                  "IDC_IMAGE_EFFECT6_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect6_2.json",
+                  "IDC_IMAGE_EFFECT7_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect7_2.json",
+                  "IDC_IMAGE_EFFECT8_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect8_2.json",
+                  "IDC_IMAGE_EFFECT9_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect9_2.json",
+                  "IDC_IMAGE_EFFECT10_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect10_2.json",
+                  "IDC_IMAGE_EFFECT11_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect11_2.json",
+                  "IDC_IMAGE_EFFECT12_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect12_2.json",
+                  "IDC_IMAGE_EFFECT13_2": "ControlList/State/Waiting/Waiting7K/MapSelector/Effects/Wait_Effect13_2.json"
                 }
               }
             },
@@ -112,6 +128,7 @@
       "IDC_DIALOG_CHANGE_TITLE": "ControlList/Dialog/ChangeTitle.json",
       "IDC_DIALOG_WHISPER": "ControlList/Dialog/Whisper.json",
       "IDC_BUTTON_SELECT_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_Btn_MusicSelect.json",
+      "IDC_IMAGE_COVER_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_Cover_Music.json",
       "IDC_CHAT_PANEL": "ControlList/State/Waiting/Waiting7K/Wait_ChatPanel.json",
       "IDC_BUTTON_EMOTICON": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Emoticon.json",
       "IDC_BUTTON_START": "ControlList/State/Waiting/Waiting7K/Wait_Btn_Start.json",

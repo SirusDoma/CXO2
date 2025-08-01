@@ -1,0 +1,21 @@
+{
+  "type": "ToolTip",
+  "require": {
+    "font": "Interface/Common/Font.ttf"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 462,
+        "y": 434
+      }
+    },
+    "fontSize": 12,
+    "color": {
+      "a": 255,
+      "r": 0,
+      "g": 0,
+      "b": 0
+    }
+  }
+}

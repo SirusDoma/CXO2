@@ -1,29 +1,20 @@
 #pragma once
 
 #include <OTwo/Models/Planet.hpp>
+#include <OTwo/Models/Character.hpp>
 #include <OTwo/Models/Room.hpp>
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-
-struct ScoreResultItem
-{
-    RoomMember Member;
-    unsigned long long Cool;
-    unsigned long long Good;
-    unsigned long long Bad;
-    unsigned long long Miss;
-    unsigned long long MaxCombo;
-    unsigned long long MaxJamCombo;
-    unsigned long long ScorePoint;
-};
+#include <OTwo/Metadata/Chart/O2JamChartMetadata.hpp>
 
 class SessionContext
 {
 public:
     SessionContext() = default;
-    SessionContext(const std::string& token, const Player& player);
+    explicit SessionContext(const std::string& token);
 
     const std::string& GetToken() const;
-    Player& GetCurrentPlayer();
+
+    CharacterInfo& GetCharacterInfo();
+    void SetCharacterInfo(const CharacterInfo& CharacterInfo);
 
     Planet GetPlanet() const;
     void SetPlanet(Planet planet);
@@ -34,13 +25,7 @@ public:
     unsigned int GetChannelID() const;
     void SetChannelID(unsigned int channelId);
 
-    const Room& GetCurrentRoom() const;
-    void SetCurrentRoom(const Room& room);
-
-    const std::array<ScoreResultItem, 8>& GetLatestScoreResults() const;
-    void SetLatestScoreResults(const std::array<ScoreResultItem, 8>& result);
-
-    const std::vector<ChartMetadata> &GetInstalledMusic(bool rescan = false) const;
+    const std::vector<ChartMetadata>& GetInstalledMusic(bool rescan = false) const;
 
     void Load();
     void Save() const;
@@ -48,12 +33,10 @@ public:
 private:
     std::string m_token;
 
-    Player m_player;
+    CharacterInfo m_characterInfo;
     Planet m_planet = Planet::O2Planet;
-    MusicHall m_hall;
+    MusicHall m_server;
     unsigned int m_channelID;
-    Room m_room;
 
-    std::array<ScoreResultItem, 8> m_lastResult;
     mutable std::vector<ChartMetadata> m_installedMusicList;
 };

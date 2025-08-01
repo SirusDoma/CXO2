@@ -1,0 +1,19 @@
+{
+  "type": "Image",
+  "require": {
+    "sheet": "Loading_Sign.ojs"
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 145,
+        "y": 0
+      }
+    },
+    "frames": {
+      "Failed": {},
+      "Loading": {},
+      "Completed": {}
+    }
+  }
+}

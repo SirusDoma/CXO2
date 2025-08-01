@@ -21,7 +21,7 @@ namespace Gx
                 }
             }
 
-            if (m_onCheckStateChanged)
+            if (IsEnabled() && m_onCheckStateChanged)
                 m_onCheckStateChanged(*this);
         }
     }

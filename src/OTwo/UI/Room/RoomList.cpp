@@ -1,8 +1,10 @@
 #include <OTwo/UI/Room/RoomList.hpp>
-#include <OTwo/States/State.hpp>
+
+#include <OTwo/Models/Room.hpp>
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
+#include <Genode/IO/ResourceManager.hpp>
 #include <Genode/UI/List.hpp>
 
 #include <cmath>
@@ -26,27 +28,67 @@ void RoomList::Initialize()
     for (const auto child : GetChildren())
     {
         auto roomButton = dynamic_cast<RoomButton*>(child);
-        roomButton->SetClickCallback([this, sfx = sfxInvalid, button = roomButton] (auto& sender, auto& ev)
+        roomButton->SetClickCallback([this, sfx = sfxInvalid, button = roomButton] (auto&, auto&)
         {
            if (!button->IsActive())
-           {
                m_mixer.Play(*sfx, Sound::Channel::SFX);
-               return;
-           }
         });
     }
 }
 
-void RoomList::Add(const Room& room)
+void RoomList::Upsert(const RoomInfo& room)
 {
-    m_rooms[room.ID] = room;
-    Invalidate();
+    if (const auto it = m_rooms.find(room.ID); it != m_rooms.end())
+    {
+        it->second.State         = room.State;
+        it->second.Title         = room.Title;
+        it->second.Locked        = room.Locked;
+        it->second.MusicID       = room.MusicID;
+        it->second.Difficulty    = room.Difficulty;
+        it->second.Mode          = room.Mode;
+        it->second.SpeedID       = room.SpeedID;
+        it->second.Capacity      = room.Capacity;
+        it->second.UserCount     = room.UserCount;
+        it->second.MinLevelLimit = room.MinLevelLimit;
+        it->second.MaxLevelLimit = room.MaxLevelLimit;
+    }
+    else
+        m_rooms[room.ID] = room;
+}
+
+RoomInfo& RoomList::GetRoom(const std::uint32_t id)
+{
+    if (const auto it = m_rooms.find(id); it != m_rooms.end())
+        return it->second;
+
+    m_rooms[id] = RoomInfo{};
+    return m_rooms[id];
+}
+
+void RoomList::Remove(const std::uint32_t id)
+{
+    if (const auto it = m_rooms.find(id); it != m_rooms.end())
+    {
+        m_rooms.erase(it);
+        Invalidate();
+    }
 }
 
 void RoomList::Clear()
 {
     m_rooms.clear();
     Invalidate();
+}
+
+const RoomInfo* RoomList::GetWaitingRoom()
+{
+    for (const auto& [id, room] : m_rooms)
+    {
+        if (room.State == RoomState::Waiting && !room.Locked && room.UserCount < room.Capacity)
+            return &room;
+    }
+
+    return nullptr;
 }
 
 void RoomList::ShowAll()
@@ -73,6 +115,26 @@ void RoomList::PreviousPage()
     Invalidate();
 }
 
+void RoomList::SetEnterRoomCallback(std::function<void(const RoomInfo&)> callback) const
+{
+    auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
+    for (const auto child : GetChildren())
+    {
+        auto roomButton = dynamic_cast<RoomButton*>(child);
+        roomButton->SetClickCallback([this, callback, sfx = sfxInvalid, button = roomButton] (auto&, auto&)
+        {
+           if (!button->IsActive())
+           {
+               m_mixer.Play(*sfx, Sound::Channel::SFX);
+               return;
+           }
+
+            if (callback)
+                callback(button->GetRoomInfo());
+        });
+    }
+}
+
 void RoomList::Invalidate()
 {
     const auto children = GetChildren();
@@ -81,10 +143,13 @@ void RoomList::Invalidate()
     for (size_t i = 0; i < children.size(); i++)
     {
         const auto roomButton = dynamic_cast<RoomButton*>(children[i]);
+        if (!roomButton)
+            continue;
+
         auto roomNumber = ((m_page - 1) * children.size()) + i;
         auto room = m_rooms.find(roomNumber);
 
-        if (room != m_rooms.end() && (!m_waiting || room->second.State == RoomState::Waiting))
+        if (room != m_rooms.end() && room->second.MusicID != 0 && room->second.State != RoomState::Unavailable && (!m_waiting || room->second.State == RoomState::Waiting))
             roomButton->SetRoomInfo(room->second);
         else
             roomButton->Reset();

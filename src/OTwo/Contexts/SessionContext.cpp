@@ -1,15 +1,13 @@
 #include <magic_enum/magic_enum.hpp>
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 
-SessionContext::SessionContext(const std::string& token, const Player& player) :
+SessionContext::SessionContext(const std::string& token) :
     m_token(token),
-    m_player(player),
-    m_hall(MusicHall::None),
-    m_channelID(0),
-    m_room(),
-    m_lastResult()
+    m_characterInfo(),
+    m_server(MusicHall::None),
+    m_channelID(0)
 {
 }
 
@@ -18,9 +16,14 @@ const std::string& SessionContext::GetToken() const
     return m_token;
 }
 
-Player& SessionContext::GetCurrentPlayer()
+CharacterInfo& SessionContext::GetCharacterInfo()
 {
-    return m_player;
+    return m_characterInfo;
+}
+
+void SessionContext::SetCharacterInfo(const CharacterInfo& CharacterInfo)
+{
+    m_characterInfo = CharacterInfo;
 }
 
 Planet SessionContext::GetPlanet() const
@@ -35,12 +38,12 @@ void SessionContext::SetPlanet(const Planet planet)
 
 MusicHall SessionContext::GetMusicHall() const
 {
-    return m_hall;
+    return m_server;
 }
 
 void SessionContext::SetMusicHall(const MusicHall hall)
 {
-    m_hall = hall;
+    m_server = hall;
 }
 
 unsigned int SessionContext::GetChannelID() const
@@ -53,41 +56,23 @@ void SessionContext::SetChannelID(const unsigned int channelId)
     m_channelID = channelId;
 }
 
-const Room& SessionContext::GetCurrentRoom() const
-{
-    return m_room;
-}
-
-void SessionContext::SetCurrentRoom(const Room& room)
-{
-    m_room = room;
-}
-
-const std::array<ScoreResultItem, 8> & SessionContext::GetLatestScoreResults() const
-{
-    return m_lastResult;
-}
-
-void SessionContext::SetLatestScoreResults(const std::array<ScoreResultItem, 8> &result)
-{
-    for (std::size_t i = 0; i < m_lastResult.size(); i++)
-        m_lastResult[i] = result[i];
-
-    std::sort(m_lastResult.begin(), m_lastResult.end(), [] (auto& a, auto& b) { return a.ScorePoint > b.ScorePoint; });
-}
-
-const std::vector<ChartMetadata> &SessionContext::GetInstalledMusic(const bool rescan) const
+const std::vector<ChartMetadata>& SessionContext::GetInstalledMusic(const bool rescan) const
 {
     if (rescan || m_installedMusicList.empty())
     {
         m_installedMusicList.clear();
-        const auto metaLoader = ChartMetadataLoader();
+        const auto metaLoader = O2JamChartMetadataLoader();
+
         for (const auto& file : Gx::FileSystem::Scan("o2ma*.ojn"))
         {
-            auto name = file->GetName();
-            auto meta = metaLoader.LoadFromFile(file->GetName(), Gx::ResourceContext::Default);
-            m_installedMusicList.push_back(*meta);
+            if (const auto meta = metaLoader.LoadFromFile(file->GetName(), Gx::ResourceContext::Default))
+                m_installedMusicList.push_back(meta->ToChartMetadata());
         }
+
+        std::sort(m_installedMusicList.begin(), m_installedMusicList.end(), [this] (ChartMetadata& a, ChartMetadata& b)
+        {
+            return a.Levels[Difficulty::EX] < b.Levels[Difficulty::EX];
+        });
     }
 
     return m_installedMusicList;
@@ -110,43 +95,43 @@ void SessionContext::Load()
     if (sessionDb.is_discarded())
         return;
 
-    if (const auto playerInfo = sessionDb.find("player"); playerInfo != sessionDb.end())
+    if (const auto CharacterInfoInfo = sessionDb.find("CharacterInfo"); CharacterInfoInfo != sessionDb.end())
     {
-        if (const auto it = playerInfo->find("name"); it != playerInfo->end() && it->is_string())
-            m_player.Name = it->get<std::string>();
+        if (const auto it = CharacterInfoInfo->find("name"); it != CharacterInfoInfo->end() && it->is_string())
+            m_characterInfo.Name = it->get<std::string>();
 
-        if (const auto it = playerInfo->find("gender"); it != playerInfo->end() && it->is_string())
-            m_player.Gender = magic_enum::enum_cast<Gender>(it->get<std::string>(), magic_enum::case_insensitive).value_or(Gender::Male);
+        if (const auto it = CharacterInfoInfo->find("gender"); it != CharacterInfoInfo->end() && it->is_string())
+            m_characterInfo.Gender = magic_enum::enum_cast<Gender>(it->get<std::string>(), magic_enum::case_insensitive).value_or(Gender::Male);
 
-        if (const auto it = playerInfo->find("level"); it != playerInfo->end() && it->is_number_integer())
-            m_player.Level = it->get<int>();
+        if (const auto it = CharacterInfoInfo->find("level"); it != CharacterInfoInfo->end() && it->is_number_integer())
+            m_characterInfo.Level = it->get<int>();
 
-        if (const auto it = playerInfo->find("gems"); it != playerInfo->end() && it->is_number_integer())
-            m_player.Gem = it->get<unsigned int>();
+        if (const auto it = CharacterInfoInfo->find("gems"); it != CharacterInfoInfo->end() && it->is_number_integer())
+            m_characterInfo.Wallet.Gem = it->get<unsigned int>();
 
-        if (const auto it = playerInfo->find("cash"); it != playerInfo->end() && it->is_number_integer())
-            m_player.Cash = it->get<unsigned int>();
+        if (const auto it = CharacterInfoInfo->find("cash"); it != CharacterInfoInfo->end() && it->is_number_integer())
+            m_characterInfo.Wallet.Cash = it->get<unsigned int>();
 
         auto items = std::unordered_set<unsigned int>();
-        if (const auto it = playerInfo->find("items"); it != playerInfo->end() && it->is_array())
+        if (const auto it = CharacterInfoInfo->find("items"); it != CharacterInfoInfo->end() && it->is_array())
         {
-            m_player.Inventory.clear();
+            m_characterInfo.Inventory.clear();
             for (const auto id : it->items())
             {
                 if (id.value().is_number_unsigned() && id.value().is_number_integer())
                 {
                     const auto val = id.value().get<unsigned int>();
                     if (items.insert(val).second)
-                        m_player.Inventory.push_back(val);
-                    else
-                        m_player.ItemQuantities[val]++;
+                        m_characterInfo.Inventory.push_back(val);
+                    else if (const auto in = std::find(m_characterInfo.Inventory.begin(), m_characterInfo.Inventory.end(), val); in != m_characterInfo.Inventory.end())
+                        in->Quantity++;
                 }
             }
         }
 
-        if (const auto it = playerInfo->find("equipments"); it != playerInfo->end() && it->is_array())
+        if (const auto it = CharacterInfoInfo->find("equipments"); it != CharacterInfoInfo->end() && it->is_array())
         {
-            m_player.EquippedItemIDs.clear();
+            m_characterInfo.EquippedItemIDs.clear();
             auto set = std::unordered_set<unsigned int>();
             for (const auto id : it->items())
             {
@@ -154,7 +139,7 @@ void SessionContext::Load()
                 {
                     const auto val = id.value().get<unsigned int>();
                     if (items.find(val) != items.end() && set.insert(val).second)
-                        m_player.EquippedItemIDs.push_back(val);
+                        m_characterInfo.EquippedItemIDs.insert(val);
                 }
             }
         }
@@ -164,17 +149,24 @@ void SessionContext::Load()
 void SessionContext::Save() const
 {
     Gx::Json sessionDb;
-    Gx::Json playerInfo;
+    Gx::Json characterInfo;
 
-    playerInfo["name"]       = m_player.Name;
-    playerInfo["gender"]     = magic_enum::enum_name(m_player.Gender);
-    playerInfo["level"]      = m_player.Level;
-    playerInfo["gems"]       = m_player.Gem;
-    playerInfo["cash"]       = m_player.Cash;
-    playerInfo["items"]      = m_player.Inventory;
-    playerInfo["equipments"] = m_player.EquippedItemIDs;
+    std::vector<std::uint32_t> items = {};
+    for (auto& item : m_characterInfo.Inventory)
+    {
+        for (std::size_t i = 0; i < item.Quantity; i++)
+            items.push_back(item.ID);
+    }
 
-    sessionDb["player"] = playerInfo;
+    characterInfo["name"]       = m_characterInfo.Name;
+    characterInfo["gender"]     = magic_enum::enum_name(m_characterInfo.Gender);
+    characterInfo["level"]      = m_characterInfo.Level;
+    characterInfo["gems"]       = m_characterInfo.Wallet.Gem;
+    characterInfo["cash"]       = m_characterInfo.Wallet.Cash;
+    characterInfo["items"]      = items;
+    characterInfo["equipments"] = m_characterInfo.EquippedItemIDs;
+
+    sessionDb["CharacterInfo"] = characterInfo;
 
     const auto json = sessionDb.dump(2);
     Gx::LocalFileSystem::Instance().WriteFile("session.json", json.c_str(), json.size());

@@ -44,6 +44,11 @@ namespace Gx
     void Node::Finalize()
     {
         m_state = State::Finalized;
+        for (const auto child : m_children)
+        {
+            if (child)
+                child->Finalize();
+        }
     }
 
     void Node::OnChildAdded(Node& node)

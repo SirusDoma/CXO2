@@ -2,8 +2,8 @@
 
 #include <OTwo/Models/Room.hpp>
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/Contexts/MusicSelectionContext.hpp>
+#include <OTwo/Metadata/Chart/O2JamChartMetadata.hpp>
+#include <OTwo/Contexts/RoomContext.hpp>
 
 #include <Genode/IO/Resource.hpp>
 #include <Genode/UI/Dialog.hpp>
@@ -20,13 +20,14 @@ class SessionContext;
 class SelectMusicDialog : public Gx::Dialog
 {
 public:
-    SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection);
+    SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room);
 
     void Initialize() override;
 
     ChartMetadata GetSelectedMusic() const;
-    LevelCategory GetSelectedRandomLevels() const;
     Difficulty GetSelectedDifficulty() const;
+    LevelCategory GetSelectedRandomLevels() const;
+
     Genre GetSelectedGenre() const;
     float GetSelectedSpeed() const;
 
@@ -51,13 +52,13 @@ private:
     Gx::AudioMixer&        m_mixer;
     Gx::ResourceManager&   m_resources;
     SessionContext&        m_session;
-    MusicSelectionContext& m_selection;
+    RoomContext&           m_room;
 
-    Difficulty     m_difficulty = Difficulty::EX;
-    MusicSortMode  m_sort       = static_cast<MusicSortMode>(-1);
-    MusicSortOrder m_order      = static_cast<MusicSortOrder>(-1);
-    Genre          m_genre      = static_cast<Genre>(-1);
-    LevelCategory  m_random     = static_cast<LevelCategory>(0);
+    Difficulty                    m_difficulty = Difficulty::EX;
+    std::optional<MusicSortMode>  m_sort       = std::nullopt;
+    std::optional<MusicSortOrder> m_order      = std::nullopt;
+    std::optional<Genre>          m_genre      = std::nullopt;
+    LevelCategory                 m_random     = static_cast<LevelCategory>(0);
 
     ChartMetadata                m_music;
     Gx::ResourcePtr<sf::Texture> m_thumbnail;

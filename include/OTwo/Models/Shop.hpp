@@ -25,5 +25,4 @@ struct CartItem
 struct Cart
 {
     std::vector<CartItem> Items = {};
-
 };

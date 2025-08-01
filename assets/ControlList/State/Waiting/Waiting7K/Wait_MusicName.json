@@ -5,6 +5,12 @@
     "bndID": "0X1640001D"
   },
   "attributes": {
+    "transform": {
+      "origin": {
+        "x": -3,
+        "y": -5
+      }
+    },
     "fontSize": 12,
     "outline": {
       "thickness": 1.25,

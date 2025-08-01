@@ -7,7 +7,8 @@ GameContext::GameContext(GameConfig& config) :
     m_speed(),
     m_mapID(),
     m_effectID(),
-    m_viewport()
+    m_viewport(),
+    m_scoreEntries()
 {
 }
 
@@ -84,6 +85,17 @@ unsigned int GameContext::GetViewport() const
 void GameContext::SetViewport(const unsigned int viewport)
 {
     m_viewport = viewport;
+}
+
+const std::array<ScoreEntry, 8>& GameContext::GetScoreEntries() const
+{
+    return m_scoreEntries;
+}
+
+void GameContext::SetScoreEntries(const std::array<ScoreEntry, 8>& entries)
+{
+    m_scoreEntries = entries;
+    std::sort(m_scoreEntries.begin(), m_scoreEntries.end(), [] (auto& a, auto& b) { return a.Score > b.Score; });
 }
 
 void GameContext::Reset()

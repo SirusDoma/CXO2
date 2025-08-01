@@ -21,9 +21,9 @@ public:
 
     void Initialize() override;
 
-    ChartMetadataView GetMetadata() const;
+    ChartMetadata GetMetadata() const;
     Difficulty GetDifficulty() const;
-    void SetMetadata(const ChartMetadataView& metadata, const Difficulty diff);
+    void SetMetadata(const ChartMetadata& metadata, const Difficulty diff);
 
     void SetScoreTracker(const ScoreTracker& scores);
     const ScoreTracker* GetScoreTracker() const;
@@ -34,7 +34,7 @@ private:
 
     const GameContext& m_context;
 
-    ChartMetadataView m_metadata;
+    ChartMetadata m_metadata;
     Difficulty m_difficulty;
     const ScoreTracker* m_scoreTracker;
 

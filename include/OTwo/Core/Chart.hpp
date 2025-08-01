@@ -1,6 +1,6 @@
 #pragma once
 
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Metadata/Chart/O2JamChartMetadata.hpp>
 #include <OTwo/Models/Game.hpp>
 
 #include <Genode/IO/Resource.hpp>
@@ -183,11 +183,11 @@ private:
     using FractionMap = std::unordered_map<Difficulty, std::map<int, float>>;
     using PositionMap = std::unordered_map<Difficulty, double>;
 
-    ChartMetadata m_metadata;
-    EventMap      m_events;
-    SampleMap     m_samples;
-    FractionMap   m_fractions;
-    PositionMap   m_lasts;
+    ChartMetadata  m_metadata;
+    EventMap           m_events;
+    SampleMap          m_samples;
+    FractionMap        m_fractions;
+    PositionMap        m_lasts;
 
     Gx::ResourcePtr<sf::Image> m_cover;
     Gx::ResourcePtr<sf::Image> m_thumbnail;

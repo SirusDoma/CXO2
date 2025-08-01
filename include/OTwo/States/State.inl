@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/System/Application.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 #include <SFML/Audio/SoundSource.hpp>
@@ -37,7 +38,12 @@ R* State::Instantiate(const std::string& source, const ResourceScope scope)
                     instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
             }
             else
-                instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+            {
+                if (Gx::FileSystem::Contains(source))
+                    instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+                else
+                    instance = &resources->AddFromDeserializer<R>(Gx::StringHelper::RemoveExtension(source), [this] { return GetContext().Create<R>(); });
+            }
         }
     }
 

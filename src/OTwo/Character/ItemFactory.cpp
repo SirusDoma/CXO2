@@ -14,7 +14,7 @@ ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources, const std::string
 std::unordered_map<EquipmentType, Item> ItemFactory::GetDefaultItems(const Gender& gender) const
 {
     auto items = std::unordered_map<EquipmentType, Item>();
-    if (!O2Jam::InCompatibilityMode(CompatibilityMode::Avatar))
+    if (!O2Jam::InInteropMode(InteropMode::Avatar))
     {
         const auto names = {
             "Avatar/default/Body.json",

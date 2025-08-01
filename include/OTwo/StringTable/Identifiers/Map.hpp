@@ -16,6 +16,8 @@ namespace StringTable::Identifiers::Resource::Map
     constexpr static auto IDC_IMAGE_EFFECT0_2         = "IDC_IMAGE_EFFECT0_2";
     constexpr static auto IDC_BUTTON_MAP_LEFT         = "IDC_BUTTON_MAP_LEFT";
     constexpr static auto IDC_BUTTON_MAP_RIGHT        = "IDC_BUTTON_MAP_RIGHT";
+    constexpr static auto IDC_IMAGE_COVER_LEFT        = "IDC_IMAGE_COVER_LEFT";
+    constexpr static auto IDC_IMAGE_COVER_RIGHT       = "IDC_IMAGE_COVER_RIGHT";
     constexpr static auto IDC_RADIO_MAP_SELECT_TOP    = "IDC_RADIO_MAP_SELECT_TOP";
     constexpr static auto IDC_RADIO_MAP_SELECT_BOTTOM = "IDC_RADIO_MAP_SELECT_BOTTOM";
 

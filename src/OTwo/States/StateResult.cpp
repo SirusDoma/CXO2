@@ -2,11 +2,14 @@
 #include <OTwo/States/StateWaiting7K.hpp>
 #include <OTwo/States/StateLoading.hpp>
 #include <OTwo/States/StatePlaying7K.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 
 #include <OTwo/Core/ScoreTracker.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/Contexts/RoomContext.hpp>
+
+#include <OTwo/Messages/RoomInfo.hpp>
 
 #include <OTwo/StringTable/Identifiers/Cache.hpp>
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
@@ -22,9 +25,12 @@
 
 using namespace StringTable::Identifiers;
 
-StateResult::                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       StateResult(Gx::AudioMixer& mixer, SessionContext& session, const ScoreTracker& scoreTracker) :
+StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, PlayingService& service) :
     m_mixer(mixer),
     m_session(session),
+    m_room(room),
+    m_context(context),
+    m_service(service),
     m_scoreTracker(scoreTracker)
 {
 }
@@ -89,20 +95,31 @@ void StateResult::Initialize()
     if (const auto list = bottom->FindChild<Gx::List>(Resource::Result::Bottom::IDC_LIST_RANK_SCORE); list)
     {
         const auto listItems  = list->GetChildren();
-        const auto scoreItems = m_session.GetLatestScoreResults();
+        const auto scoreItems = m_context.GetScoreEntries();
         for (std::size_t i = 0; i < listItems.size(); i++)
         {
             const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
             if (!item)
                 continue;
 
-            if (i >= scoreItems.size() || scoreItems[i].Member.ID == 0)
-            {
-                item->SetVisible(false);
+            item->SetVisible(false);
+            if (i >= scoreItems.size())
                 continue;
-            }
+
+            const auto& entry = scoreItems[i];
+            if (!entry.Active)
+                continue;
+
+            auto& slot = m_room.GetSlot(entry.ID);
+            if (slot.State != RoomSlotState::Occupied || !slot.Member.has_value())
+                continue;
+
+            auto& member = slot.Member.value();
+            if (member.Name.isEmpty())
+                continue;
 
             // TODO: Make this adjustable?
+            item->SetVisible(true);
 
             auto primaryTeamColor = std::unordered_map<RoomTeam, sf::Color>
             ({
@@ -128,47 +145,48 @@ void StateResult::Initialize()
                 { RoomTeam::H, sf::Color(90, 36, 25, 50) },
             });
 
-            if (scoreItems[i].Member.ID == m_session.GetCurrentPlayer().ID)
+            if (member.Name == m_session.GetCharacterInfo().Name)
                 banner->SetFrame(i == 0 ? "win" : "lose");
 
             if (const auto highlighter = item->FindChild<Gx::Rectangle>(Resource::Result::Bottom::Score::IDC_RECTANGLE_HIGHLIGHT); highlighter)
             {
-                if (scoreItems[i].Member.ID == m_session.GetCurrentPlayer().ID)
-                    highlighter->SetColor(primaryTeamColor[scoreItems[i].Member.Team]);
+                if (member.Name == m_session.GetCharacterInfo().Name)
+                    highlighter->SetColor(primaryTeamColor[slot.Team]);
                 else
-                    highlighter->SetColor(secondaryTeamColor[scoreItems[i].Member.Team]);
+                    highlighter->SetColor(secondaryTeamColor[slot.Team]);
             }
 
             if (const auto rank = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NUMBER); rank)
                 rank->SetString(std::to_string(i + 1));
 
             if (const auto name = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NAME); name)
-                name->SetString(scoreItems[i].Member.Name);
+                name->SetString(member.Name);
 
             if (const auto cool = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_COOL); cool)
-                cool->SetString(std::to_string(scoreItems[i].Cool));
+                cool->SetString(std::to_string(entry.Cool));
 
             if (const auto good = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_GOOD); good)
-                good->SetString(std::to_string(scoreItems[i].Good));
+                good->SetString(std::to_string(entry.Good));
 
             if (const auto bad = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_BAD); bad)
-                bad->SetString(std::to_string(scoreItems[i].Bad));
+                bad->SetString(std::to_string(entry.Bad));
 
             if (const auto miss = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MISS); miss)
-                miss->SetString(std::to_string(scoreItems[i].Miss));
+                miss->SetString(std::to_string(entry.Miss));
 
             if (const auto maxCombo = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_COMBO); maxCombo)
-                maxCombo->SetString(std::to_string(scoreItems[i].MaxCombo));
+                maxCombo->SetString(std::to_string(entry.MaxCombo));
 
             if (const auto maxJamCombo = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_JAM_COMBO); maxJamCombo)
-                maxJamCombo->SetString(std::to_string(scoreItems[i].MaxJamCombo));
+                maxJamCombo->SetString(std::to_string(entry.MaxJamCombo));
 
             if (const auto point = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_POINT); point)
-                point->SetString(std::to_string(scoreItems[i].ScorePoint));
+                point->SetString(std::to_string(entry.Score));
         }
     }
 
     const auto btnRetry = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_PLAY_RETRY);
+    btnRetry->SetVisible(false);
     btnRetry->SetEnabled(false);
     btnRetry->SetClickCallback([this] (auto& sender, const auto& ev)
     {
@@ -186,7 +204,25 @@ void StateResult::Initialize()
     btnBack->SetClickCallback([this] (auto& sender, const auto& ev)
     {
         sender.SetEnabled(false);
-        GetDirector().Dismiss<StateWaiting7K>();
+        m_service.ConfirmResult([=]
+        {
+            Invoke([=]
+            {
+                GetDirector().Dismiss<StateWaiting7K>();
+            });
+        },
+        [=] (const auto& ex)
+        {
+            Invoke([=]
+            {
+                StopAll();
+                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                {
+                    GetDirector().Dismiss<StatePlanet>();
+                });
+            });
+        });
+
     });
 
     auto topFx    = Run<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
@@ -194,7 +230,7 @@ void StateResult::Initialize()
         {
             background->SetVisible(true);
             banner->SetVisible(true);
-            btnRetry->SetEnabled(true);
+            //btnRetry->SetEnabled(true);
             btnBack->SetEnabled(true);
         },
         Gx::Move(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))

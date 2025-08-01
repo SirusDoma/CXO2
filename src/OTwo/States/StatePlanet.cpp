@@ -1,31 +1,42 @@
-#include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <OTwo/States/StatePlanet.hpp>
-#include <OTwo/UI/Planet/ChannelBoard.hpp>
-#include <OTwo/Models/Planet.hpp>
-#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/StateRoom.hpp>
+
+#include <OTwo/O2Jam.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
+
+#include <OTwo/Network/NetworkAdapter.hpp>
+#include <OTwo/Messages/Requests/AuthRequest.hpp>
+#include <OTwo/Messages/Responses/AuthResponse.hpp>
+
+#include <OTwo/Models/Planet.hpp>
+#include <OTwo/UI/Planet/ChannelBoard.hpp>
 
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/Planet.hpp>
 
 #include <Genode/System/Application.hpp>
-#include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
-#include <OTwo/O2Jam.hpp>
+#include <OTwo/Services/AuthService.hpp>
+#include <OTwo/Services/NetworkService.hpp>
 
 using namespace StringTable::Identifiers;
 
-StatePlanet::StatePlanet(Gx::AudioMixer& mixer, SessionContext& session) :
+class AuthService;
+class PlanetService;
+StatePlanet::StatePlanet(Gx::AudioMixer& mixer, SessionContext& session, NetworkService& network, AuthService& auth, PlanetService& service) :
     m_mixer(mixer),
-    m_session(session),
-    m_connecting(false)
+    m_auth(auth),
+    m_network(network),
+    m_service(service),
+    m_session(session)
 {
 }
 
 void StatePlanet::Initialize()
 {
     State::Initialize();
+    m_network.StopHeartbeat();
 
     const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_MAIN_ROOM);
     auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -43,7 +54,10 @@ void StatePlanet::Initialize()
     exitButton->SetClickCallback([&] (auto&, auto&) { GetApplication().Close(); });
 
     auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
-    channelBoard->SetChannelEnterCallback([=] (auto hall, auto channel) { OnChannelEnter(hall, channel); });
+    channelBoard->SetChannelEnterCallback([=] (auto hall, std::uint16_t serverID, std::uint16_t channelID)
+    {
+        OnChannelEnterButtonClicked(hall, serverID, channelID);
+    });
 
     std::unordered_map<MusicHall, Gx::RadioButton*> planets =
     {
@@ -68,7 +82,7 @@ void StatePlanet::Initialize()
 
         radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)
         {
-            if (!sender.IsChecked() || channelBoard->InTransition() || IsConnecting())
+            if (!sender.IsChecked() || channelBoard->InTransition())
                 return;
 
             m_mixer.Play(*clickSfx, Sound::Channel::SFX);
@@ -76,7 +90,7 @@ void StatePlanet::Initialize()
         });
     }
 
-    if (m_session.GetMusicHall() == MusicHall::None && !O2Jam::InCompatibilityMode(CompatibilityMode::Interface))
+    if (m_session.GetMusicHall() == MusicHall::None && !O2Jam::InInteropMode(InteropMode::Interface))
     {
         auto& overlay = Create<Gx::Rectangle>(GetView().getSize());
         overlay.SetColor(sf::Color::Black);
@@ -94,52 +108,154 @@ void StatePlanet::Initialize()
     m_mixer.Play(*bgm, Sound::Channel::BGM);
 }
 
-bool StatePlanet::IsConnecting() const
+void StatePlanet::OnAuthenticated(const AuthResult result)
 {
-    return m_connecting;
-}
 
-void StatePlanet::OnMusicHallSelected(const MusicHall hall)
-{
-    m_connecting = true;
-    const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
-
-    auto planetInfo = PlanetInfo();
-    planetInfo.Hall = hall;
-
-    for (unsigned int x = 0; x < 2; x++)
+    if (result != AuthResult::Success)
     {
-        for (unsigned int i = 1; i <= 20; i++)
+        auto message = std::string();
+        switch (result)
         {
-            auto channel       = ServerChannel();
-            channel.ID         = (x * 20) + i;
-            channel.Population = static_cast<int>((i / 20.f) * 100.f);
-
-            planetInfo.Channels.push_back(channel);
+            case AuthResult::DatabaseError:
+                message = "(Please inquire of Administrator.) DB error";
+                break;
+            case AuthResult::Banned:
+                message = "You have been banned!\nPlease enquire customer service for detail.";
+                break;
+            case AuthResult::DuplicateSessions:
+                message = "User is now being connected to the Game.";
+                break;
+            case AuthResult::InvalidCredentials:
+                message = "Either login name or password is incorrect.";
+                break;
+            case AuthResult::IllegalUser:
+                message = "You are illegal user.";
+                break;
+            case AuthResult::InsufficientBalance:
+                message = "You have insufficient points to play. Please top up";
+                break;
+            case AuthResult::MultiGamesSession:
+                message = "You have already connected another game.";
+                break;
+            default:
+                message = "Network Error has occurred.";
+                break;
         }
+
+        ShowDialog(message, DialogStyle::Information);
+
+        const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+        container->SetEnabled(true);
+
+        return;
     }
 
-    m_connecting = false;
-    channelBoard->UpdateChannelList(planetInfo);
+    m_service.GetChannelList([=] (const ChannelListResponse& response)
+    {
+        OnChannelListUpdated(response);
+    },
+    [=](const auto&)
+    {
+        Invoke([=]
+        {
+            const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+            container->SetEnabled(true);
+
+            ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+        });
+    });
 }
 
-void StatePlanet::OnChannelEnter(const MusicHall hall, const ServerChannel& channel)
+void StatePlanet::OnChannelListUpdated(const ChannelListResponse& response)
 {
-    if (channel.Population >= channel.MaxPopulation)
+    const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+    container->SetEnabled(true);
+
+    const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
+    channelBoard->UpdateChannelList(m_session.GetMusicHall(), response);
+    channelBoard->SetEnabled(true);
+}
+
+void StatePlanet::OnChannelLogin(const ChannelLoginResponse& response)
+{
+    if (response.Full)
     {
         ShowDialog("Channel is full.", DialogStyle::Information);
         return;
     }
 
-    m_session.SetMusicHall(hall);
-    m_session.SetChannelID(channel.ID);
+    m_network.StartHeartbeat();
+    Invoke([=]
+    {
+        auto& director = GetDirector();
+        director.Present<StateRoom>();
+    });
+}
 
-    m_connecting = true;
-    Run<Gx::Sequence>([&]
+void StatePlanet::OnMusicHallSelected(const MusicHall hall)
+{
+    const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+    container->SetEnabled(false);
+
+    const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
+    channelBoard->SetEnabled(false);
+
+    m_network.Start(hall, [=] (const bool success)
+    {
+        Invoke([=]
         {
-            auto& director = GetDirector();
-            director.Present<StateRoom>();
-        },
-        Gx::Delay(sf::milliseconds(750))
-    );
+            if (!success)
+            {
+                container->SetEnabled(true);
+                ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+
+                return;
+            }
+
+            m_auth.Authenticate(hall, m_session.GetToken(),
+            [=] (const auto& response)
+            {
+                Invoke([=]
+                {
+                    m_session.SetMusicHall(hall);
+                    OnAuthenticated(response.ResultCode);
+                });
+            },
+            [=] (const auto& ex)
+            {
+                Invoke([=]
+                {
+                    container->SetEnabled(true);
+                    ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+                });
+            });
+        });
+    });
+}
+
+void StatePlanet::OnChannelEnterButtonClicked(const MusicHall hall, const std::uint16_t serverID, const std::uint16_t channelID)
+{
+    const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+    container->SetEnabled(false);
+
+    const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
+    channelBoard->SetEnabled(false);
+
+    m_session.SetMusicHall(hall);
+    m_session.SetChannelID(channelID);
+
+    m_service.Login(ChannelLoginRequest{serverID, channelID},
+    [=] (const ChannelLoginResponse& response)
+    {
+        OnChannelLogin(response);
+    },
+    [=] (const auto&)
+    {
+        Invoke([=]
+        {
+            ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+            container->SetEnabled(true);
+            channelBoard->SetEnabled(true);
+        });
+    });
 }

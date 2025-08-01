@@ -1,13 +1,20 @@
-#include <OTwo/O2Jam.hpp>
-
 #include <OTwo/States/StateItemShop.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 #include <OTwo/States/StateRoom.hpp>
 #include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StatePayment.hpp>
 
+#include <OTwo/O2Jam.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
+
 #include <OTwo/Avatar/ItemFactory.hpp>
+
+#include <OTwo/Network/Exception.hpp>
+#include <OTwo/Services/ItemShopService.hpp>
+
+#include <OTwo/Messages/Responses/PurchaseItemResponse.hpp>
+#include <OTwo/Messages/Responses/SellItemResponse.hpp>
 
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/ItemShop.hpp>
@@ -25,8 +32,9 @@
 
 using namespace StringTable::Identifiers;
 
-StateItemShop::StateItemShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
+StateItemShop::StateItemShop(Gx::AudioMixer& mixer, ItemShopService& service, SessionContext& session, CartContext& cart, ItemFactory& items) :
     m_mixer(mixer),
+    m_service(service),
     m_session(session),
     m_cart(cart),
     m_items(items),
@@ -40,7 +48,7 @@ void StateItemShop::Initialize()
 {
     State::Initialize();
 
-    const auto& player    = m_session.GetCurrentPlayer();
+    const auto& charInfo  = m_session.GetCharacterInfo();
     const auto bgm        = Instantiate<sf::Music>(Sound::BGM::BG_ITEM_SHOP);
     const auto sfxWelcome = Instantiate<sf::Sound>(Sound::Speech::NPC_1);
     const auto sfxAccept  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -54,26 +62,26 @@ void StateItemShop::Initialize()
     for (auto id : { Sound::Speech::NPC_5, Sound::Speech::NPC_6, Sound::Speech::NPC_7 })
         m_shopMasterSpeech.push_back(Instantiate<sf::Sound>(id));
 
-    m_genderCategory = player.Gender;
+    m_genderCategory = charInfo.Gender;
     m_shopCategory   = ShopCategory::Special;
     m_itemCategory   = EquipmentType::Costume;
 
     const auto avatar = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
-    avatar->SetGender(player.Gender);
-    for (auto& [_, item] : m_items.GetDefaultItems(player.Gender))
+    avatar->SetGender(charInfo.Gender);
+    for (auto& [_, item] : m_items.GetDefaultItems(charInfo.Gender))
         avatar->SetDefaultItem(std::move(item));
 
-    for (const auto id : player.EquippedItemIDs)
+    for (const auto id : charInfo.EquippedItemIDs)
         avatar->Equip(m_items.Create(id));
 
     const auto nicknameText = Instantiate<Gx::Label>(Resource::ItemShop::IDC_TEXT_NICKNAME);
-    nicknameText->SetString(fmt::format(L"Lv.{}: {}", player.Level, player.Name));
+    nicknameText->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
-    currentGem->SetValue(player.Gem);
+    currentGem->SetValue(charInfo.Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
-    currentCash->SetValue(player.Cash);
+    currentCash->SetValue(charInfo.Wallet.Cash);
 
     const auto myRoomButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MY_ROOM);
     myRoomButton->SetClickCallback([this] (auto&, auto&)
@@ -160,7 +168,7 @@ void StateItemShop::Initialize()
     defaultButton->SetClickCallback([=] (auto&, auto&)
     {
         avatar->ClearEquipments();
-        for (const auto id : player.EquippedItemIDs)
+        for (const auto id : charInfo.EquippedItemIDs)
             avatar->Equip(m_items.Create(id));
     });
 
@@ -185,7 +193,7 @@ void StateItemShop::Initialize()
 
     const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap = []
     {
-        if (O2Jam::InCompatibilityMode(CompatibilityMode::Avatar))
+        if (O2Jam::InInteropMode(InteropMode::Avatar))
         {
             return std::unordered_map<ShopCategory, std::vector<EquipmentType>>
             {
@@ -695,7 +703,7 @@ void StateItemShop::OnGiftButtonClicked()
 
 void StateItemShop::OnItemSellClicked()
 {
-    auto& player         = m_session.GetCurrentPlayer();
+    auto& charInfo       = m_session.GetCharacterInfo();
     const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
     const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
 
@@ -725,7 +733,7 @@ void StateItemShop::OnItemSellClicked()
     const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
         m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-    ShowDialog(message, DialogStyle::OkCancel, false, [=, &player] (auto accepted)
+    ShowDialog(message, DialogStyle::OkCancel, false, [=, &charInfo] (auto accepted)
     {
         if (!accepted)
         {
@@ -733,25 +741,45 @@ void StateItemShop::OnItemSellClicked()
             return;
         }
 
-        player.Inventory.erase(
-            std::remove_if(player.Inventory.begin(), player.Inventory.end(), [=] (auto i) { return i == m_myBagSelectedItem->GetID(); }),
-            player.Inventory.end()
-        );
+        std::size_t slotID = charInfo.Inventory.size() + 1;
+        for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+        {
+            if (charInfo.Inventory[i] == m_myBagSelectedItem->GetID())
+            {
+                slotID = i;
+                break;
+            }
+        }
 
-        m_inventory.erase(
-            std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i.GetID() == m_myBagSelectedItem->GetID(); }),
-            m_inventory.end()
-        );
+        if (slotID >= charInfo.Inventory.size())
+            return;
 
-        m_myBagSelectedItem = nullptr;
-        if (currency == Currency::Gem)
-            player.Gem += price;
-        else
-            player.Cash += price;
+        m_service.SellItem(slotID, [=, &charInfo] (const SellItemResponse& response)
+        {
+            Invoke([=, &charInfo]
+            {
+                if (response.Result == SellItemResult::Failed)
+                {
+                    ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+                    return;
+                }
 
-        m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
-        m_session.Save();
-        InvalidateMyBag();
+                charInfo.Inventory[response.SlotID] = 0;
+                m_inventory[response.SlotID] = Item{};
+
+                charInfo.Wallet = CharacterInfo::WalletInfo
+                {
+                    response.Gem,
+                    response.Cash
+                };
+
+                m_myBagSelectedItem = nullptr;
+                m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
+
+                m_session.Save();
+                InvalidateMyBag();
+            });
+        });
     });
 }
 
@@ -802,7 +830,7 @@ void StateItemShop::InvalidateShopMaster(const bool moveIn)
 
 void StateItemShop::InvalidateMyBag()
 {
-    const auto& player   = m_session.GetCurrentPlayer();
+    auto& charInfo       = m_session.GetCharacterInfo();
     const auto avatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
     const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
     const auto container = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
@@ -811,11 +839,8 @@ void StateItemShop::InvalidateMyBag()
 
     if (m_inventory.empty())
     {
-        for (const auto id : player.Inventory)
-        {
-            if (const auto item = m_items.Create(id); item.GetID() != 0)
-                m_inventory.push_back(std::move(item));
-        }
+        for (const auto id : charInfo.Inventory)
+            m_inventory.push_back(m_items.Create(id));
     }
 
     Gx::UiContainer* currentSlot = nullptr;
@@ -823,7 +848,7 @@ void StateItemShop::InvalidateMyBag()
     auto inventory = std::vector<Item*>();
     for (auto& item : m_inventory)
     {
-        if (!avatar->IsEquiped(item))
+        if (charInfo.EquippedItemIDs.find(item.GetID()) == charInfo.EquippedItemIDs.end())
             inventory.push_back(&item);
     }
 
@@ -835,24 +860,23 @@ void StateItemShop::InvalidateMyBag()
         if (!slot)
             continue;
 
+        slot->SetVisible(false);
         slot->SetClickCallback(nullptr);
         slot->SetDoubleClickCallback(nullptr);
         if (j >= inventory.size())
-        {
-            slot->SetVisible(false);
             continue;
-        }
 
         const auto item = inventory[j++];
-        itemCount++;
-
         unsigned int quantity = 0;
-        if (const auto it = player.ItemQuantities.find(item->GetID()); it != player.ItemQuantities.end())
-            quantity = it->second;
+
+        if (const auto it = std::find(charInfo.Inventory.begin(), charInfo.Inventory.end(), item->GetID()); it != charInfo.Inventory.end())
+            quantity = it->Quantity;
 
         currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
         const auto thumbnail = slot->FindChild<Gx::Image>(Resource::ItemShop::MyBag::Item::IDC_IMAGE_THUMBNAIL);
-        if (item->GetSmallThumbnail().GetTexture())
+        if (item->GetID() == 0)
+            thumbnail->SetTexCoords({});
+        else if (item->GetSmallThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
@@ -868,22 +892,22 @@ void StateItemShop::InvalidateMyBag()
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
         {
-            if (m_myBagSelectedItem == item)
+            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+            if (m_myBagSelectedItem == item || item->GetID() == 0)
                 return;
 
             m_myBagSelectedItem = item;
             m_myBagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_myBagSelectIndicator);
-            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
-            if (!item)
+            if (!item || item->GetID() == 0)
                 return;
 
-            if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
+            if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
             {
                 if (const auto dialog = Instantiate<Gx::Dialog>(Resource::ItemShop::IDC_DIALOG_SKILL_INFO); dialog)
                 {
@@ -955,10 +979,10 @@ void StateItemShop::InvalidateMyBag()
     bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
-    currentGem->SetValue(player.Gem);
+    currentGem->SetValue(charInfo.Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
-    currentCash->SetValue(player.Cash);
+    currentCash->SetValue(charInfo.Wallet.Cash);
 }
 
 void StateItemShop::InvalidateCart()
@@ -1241,23 +1265,78 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
         addButton->SetClickCallback([this, metadata] (auto&, auto&)
         {
-            if (O2Jam::InCompatibilityMode(CompatibilityMode::Interface))
+            if (O2Jam::InInteropMode(InteropMode::Interface))
             {
-                auto& player = m_session.GetCurrentPlayer();
-                const auto it = std::find_if(player.Inventory.begin(), player.Inventory.end(), [itemID = metadata.ID] (auto id)
+                auto& charInfo = m_session.GetCharacterInfo();
+                const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID = metadata.ID] (auto id)
                 {
                     return id == itemID;
                 });
 
-                if (it == player.Inventory.end())
-                    player.Inventory.push_back(static_cast<std::uint32_t>(metadata.ID));
+                if (it != charInfo.Inventory.end())
+                    return;
 
-                m_session.Save();
-                m_inventory.clear();
-                InvalidateMyBag();
+                bool purchasable = false;
+                for (auto currency : { Currency::Gem, Currency::Cash })
+                {
+                    auto money = currency == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
+                    if (auto pIt = metadata.Prices.find(currency); pIt != metadata.Prices.end())
+                    {
+                        if (pIt->second != 0 && pIt->second <= money)
+                        {
+                            purchasable = true;
+                            break;
+                        }
+                    }
+                }
 
-                const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
-                bagButton->PerformClick();
+                if (!purchasable)
+                {
+                    ShowDialog("Not enough money to buy.", DialogStyle::Information);
+                    return;
+                }
+
+                m_service.PurchaseItem(metadata.ID, [=] (const PurchaseItemResponse& response)
+                {
+                    Invoke([=]
+                    {
+                        if (response.ResultCode != PurchaseItemResult::Success)
+                        {
+                            if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
+                                ShowDialog("You need more money.", DialogStyle::Information);
+                            else if (response.ResultCode == PurchaseItemResult::InventoryFull)
+                                ShowDialog("No more room in your Bag.", DialogStyle::Information);
+
+                            return;
+                        }
+
+                        auto& inventory = m_session.GetCharacterInfo().Inventory;
+                        if (inventory[response.SlotID] != 0)
+                        {
+                            ShowDialog("Invalid inventory slot.", DialogStyle::Information);
+                            return;
+                        }
+
+                        inventory[response.SlotID] = metadata.ID;
+
+                        m_session.Save();
+                        m_inventory.clear();
+                        InvalidateMyBag();
+
+                        const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
+                        bagButton->PerformClick();
+                    });
+                },
+                [=] (const NetworkException& ex)
+                {
+                    Invoke([=]
+                    {
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                        {
+                            GetDirector().Present<StatePlanet>();
+                        });
+                    });
+                });
 
                 return;
             }
@@ -1282,12 +1361,13 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             }
 
             cartButton->PerformClick();
+
         });
 
         previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
         {
-            const auto& player = m_session.GetCurrentPlayer();
-            if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
+            const auto& charInfo = m_session.GetCharacterInfo();
+            if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
             {
                 ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
                 return;
@@ -1550,8 +1630,8 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
 
         previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
         {
-            const auto& player = m_session.GetCurrentPlayer();
-            if (metadata.Gender != Gender::Any && player.Gender != metadata.Gender)
+            const auto& charInfo = m_session.GetCharacterInfo();
+            if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
             {
                 ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
                 return;

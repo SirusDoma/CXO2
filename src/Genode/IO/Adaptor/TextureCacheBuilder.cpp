@@ -1,15 +1,15 @@
 #include <OTwo/IO/TextureCacheBuilder.hpp>
 #include <OTwo/IO/Loaders/Adaptor/O2JamSpriteLoader.hpp>
+#include <OTwo/IO/Loaders/Adaptor/ControlListLoader.hpp>
+
 #include <OTwo/Metadata/Legacy/ControlList.hpp>
+#include <OTwo/Metadata/Avatar/ItemData.hpp>
+#include <OTwo/Metadata/Avatar/SetInfoData.hpp>
+
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 
 #include <fmt/format.h>
-
 #include <future>
-#include <iostream>
-#include <OTwo/IO/Loaders/Adaptor/ControlListLoader.hpp>
-#include <OTwo/Metadata/Avatar/ItemData.hpp>
-#include <OTwo/Metadata/Avatar/SetInfoData.hpp>
 
 TextureCacheBuilder::TextureCacheBuilder(Gx::Archive& archive, Gx::ResourceManager& resources) :
     m_archive(archive),
@@ -17,7 +17,7 @@ TextureCacheBuilder::TextureCacheBuilder(Gx::Archive& archive, Gx::ResourceManag
 {
 }
 
-void TextureCacheBuilder::BuildCache()
+void TextureCacheBuilder::BuildCache() const
 {
     if (m_archive.Contains("ControlList_Interface.txt"))
         BuildInterfaceCache();

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <OTwo/Models/Planet.hpp>
+#include <OTwo/Messages/Responses/ChannelListResponse.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
+#include <OTwo/Services/PlanetService.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/TaskContainer.hpp>
@@ -29,7 +31,7 @@ public:
     sf::FloatRect GetLocalBounds() const override;
 
     void Show(MusicHall hall, std::function<void()> callback);
-    void UpdateChannelList(const PlanetInfo& planet);
+    void UpdateChannelList(MusicHall hall, const ChannelListResponse& response);
     void ShowChannelList(unsigned int page);
     void ShowNotice(unsigned int page);
     void SwitchTab(Tab tab);
@@ -39,7 +41,7 @@ public:
     bool IsAnimationEnabled() const;
     void SetAnimationEnabled(bool animationEnabled);
 
-    void SetChannelEnterCallback(std::function<void(MusicHall, ServerChannel)> callback);
+    void SetChannelEnterCallback(std::function<void(MusicHall, std::uint16_t, std::uint16_t)> callback);
 
     unsigned int GetChannelsPerPage() const;
     void SetChannelsPerPage(unsigned int channelsPerPage);
@@ -62,9 +64,11 @@ private:
     sf::RenderTexture m_renderTexture;
     Gx::Sequence m_sequence;
 
-    PlanetInfo m_planetInfo;
-    ChannelBoard::Tab m_tab;
-    std::function<void(MusicHall, ServerChannel)> m_callback;
+    ::ChannelBoard::Tab m_tab;
+    MusicHall m_hall{MusicHall::None};
+
+    std::vector<ChannelListResponse::ChannelState> m_channels;
+    std::function<void(MusicHall, std::uint16_t, std::uint16_t)> m_callback;
 
     bool m_transitioning, m_animationEnabled;
     int m_selectedChannel;

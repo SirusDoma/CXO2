@@ -37,14 +37,14 @@ void StateMusicShop::Initialize()
 {
     State::Initialize();
 
-    const auto& player = m_session.GetCurrentPlayer();
-    const auto bgm     = Instantiate<sf::Music>(Sound::BGM::BG_MUSIC_SHOP);
+    const auto& charInfo = m_session.GetCharacterInfo();
+    const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MUSIC_SHOP);
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MusicShop::IDC_NUMBER_GEM);
-    currentGem->SetValue(player.Gem);
+    currentGem->SetValue(charInfo.Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MusicShop::IDC_NUMBER_CASH);
-    currentCash->SetValue(player.Cash);
+    currentCash->SetValue(charInfo.Wallet.Cash);
 
     const auto shopContainer     = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_SHOP);
     const auto musicContainer    = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_MUSIC);

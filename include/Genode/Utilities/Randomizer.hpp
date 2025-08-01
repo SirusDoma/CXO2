@@ -14,14 +14,14 @@ namespace Gx
             }
 
             template<class T = int>
-            T Next(T min = 0, T max = std::numeric_limits<T>::max)
+            T Next(T min = 0, T max = std::numeric_limits<T>::max())
             {
                 auto randomizer = std::uniform_real_distribution<T>(min, max);
                 return static_cast<T>(randomizer(m_seeder));
             }
 
             template<class T = int>
-            static T Randomize(T min = 0, T max = std::numeric_limits<T>::max)
+            static T Randomize(T min = 0, T max = std::numeric_limits<T>::max())
             {
                 static auto device = std::random_device();
                 static auto seeder = std::mt19937(device());

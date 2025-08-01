@@ -1,10 +1,9 @@
 #pragma once
 
-
-#include <OTwo/Models/Room.hpp>
-
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
+
+enum class GameMode : std::uint8_t;
 
 class SessionContext;
 class CreateRoomDialog : public Gx::Dialog

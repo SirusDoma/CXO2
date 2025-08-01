@@ -3,7 +3,7 @@
   "require": {
     "bndID": "0X16015028",
     "template": {
-      "name": "IDC_AVATAR",
+      "name": "IDC_CONTAINER_AVATAR",
       "source": "ControlList/State/Waiting/Waiting7K/Avatar.json",
       "bounds": [
         "0X16015028",

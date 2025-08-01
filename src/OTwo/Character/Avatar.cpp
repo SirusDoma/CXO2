@@ -378,6 +378,9 @@ void Avatar::Update(const double delta)
 
 Gx::RenderStates Avatar::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
 {
+    if (!IsVisible())
+        return states;
+
     states.transform *= GetTransform();
 
     auto offset = states;

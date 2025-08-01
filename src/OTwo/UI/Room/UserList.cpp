@@ -10,10 +10,13 @@
 #include <fmt/format.h>
 #include <cmath>
 #include <Genode/UI/Image.hpp>
+#include <OTwo/Services/RoomService.hpp>
+#include <OTwo/States/State.hpp>
 
 using namespace StringTable::Identifiers;
 
-UserList::UserList() :
+UserList::UserList(RoomService& service) :
+    m_service(service),
     m_users(),
     m_selectedUser(),
     m_page(1)
@@ -34,7 +37,7 @@ void UserList::Initialize()
         {
             const size_t index = ((m_page - 1) * listChildren.size()) + i;
             if (index < m_users.size() && sender.IsChecked())
-                m_selectedUser = m_users[index].ID;
+                m_selectedUser = m_users[index].Name;
         });
 
         for (const auto child : userButton->GetChildren())
@@ -61,29 +64,57 @@ void UserList::Initialize()
     const auto btnUserLeft  = FindChild<Gx::Button>(Resource::Room::UserList::IDC_BUTTON_USER_LEFT);
     const auto btnUserRight = FindChild<Gx::Button>(Resource::Room::UserList::IDC_BUTTON_USER_RIGHT);
 
-    btnUserLeft->SetClickCallback([=] (auto& sender, auto& ev)
+    btnUserRefresh->SetClickCallback([=] (auto&, auto&)
+    {
+        OnRefreshButtonClicked();
+    });
+
+    btnUserLeft->SetClickCallback([=] (auto&, auto&)
     {
         m_page--;
         Invalidate();
     });
 
-    btnUserRight->SetClickCallback([=] (auto& sender, auto& ev)
+    btnUserRight->SetClickCallback([=] (auto&, auto&)
     {
         m_page++;
         Invalidate();
     });
 }
 
-void UserList::AddUser(const Player& user)
+void UserList::AddUser(const CharacterInfo& user)
 {
     m_users.push_back(user);
-    Invalidate();
 }
 
 void UserList::Clear()
 {
     m_users.clear();
-    Invalidate();
+}
+
+void UserList::OnRefreshButtonClicked()
+{
+    if (m_refreshing)
+        return;
+
+    m_refreshing = true;
+    m_service.GetUserList([this] (const auto& users)
+    {
+        auto parent = GetParent<::State>();
+        parent->Invoke([this, users]
+        {
+            Clear();
+            for (auto& user : users)
+                AddUser(user);
+
+            Invalidate();
+            m_refreshing = false;
+        });
+    },
+    [this] (const auto&)
+    {
+        m_refreshing = false;
+    });
 }
 
 void UserList::Invalidate()
@@ -117,7 +148,7 @@ void UserList::Invalidate()
             auto user = m_users[index];
             userNickLabel->SetString(fmt::format(L"Lv.{}: {}", user.Level, user.Name));
 
-            userButton->SetCheckedState(user.ID == m_selectedUser);
+            userButton->SetCheckedState(user.Name == m_selectedUser);
             userButton->SetEnabled(true);
             userButton->SetVisible(true);
         }

@@ -59,10 +59,7 @@ Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromMetadata(const ResourceMetadata&
     });
 
     if (!music->openFromMemory(data, size.value()))
-    {
-        delete[] data;
         return nullptr;
-    }
 
     music->setLooping(metadata->IsLoop);
     return music;

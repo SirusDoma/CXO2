@@ -1,6 +1,8 @@
 ﻿#include <OTwo/UI/Planet/ChannelBoard.hpp>
-#include <OTwo/States/State.hpp>
 #include <OTwo/UI/Planet/ChannelButton.hpp>
+
+#include <OTwo/States/State.hpp>
+#include <OTwo/Services/PlanetService.hpp>
 
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/Planet.hpp>
@@ -44,7 +46,7 @@ void ChannelBoard::Initialize()
     channelTabButton->SetClickCallback(
         [=] (auto&, auto& ev)
         {
-            if (m_tab == Tab::ChannelList || m_transitioning || m_planetInfo.Hall == MusicHall::None)
+            if (m_tab == Tab::ChannelList || m_transitioning || m_hall == MusicHall::None)
             {
                 ev.Handled = true;
                 return;
@@ -79,8 +81,8 @@ void ChannelBoard::Initialize()
         [this, sfxEnter] (auto&, auto&)
         {
             m_mixer.Play(*sfxEnter, Sound::Channel::SFX);
-            if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < m_planetInfo.Channels.size())
-                m_callback(m_planetInfo.Hall, m_planetInfo.Channels[m_selectedChannel]);
+            if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < static_cast<int>(m_channels.size()))
+                m_callback(m_hall, m_channels[m_selectedChannel].ServerID, m_channels[m_selectedChannel].ID);
         }
     );
 
@@ -208,7 +210,7 @@ void ChannelBoard::SetAnimationEnabled(const bool animationEnabled)
     m_animationEnabled = animationEnabled;
 }
 
-void ChannelBoard::SetChannelEnterCallback(std::function<void(MusicHall, ServerChannel)> callback)
+void ChannelBoard::SetChannelEnterCallback(std::function<void(MusicHall, std::uint16_t, std::uint16_t)> callback)
 {
     m_callback = std::move(callback);
 }
@@ -259,7 +261,7 @@ void ChannelBoard::SwitchTab(const ChannelBoard::Tab tab)
         SetFrame("Notice");
         notice->SetVisible(true);
 
-        if (m_planetInfo.Hall != MusicHall::None)
+        if (m_hall != MusicHall::None)
         {
             channelTabButton->SetVisible(true);
             channelTabButton->SetEnabled(true);
@@ -281,7 +283,7 @@ void ChannelBoard::SwitchTab(const ChannelBoard::Tab tab)
 
 void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
 {
-    if (m_transitioning || m_planetInfo.Hall == hall)
+    if (m_transitioning || m_hall == hall)
         return;
 
     const auto sfxPopup    = m_resources.Find<sf::Sound>("Planet/openChannel");
@@ -292,7 +294,7 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     if (m_animationEnabled)
         CaptureCurrentState();
 
-    m_planetInfo.Hall = hall;
+    m_hall = hall;
     switch (hall)
     {
         case MusicHall::Kalliope: category->SetFrame("Kalliope");  break;
@@ -334,22 +336,24 @@ void ChannelBoard::Show(const MusicHall hall, std::function<void()> callback)
     }
 }
 
-void ChannelBoard::UpdateChannelList(const PlanetInfo& planet)
+void ChannelBoard::UpdateChannelList(const MusicHall hall, const ChannelListResponse& response)
 {
     const auto container   = FindChild<Gx::UiContainer>(Resource::Planet::ChannelBoard::IDC_CONTAINER_CHANNEL_CONTROLS);
     const auto channelList = container->FindChild<Gx::List>(Resource::Planet::ChannelBoard::IDC_LIST_CHANNEL);
 
-    m_planetInfo = planet;
+    m_hall = hall;
+    m_channels = response.Channels.GetContainer();
     if (channelList->GetChildrenCount() == 0)
         m_channelMaxPage = 1;
     else
-        m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(planet.Channels.size()) / channelList->GetChildrenCount()));
+        m_channelMaxPage = static_cast<int>(std::ceil(static_cast<float>(m_channels.size()) / channelList->GetChildrenCount()));
 
     const auto maxPageNumber = FindChild<Gx::BitmapNumber>(Resource::Planet::ChannelBoard::IDC_NUMBER_MAX_CHANNEL_PAGE);
     maxPageNumber->SetValue(m_channelMaxPage);
 
     m_selectedChannel = 0;
     ShowChannelList(1);
+    SetEnabled(true);
 }
 
 void ChannelBoard::ShowChannelList(unsigned int page)
@@ -369,8 +373,8 @@ void ChannelBoard::ShowChannelList(unsigned int page)
 
     const int start = (page - 1) * m_channelsPerPage;
     int end = start + m_channelsPerPage;
-    if (end > m_planetInfo.Channels.size())
-        end = m_planetInfo.Channels.size();
+    if (end > static_cast<int>(m_channels.size()))
+        end = static_cast<int>(m_channels.size());
 
     const auto children = channelList->GetChildren();
     channelList->SetVisible(true);
@@ -392,14 +396,22 @@ void ChannelBoard::ShowChannelList(unsigned int page)
             continue;
         }
 
-        const auto& channelInfo = m_planetInfo.Channels[channelIndex];
+        const auto& channel = m_channels[channelIndex];
+        if (!channel.Active)
+        {
+            channelButton->SetVisible(false);
+            channelButton->SetEnabled(false);
+
+            continue;
+        }
+
         channelButton->SetChannelNumber(channelIndex + 1);
-        channelButton->SetMusicHall(m_planetInfo.Hall);
+        channelButton->SetMusicHall(m_hall);
         channelButton->SetCheckedState(channelIndex == m_selectedChannel);
-        channelButton->SetChannelPopulation(channelInfo.Population, channelInfo.MaxPopulation);
+        channelButton->SetChannelPopulation(channel.UserCount, channel.Capacity);
         channelButton->SetVisible(true);
         channelButton->SetEnabled(true);
-        channelButton->SetClickCallback([=] (auto& sender, auto& ev)
+        channelButton->SetClickCallback([=] (auto&, auto&)
         {
             m_selectedChannel = channelIndex;
         });

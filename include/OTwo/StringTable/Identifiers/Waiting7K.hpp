@@ -9,6 +9,7 @@ namespace StringTable::Identifiers::Resource::Waiting7K
     constexpr static auto IDC_TEXT_MUSIC_NAME               = "STATE_WAITING_7K/IDC_TEXT_MUSIC_NAME";
     constexpr static auto IDC_IMAGE_ROOM_LEVEL              = "STATE_WAITING_7K/IDC_IMAGE_ROOM_LEVEL";
     constexpr static auto IDC_LIST_AVATAR                   = "STATE_WAITING_7K/IDC_LIST_AVATAR";
+    constexpr static auto IDC_IMAGE_COVER_MUSIC             = "STATE_WAITING_7K/IDC_IMAGE_COVER_MUSIC";
     constexpr static auto IDC_BUTTON_SELECT_MUSIC           = "STATE_WAITING_7K/IDC_BUTTON_SELECT_MUSIC";
     constexpr static auto IDC_BUTTON_CHANGE_TITLE           = "STATE_WAITING_7K/IDC_BUTTON_CHANGE_TITLE";
     constexpr static auto IDC_BUTTON_EMOTICON               = "STATE_WAITING_7K/IDC_BUTTON_EMOTICON";
@@ -25,10 +26,13 @@ namespace StringTable::Identifiers::Resource::Waiting7K
 
     namespace Avatar
     {
+        constexpr static auto IDC_AVATAR             = "IDC_AVATAR";
         constexpr static auto IDC_CONTAINER_EMOTICON = "IDC_CONTAINER_EMOTICON";
         constexpr static auto IDC_AVATAR_INFO        = "IDC_AVATAR_INFO";
         constexpr static auto IDC_IMAGE_BOSS_MARK    = "IDC_IMAGE_BOSS_MARK";
         constexpr static auto IDC_IMAGE_NO_MUSIC     = "IDC_IMAGE_NO_MUSIC";
+        constexpr static auto IDC_IMAGE_COVER_AVATAR = "IDC_IMAGE_COVER_AVATAR";
+        constexpr static auto IDC_BUTTON_EXTEND      = "IDC_BUTTON_EXTEND";
     }
 
     namespace Team

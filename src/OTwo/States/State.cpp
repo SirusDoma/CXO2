@@ -6,6 +6,7 @@
 #include <OTwo/States/StateResult.hpp>
 #include <OTwo/Config/GameConfig.hpp>
 
+#include <OTwo/Network/NetworkAdapter.hpp>
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 
 #include <Genode/System/Application.hpp>
@@ -44,6 +45,8 @@ State::State(const std::string& name, Gx::ResourceManager& resources) :
 void State::Finalize()
 {
     Scene::Finalize();
+
+    // Require<NetworkAdapter>().ResetQueue();
     Require<Gx::AudioMixer>().Reset(true);
 
     m_prompted = false;
@@ -65,18 +68,28 @@ void State::LoadCommonResources()
     m_prompted    = false;
     if (Gx::FileSystem::Contains("ControlList_Interface.txt"))
     {
-        m_dialogInfo = Instantiate<Gx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
-        m_dialog1    = Instantiate<Gx::Dialog>("ControlList/Dialog/Question1.json", ResourceScope::Shared);
-        m_dialog2    = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
-        m_exitDialog = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+        m_dialogInfo   = Instantiate<Gx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
+        m_dialog1      = Instantiate<Gx::Dialog>("ControlList/Dialog/Question1.json", ResourceScope::Shared);
+        m_dialog2      = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+        m_dialogNotice = Instantiate<Gx::Dialog>("ControlList/Dialog/Notice.json", ResourceScope::Shared);
+        m_exitDialog   = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
     }
     else
     {
-        m_dialogInfo = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
-        m_dialog1    = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
-        m_dialog2    = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-        m_exitDialog = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_dialogInfo   = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
+        m_dialog1      = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
+        m_dialog2      = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+        m_dialogNotice = Instantiate<Gx::Dialog>("Interface/Dialog/Notice.json", ResourceScope::Shared);
+        m_exitDialog   = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
     }
+
+    const auto center    = GetApplication().GetView().getCenter();
+    const unsigned int x = static_cast<unsigned int>(center.x - (m_dialogNotice->GetLocalBounds().size.x / 2.f));
+    const unsigned int y = static_cast<unsigned int>(center.y - (m_dialogNotice->GetLocalBounds().size.y / 2.f));
+
+    m_dialogNotice->SetVisible(false);
+    m_dialogNotice->SetOrigin(0.f, 0.f);
+    m_dialogNotice->SetPosition(x, y);
 
     m_cancelSound = Instantiate<sf::Sound>(Sound::Effects::EF_03, ResourceScope::Shared);
     m_popupSound  = Instantiate<sf::Sound>(Sound::Effects::EF_06, ResourceScope::Shared);
@@ -138,11 +151,19 @@ void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool ba
     Present(*dialog, ctx);
 }
 
+void State::Announce(const std::string& content)
+{
+    m_dialogNotice->SetVisible(true);
+    m_dialogNotice->SetPromptString(content);
+
+    m_noticeTimer.restart();
+}
+
 void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
 {
     Scene::OnKeyPressed(ev);
 
-    auto& director = GetDirector();
+    const auto& director = GetDirector();
 
     if (!director.IsPresenting<StateAvi>() &&
         !director.IsPresenting<StatePayment>() &&
@@ -204,6 +225,25 @@ void State::OnKeyPressed(const sf::Event::KeyPressed& ev)
                 ShowDialog("Vsync disabled.\n( Press F10 again to enable. )", DialogStyle::Information);
         }
     }
+}
+
+Gx::RenderStates State::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
+{
+    auto result = Scene::Render(surface, states);
+    if (m_dialogNotice->IsVisible() && m_noticeTimer.getElapsedTime() < sf::seconds(15))
+    {
+        if (const auto updatable = dynamic_cast<Updatable*>(m_dialogNotice))
+            updatable->Update(states.Delta);
+
+        surface.Render(*m_dialogNotice, states);
+    }
+    else if (m_noticeTimer.isRunning())
+    {
+        m_dialogNotice->SetVisible(false);
+        m_noticeTimer.reset();
+    }
+
+    return result;
 }
 
 bool State::OnAppClose()

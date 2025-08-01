@@ -11,6 +11,13 @@ namespace Gx
         Provide<T>(As<T>(), scope);
     }
 
+    template<typename T, typename U>
+    std::enable_if_t<std::is_base_of_v<T, U>>
+    Context::Provide(Scope scope)
+    {
+        Provide<T>(As<U>(), scope);
+    }
+
     template<typename T>
     void Context::Provide(Builder<T> builder, const Scope scope)
     {
@@ -39,18 +46,20 @@ namespace Gx
     std::enable_if_t<!std::is_pointer_v<T>, T&>
     Context::Require() const
     {
-        if (auto instance = Require<T*>(); instance)
+        using U = std::decay_t<T>;
+
+        if (auto instance = Require<U*>(); instance)
             return *instance;
 
-        if constexpr (Constructible<T>::value)
+        if constexpr (Constructible<U>::value)
         {
             const std::type_index type = typeid(T);
-            auto factory = std::make_shared<Factory<T>>(As<T>(), Scope::Local);
+            auto factory = std::make_shared<Factory<U>>(As<U>(), Scope::Local);
 
-            m_instances[type] = std::make_shared<Instance<T>>(std::move(factory->Create(*this)), Scope::Local);
+            m_instances[type] = std::make_shared<Instance<U>>(std::move(factory->Create(*this)), Scope::Local);
             m_factories[type] = std::move(factory);
 
-            return static_cast<T&>(*(static_cast<Instance<T>*>(m_instances[type].get()))->Handle.get());
+            return static_cast<T&>(*(static_cast<Instance<U>*>(m_instances[type].get()))->Handle.get());
         }
         else
             throw Exception(std::string(typeid(T).name()) + " is not constructible and not provided within the current context");

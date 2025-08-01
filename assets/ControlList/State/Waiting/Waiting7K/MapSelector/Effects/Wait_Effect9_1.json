@@ -1,0 +1,10 @@
+{
+  "type": "Animation",
+  "require": {
+    "sheet": "Wait_Effect9_1.ojs",
+    "bndID": "0X16500045"
+  },
+  "attributes": {
+    "isLoop": true
+  }
+}

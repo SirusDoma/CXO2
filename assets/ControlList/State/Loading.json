@@ -13,7 +13,8 @@
       "IDC_IMAGE_STATE_LOADING7": "ControlList/State/Loading/MusicLoading7.json",
       "IDC_IMAGE_STATE_LOADING8": "ControlList/State/Loading/MusicLoading8.json",
       "IDC_IMAGE_STATE_LOADING9": "ControlList/State/Loading/MusicLoading9.json",
-      "IDC_IMAGE_STATE_LOADING10": "ControlList/State/Loading/MusicLoading10.json"
+      "IDC_IMAGE_STATE_LOADING10": "ControlList/State/Loading/MusicLoading10.json",
+      "IDC_LIST_LOADING_SIGN": "ControlList/State/Loading/Loading_List.json"
     }
   }
 }

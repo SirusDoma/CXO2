@@ -3,11 +3,11 @@
 #include <OTwo/States/State.hpp>
 #include <OTwo/Models/Game.hpp>
 
-#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/Metadata/Chart/O2JamChartMetadata.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartLoader.hpp>
 
 #include <OTwo/Contexts/SessionContext.hpp>
-#include <OTwo/Contexts/MusicSelectionContext.hpp>
+#include <OTwo/Contexts/RoomContext.hpp>
 
 #include <OTwo/Utilities/StringFormatter.hpp>
 #include <OTwo/StringTable/Identifiers/Cache.hpp>
@@ -30,13 +30,13 @@
 
 using namespace StringTable::Identifiers;
 
-SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, MusicSelectionContext& selection) :
+SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room) :
     m_coverID(0),
     m_speed(0),
     m_mixer(mixer),
     m_resources(resources),
     m_session(session),
-    m_selection(selection),
+    m_room(room),
     m_music()
 {
 }
@@ -54,13 +54,14 @@ void SelectMusicDialog::Initialize()
     for (auto& metadata : m_musicList)
         m_displayList.push_back(metadata);
 
-    m_random = m_selection.GetRandomLevel();
-    m_difficulty = m_selection.GetDifficulty();
-    m_speed = m_selection.GetSpeed();
+    m_random     = m_room.GetRandomLevel();
+    m_difficulty = m_room.GetDifficulty();
+    m_speed      = m_room.GetSpeed();
+
     if (!m_displayList.empty())
     {
-        if (m_selection.GetMetadata().ID != 0)
-            m_music = m_selection.GetMetadata();
+        if (m_room.GetMusic().ID != 0)
+            m_music = m_room.GetMusic();
         else
             m_music = m_displayList[m_displayList.size() - 1];
     }
@@ -194,19 +195,19 @@ void SelectMusicDialog::Initialize()
         if (auto allButton = genreSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL); allButton)
             allButton->SetCheckedState(true);
 
-        std::unordered_map<std::string, Genre> genreMap = {
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL, static_cast<Genre>(-1) },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD, Genre::Ballad },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK, Genre::Rock },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE, Genre::Dance },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO, Genre::Techno },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP, Genre::HipHop },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL, Genre::Soul },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ, Genre::Jazz },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK, Genre::Funk },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL, Genre::Classical },
+        std::unordered_map<std::string, std::optional<Genre>> genreMap = {
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL,         std::nullopt },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD,      Genre::Ballad },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK,        Genre::Rock },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE,       Genre::Dance },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO,      Genre::Techno },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP,      Genre::HipHop },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL,        Genre::Soul },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ,        Genre::Jazz },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK,        Genre::Funk },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL,   Genre::Classical },
             { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TRADITIONAL, Genre::Traditional },
-            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC, Genre::Etc },
+            { Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC,         Genre::Etc },
         };
 
         for (auto [key, genre] : genreMap)
@@ -215,7 +216,7 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
-            button->SetCheckStateChangeCallback([this, g = genre] (auto& sender)
+            button->SetCheckStateChangeCallback([this, genre] (auto& sender)
             {
                 if (!sender.IsChecked())
                     return;
@@ -226,17 +227,23 @@ void SelectMusicDialog::Initialize()
                     return;
                 }
 
-                m_genre = g;
+                m_genre = genre;
                 m_music = ChartMetadata{};
                 m_page  = 0;
                 m_displayList.clear();
                 for (auto& metadata : m_musicList)
                 {
-                    if (m_genre == static_cast<Genre>(-1) || metadata.Genre == m_genre)
+                    auto musicGenre = magic_enum::enum_cast<Genre>(metadata.Genre.toAnsiString())
+                        .value_or(Genre::Etc);
+
+                    if (!m_genre.has_value() || musicGenre == m_genre)
                         m_displayList.push_back(metadata);
                 }
 
-                Sort(m_sort, m_order);
+                if (m_sort.has_value() && m_order.has_value())
+                    Sort(m_sort.value(), m_order.value());
+                else
+                    Invalidate();
             });
         }
     }
@@ -336,7 +343,10 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::EX;
-                Sort(m_sort, m_order);
+                if (m_sort.has_value() && m_order.has_value())
+                    Sort(m_sort.value(), m_order.value());
+                else
+                    Invalidate();
             });
         }
 
@@ -354,7 +364,10 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::NX;
-                Sort(m_sort, m_order);
+                if (m_sort.has_value() && m_order.has_value())
+                    Sort(m_sort.value(), m_order.value());
+                else
+                    Invalidate();
             });
         }
 
@@ -372,7 +385,10 @@ void SelectMusicDialog::Initialize()
                 }
 
                 m_difficulty = Difficulty::HX;
-                Sort(m_sort, m_order);
+                if (m_sort.has_value() && m_order.has_value())
+                    Sort(m_sort.value(), m_order.value());
+                else
+                    Invalidate();
             });
         }
     }
@@ -433,8 +449,10 @@ void SelectMusicDialog::Initialize()
         }
     }
 
-    Sort(m_selection.GetSortMode(), m_selection.GetSortOrder());
+    Sort(m_room.GetMusicSortMode(), m_room.GetMusicSortOrder());
     CacheMusicCover();
+
+    m_initialized = true;
 }
 
 void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
@@ -555,23 +573,28 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
 void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
 {
+    Initialize();
     Dialog::OnPresented(parent, context);
 
     m_musicList = m_session.GetInstalledMusic(true);
     m_displayList.clear();
     for (auto& metadata : m_musicList)
     {
-        if (m_genre == static_cast<Genre>(-1) || metadata.Genre == m_genre)
+        auto genre = magic_enum::enum_cast<Genre>(metadata.Genre.toAnsiString());
+        if (!genre.has_value())
+            genre = Genre::Etc;
+
+        if (!m_genre.has_value() || genre == m_genre)
             m_displayList.push_back(metadata);
     }
 
-    if (!m_selection.GetMetadata().Source.empty())
-        m_music = m_selection.GetMetadata();
+    if (!m_room.GetMusic().Source.empty())
+        m_music = m_room.GetMusic();
     else
         m_music = m_musicList[m_musicList.size() - 1];
 
-    m_random = m_selection.GetRandomLevel();
-    m_difficulty = m_selection.GetDifficulty();
+    m_random = m_room.GetRandomLevel();
+    m_difficulty = m_room.GetDifficulty();
     if (const auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
     {
         std::unordered_map<std::string, Difficulty> diffMap = {
@@ -587,7 +610,7 @@ void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContex
         }
     }
 
-    m_speed = m_selection.GetSpeed();
+    m_speed = m_room.GetSpeed();
     if (const auto speedSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SPEED_SELECTOR); speedSelector)
     {
         for (const auto child : speedSelector->GetChildren())
@@ -634,7 +657,8 @@ void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContex
         }
     }
 
-    Sort(m_selection.GetSortMode(), m_selection.GetSortOrder());
+
+    Sort(m_room.GetMusicSortMode(), m_room.GetMusicSortOrder());
 }
 
 void SelectMusicDialog::OnAccepted()
@@ -645,12 +669,12 @@ void SelectMusicDialog::OnAccepted()
 
     Dialog::OnAccepted();
 
-    m_selection.SetMetadata(m_music);
-    m_selection.SetRandomLevel(m_random);
-    m_selection.SetSortMode(m_sort);
-    m_selection.SetSortOrder(m_order);
-    m_selection.SetDifficulty(m_difficulty);
-    m_selection.SetSpeed(m_speed);
+    m_room.SetMusic(m_music);
+    m_room.SetRandomLevel(m_random);
+    m_room.SetMusicSortMode(m_sort.value_or(MusicSortMode::ID));
+    m_room.SetMusicSortOrder(m_order.value_or(MusicSortOrder::None));
+    m_room.SetDifficulty(m_difficulty);
+    m_room.SetSpeed(m_speed);
     CacheMusicCover();
 
     auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_02);
@@ -675,7 +699,7 @@ void SelectMusicDialog::CacheMusicCover(const bool refresh) const
         if (!refresh && m_resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER))
             return;
 
-        if (auto image = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default); image)
+        if (auto image = O2JamChartLoader::LoadCoverArt(m_music.Source, Gx::ResourceContext::Default); image)
             m_resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
         else
             m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
@@ -703,7 +727,7 @@ Difficulty SelectMusicDialog::GetSelectedDifficulty() const
 
 Genre SelectMusicDialog::GetSelectedGenre() const
 {
-    return m_genre;
+    return m_genre.value_or(Genre::Etc);
 }
 
 float SelectMusicDialog::GetSelectedSpeed() const
@@ -713,13 +737,13 @@ float SelectMusicDialog::GetSelectedSpeed() const
 
 void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder order)
 {
-    m_sort = sort;
+    m_sort  = sort;
     m_order = order;
 
     switch (sort)
     {
         case MusicSortMode::ID:
-            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto& a, auto& b)
             {
                 if (m_order == MusicSortOrder::Ascending)
                     return a.ID < b.ID;
@@ -728,7 +752,7 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
             });
             break;
         case MusicSortMode::Title:
-            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto& a, auto& b)
             {
                 if (m_order == MusicSortOrder::Ascending)
                     return std::string(a.Title) < std::string(b.Title);
@@ -737,10 +761,10 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
             });
             break;
         case MusicSortMode::Level:
-            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto& a, auto& b)
             {
-                auto x = a.GetLevel(m_difficulty);
-                auto y = b.GetLevel(m_difficulty);
+                auto x = a.Levels[m_difficulty];
+                auto y = b.Levels[m_difficulty];
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x < y;
@@ -749,10 +773,10 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
             });
             break;
         case MusicSortMode::Duration:
-            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto a, auto b)
+            std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto& a, auto& b)
             {
-                auto x = a.GetDuration(m_difficulty);
-                auto y = b.GetDuration(m_difficulty);
+                auto x = a.Durations[m_difficulty];
+                auto y = b.Durations[m_difficulty];
 
                 if (m_order == MusicSortOrder::Ascending)
                     return x < y;
@@ -815,6 +839,7 @@ void SelectMusicDialog::Invalidate()
             {
                 auto lv = static_cast<LevelCategory>(1 << (r - 1));
                 bool isRandomActivated = static_cast<int>(m_random) & static_cast<int>(lv);
+
                 button->SetCheckedState(false);
                 button->SetEnabled(false);
 
@@ -838,12 +863,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 1 - 5");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        return m.GetLevel(diff) <= 5;
+                                        return m.Levels[diff] <= 5;
                                     });
 
                                     if (result)
@@ -861,12 +886,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 5 - 9");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        const int level = m.GetLevel(diff);
+                                        const int level = m.Levels[diff];
                                         return level > 5 && level <= 9;
                                     });
 
@@ -885,12 +910,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 9 - 13");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        const int level = m.GetLevel(diff);
+                                        const int level = m.Levels[diff];
                                         return level > 9 && level <= 13;
                                     });
 
@@ -909,12 +934,12 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 13 higher");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (const ChartMetadata& m)
+                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        return m.GetLevel(diff) > 13;
+                                        return m.Levels[diff] > 13;
                                     });
 
                                     if (result)
@@ -1037,8 +1062,16 @@ void SelectMusicDialog::Invalidate()
                     if (!lastTitle)
                         lastTitle = title;
 
-                    title->SetString(fmt::format("{} is not available yet.", magic_enum::enum_name(m_genre)));
-                    title->SetColor(sf::Color(135, 200, 60));
+                    if (m_genre.has_value())
+                    {
+                        title->SetString(fmt::format("{} is not available yet.", magic_enum::enum_name(m_genre.value())));
+                        title->SetColor(sf::Color(135, 200, 60));
+                    }
+                    else
+                    {
+                        title->SetString("No installed music found.");
+                        title->SetColor(sf::Color(135, 200, 60));
+                    }
                 }
 
                 if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
@@ -1070,11 +1103,11 @@ void SelectMusicDialog::Invalidate()
         }
 
         if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
-            level->SetString(std::to_string(m_displayList[index].GetLevel(m_difficulty)));
+            level->SetString(std::to_string(m_displayList[index].Levels[m_difficulty]));
 
         if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
         {
-            float seconds = m_displayList[index].GetDuration(m_difficulty).asSeconds();
+            float seconds = m_displayList[index].Durations[m_difficulty].asSeconds();
             int minute    = std::floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
@@ -1089,7 +1122,7 @@ void SelectMusicDialog::Invalidate()
     if (m_music.Source.empty())
         return;
 
-    auto currentMetadata = m_music.ToChartMetadataView(m_difficulty);
+    auto currentMetadata = m_music;
     if (auto infoList = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_INFO); infoList)
     {
         std::vector info =
@@ -1097,7 +1130,7 @@ void SelectMusicDialog::Invalidate()
             fmt::format(L"Title: {}", currentMetadata.Title),
             fmt::format(L"Artist: {}", currentMetadata.Artist),
             fmt::format(L"Note Designer: {}",  currentMetadata.NoteDesigner),
-            fmt::format(L"Total Notes: {}", currentMetadata.NoteCount),
+            fmt::format(L"Total Notes: {}", currentMetadata.NoteCounts[m_difficulty]),
             fmt::format(L"BPM: {:.2f}", m_music.BPM)
         };
 
@@ -1121,7 +1154,7 @@ void SelectMusicDialog::Invalidate()
         if (m_coverID != m_music.ID)
         {
             m_coverID  = m_music.ID;
-            if (auto image = ChartLoader::LoadThumbnail(m_music, Gx::ResourceContext::Default))
+            if (auto image = O2JamChartLoader::LoadThumbnail(m_music.Source, Gx::ResourceContext::Default))
             {
                 m_thumbnail = std::make_unique<sf::Texture>();
                 if (m_thumbnail->loadFromImage(*image))
@@ -1130,7 +1163,7 @@ void SelectMusicDialog::Invalidate()
                     thumbnail->SetTexture(*m_thumbnail);
                 }
             }
-            else if (auto cover = ChartLoader::LoadCoverArt(m_music, Gx::ResourceContext::Default))
+            else if (auto cover = O2JamChartLoader::LoadCoverArt(m_music.Source, Gx::ResourceContext::Default))
             {
                 m_thumbnail = std::make_unique<sf::Texture>();
                 if (m_thumbnail->loadFromImage(*cover))

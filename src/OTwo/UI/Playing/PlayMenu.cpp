@@ -51,7 +51,7 @@ void PlayMenu::Initialize()
     }
 }
 
-ChartMetadataView PlayMenu::GetMetadata() const
+ChartMetadata PlayMenu::GetMetadata() const
 {
     return m_metadata;
 }
@@ -61,7 +61,7 @@ Difficulty PlayMenu::GetDifficulty() const
     return m_difficulty;
 }
 
-void PlayMenu::SetMetadata(const ChartMetadataView& metadata, const Difficulty diff)
+void PlayMenu::SetMetadata(const ChartMetadata& metadata, const Difficulty diff)
 {
     m_metadata   = metadata;
     m_difficulty = diff;
@@ -70,7 +70,10 @@ void PlayMenu::SetMetadata(const ChartMetadataView& metadata, const Difficulty d
         m_title->SetString(metadata.Title);
 
     if (m_wave)
-        m_wave->SetMaximumValue(metadata.Duration.asSeconds());
+    {
+        m_wave->SetMaximumValue(metadata.Durations.find(diff)->second.asSeconds());
+        m_wave->SetValue(0);
+    }
 
     if (m_level)
     {
@@ -122,7 +125,7 @@ void PlayMenu::Update(const double delta)
 
     if (m_renderer && m_renderer->IsRendering())
     {
-        if (m_elapsed < m_metadata.Duration.asMilliseconds())
+        if (m_elapsed < m_metadata.Durations[m_difficulty].asMilliseconds())
             m_elapsed += delta;
 
         if (m_wave)

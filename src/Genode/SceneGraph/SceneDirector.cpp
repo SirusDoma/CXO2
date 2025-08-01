@@ -24,11 +24,14 @@ namespace Gx
             m_nextScene = nullptr;
 
             m_currentScene->SetDirector(*this);
-            m_currentScene->SetContext(GetContext().Capture());
-            m_currentScene->Initialize();
+
+            if (!m_currentScene->m_context.has_value())
+                m_currentScene->SetContext(GetContext().Capture());
 
             if (m_initializer)
                 m_initializer();
+            else
+                m_currentScene->Initialize();
 
             m_initializer = nullptr;
             m_staged = true;

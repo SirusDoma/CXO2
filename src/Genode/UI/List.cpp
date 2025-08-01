@@ -179,10 +179,17 @@ namespace Gx
 
             // TODO: Use optional
             const auto& [origin, position, rotation, scale] = m_layouts[GetChildrenCount() - 1];
-            node.SetOrigin(origin);
+
+            if (origin != sf::Vector2f())
+                node.SetOrigin(origin);
+
+            if (rotation != 0)
+                node.SetRotation(rotation);
+
+            if (scale != sf::Vector2f{1.f, 1.f})
+                node.SetScale(scale);
+
             node.SetPosition(position);
-            node.SetRotation(rotation);
-            node.SetScale(scale);
         }
 
         UiContainer::OnChildAdded(node);
@@ -196,6 +203,9 @@ namespace Gx
             const auto children = GetChildren();
             for (std::size_t i = 0; i < children.size(); i++)
             {
+                if (i >= m_layouts.size())
+                    break;
+
                 const auto& [origin, position, rotation, scale] = m_layouts[i];
                 children[i]->SetOrigin(origin);
                 children[i]->SetPosition(position);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <Genode/SceneGraph/Node.hpp>
 #include <Genode/SceneGraph/RenderableContainer.hpp>
 #include <Genode/SceneGraph/UpdatableContainer.hpp>
@@ -45,7 +46,7 @@ namespace Gx
         template<typename T>
         T& Require();
 
-        void QueueEvent(const std::function<void()>& evt);
+        void Invoke(const std::function<void()>& evt);
 
     protected:
         Scene();
@@ -77,6 +78,7 @@ namespace Gx
         std::vector<Presentable*> m_presentables;
 
         std::optional<sf::Event> m_lastInput{};
+        std::mutex m_mutex;
         std::queue<std::function<void()>> m_events{};
 
         bool m_initialized{};

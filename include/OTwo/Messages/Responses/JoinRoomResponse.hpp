@@ -1,0 +1,74 @@
+#pragma once
+
+#include <OTwo/Models/Room.hpp>
+#include <OTwo/Network/Packet.hpp>
+#include <OTwo/Messages/Commands.hpp>
+#include <OTwo/Messages/MapInfo.hpp>
+#include <OTwo/Messages/RoomInfo.hpp>
+
+enum class JoinResult : std::uint32_t
+{
+    Success         = 0x00000000, // 0
+    ConnectionError = 0xFFFFFFFF, // -1
+    InvalidMode     = 0xFFFFFFFE, // -2
+    InvalidPassword = 0xFFFFFFFD, // -3
+    InProgress      = 0xFFFFFFFB, // -5
+    Full            = 0xFFFFFFFA  // -6 (or -4 / 0xFFFFFFFC)
+};
+
+
+struct JoinRoomResponse
+{
+    static constexpr Command Command = ResponseCommand::JoinRoom;
+
+    struct MemberInfo
+    {
+        std::string Name{};
+        int         Level{};
+        Gender      Gender{};
+        bool        IsRoomMaster{};
+        RoomTeam    Team{};
+        bool        Ready{};
+
+        CollectionEnvelope<std::unordered_set<std::uint32_t>> EquippedItemIDs{12, 12};
+        CollectionEnvelope<std::unordered_set<std::uint32_t>, std::uint32_t> MusicIDs{};
+    };
+
+    struct SlotInfo
+    {
+        std::uint8_t  Index{};
+        RoomSlotState State{};
+        MemberInfo    Member{};
+    };
+
+    JoinResult    Result{};
+    std::uint8_t  SlotID{};
+    RoomTeam      Team{};
+    std::string   Title{};
+    std::uint32_t MusicID{};
+    MapInfo       Map{};
+    GameMode      Mode{};
+    Difficulty    Difficulty{};
+    std::uint8_t  SpeedID{};
+    std::uint32_t UserCount{};
+
+    CollectionEnvelope<std::vector<SlotInfo>> Slots{8, 8};
+};
+
+inline Packet& operator<<(Packet& packet, const JoinRoomResponse::SlotInfo& slot)
+{
+    packet << slot.Index << slot.State;
+    if (slot.State == RoomSlotState::Occupied)
+        packet << slot.Member;
+
+    return packet;
+}
+
+inline Packet& operator>>(Packet& packet, JoinRoomResponse::SlotInfo& slot)
+{
+    packet >> slot.Index >> slot.State;
+    if (slot.State == RoomSlotState::Occupied)
+        packet >> slot.Member;
+
+    return packet;
+}

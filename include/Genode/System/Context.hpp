@@ -42,6 +42,10 @@ namespace Gx
         template<typename T>
         void Provide(Scope scope = Scope::Local);
 
+        template<typename T, typename U>
+        std::enable_if_t<std::is_base_of_v<T, U>>
+        Provide(Scope scope = Scope::Local);
+
         template<typename T>
         void Provide(Builder<T> builder, Scope scope = Scope::Local);
 
@@ -49,10 +53,12 @@ namespace Gx
         Builder<T> As() const;
 
         template<typename T>
-        std::enable_if_t<!std::is_pointer_v<T>, T&> Require() const;
+        std::enable_if_t<!std::is_pointer_v<T>, T&>
+        Require() const;
 
         template<typename T>
-        std::enable_if_t<std::is_pointer_v<T>, T> Require() const;
+        std::enable_if_t<std::is_pointer_v<T>, T>
+        Require() const;
 
         template<typename T>
         std::unique_ptr<T> Create() const;
@@ -71,10 +77,7 @@ namespace Gx
         Context(const Context& other)
         {
             for (auto& [type, factory] : other.m_factories)
-            {
-                if (factory->Scope == Scope::Shared)
-                    m_factories[type] = std::shared_ptr(factory);
-            }
+                m_factories[type] = std::shared_ptr(factory);
 
             for (auto& [type, instance] : other.m_instances)
             {
@@ -120,8 +123,8 @@ namespace Gx
         template <typename Tuple>
         auto BuildParameters() const;
 
-        mutable ScoppableMap m_factories;
-        mutable ScoppableMap m_instances;
+        mutable ScoppableMap m_factories{};
+        mutable ScoppableMap m_instances{};
     };
 }
 

@@ -3,9 +3,6 @@
 
 #include <OTwo/StringTable/Identifiers/Planet.hpp>
 
-#include <cmath>
-#include <iostream>
-
 using namespace StringTable::Identifiers;
 
 ChannelButton::ChannelButton() :
@@ -90,7 +87,7 @@ void ChannelButton::SetChannelPopulation(const unsigned int population, const un
         child->SetVisible(population > i * partition);
     }
 
-    m_populationCounter->SetVisible(!m_fullIndicator->IsVisible());
+    m_populationCounter->SetVisible(m_population < maxPopulation);
 }
 
 MusicHall ChannelButton::GetPlanet() const

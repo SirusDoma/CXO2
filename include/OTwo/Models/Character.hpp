@@ -1,9 +1,66 @@
 #pragma once
 
-enum class Gender
+#include <SFML/System/String.hpp>
+
+#include <cstdint>
+#include <unordered_set>
+
+enum class Gender : std::uint8_t
 {
-    Any,
+    Female,
     Male,
-    Female
+    Any
 };
 
+enum class Role : std::uint8_t
+{
+    Normal        = 0,
+    Administrator = 1
+};
+
+struct CharacterInfo
+{
+    struct ItemInfo
+    {
+        ItemInfo() = default;
+
+        // ReSharper disable once CppNonExplicitConvertingConstructor
+        ItemInfo(const std::uint32_t id) : ID(id) {}
+
+        std::uint32_t ID{};
+        std::uint32_t Quantity{1};
+
+        // ReSharper disable once CppNonExplicitConversionOperator
+        operator std::uint32_t() const { return ID;}
+    };
+
+    struct RankStatsInfo
+    {
+        std::int32_t Rank{};
+        std::int32_t Wins{};
+        std::int32_t Loses{};
+        std::int32_t Draws{};
+    };
+
+    struct WalletInfo
+    {
+        std::uint32_t Gem{};
+        std::uint32_t Cash{}; // a.k.a point a.k.a ePoint a.k.a eP
+    };
+
+    using EquipmentSet = std::unordered_set<std::uint32_t>;
+    using MusicList    = std::unordered_set<std::uint32_t>;
+    using ItemList     = std::vector<ItemInfo>;
+
+    sf::String    Name;
+    ::Gender      Gender;
+    ::Role        Role;
+    std::int32_t  Level;
+    std::int32_t  Experience;
+    RankStatsInfo RankStats;
+    WalletInfo    Wallet;
+
+    EquipmentSet EquippedItemIDs;
+    ItemList     Inventory;
+    MusicList    MusicIDs;
+};

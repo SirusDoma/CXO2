@@ -1,24 +1,29 @@
 #pragma once
 
+#include <OTwo/Models/Character.hpp>
 #include <Genode/UI/UiContainer.hpp>
-
-#include <OTwo/Models/Room.hpp>
 
 #include <vector>
 
+class RoomService;
 class UserList : public Gx::UiContainer
 {
 public:
-    UserList();
+    explicit UserList(RoomService& service);
     void Initialize() override;
 
-    void AddUser(const Player& user);
+    void AddUser(const CharacterInfo& user);
     void Clear();
 
-private:
     void Invalidate() override;
-    std::vector<Player> m_users;
 
-    unsigned int m_selectedUser;
+private:
+    void OnRefreshButtonClicked();
+
+    bool m_refreshing{false};
+
+    RoomService& m_service;
+    std::vector<CharacterInfo> m_users;
+    std::string m_selectedUser;
     unsigned int m_page = 1;
 };

@@ -161,7 +161,7 @@ Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata&
     gauge->SetName(metadata->Name);
     gauge->SetOrientation(metadata->Orientation);
     gauge->SetMaximumValue(metadata->Maximum);
-    gauge->SetValue(metadata->Maximum / 2);
+    gauge->SetValue(0);
     gauge->SetColor(metadata->Color);
     gauge->SetOrigin(metadata->Origin);
     gauge->SetScale(metadata->Scale);

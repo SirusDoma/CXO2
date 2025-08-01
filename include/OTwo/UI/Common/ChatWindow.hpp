@@ -1,23 +1,22 @@
 #pragma once
 
+#include <OTwo/Models/Messaging.hpp>
+
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/ScrollBar.hpp>
 
-#include <OTwo/Models/Room.hpp>
-
 #include <vector>
 #include <memory>
 
+class SessionContext;
 class ChatWindow : public Gx::List
 {
 public:
-    ChatWindow();
-    ChatWindow(ChatWindow &&other) noexcept;
-    ChatWindow(const Gx::Font& font, const sf::FloatRect& localBounds, unsigned int characterSize = 13);
-    ChatWindow(Gx::Font&& font, const sf::FloatRect& localBounds, unsigned int characterSize = 13) = delete;
+    explicit ChatWindow(SessionContext& session);
 
+    sf::FloatRect GetGlobalBounds() const override;
     sf::FloatRect GetLocalBounds() const override;
     void SetLocalBounds(const sf::FloatRect& bounds) override;
 
@@ -35,9 +34,10 @@ public:
     void SetScrollBar(Gx::ScrollBar& scrollBar);
     void SetScrollOffset(unsigned int offset);
     void SetMaximumChatLength(unsigned int maxLength);
-    void SetLineSpacing(const float lineSpacing);
+    void SetLineSpacing(float lineSpacing);
 
-    void PushMessage(const Player& player, const sf::String& chat);
+    void PushMessage(const CharacterInfo& sender, const sf::String& chat);
+    void PushWhisper(const CharacterInfo& sender, const CharacterInfo& recepient, const sf::String& chat);
     void PushSystemMessage(const sf::String& chat);
 
 private:
@@ -55,4 +55,6 @@ private:
 
     std::vector<ChatMessage> m_chats;
     std::vector<std::unique_ptr<Gx::Label>> m_labels;
+
+    SessionContext& m_session;
 };

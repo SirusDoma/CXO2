@@ -5,6 +5,7 @@
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <SFML/Audio/Sound.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include <memory>
 
@@ -50,12 +51,16 @@ public:
     Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local);
     bool OnAppClose() override;
 
+    void ShowDialog(const sf::String& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+    void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+
+    static void Announce(const std::string& content);
+
 protected:
     void Initialize() override;
     void Finalize() override;
 
-    void ShowDialog(const sf::String& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
-    void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+    Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
@@ -65,9 +70,10 @@ private:
     std::unique_ptr<Gx::ResourceManager> m_resources;
     std::unique_ptr<Gx::ResourceManager> m_tempResources;
 
-    inline static Gx::Dialog* m_dialogInfo, *m_dialog1, *m_dialog2, *m_exitDialog;
+    inline static Gx::Dialog* m_dialogInfo, *m_dialog1, *m_dialog2, *m_dialogNotice, *m_exitDialog;
     inline static sf::Sound* m_popupSound, *m_cancelSound;
     inline static bool m_prompted = false;
+    inline static sf::Clock m_noticeTimer{};
 };
 
 #include <OTwo/States/State.inl>

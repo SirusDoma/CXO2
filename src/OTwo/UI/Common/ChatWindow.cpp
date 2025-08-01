@@ -1,10 +1,12 @@
 #include <OTwo/UI/Common/ChatWindow.hpp>
+#include <OTwo/Models/Messaging.hpp>
+#include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Utilities/StringFormatter.hpp>
 
 #include <fmt/format.h>
 #include <utility>
 
-ChatWindow::ChatWindow() :
+ChatWindow::ChatWindow(SessionContext& session) :
     m_font(),
     m_textColor(sf::Color::White),
     m_scroll(),
@@ -12,34 +14,15 @@ ChatWindow::ChatWindow() :
     m_offset(),
     m_maxChatLength(0),
     m_characterSize(13),
-    m_lineSpacing(0)
+    m_lineSpacing(0),
+    m_chats(),
+    m_session(session)
 {
 }
 
-ChatWindow::ChatWindow(ChatWindow &&other) noexcept :
-    m_font(other.m_font),
-    m_textColor(other.m_textColor),
-    m_scroll(other.m_scroll),
-    m_bounds(other.m_bounds),
-    m_offset(other.m_offset),
-    m_maxChatLength(other.m_maxChatLength),
-    m_characterSize(other.m_characterSize),
-    m_lineSpacing(other.m_lineSpacing),
-    m_chats(other.m_chats),
-    m_labels(std::move(other.m_labels))
+sf::FloatRect ChatWindow::GetGlobalBounds() const
 {
-}
-
-
-ChatWindow::ChatWindow(const Gx::Font& font, const sf::FloatRect& localBounds, const unsigned int characterSize) :
-    m_font(&font),
-    m_textColor(sf::Color::White),
-    m_scroll(),
-    m_bounds(localBounds),
-    m_offset(), m_maxChatLength(0),
-    m_characterSize(characterSize),
-    m_lineSpacing(0)
-{
+    return Control::GetGlobalBounds();
 }
 
 sf::FloatRect ChatWindow::GetLocalBounds() const
@@ -149,11 +132,19 @@ void ChatWindow::SetLineSpacing(const float lineSpacing)
     }
 }
 
-void ChatWindow::PushMessage(const Player& player, const sf::String& chat)
+void ChatWindow::PushMessage(const CharacterInfo& sender, const sf::String& chat)
 {
-    const auto chatData = ChatMessage{ player, chat };
-    // Do something if player is self
+    const auto chatData = ChatMessage{ sender, chat };
+    if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
+        m_offset++;
 
+    m_chats.push_back(chatData);
+    Invalidate();
+}
+
+void ChatWindow::PushWhisper(const CharacterInfo& sender, const CharacterInfo& recepient, const sf::String& chat)
+{
+    const auto chatData = ChatMessage{ sender, chat, recepient };
     if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
         m_offset++;
 
@@ -163,7 +154,7 @@ void ChatWindow::PushMessage(const Player& player, const sf::String& chat)
 
 void ChatWindow::PushSystemMessage(const sf::String& chat)
 {
-    PushMessage(Player{0}, chat);
+    PushMessage(CharacterInfo{}, chat);
 }
 
 Gx::RenderStates ChatWindow::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
@@ -244,7 +235,14 @@ void ChatWindow::Invalidate()
 
         if (m_textColor == sf::Color::White)
         {
-            if (chat.Sender.Role == Role::Administrator || chat.Sender.ID == 0)
+            if (!chat.Recipient.Name.isEmpty())
+            {
+                if (chat.Sender.Name == m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
+                    m_labels[index]->SetColor(sf::Color(225, 230, 10));
+                else
+                    m_labels[index]->SetColor(sf::Color(0, 160, 180));
+            }
+            else if (chat.Sender.Role == Role::Administrator || chat.Sender.Name.isEmpty())
                 m_labels[index]->SetColor(sf::Color(200, 155, 55));
             else
                 m_labels[index]->SetColor(sf::Color::White);
@@ -259,17 +257,27 @@ void ChatWindow::Invalidate()
             m_labels[index]->SetOutlineThickness(0.f);
 
         }
-        if (chat.Sender.ID != 0)
+
+        auto padSenderName = [] (sf::String& nickname)
         {
-            auto nickname = chat.Sender.Name;
             if (constexpr size_t nickLength = 16; nickname.getSize() < nickLength)
             {
                 for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
                     nickname = fmt::format(L" {}", nickname);
             }
 
-            m_labels[index]->SetString(fmt::format(L"[{}] {}", nickname, chat.Content));
+            return nickname;
+        };
+
+        if (!chat.Sender.Name.isEmpty() && !chat.Recipient.Name.isEmpty())
+        {
+            if (chat.Sender.Name == m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
+                m_labels[index]->SetString(fmt::format(L"[{}] >> {}", padSenderName(chat.Recipient.Name), chat.Content));
+            else
+                m_labels[index]->SetString(fmt::format(L"[{}] << {}", padSenderName(chat.Recipient.Name), chat.Content));
         }
+        else if (!chat.Sender.Name.isEmpty())
+            m_labels[index]->SetString(fmt::format(L"[{}] {}", padSenderName(chat.Sender.Name), chat.Content));
         else
             m_labels[index]->SetString(chat.Content);
     }

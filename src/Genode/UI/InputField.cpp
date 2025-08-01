@@ -4,6 +4,63 @@
 
 #include <SFML/Window/Clipboard.hpp>
 
+namespace
+{
+    bool IsSeparator(const std::uint32_t ch)
+    {
+        if (ch == U' ' || ch == U'\t')
+            return true;
+
+        static constexpr std::u32string_view separators = U".,;:!?()[]{}/\\-_@#%&*";
+        return separators.find(static_cast<char32_t>(ch)) != std::u32string_view::npos;
+    }
+
+    size_t FindWordStart(const sf::String& str, const size_t from)
+    {
+        size_t left = from;
+        while (left > 0)
+        {
+            const auto ch = str[left - 1];
+            if (IsSeparator(ch))
+                left--;
+            else
+                break;
+        }
+        while (left > 0)
+        {
+            const auto ch = str[left - 1];
+            if (!IsSeparator(ch))
+                left--;
+            else
+                break;
+        }
+        return left;
+    }
+
+    size_t FindWordEnd(const sf::String& str, const size_t from)
+    {
+        size_t right = from;
+        const size_t size = str.getSize();
+        while (right < size)
+        {
+            const auto ch = str[right];
+            if (IsSeparator(ch))
+                right++;
+            else
+                break;
+        }
+        while (right < size)
+        {
+            const auto ch = str[right];
+            if (!IsSeparator(ch))
+                right++;
+            else
+                break;
+        }
+        return right;
+    }
+}
+
 namespace Gx
 {
     InputField::InputField() :
@@ -248,9 +305,12 @@ namespace Gx
 
     size_t InputField::Insert(size_t index, const std::uint32_t unicode, const int selectionLength)
     {
-        // backspace, tab, enter, etc
-        if (unicode <= 31)
+
+        if (unicode <= 31 || // backspace, tab, enter, etc
+            unicode == 127)  // ctrl+backspace
+        {
             return index;
+        }
 
         // Max length validation
         if (m_maxLength > 0 && selectionLength == 0 && m_text.GetString().getSize() >= m_maxLength)
@@ -435,8 +495,21 @@ namespace Gx
             if (m_caret.Index == 0 && m_caret.SelectionLength == 0)
                 return;
 
-            const int length    = m_caret.SelectionLength;
-            m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, length == 0 ? -1 : length));
+            int eraseLength = m_caret.SelectionLength == 0 ? -1 :  m_caret.SelectionLength;
+            if (m_caret.SelectionLength == 0 && control)
+            {
+                if (!ev.shift)
+                {
+                    const size_t left = FindWordStart(m_text.GetString(), static_cast<size_t>(m_caret.Index));
+                    eraseLength = -static_cast<int>(static_cast<size_t>(m_caret.Index) - left);
+                }
+                else
+                {
+                    eraseLength = -static_cast<int>(static_cast<size_t>(m_caret.Index));
+                }
+            }
+
+            m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, eraseLength));
             m_caret.SelectionLength = 0;
         }
         else if (ev.code == sf::Keyboard::Key::Delete)
@@ -444,11 +517,36 @@ namespace Gx
             if (m_caret.Index >= m_text.GetString().getSize())
                 return;
 
-            auto str = m_text.GetString();
-            str.erase(m_caret.Index);
+            if (control && ev.shift)
+            {
+                const size_t from = static_cast<size_t>(m_caret.Index);
+                const size_t end  = m_text.GetString().getSize();
+                const int delta   = static_cast<int>(end - from);
+                if (delta <= 0)
+                    return;
 
-            m_text.SetString(str);
-            m_caret.SelectionLength = 0;
+                m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, delta));
+                m_caret.SelectionLength = 0;
+            }
+            else if (control)
+            {
+                const size_t from = static_cast<size_t>(m_caret.Index);
+                const size_t right = FindWordEnd(m_text.GetString(), from);
+                const int delta = static_cast<int>(right - from);
+                if (delta <= 0)
+                    return;
+
+                m_caret.Index = static_cast<int>(Erase(m_caret.Index - 1, delta));
+                m_caret.SelectionLength = 0;
+            }
+            else
+            {
+                auto str = m_text.GetString();
+                str.erase(m_caret.Index);
+
+                m_text.SetString(str);
+                m_caret.SelectionLength = 0;
+            }
         }
         else if (ev.code == sf::Keyboard::Key::Enter)
         {
@@ -464,7 +562,37 @@ namespace Gx
         {
             if (ev.shift)
             {
-                if (ev.code == sf::Keyboard::Key::Left)
+                if (control && ev.code == sf::Keyboard::Key::Left)
+                {
+                    if (m_caret.Index <= 0)
+                        return;
+
+                    const size_t from = static_cast<size_t>(m_caret.Index);
+                    const size_t left = FindWordStart(m_text.GetString(), from);
+                    const int delta = static_cast<int>(from - left);
+
+                    if (delta <= 0)
+                        return;
+
+                    m_caret.Index -= delta;
+                    m_caret.SelectionLength += delta;
+                }
+                else if (control && ev.code == sf::Keyboard::Key::Right)
+                {
+                    if (m_caret.Index >= m_text.GetString().getSize())
+                        return;
+
+                    const size_t from = static_cast<size_t>(m_caret.Index);
+                    const size_t right = FindWordEnd(m_text.GetString(), from);
+                    const int delta = static_cast<int>(right - from);
+
+                    if (delta <= 0)
+                        return;
+
+                    m_caret.Index += delta;
+                    m_caret.SelectionLength -= delta;
+                }
+                else if (ev.code == sf::Keyboard::Key::Left)
                 {
                     if (m_caret.Index <= 0)
                         return;
@@ -499,6 +627,24 @@ namespace Gx
                     auto string = sf::String::fromUtf8(input.begin(), input.end());
                     for (size_t index = 0; index < string.getSize(); index++)
                         m_caret.Index = static_cast<int>(Insert(m_caret.Index, string[index]));
+                }
+                else if (ev.code == sf::Keyboard::Key::A)
+                {
+                    SelectAll();
+                }
+                else if (!ev.shift && ev.code == sf::Keyboard::Key::Left)
+                {
+                    const size_t left = FindWordStart(m_text.GetString(), static_cast<size_t>(m_caret.Index));
+                    
+                    m_caret.Index = static_cast<int>(left);
+                    m_caret.SelectionLength = 0;
+                }
+                else if (!ev.shift && ev.code == sf::Keyboard::Key::Right)
+                {
+                    const size_t right = FindWordEnd(m_text.GetString(), static_cast<size_t>(m_caret.Index));
+
+                    m_caret.Index = static_cast<int>(right);
+                    m_caret.SelectionLength = 0;
                 }
             }
         }

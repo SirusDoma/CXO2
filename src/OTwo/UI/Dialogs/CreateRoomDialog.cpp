@@ -2,6 +2,8 @@
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/States/State.hpp>
 
+#include <OTwo/Models/Game.hpp>
+
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/Room.hpp>
 #include <OTwo/Utilities/StringFormatter.hpp>
@@ -157,7 +159,7 @@ void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext
 
     const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
-    titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetCurrentPlayer().Name));
+    titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetCharacterInfo().Name));
     titleInput->SelectAll();
     passwordInput->SetString("");
 

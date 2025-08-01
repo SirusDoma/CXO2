@@ -21,8 +21,12 @@ public:
 
     void Initialize() override;
 
-    void Add(const Room& room);
+    void Upsert(const RoomInfo& room);
+    RoomInfo& GetRoom(std::uint32_t id);
+    void Remove(std::uint32_t id);
     void Clear();
+
+    const RoomInfo* GetWaitingRoom();
 
     void ShowAll();
     void ShowWaitingOnly();
@@ -30,15 +34,17 @@ public:
     void NextPage();
     void PreviousPage();
 
-private:
-    constexpr static unsigned int MAX_NUMBER_OF_ROOM = 100;
+    void SetEnterRoomCallback(std::function<void(const RoomInfo&)> callback) const;
 
     void Invalidate() override;
+
+private:
+    constexpr static unsigned int MAX_NUMBER_OF_ROOM = 100;
 
     Gx::AudioMixer& m_mixer;
     Gx::ResourceManager& m_resources;
 
-    std::map<unsigned int, Room> m_rooms;
+    std::map<unsigned int, RoomInfo> m_rooms;
     unsigned int m_page;
     bool m_waiting;
 };

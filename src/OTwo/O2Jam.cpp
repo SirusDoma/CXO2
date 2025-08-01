@@ -1,4 +1,5 @@
 ﻿#include <OTwo/O2Jam.hpp>
+
 #include <Genode.hpp>
 
 #include <OTwo/Archives/OpiArchive.hpp>
@@ -46,8 +47,8 @@
 #include <OTwo/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 #include <OTwo/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 
-#include <OTwo/IO/Loaders/Chart/ChartMetadataLoader.hpp>
-#include <OTwo/IO/Loaders/Chart/ChartLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
 
@@ -67,6 +68,19 @@
 #include <OTwo/UI/Playing/Equalizer.hpp>
 
 #include <OTwo/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
+
+#include <OTwo/Network/NetworkAdapter.hpp>
+#include <OTwo/Services/NetworkService.hpp>
+#include <OTwo/Services/AuthService.hpp>
+#include <OTwo/Services/PlanetService.hpp>
+#include <OTwo/Services/CharacterService.hpp>
+#include <OTwo/Services/MessagingService.hpp>
+#include <OTwo/Services/RoomService.hpp>
+#include <OTwo/Services/ItemShopService.hpp>
+#include <OTwo/Services/WaitingService.hpp>
+#include <OTwo/Services/PlayingService.hpp>
+
+#include <OTwo/Contexts/CommandLineContext.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
 #include <OTwo/Contexts/CartContext.hpp>
 
@@ -97,28 +111,28 @@ O2Jam::O2Jam(std::string title, const sf::VideoMode& mode, const sf::View& view,
 {
 }
 
-bool O2Jam::InCompatibilityMode()
+bool O2Jam::InInteropMode()
 {
-    return InCompatibilityMode(
-        CompatibilityMode::Interface |
-        CompatibilityMode::Playing |
-        CompatibilityMode::Avatar
+    return InInteropMode(
+        InteropMode::Interface |
+        InteropMode::Playing |
+        InteropMode::Avatar
     );
 }
 
-bool O2Jam::InCompatibilityMode(CompatibilityMode modes)
+bool O2Jam::InInteropMode(const InteropMode modes)
 {
     static bool image   = Gx::FileSystem::Contains("ControlList_Interface.txt");
     static bool playing = Gx::FileSystem::Contains("ControlList_Playing.txt");
     static bool avatar  = Gx::FileSystem::Scan("Itemdata*.dat").size() > 0;
 
-    if (modes & CompatibilityMode::Interface && !image)
+    if (modes & InteropMode::Interface && !image)
         return false;
 
-    if (modes & CompatibilityMode::Playing && !playing)
+    if (modes & InteropMode::Playing && !playing)
         return false;
 
-    if (modes & CompatibilityMode::Avatar && !avatar)
+    if (modes & InteropMode::Avatar && !avatar)
         return false;
 
     return true;
@@ -130,6 +144,100 @@ void O2Jam::Boot()
     const auto& window = GetMainWindow();
     if (GetWindowState() == sf::State::Fullscreen)
         Gx::Application::SetView(GetLetterBoxView(window.getView(), window.getSize()));
+
+    // Initialize singleton providers
+    auto& context = GetContext();
+    context.Provide<NetworkAdapter>([](auto&)
+    {
+        auto adapter = std::make_unique<NetworkAdapter>();
+        adapter->UsePrefixSizeType<std::uint16_t>();
+
+        return adapter;
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<GameConfig>([](auto&)
+    {
+        auto config = std::make_unique<GameConfig>();
+        config->Load();
+
+        return config;
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<Gx::FontManager>([] (auto&)
+    {
+        return std::make_unique<Gx::FontManager>();
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<Gx::ResourceManager>([](auto&)
+    {
+        // Register shared resource container
+        auto resources = std::make_unique<Gx::ResourceManager>();
+        resources->Register<Item>();
+        resources->Register<ItemData>();
+
+        return resources;
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<Gx::AudioMixer>([](auto& ctx)
+    {
+        auto mixer = std::make_unique<Gx::AudioMixer>();
+        auto& cfg  = ctx.template Require<GameConfig>();
+
+        mixer->GetSoundGroup(Sound::Channel::BGM).SetVolume(cfg.MusicVolume);
+        mixer->GetSoundGroup(Sound::Channel::SFX).SetVolume(cfg.EffectVolume);
+
+        return mixer;
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<SessionContext>([&](auto& ctx)
+    {
+        // auto charInfo            = CharacterInfo();
+        // charInfo.Name            = "Player";
+        // charInfo.Level           = -1;
+        // charInfo.Experience      = 11200;
+        // charInfo.RankStats.Rank  = 7;
+        // charInfo.RankStats.Wins  = 100;
+        // charInfo.RankStats.Draws = 10;
+        // charInfo.RankStats.Loses = 5;
+        // charInfo.Gender          = Gender::Male;
+        // charInfo.Wallet.Cash     = 15000;
+
+        const auto& cmd   = ctx.template Require<CommandLineContext>();
+        std::string token = cmd.GetAuthToken();
+
+        auto session = std::make_unique<SessionContext>(token);
+        // session->SetCharacterInfo(charInfo);
+        // session->Load();
+
+        return session;
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<CartContext>([&] (auto&)
+    {
+        return std::make_unique<CartContext>();
+    }, Gx::Context::Scope::Shared);
+
+    context.Provide<ScoreTracker>([] (auto&)
+    {
+        return std::make_unique<ScoreTracker>();
+    }, Gx::Context::Scope::Shared);
+
+    // Initialize local providers
+    context.Provide<JudgementStrategy>([] (auto&)
+    {
+        return std::make_unique<RenderPositionJudgementStrategy>();
+    });
+
+    // Register services
+    context.Provide<AuthService, AuthOnlineService>();
+    context.Provide<PlanetService, PlanetOnlineService>();
+    context.Provide<CharacterService, CharacterOnlineService>();
+    context.Provide<MessagingService, MessagingOnlineService>();
+    context.Provide<ItemShopService, ItemShopOnlineService>();
+    context.Provide<RoomService, RoomOnlineService>();
+    context.Provide<WaitingService, WaitingOnlineService>();
+    context.Provide<PlayingService, PlayingOnlineService>();
+    context.Provide<NetworkService, OnlineNetworkService>();
 
     // Asset Path
     Gx::LocalFileSystem::AddAssetPath("./assets");
@@ -190,8 +298,8 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, CreateRoomDialog>();
     Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, SelectMusicDialog>();
     // O2Jam Core Resources
-    Gx::ResourceLoaderFactory::Register<ChartMetadata, ChartMetadataLoader>();
-    Gx::ResourceLoaderFactory::Register<Chart, ChartLoader>();
+    Gx::ResourceLoaderFactory::Register<O2JamChartMetadata, O2JamChartMetadataLoader>();
+    Gx::ResourceLoaderFactory::Register<Chart, O2JamChartLoader>();
     // SceneGraph
     Gx::ResourceLoaderFactory::Register<State, StateLoader>();
     Gx::ResourceLoaderFactory::Reuse<State, StateAvi>();
@@ -207,74 +315,6 @@ void O2Jam::Boot()
     Gx::ResourceLoaderFactory::Reuse<State, StateResult>();
     Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
 
-    // Initialize singleton providers
-    auto& context = GetContext();
-    context.Provide<GameConfig>([] (auto& ctx)
-    {
-        auto config = std::make_unique<GameConfig>();
-        config->Load();
-
-        return config;
-    }, Gx::Context::Scope::Shared);
-
-    context.Provide<Gx::ResourceManager>([](auto& ctx)
-    {
-        // Register shared resource container
-        auto resources = std::make_unique<Gx::ResourceManager>();
-        resources->Register<Item>();
-        resources->Register<ItemData>();
-
-        return resources;
-    }, Gx::Context::Scope::Shared);
-
-    context.Provide<Gx::AudioMixer>([](auto& ctx)
-    {
-        auto mixer = std::make_unique<Gx::AudioMixer>();
-        auto& cfg  = ctx.template Require<GameConfig>();
-
-        mixer->GetSoundGroup(Sound::Channel::BGM).SetVolume(cfg.MusicVolume);
-        mixer->GetSoundGroup(Sound::Channel::SFX).SetVolume(cfg.EffectVolume);
-
-        return mixer;
-    }, Gx::Context::Scope::Shared);
-
-    context.Provide<SessionContext>([&](auto& ctx)
-    {
-        auto player    = Player();
-        player.ID      = 1;
-        player.Name    = "Player";
-        player.Level   = -1;
-        player.Rank    = 7;
-        player.Exp     = 11200;
-        player.NextExp = 345500;
-        player.Wins    = 100;
-        player.Draws   = 10;
-        player.Loses   = 5;
-        player.Gender  = Gender::Male;
-        player.Cash    = 15000;
-
-        auto session  = std::make_unique<SessionContext>(player);
-        session->Load();
-
-        return session;
-    }, Gx::Context::Scope::Shared);
-
-    context.Provide<CartContext>([&] (auto& ctx)
-    {
-        return std::make_unique<CartContext>();
-    }, Gx::Context::Scope::Shared);
-
-    context.Provide<ScoreTracker>([] (auto& ctx)
-    {
-        return std::make_unique<ScoreTracker>();
-    }, Gx::Context::Scope::Shared);
-
-    // Initialize local providers
-    context.Provide<JudgementStrategy>([] (auto& ctx)
-    {
-        return std::make_unique<RenderPositionJudgementStrategy>();
-    });
-
     // Load global interface assets
     auto& resources = context.Require<Gx::ResourceManager>();
     auto& image     = resources.Create<OpiArchive>("Interface");
@@ -282,7 +322,14 @@ void O2Jam::Boot()
     auto& avatar    = resources.Create<OpiArchive>("Avatar");
     auto& embedded  = resources.Create<EmbeddedArchive>("Internal");
 
-    // Embbeded resources
+    // Reroute font to embedded resource
+    auto& fontManager = context.Require<Gx::FontManager>();
+    if (auto data = fontManager.GetData("Arial"))
+        embedded.WriteFile("Interface/Common/Font.ttf", data->first, data->second);
+    else if (auto defaultData = fontManager.GetDefaultData())
+        embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
+
+    // Embedded resources
     for (const auto& [name, resource] : OTwo::Resources)
         embedded.WriteFile(std::string(name), resource.data, resource.size);
 
@@ -302,6 +349,7 @@ void O2Jam::Boot()
         if (playing.LoadFromFile(name))
         {
             Gx::FileSystem::Mount(playing);
+            break;
         }
     }
 
@@ -331,7 +379,7 @@ void O2Jam::Boot()
         Gx::FileSystem::Mount(npc);
 
     // Cache item textures
-    if (InCompatibilityMode(CompatibilityMode::Avatar))
+    if (InInteropMode(InteropMode::Avatar))
     {
         auto cache = TextureCacheBuilder(image, resources);
         cache.BuildCache();
@@ -378,7 +426,7 @@ void O2Jam::Boot()
     }
 
     auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
-    if (InCompatibilityMode(CompatibilityMode::Interface))
+    if (InInteropMode(InteropMode::Interface))
     {
         // Cache textures
         auto cache = TextureCacheBuilder(image, resources);
@@ -423,7 +471,7 @@ void O2Jam::Boot()
         director.Register<StatePlaying7K>("Playing/State/Playing7K.json");
     }
 
-    if (InCompatibilityMode(CompatibilityMode::Interface) && InCompatibilityMode(CompatibilityMode::Playing))
+    if (InInteropMode(InteropMode::Interface) && InInteropMode(InteropMode::Playing))
     {
         director.Register<StateResult>("ControlList/State/Result.json");
     }
@@ -522,6 +570,8 @@ void O2Jam::Update(const double delta)
     {
         m_windowStateSwitched = true;
         SetWindowState(GetWindowState() == sf::State::Fullscreen ? sf::State::Windowed : sf::State::Fullscreen);
+        if (GetWindowState() == sf::State::Fullscreen)
+            Gx::Application::SetView(GetLetterBoxView(Gx::Application::GetView(), GetMainWindow().getSize()));
     }
     else if (m_windowStateSwitched && !isKeyPressed(sf::Keyboard::Key::Enter))
         m_windowStateSwitched = false;

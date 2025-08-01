@@ -1,10 +1,15 @@
 #pragma once
 
+
 #include <OTwo/Core/Chart.hpp>
+
 #include <OTwo/Models/Game.hpp>
-#include <OTwo/Archives/OjmArchive.hpp>
+
+#include <OTwo/Messages/ScoreEntry.hpp>
 
 #include <OTwo/Config/GameConfig.hpp>
+
+#include <array>
 
 class Chart;
 class GameContext
@@ -35,6 +40,9 @@ public:
     unsigned int GetViewport() const;
     void SetViewport(unsigned int viewport);
 
+    const std::array<ScoreEntry, 8>& GetScoreEntries() const;
+    void SetScoreEntries(const std::array<ScoreEntry, 8>& entries);
+
     void Reset();
 
 private:
@@ -49,4 +57,6 @@ private:
     unsigned int m_viewport;
 
     // TODO: Skill modifiers
+
+    std::array<ScoreEntry, 8> m_scoreEntries;
 };

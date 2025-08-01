@@ -8,7 +8,7 @@ class TextureCacheBuilder
 public:
     TextureCacheBuilder(Gx::Archive& archive, Gx::ResourceManager& resources);
 
-    void BuildCache();
+    void BuildCache() const;
 
 private:
     void BuildInterfaceCache() const;

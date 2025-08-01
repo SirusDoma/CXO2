@@ -12,7 +12,10 @@ namespace StringTable::Identifiers::Resource::Room
     constexpr static auto IDC_ROOM_LIST              = "STATE_ROOM/IDC_ROOM_LIST";
     constexpr static auto IDC_ROOM_BUTTON            = "STATE_ROOM/IDC_ROOM_LIST/IDC_ROOM_BUTTON*";
     constexpr static auto IDC_BUTTON_CREATE_ROOM     = "STATE_ROOM/IDC_BUTTON_CREATE_ROOM";
+    constexpr static auto IDC_BUTTON_QUICK_JOIN      = "STATE_ROOM/IDC_BUTTON_QUICK_JOIN";
+    constexpr static auto IDC_TOOLTIP_QUICK_JOIN     = "STATE_ROOM/IDC_TOOLTIP_QUICK_JOIN";
     constexpr static auto IDC_DIALOG_CREATE_ROOM     = "STATE_ROOM/IDC_DIALOG_CREATE_ROOM";
+    constexpr static auto IDC_DIALOG_PASSWORD        = "STATE_ROOM/IDC_DIALOG_PASSWORD";
     constexpr static auto IDC_BUTTON_SHOW_ALL        = "STATE_ROOM/IDC_BUTTON_SHOW_ALL";
     constexpr static auto IDC_BUTTON_SHOW_WAITING    = "STATE_ROOM/IDC_BUTTON_SHOW_WAITING";
     constexpr static auto IDC_BUTTON_ROOM_LEFT       = "STATE_ROOM/IDC_BUTTON_ROOM_LEFT";
@@ -69,5 +72,10 @@ namespace StringTable::Identifiers::Resource::Room
         constexpr static auto IDC_EDIT_MIN_LEVEL_LIMIT = "STATE_ROOM/IDC_DIALOG_CREATE_ROOM/IDC_EDIT_MIN_LEVEL_LIMIT";
         constexpr static auto IDC_EDIT_MAX_LEVEL_LIMIT = "STATE_ROOM/IDC_DIALOG_CREATE_ROOM/IDC_EDIT_MAX_LEVEL_LIMIT";
         constexpr static auto IDC_TOOLTIP_INFO         = "STATE_ROOM/IDC_DIALOG_CREATE_ROOM/IDC_TOOLTIP_INFO";
+    }
+
+    namespace Password
+    {
+        constexpr static auto IDC_EDIT_PASSWORD = "STATE_ROOM/IDC_DIALOG_PASSWORD/IDC_EDIT_PASSWORD";
     }
 }

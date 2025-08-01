@@ -1,0 +1,145 @@
+#pragma once
+
+#include <unordered_map>
+#include <OTwo/Models/Game.hpp>
+#include <OTwo/Metadata/Chart/ChartMetadata.hpp>
+#include <OTwo/Utilities/StringTranscoder.hpp>
+
+#include <Genode/Utilities/StringHelper.hpp>
+
+#include <SFML/System/Time.hpp>
+
+enum class Genre
+{
+    Ballad      = 0,
+    Rock        = 1,
+    Dance       = 2,
+    Techno      = 3,
+    HipHop      = 4,
+    Soul        = 5,
+    Jazz        = 6,
+    Funk        = 7,
+    Classical   = 8,
+    Traditional = 9,
+    Etc         = 10
+};
+
+struct O2JamChartMetadata
+{
+    static constexpr std::uint32_t Size = 300;
+
+    std::uint32_t ID;
+    char Signature[4];
+    float EncodingVersion;
+    ::Genre Genre;
+    float BPM;
+    std::uint16_t LevelEx;
+    std::uint16_t LevelNx;
+    std::uint16_t LevelHx;
+    std::int16_t  Unk1;
+    std::uint32_t EventCountEx;
+    std::uint32_t EventCountNx;
+    std::uint32_t EventCountHx;
+    std::uint32_t NoteCountEx;
+    std::uint32_t NoteCountNx;
+    std::uint32_t NoteCountHx;
+    std::uint32_t MeasureCountEx;
+    std::uint32_t MeasureCountNx;
+    std::uint32_t MeasureCountHx;
+    std::uint32_t BlockCountEx;
+    std::uint32_t BlockCountNx;
+    std::uint32_t BlockCountHx;
+    std::int16_t  OldEncodingVersion;
+    std::int16_t  OldSongID;
+    char OldGenre[20];
+    std::uint32_t ThumbnailSize;
+    std::uint32_t FileVersion;
+    char Title[64];
+    char Artist[32];
+    char NoteArranger[32];
+    char OJM[32];
+    std::uint32_t CoverSize;
+    std::uint32_t DurationEx;
+    std::uint32_t DurationNx;
+    std::uint32_t DurationHx;
+    std::uint32_t BlockOffsetEx;
+    std::uint32_t BlockOffsetNx;
+    std::uint32_t BlockOffsetHx;
+    std::uint32_t CoverOffset;
+
+    std::string Source;
+
+    unsigned int GetLevel(const Difficulty difficulty) const
+    {
+        switch (difficulty)
+        {
+            case Difficulty::EX: return LevelEx;
+            case Difficulty::NX: return LevelNx;
+            case Difficulty::HX:
+            case Difficulty::MX: return LevelHx;
+        }
+
+        return 0;
+    }
+
+    sf::Time GetDuration(const Difficulty difficulty) const
+    {
+        switch (difficulty)
+        {
+            case Difficulty::EX: return sf::seconds(static_cast<float>(DurationEx));
+            case Difficulty::NX: return sf::seconds(static_cast<float>(DurationNx));
+            case Difficulty::HX:
+            case Difficulty::MX: return sf::seconds(static_cast<float>(DurationHx));
+        }
+
+        return sf::Time::Zero;
+    }
+
+    ChartMetadata ToChartMetadata() const
+    {
+        sf::String genre;
+        switch (Genre)
+        {
+            case Genre::Ballad:      genre = "Ballad";      break;
+            case Genre::Rock:        genre = "Rock";        break;
+            case Genre::Dance:       genre = "Dance";       break;
+            case Genre::Techno:      genre = "Techno";      break;
+            case Genre::HipHop:      genre = "HipHop";      break;
+            case Genre::Soul:        genre = "Soul";        break;
+            case Genre::Jazz:        genre = "Jazz";        break;
+            case Genre::Funk:        genre = "Funk";        break;
+            case Genre::Classical:   genre = "Classical";   break;
+            case Genre::Traditional: genre = "Traditional"; break;
+            default:                 genre = "Etc.";        break;
+        }
+
+        return ChartMetadata{
+            /* .ID           = */ ID,
+            /* .New          = */ false,
+            /* .Title        = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Title[0], 64)),
+            /* .Artist       = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Artist[0], 32)),
+            /* .NoteDesigner = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&NoteArranger[0], 32)),
+            /* .BPM          = */ BPM,
+            /* .Genre        = */ genre,
+            /* .Level        = */ std::unordered_map<Difficulty, unsigned int>
+                                  {
+                                     {Difficulty::EX, LevelEx},
+                                     {Difficulty::NX, LevelNx},
+                                     {Difficulty::HX, LevelHx},
+                                  },
+            /* .NoteCount    = */ std::unordered_map<Difficulty, unsigned int>
+                                  {
+                                     {Difficulty::EX, NoteCountEx},
+                                     {Difficulty::NX, NoteCountNx},
+                                     {Difficulty::HX, NoteCountHx},
+                                  },
+            /* .Duration     = */ std::unordered_map<Difficulty, sf::Time>
+                                  {
+                                     {Difficulty::EX, sf::seconds(static_cast<float>(DurationEx))},
+                                     {Difficulty::NX, sf::seconds(static_cast<float>(DurationNx))},
+                                     {Difficulty::HX, sf::seconds(static_cast<float>(DurationHx))},
+                                  },
+            /* .Source       = */ Source
+        };
+    }
+};

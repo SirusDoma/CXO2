@@ -8,10 +8,12 @@ namespace Gx
     class ResourceManager;
 }
 
+class WaitingService;
+class RoomContext;
 class MapSelector : public Gx::UiContainer
 {
 public:
-    MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId);
+    MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, unsigned int mapId, unsigned int effectId);
 
     void Initialize() override;
 
@@ -23,6 +25,10 @@ public:
 
     void SetMapChangedCallback(const std::function<void(unsigned int)> &callback);
     void SetEffectChangedCallback(const std::function<void(unsigned int)> &callback);
+
+    void SetControlsEnabled(bool enabled) const;
+
+    std::size_t GetMapCount() const;
 
 private:
     Gx::AudioMixer& m_mixer;

@@ -1,0 +1,77 @@
+{
+  "type": "List",
+  "require": {
+    "template": {
+      "name": "IDC_CONTAINER_LOADING_SIGN",
+      "count": 8,
+      "source": {
+        "type": "UiContainer",
+        "attributes": {
+          "objects": {
+            "IDC_TEXT_USER_LEVEL": {
+              "type": "Label",
+              "require": {
+                "font": "Interface/Common/Font.ttf"
+              },
+              "attributes": {
+                "transform": {
+                  "position": {
+                    "x": 0,
+                    "y": 13
+                  }
+                },
+                "fontSize": 11,
+                "outline": {
+                  "thickness": 1,
+                  "color": {
+                    "a": 255,
+                    "r": 25,
+                    "g": 25,
+                    "b": 25
+                  }
+                }
+              }
+            },
+            "IDC_TEXT_USER_NAME": {
+              "type": "Label",
+              "require": {
+                "font": "Interface/Common/Font.ttf"
+              },
+              "attributes": {
+                "transform": {
+                  "position": {
+                    "x": 34,
+                    "y": 13
+                  }
+                },
+                "fontSize": 11,
+                "outline": {
+                  "thickness": 1,
+                  "color": {
+                    "a": 255,
+                    "r": 25,
+                    "g": 25,
+                    "b": 25
+                  }
+                }
+              }
+            },
+            "IDC_IMAGE_LOADING_SIGN": "ControlList/State/Loading/Loading_Sign.json"
+          }
+        }
+      }
+    }
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 500,
+        "y": 230
+      }
+    },
+    "vertical": {
+      "count": 8,
+      "spacing": 45
+    }
+  }
+}

@@ -19,6 +19,7 @@
       "IDC_BUTTON_ROOM_RIGHT": "ControlList/State/Room/Room_Btn_Right.json",
       "IDC_BUTTON_CREATE_ROOM": "ControlList/State/Room/Room_Btn_Create.json",
       "IDC_BUTTON_QUICK_JOIN": "ControlList/State/Room/Room_Btn_QuickJoin.json",
+      "IDC_TOOLTIP_QUICK_JOIN": "ControlList/State/Room/Room_QuickJoinTip.json",
       "IDC_BUTTON_SHOW_ALL": "ControlList/State/Room/Room_Btn_ShowAll.json",
       "IDC_BUTTON_SHOW_WAITING": "ControlList/State/Room/Room_Btn_WaitingRoom.json",
       "IDC_TEXT_NICKNAME": "ControlList/State/Room/Room_Nickname.json",
@@ -27,6 +28,7 @@
       "IDC_USER_LIST": "ControlList/State/Room/Room_UserList.json",
       "IDC_DIALOG_OPTION": "ControlList/Dialog/Option.json",
       "IDC_DIALOG_CREATE_ROOM": "ControlList/Dialog/CreateRoom.json",
+      "IDC_DIALOG_PASSWORD": "ControlList/Dialog/Password.json",
       "IDC_DIALOG_WHISPER": "ControlList/Dialog/Whisper.json",
       "IDC_BUTTON_BACK": "ControlList/State/Room/Room_Btn_Back.json"
     }

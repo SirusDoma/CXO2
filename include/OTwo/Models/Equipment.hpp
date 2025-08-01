@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 
 enum class EquipmentType : std::uint8_t

@@ -134,11 +134,9 @@ if(WIN32)
     # Allow big obj (for embedded Resource.hpp)
     target_compile_options(${TARGET} PRIVATE /bigobj)
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message("-- Configuring compiler flags for hot reload")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi /Gm- /hotpatch /Gy /Gw")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /FUNCTIONPADMIN /OPT:NOREF /OPT:NOICF /DEBUG:FULL")
-    endif()
+    # Windows API for fetching font
+    target_link_libraries(${TARGET} PRIVATE Advapi32)
+    target_link_libraries(${TARGET} PRIVATE User32)
 elseif(APPLE)
     # App Arch
     if (NOT CMAKE_OSX_ARCHITECTURES)
@@ -182,8 +180,17 @@ elseif(APPLE)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
+    # Allow big obj (for embedded Resource.hpp)
+    target_compile_options(${TARGET} PRIVATE -bigobj)
+
+    # Add LIBICONV
+    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
+    add_compile_definitions(USE_LIBICONV)
+    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE "-framework Security")
+    target_link_libraries(${TARGET} PRIVATE "-framework CoreText" "-framework CoreFoundation")
 else()
     # Executable
     add_executable(${TARGET} ${SRCS} ${HEADERS})
@@ -215,8 +222,19 @@ else()
     set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
     add_compile_definitions(USE_LIBICONV)
 
+    # Allow big obj (for embedded Resource.hpp)
+    target_compile_options(${TARGET} PRIVATE -mbig-obj)
+
+    # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE stdc++fs)
     target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+
+    # Fontconfig for font discovery on Linux
+    find_package(Fontconfig QUIET)
+    if (Fontconfig_FOUND)
+        target_link_libraries(${TARGET} PRIVATE Fontconfig::Fontconfig)
+        target_compile_definitions(${TARGET} PRIVATE GX_HAS_FONTCONFIG)
+    endif()
 endif()
 
 message("-- Output Directory: " ${OUTPUT_DIR})

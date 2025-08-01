@@ -98,7 +98,6 @@ int main()
     
     // Additional files to include in resources (relative to assets folder)
     const std::vector<std::string> additionalFiles = {
-        "Interface/Common/Font.ttf",
         "Interface/Common/Font.Bold.ttf"
     };
 

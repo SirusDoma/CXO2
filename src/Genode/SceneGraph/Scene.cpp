@@ -146,14 +146,17 @@ namespace Gx
         return Dismiss(**m_presentables.rbegin());
     }
 
-    void Scene::QueueEvent(const std::function<void()>& evt)
+    void Scene::Invoke(const std::function<void()>& evt)
     {
+        auto lock = std::lock_guard(m_mutex);
         if (evt)
             m_events.push(evt);
     }
 
     void Scene::ProcessEvents()
     {
+        auto lock = std::lock_guard(m_mutex);
+
         const auto& director = GetDirector();
         while (!m_events.empty())
         {

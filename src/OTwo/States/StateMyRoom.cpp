@@ -1,11 +1,20 @@
 #include <OTwo/States/StateMyRoom.hpp>
 #include <OTwo/States/StateItemShop.hpp>
 #include <OTwo/States/StateRoom.hpp>
+#include <OTwo/States/StatePlanet.hpp>
 
 #include <OTwo/Avatar/Avatar.hpp>
 
 #include <OTwo/Avatar/ItemFactory.hpp>
 #include <OTwo/Contexts/SessionContext.hpp>
+
+#include <OTwo/Network/Exception.hpp>
+#include <OTwo/Services/CharacterService.hpp>
+#include <OTwo/Services/ItemShopService.hpp>
+
+#include <OTwo/Messages/Requests/EquipItemRequest.hpp>
+#include <OTwo/Messages/Responses/EquipItemResponse.hpp>
+#include <OTwo/Messages/Responses/SellItemResponse.hpp>
 
 #include <OTwo/StringTable/Identifiers/Sound.hpp>
 #include <OTwo/StringTable/Identifiers/MyRoom.hpp>
@@ -23,9 +32,37 @@
 
 using namespace StringTable::Identifiers;
 
-StateMyRoom::StateMyRoom(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items) :
+namespace
+{
+    ItemEquipSlotType GetItemEquipSlotType(EquipmentType type)
+    {
+        switch (type)
+        {
+            case EquipmentType::Guitar:             return ItemEquipSlotType::Instrument;
+            case EquipmentType::Bass:               return ItemEquipSlotType::Instrument;
+            case EquipmentType::Keyboard:           return ItemEquipSlotType::Instrument;
+            case EquipmentType::Drum:               return ItemEquipSlotType::Instrument;
+            case EquipmentType::Hair:               return ItemEquipSlotType::Hair;
+            case EquipmentType::Earrings:           return ItemEquipSlotType::Earrings;
+            case EquipmentType::Gloves:             return ItemEquipSlotType::Gloves;
+            case EquipmentType::Accessories:        return ItemEquipSlotType::Accessories;
+            case EquipmentType::Top:                return ItemEquipSlotType::Top;
+            case EquipmentType::Pants:              return ItemEquipSlotType::Pants;
+            case EquipmentType::Glasses:            return ItemEquipSlotType::Glasses;
+            case EquipmentType::Necklace:           return ItemEquipSlotType::Necklace;
+            case EquipmentType::ClothesAccessories: return ItemEquipSlotType::ClothesAccessories;
+            case EquipmentType::Shoes:              return ItemEquipSlotType::Shoes;
+            case EquipmentType::Face:               return ItemEquipSlotType::Face;
+            default:                                return ItemEquipSlotType{};
+        }
+    }
+}
+
+StateMyRoom::StateMyRoom(Gx::AudioMixer& mixer, SessionContext& session, CharacterService& service, ItemShopService& shopService, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
+    m_service(service),
+    m_shopService(shopService),
     m_items(items),
     m_selectedItem(nullptr),
     m_bagSelectIndicator(nullptr)
@@ -36,7 +73,7 @@ void StateMyRoom::Initialize()
 {
     State::Initialize();
     
-    auto& player         = m_session.GetCurrentPlayer();
+    auto& charInfo       = m_session.GetCharacterInfo();
     const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MY_ROOM);
     const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
     const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
@@ -44,17 +81,17 @@ void StateMyRoom::Initialize()
     const auto sfxNext   = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
 
     const auto avatar = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
-    avatar->SetGender(player.Gender);
-    for (auto [_, item] : m_items.GetDefaultItems(player.Gender))
+    avatar->SetGender(charInfo.Gender);
+    for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
         avatar->SetDefaultItem(std::move(item));
 
-    for (const auto id : player.EquippedItemIDs)
+    for (const auto id : charInfo.EquippedItemIDs)
         avatar->Equip(m_items.Create(id));
 
-    for (const auto id : player.Inventory)
+    for (const auto id : charInfo.Inventory)
     {
-        if (const auto item = m_items.Create(id); item.GetID() != 0)
-            m_inventory.push_back(std::move(item));
+        const auto item = m_items.Create(id);
+        m_inventory.push_back(std::move(item));
     }
 
     m_bagSelectIndicator = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_MYBAG_SELECT);
@@ -107,10 +144,10 @@ void StateMyRoom::Initialize()
     equipmentsContainer->SetVisible(true);
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
-    currentGem->SetValue(player.Gem);
+    currentGem->SetValue(charInfo.Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
-    currentCash->SetValue(player.Cash);
+    currentCash->SetValue(charInfo.Wallet.Cash);
 
     const auto statusPanel = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_STATUS);
     statusPanel->SetEnabled(false);
@@ -125,14 +162,14 @@ void StateMyRoom::Initialize()
     const auto ranking  = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_RANKING);
     const auto guild    = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_GUILD);
 
-    nickname->SetString(player.Name);
-    level->SetString(std::to_string(player.Level));
-    epoint->SetString(std::to_string(player.EventPoint));
-    exp->SetString(std::to_string(player.Exp));
-    nextExp->SetString(std::to_string(player.NextExp));
-    record->SetString(fmt::format("Wins: {} / Draws: {} / Loses: {}", player.Wins, player.Draws, player.Loses));
-    ranking->SetString(std::to_string(player.Rank));
-    guild->SetString(player.Guild.Name);
+    nickname->SetString(charInfo.Name);
+    level->SetString(std::to_string(charInfo.Level));
+    epoint->SetString(std::to_string(charInfo.Wallet.Cash));
+    exp->SetString(std::to_string(charInfo.Experience));
+    nextExp->SetString(std::to_string(0));
+    record->SetString(fmt::format("Wins: {} / Draws: {} / Loses: {}", charInfo.RankStats.Wins, charInfo.RankStats.Draws, charInfo.RankStats.Loses));
+    ranking->SetString(std::to_string(charInfo.RankStats.Rank));
+    guild->SetString("");
 
     const auto albumButton = statusPanel->FindChild<Gx::Button>(Resource::MyRoom::Status::IDC_BUTTON_MY_ALBUM);
     albumButton->SetClickCallback([=] (auto&, auto&)
@@ -144,7 +181,7 @@ void StateMyRoom::Initialize()
     });
 
     const auto sellButton = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SELL);
-    sellButton->SetClickCallback([=, &player] (auto&, auto&)
+    sellButton->SetClickCallback([=, &charInfo] (auto&, auto&)
     {
         if (statusPanel->IsVisible())
             return;
@@ -175,7 +212,7 @@ void StateMyRoom::Initialize()
         const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
             m_selectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-        ShowDialog(message, DialogStyle::OkCancel, false, [=, &player] (auto accepted)
+        ShowDialog(message, DialogStyle::OkCancel, false, [=, &charInfo] (auto accepted)
         {
             if (!accepted)
             {
@@ -183,25 +220,45 @@ void StateMyRoom::Initialize()
                 return;
             }
 
-            player.Inventory.erase(
-                std::remove_if(player.Inventory.begin(), player.Inventory.end(), [=] (auto i) { return i == m_selectedItem->GetID(); }),
-                player.Inventory.end()
-            );
+            std::size_t slotID = charInfo.Inventory.size() + 1;
+            for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+            {
+                if (charInfo.Inventory[i] == m_selectedItem->GetID())
+                {
+                    slotID = i;
+                    break;
+                }
+            }
 
-            m_inventory.erase(
-                std::remove_if(m_inventory.begin(), m_inventory.end(), [=] (auto i) { return i.GetID() == m_selectedItem->GetID(); }),
-                m_inventory.end()
-            );
+            if (slotID >= charInfo.Inventory.size())
+                return;
 
-            m_selectedItem = nullptr;
-            if (currency == Currency::Gem)
-                player.Gem += price;
-            else
-                player.Cash += price;
+            m_shopService.SellItem(slotID, [=, &charInfo] (const SellItemResponse& response)
+            {
+                Invoke([=, &charInfo]
+                {
+                    if (response.Result == SellItemResult::Failed)
+                    {
+                        ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+                        return;
+                    }
 
-            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
-            m_session.Save();
-            Invalidate();
+                    charInfo.Inventory[response.SlotID] = 0;
+                    m_inventory[response.SlotID] = Item{};
+
+                    charInfo.Wallet = CharacterInfo::WalletInfo
+                    {
+                        response.Gem,
+                        response.Cash
+                    };
+
+                    m_selectedItem = nullptr;
+                    m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
+
+                    m_session.Save();
+                    Invalidate();
+                });
+            });
         });
     });
 
@@ -238,7 +295,7 @@ void StateMyRoom::Initialize()
 
 void StateMyRoom::Invalidate()
 {
-    const auto player    = &m_session.GetCurrentPlayer();
+    const auto charInfo  = &m_session.GetCharacterInfo();
     const auto avatar    = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
     const auto container = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_EQUIPMENTS);
     const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
@@ -247,11 +304,10 @@ void StateMyRoom::Invalidate()
     const auto bagSlots = bagList->GetChildren();
 
     Gx::UiContainer* currentSlot = nullptr;
-    unsigned int itemCount = 0;
     auto inventory = std::vector<Item*>();
     for (auto& item : m_inventory)
     {
-        if (!avatar->IsEquiped(item))
+        if (charInfo->EquippedItemIDs.find(item.GetID()) == charInfo->EquippedItemIDs.end())
             inventory.push_back(&item);
     }
 
@@ -263,24 +319,25 @@ void StateMyRoom::Invalidate()
         if (!slot)
             continue;
 
+        slot->SetVisible(false);
         slot->SetClickCallback(nullptr);
         slot->SetDoubleClickCallback(nullptr);
+
         if (j >= inventory.size())
-        {
-            slot->SetVisible(false);
             continue;
-        }
 
+        const auto target = j;
         const auto item = inventory[j++];
-        itemCount++;
-
         unsigned int quantity = 0;
-        if (const auto it = player->ItemQuantities.find(item->GetID()); it != player->ItemQuantities.end())
-            quantity = it->second;
+
+        if (const auto it = std::find(charInfo->Inventory.begin(), charInfo->Inventory.end(), item->GetID()); it != charInfo->Inventory.end())
+            quantity = it->Quantity;
 
         currentSlot = item == m_selectedItem ? slot : currentSlot;
         const auto thumbnail = slot->FindChild<Gx::Image>(Resource::MyRoom::Item::IDC_IMAGE_THUMBNAIL);
-        if (item->GetSmallThumbnail().GetTexture())
+        if (item->GetID() == 0)
+            thumbnail->SetTexCoords({});
+        else if (item->GetSmallThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetSmallThumbnail().GetTexture(), true);
         else if (item->GetLargeThumbnail().GetTexture())
             thumbnail->SetTexture(*item->GetLargeThumbnail().GetTexture(), true);
@@ -296,22 +353,22 @@ void StateMyRoom::Invalidate()
         slot->SetVisible(true);
         slot->SetClickCallback([=] (auto&, auto&)
         {
-            if (m_selectedItem == item)
+            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+            if (m_selectedItem == item || item->GetID() == 0)
                 return;
 
             m_selectedItem = item;
             m_bagSelectIndicator->SetVisible(true);
 
             slot->AddChild(*m_bagSelectIndicator);
-            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
         });
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
-            if (!item)
+            if (!item || item->GetID() == 0)
                 return;
 
-            if (item->GetType() == EquipmentType::AttributiveItem || quantity > 0)
+            if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
             {
                 if (const auto dialog = Instantiate<Gx::Dialog>(Resource::MyRoom::IDC_DIALOG_SKILL_INFO); dialog)
                 {
@@ -360,21 +417,45 @@ void StateMyRoom::Invalidate()
                 return;
             }
 
+            if (m_busy)
+                return;
 
-            if (avatar->IsEquiped(*item))
-                avatar->Unequip(item->GetType());
-            else
-                avatar->Equip(*item);
+            m_busy = true;
+            m_service.Equip
+            (
+                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), target },
+                [=] (const EquipItemResponse& response)
+                {
+                    m_busy = false;
+                    if (response.Invalid)
+                        return;
 
-            avatar->ResetRenderables();
+                    Invoke([=]
+                    {
+                        avatar->Equip(m_inventory[response.SlotID]);
 
-            m_selectedItem = nullptr;
-            player->EquippedItemIDs.clear();
-            for (auto [_, item] : avatar->GetEquipedItems())
-                player->EquippedItemIDs.push_back(item->GetID());
+                        charInfo->EquippedItemIDs.insert(response.NewEquippedItemId);
+                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
+                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
-            m_session.Save();
-            Invalidate();
+                        m_selectedItem = nullptr;
+                        m_session.Save();
+
+                        Invalidate();
+                    });
+                },
+                [=] (const auto& ex)
+                {
+                    Invoke([=]
+                    {
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                        {
+                            GetDirector().Dismiss<StatePlanet>();
+                        });
+                    });
+                }
+            );
         });
     }
 
@@ -429,10 +510,10 @@ void StateMyRoom::Invalidate()
     bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
     const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
-    currentGem->SetValue(player->Gem);
+    currentGem->SetValue(charInfo->Wallet.Gem);
 
     const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
-    currentCash->SetValue(player->Cash);
+    currentCash->SetValue(charInfo->Wallet.Cash);
 }
 
 void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart thumbnailType)
@@ -443,8 +524,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
     if (thumbnailType != RenderPart::SmallThumbnail)
         thumbnailType = RenderPart::LargeThumbnail;
 
-    const auto player   = &m_session.GetCurrentPlayer();
-    const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
+    const auto charInfo = &m_session.GetCharacterInfo();
 
     const auto avatar        = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
     const auto equippedItems = avatar->GetEquipedItems();
@@ -463,14 +543,52 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
 
         slot->SetDoubleClickCallback([=] (auto&, auto&)
         {
-            avatar->Unequip(item->GetType());
-            player->EquippedItemIDs.clear();
-            for (auto [_, item] : avatar->GetEquipedItems())
-                player->EquippedItemIDs.push_back(item->GetID());
+            if (m_busy)
+                return;
 
-            m_mixer.Play(*sfxDress, Sound::Channel::SFX);
-            m_session.Save();
-            Invalidate();
+            m_busy = true;
+
+            auto& inventory = charInfo->Inventory;
+            auto slotIt = std::find_if(inventory.begin(), inventory.end(), [id = item->GetID()] (const auto& i) {
+                return i.ID == 0;
+            });
+
+            const size_t target = slotIt != inventory.end() ? static_cast<size_t>(std::distance(inventory.begin(), slotIt)) : inventory.size();
+            m_service.Equip
+            (
+                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), target },
+                [=] (const EquipItemResponse& response)
+                {
+                    m_busy = false;
+                    if (response.Invalid)
+                        return;
+
+                    Invoke([=]
+                    {
+                        const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
+                        m_mixer.Play(*sfxDress);
+
+                        avatar->Unequip(item->GetType());
+
+                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
+                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
+
+                        m_session.Save();
+                        Invalidate();
+                    });
+                },
+                [=] (const auto& ex)
+                {
+                    Invoke([=]
+                    {
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                        {
+                            GetDirector().Dismiss<StatePlanet>();
+                        });
+                    });
+                }
+            );
         });
     }
 }

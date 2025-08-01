@@ -12,3 +12,4 @@
 #include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <Genode/IO/Archive.hpp>
 #include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/FontManager.hpp>

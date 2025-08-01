@@ -1,14 +1,58 @@
 {
-  "type": "Avatar",
+  "type": "UiContainer",
   "attributes": {
-    "offset": {
-      "x": -90,
-      "y": -60
-    },
     "objects": {
-      "IDC_AVATAR_INFO": "ControlList/State/Waiting/Waiting7K/Wait_AvatarInfo.json",
-      "IDC_IMAGE_BOSS_MARK": "ControlList/State/Waiting/Waiting7K/Wait_BossMark.json",
-      "IDC_IMAGE_NO_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_NoMusic.json"
+      "IDC_AVATAR": {
+        "type": "Avatar",
+        "attributes": {
+          "offset": {
+            "x": -90,
+            "y": -60
+          },
+          "objects": {
+            "IDC_AVATAR_INFO": "ControlList/State/Waiting/Waiting7K/Wait_AvatarInfo.json",
+            "IDC_IMAGE_BOSS_MARK": "ControlList/State/Waiting/Waiting7K/Wait_BossMark.json",
+            "IDC_IMAGE_NO_MUSIC": "ControlList/State/Waiting/Waiting7K/Wait_NoMusic.json",
+            "IDC_IMAGE_COVER_AVATAR": {
+              "type": "Sprite",
+              "require": {
+                "sheet": "Wait_Cover_Avatar.ojs"
+              },
+              "attributes": {
+                "transform": {
+                  "origin": {
+                    "x": 9,
+                    "y": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "IDC_BUTTON_EXTEND": {
+        "type": "Button",
+        "attributes": {
+          "states": {
+            "normal": {
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 141,
+                "height": 175
+              }
+            },
+            "click": {
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 141,
+                "height": 175
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
