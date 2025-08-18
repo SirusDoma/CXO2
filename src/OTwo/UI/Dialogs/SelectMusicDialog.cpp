@@ -450,8 +450,6 @@ void SelectMusicDialog::Initialize()
     }
 
     Sort(m_room.GetMusicSortMode(), m_room.GetMusicSortOrder());
-    CacheMusicCover();
-
     m_initialized = true;
 }
 
@@ -675,7 +673,6 @@ void SelectMusicDialog::OnAccepted()
     m_room.SetMusicSortOrder(m_order.value_or(MusicSortOrder::None));
     m_room.SetDifficulty(m_difficulty);
     m_room.SetSpeed(m_speed);
-    CacheMusicCover();
 
     auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_02);
     m_mixer.Play(sfx, Sound::Channel::SFX);
@@ -687,27 +684,6 @@ void SelectMusicDialog::OnCancelled()
 
     auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_03);
     m_mixer.Play(sfx);
-}
-
-void SelectMusicDialog::CacheMusicCover(const bool refresh) const
-{
-    if (m_music.Source.empty())
-        return;
-
-    try
-    {
-        if (!refresh && m_resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER))
-            return;
-
-        if (auto image = O2JamChartLoader::LoadCoverArt(m_music.Source, Gx::ResourceContext::Default); image)
-            m_resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
-        else
-            m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
-    }
-    catch (Gx::Exception)
-    {
-        m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
-    }
 }
 
 ChartMetadata SelectMusicDialog::GetSelectedMusic() const

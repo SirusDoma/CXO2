@@ -776,7 +776,7 @@ void StateItemShop::OnItemSellClicked()
                 m_myBagSelectedItem = nullptr;
                 m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
 
-                m_session.Save();
+                // m_session.Save();
                 InvalidateMyBag();
             });
         });
@@ -1319,7 +1319,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
 
                         inventory[response.SlotID] = metadata.ID;
 
-                        m_session.Save();
+                        // m_session.Save();
                         m_inventory.clear();
                         InvalidateMyBag();
 

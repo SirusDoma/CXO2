@@ -653,9 +653,6 @@ void StateWaiting7K::OnSelectMusicDialogAccepted()
 
         m_room.SetMusic(music);
         m_room.SetDifficulty(diff);
-
-        auto& resources = GetResources(ResourceScope::Shared);
-        resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
     }
     else
     {

@@ -32,7 +32,6 @@ public:
     float GetSelectedSpeed() const;
 
     void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
-    void CacheMusicCover(bool refresh = true) const;
 
 protected:
     void OnKeyPressed(const sf::Event::KeyPressed& ev) override;

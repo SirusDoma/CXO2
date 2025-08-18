@@ -442,9 +442,6 @@ void StateRoom::JoinRoom(const RoomInfo& room)
     }
 
     const auto& musicList = m_session.GetInstalledMusic();
-
-
-
     if (room.MusicID <= std::numeric_limits<std::uint16_t>::max())
     {
         const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID = room.MusicID] (const auto& header)

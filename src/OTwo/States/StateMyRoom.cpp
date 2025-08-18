@@ -255,7 +255,7 @@ void StateMyRoom::Initialize()
                     m_selectedItem = nullptr;
                     m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
 
-                    m_session.Save();
+                    // m_session.Save();
                     Invalidate();
                 });
             });
@@ -440,7 +440,7 @@ void StateMyRoom::Invalidate()
                         m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
                         m_selectedItem = nullptr;
-                        m_session.Save();
+                        // m_session.Save();
 
                         Invalidate();
                     });
@@ -574,7 +574,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
                         charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
                         m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
-                        m_session.Save();
+                        // m_session.Save();
                         Invalidate();
                     });
                 },

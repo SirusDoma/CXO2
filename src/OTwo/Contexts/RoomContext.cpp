@@ -76,6 +76,9 @@ ChartMetadata RoomContext::GetMusic() const
 
 void RoomContext::SetMusic(const ChartMetadata& metadata)
 {
+    if (m_music.ID == metadata.ID)
+        return;
+
     m_music = metadata;
     if (!metadata.Source.empty() && Gx::FileSystem::Contains(metadata.Source))
     {
