@@ -655,6 +655,28 @@ void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContex
         }
     }
 
+    if (auto randomSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_RANDOM_SELECTOR); randomSelector)
+    {
+        std::unordered_map<std::string, LevelCategory> randomLevelMap = {
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_1, LevelCategory::Level1 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_2, LevelCategory::Level2 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_3, LevelCategory::Level3 },
+            { Resource::SelectMusic::Random::IDC_TOGGLE_RANDOM_DIFF_4, LevelCategory::Level4 },
+        };
+
+        for (auto [id, level] : randomLevelMap)
+        {
+            auto button = randomSelector->FindChild<Gx::ToggleButton>(id);
+            if (!button)
+                continue;
+
+            if (static_cast<int>(m_random) & static_cast<int>(level))
+                button->SetCheckedState(true);
+            else
+                button->SetCheckedState(false);
+        }
+    }
+
 
     Sort(m_room.GetMusicSortMode(), m_room.GetMusicSortOrder());
 }
@@ -915,7 +937,7 @@ void SelectMusicDialog::Invalidate()
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
                                     {
-                                        return m.Levels[diff] > 13;
+                                        return m.Levels[diff] >= 13;
                                     });
 
                                     if (result)

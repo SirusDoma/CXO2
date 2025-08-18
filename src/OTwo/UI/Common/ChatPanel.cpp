@@ -32,7 +32,7 @@ void ChatPanel::Initialize()
         parent->Invoke([=]
         {
             if (isWhisper)
-                chatWindow->PushWhisper(actor, actor, text);
+                chatWindow->PushWhisper(actor, m_session.GetCharacterInfo(), text);
             else
                 chatWindow->PushMessage(actor, text);
         });

@@ -95,33 +95,33 @@ namespace
 
         if (levels & static_cast<int>(LevelCategory::Level1))
         {
-            if (start == 0 || start > 1)
-                start = 1;
-
-            if (end < 5)
-                end = 5;
+            start = 1;
+            end = 5;
         }
 
         if (levels & static_cast<int>(LevelCategory::Level2))
         {
-            if (start == 0 || start > 5)
+            if (start == 0)
                 start = 5;
 
-            if (end < 9)
-                end = 9;
+            end = 9;
         }
 
         if (levels & static_cast<int>(LevelCategory::Level3))
         {
-            if (start == 0 || start > 9)
+            if (start == 0)
                 start = 9;
 
-            if (end < 13)
-                end = 13;
+            end = 13;
         }
 
         if (levels & static_cast<int>(LevelCategory::Level4))
+        {
+            if (start == 0)
+                start = 13;
+
             end = 0;
+        }
 
         return std::pair(start, end);
     }
@@ -271,9 +271,7 @@ void StateWaiting7K::Initialize()
     }
 
     if (m_room.GetCurrentSlot().IsMaster && (m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0))
-    {
         OnMapSelectorStateChanged(0);
-    }
 
     bgm->setLooping(true);
     m_mixer.Play(*bgm, Sound::Channel::BGM);
@@ -386,7 +384,6 @@ void StateWaiting7K::OnMemberLeft(const WaitingMemberLeftEventData& ev)
 
     InvalidateMembers();
     InvalidateRoomInfo();
-
 }
 
 void StateWaiting7K::OnMemberTeamChanged(const WaitingMemberTeamChangedEventData& ev)
@@ -797,7 +794,7 @@ void StateWaiting7K::OnMapSelectorStateChanged(const unsigned int mapID)
     const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
     const auto mapInfo = MapInfo
     {
-        static_cast<std::uint8_t>((mapID == MapInfo::RandomID || mapID == 0) ? Gx::Randomizer::Randomize<int>(0, mapSelector->GetMapCount()) : mapID),
+        static_cast<std::uint8_t>((mapID == MapInfo::RandomID || mapID == 0) ? Gx::Randomizer::Randomize<int>(1, mapSelector->GetMapCount()) : mapID),
         static_cast<std::uint16_t>(0),
         static_cast<std::uint8_t>((mapID == MapInfo::RandomID || mapID == 0) ? MapInfo::RandomID : 0)
     };
@@ -1106,7 +1103,7 @@ void StateWaiting7K::InvalidateMembers()
             btnExtend->SetDoubleClickCallback([=] (const auto&, auto&) { ExtendSlot(memberIndex); });
         }
 
-        if (slot.State == RoomSlotState::Unoccupied)
+        if (slot.State == RoomSlotState::Unoccupied || !slot.Member.has_value())
         {
             avatar->SetVisible(false);
             memberIndex++;

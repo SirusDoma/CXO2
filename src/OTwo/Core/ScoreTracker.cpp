@@ -194,6 +194,7 @@ void ScoreTracker::Reset()
     m_capturedScore  = 0;
     m_maxCombo       = 0;
     m_combo          = 0;
+    m_jams           = 0;
     m_maxJamCombo    = 0;
     m_jamCombo       = 0;
     m_jamProgress    = 0;

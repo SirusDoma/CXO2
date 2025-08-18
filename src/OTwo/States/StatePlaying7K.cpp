@@ -550,6 +550,9 @@ void StatePlaying7K::Initialize()
 
     });
 
+    for (auto [_, avatar] : m_avatars)
+        avatar->GetAvatarInfo()->GetLifeBar()->SetValue(avatar->GetAvatarInfo()->GetLifeBar()->GetMaximumValue());
+
     // Start initial lifebar fill-up animation
     Run<Gx::Scheduler>
     (
@@ -558,11 +561,6 @@ void StatePlaying7K::Initialize()
         [this, lifeBar] (const auto& task, auto delta)
         {
             lifeBar->SetValue(lifeBar->GetValue() + m_lifeSystem.GetMaxLifePoint() / (2.f / (delta / 1000.f)));
-
-            // TODO: There's no need to animate avatar life bar?
-            for (auto [_, avatar] : m_avatars)
-                avatar->GetAvatarInfo()->GetLifeBar()->SetValue(lifeBar->GetValue());
-
             if (task.GetState() == Gx::TaskState::Completed)
             {
                 lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
@@ -636,7 +634,7 @@ void StatePlaying7K::OnMemberStatsUpdate(const PlayingMemberStatsUpdateEventData
     if (ev.Type == UpdateStatsType::Life)
     {
         const auto it = m_states.find(ev.ID);
-        if (it == m_states.end() || !it->second.Valid)
+        if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
             return;
 
         it->second.Life = ev.Value;
@@ -653,7 +651,7 @@ void StatePlaying7K::OnMemberStatsUpdate(const PlayingMemberStatsUpdateEventData
     else
     {
         const auto it = m_states.find(ev.ID);
-        if (it == m_states.end() || !it->second.Valid)
+        if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
             return;
 
         if (const auto avatar = it->second.Avatar)

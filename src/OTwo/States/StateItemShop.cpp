@@ -1277,10 +1277,10 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                     return;
 
                 bool purchasable = false;
-                for (auto currency : { Currency::Gem, Currency::Cash })
+                for (auto c : { Currency::Gem, Currency::Cash })
                 {
-                    auto money = currency == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
-                    if (auto pIt = metadata.Prices.find(currency); pIt != metadata.Prices.end())
+                    const auto money = c == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
+                    if (auto pIt = metadata.Prices.find(c); pIt != metadata.Prices.end())
                     {
                         if (pIt->second != 0 && pIt->second <= money)
                         {
@@ -1296,7 +1296,7 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                     return;
                 }
 
-                m_service.PurchaseItem(metadata.ID, [=] (const PurchaseItemResponse& response)
+                m_service.PurchaseItem(metadata.ID, [=, &charInfo] (const PurchaseItemResponse& response)
                 {
                     Invoke([=]
                     {
@@ -1318,6 +1318,12 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
                         }
 
                         inventory[response.SlotID] = metadata.ID;
+
+                        m_session.GetCharacterInfo().Wallet = CharacterInfo::WalletInfo
+                        {
+                            response.Gem,
+                            response.Cash
+                        };
 
                         // m_session.Save();
                         m_inventory.clear();

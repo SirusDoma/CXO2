@@ -237,7 +237,7 @@ void ChatWindow::Invalidate()
         {
             if (!chat.Recipient.Name.isEmpty())
             {
-                if (chat.Sender.Name == m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
+                if (chat.Sender.Name != m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
                     m_labels[index]->SetColor(sf::Color(225, 230, 10));
                 else
                     m_labels[index]->SetColor(sf::Color(0, 160, 180));
@@ -271,7 +271,7 @@ void ChatWindow::Invalidate()
 
         if (!chat.Sender.Name.isEmpty() && !chat.Recipient.Name.isEmpty())
         {
-            if (chat.Sender.Name == m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
+            if (chat.Sender.Name != m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
                 m_labels[index]->SetString(fmt::format(L"[{}] >> {}", padSenderName(chat.Recipient.Name), chat.Content));
             else
                 m_labels[index]->SetString(fmt::format(L"[{}] << {}", padSenderName(chat.Recipient.Name), chat.Content));

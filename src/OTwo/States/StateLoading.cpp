@@ -94,20 +94,16 @@ void StateLoading::Initialize()
     }
 
     if (const auto image = resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER); image)
-    {
         OnCoverLoaded(image);
-    }
-    else
+
+    loader.SetCoverLoadCallback([this] (auto cover)
     {
-        loader.SetCoverLoadCallback([this] (auto cover)
+        Invoke([=]
         {
-            Invoke([=]
-            {
-                if (cover)
-                    OnCoverLoaded(cover);
-            });
+            if (cover)
+                OnCoverLoaded(cover);
         });
-    }
+    });
 
     auto thread = std::thread([=] ()
     {
@@ -200,9 +196,6 @@ void StateLoading::OnChartLoaded(const Chart* chart)
     },
     [=] (const auto& ex)
     {
-        Invoke([=]
-        {
-            GetDirector().Dismiss<StatePlanet>();
-        });
+        GetDirector().Dismiss<StatePlanet>();
     });
 }
