@@ -1,9 +1,9 @@
 #include <OTwo/IO/Loaders/Chart/O2JamChartLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
 #include <magic_enum/magic_enum.hpp>
-#include <OTwo/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 
 O2JamChartLoader::O2JamChartLoader(const GameContext& context) :
     m_mode(context.GetMode()),
@@ -259,14 +259,27 @@ Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadThumbnail(sf::InputStream& stre
         return nullptr;
 
     auto data = std::vector<std::uint8_t>(metadata.ThumbnailSize);
-    if (const auto read = stream.read(&data[0], metadata.ThumbnailSize); !read.has_value())
+    if (const auto read = stream.read(data.data(), metadata.ThumbnailSize); !read.has_value())
         return nullptr;
 
     auto image  = std::make_unique<sf::Image>();
-    if (!image->loadFromMemory(&data[0], metadata.ThumbnailSize))
-        throw Gx::ResourceLoadException("Failed to load image");
+    if (image->loadFromMemory(data.data(), metadata.ThumbnailSize))
+    {
+        for (unsigned y = 0; y < image->getSize().y; ++y)
+        {
+            for (unsigned x = 0; x < image->getSize().x; ++x)
+            {
+                auto p = image->getPixel({x, y});
+                p.a = 255;
 
-    return image;
+                image->setPixel({x, y}, p);
+            }
+        }
+
+        return image;
+    }
+
+    return nullptr;
 }
 
 Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(sf::InputStream& stream, const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx)
@@ -278,12 +291,12 @@ Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(sf::InputStream& strea
         return nullptr;
 
     auto data = std::vector<std::uint8_t>(metadata.CoverSize);
-    if (stream.read(&data[0], metadata.CoverSize) != metadata.CoverSize)
+    if (stream.read(data.data(), metadata.CoverSize) != metadata.CoverSize)
         return nullptr;
 
-    auto image = std::make_unique<sf::Image>();
-    if (!image->loadFromMemory(&data[0], metadata.CoverSize))
-        throw Gx::ResourceLoadException("Failed to load image");
+    auto image  = std::make_unique<sf::Image>();
+    if (!image->loadFromMemory(data.data(), metadata.CoverSize))
+        return nullptr;
 
     return image;
 }
@@ -297,5 +310,3 @@ void O2JamChartLoader::SetThumbnailLoadCallback(const std::function<void(const s
 {
     m_onThumbnailLoaded = onThumbnailLoaded;
 }
-
-

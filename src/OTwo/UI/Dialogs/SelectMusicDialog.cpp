@@ -571,10 +571,14 @@ void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)
 
 void SelectMusicDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
 {
-    Initialize();
     Dialog::OnPresented(parent, context);
 
-    m_musicList = m_session.GetInstalledMusic(true);
+    // TODO: Do not rescan, use fs to watch music folder
+    bool rescan = false; // !m_initialized;
+
+    Initialize();
+
+    m_musicList = m_session.GetInstalledMusic(rescan);
     m_displayList.clear();
     for (auto& metadata : m_musicList)
     {
@@ -791,6 +795,7 @@ void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder orde
 
 void SelectMusicDialog::Invalidate()
 {
+    // TODO: Prevent unnecessary invalidate
     Dialog::Invalidate();
 
     auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
