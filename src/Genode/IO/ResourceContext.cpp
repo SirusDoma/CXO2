@@ -63,7 +63,10 @@ namespace Gx
 
     void ResourceContext::SetProperty(const std::string& name, const std::string& value)
     {
-        m_properties[name] = value;
+        if (value.empty())
+            m_properties.erase(name);
+        else
+            m_properties[name] = value;
     }
 
     CacheMode ResourceContext::GetCacheMode() const

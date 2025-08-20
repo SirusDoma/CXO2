@@ -171,6 +171,8 @@ Gx::ResourcePtr<Gx::Animation> AnimationLoader::LoadFromMetadata(const ResourceM
 
                     if (frame.ID.has_value())
                         frame.TexCoords = sheet->TexCoords[frame.ID.value()];
+                    else if (frame.TexCoords == sf::IntRect() && i < sheet->TexCoords.size())
+                        frame.TexCoords = sheet->TexCoords[i];
 
                     if (metadata->Align != AnimationMetadata::Alignment::None && frame.Origin == sf::Vector2f())
                     {

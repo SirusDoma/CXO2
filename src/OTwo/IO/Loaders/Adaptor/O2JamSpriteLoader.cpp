@@ -92,7 +92,7 @@ namespace
         return sf::Image({width, height}, pixels.data());
     }
 
-    sf::Image LoadBitmap3D(const std::vector<std::uint8_t>& data, unsigned int width, unsigned int height, const sf::Color& keyColor = sf::Color(255, 82, 255), const float threshold = 30.0f)
+    sf::Image LoadMaskBitmap(const std::vector<std::uint8_t>& data, unsigned int width, unsigned int height, const sf::Color& keyColor = sf::Color(255, 82, 255), const float threshold = 30.0f)
     {
         // Create pixel array for RGBA format, initialized to transparent black
         std::vector<std::uint8_t> pixels(width * height * 4, 0);
@@ -182,6 +182,49 @@ namespace
 
         return sf::Image({width, height}, pixels.data());
     }
+
+    sf::Image LoadEncodedBitmap(const std::vector<std::uint8_t>& data, unsigned int width, unsigned int height)
+    {
+        if (width == 0 || height == 0)
+            return sf::Image();
+
+        sf::MemoryInputStream stream(data.data(), data.size());
+        auto image = sf::Image(sf::Vector2u{width, height});
+
+        while (stream.tell() < stream.getSize())
+        {
+            std::uint16_t count;
+            if (stream.read(&count, sizeof(count)) != sizeof(count) || count == 0)
+                break;
+
+            std::uint16_t x, y;
+            if (stream.read(&x, sizeof(x)) != sizeof(x))
+                break;
+
+            if (stream.read(&y, sizeof(y)) != sizeof(y))
+                break;
+
+            for (std::size_t i = 0; i < count; i++)
+            {
+                std::uint16_t pixel;
+                if (stream.read(&pixel, sizeof(pixel)) != sizeof(pixel))
+                    break;
+
+                uint8_t r = ((pixel >> 10) & 0x1F);
+                uint8_t g = ((pixel >> 5)  & 0x1F);
+                uint8_t b = (pixel & 0x1F);
+
+                r = (r << 3) | (r >> 2);
+                g = (g << 3) | (g >> 2);
+                b = (b << 3) | (b >> 2);
+
+                image.setPixel({x + i, y}, sf::Color{r, g, b, 255});
+            }
+        }
+
+        return image;
+    }
+
 
     void PreprocessColorKey(sf::Image& image, const sf::Color keyColor, const float threshold = 30.0f)
     {
@@ -322,9 +365,13 @@ Gx::ResourcePtr<SpriteSheet> O2JamSpriteLoader::LoadFromStream(sf::InputStream& 
         if (stream.seek(position).value_or(0) != position)
             throw Gx::ResourceLoadException("Unsupported stream");
 
-        auto image = format != TextureFormat::OJI ? 
-            LoadBitmap(bytes, frame.size.x, frame.size.y, transparencyColor, 20.f) :
-            LoadBitmap3D(bytes, frame.size.x, frame.size.y, transparencyColor, 20.f);
+        auto image = sf::Image();
+        if (format == TextureFormat::OJI)
+            image = LoadMaskBitmap(bytes, frame.size.x, frame.size.y, transparencyColor, 20.f);
+        else if (format == TextureFormat::OJA)
+            image = LoadEncodedBitmap(bytes, frame.size.x, frame.size.y);
+        else
+            image = LoadBitmap(bytes, frame.size.x, frame.size.y, transparencyColor, 20.f);
 
         compiler.Add(std::move(image));
     }

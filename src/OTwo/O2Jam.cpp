@@ -324,8 +324,10 @@ void O2Jam::Boot()
 
     // Reroute font to embedded resource
     auto& fontManager = context.Require<Gx::FontManager>();
-    if (auto data = fontManager.GetData("Arial"))
-        embedded.WriteFile("Interface/Common/Font.ttf", data->first, data->second);
+    if (auto unicode = fontManager.GetData("Arial Unicode MS"))
+        embedded.WriteFile("Interface/Common/Font.ttf", unicode->first, unicode->second);
+    else if (auto arial = fontManager.GetData("Arial"))
+        embedded.WriteFile("Interface/Common/Font.ttf", arial->first, arial->second);
     else if (auto defaultData = fontManager.GetDefaultData())
         embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
 

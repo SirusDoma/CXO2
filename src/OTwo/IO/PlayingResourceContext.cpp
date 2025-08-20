@@ -9,6 +9,16 @@ bool PlayingResourceContext::IsFxEnabled() const
 void PlayingResourceContext::SetFxEnabled(const bool enabled)
 {
     m_fxEnabled = enabled;
+    if (m_fxEnabled)
+    {
+        SetProperty("FxMapID", std::to_string(m_mapID));
+        SetProperty("FxExtension", std::string());
+    }
+    else
+    {
+        SetProperty("FxMapID", std::string());
+        SetProperty("FxExtension", "oja");
+    }
 }
 
 unsigned int PlayingResourceContext::GetMapID() const
@@ -20,6 +30,17 @@ void PlayingResourceContext::SetMapID(const unsigned int mapID)
 {
     m_mapID = mapID;
     SetProperty("MapID", std::to_string(m_mapID));
+
+    if (m_fxEnabled)
+    {
+        SetProperty("FxMapID", std::to_string(m_mapID));
+        SetProperty("FxExtension", std::string());
+    }
+    else
+    {
+        SetProperty("FxMapID", std::string());
+        SetProperty("FxExtension", "oja");
+    }
 }
 
 unsigned int PlayingResourceContext::GetEffectID() const

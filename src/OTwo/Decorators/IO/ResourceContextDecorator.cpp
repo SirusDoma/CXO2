@@ -81,10 +81,13 @@ std::string ResourceContextDecorator::Format(const std::string& fileName, const 
     const size_t dotIndex = fileName.rfind('.');
 
     auto store = fmt::dynamic_format_arg_store<fmt::format_context>();
+    auto extension = std::string();
     if (dotIndex != std::string::npos)
     {
+        extension = fileName.substr(dotIndex + 1);
+
         store.push_back(fmt::arg("Name", fileName.substr(0, dotIndex)));
-        store.push_back(fmt::arg("Extension", fileName.substr(dotIndex + 1)));
+        store.push_back(fmt::arg("Extension", extension));
     }
     else
     {
@@ -93,6 +96,8 @@ std::string ResourceContextDecorator::Format(const std::string& fileName, const 
     }
 
     store.push_back(fmt::arg("MapID", GetProperty("MapID").value_or(std::string())));
+    store.push_back(fmt::arg("FxMapID", GetProperty("FxMapID").value_or(std::string())));
+    store.push_back(fmt::arg("FxExtension", GetProperty("FxExtension").value_or(extension)));
     store.push_back(fmt::arg("EffectID", GetProperty("EffectID").value_or(std::string())));
     store.push_back(fmt::arg("MapEffectID", fmt::vformat("{MapID}_{EffectID}", store)));
 

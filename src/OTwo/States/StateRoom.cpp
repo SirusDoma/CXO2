@@ -392,6 +392,9 @@ void StateRoom::CreateRoom(
 
 
                 m_room.UpdateFrom(room);
+                m_room.SetMapID(MapInfo::RandomID);
+                m_room.SetRandomizedMapID(0);
+
                 auto& master = m_room.GetSlot(0);
                 master = RoomSlot
                 {

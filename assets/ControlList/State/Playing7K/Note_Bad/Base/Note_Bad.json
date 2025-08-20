@@ -1,0 +1,17 @@
+{
+  "type": "Animation",
+  "require": {
+    "refID": "0X1B500055",
+    "format": "{Name}.ojs"
+  },
+  "attributes": {
+    "alignment": "Center",
+    "blend": "additive",
+    "transform": {
+      "position": {
+        "x": 99,
+        "y": 340
+      }
+    }
+  }
+}

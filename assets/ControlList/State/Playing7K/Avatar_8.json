@@ -156,8 +156,8 @@
                   "IDC_ANIMATION_EFFECT_JAM": {
                     "type": "Animation",
                     "require": {
-                      "refID": "0X1B500066",
-                      "format": "{Name}{MapID}.{Extension}"
+                      "refID": "0X1B50006D",
+                      "format": "{Name}{FxMapID}.{FxExtension}"
                     },
                     "attributes": {
                       "blend": "additive",
@@ -176,7 +176,7 @@
                   "IDC_NUMBER_EFFECT_JAM": {
                     "type": "BitmapNumber",
                     "require": {
-                      "refID": "0X1B50006E"
+                      "refID": "0X1B500075"
                     },
                     "attributes": {
                       "transform": {

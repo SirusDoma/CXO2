@@ -1,64 +1,68 @@
 {
   "type": "Animation",
   "require": {
-    "refID": "0X1B50005F",
-    "format": "{Name}.oja"
+    "refID": "0X1B500058",
+    "format": "{Name}.ojs"
   },
   "attributes": {
-    "speed": 1.5,
-    "blend": "additive",
     "transform": {
+      "position": {
+        "x": 100,
+        "y": 195
+      },
       "origin": {
-        "x": 72,
-        "y": 72
+        "x": 46,
+        "y": 13
       }
     },
+    "isLoop": true,
+    "blend": "additive",
     "frames": [
       {
         "transform": {
           "origin": {
-            "x": 72,
-            "y": 72
+            "x": 46,
+            "y": 13
           }
         }
       },
       {
         "transform": {
           "origin": {
-            "x": 57,
-            "y": 57
+            "x": 45,
+            "y": 13
           }
         }
       },
       {
         "transform": {
           "origin": {
-            "x": 49,
-            "y": 48
+            "x": 45,
+            "y": 12
           }
         }
       },
       {
         "transform": {
           "origin": {
-            "x": 39,
-            "y": 39
+            "x": 45,
+            "y": 13
           }
         }
       },
       {
         "transform": {
           "origin": {
-            "x": 30,
-            "y": 30
+            "x": 45,
+            "y": 12
           }
         }
       },
       {
         "transform": {
           "origin": {
-            "x": 20,
-            "y": 20
+            "x": 45,
+            "y": 13
           }
         }
       }

@@ -2,7 +2,7 @@
   "type": "BitmapNumber",
   "require": {
     "refID": "0X1B50005A",
-    "format": "{Name}{MapID}.{Extension}"
+    "format": "{Name}.ojs"
   },
   "attributes": {
     "transform": {
@@ -13,6 +13,6 @@
     },
     "alignment": "Center",
     "blend": "additive",
-    "kerning": -75
+    "kerning": 1
   }
 }
