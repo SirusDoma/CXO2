@@ -270,7 +270,7 @@ target_link_libraries(${TARGET} PRIVATE Freetype::Freetype)
 
 # Resource Compiler Target (separate from main build)
 add_executable(ResourceCompiler
-    src/Compiler/Compiler.cpp
+    src/ResourceCompiler/ResourceCompiler.cpp
 )
 
 # Resource Compiler includes and dependencies
@@ -286,12 +286,4 @@ set_target_properties(ResourceCompiler PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${COMPILER_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${COMPILER_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${COMPILER_OUTPUT_DIR}
-)
-
-# Custom target to run the resource compiler
-add_custom_target(GenerateResources
-    COMMAND ResourceCompiler
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    DEPENDS ResourceCompiler
-    COMMENT "Generating resource files from JSON assets"
 )
