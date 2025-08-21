@@ -8,7 +8,7 @@
 
 struct RoomListResponse
 {
-    static constexpr Command Command = ResponseCommand::GetRoomList;
+    static constexpr ::Command Command = ResponseCommand::GetRoomList;
 
     CollectionEnvelope<std::vector<RoomInfo>, std::uint32_t> Rooms{0, 100};
 };

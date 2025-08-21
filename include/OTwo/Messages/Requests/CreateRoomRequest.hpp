@@ -5,10 +5,10 @@
 
 struct CreateRoomRequest
 {
-    static constexpr Command Command = RequestCommand::CreateRoom;
+    static constexpr ::Command Command = RequestCommand::CreateRoom;
 
     std::string  Title{};
-    GameMode     GameMode{};
+    ::GameMode   GameMode{};
     bool         Locked{};
     std::string  Password{};
     std::uint8_t MinLevelLimit{};

@@ -4,7 +4,7 @@
 
 struct AuthRequest
 {
-    static constexpr Command Command = RequestCommand::Authorize;
+    static constexpr ::Command Command = RequestCommand::Authorize;
 
     std::string Token{};
 };

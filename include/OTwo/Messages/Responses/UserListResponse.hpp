@@ -7,7 +7,7 @@
 
 struct UserListResponse
 {
-    static constexpr Command Command = ResponseCommand::GetUserList;
+    static constexpr ::Command Command = ResponseCommand::GetUserList;
 
     struct UserInfo
     {

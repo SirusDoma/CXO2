@@ -1,5 +1,7 @@
 ﻿#include <Genode/UI/Image.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     Image::Image():

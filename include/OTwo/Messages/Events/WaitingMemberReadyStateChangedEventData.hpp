@@ -4,7 +4,7 @@
 
 struct WaitingMemberReadyStateChangedEventData
 {
-    static constexpr Command Command = EventCommand::UserReadyStateChanged;
+    static constexpr ::Command Command = EventCommand::UserReadyStateChanged;
 
     std::uint8_t ID{};
     bool         Ready{};

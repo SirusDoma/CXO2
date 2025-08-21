@@ -6,7 +6,7 @@ enum class RoomSlotEventType : std::uint8_t;
 
 struct WaitingSlotChangedEventData
 {
-    static constexpr Command Command = EventCommand::RoomSlotChanged;
+    static constexpr ::Command Command = EventCommand::RoomSlotChanged;
 
     std::uint8_t      ID{};
     RoomSlotEventType Type{};

@@ -58,7 +58,7 @@ private:
     {
         std::uint8_t  ID{};
         std::uint16_t Life{};
-        Avatar*       Avatar{nullptr};
+        ::Avatar*     Avatar{nullptr};
         bool          Valid{};
         bool          Completed{};
     };

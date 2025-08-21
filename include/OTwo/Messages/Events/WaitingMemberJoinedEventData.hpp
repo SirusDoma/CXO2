@@ -6,12 +6,12 @@
 
 struct WaitingMemberJoinedEventData
 {
-    static constexpr Command Command = EventCommand::UserJoinWaiting;
+    static constexpr ::Command Command = EventCommand::UserJoinWaiting;
 
     std::uint8_t ID{};
     std::string  Name{};
     std::int32_t Level{};
-    Gender       Gender{};
+    ::Gender     Gender{};
     RoomTeam     Team{};
     bool         Ready{};
 

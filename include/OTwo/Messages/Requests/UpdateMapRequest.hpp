@@ -5,7 +5,7 @@
 
 struct UpdateMapRequest
 {
-    static constexpr Command Command = RequestCommand::SetWaitingMap;
+    static constexpr ::Command Command = RequestCommand::SetWaitingMap;
 
     MapInfo Map{};
 };

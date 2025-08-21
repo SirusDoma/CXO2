@@ -4,7 +4,7 @@
 
 struct MainRoomAdminMessageResponse
 {
-    static constexpr Command Command = ResponseCommand::MainRoomAdminMessage;
+    static constexpr ::Command Command = ResponseCommand::MainRoomAdminMessage;
 
     std::string Sender{};
     std::string Content{};

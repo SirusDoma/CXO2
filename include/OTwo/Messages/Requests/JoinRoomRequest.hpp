@@ -5,7 +5,7 @@
 
 struct JoinRoomRequest
 {
-    static constexpr Command Command = RequestCommand::JoinWaiting;
+    static constexpr ::Command Command = RequestCommand::JoinWaiting;
 
     std::uint32_t ID{};
     std::string   Password{};

@@ -5,7 +5,7 @@
 
 struct PlayingMemberLeftEventData
 {
-    static constexpr Command Command = EventCommand::UserLeaveGame;
+    static constexpr ::Command Command = EventCommand::UserLeaveGame;
 
     std::uint8_t ID{};
     std::int32_t Level{};

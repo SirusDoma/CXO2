@@ -4,7 +4,7 @@
 
 struct WhisperMessageResponse
 {
-    static constexpr Command Command = ResponseCommand::SendWhisper;
+    static constexpr ::Command Command = ResponseCommand::SendWhisper;
 
     std::uint32_t Invalid{};
     std::string   Recipient{};

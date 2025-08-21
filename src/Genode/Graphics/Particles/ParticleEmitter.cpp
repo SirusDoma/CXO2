@@ -1,6 +1,8 @@
 #include <Genode/Graphics/Particles/ParticleEmitter.hpp>
 #include <Genode/Graphics/Particles/ParticleSystem.hpp>
 
+#include <algorithm>
+
 namespace Gx
 {
     ParticleEmitter::ParticleEmitter(ParticleSystem& particleSystem) :

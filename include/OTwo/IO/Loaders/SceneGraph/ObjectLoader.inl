@@ -1,5 +1,7 @@
 #pragma once
 
+#include <OTwo/Decorators/IO/ResourceContextDecorator.hpp>
+
 template<typename R>
 Gx::ResourcePtr<R> ObjectLoader::LoadFromJson(const std::string& name, const Gx::Json& json, const Gx::ResourceContext& context)
 {

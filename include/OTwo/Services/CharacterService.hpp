@@ -2,6 +2,7 @@
 
 #include <OTwo/Services/Service.hpp>
 
+#include <cstdint>
 #include <functional>
 
 enum class EquipmentType : std::uint8_t;

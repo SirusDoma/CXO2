@@ -10,7 +10,7 @@ enum class CreateRoomResult : std::uint32_t
 
 struct CreateRoomResponse
 {
-    static constexpr Command Command = ResponseCommand::CreateRoom;
+    static constexpr ::Command Command = ResponseCommand::CreateRoom;
 
     CreateRoomResult ResultCode{};
     std::uint32_t ID{};

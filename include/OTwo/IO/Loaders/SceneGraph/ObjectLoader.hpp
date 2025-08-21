@@ -1,10 +1,10 @@
 #pragma once
 
-#include <OTwo/IO/ResourceLoader.hpp>
 #include <OTwo/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 
 #include <Genode/IO/Json.hpp>
 
+class REsourceLoader;
 class ObjectLoader
 {
 public:

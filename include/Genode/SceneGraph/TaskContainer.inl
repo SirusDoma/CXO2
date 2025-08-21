@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 namespace Gx
 {
     template<typename T, typename ... Args>

@@ -3,6 +3,7 @@
 #include <SFML/System/MemoryInputStream.hpp>
 
 #include <algorithm>
+#include <cstring>
 
 Gx::ResourcePtr<sf::InputStream> EmbeddedArchive::Open(const std::string& fileName) const
 {

@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #define _LIBICONV_VERSION 0x0111    /* version number: (major<<8) + minor */
-extern __declspec (dllimport) int _libiconv_version; /* Likewise */
+// extern __declspec (dllimport) int _libiconv_version; /* Likewise */
 
 #ifdef __cplusplus
 }

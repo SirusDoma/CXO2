@@ -12,6 +12,7 @@
 
 namespace Gx
 {
+    class VertexPool;
     class VertexSpan final
     {
     public:

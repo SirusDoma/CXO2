@@ -136,7 +136,7 @@ void RoomOfflineService::GetChannelInfo(
                 {
                     /* .ID            = */ 0,
                     /* .State         = */ RoomState::Playing,
-                    /* .Title         = */"Let's play together~",
+                    /* .Title         = */std::string("Let's play together~"),
                     /* .Locked        = */ false,
                     /* .MusicID       = */ 100,
                     /* .Difficulty    = */ Difficulty::HX,
@@ -151,7 +151,7 @@ void RoomOfflineService::GetChannelInfo(
                 {
                     /* .ID            = */ 5,
                     /* .State         = */ RoomState::Waiting,
-                    /* .Title         = */ "Another's room",
+                    /* .Title         = */ std::string("Another's room"),
                     /* .Locked        = */ false,
                     /* .MusicID       = */ 100,
                     /* .Difficulty    = */ Difficulty::EX,
@@ -167,7 +167,7 @@ void RoomOfflineService::GetChannelInfo(
                 {
                     /* .ID            = */ 3,
                     /* .State         = */ RoomState::Waiting,
-                    /* .Title         = */ "Someone's room",
+                    /* .Title         = */ std::string("Someone's room"),
                     /* .Locked        = */ false,
                     /* .MusicID       = */ 100,
                     /* .Difficulty    = */ Difficulty::HX,

@@ -51,7 +51,7 @@ set(SFML_STATIC_LIBRARIES TRUE)
 FetchContent_Declare(
     SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG        3.0.0
+    GIT_TAG        3.0.1
 )
 FetchContent_MakeAvailable(SFML)
 
@@ -77,30 +77,6 @@ FetchContent_Declare(
     GIT_TAG        ecdeb1cea54d87b09bafe9999faf56654646209d
 )
 FetchContent_MakeAvailable(magic_enum)
-
-# -- MessageBox
-Check_Include_Files("gtk/gtk.h" GTK_AVAILABLE)
-if(WIN32 OR APPLE OR GTK_AVAILABLE)
-    # -- Boxer Flags
-    message("-- System message box: Boxer")
-    set(USE_BOXER TRUE)
-    add_compile_definitions(USE_BOXER)
-    set(BOXER_BUILD_EXAMPLES OFF CACHE BOOL "Compile boxer examples")
-    FetchContent_Declare(
-        Boxer
-        GIT_REPOSITORY https://github.com/aaronmjacobs/Boxer.git
-        GIT_TAG master
-    )
-    FetchContent_MakeAvailable(Boxer)
-else()
-    Check_Include_Files("X11/Xlib.h" X11_AVAILABLE)
-    if(X11_AVAILABLE)
-        add_compile_definitions(USE_X11)
-        message("-- System message box: MessageBox-X11")
-    else()
-        message("-- Warning: No system message box implementation compatible.")
-    endif()
-endif()
 
 # Specific OS Directories and Flags
 if(WIN32)
@@ -222,12 +198,15 @@ else()
     set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
     add_compile_definitions(USE_LIBICONV)
 
-    # Allow big obj (for embedded Resource.hpp)
-    target_compile_options(${TARGET} PRIVATE -mbig-obj)
+    # Compiler flags
+    target_compile_options(${TARGET} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-non-template-friend -Wno-virtual-move-assign>)
 
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE stdc++fs)
     target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+
+    # Freetype
+    find_package(Freetype REQUIRED)
 
     # Fontconfig for font discovery on Linux
     find_package(Fontconfig QUIET)
@@ -253,11 +232,6 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 
 # Link Magic Enum
 target_link_libraries(${TARGET} PRIVATE magic_enum::magic_enum)
-
-# Link Boxer
-if(USE_BOXER)
-    target_link_libraries(${TARGET} PRIVATE Boxer)
-endif()
 
 # Link SFML
 target_link_libraries(${TARGET} PRIVATE SFML::Audio SFML::Graphics SFML::System SFML::Window SFML::Network)

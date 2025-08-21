@@ -5,7 +5,7 @@
 
 struct RoomStateChangedEventData
 {
-    static constexpr Command Command = EventCommand::RoomStateChanged;
+    static constexpr ::Command Command = EventCommand::RoomStateChanged;
 
     std::uint32_t ID{};
     RoomState     State{};

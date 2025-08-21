@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <unordered_set>
+#include <vector>
 
 enum class Gender : std::uint8_t
 {

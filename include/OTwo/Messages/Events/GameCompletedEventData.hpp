@@ -8,7 +8,7 @@
 
 struct GameCompletedEventData
 {
-    static constexpr Command Command = EventCommand::GameCompleted;
+    static constexpr ::Command Command = EventCommand::GameCompleted;
 
     CollectionEnvelope<std::vector<ScoreEntry>, std::uint32_t> Entries{};
 };

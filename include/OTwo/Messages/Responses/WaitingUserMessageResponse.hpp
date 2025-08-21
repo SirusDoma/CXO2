@@ -4,7 +4,7 @@
 
 struct WaitingUserMessageResponse
 {
-    static constexpr Command Command = ResponseCommand::WaitingUserMessage;
+    static constexpr ::Command Command = ResponseCommand::WaitingUserMessage;
 
     std::string Sender{};
     std::string Content{};

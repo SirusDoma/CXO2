@@ -1,5 +1,7 @@
 ﻿#include <Genode/UI/Label.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     sf::FloatRect Label::GetLocalBounds() const

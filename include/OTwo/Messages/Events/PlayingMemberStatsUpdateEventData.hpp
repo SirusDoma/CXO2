@@ -11,7 +11,7 @@ enum class UpdateStatsType : std::uint16_t
 
 struct PlayingMemberStatsUpdateEventData
 {
-    static constexpr Command Command = EventCommand::GameStatsUpdate;
+    static constexpr ::Command Command = EventCommand::GameStatsUpdate;
 
     std::uint8_t    ID{};
     UpdateStatsType Type{};

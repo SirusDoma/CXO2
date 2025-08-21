@@ -378,7 +378,7 @@ void StateRoom::CreateRoom(
                 {
                     /* .ID            = */ response.ID,
                     /* .State         = */ RoomState::Waiting,
-                    /* .Title         = */ title,
+                    /* .Title         = */ title.toAnsiString(),
                     /* .Locked        = */ !password.empty(),
                     /* .MusicID       = */ music.ID,
                     /* .Difficulty    = */ Difficulty::EX,

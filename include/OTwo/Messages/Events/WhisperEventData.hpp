@@ -4,7 +4,7 @@
 
 struct WhisperEventData
 {
-    static constexpr Command Command = EventCommand::ReceiveWhisper;
+    static constexpr ::Command Command = EventCommand::ReceiveWhisper;
 
     std::string   Sender{};
     std::string   Content{};

@@ -4,7 +4,7 @@
 
 struct PurchaseItemRequest
 {
-    static constexpr Command Command = RequestCommand::PurchaseItem;
+    static constexpr ::Command Command = RequestCommand::PurchaseItem;
 
     std::uint32_t ItemID{};
 };

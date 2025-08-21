@@ -9,6 +9,7 @@
 
 #include <SFML/System/FileInputStream.hpp>
 
+#include <cstdint>
 #include <unordered_map>
 
 class OjmArchive final : public virtual Gx::Archive, M30Archive, OmcArchive

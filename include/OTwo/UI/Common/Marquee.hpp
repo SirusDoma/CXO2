@@ -4,6 +4,8 @@
 #include <Genode/UI/Label.hpp>
 #include <Genode/Graphics/Sprite.hpp>
 
+#include <SFML/Graphics/RenderTexture.hpp>
+
 class Marquee : public Gx::Label
 {
 public:

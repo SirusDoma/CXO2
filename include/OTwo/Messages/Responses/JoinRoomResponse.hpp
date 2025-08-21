@@ -19,13 +19,13 @@ enum class JoinResult : std::uint32_t
 
 struct JoinRoomResponse
 {
-    static constexpr Command Command = ResponseCommand::JoinRoom;
+    static constexpr ::Command Command = ResponseCommand::JoinRoom;
 
     struct MemberInfo
     {
         std::string Name{};
         int         Level{};
-        Gender      Gender{};
+        ::Gender    Gender{};
         bool        IsRoomMaster{};
         RoomTeam    Team{};
         bool        Ready{};
@@ -48,7 +48,7 @@ struct JoinRoomResponse
     std::uint32_t MusicID{};
     MapInfo       Map{};
     GameMode      Mode{};
-    Difficulty    Difficulty{};
+    ::Difficulty  Difficulty{};
     std::uint8_t  SpeedID{};
     std::uint32_t UserCount{};
 

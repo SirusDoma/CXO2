@@ -1,7 +1,8 @@
 #pragma once
-#include <unordered_map>
 #include <OTwo/Models/Planet.hpp>
 #include <SFML/Network/IpAddress.hpp>
+
+#include <vector>
 
 struct GatewayInfo
 {

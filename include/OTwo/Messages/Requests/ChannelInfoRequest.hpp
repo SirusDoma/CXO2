@@ -4,5 +4,5 @@
 
 struct ChannelInfoRequest
 {
-    static constexpr Command Command = RequestCommand::GetChannelInfo;
+    static constexpr ::Command Command = RequestCommand::GetChannelInfo;
 };

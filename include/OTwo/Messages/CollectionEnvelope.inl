@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Genode/System/Exception.hpp>
+
 template<typename TContainer, typename TPrefixSize, typename T0>
 CollectionEnvelope<TContainer, TPrefixSize, T0>::CollectionEnvelope() :
     m_container{}
@@ -67,7 +69,7 @@ void CollectionEnvelope<TContainer, TPrefixSize, T0>::UsePrefixSizeType()
         }
         else
         {
-            return m_minSize.value_or({});
+            return m_minSize.value_or(0);
         }
     };
 }

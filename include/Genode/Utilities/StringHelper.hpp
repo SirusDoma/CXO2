@@ -7,6 +7,10 @@
 #include <cmath>
 #include <regex>
 
+#ifndef _WIN32
+#include <cxxabi.h>
+#endif
+
 namespace Gx
 {
     class StringHelper
@@ -184,6 +188,18 @@ namespace Gx
         static std::string GetTypeName([[maybe_unused]] T& obj, const bool withNamespace = true)
         {
             auto name = std::string(typeid(obj).name());
+
+#ifndef _WIN32
+            int status = -1;
+            const auto buffer = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
+
+            name = std::string(buffer);
+            free(buffer);
+
+            if (status == -1)
+                name = std::string(typeid(T).name());
+#endif
+
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
@@ -204,15 +220,6 @@ namespace Gx
                     parts.pop_back();
 
                 return parts.back();
-            }
-
-            if (!name.empty() && std::isdigit(name[0]))
-            {
-                size_t i = 0;
-                while (i < name.length() && std::isdigit(name[i])) {
-                    ++i;
-                }
-                return name.substr(i);
             }
 
             return name;
@@ -222,6 +229,18 @@ namespace Gx
         static std::string GetTypeName(const bool withNamespace = true)
         {
             auto name = std::string(typeid(T).name());
+
+#ifndef _WIN32
+            int status = -1;
+            const auto buffer = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
+
+            name = std::string(buffer);
+            free(buffer);
+
+            if (status == -1)
+                name = std::string(typeid(T).name());
+#endif
+
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
@@ -242,15 +261,6 @@ namespace Gx
                     parts.pop_back();
 
                 return parts.back();
-            }
-
-            if (!name.empty() && std::isdigit(name[0]))
-            {
-                size_t i = 0;
-                while (i < name.length() && std::isdigit(name[i])) {
-                    ++i;
-                }
-                return name.substr(i);
             }
 
             return name;
@@ -259,6 +269,18 @@ namespace Gx
         static std::string GetTypeName(const std::type_info& type, const bool withNamespace = true)
         {
             auto name = std::string(type.name());
+
+#ifndef _WIN32
+            int status = -1;
+            const auto buffer = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
+
+            name = std::string(buffer);
+            free(buffer);
+
+            if (status == -1)
+                name = std::string(type.name());
+#endif
+
             if (!withNamespace)
             {
                 if (const auto pos = name.find_last_of(':'); pos != std::string::npos)
@@ -279,15 +301,6 @@ namespace Gx
                     parts.pop_back();
 
                 return parts.back();
-            }
-
-            if (!name.empty() && std::isdigit(name[0]))
-            {
-                size_t i = 0;
-                while (i < name.length() && std::isdigit(name[i])) {
-                    ++i;
-                }
-                return name.substr(i);
             }
 
             return name;

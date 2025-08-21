@@ -5,7 +5,7 @@
 
 struct RoomTitleChangedEventData
 {
-    static constexpr Command Command = EventCommand::RoomTitleChanged;
+    static constexpr ::Command Command = EventCommand::RoomTitleChanged;
 
     std::uint32_t ID{};
     std::string   Title{};

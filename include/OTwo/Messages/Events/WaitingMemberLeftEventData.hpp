@@ -5,7 +5,7 @@
 
 struct WaitingMemberLeftEventData
 {
-    static constexpr Command Command = EventCommand::UserLeaveWaiting;
+    static constexpr ::Command Command = EventCommand::UserLeaveWaiting;
 
     std::uint8_t ID{};
     std::uint8_t RoomMasterID{};

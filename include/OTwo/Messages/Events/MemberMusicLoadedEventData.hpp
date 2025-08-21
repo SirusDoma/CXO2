@@ -4,7 +4,7 @@
 
 struct MemberMusicLoadedEventData
 {
-    static constexpr Command Command = EventCommand::MusicLoaded;
+    static constexpr ::Command Command = EventCommand::MusicLoaded;
 
     std::uint8_t ID{};
 };

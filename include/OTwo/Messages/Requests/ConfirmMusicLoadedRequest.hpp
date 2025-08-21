@@ -4,5 +4,5 @@
 
 struct ConfirmMusicLoadedRequest
 {
-    static constexpr Command Command = RequestCommand::ConfirmMusicLoaded;
+    static constexpr ::Command Command = RequestCommand::ConfirmMusicLoaded;
 };

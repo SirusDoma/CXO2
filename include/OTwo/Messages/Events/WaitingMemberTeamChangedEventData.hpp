@@ -5,7 +5,7 @@
 
 struct WaitingMemberTeamChangedEventData
 {
-    static constexpr Command Command = EventCommand::UserTeamChanged;
+    static constexpr ::Command Command = EventCommand::UserTeamChanged;
 
     std::uint8_t ID{};
     RoomTeam     Team{};

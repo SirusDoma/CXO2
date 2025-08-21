@@ -4,5 +4,5 @@
 
 struct WaitingKickEventData
 {
-    static constexpr Command Command = EventCommand::Kick;
+    static constexpr ::Command Command = EventCommand::Kick;
 };

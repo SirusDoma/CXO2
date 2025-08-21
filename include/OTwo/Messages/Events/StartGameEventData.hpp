@@ -12,7 +12,7 @@ enum class StartGameResult : std::uint32_t
 
 struct StartGameEventData
 {
-    static constexpr Command Command = EventCommand::StartGame;
+    static constexpr ::Command Command = EventCommand::StartGame;
 
     StartGameResult ResultCode{};
 };

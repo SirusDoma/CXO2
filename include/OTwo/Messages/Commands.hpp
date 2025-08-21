@@ -152,7 +152,7 @@ public:
         return std::visit([](auto&& cmd)
         {
             return static_cast<std::uint16_t>(cmd);
-        }, *this);
+        }, std::variant<RequestCommand, ResponseCommand, EventCommand, GenericCommand>(*this));
     }
 
     // ReSharper disable once CppNonExplicitConversionOperator

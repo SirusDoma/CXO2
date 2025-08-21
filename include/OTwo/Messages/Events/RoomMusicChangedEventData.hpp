@@ -5,10 +5,10 @@
 
 struct RoomMusicChangedEventData
 {
-    static constexpr Command Command = EventCommand::RoomMusicChanged;
+    static constexpr ::Command Command = EventCommand::RoomMusicChanged;
 
     std::uint32_t ID{};
     std::uint32_t MusicID{};
-    Difficulty    Difficulty{};
+    ::Difficulty  Difficulty{};
     std::uint8_t  SpeedID{};
 };

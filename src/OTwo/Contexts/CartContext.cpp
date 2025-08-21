@@ -1,6 +1,8 @@
 #include <OTwo/Contexts/CartContext.hpp>
 #include <OTwo/Models/Shop.hpp>
 
+#include <algorithm>
+
 bool CartContext::AddEquipment(const unsigned int id)
 {
     if (Contains(CartItemType::Equipment, id))

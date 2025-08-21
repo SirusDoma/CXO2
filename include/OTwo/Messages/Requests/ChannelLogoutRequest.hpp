@@ -4,5 +4,5 @@
 
 struct ChannelLogoutRequest
 {
-    static constexpr Command Command = RequestCommand::ChannelLogout;
+    static constexpr ::Command Command = RequestCommand::ChannelLogout;
 };

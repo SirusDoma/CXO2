@@ -4,7 +4,7 @@
 
 struct MainRoomMessageRequest
 {
-    static constexpr Command Command = RequestCommand::SendMainRoomMessage;
+    static constexpr ::Command Command = RequestCommand::SendMainRoomMessage;
 
     std::string Content{};
 };

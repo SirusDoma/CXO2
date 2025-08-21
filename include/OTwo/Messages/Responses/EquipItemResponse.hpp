@@ -5,7 +5,7 @@
 
 struct EquipItemResponse
 {
-    static constexpr Command Command = ResponseCommand::EquipItem;
+    static constexpr ::Command Command = ResponseCommand::EquipItem;
 
     std::uint32_t     Invalid{};
     ItemEquipSlotType EquipSlot{};

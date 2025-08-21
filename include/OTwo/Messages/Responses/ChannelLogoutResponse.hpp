@@ -4,7 +4,7 @@
 
 struct ChannelLogoutResponse
 {
-    static constexpr Command Command = ResponseCommand::ChannelLogout;
+    static constexpr ::Command Command = ResponseCommand::ChannelLogout;
 
     std::uint32_t Invalid{};
 };

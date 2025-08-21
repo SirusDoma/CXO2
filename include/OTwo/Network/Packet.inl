@@ -1,6 +1,7 @@
 #pragma once
 
 #include <magic_enum/magic_enum.hpp>
+#include <cstring>
 
 template<typename T>
 std::enable_if_t<std::is_enum_v<T>, Packet&>

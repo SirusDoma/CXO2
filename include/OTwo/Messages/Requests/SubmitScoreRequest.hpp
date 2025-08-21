@@ -4,7 +4,7 @@
 
 struct SubmitScoreRequest
 {
-    static constexpr Command Command = RequestCommand::SubmitScore;
+    static constexpr ::Command Command = RequestCommand::SubmitScore;
 
     std::uint16_t Cool{};
     std::uint16_t Good{};

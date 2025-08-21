@@ -4,5 +4,5 @@
 
 struct UserListRequest
 {
-    static constexpr Command Command = RequestCommand::GetUserList;
+    static constexpr ::Command Command = RequestCommand::GetUserList;
 };

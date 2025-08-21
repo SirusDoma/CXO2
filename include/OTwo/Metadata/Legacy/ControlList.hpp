@@ -67,12 +67,12 @@ struct ControlList : public ResourceMetadata
             return m_name;
         }
 
-        Control State::GetBase() const
+        Control GetBase() const
         {
             return m_base;
         }
 
-        void State::SetBase(const Control& identifier)
+        void SetBase(const Control& identifier)
         {
             m_base = identifier;
         }

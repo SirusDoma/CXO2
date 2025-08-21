@@ -4,7 +4,7 @@
 
 struct ExitWaitingResponse
 {
-    static constexpr Command Command = ResponseCommand::ExitWaiting;
+    static constexpr ::Command Command = ResponseCommand::ExitWaiting;
 
     std::uint32_t Invalid{};
 };

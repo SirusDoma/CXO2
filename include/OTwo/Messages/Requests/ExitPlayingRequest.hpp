@@ -4,5 +4,5 @@
 
 struct ExitPlayingRequest
 {
-    static constexpr Command Command = RequestCommand::ExitPlaying;
+    static constexpr ::Command Command = RequestCommand::ExitPlaying;
 };

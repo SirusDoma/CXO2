@@ -218,7 +218,7 @@ namespace
                 g = (g << 3) | (g >> 2);
                 b = (b << 3) | (b >> 2);
 
-                image.setPixel({x + i, y}, sf::Color{r, g, b, 255});
+                image.setPixel({static_cast<unsigned int>(x + i), y}, sf::Color{r, g, b, 255});
             }
         }
 

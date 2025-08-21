@@ -88,7 +88,7 @@ namespace Gx
 
         struct Scoppable
         {
-            explicit Scoppable(const Scope scope) : Scoppable::Scope(scope) {};
+            explicit Scoppable(const Scope scope) : Scope(scope) {};
             virtual ~Scoppable() = default;
 
             Context::Scope Scope;

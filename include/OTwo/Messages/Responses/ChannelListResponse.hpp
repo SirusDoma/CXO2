@@ -5,7 +5,7 @@
 
 struct ChannelListResponse
 {
-    static constexpr Command Command = ResponseCommand::GetChannelList;
+    static constexpr ::Command Command = ResponseCommand::GetChannelList;
 
     struct ChannelState
     {

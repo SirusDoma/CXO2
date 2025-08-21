@@ -5,7 +5,7 @@
 
 struct UpdateMemberTeamRequest
 {
-    static constexpr Command Command = RequestCommand::SetUserTeam;
+    static constexpr ::Command Command = RequestCommand::SetUserTeam;
 
     RoomTeam Team;
 };

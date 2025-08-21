@@ -9,7 +9,6 @@
 
 #include <fmt/format.h>
 #include <string>
-#include <Genode/Utilities/Debugger.hpp>
 
 template<typename R>
 Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const

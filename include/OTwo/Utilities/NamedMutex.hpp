@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/interprocess/sync/named_mutex.hpp>
+#include <memory>
 #include <string>
 
 class NamedMutex final

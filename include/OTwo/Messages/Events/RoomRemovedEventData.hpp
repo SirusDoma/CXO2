@@ -4,7 +4,7 @@
 
 struct RoomRemovedEventData
 {
-    static constexpr Command Command = EventCommand::RoomRemoved;
+    static constexpr ::Command Command = EventCommand::RoomRemoved;
 
     std::uint32_t ID{};
 };

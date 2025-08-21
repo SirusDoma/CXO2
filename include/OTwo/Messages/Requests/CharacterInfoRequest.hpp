@@ -4,5 +4,5 @@
 
 struct CharacterInfoRequest
 {
-    static constexpr Command Command = RequestCommand::GetCharacterInfo;
+    static constexpr ::Command Command = RequestCommand::GetCharacterInfo;
 };

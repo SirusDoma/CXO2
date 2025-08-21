@@ -4,5 +4,5 @@
 
 struct ExitWaitingRequest
 {
-    static constexpr Command Command = RequestCommand::ExitWaiting;
+    static constexpr ::Command Command = RequestCommand::ExitWaiting;
 };

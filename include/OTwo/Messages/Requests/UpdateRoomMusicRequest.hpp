@@ -5,9 +5,9 @@
 
 struct UpdateRoomMusicRequest
 {
-    static constexpr Command Command = RequestCommand::SetWaitingMusic;
+    static constexpr ::Command Command = RequestCommand::SetWaitingMusic;
 
     std::uint32_t MusicID{};
-    Difficulty    Difficulty{};
+    ::Difficulty  Difficulty{};
     std::uint8_t  SpeedID{};
 };

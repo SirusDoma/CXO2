@@ -4,5 +4,5 @@
 
 struct StartGameRequest
 {
-    static constexpr Command Command = RequestCommand::StartGame;
+    static constexpr ::Command Command = RequestCommand::StartGame;
 };

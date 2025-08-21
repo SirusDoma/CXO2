@@ -22,7 +22,7 @@ struct RoomInfo
     StringEnvelope<> Title{0, 21};
     bool             Locked{};
     std::uint32_t    MusicID{};
-    Difficulty       Difficulty{};
+    ::Difficulty     Difficulty{};
     GameMode         Mode{};
     std::uint8_t     SpeedID{};
     std::uint8_t     Capacity{};

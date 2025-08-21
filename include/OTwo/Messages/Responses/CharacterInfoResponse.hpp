@@ -9,7 +9,7 @@
 
 struct CharacterInfoResponse
 {
-    static constexpr Command Command = ResponseCommand::GetCharacterInfo;
+    static constexpr ::Command Command = ResponseCommand::GetCharacterInfo;
 
     std::uint32_t Suspended{};
     std::string   Name{};

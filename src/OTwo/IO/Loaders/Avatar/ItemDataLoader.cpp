@@ -29,12 +29,12 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileNa
     {
         std::uint32_t ID;
         EquipmentType Type;
-        Planet        Planet;
+        ::Planet      Planet;
         std::uint16_t Flag;
         std::uint8_t  Quantity; // newer version: std::uint16_t
         std::uint8_t  MoidifierEffect;
         std::uint8_t  MoidifierCategory;
-        Currency      Currency;
+        ::Currency    Currency;
         std::uint32_t PriceGem;
         std::uint32_t PriceCash;
     };

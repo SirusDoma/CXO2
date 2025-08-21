@@ -5,7 +5,7 @@
 
 struct WaitingTitleChangedEventData
 {
-    static constexpr Command Command = EventCommand::WaitingTitleChanged;
+    static constexpr ::Command Command = EventCommand::WaitingTitleChanged;
 
     std::string Title{};
 };

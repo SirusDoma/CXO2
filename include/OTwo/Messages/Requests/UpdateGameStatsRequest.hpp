@@ -6,7 +6,7 @@
 enum class UpdateStatsType : std::uint16_t;
 struct UpdateGameStatsRequest
 {
-    static constexpr Command Command = RequestCommand::UpdateGameStats;
+    static constexpr ::Command Command = RequestCommand::UpdateGameStats;
 
     UpdateStatsType Type{};
     std::uint16_t   Value{};

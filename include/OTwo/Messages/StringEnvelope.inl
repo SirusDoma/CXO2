@@ -58,28 +58,28 @@ void StringEnvelope<TString, TPrefixSize, T0>::SetNullTerminated(const bool valu
 template<typename TString, typename TPrefixSize, typename T0>
 StringEnvelope<TString, TPrefixSize, T0>::operator sf::String() const
 {
-    return sf::String(GetContainer());
+    return sf::String(this->GetContainer());
 }
 
 template<typename TString, typename TPrefixSize, typename T0>
 StringEnvelope<TString, TPrefixSize, T0>::operator std::string()
 {
-    if (typeid(GetContainer()) == typeid(std::string))
-        return GetContainer();
+    if (typeid(this->GetContainer()) == typeid(std::string))
+        return this->GetContainer();
 
-    if (typeid(GetContainer()) == typeid(sf::String))
-        return GetContainer();
+    if (typeid(this->GetContainer()) == typeid(sf::String))
+        return this->GetContainer();
 
-    return std::string(GetContainer());
+    return std::string(this->GetContainer());
 }
 
 template<typename TString, typename TPrefixSize, typename T0>
 void StringEnvelope<TString, TPrefixSize, T0>::OnSend(Packet& packet) const
 {
-    WriteEnvelopeSize(packet);
+    this->WriteEnvelopeSize(packet);
 
-    const std::size_t size = NormalizeEnvelopeSize(GetContainerSize());
-    const auto& container  = GetContainer();
+    const std::size_t size = this->NormalizeEnvelopeSize(this->GetContainerSize());
+    const auto& container  = this->GetContainer();
 
     for (std::size_t i = 0; i < size; i++)
     {
@@ -101,12 +101,15 @@ void StringEnvelope<TString, TPrefixSize, T0>::OnSend(Packet& packet) const
     }
 }
 
+template<class T>
+struct always_false : std::false_type {};
+
 template<typename TString, typename TPrefixSize, typename T0>
 void StringEnvelope<TString, TPrefixSize, T0>::OnReceive(Packet& packet)
 {
-    const std::size_t size = NormalizeEnvelopeSize(ReadEnvelopeSize(packet));
+    const std::size_t size = this->NormalizeEnvelopeSize(this->ReadEnvelopeSize(packet));
 
-    auto& container = GetContainer();
+    auto& container = this->GetContainer();
     container.clear();
 
     for (std::size_t i = 0; i < size; ++i)
@@ -133,7 +136,11 @@ void StringEnvelope<TString, TPrefixSize, T0>::OnReceive(Packet& packet)
         }
         else
         {
-            static_assert(false && "Container type must have either push_back() or insert() method");
+            static_assert(
+                !CollectionEnvelope<TString, TPrefixSize, T0>::template HasPushBack<TString>::value &&
+                !CollectionEnvelope<TString, TPrefixSize, T0>::template HasInsert<TString>::value,
+                "Container type must have either push_back() or insert() method"
+            );
 
             throw Gx::NotSupportedException();
         }

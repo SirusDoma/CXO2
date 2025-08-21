@@ -20,6 +20,7 @@
 namespace Gx
 {
     class Application;
+    class SceneDirector;
     class Scene : public virtual Node, public RenderableContainer, public UpdatableContainer,
                   public InputableContainer, public TaskContainer, public Presentable::Parent
     {

@@ -1,5 +1,7 @@
 #include <Genode/Graphics/Particles/ParticleSystem.hpp>
 
+#include <algorithm>
+
 namespace Gx
 {
     ParticleSystem::ParticleSystem(const sf::PrimitiveType primitiveType) :

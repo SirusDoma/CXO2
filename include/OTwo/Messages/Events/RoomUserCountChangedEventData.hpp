@@ -5,7 +5,7 @@
 
 struct RoomUserCountChangedEventData
 {
-    static constexpr Command Command = EventCommand::RoomUserCountChanged;
+    static constexpr ::Command Command = EventCommand::RoomUserCountChanged;
 
     std::uint32_t ID{};
     std::uint8_t  Capacity{};

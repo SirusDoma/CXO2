@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Genode/IO/FileSystem/FileInfo.hpp>
+#include <cstdint>
 
 class FileInfo final : public Gx::FileInfo
 {

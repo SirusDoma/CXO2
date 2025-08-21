@@ -4,5 +4,5 @@
 
 struct UpdateMemberReadyStateRequest
 {
-    static constexpr Command Command = RequestCommand::Ready;
+    static constexpr ::Command Command = RequestCommand::Ready;
 };

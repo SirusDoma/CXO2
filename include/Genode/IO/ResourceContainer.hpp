@@ -3,6 +3,7 @@
 #include <Genode/IO/Resource.hpp>
 #include <Genode/IO/IOException.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <unordered_map>
 #include <string>

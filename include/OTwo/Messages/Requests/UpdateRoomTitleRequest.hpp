@@ -4,7 +4,7 @@
 
 struct UpdateRoomTitleRequest
 {
-    static constexpr Command Command = RequestCommand::SetRoomTitle;
+    static constexpr ::Command Command = RequestCommand::SetRoomTitle;
 
     std::string Title{};
 };

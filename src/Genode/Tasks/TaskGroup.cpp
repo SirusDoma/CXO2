@@ -1,5 +1,7 @@
 #include <Genode/Tasks/TaskGroup.hpp>
 
+#include <algorithm>
+
 namespace Gx
 {
     TaskGroup& TaskGroup::Add(Task& task)

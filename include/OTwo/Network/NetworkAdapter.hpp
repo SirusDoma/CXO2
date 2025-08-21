@@ -13,6 +13,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <optional>
+#include <condition_variable>
 
 class NetworkAdapter
 {
@@ -116,7 +117,7 @@ public:
 private:
     struct PumpRequest
     {
-        Command                                      Command{};
+        ::Command                                    Command{};
         Packet                                       Request{};
         sf::Clock                                    Timer{};
         sf::Time                                     Timeout{sf::seconds(5)};
@@ -126,7 +127,7 @@ private:
 
     struct PollRequest
     {
-        Command                                      Command{};
+        ::Command                                    Command{};
         sf::Clock                                    Timer{};
         sf::Time                                     Timeout{sf::seconds(5)};
         bool                                         Recurring{false};

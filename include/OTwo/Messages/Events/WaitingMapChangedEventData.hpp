@@ -5,7 +5,7 @@
 
 struct WaitingMapChangedEventData
 {
-    static constexpr Command Command = EventCommand::WaitingMapChanged;
+    static constexpr ::Command Command = EventCommand::WaitingMapChanged;
 
     MapInfo Map{};
 };

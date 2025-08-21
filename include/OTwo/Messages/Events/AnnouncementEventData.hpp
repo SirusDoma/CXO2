@@ -6,7 +6,7 @@
 
 struct AnnouncementEventData
 {
-    static constexpr Command Command = ResponseCommand::Announcement;
+    static constexpr ::Command Command = ResponseCommand::Announcement;
 
     std::string Content{};
 };

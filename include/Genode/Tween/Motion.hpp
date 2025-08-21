@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <cmath>
 
 namespace Gx
 {

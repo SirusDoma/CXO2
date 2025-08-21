@@ -10,7 +10,7 @@ enum class SellItemResult : std::uint32_t
 
 struct SellItemResponse
 {
-    static constexpr Command Command = ResponseCommand::SellItem;
+    static constexpr ::Command Command = ResponseCommand::SellItem;
 
     SellItemResult Result{};
     std::uint32_t  Gem{};

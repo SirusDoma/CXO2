@@ -3,6 +3,11 @@
 #include <tuple>
 #include <utility>
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-local-addr"
+#endif
+
 // Based on
 // * https://stackoverflow.com/a/54493136
 //   https://godbolt.org/z/FxPDgU
@@ -149,3 +154,7 @@ namespace Gx
         };
     }
 }
+
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif

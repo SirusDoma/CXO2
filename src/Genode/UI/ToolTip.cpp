@@ -1,5 +1,7 @@
 #include <Genode/UI/ToolTip.hpp>
 
+#include <cmath>
+
 namespace Gx
 {
     ToolTip::ToolTip() :

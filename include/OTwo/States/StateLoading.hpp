@@ -6,6 +6,7 @@
 #include <OTwo/IO/Loaders/Chart/O2JamChartLoader.hpp>
 
 #include <unordered_set>
+#include <condition_variable>
 
 struct WaitingMemberLeftEventData;
 struct MemberMusicLoadedEventData;

@@ -21,7 +21,7 @@ enum class ItemEquipSlotType : std::uint32_t
 
 struct EquipItemRequest
 {
-    static constexpr Command Command = RequestCommand::EquipItem;
+    static constexpr ::Command Command = RequestCommand::EquipItem;
 
     ItemEquipSlotType EquipSlot{};
     std::uint32_t     SlotID{};

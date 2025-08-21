@@ -7,10 +7,10 @@
 
 struct AuthResponse
 {
-    static constexpr Command Command = ResponseCommand::Authorize;
+    static constexpr ::Command Command = ResponseCommand::Authorize;
 
     AuthResult       ResultCode{};
-    BillingCode      BillingCode{};
+    ::BillingCode    BillingCode{};
     StringEnvelope<> Timestamp{12, 12, false};
     std::uint32_t    SubscriptionRemainingTimeMinutes{};
 };

@@ -11,7 +11,7 @@ enum class PurchaseItemResult : std::uint32_t
 
 struct PurchaseItemResponse
 {
-    static constexpr Command Command = ResponseCommand::PurchaseItem;
+    static constexpr ::Command Command = ResponseCommand::PurchaseItem;
 
     PurchaseItemResult ResultCode{};
     std::uint32_t Gem{};

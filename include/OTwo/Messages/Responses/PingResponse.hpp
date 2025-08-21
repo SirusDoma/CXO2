@@ -4,5 +4,5 @@
 
 struct PingResponse
 {
-    static constexpr Command Command = GenericCommand::Ping;
+    static constexpr ::Command Command = GenericCommand::Ping;
 };

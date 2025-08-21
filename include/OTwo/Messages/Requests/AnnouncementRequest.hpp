@@ -4,7 +4,7 @@
 
 struct AnnouncementRequest
 {
-    static constexpr Command Command = RequestCommand::Announce;
+    static constexpr ::Command Command = RequestCommand::Announce;
 
     std::string Content{};
 };

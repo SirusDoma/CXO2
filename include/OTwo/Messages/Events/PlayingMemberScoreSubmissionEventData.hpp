@@ -5,7 +5,7 @@
 
 struct PlayingMemberScoreSubmissionEventData
 {
-    static constexpr Command Command = EventCommand::ScoreSubmission;
+    static constexpr ::Command Command = EventCommand::ScoreSubmission;
 
     std::uint8_t    ID{};
 };
