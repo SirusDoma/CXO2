@@ -4,7 +4,6 @@
 
 #include <Genode/IO/Json.hpp>
 
-class REsourceLoader;
 class ObjectLoader
 {
 public:
