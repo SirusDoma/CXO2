@@ -53,6 +53,9 @@ namespace Gx
             m_instance = this;
         }
 
+        // Re-create window to fix X11 icon bug
+        CreateMainWindow();
+
         // Bootstrap the game
         Boot();
 
@@ -102,8 +105,6 @@ namespace Gx
 
                         auto ev = event.value();
                         OnInputReceived(ev);
-
-                        break;
                     }
                 }
             }

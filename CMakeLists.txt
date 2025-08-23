@@ -43,41 +43,6 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 message("-- Build type: " ${CMAKE_BUILD_TYPE})
 
-# External Libs Sources and Flags
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
-
-# -- SFML
-set(SFML_STATIC_LIBRARIES TRUE)
-FetchContent_Declare(
-    SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG        3.0.1
-)
-FetchContent_MakeAvailable(SFML)
-
-# -- JSON
-FetchContent_Declare(
-    json
-    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-)
-FetchContent_MakeAvailable(json)
-
-# -- FMT
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt
-    GIT_TAG        11.0.2
-)
-FetchContent_MakeAvailable(fmt)
-
-# -- Magic Enum
-FetchContent_Declare(
-    magic_enum
-    GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-    GIT_TAG        ecdeb1cea54d87b09bafe9999faf56654646209d
-)
-FetchContent_MakeAvailable(magic_enum)
-
 # Specific OS Directories and Flags
 if(WIN32)
     # App Resources (Icon)
@@ -91,8 +56,10 @@ if(WIN32)
     # Windows (Visual Studio) Compiler Output Directories and Flags
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Force static link" FORCE)
     set_target_properties(${TARGET} PROPERTIES
         WIN32_EXECUTABLE                        TRUE
+        MSVC_RUNTIME_LIBRARY                    ${CMAKE_MSVC_RUNTIME_LIBRARY}
         RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${OUTPUT_DIR}
@@ -100,7 +67,6 @@ if(WIN32)
     )
 
     # External libs compiler flags
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-msvc/libiconv/libiconv$<$<CONFIG:Debug>:d>.lib)
 
     # Add LIBICONV
@@ -215,6 +181,41 @@ else()
         target_compile_definitions(${TARGET} PRIVATE GX_HAS_FONTCONFIG)
     endif()
 endif()
+
+# External Libs Sources and Flags
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
+
+# -- SFML
+FetchContent_Declare(
+    SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG        3.0.1
+)
+FetchContent_MakeAvailable(SFML)
+
+# -- JSON
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+FetchContent_MakeAvailable(json)
+
+# -- FMT
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_TAG        11.0.2
+)
+FetchContent_MakeAvailable(fmt)
+
+# -- Magic Enum
+FetchContent_Declare(
+    magic_enum
+    GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+    GIT_TAG        ecdeb1cea54d87b09bafe9999faf56654646209d
+)
+FetchContent_MakeAvailable(magic_enum)
+
 
 message("-- Output Directory: " ${OUTPUT_DIR})
 

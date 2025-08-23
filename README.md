@@ -44,8 +44,8 @@ List of dependencies:
 - [magic_enum](https://github.com/Neargye/magic_enum)
 - [kissfft](https://github.com/mborgerding/kissfft)
 - [libiconv](https://www.gnu.org/software/libiconv/)
-- [Boxer](https://github.com/aaronmjacobs/Boxer) (Windows, Apple, GTK)
-- [MessageBoxX11](https://github.com/Eleobert/MessageBox-X11) (X11)
+- [compact_enc_det](https://github.com/google/compact_enc_det)
+- [tinyfiledialogs](http://tinyfiledialogs.sourceforge.net)
 
 > [!Important]
 > Before building a `Release` build, make sure to run `ResourceCompiler` to ensure `Resources.hpp` contains latest changes.
