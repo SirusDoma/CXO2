@@ -46,7 +46,7 @@ message("-- Build type: " ${CMAKE_BUILD_TYPE})
 # Specific OS Directories and Flags
 if(WIN32)
     # App Resources (Icon)
-    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/resources/OTwo.o)
+    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/resources/OTwo.rc)
     add_executable(${TARGET} ${APP_RESOURCE} ${SRCS} ${HEADERS})
 
     # Output directory
