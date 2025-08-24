@@ -3,6 +3,9 @@
 #if _WIN32
 #include <windows.h>
 #endif
+#include <fstream>
+#include <cctype>
+#include <OTwo/Utilities/StringFormatter.hpp>
 
 NamedMutex::NamedMutex(const std::string& name):
     m_name(std::move(name)),
@@ -26,11 +29,25 @@ NamedMutex::NamedMutex(const std::string& name):
 #else
     try
     {
-        m_mutex  = std::make_unique<boost::interprocess::named_mutex>(boost::interprocess::open_or_create, m_name.c_str());
+        std::string sanitized = m_name;
+        for (char& ch : sanitized)
+        {
+            if (!std::isalnum(static_cast<unsigned char>(ch)) && ch != '.' && ch != '-' && ch != '_')
+            {
+                ch = '_';
+            }
+        }
+
+        auto path = fmt::format("/tmp/{}", sanitized);
+        {
+            std::ofstream touchFile(path.c_str(), std::ios::app);
+        }
+
+        m_mutex  = std::make_unique<boost::interprocess::file_lock>(path.c_str());
         m_locked = m_mutex->try_lock();
         return;
     }
-    catch (boost::interprocess::interprocess_exception)
+    catch (const boost::interprocess::interprocess_exception&)
     {
         m_mutex  = nullptr;
         m_locked = false;
@@ -52,7 +69,6 @@ NamedMutex::~NamedMutex()
     if (m_mutex && m_locked)
     {
         m_mutex->unlock();
-        m_mutex->remove(m_name.c_str());
     }
 #endif
 }

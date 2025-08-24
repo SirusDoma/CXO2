@@ -3,7 +3,7 @@
 <plist version="1.0">
     <dict>
         <key>NSHighResolutionCapable</key>
-        <false/>
+        <true/>
         <key>LSUIPresentationMode</key>
         <integer>4</integer>
     </dict>

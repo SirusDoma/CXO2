@@ -122,13 +122,10 @@ elseif(APPLE)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # Allow big obj (for embedded Resource.hpp)
-    target_compile_options(${TARGET} PRIVATE -bigobj)
-
-    # Add LIBICONV
-    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
-    add_compile_definitions(USE_LIBICONV)
-    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
+    # TODO: Get correct LIBICONV archive for osx arm64
+    # set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
+    # add_compile_definitions(USE_LIBICONV)
+    # target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
 
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE "-framework Security")

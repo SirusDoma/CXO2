@@ -29,9 +29,10 @@ int main(int argc , char** argv)
                 return 1;
             }
 
+            // TODO: No longer working in recent MacOS. It probably not worth it to chase this
             // "Fix" macOS translocation
-            if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
-                Gx::LocalFileSystem::SetWorkingDirectory(path);
+            // if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
+            //     Gx::LocalFileSystem::SetWorkingDirectory(path);
         }
 
         // TODO: Remove validation for offline client

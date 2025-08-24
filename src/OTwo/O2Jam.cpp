@@ -1,6 +1,7 @@
 ﻿#include <OTwo/O2Jam.hpp>
 
 #include <Genode.hpp>
+#include <OTwo/Utilities/Reflection.hpp>
 
 #include <OTwo/Archives/OpiArchive.hpp>
 #include <OTwo/Archives/OjmArchive.hpp>
@@ -355,7 +356,7 @@ void O2Jam::Boot()
         }
     }
 
-    if (avatar.LoadFromFile("Avatar.opa"))
+    if (avatar.LoadFromFile("avatar.opa"))
         Gx::FileSystem::Mount(avatar);
 
     // Load global music assets

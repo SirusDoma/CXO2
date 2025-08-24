@@ -423,7 +423,7 @@ void StateMyRoom::Invalidate()
             m_busy = true;
             m_service.Equip
             (
-                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), target },
+                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), static_cast<uint32_t>(target) },
                 [=] (const EquipItemResponse& response)
                 {
                     m_busy = false;
@@ -556,7 +556,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
             const size_t target = slotIt != inventory.end() ? static_cast<size_t>(std::distance(inventory.begin(), slotIt)) : inventory.size();
             m_service.Equip
             (
-                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), target },
+                EquipItemRequest{ GetItemEquipSlotType(item->GetType()), static_cast<uint32_t>(target) },
                 [=] (const EquipItemResponse& response)
                 {
                     m_busy = false;

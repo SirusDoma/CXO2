@@ -19,11 +19,11 @@ void JudgementIndicator::Initialize()
     {
         if (!m_useFx)
         {
-            indicator->SetAnimationCallback([=] (auto _)
+            indicator->SetAnimationCallback([=] (auto& animation)
             {
-                indicator->SetVisible(
-                    indicator->GetState() == Gx::Animation::AnimationState::Playing ||
-                    indicator->GetState() == Gx::Animation::AnimationState::Initial
+                animation.SetVisible(
+                    animation.GetState() == Gx::Animation::AnimationState::Playing ||
+                    animation.GetState() == Gx::Animation::AnimationState::Initial
                 );
             });
         }

@@ -1,4 +1,5 @@
 ﻿#include <Genode/System/Application.hpp>
+#include <Genode/System/Platform.hpp>
 #include <Genode/System/Context.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
@@ -304,6 +305,10 @@ namespace Gx
                 mode = fsModes.front();
             else
                 mode = GetDesktopVideoMode();
+
+            // TODO: For Apple, use OS API to determine the available screen size to account dock and system bar
+            if (GetCurrentPlatform() == Platform::macOS)
+                mode.size.y -= 120; // HACK: Account for System Bar and Dock
         }
 
         // Create/Re-create the window and apply window state.

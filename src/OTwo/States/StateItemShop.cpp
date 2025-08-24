@@ -229,7 +229,7 @@ void StateItemShop::Initialize()
         shopCategoryContainerMap.at(category)->SetVisible(category == m_shopCategory);
 
         button->SetCheckedState(category == m_shopCategory);
-        button->SetCheckStateChangeCallback([this, sfxMenu, category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
+        button->SetCheckStateChangeCallback([this, sfxMenu, category = category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
         {
             if (!sender.IsChecked())
                 return;
@@ -269,7 +269,7 @@ void StateItemShop::Initialize()
             if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
             {
                 radio->SetCheckedState(category == m_shopCategory && i == 0);
-                radio->SetCheckStateChangeCallback([this, i, sfxMenu, category, itemCategoryMap] (auto& sender)
+                radio->SetCheckStateChangeCallback([this, i, sfxMenu, category = category, itemCategoryMap] (auto& sender)
                 {
                     if (!sender.IsChecked())
                         return;
@@ -364,12 +364,12 @@ void StateItemShop::Initialize()
 
     for (auto [planet, button] : shopPlanetExtMap)
     {
-        button->SetClickCallback([=] (auto&, auto&)
+        button->SetClickCallback([=, p = planet] (auto&, auto&)
         {
-            if (m_shopPlanetCategory == planet)
+            if (m_shopPlanetCategory == p)
                 return;
 
-            m_shopPlanetCategory = planet;
+            m_shopPlanetCategory = p;
             m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
             InvalidateShopMaster(true);
             InvalidateShopItemList(true);

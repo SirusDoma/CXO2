@@ -216,7 +216,7 @@ void SelectMusicDialog::Initialize()
             if (!button)
                 continue;
 
-            button->SetCheckStateChangeCallback([this, genre] (auto& sender)
+            button->SetCheckStateChangeCallback([this, genre = genre] (auto& sender)
             {
                 if (!sender.IsChecked())
                     return;
