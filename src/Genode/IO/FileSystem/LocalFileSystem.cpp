@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <fstream>
 #include <filesystem>
-using namespace std::filesystem;
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -37,102 +36,12 @@ namespace Gx
     {
         // Windows and Linux doesn't have to be using the actual path of the executable.
         // This because the operating system allows the user to manually specify working directory on their own.
-        auto workingDir = std::filesystem::current_path().string();
 
-#ifdef __APPLE__
         // On the other hand, macOS "security" modify the working directory out of developer / user will.
         // Context: https://lapcatsoftware.com/articles/app-translocation.html
 
-        // TODO: This "de-translocation" may not desirable for general use cases.
-        //       Consider to remove this particular handling from public repo
-
-        // Get the current bundle
-        CFBundleRef mainBundle;
-        if (mainBundle = CFBundleGetMainBundle(); !mainBundle)
-            return workingDir;
-
-        // Get the URL of main bunddle
-        CFURLRef mainBundleURL;
-        if (mainBundleURL = CFBundleCopyBundleURL(mainBundle); !mainBundleURL)
-        {
-            CFRelease(mainBundle);
-            return workingDir;
-        }
-
-        // Extract URL into std::string
-        if (CFStringRef path = CFURLCopyFileSystemPath(mainBundleURL, kCFURLPOSIXPathStyle); path)
-        {
-            char buffer[PATH_MAX];
-            CFStringGetCString(path, buffer, sizeof(buffer), kCFStringEncodingUTF8);
-
-            workingDir = std::string(buffer);
-            CFRelease(path);
-        }
-
-        // Release bundle ref
-        CFRelease(mainBundle);
-
-        // Load security framework
-        auto handle = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY);
-        if (!handle)
-        {
-            CFRelease(mainBundleURL);
-            return workingDir;
-        }
-
-        // Load SecTranslocateIsTranslocatedURL
-        auto SecTranslocateIsTranslocatedURL = reinterpret_cast<SecTranslocateIsTranslocatedURLFunc>(dlsym(handle, "SecTranslocateIsTranslocatedURL"));
-        if (SecTranslocateIsTranslocatedURL == nullptr)
-        {
-            CFRelease(mainBundleURL);
-            dlclose(handle);
-            return workingDir;
-        }
-
-        // Check whether the current working directory is translocated
-        Boolean isTranslocated = false;
-        if (auto status = SecTranslocateIsTranslocatedURL(mainBundleURL, &isTranslocated); !status || !isTranslocated)
-        {
-            CFRelease(mainBundleURL);
-            dlclose(handle);
-            return workingDir;
-        }
-
-        // Load SecTranslocateCreateOriginalPathForURL
-        auto SecTranslocateCreateOriginalPathForURL = reinterpret_cast<SecTranslocateCreateOriginalPathForURLFunc>(dlsym(handle, "SecTranslocateCreateOriginalPathForURL"));
-        if (SecTranslocateCreateOriginalPathForURL == nullptr)
-        {
-            CFRelease(mainBundleURL);
-            dlclose(handle);
-            return workingDir;
-        }
-
-        // Get Untranslocated Current Working Directory
-        auto appURL = SecTranslocateCreateOriginalPathForURL(mainBundleURL, nullptr);
-        if (!appURL)
-        {
-            CFRelease(mainBundleURL);
-            CFRelease(appURL);
-            dlclose(handle);
-            return workingDir;
-        }
-
-        // Convert the URL into string
-        if (auto appPath = CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle); appPath)
-        {
-            char buffer[PATH_MAX];
-            CFStringGetCString(appPath, buffer, sizeof(buffer), kCFStringEncodingUTF8);
-
-            workingDir = std::string(buffer);
-        }
-
-        // Clean up
-        CFRelease(mainBundleURL);
-        CFRelease(appURL);
-        dlclose(handle);
-#endif
-
-        return workingDir;
+        // De-translocate is not worth, workaround has been breaking multiple times since it relies on private API
+        return std::filesystem::current_path().string();
     }
 
     std::string LocalFileSystem::GetWorkingDirectory()
@@ -142,7 +51,7 @@ namespace Gx
 
     void LocalFileSystem::SetWorkingDirectory(const std::string& inputPath)
     {
-        auto workingDir = path(inputPath);
+        auto workingDir = std::filesystem::path(inputPath);
 
 #ifdef __APPLE__
         if (workingDir.has_filename() || workingDir.has_extension())
@@ -159,7 +68,7 @@ namespace Gx
     {
         auto paths = std::vector<std::string>();
         for (const auto& p : m_paths)
-            paths.push_back(weakly_canonical(path(p)).string());
+            paths.push_back(std::filesystem::weakly_canonical(std::filesystem::path(p)).string());
 
         return paths;
     }
@@ -200,19 +109,19 @@ namespace Gx
         if (fileName.empty())
             return false;
 
-        if (const auto filePath = path(fileName.c_str()); exists(filePath))
+        if (const auto filePath = std::filesystem::path(fileName.c_str()); std::filesystem::exists(filePath))
             return true;
 
         return std::any_of(m_paths.begin(), m_paths.end(), [fileName] (const std::string& path)
         {
             const std::string fullPath = std::string(path).append("/").append(fileName);
-            return exists(fullPath.c_str());
+            return std::filesystem::exists(fullPath.c_str());
         });
     }
 
     std::string LocalFileSystem::GetFileName(const std::string& fullPath, const bool withExtension) const
     {
-        const auto filePath = path(fullPath.c_str());
+        const auto filePath = std::filesystem::path(fullPath.c_str());
         if (withExtension)
             return filePath.filename().string();
 
@@ -221,22 +130,22 @@ namespace Gx
 
     std::string LocalFileSystem::GetFullName(const std::string& fileName, const bool withExtension) const
     {
-        if (exists(fileName))
+        if (std::filesystem::exists(fileName))
         {
             if (withExtension)
                 return fileName;
 
-            return path(fileName).replace_extension().string();
+            return std::filesystem::path(fileName).replace_extension().string();
         }
 
         for (std::string& dir : m_paths)
         {
-            if (std::string fullPath = std::string(dir).append("/").append(fileName); exists(fullPath))
+            if (std::string fullPath = std::string(dir).append("/").append(fileName); std::filesystem::exists(fullPath))
             {
                 if (withExtension)
                     return fullPath;
 
-                return path(fullPath).replace_extension().string();
+                return std::filesystem::path(fullPath).replace_extension().string();
             }
         }
 
@@ -277,10 +186,10 @@ namespace Gx
         auto paths = m_paths;
         for (const auto& dir : paths)
         {
-            if (!exists(dir))
+            if (!std::filesystem::exists(dir))
                 continue;
 
-            for (const auto& entry : directory_iterator(dir))
+            for (const auto& entry : std::filesystem::directory_iterator(dir))
             {
                 if (is_directory(entry) && recursive)
                 {

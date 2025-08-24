@@ -2,6 +2,21 @@
 <!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
 <plist version="1.0">
     <dict>
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleURLName</key>
+                <string>CXO2</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>cxo2</string>
+                </array>
+            </dict>
+        </array>
+        <key>NSUIElement</key>
+        <true/>
+        <key>CFBundleIconFile</key>
+        <string>OTwo</string>
         <key>NSHighResolutionCapable</key>
         <true/>
         <key>LSUIPresentationMode</key>

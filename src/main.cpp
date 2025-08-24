@@ -8,6 +8,7 @@
 #include <Genode/IO/IOException.hpp>
 #include <Genode/Utilities/Debugger.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
+#include <Genode/System/Platform.hpp>
 
 #include <iostream>
 #include <exception>
@@ -30,9 +31,15 @@ int main(int argc , char** argv)
             }
 
             // TODO: No longer working in recent MacOS. It probably not worth it to chase this
-            // "Fix" macOS translocation
             // if (const auto path = Gx::LocalFileSystem::GetApplicationDirectoryPath(); !path.empty())
             //     Gx::LocalFileSystem::SetWorkingDirectory(path);
+
+            // MacOS: This could be happening if the game launched in a certain way
+            if (Gx::GetCurrentPlatform() == Gx::Platform::macOS)
+            {
+                if (argc >= 1)
+                    Gx::LocalFileSystem::SetWorkingDirectory(std::string(argv[0]));
+            }
         }
 
         // TODO: Remove validation for offline client
@@ -66,12 +73,10 @@ int main(int argc , char** argv)
         auto details = std::string();
         if (typeid(ex) == typeid(Gx::ResourceAccessException) || typeid(ex) == typeid(Gx::ResourceLoadException))
         {
-            details += "\n\nWorking Directory:\n";
-            details += Gx::LocalFileSystem::GetWorkingDirectory() + "\n";
-
-            details += "\n\nAsset paths:\n";
-            for (auto path : Gx::LocalFileSystem::GetAssetPaths())
-                details += path + "\n";
+            if (const auto accessEx = dynamic_cast<Gx::ResourceAccessException*>(&ex))
+                details += "\n(" + accessEx->GetResourceID() + ")";
+            else if (const auto loadEx = dynamic_cast<Gx::ResourceLoadException*>(&ex))
+                details += "\n(" + loadEx->GetResourceID() + ")";
         }
 
         auto message = std::string(std::string(ex.what()) + details);

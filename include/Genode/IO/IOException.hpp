@@ -18,6 +18,8 @@ namespace Gx
         explicit ResourceLoadException(const std::string& message) : IOException(message) {};
         ResourceLoadException(std::string  id, const std::string& message) : IOException(message), m_resourceID(std::move(id)) {};
 
+        [[nodiscard]] const std::string& GetResourceID() const { return m_resourceID; }
+
     private:
         std::string m_resourceID;
     };

@@ -101,8 +101,9 @@ elseif(APPLE)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
     # Executable
-    set(PACKAGE_NAME com.o2jam.game)
+    set(PACKAGE_NAME com.cxo2.game)
     add_executable(${TARGET} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
+    target_sources(${TARGET} PRIVATE ${APP_ICON})
 
     # MacOS Bundle flag
     set_target_properties(${TARGET} PROPERTIES
