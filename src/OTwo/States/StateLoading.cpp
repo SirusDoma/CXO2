@@ -93,9 +93,6 @@ void StateLoading::Initialize()
             sign->SetFrame("Loading");
     }
 
-    if (const auto image = resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER); image)
-        OnCoverLoaded(image);
-
     loader.SetCoverLoadCallback([this] (auto cover)
     {
         Invoke([=]
