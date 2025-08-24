@@ -25,6 +25,7 @@
 #pragma once
 
 #include <Genode/Utilities/Endian.hpp>
+#include <SFML/System/String.hpp>
 
 #include <boost/pfr.hpp>
 #include <vector>
@@ -76,6 +77,7 @@ public:
     Packet& operator>>(std::string& data);
     Packet& operator>>(wchar_t* data);
     Packet& operator>>(std::wstring& data);
+    Packet& operator>>(sf::String& data);
 
     template<typename T>
     std::enable_if_t<std::is_enum_v<T>, Packet&>
@@ -100,6 +102,7 @@ public:
     Packet& operator<<(const std::string& data);
     Packet& operator<<(const wchar_t* data);
     Packet& operator<<(const std::wstring& data);
+    Packet& operator<<(sf::String& data);
 
     template<typename T>
     std::enable_if_t<std::is_enum_v<T>, Packet&>

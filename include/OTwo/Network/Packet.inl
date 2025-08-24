@@ -40,7 +40,10 @@ Packet::operator<<(const T& data)
 {
     boost::pfr::for_each_field(data, [this] (const auto& value)
     {
-       *this << value;
+        if constexpr (std::is_same_v<std::decay_t<decltype(value)>, sf::String>)
+            *this << static_cast<const sf::String&>(value).toWideString();
+        else
+            *this << value;
     });
 
     return *this;

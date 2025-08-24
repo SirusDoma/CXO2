@@ -47,7 +47,7 @@ void MessagingOnlineService::SendWhisper(
 )
 {
     GetNetworkAdapter().Exchange<WhisperMessageRequest, WhisperMessageResponse>(
-        WhisperMessageRequest{ recipient, message},
+        WhisperMessageRequest{ recipient, message },
         [callback] (const auto& response)
         {
             if (callback)

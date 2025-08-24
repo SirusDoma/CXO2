@@ -216,7 +216,24 @@ Packet& Packet::operator>>(std::wstring& data)
     data.clear();
     while (m_isValid)
     {
-        std::uint32_t character{};
+        std::uint16_t character{};
+        *this >> character;
+
+        if (character == 0x00)
+            break;
+
+        data += static_cast<wchar_t>(character);
+    }
+
+    return *this;
+}
+
+Packet& Packet::operator>>(sf::String& data)
+{
+    data.clear();
+    while (m_isValid)
+    {
+        std::uint16_t character{};
         *this >> character;
 
         if (character == 0x00)
@@ -333,10 +350,24 @@ Packet& Packet::operator<<(const std::wstring& data)
     if (data.size() > 0)
     {
         for (const wchar_t c : data)
-            *this << static_cast<std::uint32_t>(c);
+            *this << static_cast<std::uint16_t>(c);
 
-        if (static_cast<std::uint32_t>(data.back()) != 0x00)
-            *this << static_cast<std::uint32_t>(0);
+        if (static_cast<std::uint16_t>(data.back()) != 0x00)
+            *this << static_cast<std::uint16_t>(0);
+    }
+
+    return *this;
+}
+
+Packet& Packet::operator<<(sf::String& data)
+{
+    if (data.getSize() > 0)
+    {
+        for (const wchar_t c : data)
+            *this << static_cast<std::uint16_t>(c);
+
+        if (static_cast<std::uint16_t>(*(data.end() - 1)) != 0x00)
+            *this << static_cast<std::uint16_t>(0);
     }
 
     return *this;
