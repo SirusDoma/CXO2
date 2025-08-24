@@ -86,7 +86,7 @@ private:
         return result;
     }
 
-    static std::string Utf16ToUtf8(const std::vector<uint16_t>& utf16)
+    static std::string Utf16ToUtf8(const std::vector<std::uint16_t>& utf16)
     {
         std::string utf8;
 
@@ -145,13 +145,13 @@ private:
             throw std::invalid_argument("Data length must be even for UTF-16");
         }
 
-        std::vector<uint16_t> utf16Chars;
+        std::vector<std::uint16_t> utf16Chars;
         utf16Chars.reserve(data.size() / 2);
 
         // Convert big-endian bytes to UTF-16 characters
         for (size_t i = 0; i < data.size(); i += 2)
         {
-            uint16_t ch = (static_cast<uint16_t>(data[i]) << 8) | static_cast<uint16_t>(data[i + 1]);
+            std::uint16_t ch = (static_cast<std::uint16_t>(data[i]) << 8) | static_cast<std::uint16_t>(data[i + 1]);
             utf16Chars.push_back(ch);
         }
 
