@@ -849,7 +849,7 @@ void StateWaiting7K::OnBackButtonClicked(Gx::Control&, Gx::Control::Event&)
     m_service.ExitRoom([&]
     {
         if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_36))
-            m_mixer.Play(*sfx);
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
 
         GetDirector().Dismiss();
     },
@@ -1103,7 +1103,7 @@ void StateWaiting7K::InvalidateMembers()
             btnExtend->SetDoubleClickCallback([=] (const auto&, auto&) { ExtendSlot(memberIndex); });
         }
 
-        if (slot.State == RoomSlotState::Unoccupied || !slot.Member.has_value())
+        if (slot.State == RoomSlotState::Unoccupied || (slot.State == RoomSlotState::Occupied && !slot.Member.has_value()))
         {
             avatar->SetVisible(false);
             memberIndex++;

@@ -691,6 +691,10 @@ void SelectMusicDialog::OnAccepted()
     if (m_music.Source.empty() && m_random == static_cast<LevelCategory>(0))
         return;
 
+    // Edge case: No music match with random categories
+    if (m_randomMusicCount == 0 && m_random != static_cast<LevelCategory>(0))
+        return;
+
     Dialog::OnAccepted();
 
     m_room.SetMusic(m_music);
@@ -709,7 +713,7 @@ void SelectMusicDialog::OnCancelled()
     Dialog::OnCancelled();
 
     auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_03);
-    m_mixer.Play(sfx);
+    m_mixer.Play(sfx, Sound::Channel::SFX);
 }
 
 ChartMetadata SelectMusicDialog::GetSelectedMusic() const
@@ -835,7 +839,7 @@ void SelectMusicDialog::Invalidate()
             pager->SetVisible(false);
 
         std::unordered_set<unsigned int> scanned;
-        unsigned int used = 0;
+        m_randomMusicCount = 0;
         for (std::size_t r = 1; r < elements.size(); r++)
         {
             if (auto button = dynamic_cast<Gx::RadioButton*>(elements[r]); button)
@@ -866,7 +870,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 1 - 5");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
+                                m_randomMusicCount += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -889,7 +893,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 5 - 9");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
+                                m_randomMusicCount += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -913,7 +917,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 9 - 13");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
+                                m_randomMusicCount += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -937,7 +941,7 @@ void SelectMusicDialog::Invalidate()
                                 if (infoLabel)
                                     infoLabel->SetString("LEVEL 13 higher");
 
-                                used += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
+                                m_randomMusicCount += std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned] (ChartMetadata& m)
                                 {
                                     const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
                                     const bool result = std::any_of(diffs.begin(), diffs.end(), [&m] (auto diff)
@@ -987,7 +991,7 @@ void SelectMusicDialog::Invalidate()
                 {
                     title->SetColor(sf::Color(200, 155, 55));
                     title->SetString(fmt::format("'Random' is selected (Total: {0:02}/{1:02})",
-                        static_cast<int>(used),
+                        static_cast<int>(m_randomMusicCount),
                         static_cast<int>(m_musicList.size())
                     ));
                 }
@@ -1098,6 +1102,9 @@ void SelectMusicDialog::Invalidate()
                 title->SetColor(lastTitle->GetColor());
 
             auto name = StringTranscoder::Transcode(m_displayList[index].Title);
+            if (name.isEmpty())
+                name = m_displayList[index].Title; // better than show nothing
+
             title->SetString(name);
             title->Truncate(150);
 
@@ -1120,6 +1127,9 @@ void SelectMusicDialog::Invalidate()
         button->SetCheckedState(m_music.Source == m_displayList[index].Source);
         button->SetEnabled(true);
         button->SetVisible(true);
+
+        if (auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter && m_music.Source == m_displayList[index].Source)
+            activeHighlighter->SetVisible(true);
     }
 
     if (m_music.Source.empty())
@@ -1153,7 +1163,6 @@ void SelectMusicDialog::Invalidate()
 
     if (auto thumbnail = FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_THUMBNAIL))
     {
-        thumbnail->SetVisible(true);
         if (m_coverID != m_music.ID)
         {
             m_coverID  = m_music.ID;
@@ -1163,7 +1172,8 @@ void SelectMusicDialog::Invalidate()
                 if (m_thumbnail->loadFromImage(*image))
                 {
                     m_thumbnail->setSmooth(true);
-                    thumbnail->SetTexture(*m_thumbnail);
+                    thumbnail->SetVisible(true);
+                    thumbnail->SetTexture(*m_thumbnail, true);
                 }
             }
             else if (auto cover = O2JamChartLoader::LoadCoverArt(m_music.Source, Gx::ResourceContext::Default))
@@ -1172,11 +1182,14 @@ void SelectMusicDialog::Invalidate()
                 if (m_thumbnail->loadFromImage(*cover))
                 {
                     m_thumbnail->setSmooth(true);
-                    thumbnail->SetTexture(*m_thumbnail);
+                    thumbnail->SetVisible(true);
+                    thumbnail->SetTexture(*m_thumbnail, true);
                 }
             }
             else
+            {
                 thumbnail->SetVisible(false);
+            }
         }
     }
 }

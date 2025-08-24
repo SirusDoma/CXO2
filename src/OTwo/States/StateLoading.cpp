@@ -48,16 +48,24 @@ void StateLoading::Initialize()
     State::Initialize();
 
     std::size_t index = 0;
-    const int result = Gx::Randomizer::Randomize(0,  static_cast<int>(GetChildrenCount()) - 1);
-
+    auto imageSet = std::vector<Gx::Image*>();
     for (const auto child : GetChildren())
     {
-        if (const auto image = dynamic_cast<Gx::Image*>(child); image)
-        {
-            image->SetVisible(index == result);
-            index++;
-        }
+        if (const auto image = dynamic_cast<Gx::Image*>(child); image && Gx::StringHelper::StartsWith(image->GetName(), Resource::Loading::IDC_IMAGE_STATE_LOADING))
+            imageSet.push_back(image);
     }
+
+    const int result = Gx::Randomizer::Randomize(0, static_cast<int>(imageSet.size() - 1));
+    bool randomized = false;
+    for (const auto image : imageSet)
+    {
+        randomized = randomized || index == result;
+        image->SetVisible(index == result);
+        index++;
+    }
+
+    if (!randomized && !imageSet.empty())
+        imageSet[0]->SetVisible(true);
 
     const auto chart      = m_context.GetChart();
     const auto& resources = GetResources(ResourceScope::Shared);
@@ -93,14 +101,21 @@ void StateLoading::Initialize()
             sign->SetFrame("Loading");
     }
 
-    loader.SetCoverLoadCallback([this] (auto cover)
+    if (const auto image = resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER))
     {
-        Invoke([=]
+        OnCoverLoaded(image);
+    }
+    else
+    {
+        loader.SetCoverLoadCallback([this] (const sf::Image* cover)
         {
-            if (cover)
-                OnCoverLoaded(cover);
+            Invoke([=]
+            {
+                if (cover && cover->getSize() != sf::Vector2u{})
+                    OnCoverLoaded(cover);
+            });
         });
-    });
+    }
 
     auto thread = std::thread([=] ()
     {

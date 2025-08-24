@@ -174,6 +174,10 @@ void StatePlaying7K::Initialize()
                 continue;
 
             auto charInfo = m_session.GetCharacterInfo();
+            avatar->SetGender(charInfo.Gender);
+            for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+                avatar->SetDefaultItem(std::move(item));
+
             for (const auto id : charInfo.EquippedItemIDs)
                 avatar->Equip(m_items.Create(id));
 
@@ -208,6 +212,11 @@ void StatePlaying7K::Initialize()
                 continue;
 
             slot.Ready = slot.IsMaster; // reset ready state early
+
+            avatar->SetGender(slot.Member->Gender);
+            for (auto [_, item] : m_items.GetDefaultItems(slot.Member->Gender))
+                avatar->SetDefaultItem(std::move(item));
+
             for (const auto id : slot.Member->EquippedItemIDs)
                 avatar->Equip(m_items.Create(id));
 

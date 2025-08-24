@@ -51,18 +51,18 @@ Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromStream(sf::InputStream& stream,
         return nullptr;
 
     chart->SetMetadata(metadata.ToChartMetadata());
-    if (metadata.CoverSize > 0)
+    if (metadata.CoverSize > 0 && m_onCoverLoaded)
     {
         chart->SetCover(LoadCoverArt(stream, metadata, ctx));
         if (m_onCoverLoaded)
             m_onCoverLoaded(chart->GetCover());
     }
 
-    if (metadata.ThumbnailSize > 0)
+    if (metadata.ThumbnailSize > 0 && m_onThumbnailLoaded)
+    {
         chart->SetThumbnail(LoadThumbnail(stream, metadata, ctx));
-
-    if (m_onThumbnailLoaded)
         m_onThumbnailLoaded(chart->GetThumbnail());
+    }
 
     auto loadSamples = [&chart] (const OjmArchive* archive)
     {

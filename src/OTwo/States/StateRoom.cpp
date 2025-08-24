@@ -243,10 +243,12 @@ void StateRoom::OnRoomRemoved(const RoomRemovedEventData& ev)
 
 void StateRoom::LoadCharacterInfo()
 {
-    auto callback = [this] (const auto& charInfo)
+    m_charService.GetCharacterInfo([=](const auto& charInfo)
     {
         Invoke([this, charInfo]
         {
+            m_session.SetCharacterInfo(charInfo);
+
             const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
             nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
 
@@ -261,18 +263,7 @@ void StateRoom::LoadCharacterInfo()
 
             avatar->SetVisible(true);
         });
-    };
-
-    if (m_session.GetCharacterInfo().Name.isEmpty())
-    {
-        m_charService.GetCharacterInfo([=] (const auto& charInfo)
-        {
-            m_session.SetCharacterInfo(charInfo);
-            callback(charInfo);
-        });
-    }
-    else
-        callback(m_session.GetCharacterInfo());
+    });
 }
 
 void StateRoom::LoadChannelInfo()
@@ -730,6 +721,15 @@ void StateRoom::OnTutorialButtonClicked(Gx::Control& sender, Gx::Control::Event&
     auto chart    = std::make_unique<Chart>();
     chart->Source = "Tutorial.ojn";
 
+    auto& resources = GetResources(ResourceScope::Shared);
+    if (const auto metadata = O2JamChartMetadataLoader().LoadFromFile(chart->Source, Gx::ResourceContext::Default))
+    {
+        if (auto image = O2JamChartLoader::LoadCoverArt(*metadata, Gx::ResourceContext::Default); image)
+            resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
+        else
+            resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
+    }
+
     m_game.GetConfig().KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];
     m_game.SetChart(std::move(chart));
     m_game.SetMode(GameMode::Tutorial);
@@ -751,7 +751,7 @@ void StateRoom::OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         auto& director = GetDirector();
         if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-            m_mixer.Play(*sfx);
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
 
         director.Dismiss<StatePlanet>();
     },

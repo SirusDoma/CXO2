@@ -80,6 +80,18 @@ void RoomContext::SetMusic(const ChartMetadata& metadata)
         return;
 
     m_music = metadata;
+    if (!metadata.Source.empty() && Gx::FileSystem::Contains(metadata.Source))
+    {
+        if (const auto chartMetadata = O2JamChartMetadataLoader().LoadFromFile(metadata.Source, Gx::ResourceContext::Default))
+        {
+            if (auto image = O2JamChartLoader::LoadCoverArt(*chartMetadata, Gx::ResourceContext::Default); image)
+                m_resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
+            else
+                m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
+        }
+    }
+    else
+        m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
 }
 
 Difficulty RoomContext::GetDifficulty() const

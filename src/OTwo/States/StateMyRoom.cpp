@@ -282,7 +282,7 @@ void StateMyRoom::Initialize()
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-            m_mixer.Play(*sfx);
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
 
         GetDirector().Dismiss<StateRoom>();
     });
@@ -566,7 +566,7 @@ void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, Rend
                     Invoke([=]
                     {
                         const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
-                        m_mixer.Play(*sfxDress);
+                        m_mixer.Play(*sfxDress, Sound::Channel::SFX);
 
                         avatar->Unequip(item->GetType());
 

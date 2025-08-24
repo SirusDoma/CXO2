@@ -249,8 +249,33 @@ void OnlineNetworkService::OnWaitingMusicChanged(const WaitingMusicChangedEventD
 
 void OnlineNetworkService::OnWaitingMemberJoined(const WaitingMemberJoinedEventData& ev)
 {
-    if (auto* state = dynamic_cast<StateWaiting7K*>(&Gx::Application::Instance().GetSceneDirector().GetPresentingScene()))
-        state->Invoke([=] { state->OnMemberJoined(ev); });
+    if (auto* state = dynamic_cast<State*>(&Gx::Application::Instance().GetSceneDirector().GetPresentingScene()))
+    {
+        state->Invoke([=]
+        {
+            auto& slot    = m_room.GetSlot(ev.ID);
+            slot.State    = RoomSlotState::Occupied;
+            slot.Ready    = ev.Ready;
+            slot.Team     = ev.Team;
+            slot.IsMaster = false;
+            slot.Member   = CharacterInfo
+            {
+                /* .Name            = */ ev.Name,
+                /* .Gender          = */ ev.Gender,
+                /* .Role            = */ Role::Normal,
+                /* .Level           = */ ev.Level,
+                /* .Experience      = */ 0,
+                /* .RankStats       = */ {},
+                /* .Wallet          = */ {},
+                /* .EquippedItemIDs = */ ev.EquippedItemIDs,
+                /* .Inventory       = */ {},
+                /* .MusicIDs        = */ ev.MusicIDs
+            };
+
+            if (const auto waiting = dynamic_cast<StateWaiting7K*>(state))
+                waiting->OnMemberJoined(ev);
+        });
+    }
 }
 
 void OnlineNetworkService::OnWaitingMemberLeft(const WaitingMemberLeftEventData& ev)

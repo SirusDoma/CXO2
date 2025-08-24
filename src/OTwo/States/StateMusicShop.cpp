@@ -176,7 +176,7 @@ void StateMusicShop::Initialize()
     backButton->SetClickCallback([this] (auto&, auto&)
     {
         if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-            m_mixer.Play(*sfx);
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
 
         GetDirector().Dismiss<StateRoom>();
     });

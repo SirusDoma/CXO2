@@ -45,6 +45,7 @@ protected:
 private:
     bool         m_initialized = false;
     unsigned int m_page = 0;
+    unsigned int m_randomMusicCount = 0;
     unsigned int m_coverID;
     float        m_speed;
 
