@@ -31,7 +31,6 @@ namespace Gx
         m_fullScreen(fullScreen),
         m_closeRequested(false)
     {
-        CreateMainWindow();
         ResourceLoaderFactory::BindContext(m_context);
     }
 
