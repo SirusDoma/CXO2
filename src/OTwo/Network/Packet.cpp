@@ -267,12 +267,15 @@ Packet& Packet::operator>>(sf::String& data)
         case Encoding::ASCII_7BIT:
         case Encoding::UTF8:
         case Encoding::UTF8UTF8:
+        {
             data = sf::String::fromUtf8(bytes.begin(), bytes.end());
             break;
+        }
         case Encoding::UTF32LE:
         case Encoding::UTF32BE:
         case Encoding::GB18030:
         {
+            // TODO: Handle Big Endian
             auto* ptr = reinterpret_cast<std::uint32_t*>(bytes.data());
             data = sf::String::fromUtf16(ptr, ptr + bytes.size() / sizeof(std::uint32_t));
 
@@ -280,6 +283,7 @@ Packet& Packet::operator>>(sf::String& data)
         }
         default:
         {
+            // TODO: Handle Big Endian
             auto* ptr = reinterpret_cast<std::uint16_t*>(bytes.data());
             data = sf::String::fromUtf16(ptr, ptr + bytes.size() / sizeof(std::uint16_t));
 
