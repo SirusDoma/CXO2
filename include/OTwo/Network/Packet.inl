@@ -15,7 +15,7 @@ Packet::operator>>(T& data)
 }
 
 template<typename T>
-std::enable_if_t<Packet::IsSerializable<T>::value, Packet&>
+std::enable_if_t<Packet::IsSerializable<T>::value && !std::is_same_v<std::decay_t<T>, sf::String>, Packet&>
 Packet::operator>>(T& data)
 {
     boost::pfr::for_each_field(data, [this] (auto& value)
@@ -35,15 +35,12 @@ Packet::operator<<(const T& data)
 }
 
 template<typename T>
-std::enable_if_t<Packet::IsSerializable<T>::value, Packet&>
+std::enable_if_t<Packet::IsSerializable<T>::value && !std::is_same_v<std::decay_t<T>, sf::String>, Packet&>
 Packet::operator<<(const T& data)
 {
     boost::pfr::for_each_field(data, [this] (const auto& value)
     {
-        if constexpr (std::is_same_v<std::decay_t<decltype(value)>, sf::String>)
-            *this << static_cast<const sf::String&>(value).toWideString();
-        else
-            *this << value;
+        *this << value;
     });
 
     return *this;

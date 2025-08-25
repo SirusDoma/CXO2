@@ -1,11 +1,12 @@
 #pragma once
 
 #include <OTwo/Messages/Commands.hpp>
+#include <SFML/System/String.hpp>
 
 struct WhisperMessageRequest
 {
     static constexpr ::Command Command = RequestCommand::SendWhisper;
 
-    std::string Recipient{};
-    std::string Content{};
+    sf::String Recipient{};
+    sf::String Content{};
 };

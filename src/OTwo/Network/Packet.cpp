@@ -26,6 +26,8 @@
 
 #include <Genode/System/Exception.hpp>
 
+#include <ced/compact_enc_det.h>
+
 #include <algorithm>
 #include <codecvt>
 #include <locale>
@@ -231,15 +233,58 @@ Packet& Packet::operator>>(std::wstring& data)
 Packet& Packet::operator>>(sf::String& data)
 {
     data.clear();
+    auto bytes = std::vector<char>{};
+
     while (m_isValid)
     {
-        std::uint16_t character{};
+        std::uint8_t character{};
         *this >> character;
 
         if (character == 0x00)
             break;
 
-        data += static_cast<wchar_t>(character);
+        bytes.push_back(character);
+    }
+
+    bool reliable = false;
+    int consumed = 0;
+    const auto encoding = CompactEncDet::DetectEncoding(
+        bytes.data(),
+        bytes.size(),
+        nullptr,
+        nullptr,
+        nullptr,
+        0,
+        Language::UNKNOWN_LANGUAGE,
+        CompactEncDet::TextCorpusType::QUERY_CORPUS,
+        true,
+        &consumed,
+        &reliable
+    );
+
+    switch (encoding)
+    {
+        case Encoding::ASCII_7BIT:
+        case Encoding::UTF8:
+        case Encoding::UTF8UTF8:
+            data = sf::String::fromUtf8(bytes.begin(), bytes.end());
+            break;
+        case Encoding::UTF32LE:
+        case Encoding::UTF32BE:
+        case Encoding::GB18030:
+        {
+            auto* ptr = reinterpret_cast<std::uint32_t*>(bytes.data());
+            data = sf::String::fromUtf16(ptr, ptr + bytes.size() / sizeof(std::uint32_t));
+
+            break;
+        }
+        default:
+        {
+            auto* ptr = reinterpret_cast<std::uint16_t*>(bytes.data());
+            data = sf::String::fromUtf16(ptr, ptr + bytes.size() / sizeof(std::uint16_t));
+
+            break;
+        }
     }
 
     return *this;
@@ -359,15 +404,22 @@ Packet& Packet::operator<<(const std::wstring& data)
     return *this;
 }
 
-Packet& Packet::operator<<(sf::String& data)
+Packet& Packet::operator<<(const sf::String& data)
 {
     if (data.getSize() > 0)
     {
-        for (const wchar_t c : data)
-            *this << static_cast<std::uint16_t>(c);
+        for (const std::uint32_t c : data)
+        {
+            if (c <= std::numeric_limits<std::uint8_t>::max())
+                *this << static_cast<std::uint8_t>(c);
+            else if (c <= std::numeric_limits<std::uint16_t>::max())
+                *this << static_cast<std::uint16_t>(c);
+            else
+                *this << c;
+        }
 
-        if (static_cast<std::uint16_t>(*(data.end() - 1)) != 0x00)
-            *this << static_cast<std::uint16_t>(0);
+        if (static_cast<std::uint32_t>(*(data.end() - 1)) != 0x00)
+            *this << static_cast<std::uint8_t>(0);
     }
 
     return *this;

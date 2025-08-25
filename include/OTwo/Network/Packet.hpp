@@ -74,8 +74,8 @@ public:
     Packet& operator>>(float& data);
     Packet& operator>>(double& data);
     Packet& operator>>(char* data);
-    Packet& operator>>(std::string& data);
     Packet& operator>>(wchar_t* data);
+    Packet& operator>>(std::string& data);
     Packet& operator>>(std::wstring& data);
     Packet& operator>>(sf::String& data);
 
@@ -84,7 +84,7 @@ public:
     operator>>(T& data);
 
     template<typename T>
-    std::enable_if_t<IsSerializable<T>::value, Packet&>
+    std::enable_if_t<IsSerializable<T>::value && !std::is_same_v<std::decay_t<T>, sf::String>, Packet&>
     operator>>(T& data);
 
     Packet& operator<<(bool data);
@@ -99,17 +99,17 @@ public:
     Packet& operator<<(float data);
     Packet& operator<<(double data);
     Packet& operator<<(const char* data);
-    Packet& operator<<(const std::string& data);
     Packet& operator<<(const wchar_t* data);
+    Packet& operator<<(const std::string& data);
     Packet& operator<<(const std::wstring& data);
-    Packet& operator<<(sf::String& data);
+    Packet& operator<<(const sf::String& data);
 
     template<typename T>
     std::enable_if_t<std::is_enum_v<T>, Packet&>
     operator<<(const T& data);
 
     template<typename T>
-    std::enable_if_t<IsSerializable<T>::value, Packet&>
+    std::enable_if_t<IsSerializable<T>::value && !std::is_same_v<std::decay_t<T>, sf::String>, Packet&>
     operator<<(const T& data);
 
 protected:

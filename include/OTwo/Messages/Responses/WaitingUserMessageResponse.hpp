@@ -1,11 +1,12 @@
 #pragma once
 
 #include <OTwo/Messages/Commands.hpp>
+#include <SFML/System/String.hpp>
 
 struct WaitingUserMessageResponse
 {
     static constexpr ::Command Command = ResponseCommand::WaitingUserMessage;
 
-    std::string Sender{};
-    std::string Content{};
+    sf::String Sender{};
+    sf::String Content{};
 };
