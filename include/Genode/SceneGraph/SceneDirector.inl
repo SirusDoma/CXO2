@@ -209,6 +209,6 @@ namespace Gx
     template<typename T>
     bool SceneDirector::IsPresenting() const
     {
-        return m_currentScene && typeid(m_currentScene.get()) == typeid(T);
+        return m_currentScene && dynamic_cast<T*>(m_currentScene.get()) != nullptr;
     }
 }
