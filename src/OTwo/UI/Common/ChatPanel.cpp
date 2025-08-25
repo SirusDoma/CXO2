@@ -12,6 +12,7 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/InputField.hpp>
+#include <OTwo/States/StateWaiting7K.hpp>
 
 using namespace StringTable::Identifiers;
 
@@ -31,10 +32,18 @@ void ChatPanel::Initialize()
         auto parent = GetParent<::State>();
         parent->Invoke([=]
         {
-            if (isWhisper)
-                chatWindow->PushWhisper(actor, m_session.GetCharacterInfo(), text);
+            if (!isWhisper)
+            {
+                if (Gx::StringHelper::StartsWith(text, "/"))
+                {
+                    if (const auto waiting = dynamic_cast<StateWaiting7K*>(parent))
+                        waiting->OnMemberEmoticon(actor, text);
+                }
+                else
+                    chatWindow->PushMessage(actor, text);
+            }
             else
-                chatWindow->PushMessage(actor, text);
+                chatWindow->PushWhisper(actor, m_session.GetCharacterInfo(), text);
         });
     });
 

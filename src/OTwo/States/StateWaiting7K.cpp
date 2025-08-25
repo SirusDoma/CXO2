@@ -46,6 +46,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
+#include <OTwo/Services/MessagingService.hpp>
 
 using namespace StringTable::Identifiers;
 
@@ -127,12 +128,13 @@ namespace
     }
 }
 
-StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ItemFactory& items) :
+StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, MessagingService& messaging, ItemFactory& items) :
     m_mixer(mixer),
     m_session(session),
     m_room(room),
     m_game(game),
     m_service(service),
+    m_messaging(messaging),
     m_items(items)
 {
 }
@@ -406,6 +408,78 @@ void StateWaiting7K::OnMemberReadyStateChanged(const WaitingMemberReadyStateChan
     slot.Ready = ev.Ready;
 
     InvalidateAvatarInfo();
+}
+
+void StateWaiting7K::OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData)
+{
+    auto code = std::string();
+    auto text = chatData.toAnsiString();
+    auto data = std::vector<std::uint8_t>(text.begin(), text.end());
+
+    if (data == std::vector<std::uint8_t>{ 47, 33 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK;
+    else if (data == std::vector<std::uint8_t>{ 47, 63 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION;
+    else if (data == std::vector<std::uint8_t>{ 47, 187, 231, 182, 251, 199, 216 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART;
+    else if (data == std::vector<std::uint8_t>{ 47, 51, 50, 49 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT;
+    else if (data == std::vector<std::uint8_t>{ 47, 126 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE;
+    else if (data == std::vector<std::uint8_t>{ 47, 33, 33 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2;
+    else if (data == std::vector<std::uint8_t>{ 47, 185, 204, 191, 246 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART;
+    else if (data == std::vector<std::uint8_t>{ 47, 55 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER;
+    else if (data == std::vector<std::uint8_t>{ 47, 178, 201 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER;
+    else if (data == std::vector<std::uint8_t>{ 47, 185, 221, 194, 166 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA;
+    else if (data == std::vector<std::uint8_t>{ 47, 190, 200, 179, 231 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI;
+    else if (data == std::vector<std::uint8_t>{ 47, 176, 237 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO;
+    else if (data == std::vector<std::uint8_t>{ 47, 183, 185, 181, 240 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY;
+    else if (data == std::vector<std::uint8_t>{ 47, 193, 193, 190, 198 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL;
+    else if (data == std::vector<std::uint8_t>{ 47, 189, 200, 190, 238 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION;
+    else if (data == std::vector<std::uint8_t>{ 47, 200, 229, 200, 229 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE;
+    else if (data == std::vector<std::uint8_t>{ 47, 199, 207, 199, 207 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA;
+    else if (data == std::vector<std::uint8_t>{ 47, 197, 169, 197, 169 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY;
+    else if (data == std::vector<std::uint8_t>{ 47, 192, 185 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE;
+    else if (data == std::vector<std::uint8_t>{ 47, 46, 46, 46 })
+        code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES;
+
+    const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+
+    int memberID = 0;
+    Avatar* avatar = nullptr;
+    for (const auto child : avatarList->GetChildren())
+    {
+        if (memberID >= RoomContext::MaxCapacity)
+            break;
+
+        const auto container = dynamic_cast<Gx::UiContainer*>(child);
+        if (!container)
+            continue;
+
+        const auto& slot = m_room.GetSlot(memberID++);
+        if (slot.Member.has_value() && slot.Member->Name == sender.Name)
+        {
+            avatar = container->FindChild<Avatar>(Resource::Waiting7K::Avatar::IDC_AVATAR);
+            break;
+        }
+    }
+
+    if (avatar && !code.empty())
+        ShowEmoticon(avatar, code);
 }
 
 void StateWaiting7K::OnMusicChanged(const WaitingMusicChangedEventData& ev)
@@ -883,40 +957,184 @@ void StateWaiting7K::OnKeyPressed(const sf::Event::KeyPressed& ev)
         }
     }
 
+
+    const auto chatPanel = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
     if (ev.control)
     {
         if (ev.shift)
         {
             switch (ev.code)
             {
-                case sf::Keyboard::Key::Num1: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);          break;
-                case sf::Keyboard::Key::Num2: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);          break;
-                case sf::Keyboard::Key::Num3: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);       break;
-                case sf::Keyboard::Key::Num4: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);    break;
-                case sf::Keyboard::Key::Num5: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);   break;
-                case sf::Keyboard::Key::Num6: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);   break;
-                case sf::Keyboard::Key::Num7: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);    break;
-                case sf::Keyboard::Key::Num8: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY); break;
-                case sf::Keyboard::Key::Num9: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);    break;
-                case sf::Keyboard::Key::Num0: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);  break;
-                default: break;
+                case sf::Keyboard::Key::Num1:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 190, 200, 179, 231 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);
+                    break;
+                }
+                case sf::Keyboard::Key::Num2:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 176, 237 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);
+                    break;
+                }
+                case sf::Keyboard::Key::Num3:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 183, 185, 181, 240 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);
+                    break;
+                }
+                case sf::Keyboard::Key::Num4:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 193, 193, 190, 198 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);
+                    break;
+                }
+                case sf::Keyboard::Key::Num5:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 189, 200, 190, 238 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);
+                    break;
+                };
+                case sf::Keyboard::Key::Num6:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 200, 229, 200, 229 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);
+                    break;
+                };
+                case sf::Keyboard::Key::Num7:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 199, 207, 199, 207 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);
+                    break;
+                };
+                case sf::Keyboard::Key::Num8:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 197, 169, 197, 169 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY);
+                    break;
+                };
+                case sf::Keyboard::Key::Num9:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 192, 185 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);
+                    break;
+                };
+                case sf::Keyboard::Key::Num0:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 46, 46, 46 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);
+                    break;
+                };
+                default:
+                    break;
             }
         }
         else
         {
             switch (ev.code)
             {
-                case sf::Keyboard::Key::Num1: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);  break;
-                case sf::Keyboard::Key::Num2: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);          break;
-                case sf::Keyboard::Key::Num3: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);             break;
-                case sf::Keyboard::Key::Num4: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);             break;
-                case sf::Keyboard::Key::Num5: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);              break;
-                case sf::Keyboard::Key::Num6: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2); break;
-                case sf::Keyboard::Key::Num7: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);      break;
-                case sf::Keyboard::Key::Num8: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);            break;
-                case sf::Keyboard::Key::Num9: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);            break;
-                case sf::Keyboard::Key::Num0: ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);              break;
-                default: break;
+                case sf::Keyboard::Key::Num1:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 33 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);
+                    break;
+                }
+                case sf::Keyboard::Key::Num2:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 63 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);
+                    break;
+                }
+                case sf::Keyboard::Key::Num3:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 187, 231, 182, 251, 199, 216 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);
+                    break;
+                }
+                case sf::Keyboard::Key::Num4:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 51, 50, 49 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);
+                    break;
+                }
+                case sf::Keyboard::Key::Num5:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 126 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);
+                    break;
+                }
+                case sf::Keyboard::Key::Num6:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 33, 33 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2);
+                    break;
+                }
+                case sf::Keyboard::Key::Num7:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 185, 204, 191, 246 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);
+                    break;
+                }
+                case sf::Keyboard::Key::Num8:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 55 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);
+                    break;
+                }
+                case sf::Keyboard::Key::Num9:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 178, 201 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);
+                    break;
+                }
+                case sf::Keyboard::Key::Num0:
+                {
+                    auto code = std::vector<std::uint8_t>{ 47, 185, 221, 194, 166 };
+                    m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+
+                    ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);
+                    break;
+                }
+                default:
+                    break;
             }
         }
     }

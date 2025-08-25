@@ -1,8 +1,11 @@
 #pragma once
 
 #include <OTwo/States/State.hpp>
+#include <OTwo/Models/Character.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/ToggleButton.hpp>
+
+#include <SFML/System/String.hpp>
 
 #include <vector>
 
@@ -29,10 +32,11 @@ class SessionContext;
 class RoomContext;
 class GameContext;
 class WaitingService;
+class MessagingService;
 class StateWaiting7K : public State
 {
 public:
-    StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ItemFactory& items);
+    StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, MessagingService& messaging, ItemFactory& items);
 
     void Initialize() override;
 
@@ -41,6 +45,7 @@ public:
     void OnMemberLeft(const WaitingMemberLeftEventData& ev);
     void OnMemberTeamChanged(const WaitingMemberTeamChangedEventData& ev);
     void OnMemberReadyStateChanged(const WaitingMemberReadyStateChangedEventData& ev);
+    void OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData);
     void OnMusicChanged(const WaitingMusicChangedEventData& ev);
     void OnTitleChanged(const WaitingTitleChangedEventData& ev);
     void OnMapChanged(const WaitingMapChangedEventData& ev);
@@ -84,6 +89,7 @@ private:
     RoomContext& m_room;
     GameContext& m_game;
     WaitingService& m_service;
+    MessagingService& m_messaging;
     ItemFactory& m_items;
 
     Avatar* m_mainAvatar{};
