@@ -648,10 +648,10 @@ namespace Gx
         }
 
         // Update the bounding rectangle
-        m_bounds.position.x   = minX;
-        m_bounds.position.y    = minY;
-        m_bounds.size.x  = maxX - minX;
-        m_bounds.size.y = maxY - minY;
+        m_bounds.position.x = minX;
+        m_bounds.position.y = minY;
+        m_bounds.size.x     = maxX - minX;
+        m_bounds.size.y     = maxY - minY;
 
         OnGeometryUpdated();
     }

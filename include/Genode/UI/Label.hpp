@@ -13,6 +13,7 @@ namespace Gx
         using Text::Text;
 
         sf::FloatRect GetLocalBounds() const override;
+        void SetLocalBounds(const sf::FloatRect& bounds);
 
         Alignment GetAlignment() const;
         void SetAlignment(Alignment alignment);
@@ -27,5 +28,6 @@ namespace Gx
     private:
         mutable bool m_alignmentUpdated = false;
         Alignment m_alignment = Alignment::None;
+        sf::FloatRect m_bounds{};
     };
 }

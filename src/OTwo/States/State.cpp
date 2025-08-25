@@ -90,6 +90,7 @@ void State::LoadCommonResources()
     m_dialogNotice->SetVisible(false);
     m_dialogNotice->SetOrigin(0.f, 0.f);
     m_dialogNotice->SetPosition(x, y);
+    m_dialogNotice->GetLabel()->SetLocalBounds(sf::FloatRect{{}, {152, 300}});
 
     m_cancelSound = Instantiate<sf::Sound>(Sound::Effects::EF_03, ResourceScope::Shared);
     m_popupSound  = Instantiate<sf::Sound>(Sound::Effects::EF_06, ResourceScope::Shared);
