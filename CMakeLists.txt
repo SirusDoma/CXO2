@@ -152,6 +152,10 @@ else()
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE stdc++fs)
 
+    # iconv
+    find_library(ICONV_LIB iconv REQUIRED)
+    target_link_libraries(${TARGET} PRIVATE ${ICONV_LIB})
+
     # Freetype
     find_package(Freetype REQUIRED)
 

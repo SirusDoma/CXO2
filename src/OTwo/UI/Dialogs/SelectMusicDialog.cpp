@@ -1101,10 +1101,7 @@ void SelectMusicDialog::Invalidate()
             else
                 title->SetColor(lastTitle->GetColor());
 
-            auto name = StringTranscoder::Transcode(m_displayList[index].Title);
-            if (name.isEmpty())
-                name = m_displayList[index].Title; // better than show nothing
-
+            auto name = m_displayList[index].Title;
             title->SetString(name);
             title->Truncate(150);
 
