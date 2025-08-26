@@ -164,6 +164,9 @@ void StateItemShop::Initialize()
     const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
     tooltip->SetVisible(false);
 
+    const auto tooltipMessage = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
+    tooltipMessage->SetLocalBounds(tooltip->GetLocalBounds());
+
     const auto defaultButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_DEFAULT);
     defaultButton->SetClickCallback([=] (auto&, auto&)
     {
@@ -1406,36 +1409,11 @@ void StateItemShop::InvalidateShopItemList(const bool rebuildList)
             Stop(m_tooltipDelay);
             if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
             {
-                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
+                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=]
                 {
                     const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
                     message->SetString(description);
-
-                    const auto  bounds = tooltip->GetGlobalBounds();
-                    const float right  = bounds.position.x + bounds.size.x;
-
-                    auto string = message->GetString();
-                    std::size_t checkpoint = 0;
-                    for (std::size_t c = 0; c < string.getSize(); c++)
-                    {
-                        if (string[c] == '\n')
-                            continue;
-
-                        if (string[c] == ' ')
-                        {
-                            checkpoint = c;
-                            continue;
-                        }
-
-                        const auto position = message->FindCharacterPosition(c);
-                        if (bounds.position.x + position.x > right - message->GetPosition().x)
-                        {
-                            string.replace(checkpoint, 1, "\n");
-                            message->SetString(string);
-
-                            c = 0;
-                        }
-                    }
+                    message->SetLocalBounds(tooltip->GetLocalBounds());
 
                     tooltip->SetVisible(slot->IsVisible());
                     InvalidateShopMaster();
@@ -1668,36 +1646,11 @@ void StateItemShop::InvalidateShopSetItemList(bool rebuildList)
             Stop(m_tooltipDelay);
             if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
             {
-                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=] ()
+                m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=]
                 {
                     const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
                     message->SetString(description);
-
-                    const auto  bounds = tooltip->GetGlobalBounds();
-                    const float right  = bounds.position.x + bounds.size.x;
-
-                    auto string = message->GetString();
-                    std::size_t checkpoint = 0;
-                    for (std::size_t c = 0; c < string.getSize(); c++)
-                    {
-                        if (string[c] == '\n')
-                            continue;
-
-                        if (string[c] == ' ')
-                        {
-                            checkpoint = c;
-                            continue;
-                        }
-
-                        const auto position = message->FindCharacterPosition(c);
-                        if (bounds.position.x + position.x > right - message->GetPosition().x)
-                        {
-                            string.replace(checkpoint, 1, "\n");
-                            message->SetString(string);
-
-                            c = 0;
-                        }
-                    }
+                    message->SetLocalBounds(tooltip->GetLocalBounds());
 
                     tooltip->SetVisible(slot->IsVisible());
                     InvalidateShopMaster();

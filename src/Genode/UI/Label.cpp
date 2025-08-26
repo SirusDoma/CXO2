@@ -14,9 +14,6 @@ namespace Gx
 
     void Label::SetLocalBounds(const sf::FloatRect& bounds)
     {
-        if (m_bounds == bounds)
-            return;
-
         m_bounds = bounds;
         Invalidate();
     }
@@ -95,6 +92,8 @@ namespace Gx
                     }
                 }
             }
+
+            EnsureGeometryUpdate();
         }
 
         if (m_alignmentUpdated)
