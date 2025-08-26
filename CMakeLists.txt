@@ -66,13 +66,6 @@ if(WIN32)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # External libs compiler flags
-    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-msvc/libiconv/libiconv$<$<CONFIG:Debug>:d>.lib)
-
-    # Add LIBICONV
-    add_compile_definitions(USE_LIBICONV)
-    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
-
     # Allow big obj (for embedded Resource.hpp)
     target_compile_options(${TARGET} PRIVATE /bigobj)
 
@@ -123,11 +116,6 @@ elseif(APPLE)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # TODO: Get correct LIBICONV archive for osx arm64
-    # set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
-    # add_compile_definitions(USE_LIBICONV)
-    # target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
-
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE "-framework Security")
     target_link_libraries(${TARGET} PRIVATE "-framework CoreText" "-framework CoreFoundation")
@@ -158,16 +146,11 @@ else()
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
-    # External libs
-    set(LIBICONV ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libs/libs-gcc/libiconv/libiconv.a)
-    add_compile_definitions(USE_LIBICONV)
-
     # Compiler flags
     target_compile_options(${TARGET} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-non-template-friend -Wno-virtual-move-assign>)
 
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE stdc++fs)
-    target_link_libraries(${TARGET} PRIVATE ${LIBICONV})
 
     # Freetype
     find_package(Freetype REQUIRED)

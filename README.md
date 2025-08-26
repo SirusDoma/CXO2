@@ -43,7 +43,6 @@ List of dependencies:
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [magic_enum](https://github.com/Neargye/magic_enum)
 - [kissfft](https://github.com/mborgerding/kissfft)
-- [libiconv](https://www.gnu.org/software/libiconv/)
 - [compact_enc_det](https://github.com/google/compact_enc_det)
 - [tinyfiledialogs](http://tinyfiledialogs.sourceforge.net)
 
