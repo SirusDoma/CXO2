@@ -116,6 +116,10 @@ elseif(APPLE)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR}
     )
 
+    # iconv
+    find_library(ICONV_LIB iconv REQUIRED)
+    target_link_libraries(${TARGET} PRIVATE ${ICONV_LIB})
+
     # Set dependencies libs
     target_link_libraries(${TARGET} PRIVATE "-framework Security")
     target_link_libraries(${TARGET} PRIVATE "-framework CoreText" "-framework CoreFoundation")
