@@ -1,9 +1,18 @@
 ﻿#include <Genode/UI/Label.hpp>
+#include <Genode/Graphics/Font.hpp>
 
 #include <cmath>
 
 namespace Gx
 {
+    void Label::AddFallbackFont(const Gx::Font& font) const
+    {
+        if (m_defaultFont == nullptr)
+            m_defaultFont = GetFont();
+
+        m_fallbackFonts.insert(&font);
+    }
+
     sf::FloatRect Label::GetLocalBounds() const
     {
         if (m_bounds != sf::FloatRect{})
@@ -33,6 +42,12 @@ namespace Gx
         return Text::Render(surface, states);
     }
 
+    void Label::OnFontChanged(const Gx::Font& font) const
+    {
+        Text::OnFontChanged(font);
+        m_defaultFont = &font;
+    }
+
     Label::Alignment Label::GetAlignment() const
     {
         return m_alignment;
@@ -46,6 +61,53 @@ namespace Gx
         m_alignment = alignment;
         m_alignmentUpdated = false;
         Invalidate();
+    }
+
+    void Label::OnGeometryUpdating() const
+    {
+        Text::OnGeometryUpdating();
+
+        if (m_fallbackFonts.empty())
+            return;
+
+        if (m_defaultFont == nullptr)
+            m_defaultFont = GetFont();
+
+        auto candidates = std::unordered_set<const Font*>{};
+        for (const auto& font : m_fallbackFonts)
+            candidates.insert(font);
+
+        bool useDefault = m_defaultFont != nullptr;
+        for (const char32_t codepoint : GetString())
+        {
+            useDefault = useDefault && m_defaultFont->HasGlyph(codepoint);
+            for (auto& font : m_fallbackFonts)
+            {
+                if (candidates.find(font) == candidates.end())
+                    continue;
+
+                if (!font->HasGlyph(codepoint))
+                    candidates.erase(font);
+            }
+
+            if (candidates.empty())
+                return;
+        }
+
+        if (useDefault)
+        {
+            const_cast<Label*>(this)->SetFont(*m_defaultFont);
+            return;
+        }
+
+        for (auto& candidate : candidates)
+        {
+            if (candidate)
+            {
+                const_cast<Label*>(this)->SetFont(*candidate);
+                return;
+            }
+        }
     }
 
     void Label::OnGeometryUpdated() const

@@ -1,7 +1,12 @@
 {
   "type": "Label",
   "require": {
-    "font": "Interface/Common/Font.ttf"
+    "font": "Interface/Common/Font.ttf",
+    "fallbackFonts": [
+      "Interface/Common/Fallback-Font1.ttf",
+      "Interface/Common/Fallback-Font2.ttf",
+      "Interface/Common/Fallback-Font3.ttf"
+    ]
   },
   "attributes": {
     "transform": {

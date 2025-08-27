@@ -50,6 +50,8 @@ void ChatWindow::SetFont(const Gx::Font& font)
     if (m_font != &font)
     {
         m_font = &font;
+        m_labels.clear();
+
         Invalidate();
     }
 }
@@ -64,8 +66,16 @@ void ChatWindow::SetCharacterSize(const unsigned int characterSize)
     if (m_characterSize != characterSize)
     {
         m_characterSize = characterSize;
+        m_labels.clear();
+
         Invalidate();
     }
+}
+
+void ChatWindow::AddFallbackFont(const Gx::Font& font)
+{
+    m_fallbackFonts.push_back(&font);
+    m_labels.clear();
 }
 
 unsigned int ChatWindow::GetScrollOffset() const
@@ -200,6 +210,12 @@ void ChatWindow::Invalidate()
         {
             auto label = std::make_unique<Gx::Label>();
             label->SetFont(*m_font);
+            for (const auto font : m_fallbackFonts)
+            {
+                if (font)
+                    label->AddFallbackFont(*font);
+            }
+
             label->SetColor(m_textColor);
             label->SetCharacterSize(GetCharacterSize());
 

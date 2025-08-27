@@ -112,8 +112,8 @@ Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileNa
             default: item.Gender = Gender::Any;    break;
         }
 
-        item.Name          = sf::String::fromUtf8(fn.begin(), fn.end());
-        item.Description   = sf::String::fromUtf8(ds.begin(), ds.end());
+        item.Name          = StringTranscoder::Transcode(fn.data(), fn.size());
+        item.Description   = StringTranscoder::Transcode(ds.data(), ds.size());
 
         item.Prices = {};
         if (info.Currency != Currency::None)

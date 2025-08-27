@@ -4,6 +4,7 @@
 
 #include <Genode/Graphics/Shapes/Rectangle.hpp>
 #include <Genode/Graphics/Text.hpp>
+#include <Genode/UI/Label.hpp>
 
 namespace Gx
 {
@@ -20,6 +21,7 @@ namespace Gx
 
         void SetString(const sf::String& string);
         void SetFont(const Font& font);
+        void AddFallbackFont(const Font& font) const;
         void SetMasked(bool masked);
         void SetNumericModeEnabled(bool enabled);
 
@@ -111,7 +113,7 @@ namespace Gx
             double    m_elapsed;
         };
 
-        Text  m_text;
+        Label m_label;
         Caret m_caret;
         sf::Color m_highlightColor;
         sf::FloatRect m_bounds;

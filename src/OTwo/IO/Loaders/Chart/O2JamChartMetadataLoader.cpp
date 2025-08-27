@@ -1,4 +1,5 @@
 #include <OTwo/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
+#include <OTwo/IO/Loaders/Chart/O2JamChartLoader.hpp>
 
 Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
 {
@@ -21,8 +22,11 @@ Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromMemory(voi
     return LoadFromStream(stream, ctx);
 }
 
-Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromStream(sf::InputStream& input, const Gx::ResourceContext& ctx) const
 {
+    const auto decryptedStream = O2JamChartLoader::Decrypt(Gx::ResourcePtr<sf::InputStream>(&input, [] (auto) {}));
+    auto& stream = *decryptedStream.get();
+
     auto metadata = std::make_unique<O2JamChartMetadata>();
     if (stream.read(metadata.get(), O2JamChartMetadata::Size) != O2JamChartMetadata::Size)
         return nullptr;

@@ -8,5 +8,5 @@ class O2JamChartMetadataLoader : public Gx::ResourceLoader<O2JamChartMetadata>
 public:
     Gx::ResourcePtr<O2JamChartMetadata> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const override;
     Gx::ResourcePtr<O2JamChartMetadata> LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const override;
-    Gx::ResourcePtr<O2JamChartMetadata> LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const override;
+    Gx::ResourcePtr<O2JamChartMetadata> LoadFromStream(sf::InputStream& input, const Gx::ResourceContext& ctx) const override;
 };

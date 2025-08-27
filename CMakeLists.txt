@@ -167,7 +167,7 @@ else()
     find_package(Fontconfig QUIET)
     if (Fontconfig_FOUND)
         target_link_libraries(${TARGET} PRIVATE Fontconfig::Fontconfig)
-        target_compile_definitions(${TARGET} PRIVATE GX_HAS_FONTCONFIG)
+        target_compile_definitions(${TARGET} PRIVATE USE_FONTCONFIG)
     endif()
 endif()
 
@@ -204,7 +204,6 @@ FetchContent_Declare(
     GIT_TAG        ecdeb1cea54d87b09bafe9999faf56654646209d
 )
 FetchContent_MakeAvailable(magic_enum)
-
 
 message("-- Output Directory: " ${OUTPUT_DIR})
 

@@ -20,7 +20,7 @@
 #else
     // Linux/Unix: search typical font directories
     #include <unistd.h>
-    #ifdef GX_HAS_FONTCONFIG
+    #ifdef USE_FONTCONFIG
         #include <fontconfig/fontconfig.h>
     #endif
 #endif
@@ -193,7 +193,7 @@ namespace Gx
         return std::nullopt;
 #else
         // Use Fontconfig to resolve family -> file path
-        #ifdef GX_HAS_FONTCONFIG
+        #ifdef USE_FONTCONFIG
         if (FcInit())
         {
             FcPattern* pat = FcNameParse(reinterpret_cast<const FcChar8*>(nameOrPath.c_str()));
@@ -310,7 +310,7 @@ namespace Gx
 
         return std::nullopt;
 #else
-        #ifdef GX_HAS_FONTCONFIG
+        #ifdef USE_FONTCONFIG
         if (FcInit())
         {
             FcPattern* pat = FcPatternBuild(nullptr,

@@ -502,6 +502,16 @@ namespace Gx
         void EnsureGeometryUpdate() const;
 
         ////////////////////////////////////////////////////////////
+        /// @brief An overridable callback that called when the font is changed
+        ////////////////////////////////////////////////////////////
+        virtual void OnFontChanged(const Gx::Font&) const {};
+
+        ////////////////////////////////////////////////////////////
+        /// @brief An overridable callback that called when the geometry is updating
+        ////////////////////////////////////////////////////////////
+        virtual void OnGeometryUpdating() const {};
+
+        ////////////////////////////////////////////////////////////
         /// @brief An overridable callback that called when the geometry is updated
         ////////////////////////////////////////////////////////////
         virtual void OnGeometryUpdated() const {};

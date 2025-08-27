@@ -76,6 +76,25 @@ Gx::ResourcePtr<ChatWindow> ChatWindowLoader::LoadFromMetadata(const ResourceMet
     window->SetLineSpacing(metadata->LineSpacing);
 
     const auto ctx = ResourceContextDecorator::Decorate(context);
+    if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && ffIt->second.has_value())
+    {
+        auto ffResource = ffIt->second;
+        auto fallbackFonts = std::vector<std::string>();
+
+        if (ffResource.type() == typeid(Gx::Json))
+            fallbackFonts = std::any_cast<Gx::Json>(ffResource);
+        else if (ffResource.type() == typeid(std::vector<std::string>()))
+            fallbackFonts = std::any_cast<std::vector<std::string>>(ffResource);
+
+        for (const auto& fontPath : fallbackFonts)
+        {
+            if (const auto font = ctx.Find<Gx::Font>(fontPath))
+                window->AddFallbackFont(*font);
+            else if (Gx::FileSystem::Contains(fontPath))
+                window->AddFallbackFont(ctx.Acquire<Gx::Font>(fontPath));
+        }
+    }
+
     if (const auto font = ctx.Require<Gx::Font>(*metadata); font)
         window->SetFont(*font);
 

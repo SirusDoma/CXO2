@@ -11,42 +11,60 @@
 #include <cstring>
 #endif
 
-namespace
+
+std::string StringTranscoder::DetectEncoding(const std::string& text)
 {
-    std::string DetectEncoding(const char* text, const std::size_t length)
-    {
-        bool isReliable = false;
-        int bytesConsumed = 0;
-
-        // Compact Encoding Detector result
-        Encoding detected = CompactEncDet::DetectEncoding(
-            text,
-            static_cast<int>(length),
-            nullptr, nullptr, nullptr,
-            UNKNOWN_ENCODING,
-            UNKNOWN_LANGUAGE,
-            CompactEncDet::QUERY_CORPUS,
-            true,
-            &bytesConsumed,
-            &isReliable
-        );
-
-        // Custom handling (fallback, reliabilities, etc
-        if (detected == UNKNOWN_ENCODING)
-            detected = Encoding::KOREAN_EUC_KR;
-        else if (detected == Encoding::ISO_8859_1)
-            detected = isReliable ? Encoding::ISO_8859_1 : Encoding::KOREAN_EUC_KR;
-
-        return MimeEncodingName(detected);
-    }
+    return DetectEncoding(text.c_str(), text.size());
 }
+
+std::string StringTranscoder::DetectEncoding(const char* text, const std::size_t length)
+{
+    bool isReliable = false;
+    int bytesConsumed = 0;
+
+    // Compact Encoding Detector result
+    Encoding detected = CompactEncDet::DetectEncoding(
+        text,
+        static_cast<int>(length),
+        nullptr,
+        nullptr,
+        nullptr,
+        UNKNOWN_ENCODING,
+        UNKNOWN_LANGUAGE,
+        CompactEncDet::QUERY_CORPUS,
+        true,
+        &bytesConsumed,
+        &isReliable
+    );
+
+    // Custom handling (fallback, reliabilities, etc)
+    if (detected == UNKNOWN_ENCODING)
+        detected = Encoding::KOREAN_EUC_KR;
+    else if (detected == Encoding::ISO_8859_1)
+        detected = isReliable ? detected : Encoding::KOREAN_EUC_KR;
+    // else if (detected == Encoding::GBK || detected == Encoding::GB18030 || detected == Encoding::HZ_GB_2312 || detected == Encoding::CHINESE_GB)
+    //     detected = isReliable ? detected : Encoding::KOREAN_EUC_KR;
+
+    return MimeEncodingName(detected);
+}
+
 
 sf::String StringTranscoder::Transcode(const std::string& text)
 {
-    return Transcode(text.data(), text.size(), DetectEncoding(text.data(), text.size()));
+    return Transcode(text, DetectEncoding(text.data(), text.size()));
 }
 
-sf::String StringTranscoder::Transcode(const char* text, std::size_t length)
+sf::String StringTranscoder::Transcode(const std::string& text, const std::string& encoding)
+{
+    return Transcode(text.c_str(), text.size(), encoding);
+}
+
+sf::String StringTranscoder::Transcode(const char* text, const std::size_t length)
+{
+    return Transcode(text, length, DetectEncoding(text, length));
+}
+
+sf::String StringTranscoder::Transcode(const char* text, std::size_t length, const std::string& encoding)
 {
     for (std::size_t i = 0; i < length; i++)
     {
@@ -57,19 +75,18 @@ sf::String StringTranscoder::Transcode(const char* text, std::size_t length)
         }
     }
 
-    return Transcode(text, length, DetectEncoding(text, length));
-}
+    std::string actualEncoding = encoding;
+    if (encoding.empty())
+        actualEncoding = DetectEncoding(text, length);
 
-sf::String StringTranscoder::Transcode(const char* text, std::size_t length, const std::string& encoding)
-{
 #if defined(_WIN32)
     // Map encoding name to Windows Code Page
     UINT codePage = CP_ACP;
-    if (encoding == "EUC-KR") codePage = 949;
-    else if (encoding == "SHIFT_JIS") codePage = 932;
-    else if (encoding == "GBK" || encoding == "GB2312" || encoding == "GB18030") codePage = 936;
-    else if (encoding == "BIG5") codePage = 950;
-    else if (encoding == "UTF-8") codePage = CP_UTF8;
+    if (actualEncoding == "EUC-KR") codePage = 949;
+    else if (actualEncoding == "SHIFT_JIS") codePage = 932;
+    else if (actualEncoding == "GBK" || actualEncoding == "GB2312" || actualEncoding == "GB18030") codePage = 936;
+    else if (actualEncoding == "BIG5") codePage = 950;
+    else if (actualEncoding == "UTF-8") codePage = CP_UTF8;
 
     const int wideLen = MultiByteToWideChar(codePage, 0, text, static_cast<int>(length), nullptr, 0);
     if (wideLen <= 0)
@@ -81,7 +98,7 @@ sf::String StringTranscoder::Transcode(const char* text, std::size_t length, con
     return sf::String(wideStr);
 
 #else
-    iconv_t cd = iconv_open("UTF-32LE", encoding.c_str());
+    iconv_t cd = iconv_open("UTF-32LE", actualEncoding.c_str());
     if (cd == (iconv_t)(-1))
         return sf::String();
 

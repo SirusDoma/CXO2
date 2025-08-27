@@ -3,6 +3,7 @@
 #include <OTwo/Archives/OjmArchive.hpp>
 #include <OTwo/Contexts/GameContext.hpp>
 
+#include <SFML/System/MemoryInputStream.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 O2JamChartLoader::O2JamChartLoader(const GameContext& context) :
@@ -38,8 +39,11 @@ Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromMemory(void* data, const std::s
     return LoadFromStream(stream, ctx);
 }
 
-Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const
+Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromStream(sf::InputStream& input, const Gx::ResourceContext& ctx) const
 {
+    const auto decryptedStream = Decrypt(Gx::ResourcePtr<sf::InputStream>(&input, [] (auto) {}));
+    auto& stream = *decryptedStream.get();
+
     auto chart = std::make_unique<Chart>();
     chart->Source = ctx.GetID();
 
@@ -222,7 +226,7 @@ Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromStream(sf::InputStream& stream,
 
 Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadThumbnail(const std::string& source, const Gx::ResourceContext& ctx)
 {
-    const auto loader   = O2JamChartMetadataLoader();
+    const auto loader = O2JamChartMetadataLoader();
     if (const auto metadata = loader.LoadFromFile(source, ctx))
         return LoadThumbnail(*metadata, ctx);
 
@@ -250,8 +254,11 @@ Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(const O2JamChartMetada
     return LoadCoverArt(*fs, metadata, ctx);
 }
 
-Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadThumbnail(sf::InputStream& stream, const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx)
+Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadThumbnail(sf::InputStream& input, const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
+    const auto decryptedStream = Decrypt(Gx::ResourcePtr<sf::InputStream>(&input, [] (auto) {}));
+    auto& stream = *decryptedStream.get();
+
     if (metadata.ThumbnailSize == 0)
         return nullptr;
 
@@ -282,8 +289,11 @@ Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadThumbnail(sf::InputStream& stre
     return nullptr;
 }
 
-Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(sf::InputStream& stream, const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx)
+Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(sf::InputStream& input, const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx)
 {
+    const auto decryptedStream = Decrypt(Gx::ResourcePtr<sf::InputStream>(&input, [] (auto) {}));
+    auto& stream = *decryptedStream.get();
+
     if (metadata.CoverSize == 0)
         return nullptr;
 
@@ -299,6 +309,91 @@ Gx::ResourcePtr<sf::Image> O2JamChartLoader::LoadCoverArt(sf::InputStream& strea
         return nullptr;
 
     return image;
+}
+
+Gx::ResourcePtr<sf::InputStream> O2JamChartLoader::Decrypt(Gx::ResourcePtr<sf::InputStream> stream)
+{
+    // Early return if stream is null
+    if (!stream)
+        return stream;
+
+    auto& input = *stream.get();
+
+    // Read entire stream into memory
+    const auto totalSizeOpt = input.getSize();
+    if (!totalSizeOpt.has_value())
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    const std::size_t totalSize = totalSizeOpt.value();
+    if (totalSize < 8)
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    if (!input.seek(0).has_value())
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    auto data = std::vector<std::uint8_t>(totalSize);
+    if (input.read(data.data(), static_cast<std::int64_t>(totalSize)) != totalSize)
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    // Validate signature "new"
+    const std::string signature(reinterpret_cast<const char*>(data.data()), 3);
+    if (signature != "new")
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    // Read block info and keys
+    const std::uint8_t blockSize  = data[3];
+    const std::uint8_t mainKey    = data[4];
+    const std::uint8_t midKey     = data[5];
+    const std::uint8_t initialKey = data[6];
+
+    if (blockSize == 0)
+    {
+        auto _ = stream->seek(0);
+        return stream;
+    }
+
+    // Prepare encrypt key buffer
+    std::vector<std::uint8_t> encryptKey(blockSize, mainKey);
+    encryptKey[0] = initialKey;
+    encryptKey[static_cast<std::size_t>(std::floor(static_cast<float>(blockSize) / 2.f))] = midKey;
+
+    // Discard 8-byte header and decrypt the rest reading backwards
+    const std::size_t payloadSize = totalSize - 8;
+    auto output = new std::uint8_t[payloadSize];
+
+    for (std::size_t i = 0; i < payloadSize; i += blockSize)
+    {
+        for (std::size_t j = 0; j < blockSize; j++)
+        {
+            const std::size_t offset = i + j;
+            if (offset >= payloadSize)
+                break;
+
+            const std::size_t srcIndex = (totalSize - 1) - offset; // read backward from end of file
+            output[offset] = static_cast<std::uint8_t>(data[srcIndex] ^ encryptKey[j]);
+        }
+    }
+
+    return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(output, payloadSize), [output] (const sf::InputStream* ms)
+    {
+        delete[] output;
+        delete ms;
+    });
 }
 
 void O2JamChartLoader::SetCoverLoadCallback(const std::function<void(const sf::Image*)> &onCoverLoaded)

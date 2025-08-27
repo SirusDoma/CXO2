@@ -327,10 +327,37 @@ void O2Jam::Boot()
     auto& fontManager = context.Require<Gx::FontManager>();
     if (auto unicode = fontManager.GetData("Arial Unicode MS"))
         embedded.WriteFile("Interface/Common/Font.ttf", unicode->first, unicode->second);
-    else if (auto arial = fontManager.GetData("Arial"))
-        embedded.WriteFile("Interface/Common/Font.ttf", arial->first, arial->second);
-    else if (auto defaultData = fontManager.GetDefaultData())
-        embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
+    else
+    {
+        if (auto arial = fontManager.GetData("Arial"))
+            embedded.WriteFile("Interface/Common/Font.ttf", arial->first, arial->second);
+        else if (auto defaultData = fontManager.GetDefaultData())
+            embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
+
+        // Korea
+        if (auto ff1_1 = fontManager.GetData("Malgun Gothic"))
+            embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_1->first, ff1_1->second);
+        else if (auto ff1_2 = fontManager.GetData("Apple SD Gothic Neo"))
+            embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_2->first, ff1_2->second);
+        else if (auto ff1_3 = fontManager.GetData("Baekmuk Dotum"))
+            embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_3->first, ff1_3->second);
+
+        // Chinese
+        if (auto ff2_1 = fontManager.GetData("Microsoft YaHei UI"))
+            embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_1->first, ff2_1->second);
+        else if (auto ff2_2 = fontManager.GetData("PingFang SC"))
+            embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_2->first, ff2_2->second);
+        else if (auto ff2_3 = fontManager.GetData("AR PL UMing CN"))
+            embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_3->first, ff2_3->second);
+
+        // Japan
+        if (auto ff3_1 = fontManager.GetData("Yu Gothic UI"))
+            embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_1->first, ff3_1->second);
+        else if (auto ff3_2 = fontManager.GetData("Hiragino Sans"))
+            embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_2->first, ff3_2->second);
+        else if (auto ff3_3 = fontManager.GetData("Kochi Gothic"))
+            embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_3->first, ff3_3->second);
+    }
 
     // Embedded resources
     for (const auto& [name, resource] : OTwo::Resources)

@@ -17,6 +17,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400031"
         },
         "attributes": {
@@ -28,6 +33,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400032"
         },
         "attributes": {
@@ -39,6 +49,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400033"
         },
         "attributes": {
@@ -50,6 +65,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400034"
         },
         "attributes": {
@@ -61,6 +81,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400035"
         },
         "attributes": {
@@ -72,6 +97,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400036"
         },
         "attributes": {
@@ -83,6 +113,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A500037"
         },
         "attributes": {
@@ -94,6 +129,11 @@
         "type": "Label",
         "require": {
           "font": "Interface/Common/Font.ttf",
+          "fallbackFonts": [
+            "Interface/Common/Fallback-Font1.ttf",
+            "Interface/Common/Fallback-Font2.ttf",
+            "Interface/Common/Fallback-Font3.ttf"
+          ],
           "bndID": "0X1A400038"
         },
         "attributes": {

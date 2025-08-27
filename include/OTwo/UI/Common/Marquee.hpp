@@ -15,7 +15,7 @@ public:
     using Gx::Label::Label;
 
     sf::FloatRect GetLocalBounds() const override;
-    void SetLocalBounds(const sf::FloatRect& bounds);
+    void SetLocalBounds(const sf::FloatRect& bounds) override;
 
     double GetSpeed() const;
     void SetSpeed(double speed);

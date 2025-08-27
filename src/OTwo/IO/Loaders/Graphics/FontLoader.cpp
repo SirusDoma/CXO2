@@ -26,6 +26,9 @@ Gx::ResourcePtr<Gx::Font> FontLoader::LoadFromFile(const std::string& fileName, 
         delete inputStream;
     });
 
+    if (!resource->LoadFromStream(*inputStream))
+        return nullptr;
+
     resource->SetSmooth(m_smooth);
     return resource;
 }

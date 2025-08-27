@@ -124,6 +124,8 @@ namespace Gx
         {
             m_font = &font;
             m_geometryNeedUpdate = true;
+
+            OnFontChanged(*m_font);
         }
     }
 
@@ -488,6 +490,8 @@ namespace Gx
         const auto cacheId = m_font->GetTexture(m_characterWidth, m_characterHeight).*Get(CacheID());
         if (!m_geometryNeedUpdate && cacheId == m_fontTextureId)
             return;
+
+        OnGeometryUpdating();
 
         // Save the current fonts texture id
         m_fontTextureId = cacheId;

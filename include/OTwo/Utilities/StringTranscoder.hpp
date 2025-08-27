@@ -10,6 +10,9 @@ public:
     static sf::String Transcode(const std::string& text);
     static sf::String Transcode(const char* text, std::size_t length);
 
-private:
+    static sf::String Transcode(const std::string& text, const std::string& encoding);
     static sf::String Transcode(const char* text, std::size_t length, const std::string& encoding);
+
+    static std::string DetectEncoding(const std::string& text);
+    static std::string DetectEncoding(const char* text, const std::size_t length);
 };

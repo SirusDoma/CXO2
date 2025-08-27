@@ -22,6 +22,7 @@ public:
 
     void SetFont(const Gx::Font& font);
     void SetCharacterSize(unsigned int characterSize);
+    void AddFallbackFont(const Gx::Font& font);
 
     const Gx::Font* GetFont() const;
     sf::Color GetTextColor() const;
@@ -54,6 +55,7 @@ private:
     float m_lineSpacing;
 
     std::vector<ChatMessage> m_chats;
+    std::vector<const Gx::Font*> m_fallbackFonts{};
     std::vector<std::unique_ptr<Gx::Label>> m_labels;
 
     SessionContext& m_session;
