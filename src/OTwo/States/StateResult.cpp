@@ -9,6 +9,9 @@
 #include <OTwo/Contexts/GameContext.hpp>
 #include <OTwo/Contexts/RoomContext.hpp>
 
+#include <OTwo/Services/WaitingService.hpp>
+#include <OTwo/Services/PlayingService.hpp>
+
 #include <OTwo/Messages/RoomInfo.hpp>
 
 #include <OTwo/StringTable/Identifiers/Cache.hpp>
@@ -25,11 +28,12 @@
 
 using namespace StringTable::Identifiers;
 
-StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, PlayingService& service) :
+StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service) :
     m_mixer(mixer),
     m_session(session),
     m_room(room),
     m_context(context),
+    m_waiting(waiting),
     m_service(service),
     m_scoreTracker(scoreTracker)
 {
@@ -185,23 +189,49 @@ void StateResult::Initialize()
         }
     }
 
+    const auto btnBack = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK);
     const auto btnRetry = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_PLAY_RETRY);
-    btnRetry->SetVisible(false);
+
+    btnRetry->SetVisible(m_room.GetMode() == GameMode::Single);
     btnRetry->SetEnabled(false);
-    btnRetry->SetClickCallback([this] (auto& sender, const auto& ev)
+    btnRetry->SetClickCallback([this, btnBack] (auto& sender, const auto&)
     {
         sender.SetEnabled(false);
-        GetDirector().Present<StateLoading>();
+        btnBack->SetEnabled(false);
+
+        const auto errorCallback = [this] (const auto& ex)
+        {
+            Invoke([=]
+            {
+                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                {
+                    GetDirector().Dismiss<StatePlanet>();
+                });
+            });
+        };
+
+
+        m_service.ConfirmResult(nullptr, nullptr);
+        m_waiting.UpdateReadyState([=]
+        {
+            m_waiting.StartGame([=]
+            {
+                GetDirector().Present<StateLoading>();
+            },
+            errorCallback);
+        },
+        errorCallback);
+
     });
 
-    const auto btnBack = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK);
+
     btnBack->SetEnabled(false);
-    btnBack->SetFocusChangedCallback([btnRetry] (auto& sender, const auto& ev)
+    btnBack->SetFocusChangedCallback([btnRetry] (auto& sender, const auto&)
     {
         btnRetry->SetFocus(sender.IsFocused() ? false : btnRetry->IsFocused());
-        btnRetry->SetEnabled(!sender.IsFocused());
+        btnRetry->SetEnabled(!sender.IsFocused() && btnRetry->IsVisible());
     });
-    btnBack->SetClickCallback([this] (auto& sender, const auto& ev)
+    btnBack->SetClickCallback([this] (auto& sender, const auto&)
     {
         sender.SetEnabled(false);
         m_service.ConfirmResult([=]
@@ -222,7 +252,6 @@ void StateResult::Initialize()
                 });
             });
         });
-
     });
 
     auto topFx    = Run<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
@@ -230,7 +259,7 @@ void StateResult::Initialize()
         {
             background->SetVisible(true);
             banner->SetVisible(true);
-            //btnRetry->SetEnabled(true);
+            btnRetry->SetEnabled(m_room.GetMode() == GameMode::Single);
             btnBack->SetEnabled(true);
         },
         Gx::Move(*bottom, sf::Vector2f(0, view.getSize().y - bottom->GetLocalBounds().size.y), sf::seconds(2.f))

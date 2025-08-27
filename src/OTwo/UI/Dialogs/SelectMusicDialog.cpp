@@ -46,7 +46,10 @@ void SelectMusicDialog::Initialize()
     Gx::Dialog::Initialize();
 
     if (m_initialized)
+    {
+        Invalidate();
         return;
+    }
 
     m_page = 0;
     m_musicList = m_session.GetInstalledMusic();
@@ -1028,12 +1031,14 @@ void SelectMusicDialog::Invalidate()
         return;
     }
 
-    Gx::Label* lastTitle = nullptr;
     for (int i = static_cast<int>(elements.size()) - 1; i >= 0; i--)
     {
         auto button = dynamic_cast<Gx::RadioButton*>(elements[i]);
         if (!button)
             continue;
+
+        const auto refTitle = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE);
+        static auto originalTextColor = refTitle != nullptr ? refTitle->GetColor() : sf::Color(25, 25, 25);
 
         int index = i + static_cast<int>(m_page * itemListCount);
         if (index >= m_displayList.size())
@@ -1041,12 +1046,6 @@ void SelectMusicDialog::Invalidate()
             button->SetCheckedState(false);
             button->SetEnabled(false);
             button->SetVisible(false);
-
-            if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
-            {
-                if (!lastTitle)
-                    lastTitle = title;
-            }
 
             if (i == 0 && m_displayList.empty())
             {
@@ -1066,9 +1065,6 @@ void SelectMusicDialog::Invalidate()
                 button->SetVisible(true);
                 if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
-                    if (!lastTitle)
-                        lastTitle = title;
-
                     if (m_genre.has_value())
                     {
                         title->SetString(fmt::format("{} is not available yet.", magic_enum::enum_name(m_genre.value())));
@@ -1094,12 +1090,18 @@ void SelectMusicDialog::Invalidate()
         if (i == 0 && m_music.Source.empty())
             m_music = m_displayList[index];
 
+        const auto& availableMusicIDs = m_room.GetAvailableMusicIDs();
+        auto textColor = originalTextColor;
         if (auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
         {
-            if (!lastTitle)
-                lastTitle = title;
+            static sf::Color originalColor = title->GetColor();
+
+            if (availableMusicIDs.find(static_cast<std::uint32_t>(m_displayList[index].ID)) == availableMusicIDs.end())
+                title->SetColor(sf::Color(241, 195, 10));
             else
-                title->SetColor(lastTitle->GetColor());
+                title->SetColor(originalTextColor);
+
+            textColor = title->GetColor();
 
             auto name = m_displayList[index].Title;
             title->SetString(name);
@@ -1110,7 +1112,10 @@ void SelectMusicDialog::Invalidate()
         }
 
         if (auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
+        {
+            level->SetColor(textColor);
             level->SetString(std::to_string(m_displayList[index].Levels[m_difficulty]));
+        }
 
         if (auto duration = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TIME); duration)
         {
@@ -1118,6 +1123,7 @@ void SelectMusicDialog::Invalidate()
             int minute    = std::floor(seconds / 60);
             int remainder = static_cast<int>(seconds) % 60;
 
+            duration->SetColor(textColor);
             duration->SetString(fmt::format("[{}:{:02}]", minute, remainder));
         }
 

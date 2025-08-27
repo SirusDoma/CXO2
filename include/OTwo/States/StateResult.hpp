@@ -1,18 +1,18 @@
 #pragma once
 
 #include <OTwo/States/State.hpp>
-#include <OTwo/Services/PlayingService.hpp>
-
 #include <Genode/Audio/AudioMixer.hpp>
 
 class ScoreTracker;
 class RoomContext;
 class GameContext;
 class SessionContext;
+class WaitingService;
+class PlayingService;
 class StateResult : public State
 {
 public:
-    StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, PlayingService& service);
+    StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service);
 
     void Initialize() override;
 
@@ -25,6 +25,7 @@ private:
     SessionContext& m_session;
     RoomContext& m_room;
     GameContext& m_context;
+    WaitingService& m_waiting;
     PlayingService& m_service;
     const ScoreTracker& m_scoreTracker;
 };

@@ -355,6 +355,9 @@ void StateWaiting7K::OnMemberJoined(const WaitingMemberJoinedEventData& ev)
 
     chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", slot.Member->Name));
     InvalidateMembers();
+
+    const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
+    selectMusicDialog->Initialize();
 }
 
 void StateWaiting7K::OnMemberLeft(const WaitingMemberLeftEventData& ev)
@@ -386,6 +389,9 @@ void StateWaiting7K::OnMemberLeft(const WaitingMemberLeftEventData& ev)
 
     InvalidateMembers();
     InvalidateRoomInfo();
+
+    const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
+    selectMusicDialog->Initialize();
 }
 
 void StateWaiting7K::OnMemberTeamChanged(const WaitingMemberTeamChangedEventData& ev)
@@ -640,6 +646,8 @@ void StateWaiting7K::OnStartStateChanged(Gx::ToggleButton& sender)
         if (slot.Member->MusicIDs.find(m_room.GetMusic().ID) == slot.Member->MusicIDs.end())
         {
             ShowDialog("There are users who have not the right tune.", DialogStyle::Information);
+            sender.SetCheckedState(false);
+
             return;
         }
     }

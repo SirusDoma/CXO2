@@ -237,7 +237,7 @@ void OnlineNetworkService::OnWaitingMusicChanged(const WaitingMusicChangedEventD
                 return id == header.ID;
             });
 
-            m_room.SetMusic(it == musicList.end() ? ChartMetadata{} : *it);
+            m_room.SetMusic(it == musicList.end() ? ChartMetadata{musicID} : *it);
             m_room.SetDifficulty(ev.Difficulty);
             m_room.SetSpeedID(ev.SpeedID);
 
