@@ -48,7 +48,7 @@ int main(int argc , char** argv)
             ctx.GetAuthToken().empty() ||
             ctx.GetFtpUrl().empty() ||
             ctx.GetGame().empty() ||
-            ctx.GetGame().empty())
+            ctx.GetGatewayInfo().empty())
         {
             SystemMessageBox::ShowInformation("Please try to run O2jam.exe", "[INFO]");
             return 0;
