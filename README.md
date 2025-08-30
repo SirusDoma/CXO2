@@ -1,4 +1,7 @@
 # CXO2
+
+**Client Version: Pre-NX (v3.10)**
+
 A faithful, customizable, and cross-platform implementation of O2Jam client written in C++ on top of [Genode](https://github.com/SirusDoma/Genode),
 an in-house game engine based on [SFML](https://github.com/SFML/SFML/).
 
@@ -32,6 +35,16 @@ The end goal is to remake every official major clients published by e-Games and 
 | OTwo             | Core Game Client                                       |
 
 ## Compiling the Project ##
+
+**The project does not include any copyrighted assets. You are required to provide a supported copy of the game.**
+
+First, you need to place all assets in the `assets` folder.
+- Place `Interface(1).opi`, `Playing(1).opi` and `Avatar.opa` in `assets/Image/` directory.
+- Place default BGM ojm files (`BGM.ojm`, `bgEffect.ojm`, `Event.ojm`, `Planet.ojm` and `O2PlanetNPC.ojm`) in `assets/Music/` 
+
+**Please note: the provided assets must be compatible with the supported client version.**  
+You will also need to set up a local server or connect to an existing server and provide valid launch arguments to debug the project. Please refer to [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore) to learn more about setting up a local server. 
+
 The project is now fully relies on [CMake](https://cmake.org/), and it makes use of [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html) to manage the dependencies.  
 No additional setup or commands are required to build the project other than standard cmake build.
 
@@ -46,6 +59,8 @@ List of dependencies:
 - [libiconv](https://www.gnu.org/software/libiconv/) (Linux and macOS)
 - [compact_enc_det](https://github.com/google/compact_enc_det)
 - [tinyfiledialogs](http://tinyfiledialogs.sourceforge.net)
+
+See `CMakeList.txt` if you want to compile the executable with an icon included.
 
 > [!Important]
 > Before building a `Release` build, make sure to run `ResourceCompiler` to ensure `Resources.hpp` contains latest changes.

@@ -1,6 +1,6 @@
 # CMake Project
 cmake_minimum_required(VERSION 3.27)
-project(O2Jam LANGUAGES C CXX)
+project(CXO2 LANGUAGES C CXX)
 if (APPLE)
     enable_language(OBJCXX)
 endif()
@@ -45,8 +45,8 @@ message("-- Build type: " ${CMAKE_BUILD_TYPE})
 
 # Specific OS Directories and Flags
 if(WIN32)
-    # App Resources (Icon)
-    set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/resources/OTwo.rc)
+    # App Resources (Icon) (Uncomment to set icon; you need `OTwo.ico` in `resources` directory)
+    # set(APP_RESOURCE ${CMAKE_SOURCE_DIR}/resources/OTwo.rc)
     add_executable(${TARGET} ${APP_RESOURCE} ${SRCS} ${HEADERS})
 
     # Output directory
@@ -81,11 +81,13 @@ elseif(APPLE)
 
     message("-- Architecture: " ${CMAKE_OSX_ARCHITECTURES})
 
-    # App Icon
+    # App resources
     set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources/)
-    set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
-    set(APP_ICON ${RESOURCES_DIR}/${MACOSX_BUNDLE_ICON_FILE})
-    set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    # App icon (Uncomment to set icon; you need `OTwo.icns` in `resources` directory)
+    # set(MACOSX_BUNDLE_ICON_FILE OTwo.icns)
+    # set(APP_ICON ${RESOURCES_DIR}/${MACOSX_BUNDLE_ICON_FILE})
+    # set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     # Output Directory
     set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/osx/${CMAKE_OSX_ARCHITECTURES}/${CMAKE_BUILD_TYPE}")
@@ -96,7 +98,9 @@ elseif(APPLE)
     # Executable
     set(PACKAGE_NAME com.cxo2.game)
     add_executable(${TARGET} MACOSX_BUNDLE ${APP_ICON} ${SRCS} ${HEADERS})
-    target_sources(${TARGET} PRIVATE ${APP_ICON})
+
+    # App icon
+    # target_sources(${TARGET} PRIVATE ${APP_ICON})
 
     # MacOS Bundle flag
     set_target_properties(${TARGET} PROPERTIES
