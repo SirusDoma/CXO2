@@ -43,7 +43,7 @@ First, you need to place all assets in the `assets` folder.
 - Place default BGM ojm files (`BGM.ojm`, `bgEffect.ojm`, `Event.ojm`, `Planet.ojm` and `O2PlanetNPC.ojm`) in `assets/Music/` 
 
 **Please note: the provided assets must be compatible with the supported client version.**  
-You will also need to set up a local server or connect to an existing server and provide valid launch arguments to debug the project. Please refer to [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore) to learn more about setting up a local server. 
+You will also need to set up a local server or connect to an existing server and provide valid launch arguments to debug the project. Please refer to [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore/tree/mozart) to learn more about setting up a local server. 
 
 The project is now fully relies on [CMake](https://cmake.org/), and it makes use of [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html) to manage the dependencies.  
 No additional setup or commands are required to build the project other than standard cmake build.
@@ -133,7 +133,7 @@ Further modding (such as extending game via library (.dll)) is still under plann
 Also, since the game use the same network format, you can play alongside with the original game client as long as the client and server support the specified `Client Version` above.
 
 ## Can I host my own server?
-Absolutely, use [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore) to host your own server or for local network play.
+Absolutely, use [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore/tree/mozart) to host your own server or for local network play.
 
 ## Is offline mode supported?
 It is not possible at the moment but it is already partially implemented inside the code. 
