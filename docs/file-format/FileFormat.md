@@ -664,7 +664,7 @@ The set info data table defines item set packages available in the item shop. Th
 | +0 | `int32` | Set ID |
 | +4 | `byte` | First Bitflag: New label and Planet Origin (see [Set Bitflag](#set-bitflag) & [Planet](#item-type-planets-and-payment-method)) |
 | +5 | `byte` | Second Bitflag: Gender (see [Set Bitflag](#set-bitflag)) |
-| +6 | `bool` | Use discounted price\* |
+| +6 | `bool` | Use discounted price<sup>\*</sup> |
 | +7 | `int16` | Number of items included in the set |
 | +9 | `int32` | Item ID 1 |
 | +13 | `int32` | Item ID 2 |
@@ -724,7 +724,7 @@ In e-Games and NOWCOM distributions, `OJNList.dat` (and `X2OJNList.dat`) typical
 
 Most fields in these sections are unknown, but their primary purposes are documented below.
 
-#### New Label
+#### Firt Extra Section: New Label
 
 Defines music IDs with the "new" label.
 
@@ -743,11 +743,12 @@ Defines music IDs with the "new" label.
 | +8 | `int32` | Unknown² |
 | +12 | `int32` | Unknown³ |
 
+<sup>The client never read the (Unused) values. This list is merely used to mark songs with new label.</sup><br/>
 <sup>1. Always `0`</sup><br>
 <sup>2. Sometimes `1`, but otherwise `0`</sup><br>
 <sup>3. Sometimes `0`, but otherwise `1`</sup>
 
-#### Premium (Standard Client)
+#### Second Extra Section: Premium (Standard Client)
 
 Defines premium music IDs that must be purchased in the music shop before becoming playable.
 
@@ -762,15 +763,13 @@ Defines premium music IDs that must be purchased in the music shop before becomi
 | Offset | Type | Description |
 |--------|------|-------------|
 | +0 | `int32` | Music ID |
-| +4 | `int32` | Unknown¹ |
-| +8 | `int32` | Unknown² |
-| +12 | `int32` | Unknown³ |
+| +4 | `int32` | Price in ePoint / O2Cash / Gash / MCash |
+| +8 | `int32` | Price in GEM |
+| +12 | `int32` | (Unused)<sup>\*</sup> |
 
-<sup>1. Likely price in premium currency (ePoint, MCash, Gash)</sup><br>
-<sup>2. Likely price in second premium currency (O2Cash, MusicCash)</sup><br>
-<sup>3. Likely price in GEM</sup>
+<sup>* Likely price in second premium currency (O2Cash, MusicCash)</sup><br>
 
-#### Mission (X2)
+#### Second Extra Section (Alt): Mission (X2)
 
 Defines a list of mission metadata that maps to actual music IDs.
 
@@ -797,9 +796,9 @@ Defines a list of mission metadata that maps to actual music IDs.
 | 2 | `NX` | Normal |
 | 3 | `HX` | Hard |
 
-#### Extra Metadata Section
+#### Third Extra Section: Extra Metadata
 
-Contains additional metadata such as release date information.
+A section that contains extra metadata, such as release date information. Note that O2Jam NX (up to v3.82) does not read this section at all.
 
 **Section header**
 
@@ -818,7 +817,8 @@ Contains additional metadata such as release date information.
 | +20 | `int32` | Unknown |
 | +24 | `int32` | Unknown |
 
-<sup>Unknown fields are not verified. The actual field widths may differ from `int16`/`int32` as documented.</sup>
+<sup><strong>The game does not read this section</strong>.</sup><br/>
+<sup>Unknown fields are not verified. It might be possible that the bandwith size is not correct (it is not int16 or int32). </sup>
 
 ---
 
