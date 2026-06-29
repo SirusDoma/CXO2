@@ -628,8 +628,7 @@ namespace Gx
                 }
                 else if (ev.code == sf::Keyboard::Key::V)
                 {
-                    std::string input = sf::Clipboard::getString();
-                    auto string = sf::String::fromUtf32(input.begin(), input.end());
+                    auto string = sf::Clipboard::getString();
                     for (size_t index = 0; index < string.getSize(); index++)
                         m_caret.Index = static_cast<int>(Insert(m_caret.Index, string[index]));
                 }

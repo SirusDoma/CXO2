@@ -17,8 +17,6 @@ namespace Gx
 
         m_start = GetTarget().GetScale();
         m_diff = m_end - m_start;
-        // m_diff.x = std::abs(m_diff.x);
-        // m_diff.y = std::abs(m_diff.y);
     }
 
     void Scale::Update(const double delta)
