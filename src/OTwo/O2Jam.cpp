@@ -574,6 +574,15 @@ int O2Jam::Shutdown()
     return 0;
 }
 
+sf::VideoMode O2Jam::GetVideoMode() const
+{
+    auto mode = Gx::Application::GetVideoMode();
+    if (GetWindowState() == sf::State::Fullscreen && Gx::GetCurrentPlatform() == Gx::Platform::macOS)
+        mode.size.y -= 120;
+
+    return mode;
+}
+
 void O2Jam::Update(const double delta)
 {
     Application::Update(delta);

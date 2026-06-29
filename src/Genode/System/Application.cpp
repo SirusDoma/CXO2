@@ -1,5 +1,4 @@
 ﻿#include <Genode/System/Application.hpp>
-#include <Genode/System/Platform.hpp>
 #include <Genode/System/Context.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
@@ -229,6 +228,11 @@ namespace Gx
     {
     }
 
+    sf::VideoMode Application::GetVideoMode() const
+    {
+        return m_mode;
+    }
+
     void Application::OnInputReceived(sf::Event& ev)
     {
         // Re-map mouse coordinate
@@ -297,18 +301,17 @@ namespace Gx
             m_window->close();
 
         // Determine video mode to use
-        auto mode = m_mode;
         if (m_state == sf::State::Fullscreen)
         {
-            if (const auto fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
-                mode = fsModes.front();
+            if (const auto& fsModes = sf::VideoMode::getFullscreenModes(); !fsModes.empty())
+                m_mode = fsModes.front();
             else
-                mode = GetDesktopVideoMode();
-
-            // TODO: For Apple, use OS API to determine the available screen size to account dock and system bar
-            if (GetCurrentPlatform() == Platform::macOS)
-                mode.size.y -= 120; // HACK: Account for System Bar and Dock
+                m_mode = GetDesktopVideoMode();
         }
+
+        // The internal video mode should be resolved at this point.
+        // Resolve video mode override made by custom application, if any.
+        auto mode = GetVideoMode();
 
         // Create/Re-create the window and apply window state.
         // No option to turn into exclusive fullscreen for now.

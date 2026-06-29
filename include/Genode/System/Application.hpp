@@ -14,33 +14,33 @@ namespace Gx
     class Application : public RenderSurface, protected Renderable, protected Updatable
     {
     public:
-        static Application& Instance();
+        [[nodiscard]] static Application& Instance();
 
         ~Application() override = default;
 
         int Start();
         void Close();
 
-        const std::string& GetTitle() const;
-        Context& GetContext() const;
+        [[nodiscard]] const std::string& GetTitle() const;
+        [[nodiscard]] Context& GetContext() const;
 
-        SceneDirector& GetSceneDirector() const;
-        unsigned int GetRenderFrequency() const;
+        [[nodiscard]] SceneDirector& GetSceneDirector() const;
+        [[nodiscard]] unsigned int GetRenderFrequency() const;
 
-        sf::State GetWindowState() const;
+        [[nodiscard]] sf::State GetWindowState() const;
         void SetWindowState(sf::State state);
 
-        const sf::Color& GetClearColor() const;
+        [[nodiscard]] const sf::Color& GetClearColor() const;
         void SetClearColor(const sf::Color& clearColor);
 
-        Cursor* GetCursor() const;
+        [[nodiscard]] Cursor* GetCursor() const;
         void SetCursor(Cursor& cursor);
         void InvalidateCursor() const;
 
-        sf::VideoMode GetCurrentVideoMode() const;
+        [[nodiscard]] sf::VideoMode GetCurrentVideoMode() const;
 
-        const sf::View& GetDefaultView() const override;
-        const sf::View& GetView() const override;
+        [[nodiscard]] const sf::View& GetDefaultView() const override;
+        [[nodiscard]] const sf::View& GetView() const override;
         void SetView(const sf::View& view) override;
 
         void Clear(sf::Color clearColor) override;
@@ -55,14 +55,14 @@ namespace Gx
         virtual operator sf::RenderWindow&() const;
         // ReSharper restore CppNonExplicitConversionOperator
 
-        static sf::VideoMode GetDesktopVideoMode();
+        [[nodiscard]] static sf::VideoMode GetDesktopVideoMode();
 
     protected:
         Application(const std::string& title, const sf::VideoMode& mode, bool fullScreen = false, const sf::ContextSettings& settings = {});
         Application(const std::string& title, const sf::VideoMode& mode, const sf::View& view, bool fullScreen = false, const sf::ContextSettings& settings = {});
 
-        sf::RenderWindow& GetMainWindow() const;
-        const sf::ContextSettings& GetSettings() const;
+        [[nodiscard]] sf::RenderWindow& GetMainWindow() const;
+        [[nodiscard]] const sf::ContextSettings& GetSettings() const;
 
         virtual void Boot() = 0;
         virtual int Shutdown() = 0;
@@ -75,6 +75,8 @@ namespace Gx
         virtual void OnResized(const sf::Vector2u& size);
         virtual void OnInputReceived(sf::Event& ev);
         virtual bool OnClose();
+
+        virtual sf::VideoMode GetVideoMode() const;
 
     private:
         void CreateMainWindow();
