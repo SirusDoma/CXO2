@@ -1,0 +1,3 @@
+[submodule "modules/Genode"]
+	path = modules/Genode
+	url = https://github.com/SirusDoma/Genode.git

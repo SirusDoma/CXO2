@@ -21,7 +21,6 @@ set(TARGET "OTwo")
 # Sources and Headers
 file(GLOB_RECURSE SRCS
     src/main.cpp
-    src/Genode/*.cpp
     src/OTwo/*.cpp
     extlibs/libs/internal/*.c
     extlibs/libs/internal/*.cc
@@ -176,30 +175,11 @@ else()
 endif()
 
 # External Libs Sources and Flags
+set(SFML_USE_STATIC_STD_LIBS TRUE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 
-# -- SFML
-FetchContent_Declare(
-    SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG        3.0.1
-)
-FetchContent_MakeAvailable(SFML)
-
-# -- JSON
-FetchContent_Declare(
-    json
-    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-)
-FetchContent_MakeAvailable(json)
-
-# -- FMT
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt
-    GIT_TAG        11.0.2
-)
-FetchContent_MakeAvailable(fmt)
+# -- Genode
+add_subdirectory(modules/Genode)
 
 # -- Magic Enum
 FetchContent_Declare(
@@ -214,6 +194,7 @@ message("-- Output Directory: " ${OUTPUT_DIR})
 # Application includes
 target_include_directories(${TARGET} PRIVATE src)
 target_include_directories(${TARGET} PRIVATE include)
+target_include_directories(${TARGET} PRIVATE modules/Genode/include)
 target_include_directories(${TARGET} PRIVATE extlibs/headers)
 target_include_directories(${TARGET} PRIVATE extlibs/libs/internal)
 
@@ -225,6 +206,9 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 
 # Link Magic Enum
 target_link_libraries(${TARGET} PRIVATE magic_enum::magic_enum)
+
+# Link Genode
+target_link_libraries(${TARGET} PRIVATE Genode)
 
 # Link SFML
 target_link_libraries(${TARGET} PRIVATE SFML::Audio SFML::Graphics SFML::System SFML::Window SFML::Network)
