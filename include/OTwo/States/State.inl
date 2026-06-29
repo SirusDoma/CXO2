@@ -42,7 +42,7 @@ R* State::Instantiate(const std::string& source, const ResourceScope scope)
                 if (Gx::FileSystem::Contains(source))
                     instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
                 else
-                    instance = &resources->AddFromDeserializer<R>(Gx::StringHelper::RemoveExtension(source), [this] { return GetContext().Create<R>(); });
+                    instance = &resources->AddFromDeserializer<R>(Gx::StringHelper::RemoveExtension(source), [this] { return GetContext().Instantiate<R>(); });
             }
         }
     }

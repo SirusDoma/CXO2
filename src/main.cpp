@@ -58,7 +58,7 @@ int main(int argc , char** argv)
         o2jam.GetContext().Provide<CommandLineContext>([ctx] (const auto&)
         {
             return std::make_unique<CommandLineContext>(ctx);
-        }, Gx::Context::Scope::Shared);
+        }, Gx::Context::Scope::Singleton);
 
         return o2jam.Start();
     }

@@ -154,7 +154,7 @@ void O2Jam::Boot()
         adapter->UsePrefixSizeType<std::uint16_t>();
 
         return adapter;
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<GameConfig>([](auto&)
     {
@@ -162,12 +162,12 @@ void O2Jam::Boot()
         config->Load();
 
         return config;
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<Gx::FontManager>([] (auto&)
     {
         return std::make_unique<Gx::FontManager>();
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<Gx::ResourceManager>([](auto&)
     {
@@ -177,7 +177,7 @@ void O2Jam::Boot()
         resources->Register<ItemData>();
 
         return resources;
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<Gx::AudioMixer>([](auto& ctx)
     {
@@ -188,40 +188,25 @@ void O2Jam::Boot()
         mixer->GetSoundGroup(Sound::Channel::SFX).SetVolume(cfg.EffectVolume);
 
         return mixer;
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<SessionContext>([&](auto& ctx)
     {
-        // auto charInfo            = CharacterInfo();
-        // charInfo.Name            = "Player";
-        // charInfo.Level           = -1;
-        // charInfo.Experience      = 11200;
-        // charInfo.RankStats.Rank  = 7;
-        // charInfo.RankStats.Wins  = 100;
-        // charInfo.RankStats.Draws = 10;
-        // charInfo.RankStats.Loses = 5;
-        // charInfo.Gender          = Gender::Male;
-        // charInfo.Wallet.Cash     = 15000;
-
         const auto& cmd   = ctx.template Require<CommandLineContext>();
         std::string token = cmd.GetAuthToken();
 
-        auto session = std::make_unique<SessionContext>(token);
-        // session->SetCharacterInfo(charInfo);
-        // session->Load();
-
-        return session;
-    }, Gx::Context::Scope::Shared);
+        return std::make_unique<SessionContext>(token);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<CartContext>([&] (auto&)
     {
         return std::make_unique<CartContext>();
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     context.Provide<ScoreTracker>([] (auto&)
     {
         return std::make_unique<ScoreTracker>();
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     // Initialize local providers
     context.Provide<JudgementStrategy>([] (auto&)
@@ -439,7 +424,7 @@ void O2Jam::Boot()
     {
         auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>(), itemDataFileName, setInfoDataFileName);
         return factory;
-    }, Gx::Context::Scope::Shared);
+    }, Gx::Context::Scope::Singleton);
 
     auto _ = context.Require<SessionContext>().GetInstalledMusic();
     for (auto gender : {Gender::Male, Gender::Female})

@@ -39,7 +39,7 @@ namespace Gx
     std::enable_if_t<std::is_base_of_v<Scene, T>, void>
     SceneDirector::Register()
     {
-        m_deserializers[typeid(T)] = SceneDeserializer<T>([this] (const ResourceContext&) -> ResourcePtr<T> { return GetContext().Create<T>(); });
+        m_deserializers[typeid(T)] = SceneDeserializer<T>([this] (const ResourceContext&) -> ResourcePtr<T> { return GetContext().Instantiate<T>(); });
     }
 
     template<typename T>

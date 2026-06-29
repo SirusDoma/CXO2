@@ -2,136 +2,226 @@
 
 #include <Genode/System/Exception.hpp>
 
+#include <memory>
+#include <functional>
+#include <typeindex>
+#include <type_traits>
+#include <utility>
+#include <string>
+
 namespace Gx
 {
-    template<typename T>
-    void Context::Provide(const Scope scope)
+    template <typename T, std::enable_if_t<Context::IsConstructible<T>, int>>
+    void Context::Provide(Scope scope)
     {
-        static_assert(Constructible<T>::value, "Use Provide<T>(Builder<T>, Scope) instead for interface or complex constructible type");
-        Provide<T>(As<T>(), scope);
+        const auto key = std::type_index(typeid(T));
+        auto svc       = std::make_shared<Service<T>>();
+        svc->Lifetime  = scope;
+        svc->Builder   = CreateBuilder<T>();
+        m_entries[key] = std::move(svc);
     }
 
-    template<typename T, typename U>
-    std::enable_if_t<std::is_base_of_v<T, U>>
-    Context::Provide(Scope scope)
+    template <typename TInterface, typename TConcrete,
+        std::enable_if_t<
+            std::is_base_of_v<TInterface, TConcrete> &&
+            Context::IsConstructible<TConcrete>, int
+        >
+    >
+    void Context::Provide(Scope scope)
     {
-        Provide<T>(As<U>(), scope);
-    }
-
-    template<typename T>
-    void Context::Provide(Builder<T> builder, const Scope scope)
-    {
-        const std::type_index type = typeid(T);
-        auto factory = std::make_shared<Factory<T>>(builder, scope);
-
-        m_instances[type] = std::make_shared<Instance<T>>(std::move(factory->Create(*this)), scope);
-        m_factories[type] = std::move(factory);
-    }
-
-    template<typename T>
-    Context::Builder<T> Context::As() const
-    {
-        return Context::Builder<T>([this] (const Context& ctx) -> std::unique_ptr<T>
+        const auto key = std::type_index(typeid(TInterface));
+        auto svc       = std::make_shared<Service<TInterface>>();
+        svc->Lifetime  = scope;
+        svc->Builder   = [](const Context& c) -> std::unique_ptr<TInterface>
         {
-            if constexpr (std::is_default_constructible_v<T>)
-                return std::make_unique<T>();
-            else if constexpr (Constructible<T>::value)
-                return std::apply([](auto&&... args){ return std::make_unique<T>(args...); }, ctx.BuildParameters<ConstructorDescriptor<T>>());
-            else
-                throw NotSupportedException(std::string(typeid(T).name()) + " is not constructible");
-        });
+            return CreateBuilder<TConcrete>()(c);
+        };
+        m_entries[key] = std::move(svc);
     }
 
-    template<typename T>
+    template <typename T>
+    void Context::Provide(std::function<std::unique_ptr<T>(const Context&)> builder, Scope scope)
+    {
+        const auto key = std::type_index(typeid(T));
+        auto svc       = std::make_shared<Service<T>>();
+        svc->Lifetime  = scope;
+        svc->Builder   = std::move(builder);
+        m_entries[key] = std::move(svc);
+    }
+
+    template <typename T>
     std::enable_if_t<!std::is_pointer_v<T>, T&>
     Context::Require() const
     {
-        using U = std::decay_t<T>;
+        using Type = std::remove_cv_t<std::remove_reference_t<T>>;
+        const auto key = std::type_index(typeid(Type));
 
-        if (auto instance = Require<U*>(); instance)
-            return *instance;
-
-        if constexpr (Constructible<U>::value)
+        if (auto* svc = GetService<Type>(key))
         {
-            const std::type_index type = typeid(T);
-            auto factory = std::make_shared<Factory<U>>(As<U>(), Scope::Local);
+            if (svc->Instance)
+            {
+                if (m_current)
+                    m_current->Dependencies.push_back(m_entries[key]);
 
-            m_instances[type] = std::make_shared<Instance<U>>(std::move(factory->Create(*this)), Scope::Local);
-            m_factories[type] = std::move(factory);
+                return *svc->Instance;
+            }
 
-            return static_cast<T&>(*(static_cast<Instance<U>*>(m_instances[type].get()))->Handle.get());
+            auto* prev = m_current;
+            m_current = svc;
+            svc->Instance = svc->Builder(*this);
+            m_current = prev;
+
+            if (m_current)
+                m_current->Dependencies.push_back(m_entries[key]);
+
+            return *svc->Instance;
+        }
+
+        if (m_parent)
+        {
+            if (auto* ptr = m_parent->Require<Type*>())
+                return *ptr;
+        }
+
+        if constexpr (IsConstructible<Type>)
+        {
+            ProvideDefault<Type>(key);
+            return Require<T>();
         }
         else
-            throw Exception(std::string(typeid(T).name()) + " is not constructible and not provided within the current context");
+        {
+            throw InvalidOperationException(
+                std::string("Gx::Context::Require — type not registered and cannot be resolved: ") +
+                typeid(Type).name());
+        }
     }
 
-    template<typename T>
+    template <typename T>
     std::enable_if_t<std::is_pointer_v<T>, T>
     Context::Require() const
     {
-        using R = std::remove_pointer_t<T>;
-        const std::type_index type = typeid(R);
+        using Type = std::remove_cv_t<std::remove_pointer_t<T>>;
+        const auto key = std::type_index(typeid(Type));
 
-        if (const auto it = m_instances.find(type); it != m_instances.end())
-            return static_cast<T>((static_cast<Instance<R>*>(it->second.get()))->Handle.get());
-
-        if (const auto it = m_factories.find(type); it != m_factories.end())
+        if (auto* svc = GetService<Type>(key))
         {
-            auto factory      = static_cast<Factory<R>*>(it->second.get());
-            m_instances[type] = std::make_shared<Instance<R>>(std::move(factory->Create(*this)), Scope::Local);
+            if (svc->Instance)
+            {
+                if (m_current)
+                    m_current->Dependencies.push_back(m_entries[key]);
+                return svc->Instance.get();
+            }
 
-            return static_cast<T>((static_cast<Instance<R>*>(m_instances[type].get()))->Handle.get());
+            auto* prev = m_current;
+            m_current = svc;
+            svc->Instance = svc->Builder(*this);
+            m_current = prev;
+
+            if (m_current)
+                m_current->Dependencies.push_back(m_entries[key]);
+
+            return svc->Instance.get();
         }
+
+        if (m_parent)
+            return m_parent->Require<T>();
 
         return nullptr;
     }
 
-    template<typename T>
-    std::unique_ptr<T> Context::Create() const
+    template <typename T>
+    std::unique_ptr<T> Context::Instantiate() const
     {
-        if constexpr (!std::is_default_constructible_v<T>)
-        {
-            const std::type_index type = typeid(T);
-            if (const auto it = m_factories.find(type); it != m_factories.end())
-                return static_cast<Factory<T>*>(it->second.get())->Create(*this);
+        using Type = std::remove_cv_t<std::remove_reference_t<T>>;
+        const auto key = std::type_index(typeid(Type));
 
-            auto factory = std::make_unique<Factory<T>>(As<T>(), Scope::Local);
-            return factory->Create(*this);
+        if (auto* svc = GetService<Type>(key))
+            return svc->Builder(*this);
+
+        if (m_parent)
+        {
+            if (auto* ptr = m_parent->Require<Type*>())
+                return m_parent->Instantiate<T>();
+        }
+
+        if constexpr (IsConstructible<Type>)
+        {
+            return CreateBuilder<Type>()(*this);
         }
         else
-            return std::make_unique<T>();
-    }
-
-    template<typename T, typename... Args>
-    T Context::Invoke(std::function<T(Args&&...)> func) const
-    {
-        static_assert((Constructible<std::decay_t<Args>>::value && ...), "Function parameters cannot be constructed");
-
-        return std::apply([func](auto&&... args)
         {
-            return func(std::forward<Args>(args)...);
-        }, BuildParameters<std::tuple<std::decay_t<Args>...>>());
+            throw InvalidOperationException(
+                std::string("Gx::Context::Instantiate — type not registered and cannot be resolved: ") +
+                typeid(Type).name());
+        }
     }
 
     template <typename T>
-    decltype(auto) Context::BuildParameter() const
+    std::shared_ptr<Context::Scopable> Context::Service<T>::Clone(bool reset) const
     {
-        if constexpr (std::is_pointer_v<T>)
-            return std::tuple { Require<T>() };
-        else
-            return std::tuple { std::tie(Require<T>()) };
+        auto clone      = std::make_shared<Service<T>>();
+        clone->Lifetime = Lifetime;
+        clone->Builder  = Builder;
+        clone->Instance = reset ? nullptr : Instance;
+        return clone;
     }
 
-    template <typename Tuple, std::size_t... Is>
-    auto Context::BuildParameters(std::index_sequence<Is...>) const
+    template <typename T, std::size_t... Is>
+    std::unique_ptr<T> Context::Construct(const Context& c, std::index_sequence<Is...>)
     {
-        return std::tuple_cat(BuildParameter<std::tuple_element_t<Is, Tuple>>()...);
+        return std::make_unique<T>(((void)Is, Resolver<T>{c})...);
     }
 
-    template <typename Tuple>
-    auto Context::BuildParameters() const
+    template <typename T>
+    std::function<std::unique_ptr<T>(const Context&)> Context::CreateBuilder()
     {
-        constexpr std::size_t N = std::tuple_size_v<Tuple>;
-        return BuildParameters<Tuple>(std::make_index_sequence<N>{});
+        static_assert(IsConstructible<T>,
+            "Type is not constructible: no public constructor found within "
+            "the arity limit, or the type is abstract. "
+            "Use Provide<T>(builder) to register a factory manually.");
+
+        return [](const Context& c) -> std::unique_ptr<T>
+        {
+            return Construct<T>(c, std::make_index_sequence<MinArityV<T>>{});
+        };
+    }
+
+    template <typename T>
+    Context::Service<T>* Context::GetService(std::type_index key) const
+    {
+        if (const auto it = m_entries.find(key); it != m_entries.end())
+            return static_cast<Service<T>*>(it->second.get());
+
+        return nullptr;
+    }
+
+    template <typename T>
+    void Context::ProvideDefault(std::type_index key) const
+    {
+        auto svc       = std::make_shared<Service<T>>();
+        svc->Lifetime  = Scope::Local;
+        svc->Builder   = CreateBuilder<T>();
+        m_entries[key] = std::move(svc);
+    }
+
+    template <typename Owner>
+    template <typename T, typename>
+    Context::Resolver<Owner>::operator T& () const
+    {
+        return Ctx.Require<T>();
+    }
+
+    template <typename Owner>
+    template <typename T, typename>
+    Context::Resolver<Owner>::operator T&& () const
+    {
+        return std::move(Ctx.Require<T>());
+    }
+
+    template <typename Owner>
+    template <typename T, typename, typename>
+    Context::Resolver<Owner>::operator T () const
+    {
+        return Ctx.Require<T>();
     }
 }

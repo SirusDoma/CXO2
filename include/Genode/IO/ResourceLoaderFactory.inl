@@ -114,7 +114,7 @@ namespace Gx
             if constexpr (!std::is_default_constructible_v<L>)
             {
                 if (m_context)
-                    loader = m_context->Create<L>();
+                    loader = m_context->Instantiate<L>();
                 else
                     throw Exception(std::string(typeid(L).name()) + " is not constructible without application context");
             }
@@ -126,7 +126,7 @@ namespace Gx
                 if constexpr (!std::is_default_constructible_v<R>)
                 {
                     if (m_context)
-                        return m_context->Create<R>();
+                        return m_context->Instantiate<R>();
 
                     throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
                 }
@@ -218,7 +218,7 @@ namespace Gx
             if constexpr (!std::is_default_constructible_v<R>)
             {
                 if (m_context)
-                    return m_context->Create<R>();
+                    return m_context->Instantiate<R>();
 
                 throw Exception(std::string(typeid(R).name()) + " loader is not constructible without application context");
             }
@@ -276,7 +276,7 @@ namespace Gx
             if constexpr (!std::is_default_constructible_v<R>)
             {
                 if (m_context)
-                    return m_context->Create<R>();
+                    return m_context->Instantiate<R>();
 
                 throw Exception(std::string(typeid(R).name()) + " is not constructible without application context");
             }

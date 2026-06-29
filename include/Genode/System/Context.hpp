@@ -1,130 +1,205 @@
 #pragma once
 
-#include <Genode/Utilities/Reflection.hpp>
+#include <Genode/System/Exception.hpp>
 
-#include <functional>
-#include <typeindex>
-#include <unordered_map>
 #include <memory>
+#include <functional>
+#include <unordered_map>
+#include <vector>
+#include <typeindex>
 #include <type_traits>
+#include <stdexcept>
+#include <string>
 
 namespace Gx
 {
-    class Context final
+    class Context
     {
-    public:
-        template<typename T>
-        using Builder = std::function<std::unique_ptr<T>(const Context&)>;
+        static constexpr std::size_t MaxConstructorArity = 100;
 
+        template <typename Exclude>
+        struct AnyType
+        {
+            template <typename T, typename = std::enable_if_t<
+                !std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<T>, std::decay_t<Exclude>> &&
+                !std::is_same_v<std::decay_t<T>, Context>>>
+            // ReSharper disable once CppFunctionIsNotImplemented CppNonExplicitConversionOperator
+            operator T& () const noexcept;
+
+            template <typename T, typename = std::enable_if_t<
+                !std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<T>, std::decay_t<Exclude>> &&
+                !std::is_same_v<std::decay_t<T>, Context>>>
+            // ReSharper disable once CppFunctionIsNotImplemented CppNonExplicitConversionOperator
+            operator T&& () const noexcept;
+
+            template <typename T, typename = std::enable_if_t<
+                std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, std::decay_t<Exclude>> &&
+                !std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Context>>, typename = void>
+            // ReSharper disable once CppFunctionIsNotImplemented CppNonExplicitConversionOperator
+            operator T () const noexcept;
+        };
+
+        template <typename T, typename... Probes>
+        struct MinArity
+            : std::conditional_t<
+                  std::disjunction_v<
+                      std::bool_constant<(sizeof...(Probes) > MaxConstructorArity)>,
+                      std::is_constructible<T, Probes...>>,
+                  std::integral_constant<std::size_t, sizeof...(Probes)>,
+                  MinArity<T, Probes..., AnyType<T>>> {};
+
+        template <typename T>
+        static constexpr std::size_t MinArityV = MinArity<T>::value;
+
+        template <typename T>
+        static constexpr bool IsConstructible =
+            !std::is_abstract_v<T> &&
+            (MinArityV<T> <= MaxConstructorArity);
+
+        template <typename Owner>
+        struct Resolver
+        {
+            const Context& Ctx;
+
+            template <typename T, typename = std::enable_if_t<
+                !std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<T>, std::decay_t<Owner>> &&
+                !std::is_same_v<std::decay_t<T>, Context>>>
+            // ReSharper disable once CppNonExplicitConversionOperator
+            operator T& () const;
+
+            template <typename T, typename = std::enable_if_t<
+                !std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<T>, std::decay_t<Owner>> &&
+                !std::is_same_v<std::decay_t<T>, Context>>>
+            // ReSharper disable once CppNonExplicitConversionOperator
+            operator T&& () const;
+
+            template <typename T, typename = std::enable_if_t<
+                std::is_pointer_v<T> &&
+                !std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, std::decay_t<Owner>> &&
+                !std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Context>>, typename = void>
+            // ReSharper disable once CppNonExplicitConversionOperator
+            operator T () const;
+        };
+
+    public:
         enum class Scope
         {
             Local,
-            Shared
+            Singleton
         };
 
-        Context() = default;
-        Context(Context&& other) noexcept
-        {
-            m_factories = std::exchange(other.m_factories, {});
-            m_instances = std::exchange(other.m_instances, {});
-        }
+        Context() : m_parent(nullptr) {}
 
-        virtual ~Context() = default;
+        Context(const Context&)            = delete;
+        Context& operator=(const Context&) = delete;
+
+        Context(Context&& other) noexcept
+            : m_parent(other.m_parent),
+              m_entries(std::move(other.m_entries))
+        {}
 
         Context& operator=(Context&& other) noexcept
         {
-            m_factories = std::exchange(other.m_factories, {});
-            m_instances = std::exchange(other.m_instances, {});
-
+            if (this != &other)
+            {
+                m_parent  = other.m_parent;
+                m_entries = std::move(other.m_entries);
+                m_current = nullptr;
+            }
             return *this;
         }
 
-        template<typename T>
+        template <typename T, std::enable_if_t<IsConstructible<T>, int> = 0>
         void Provide(Scope scope = Scope::Local);
 
-        template<typename T, typename U>
-        std::enable_if_t<std::is_base_of_v<T, U>>
-        Provide(Scope scope = Scope::Local);
+        template <typename TInterface, typename TConcrete,
+            std::enable_if_t<
+                std::is_base_of_v<TInterface, TConcrete> &&
+                IsConstructible<TConcrete>, int
+            > = 0
+        >
+        void Provide(Scope scope = Scope::Local);
 
-        template<typename T>
-        void Provide(Builder<T> builder, Scope scope = Scope::Local);
+        template <typename T>
+        void Provide(std::function<std::unique_ptr<T>(const Context&)> builder,
+                     Scope scope = Scope::Local);
 
-        template<typename T>
-        Builder<T> As() const;
-
-        template<typename T>
+        template <typename T>
         std::enable_if_t<!std::is_pointer_v<T>, T&>
         Require() const;
 
-        template<typename T>
+        template <typename T>
         std::enable_if_t<std::is_pointer_v<T>, T>
         Require() const;
 
-        template<typename T>
-        std::unique_ptr<T> Create() const;
+        template <typename T>
+        std::unique_ptr<T> Instantiate() const;
 
-        template<typename T, typename... Args>
-        T Invoke(std::function<T(Args&&...)> func) const;
+        Context CreateScope()
+        {
+            Context scope;
+            scope.m_parent = this;
+            for (auto& [key, entry] : m_entries)
+            {
+                if (entry->Lifetime == Scope::Singleton)
+                    scope.m_entries[key] = entry;
+                else
+                    scope.m_entries[key] = entry->Clone(true);
+            }
+            return scope;
+        }
 
         Context Capture() const
         {
-            return {*this};
-        }
+            Context captured;
+            captured.m_parent = nullptr;
 
-        bool Empty() const { return m_factories.empty() && m_instances.empty(); }
+            for (auto& [key, entry] : m_entries)
+                captured.m_entries[key] = entry->Clone(false);
+
+            return captured;
+        }
 
     private:
-        Context(const Context& other)
+        struct Scopable
         {
-            for (auto& [type, factory] : other.m_factories)
-                m_factories[type] = std::shared_ptr(factory);
-
-            for (auto& [type, instance] : other.m_instances)
-            {
-                if (instance->Scope == Scope::Shared)
-                    m_instances[type] = std::shared_ptr(instance);
-            }
-        }
-
-        struct Scoppable
-        {
-            explicit Scoppable(const Scope scope) : Scope(scope) {};
-            virtual ~Scoppable() = default;
-
-            Context::Scope Scope;
-        };
-
-        using ScoppableMap = std::unordered_map<std::type_index, std::shared_ptr<Scoppable>>;
-
-        template<typename T>
-        struct Instance final : Scoppable
-        {
-            explicit Instance(std::unique_ptr<T> handle, const Context::Scope scope) :
-                Scoppable(scope), Handle(std::move(handle)) {};
-
-            std::unique_ptr<T> Handle;
-        };
-
-        template<typename T>
-        struct Factory final : Scoppable
-        {
-            Factory(Builder<T> builder, Context::Scope scope) :
-                Scoppable(std::move(scope)), Create(std::move(builder)) {};
-
-            Context::Builder<T> Create;
+            Scope Lifetime = Scope::Local;
+            std::vector<std::shared_ptr<Scopable>> Dependencies;
+            virtual ~Scopable() = default;
+            [[nodiscard]] virtual std::shared_ptr<Scopable> Clone(bool reset) const = 0;
         };
 
         template <typename T>
-        decltype(auto) BuildParameter() const;
+        struct Service final : Scopable
+        {
+            std::function<std::unique_ptr<T>(const Context&)> Builder;
+            std::shared_ptr<T> Instance;
 
-        template <typename Tuple, std::size_t... Is>
-        auto BuildParameters(std::index_sequence<Is...>) const;
+            [[nodiscard]] std::shared_ptr<Scopable> Clone(bool reset) const override;
+        };
 
-        template <typename Tuple>
-        auto BuildParameters() const;
+        using ScopableMap = std::unordered_map<std::type_index, std::shared_ptr<Scopable>>;
 
-        mutable ScoppableMap m_factories{};
-        mutable ScoppableMap m_instances{};
+        template <typename T, std::size_t... Is>
+        static std::unique_ptr<T> Construct(const Context& c, std::index_sequence<Is...>);
+
+        template <typename T>
+        static std::function<std::unique_ptr<T>(const Context&)> CreateBuilder();
+
+        template <typename T>
+        Service<T>* GetService(std::type_index key) const;
+
+        template <typename T>
+        void ProvideDefault(std::type_index key) const;
+
+        Context*            m_parent;
+        mutable ScopableMap m_entries;
+        mutable Scopable*   m_current = nullptr;
     };
 }
 
