@@ -1,4 +1,4 @@
-name: "Build O2Jam Main Client"
+name: "Build CXO2 Client"
 
 on:
   workflow_dispatch:
@@ -44,7 +44,6 @@ jobs:
             dist_name: win32
             c_compiler: cl
             cpp_compiler: cl
-            triplet: x86-windows-static
             cmake_flags: '-T host=x86 -A Win32'
             output_dir: /bin/windows/
           - os: macos-14
@@ -52,7 +51,6 @@ jobs:
             dist_name: osx-arm64
             c_compiler: clang
             cpp_compiler: clang++
-            triplet: arm64-osx-release
             cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/arm64/
           - os: macos-13
@@ -60,13 +58,12 @@ jobs:
             dist_name: osx-x86_64
             c_compiler: clang
             cpp_compiler: clang++
-            triplet: x64-osx-release
             cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/x86_64/
     steps:
     - name: Checkout repository
       if: ${{ matrix.enabled }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         submodules: 'true'
 
@@ -84,53 +81,56 @@ jobs:
           # Setup credentials paths
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-  
+
           # Import certificate from secrets
           echo -n "$P12_BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-  
+
           # Create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-  
+
           # Import certificate to keychain
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
         fi
-        
+
         # Strings variables
         echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "compiler-output-dir=${{ github.workspace }}/bin/compiler/${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
-
-    - name: Setup Dependencies
-      if: ${{ matrix.enabled }}
-      uses: johnwason/vcpkg-action@v6
-      id: vcpkg
-      with:
-        pkgs: sfml nlohmann-json magic-enum
-        triplet: ${{ matrix.triplet }}
-        token: ${{ github.token }}
-        cache-key: ${{ matrix.os }}
-        github-binarycache: true
 
     - name: Configure Project
       if: ${{ matrix.enabled }}
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake 
-        -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} 
-        -DVCPKG_MANIFEST_MODE=OFF
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
         ${{ matrix.cmake_flags }}
 
+    - name: Build Resource Compiler
+      if: ${{ matrix.enabled }}
+      run: >
+        cmake --build ${{ steps.strings.outputs.build-output-dir }}
+        --config ${{ matrix.build_type }}
+        --target ResourceCompiler
+
+    - name: Generate Resources
+      if: ${{ matrix.enabled }}
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: '${{ steps.strings.outputs.compiler-output-dir }}/ResourceCompiler'
+
     - name: Compile Project
       if: ${{ matrix.enabled }}
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      run: >
+        cmake --build ${{ steps.strings.outputs.build-output-dir }}
+        --config ${{ matrix.build_type }}
+        --target CXO2
 
     - name: 'Compress Build'
       if: ${{ matrix.enabled }}
@@ -140,51 +140,13 @@ jobs:
 
     - name: Save Build
       if: ${{ matrix.enabled }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ${{ steps.strings.outputs.binary-output-dir }}/OTwo-${{ matrix.dist_name }}.tar
 
-  compile-assets:
-    runs-on: 'ubuntu-latest'
-    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-
-      - name: Check Cache
-        id: assets-cache
-        uses: actions/cache/restore@v4
-        with:
-          key: OTwo-Assets-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
-          path: ./bin/dist/
-          lookup-only: true
-          restore-keys: |
-            OTwo-Assets-
-
-      - name: Compile Assets
-        if: steps.assets-cache.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          echo "Latest assets are not found within cache storage. Compiling assets.."
-          mkdir -p '${{ github.workspace }}/bin/dist/Image'
-          mkdir -p '${{ github.workspace }}/bin/dist/Music'
-          cp -r '${{ github.workspace }}/assets/Avatar' '${{ github.workspace }}/bin/dist/Image'
-          cp -r '${{ github.workspace }}/assets/Interface' '${{ github.workspace }}/bin/dist/Image'
-          cp -r '${{ github.workspace }}/assets/Music' '${{ github.workspace }}/bin/dist'
-
-      - name: Update Cache
-        id: assets-cache-save
-        if: steps.assets-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          key: OTwo-Assets-${{ hashFiles('./bin/dist/Image/**/*.*', './bin/dist/Music/**/*.*') }}
-          path: ./bin/dist/
-
-  build:
-    needs: [ compile, compile-assets ]
+  package:
+    needs: [ compile ]
     if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
     runs-on: 'ubuntu-latest'
     strategy:
@@ -200,14 +162,15 @@ jobs:
             enabled: ${{ inputs.osx_x64_86 }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      if: ${{ matrix.enabled }}
+      uses: actions/checkout@v7
       with:
         submodules: 'false'
 
     - name: Load Compressed Build
       id: build-cache
       if: ${{ matrix.enabled }}
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: OTwo-${{ matrix.dist_name }}
         path: ./bin/
@@ -219,34 +182,42 @@ jobs:
         mkdir -p '${{ github.workspace }}/bin/dist'
         tar -xvf ./bin/OTwo-${{ matrix.dist_name }}.tar -C ./bin/dist/
 
-    - name: Load Compiled Assets
-      id: assets-cache
+    - name: Build assets
       if: ${{ matrix.enabled }}
-      uses: actions/cache/restore@v4
-      with:
-        key: OTwo-Assets-${{ hashFiles('./assets/Avatar/**/*.*', './assets/Interface/**/*.*', './assets/Music/**/*.*') }}
-        path: ./bin/dist/
-        restore-keys: |
-          OTwo-Assets-
+      shell: bash
+      run: |
+        mkdir -p '${{ github.workspace }}/bin/dist'
+        bundled=0
+        if [ -d assets/Avatar ]; then
+          mkdir -p bin/dist/Image && cp -r assets/Avatar bin/dist/Image/ && bundled=1
+        fi
+        if [ -d assets/Interface ]; then
+          mkdir -p bin/dist/Image && cp -r assets/Interface bin/dist/Image/ && bundled=1
+        fi
+        if [ -d assets/Music ]; then
+          cp -r assets/Music bin/dist/ && bundled=1
+        fi
+        if [ "$bundled" -eq 0 ]; then
+          echo "No assets found; packaging executable only."
+        fi
 
     - name: Build Distribution Package
       if: ${{ matrix.enabled }}
       shell: bash
       run: |
         # Ideally, this generate .msi or .dmg package.
-        # Note that actions/upload-artifact will not preserve executable or any other permissions. 
+        # Note that actions/upload-artifact will not preserve executable or any other permissions.
         # See https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
         #
-        # Packaging the game files will avoid this from happening. 
+        # Packaging the game files will avoid this from happening.
         # Otherwise, the user might have to run `chmod +x <OTwo executable>` on Linux or macOS.
-        
-        mkdir -p '${{ github.workspace }}/bin/dist'
+
         cd '${{ github.workspace }}/bin/dist'
-        zip OTwo-${{ matrix.dist_name }}.zip . -r
+        zip CXO2-${{ matrix.dist_name }}.zip . -r
 
     - name: Upload Artifact
       if: ${{ matrix.enabled }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
-        name: O2Jam-${{ matrix.dist_name }}
-        path: ./bin/dist/OTwo-${{ matrix.dist_name }}.zip
+        name: CXO2-${{ matrix.dist_name }}
+        path: ./bin/dist/CXO2-${{ matrix.dist_name }}.zip
