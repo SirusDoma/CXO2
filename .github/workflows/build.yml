@@ -76,8 +76,8 @@ jobs:
         P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
-        # Setup code signing for macOS
-        if [ "$RUNNER_OS" == "macOS" ]; then
+        # Setup code signing for macOS (skipped when no certificate secret is provided)
+        if [ "$RUNNER_OS" == "macOS" ] && [ -n "$P12_BUILD_CERTIFICATE_BASE64" ]; then
           # Setup credentials paths
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
@@ -94,12 +94,13 @@ jobs:
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          echo "No signing certificate provided; skipping macOS code signing setup (unsigned build)."
         fi
 
         # Strings variables
         echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-        echo "compiler-output-dir=${{ github.workspace }}/bin/compiler/${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
 
     - name: Configure Project
@@ -123,7 +124,7 @@ jobs:
       if: ${{ matrix.enabled }}
       shell: bash
       working-directory: ${{ github.workspace }}
-      run: '${{ steps.strings.outputs.compiler-output-dir }}/ResourceCompiler'
+      run: ./bin/compiler/${{ matrix.build_type }}/ResourceCompiler
 
     - name: Compile Project
       if: ${{ matrix.enabled }}
@@ -132,7 +133,7 @@ jobs:
         --config ${{ matrix.build_type }}
         --target CXO2
 
-    - name: 'Compress Build'
+    - name: Compress Build
       if: ${{ matrix.enabled }}
       shell: bash
       working-directory: ${{ steps.strings.outputs.binary-output-dir }}
