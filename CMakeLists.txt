@@ -16,12 +16,15 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD OFF)
 set(CMAKE_DISABLE_SOURCE_CHANGES OFF)
 
 # Target
-set(TARGET "OTwo")
+set(TARGET "CXO2")
+
+# Executable output name kept as "OTwo" across all platforms (OTwo.exe / OTwo.app / OTwo)
+set(OUTPUT_NAME "OTwo")
 
 # Sources and Headers
 file(GLOB_RECURSE SRCS
     src/main.cpp
-    src/OTwo/*.cpp
+    src/CXO2/*.cpp
     extlibs/libs/internal/*.c
     extlibs/libs/internal/*.cc
     extlibs/libs/internal/*.cpp
@@ -106,7 +109,7 @@ elseif(APPLE)
         BUNDLE                                  TRUE
         MACOSX_BUNDLE                           TRUE
         MACOSX_BUNDLE_GUI_IDENTIFIER            ${PACKAGE_NAME}
-        MACOSX_BUNDLE_BUNDLE_NAME               ${TARGET}
+        MACOSX_BUNDLE_BUNDLE_NAME               ${OUTPUT_NAME}
         MACOSX_BUNDLE_BUNDLE_VERSION            "3.10"
         MACOSX_BUNDLE_LONG_VERSION_STRING       "3.10"
         MACOSX_BUNDLE_SHORT_VERSION_STRING      "3.10"
@@ -174,6 +177,9 @@ else()
     endif()
 endif()
 
+# Set executable output name
+set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
+
 # External Libs Sources and Flags
 set(SFML_USE_STATIC_STD_LIBS TRUE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
@@ -227,6 +233,8 @@ add_executable(ResourceCompiler
 # Resource Compiler includes and dependencies
 target_include_directories(ResourceCompiler PRIVATE include)
 target_include_directories(ResourceCompiler PRIVATE extlibs/headers)
+target_include_directories(ResourceCompiler PRIVATE modules/Genode/include)
+target_link_libraries(ResourceCompiler PRIVATE Genode)
 target_link_libraries(ResourceCompiler PRIVATE nlohmann_json::nlohmann_json)
 
 # Resource Compiler output directory

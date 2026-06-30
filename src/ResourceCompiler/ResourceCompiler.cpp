@@ -94,7 +94,7 @@ int main()
 {
     const fs::path assetsPath = "assets";
     const fs::path controlListPath = assetsPath / "ControlList";
-    const fs::path outputPath = "include/OTwo/Resources.hpp";
+    const fs::path outputPath = "include/CXO2/Resources.hpp";
     
     // Additional files to include in resources (relative to assets folder)
     const std::vector<std::string> additionalFiles = {
@@ -209,7 +209,7 @@ int main()
     headerFile << "#include <unordered_map>\n";
     headerFile << "#include <string_view>\n";
     headerFile << "#include <cstdint>\n\n";
-    headerFile << "namespace OTwo\n";
+    headerFile << "namespace Cx\n";
     headerFile << "{\n";
 
     // Generate array declarations
@@ -268,7 +268,7 @@ int main()
     headerFile << "    return {};\n";
     headerFile << "}\n\n";
 
-    headerFile << "} // namespace OTwo\n";
+    headerFile << "} // namespace Cx\n";
 
     headerFile.close();
 
