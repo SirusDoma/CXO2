@@ -23,7 +23,7 @@ namespace Cx
         void SetSpeed(double speed);
 
     private:
-        void Update(double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         void Invalidate() override;

@@ -22,7 +22,7 @@ namespace Cx
         void OnPresented(Parent& parent, const Gx::PresentationContext& context) override;
         void OnDismissed(Parent& parent) override;
 
-        void Update(double delta) override;
+        void Update(const sf::Time& delta) override;
 
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
         void OnKeyReleased(const sf::Event::KeyReleased& ev) override;

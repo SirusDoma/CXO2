@@ -66,7 +66,7 @@ namespace Cx
         };
 
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
-        void Update(const double delta) override;
+        void Update(const sf::Time& delta) override;
 
         void PlayAvatarJamCombo(const Avatar* avatar, std::uint16_t jams);
 

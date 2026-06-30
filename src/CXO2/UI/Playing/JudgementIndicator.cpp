@@ -58,7 +58,7 @@ namespace Cx
         }
     }
 
-    void JudgementIndicator::Update(const double delta)
+    void JudgementIndicator::Update(const sf::Time& delta)
     {
         if (!m_target)
             return;
@@ -67,7 +67,7 @@ namespace Cx
         {
             m_scale->Update(delta);
             if (m_scale->GetState() == Gx::TaskState::Completed)
-                m_elapsed += delta;
+                m_elapsed += delta.asMilliseconds();
         }
 
         m_target->Update(delta);

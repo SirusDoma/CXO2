@@ -46,7 +46,7 @@ namespace Cx
         );
 
         // Make sure initial position is recorded now
-        m_sequence.Update(0);
+        m_sequence.Update(sf::Time::Zero);
         m_sequence.Stop();
 
         SetVisible(false);
@@ -77,7 +77,7 @@ namespace Cx
         }
     }
 
-    void ComboCounter::Update(const double delta)
+    void ComboCounter::Update(const sf::Time& delta)
     {
         m_sequence.Update(delta);
         UpdatableContainer::Update(delta);

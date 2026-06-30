@@ -19,7 +19,7 @@ namespace Cx
         void Initialize() override;
 
     private:
-        void Update(double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 

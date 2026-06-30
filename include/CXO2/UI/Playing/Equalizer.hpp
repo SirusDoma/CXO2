@@ -27,7 +27,7 @@ namespace Cx
         // Add a sound to the equalizer
         void Register(const Chart::NoteEvent& ev, const sf::Sound& sound);
 
-        void Update(double delta) override;
+        void Update(const sf::Time& delta) override;
 
     private:
         void Initialize() override;

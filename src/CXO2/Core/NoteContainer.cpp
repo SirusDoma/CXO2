@@ -94,7 +94,7 @@ namespace Cx
         return m_prefabs;
     }
 
-    void NoteContainer::UpdateGeometry(const Chart::NoteEvent& ev, const double delta) const
+    void NoteContainer::UpdateGeometry(const Chart::NoteEvent& ev, const sf::Time& delta) const
     {
         UpdateMeasures(delta);
 
@@ -121,7 +121,7 @@ namespace Cx
         note->UpdateGeometry(*m_renderer, delta);
     }
 
-    void NoteContainer::UpdateMeasures(const double delta) const
+    void NoteContainer::UpdateMeasures(const sf::Time& delta) const
     {
         if (m_tapCounter == 0)
         {
@@ -142,7 +142,7 @@ namespace Cx
         }
     }
 
-    void NoteContainer::Update(const double delta)
+    void NoteContainer::Update(const sf::Time& delta)
     {
         for (const auto updatable : GetRegisteredPrefabs())
             updatable->Update(delta);

@@ -25,7 +25,7 @@ namespace Cx
         void SetCombo(unsigned int combo);
 
     private:
-        void Update(const double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         Gx::Animation*    m_header;

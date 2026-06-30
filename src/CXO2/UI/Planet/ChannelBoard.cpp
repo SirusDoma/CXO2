@@ -436,7 +436,7 @@ namespace Cx
         notice->SetFrame(m_noticePageIndex - 1);
     }
 
-    void ChannelBoard::Update(const double delta)
+    void ChannelBoard::Update(const sf::Time& delta)
     {
         Control::Update(delta);
         TaskContainer::Update(delta);

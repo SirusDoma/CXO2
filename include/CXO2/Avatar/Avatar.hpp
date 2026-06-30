@@ -46,7 +46,7 @@ namespace Cx
         void ResetRenderables() const;
 
     private:
-        void Update(double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         Gender       m_gender;

@@ -8,6 +8,7 @@
 
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Graphics/Sprite.hpp>
+#include <SFML/System/Time.hpp>
 
 namespace Cx
 {
@@ -37,7 +38,7 @@ namespace Cx
         bool IsVisible() const override;
         void SetVisible(const bool visible) override;
 
-        virtual void UpdateGeometry(const ChartRenderer& renderer, double delta);
+        virtual void UpdateGeometry(const ChartRenderer& renderer, const sf::Time& delta);
 
     protected:
         Gx::VertexSpan& GetVertices();

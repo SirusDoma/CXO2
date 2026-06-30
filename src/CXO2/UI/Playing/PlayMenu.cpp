@@ -120,7 +120,7 @@ namespace Cx
         return m_scoreTracker;
     }
 
-    void PlayMenu::Update(const double delta)
+    void PlayMenu::Update(const sf::Time& delta)
     {
         if (!m_renderer)
             m_renderer = GetParent<Cx::State>()->FindChild<ChartRenderer>(Resource::Game::Menu::IDC_CHART_RENDERER);
@@ -128,7 +128,7 @@ namespace Cx
         if (m_renderer && m_renderer->IsRendering())
         {
             if (m_elapsed < m_metadata.Durations[m_difficulty].asMilliseconds())
-                m_elapsed += delta;
+                m_elapsed += delta.asMilliseconds();
 
             if (m_wave)
                 m_wave->SetValue(std::floor(m_elapsed / 1000.f));

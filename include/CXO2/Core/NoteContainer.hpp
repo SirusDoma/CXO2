@@ -34,13 +34,13 @@ namespace Cx
         void RegisterPrefab(Updatable& prefab);
         std::unordered_set<Updatable*> GetRegisteredPrefabs();
 
-        void UpdateGeometry(const Chart::NoteEvent& ev, double delta) const;
-        void UpdateMeasures(double delta) const;
+        void UpdateGeometry(const Chart::NoteEvent& ev, const sf::Time& delta) const;
+        void UpdateMeasures(const sf::Time& delta) const;
 
     private:
         using TextureMap = std::unordered_map<NoteShape, const sf::Texture*>;
 
-        void Update(const double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         const ChartRenderer*  m_renderer;

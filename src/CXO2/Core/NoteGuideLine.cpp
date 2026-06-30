@@ -43,7 +43,7 @@ namespace Cx
         m_span = std::move(vertices);
     }
 
-    void NoteGuideLine::Render(const ChartRenderer& renderer, const double delta)
+    void NoteGuideLine::Render(const ChartRenderer& renderer, const sf::Time& delta)
     {
         if (!m_span.has_value() || !m_parent->IsVisible())
         {
@@ -88,7 +88,7 @@ namespace Cx
         // The line grow/shrunk at rate of 20ms per pixel when the current length is different from the desired length
         if (m_guideLength != guideLength)
         {
-            m_delta += delta;
+            m_delta += delta.asMilliseconds();
             if (m_delta >= (40.f / speed) / (renderer.GetCurrentBPM() / 60.f))
             {
                 m_delta = 0;

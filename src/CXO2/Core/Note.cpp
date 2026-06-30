@@ -95,7 +95,7 @@ namespace Cx
         }
     }
 
-    void Note::UpdateGeometry(const ChartRenderer& renderer, const double delta)
+    void Note::UpdateGeometry(const ChartRenderer& renderer, const sf::Time& delta)
     {
         if (!m_span.has_value() || m_span->empty())
             return;

@@ -273,7 +273,7 @@ namespace Cx
         Run<Gx::Delay>(sf::seconds(10.f), [=] { btnBack->PerformClick(); });
     }
 
-    void StateResult::Update(const double delta)
+    void StateResult::Update(const sf::Time& delta)
     {
         State::Update(delta);
     }

@@ -329,7 +329,7 @@ namespace Cx
     }
 
 
-    void Avatar::Update(const double delta)
+    void Avatar::Update(const sf::Time& delta)
     {
         const auto ohmEffect = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM_EFFECT);
         const auto ohm = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM);

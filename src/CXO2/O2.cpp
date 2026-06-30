@@ -600,7 +600,7 @@ namespace Cx
         return mode;
     }
 
-    void O2::Update(const double delta)
+    void O2::Update(const sf::Time& delta)
     {
         Gx::Application::Update(delta);
 

@@ -46,7 +46,7 @@ namespace Cx
     }
 
     // Update visualization
-    void Equalizer::Update(double delta)
+    void Equalizer::Update(const sf::Time& delta)
     {
         if (m_bars.empty())
             Initialize();

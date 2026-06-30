@@ -2,6 +2,7 @@
 
 #include <Genode/Entities/Renderable.hpp>
 #include <Genode/Graphics/VertexPool.hpp>
+#include <SFML/System/Time.hpp>
 
 namespace Cx
 {
@@ -21,7 +22,7 @@ namespace Cx
         const Gx::VertexSpan& GetVertices() const;
         void SetVertices(Gx::VertexSpan&& vertices) noexcept;
 
-        virtual void Render(const ChartRenderer& renderer, double delta);
+        virtual void Render(const ChartRenderer& renderer, const sf::Time& delta);
 
     private:
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;

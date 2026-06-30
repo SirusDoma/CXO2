@@ -381,7 +381,7 @@ namespace Cx
         m_mixer.Play(*sfxNavigation, Sound::Channel::SFX);
     }
 
-    void OptionDialog::Update(const double delta)
+    void OptionDialog::Update(const sf::Time& delta)
     {
         UiContainer::Update(delta);
     }

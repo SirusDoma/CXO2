@@ -23,7 +23,7 @@ namespace Cx
         void Play(Accuracy accuracy);
 
     private:
-        void Update(const double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         std::unordered_map<Accuracy, Gx::Animation*> m_indicators;

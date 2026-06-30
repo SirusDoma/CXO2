@@ -719,7 +719,7 @@ namespace Cx
         OnRenderComplete();
     }
 
-    void StatePlaying7K::Update(const double delta)
+    void StatePlaying7K::Update(const sf::Time& delta)
     {
         State::Update(delta);
 
@@ -745,7 +745,7 @@ namespace Cx
                     }
                     else
                     {
-                        m_guideKeyEffectDeltas[channel] += delta;
+                        m_guideKeyEffectDeltas[channel] += delta.asMilliseconds();
                         if (m_guideKeyEffectDeltas[channel] >= 500)
                         {
                             m_guideKeyEffectDeltas[channel] = 0;
@@ -892,7 +892,7 @@ namespace Cx
         {
             auto surface = Gx::RenderSurfaceAdaptor(target);
 
-            Update(0);
+            Update(sf::Time::Zero);
             surface.Render(*this, Gx::RenderStates::Default);
         }
         target.display();

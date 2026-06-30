@@ -49,11 +49,11 @@ namespace Cx
         m_speed = speed;
     }
 
-    void Marquee::Update(const double delta)
+    void Marquee::Update(const sf::Time& delta)
     {
         Label::Update(delta);
 
-        const auto velocity = sf::Vector2f(m_speed, 0.f) * static_cast<float>(delta / 1000.f);
+        const auto velocity = sf::Vector2f(m_speed, 0.f) * delta.asSeconds();
         const auto position = GetPosition() - velocity;
         SetPosition(position);
 

@@ -32,7 +32,7 @@ namespace Cx
         const ScoreTracker* GetScoreTracker() const;
 
     private:
-        void Update(const double delta) override;
+        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
         const GameContext& m_context;

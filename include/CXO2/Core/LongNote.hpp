@@ -25,7 +25,7 @@ namespace Cx
         const Gx::Sprite* GetEdgePrefab(NoteShape) const;
         void SetEdgePrefabs(const PrefabMap& prefabs);
 
-        void UpdateGeometry(const ChartRenderer& renderer, double delta) override;
+        void UpdateGeometry(const ChartRenderer& renderer, const sf::Time& delta) override;
 
     private:
         std::optional<Gx::VertexSpan> m_headVertices;

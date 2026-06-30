@@ -817,7 +817,7 @@ namespace Cx
 
                 m_shopMasterEffect = Gx::Move(*shopMaster, shopMaster->GetPosition(), sf::seconds(0.15f));
                 shopMaster->SetPosition(shopMaster->GetPosition().x - 100, shopMaster->GetPosition().y);
-                m_shopMasterEffect->Update(0);
+                m_shopMasterEffect->Update(sf::Time::Zero);
 
                 m_shopMasterSpeechCounter = 0;
                 Run(*m_shopMasterEffect);
