@@ -161,7 +161,7 @@ namespace Cx
         if (!m_span.has_value() || m_span->empty())
             return states;
 
-        surface.Render(m_span->data(), m_span->size(), sf::PrimitiveType::Triangles, states);
+        surface.Render(m_span.value(), sf::PrimitiveType::Triangles, states);
         return states;
     }
 }
