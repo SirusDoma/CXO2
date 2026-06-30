@@ -98,6 +98,7 @@ int main()
     
     // Additional files to include in resources (relative to assets folder)
     const std::vector<std::string> additionalFiles = {
+        "Icon.png",
         "Interface/Common/Font.Bold.ttf"
     };
 
@@ -202,7 +203,7 @@ int main()
     }
 
     // Write header file
-    headerFile << "// Generated via \"ResourceCompiler\" or \"GenerateResources\" task.\n";
+    headerFile << "// Generated via \"ResourceCompiler\".\n";
     headerFile << "// Do not edit the file manually.\n\n";
     headerFile << "#pragma once\n\n";
     headerFile << "#include <array>\n";

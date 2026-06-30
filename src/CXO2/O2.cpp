@@ -144,7 +144,7 @@ namespace Cx
     void O2::Boot()
     {
         // Render Settings
-        const auto& window = GetMainWindow();
+        auto& window = GetMainWindow();
         if (GetWindowState() == sf::State::Fullscreen)
             Gx::Application::SetView(GetLetterBoxView(window.getView(), window.getSize()));
 
@@ -352,6 +352,13 @@ namespace Cx
 
         Gx::FileSystem::Mount(embedded);
 
+        // App Icon
+        if (const auto stream = embedded.Open("Icon.png"))
+        {
+            m_icon = sf::Image(*stream);
+            window.setIcon(*m_icon);
+        }
+
         // Do NOT throw error when master archives cannot be loaded below.
         // There could be assets that override them completely.
 
@@ -525,12 +532,11 @@ namespace Cx
         const auto& context = GetContext();
         const auto& config  = context.Require<GameConfig>();
 
-        auto stream     = sf::MemoryInputStream(app_icon.data(), app_icon.size());
-        const auto icon = sf::Image(stream);
+        if (m_icon.has_value())
+            window.setIcon(*m_icon);
 
         window.setVerticalSyncEnabled(config.UseVsync);
         window.setFramerateLimit(0);
-        window.setIcon(icon);
     }
 
     void O2::OnFocusChanged(const bool focus)
@@ -595,7 +601,10 @@ namespace Cx
     {
         auto mode = Gx::Application::GetVideoMode();
         if (GetWindowState() == sf::State::Fullscreen && Gx::GetCurrentPlatform() == Gx::Platform::macOS)
+        {
+            mode = GetDesktopVideoMode();
             mode.size.y -= 120;
+        }
 
         return mode;
     }
