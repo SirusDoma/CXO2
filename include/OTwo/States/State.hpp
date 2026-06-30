@@ -73,7 +73,7 @@ private:
 
     inline static Gx::Dialog* m_dialogInfo, *m_dialog1, *m_dialog2, *m_dialogNotice, *m_exitDialog;
     inline static sf::Sound* m_popupSound, *m_cancelSound;
-    inline static bool m_prompted = false;
+    inline static bool m_exitPrompted = false;
     inline static sf::Clock m_noticeTimer{};
 };
 

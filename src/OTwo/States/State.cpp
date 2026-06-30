@@ -49,7 +49,7 @@ void State::Finalize()
     // Require<NetworkAdapter>().ResetQueue();
     Require<Gx::AudioMixer>().Reset(true);
 
-    m_prompted = false;
+    m_exitPrompted = false;
     m_exitDialog->Dismiss();
 }
 
@@ -65,7 +65,7 @@ void State::LoadCommonResources()
     if (loaded)
         return;
 
-    m_prompted    = false;
+    m_exitPrompted    = false;
     if (Gx::FileSystem::Contains("ControlList_Interface.txt"))
     {
         m_dialogInfo   = Instantiate<Gx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
@@ -249,7 +249,7 @@ Gx::RenderStates State::Render(Gx::RenderSurface& surface, Gx::RenderStates stat
 
 bool State::OnAppClose()
 {
-    if (!m_prompted)
+    if (!m_exitPrompted)
     {
         if (m_popupSound)
         {
@@ -259,7 +259,7 @@ bool State::OnAppClose()
 
         m_exitDialog->SetAcceptCallback([&]
         {
-            m_prompted = true;
+            m_exitPrompted = true;
             Gx::Application::Instance().Close();
         });
 
@@ -268,7 +268,7 @@ bool State::OnAppClose()
             auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::AudioMixer>();
 
             mixer.Play(*m_cancelSound, Sound::Channel::SFX);
-            m_prompted = false;
+            m_exitPrompted = false;
         });
 
         auto ctx        = Gx::DialogPresentationContext();
