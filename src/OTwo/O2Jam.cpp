@@ -350,6 +350,9 @@ void O2Jam::Boot()
 
     Gx::FileSystem::Mount(embedded);
 
+    // Do NOT throw error when master archives cannot be loaded below.
+    // There could be assets that override them completely.
+
     for (std::string name : { "Interface.opi", "Interface1.opi" })
     {
         if (image.LoadFromFile(name))
@@ -400,30 +403,42 @@ void O2Jam::Boot()
         cache.BuildCache();
     }
 
-    // Scan for item data
-    std::string itemDataFileName = []
-    {
-        if (const auto files = Gx::FileSystem::Scan("itemdata*.dat"); !files.empty())
-            return files.front()->GetName();
-
-        return std::string("Avatar/ItemData.json");
-    }();
-    std::string setInfoDataFileName = []
-    {
-        if (const auto files = Gx::FileSystem::Scan("setinfodata.*"); !files.empty())
-            return files.front()->GetName();
-
-        if (Gx::FileSystem::Contains("Avatar/SetInfoData.json"))
-            return std::string("Avatar/SetInfoData.json");
-
-        return std::string();
-    }();
-
     // Force to load item providers during start-up
-    context.Provide<ItemFactory>([&, itemDataFileName, setInfoDataFileName](auto& ctx)
+    context.Provide<ItemFactory>([] (const Gx::Context& ctx)
     {
-        auto factory = std::make_unique<ItemFactory>(ctx.template Require<Gx::ResourceManager>(), itemDataFileName, setInfoDataFileName);
-        return factory;
+        try
+        {
+            // Scan for ItemData.dat
+            std::string itemDataFileName = []
+            {
+                if (const auto files = Gx::FileSystem::Scan("itemdata*.dat"); !files.empty())
+                    return files.front()->GetName();
+
+                return std::string("Avatar/ItemData.json");
+            }();
+
+            // Scan for SetInfoData.ojs (optional)
+            std::string setInfoDataFileName = []
+            {
+                if (const auto files = Gx::FileSystem::Scan("setinfodata.*"); !files.empty())
+                    return files.front()->GetName();
+
+                if (Gx::FileSystem::Contains("Avatar/SetInfoData.json"))
+                    return std::string("Avatar/SetInfoData.json");
+
+                return std::string();
+            }();
+
+            return std::make_unique<ItemFactory>(
+                ctx.Require<Gx::ResourceManager>(),
+                itemDataFileName,
+                setInfoDataFileName
+            );
+        }
+        catch (Gx::ResourceAccessException)
+        {
+            throw Gx::ResourceAccessException("Cannot find the avatar-related image.");
+        }
     }, Gx::Context::Scope::Singleton);
 
     auto _ = context.Require<SessionContext>().GetInstalledMusic();

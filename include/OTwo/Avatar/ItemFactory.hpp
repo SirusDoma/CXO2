@@ -14,7 +14,11 @@
 class ItemFactory
 {
 public:
-    explicit ItemFactory(Gx::ResourceManager& sharedResources, const std::string& itemDataFileName, const std::string& setInfoDataFileName);
+    explicit ItemFactory(
+        Gx::ResourceManager& sharedResources,
+        const std::string& itemDataFileName,
+        const std::string& setInfoDataFileName
+    );
 
     std::unordered_map<EquipmentType, Item> GetDefaultItems(const Gender& gender) const;
     Item Create(unsigned int id) const;

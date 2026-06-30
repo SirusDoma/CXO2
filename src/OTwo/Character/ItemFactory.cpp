@@ -4,7 +4,11 @@
 #include <OTwo/Models/Equipment.hpp>
 #include <OTwo/IO/Loaders/Avatar/ItemLoader.hpp>
 
-ItemFactory::ItemFactory(Gx::ResourceManager& sharedResources, const std::string& itemDataFileName, const std::string& setInfoDataFileName) :
+ItemFactory::ItemFactory(
+    Gx::ResourceManager& sharedResources,
+    const std::string& itemDataFileName,
+    const std::string& setInfoDataFileName
+) :
     m_itemData(sharedResources.AddFromFile<ItemData>(itemDataFileName)),
     m_setInfoData(setInfoDataFileName.empty() ? nullptr : &sharedResources.AddFromFile<SetInfoData>(setInfoDataFileName))
 {
