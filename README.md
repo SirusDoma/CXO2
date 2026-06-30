@@ -43,7 +43,7 @@ The end goal is to remake every official major clients published by e-Games and 
 |------------------|--------------------------------------------------------|
 | ResourceCompiler | Compiler to compile `ControlList` into `Resources.hpp` |
 | Genode           | Game Engine On Demand                                  |
-| OTwo             | Core Game Client                                       |
+| CXO2             | Core Game Client                                       |
 
 ## Compiling the Project ##
 
@@ -94,7 +94,7 @@ Use the following commands to generate cmake build files:
 $ cmake -B ./build/cmake-build-debug -DCMAKE_BUILD_TYPE=Debug
 
 # Build the project.
-$ cmake --build build/cmake-build-debug --target OTwo
+$ cmake --build build/cmake-build-debug --target CXO2
 ```
 
 # FAQ
