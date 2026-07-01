@@ -28,15 +28,20 @@ on:
         required: true
         type: boolean
         default: true
+      linux:
+        description: Build linux
+        required: true
+        type: boolean
+        default: true
 
 jobs:
   compile:
     runs-on: ${{ matrix.os }}
-    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
+    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 || inputs.linux }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-14, macos-13]
+        os: [windows-latest, macos-14, macos-15-intel, ubuntu-latest]
         build_type: [ '${{ inputs.build_type }}' ]
         include:
           - os: windows-latest
@@ -53,13 +58,20 @@ jobs:
             cpp_compiler: clang++
             cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/arm64/
-          - os: macos-13
+          - os: macos-15-intel
             enabled: ${{ inputs.osx_x64_86 }}
             dist_name: osx-x86_64
             c_compiler: clang
             cpp_compiler: clang++
             cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
             output_dir: /bin/osx/x86_64/
+          - os: ubuntu-latest
+            enabled: ${{ inputs.linux }}
+            dist_name: linux-x86_64
+            c_compiler: gcc
+            cpp_compiler: g++
+            cmake_flags: '-G Ninja -DICONV_LIB=c'
+            output_dir: /bin/linux/
     steps:
     - name: Checkout repository
       if: ${{ matrix.enabled }}
@@ -100,6 +112,20 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
         elif [ "$RUNNER_OS" == "macOS" ]; then
           echo "No signing certificate provided; skipping macOS code signing setup (unsigned build)."
+        fi
+        
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y \
+            ninja-build \
+            libx11-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libudev-dev \
+            libgl1-mesa-dev \
+            libfreetype-dev \
+            libfontconfig1-dev
         fi
 
         # Strings variables
@@ -168,7 +194,7 @@ jobs:
           echo "No assets found; packaging executable only."
         fi
 
-    - name: Upload Artifact
+    - name: Upload artifact
       if: ${{ matrix.enabled }}
       uses: actions/upload-artifact@v7
       with:
