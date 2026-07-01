@@ -712,6 +712,6 @@ namespace Cx
         if (GetWindowState() == sf::State::Fullscreen)
             return *m_layeredTarget;
 
-        return O2::operator sf::RenderTarget&();
+        return Gx::Application::operator sf::RenderTarget&();
     }
 }
