@@ -76,7 +76,11 @@ jobs:
         P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
-        # Setup code signing for macOS (skipped when no certificate secret is provided)
+        if [ "$RUNNER_OS" == "macOS" ] && [ -z "$P12_BUILD_CERTIFICATE_BASE64" ] && [ "${{ matrix.build_type }}" != "Debug" ]; then
+          echo "::error::macOS ${{ matrix.build_type }} build requires signing credentials (P12_BUILD_CERTIFICATE_BASE64, P12_PASSWORD, KEYCHAIN_PASSWORD). Only Debug builds are permitted without them."
+          exit 1
+        fi
+
         if [ "$RUNNER_OS" == "macOS" ] && [ -n "$P12_BUILD_CERTIFICATE_BASE64" ]; then
           # Setup credentials paths
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -103,7 +107,17 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
 
-    - name: Configure Project
+    - name: Cache dependencies
+      if: ${{ matrix.enabled }}
+      uses: actions/cache@v6
+      with:
+        path: build/_deps
+        key: deps-${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('CMakeLists.txt', 'modules/Genode/CMakeLists.txt') }}
+        restore-keys: |
+          deps-${{ matrix.os }}-${{ matrix.build_type }}-
+          deps-${{ matrix.os }}-
+
+    - name: Configure project
       if: ${{ matrix.enabled }}
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -113,112 +127,52 @@ jobs:
         -S ${{ github.workspace }}
         ${{ matrix.cmake_flags }}
 
-    - name: Build Resource Compiler
+    - name: Build resource compiler
       if: ${{ matrix.enabled }}
       run: >
         cmake --build ${{ steps.strings.outputs.build-output-dir }}
         --config ${{ matrix.build_type }}
         --target ResourceCompiler
 
-    - name: Generate Resources
+    - name: Generate embedded resources
       if: ${{ matrix.enabled }}
       shell: bash
       working-directory: ${{ github.workspace }}
       run: ./bin/compiler/${{ matrix.build_type }}/ResourceCompiler
 
-    - name: Compile Project
+    - name: Build project
       if: ${{ matrix.enabled }}
       run: >
         cmake --build ${{ steps.strings.outputs.build-output-dir }}
         --config ${{ matrix.build_type }}
         --target CXO2
 
-    - name: Compress Build
-      if: ${{ matrix.enabled }}
-      shell: bash
-      working-directory: ${{ steps.strings.outputs.binary-output-dir }}
-      run: tar -cvf OTwo-${{ matrix.dist_name }}.tar .
-
-    - name: Save Build
-      if: ${{ matrix.enabled }}
-      uses: actions/upload-artifact@v7
-      with:
-        name: OTwo-${{ matrix.dist_name }}
-        path: ${{ steps.strings.outputs.binary-output-dir }}/OTwo-${{ matrix.dist_name }}.tar
-
-  package:
-    needs: [ compile ]
-    if: ${{ inputs.windows || inputs.osx_arm64 || inputs.osx_x64_86 }}
-    runs-on: 'ubuntu-latest'
-    strategy:
-      fail-fast: false
-      matrix:
-        dist_name: [ win32, osx-arm64, osx-x86_64 ]
-        include:
-          - dist_name: win32
-            enabled: ${{ inputs.windows }}
-          - dist_name: osx-arm64
-            enabled: ${{ inputs.osx_arm64 }}
-          - dist_name: osx-x86_64
-            enabled: ${{ inputs.osx_x64_86 }}
-    steps:
-    - name: Checkout repository
-      if: ${{ matrix.enabled }}
-      uses: actions/checkout@v7
-      with:
-        submodules: 'false'
-
-    - name: Load Compressed Build
-      id: build-cache
-      if: ${{ matrix.enabled }}
-      uses: actions/download-artifact@v8
-      with:
-        name: OTwo-${{ matrix.dist_name }}
-        path: ./bin/
-
-    - name: Decompress Build
-      if: ${{ matrix.enabled }}
-      shell: bash
-      run: |
-        mkdir -p '${{ github.workspace }}/bin/dist'
-        tar -xvf ./bin/OTwo-${{ matrix.dist_name }}.tar -C ./bin/dist/
-
     - name: Build assets
       if: ${{ matrix.enabled }}
       shell: bash
       run: |
-        mkdir -p '${{ github.workspace }}/bin/dist'
+        dist="${{ steps.strings.outputs.binary-output-dir }}"
         bundled=0
         if [ -d assets/Avatar ]; then
-          mkdir -p bin/dist/Image && cp -r assets/Avatar bin/dist/Image/ && bundled=1
+          mkdir -p "$dist/Image" && cp -r assets/Avatar "$dist/Image/" && bundled=1
         fi
         if [ -d assets/Interface ]; then
-          mkdir -p bin/dist/Image && cp -r assets/Interface bin/dist/Image/ && bundled=1
+          mkdir -p "$dist/Image" && cp -r assets/Interface "$dist/Image/" && bundled=1
         fi
         if [ -d assets/Music ]; then
-          cp -r assets/Music bin/dist/ && bundled=1
+          cp -r assets/Music "$dist/" && bundled=1
         fi
         if [ "$bundled" -eq 0 ]; then
           echo "No assets found; packaging executable only."
         fi
 
-    - name: Build Distribution Package
-      if: ${{ matrix.enabled }}
-      shell: bash
-      run: |
-        # Ideally, this generate .msi or .dmg package.
-        # Note that actions/upload-artifact will not preserve executable or any other permissions.
-        # See https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
-        #
-        # Packaging the game files will avoid this from happening.
-        # Otherwise, the user might have to run `chmod +x <OTwo executable>` on Linux or macOS.
-
-        cd '${{ github.workspace }}/bin/dist'
-        zip CXO2-${{ matrix.dist_name }}.zip . -r
-
     - name: Upload Artifact
       if: ${{ matrix.enabled }}
       uses: actions/upload-artifact@v7
       with:
+        # Note that actions/upload-artifact will not preserve executable or any other permissions.
+        # See https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
         name: CXO2-${{ matrix.dist_name }}
-        path: ./bin/dist/CXO2-${{ matrix.dist_name }}.zip
+        path: |
+          ${{ steps.strings.outputs.binary-output-dir }}
+          !${{ steps.strings.outputs.binary-output-dir }}/**/*Genode*
