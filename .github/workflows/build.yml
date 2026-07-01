@@ -104,6 +104,7 @@ jobs:
 
         # Strings variables
         echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
+        echo "build-type-flag=$(echo '${{ matrix.build_type }}' | tr '[:lower:]' '[:upper:]')" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "binary-output-dir=${{ github.workspace }}${{ matrix.output_dir }}${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
 
@@ -124,6 +125,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${{ steps.strings.outputs.build-type-flag }}=${{ steps.strings.outputs.binary-output-dir }}
         -S ${{ github.workspace }}
         ${{ matrix.cmake_flags }}
 
@@ -175,4 +177,5 @@ jobs:
         name: CXO2-${{ matrix.dist_name }}
         path: |
           ${{ steps.strings.outputs.binary-output-dir }}
-          !${{ steps.strings.outputs.binary-output-dir }}/**/*Genode*
+          !${{ steps.strings.outputs.binary-output-dir }}/**/*.lib
+          !${{ steps.strings.outputs.binary-output-dir }}/**/*.a
