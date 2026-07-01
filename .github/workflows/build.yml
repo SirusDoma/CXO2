@@ -125,7 +125,10 @@ jobs:
             libudev-dev \
             libgl1-mesa-dev \
             libfreetype-dev \
-            libfontconfig1-dev
+            libfontconfig1-dev \
+            libogg-dev \
+            libvorbis-dev \
+            libflac-dev
         fi
 
         # Strings variables
