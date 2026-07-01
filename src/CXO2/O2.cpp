@@ -346,6 +346,12 @@ namespace Cx
                 embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_3->first, ff3_3->second);
         }
 
+        // Reroute bold font to embedded resource
+        if (auto arialBlack = fontManager.GetData("Arial Black"))
+            embedded.WriteFile("Interface/Common/Font.Bold.ttf", arialBlack->first, arialBlack->second);
+        else if (auto defaultData = fontManager.GetDefaultData())
+            embedded.WriteFile("Interface/Common/Font.Bold.ttf", defaultData->first, defaultData->second);
+
         // Embedded resources
         for (const auto& [name, resource] : Cx::Resources)
             embedded.WriteFile(std::string(name), resource.data, resource.size);

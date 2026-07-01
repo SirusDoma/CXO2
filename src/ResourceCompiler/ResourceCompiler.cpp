@@ -98,8 +98,7 @@ int main()
     
     // Additional files to include in resources (relative to assets folder)
     const std::vector<std::string> additionalFiles = {
-        "Icon.png",
-        "Interface/Common/Font.Bold.ttf"
+        "Icon.png"
     };
 
     std::cout << "Scanning for JSON files in: " << controlListPath << std::endl;
