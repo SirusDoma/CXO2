@@ -10,8 +10,8 @@ namespace Cx
 {
     struct Judgement
     {
-        Accuracy Accuracy;
-        double   Latency;
+        Cx::Accuracy Accuracy;
+        double       Latency;
     };
 
     class ChartRenderer;

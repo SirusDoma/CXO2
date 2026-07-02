@@ -78,7 +78,7 @@ namespace Cx
 
         struct Event
         {
-            Channel Channel;
+            Cx::Chart::Channel Channel;
             double  Position;
 
             Event(const Chart::Channel channel, const double position) :
@@ -119,13 +119,13 @@ namespace Cx
 
         struct NoteEvent : Event
         {
-            std::uint16_t     ID;
-            float             Volume;
-            float             Pan;
-            NoteType          Type;
-            SampleType SampleType;
-            sf::SoundBuffer*  Sample;
-            double            Length;
+            std::uint16_t         ID;
+            float                 Volume;
+            float                 Pan;
+            NoteType              Type;
+            Cx::Chart::SampleType SampleType;
+            sf::SoundBuffer*      Sample;
+            double                Length;
 
             NoteEvent(const Event& ev, const std::uint16_t id, const float volume, const float pan, const NoteType type, const enum SampleType sampleType, sf::SoundBuffer* sample) :
                 Event(ev),
