@@ -1,4 +1,4 @@
-[[nodiscard]] #pragma once
+#pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
 #include <CXO2/Core/Chart.hpp>
