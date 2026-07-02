@@ -7,9 +7,9 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<sf::InputStream> EmbeddedArchive::Open(const std::string& fileName) const
+    Gx::ResourcePtr<sf::InputStream> EmbeddedArchive::Open(const std::filesystem::path& fileName) const
     {
-        if (const auto it = m_entries.find(fileName); it != m_entries.end())
+        if (const auto it = m_entries.find(fileName.string()); it != m_entries.end())
         {
             std::unique_ptr<sf::InputStream> stream = std::make_unique<sf::MemoryInputStream>(it->second.Data, it->second.Size);
             return stream;
@@ -18,14 +18,14 @@ namespace Cx
         return nullptr;
     }
 
-    bool EmbeddedArchive::Contains(const std::string& fileName) const
+    bool EmbeddedArchive::Contains(const std::filesystem::path& fileName) const
     {
-        return m_entries.find(fileName) != m_entries.end();
+        return m_entries.find(fileName.string()) != m_entries.end();
     }
 
-    std::unique_ptr<Gx::FileInfo> EmbeddedArchive::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<Gx::FileInfo> EmbeddedArchive::GetFileInfo(const std::filesystem::path& fileName) const
     {
-        if (const auto it = m_entries.find(fileName); it != m_entries.end())
+        if (const auto it = m_entries.find(fileName.string()); it != m_entries.end())
             return std::make_unique<Gx::FileInfo>(*this, it->first, it->second.Size);
 
         return nullptr;
@@ -40,9 +40,9 @@ namespace Cx
         return entries;
     }
 
-    std::optional<std::size_t> EmbeddedArchive::ReadFile(const std::string& name, void* data, std::size_t size) const
+    std::optional<std::size_t> EmbeddedArchive::ReadFile(const std::filesystem::path& name, void* data, std::size_t size) const
     {
-        if (const auto it = m_entries.find(name); it != m_entries.end())
+        if (const auto it = m_entries.find(name.string()); it != m_entries.end())
         {
             std::memcpy(data, it->second.Data, it->second.Size);
             return it->second.Size;
@@ -51,19 +51,19 @@ namespace Cx
         return std::nullopt;
     }
 
-    void EmbeddedArchive::WriteFile(const std::string& fileName, const void* data, const std::size_t size)
+    void EmbeddedArchive::WriteFile(const std::filesystem::path& fileName, const void* data, const std::size_t size)
     {
-        m_entries[fileName] = BlobData{ data, size };
+        m_entries[fileName.string()] = BlobData{ data, size };
     }
 
-    void EmbeddedArchive::WriteFile(const std::string& fileName, const std::vector<std::uint8_t>& bytes)
+    void EmbeddedArchive::WriteFile(const std::filesystem::path& fileName, const std::vector<std::uint8_t>& bytes)
     {
-        m_entries[fileName] = BlobData{ bytes.data(), bytes.size() };
+        m_entries[fileName.string()] = BlobData{ bytes.data(), bytes.size() };
     }
 
-    std::optional<std::size_t> EmbeddedArchive::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> EmbeddedArchive::GetFileSize(const std::filesystem::path& fileName) const
     {
-        if (const auto it = m_entries.find(fileName); it != m_entries.end())
+        if (const auto it = m_entries.find(fileName.string()); it != m_entries.end())
             return it->second.Size;
 
         return std::nullopt;

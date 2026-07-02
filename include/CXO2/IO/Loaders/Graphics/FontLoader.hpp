@@ -19,9 +19,9 @@ namespace Cx
         bool IsStreaming() const override;
         void UseSmooth(bool smooth);
 
-        Gx::ResourcePtr<Gx::Font> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const override;
-        Gx::ResourcePtr<Gx::Font> LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const override;
-        Gx::ResourcePtr<Gx::Font> LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Font> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Font> LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Font> LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const override;
 
     private:
         bool m_smooth = true;

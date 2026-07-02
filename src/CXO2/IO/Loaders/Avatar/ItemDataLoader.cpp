@@ -11,14 +11,14 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<ItemData> ItemDataLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
-        if (Gx::StringHelper::EndsWith(fileName,".json"))
+        if (Gx::StringHelper::EndsWith(fileName.string(),".json"))
             return ResourceLoader::LoadFromFile(fileName, ctx);
 
         const auto inputStream = Gx::FileSystem::Open(fileName);
         if (!inputStream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto& stream = *inputStream.get();
 
@@ -31,12 +31,12 @@ namespace Cx
         {
             std::uint32_t ID;
             EquipmentType Type;
-            Cx::Planet      Planet;
+            Cx::Planet    Planet;
             std::uint16_t Flag;
             std::uint8_t  Quantity; // newer version: std::uint16_t
             std::uint8_t  MoidifierEffect;
             std::uint8_t  MoidifierCategory;
-            Cx::Currency    Currency;
+            Cx::Currency  Currency;
             std::uint32_t PriceGem;
             std::uint32_t PriceCash;
         };

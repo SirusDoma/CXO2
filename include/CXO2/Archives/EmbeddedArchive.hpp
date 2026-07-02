@@ -4,6 +4,7 @@
 #include <Genode/IO/Archive.hpp>
 
 #include <map>
+#include <filesystem>
 
 namespace Cx
 {
@@ -12,21 +13,21 @@ namespace Cx
     public:
         EmbeddedArchive() = default;
 
-        [[nodiscard]] Gx::ResourcePtr<sf::InputStream> Open(const std::string& fileName) const override;
+        [[nodiscard]] Gx::ResourcePtr<sf::InputStream> Open(const std::filesystem::path& fileName) const override;
 
-        [[nodiscard]] bool Contains(const std::string& fileName) const override;
+        [[nodiscard]] bool Contains(const std::filesystem::path& fileName) const override;
 
-        [[nodiscard]] std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
+        [[nodiscard]] std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::filesystem::path& fileName) const override;
 
         [[nodiscard]] std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
 
-        std::optional<std::size_t> ReadFile(const std::string& name, void* data, std::size_t size) const override;
+        std::optional<std::size_t> ReadFile(const std::filesystem::path& name, void* data, std::size_t size) const override;
 
-        void WriteFile(const std::string& fileName, const void* data, std::size_t size) override;
+        void WriteFile(const std::filesystem::path& fileName, const void* data, std::size_t size) override;
 
-        void WriteFile(const std::string& fileName, const std::vector<std::uint8_t>& bytes);
+        void WriteFile(const std::filesystem::path& fileName, const std::vector<std::uint8_t>& bytes);
 
-        [[nodiscard]] std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
+        [[nodiscard]] std::optional<std::size_t> GetFileSize(const std::filesystem::path& fileName) const override;
 
     private:
         struct BlobData

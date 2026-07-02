@@ -259,14 +259,14 @@ namespace Cx
         }
     }
 
-    Gx::ResourcePtr<SpriteSheet> O2JamSpriteLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<SpriteSheet> O2JamSpriteLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto& inputStream = *stream.get();
-        return LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName));
+        return LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
     }
 
     Gx::ResourcePtr<SpriteSheet> O2JamSpriteLoader::LoadFromMemory(void* data, std::size_t size, const Gx::ResourceContext& ctx) const

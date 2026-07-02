@@ -11,14 +11,14 @@ namespace Cx
         return m_signature;
     }
 
-    bool OpiArchive::LoadFromFile(const std::string& fileName)
+    bool OpiArchive::LoadFromFile(const std::filesystem::path& fileName)
     {
         // Fetch meta data
-        m_source = fileName;
+        m_source = fileName.string();
         if (!m_fileStream.open(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
             return false;
 
-        const auto prefix = Gx::StringHelper::RemoveExtension(fileName);
+        const auto prefix = Gx::StringHelper::RemoveExtension(m_source);
         SetPathPrefix(prefix + "/");
 
         if (!m_fileStream.seek(0).has_value())
@@ -37,11 +37,12 @@ namespace Cx
         return !entries.empty(); // m_count == entries.size();
     }
 
-    Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::string& fileName) const
+    Gx::ResourcePtr<sf::InputStream> OpiArchive::Open(const std::filesystem::path& fileName) const
     {
-        const auto it = m_entries.find(fileName);
+        const auto name = fileName.string();
+        const auto it = m_entries.find(name);
         if (it == m_entries.end())
-            throw Gx::ResourceAccessException(fileName, "The specified index is out of bound for this archive");
+            throw Gx::ResourceAccessException(name, "The specified index is out of bound for this archive");
 
         const auto header = it->second;
         const auto data = new std::uint8_t[header.GetSize()];
@@ -55,9 +56,9 @@ namespace Cx
         });
     }
 
-    bool OpiArchive::Contains(const std::string& name) const
+    bool OpiArchive::Contains(const std::filesystem::path& name) const
     {
-        const auto iterator = m_entries.find(name);
+        const auto iterator = m_entries.find(name.string());
         return iterator != m_entries.end();
     }
 
@@ -90,22 +91,24 @@ namespace Cx
         return result;
     }
 
-    std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<Gx::FileInfo> OpiArchive::GetFileInfo(const std::filesystem::path& fileName) const
     {
+        const auto name = fileName.string();
         for (auto const& [key, header] : m_entries)
         {
-            if (header.GetName() == fileName)
+            if (header.GetName() == name)
                 return std::make_unique<FileInfo>(header);
         }
 
-        throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+        throw Gx::ResourceAccessException(name, "The specified name is not found for this archive");
     }
 
-    std::optional<std::size_t> OpiArchive::ReadFile(const std::string& fileName, void* data, std::size_t size) const
+    std::optional<std::size_t> OpiArchive::ReadFile(const std::filesystem::path& fileName, void* data, std::size_t size) const
     {
-        const auto iterator = m_entries.find(fileName);
+        const auto name = fileName.string();
+        const auto iterator = m_entries.find(name);
         if (iterator == m_entries.end())
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(name, "The specified name is not found for this archive");
 
         const FileInfo header = iterator->second;
         if (size > header.GetSize())
@@ -114,17 +117,18 @@ namespace Cx
         {
             auto lock = std::lock_guard(m_mutex);
             if (!m_fileStream.seek(static_cast<std::int64_t>(header.GetOffset())).has_value())
-                throw Gx::ResourceAccessException(fileName, "Failed to seek the data inside the archive");
+                throw Gx::ResourceAccessException(name, "Failed to seek the data inside the archive");
 
             return m_fileStream.read(data, size);
         }
     }
 
-    std::optional<std::size_t> OpiArchive::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> OpiArchive::GetFileSize(const std::filesystem::path& fileName) const
     {
-        const auto iterator = m_entries.find(fileName);
+        const auto name = fileName.string();
+        const auto iterator = m_entries.find(name);
         if (iterator == m_entries.end())
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(name, "The specified name is not found for this archive");
 
         return iterator->second.GetSize();
     }

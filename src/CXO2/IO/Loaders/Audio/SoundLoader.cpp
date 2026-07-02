@@ -8,13 +8,14 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& context) const
     {
-        if (Gx::StringHelper::IsGlobMatch(fileName, "*.json", false))
+        if (Gx::StringHelper::IsGlobMatch(fileName.string(), "*.json", false))
             return ResourceLoader::LoadFromFile(fileName, context);
 
+        const auto name = fileName.string();
         return std::make_unique<sf::Sound>(
-            context.Acquire<sf::SoundBuffer>(fileName, fileName)
+            context.Acquire<sf::SoundBuffer>(name, name)
         );
     }
 

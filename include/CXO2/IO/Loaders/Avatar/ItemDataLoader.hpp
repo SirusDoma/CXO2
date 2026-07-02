@@ -10,9 +10,8 @@ namespace Cx
     public :
         ItemDataLoader() = default;
 
-        Gx::ResourcePtr<ItemData> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const override;
-
-        Gx::ResourcePtr<ItemData> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<ItemData> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<ItemData> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const override;
+        [[nodiscard]] Gx::ResourcePtr<ItemData> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<ItemData> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
     };
 }

@@ -8,7 +8,7 @@
 
 namespace Cx
 {
-    bool OmcArchive::LoadFromFile(const std::string& fileName)
+    bool OmcArchive::LoadFromFile(const std::filesystem::path& fileName)
     {
         if (!Archive::LoadFromFile(fileName))
             return false;
@@ -51,11 +51,11 @@ namespace Cx
         });
     }
 
-    Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::string& fileName) const
+    Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::filesystem::path& fileName) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         const auto& entry = static_cast<FileInfo&>(*header);
         const auto data   = new std::uint8_t[header->GetSize()];
@@ -72,7 +72,7 @@ namespace Cx
         });
     }
 
-    bool OmcArchive::Contains(const std::string& name) const
+    bool OmcArchive::Contains(const std::filesystem::path& name) const
     {
         return GetFileInfo(name) != nullptr;
     }
@@ -130,11 +130,12 @@ namespace Cx
     }
 
 
-    std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<Gx::FileInfo> OmcArchive::GetFileInfo(const std::filesystem::path& fileName) const
     {
-        if (Gx::StringHelper::StartsWith(fileName, Gx::StringHelper::Split(GetPrefix(), '/').front()) && fileName.find(':') != std::string::npos)
+        const auto name = fileName.string();
+        if (Gx::StringHelper::StartsWith(name, Gx::StringHelper::Split(GetPrefix(), '/').front()) && name.find(':') != std::string::npos)
         {
-            const auto tokens = Gx::StringHelper::Split(fileName, ':');
+            const auto tokens = Gx::StringHelper::Split(name, ':');
             if (tokens.size() != 2)
                 return nullptr;
 
@@ -146,7 +147,7 @@ namespace Cx
 
         for (auto const& [key, header] : m_entries)
         {
-            if (header.GetName() == fileName)
+            if (header.GetName() == name)
                 return std::make_unique<FileInfo>(header);
         }
 
@@ -260,26 +261,26 @@ namespace Cx
         }
     }
 
-    std::optional<std::size_t> OmcArchive::ReadFile(const std::string& fileName, void* data, const std::size_t size) const
+    std::optional<std::size_t> OmcArchive::ReadFile(const std::filesystem::path& fileName, void* data, const std::size_t size) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         const auto& entry = static_cast<FileInfo&>(*header);
         return ReadFile(entry.GetIndex(), data, size);
     }
 
-    std::optional<std::size_t> OmcArchive::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> OmcArchive::GetFileSize(const std::filesystem::path& fileName) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         return header->GetSize();
     }
 
-    std::string OmcArchive::GetExtension(const std::string& name) const
+    std::string OmcArchive::GetExtension(const std::filesystem::path& name) const
     {
         const auto header = GetFileInfo(name);
         if (!header)

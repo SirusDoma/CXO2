@@ -5,7 +5,7 @@
 
 namespace Cx
 {
-    bool OjmArchive::LoadFromFile(const std::string& fileName)
+    bool OjmArchive::LoadFromFile(const std::filesystem::path& fileName)
     {
         auto fs = Gx::FileSystem::Open(fileName);
         char sign[3];
@@ -41,7 +41,7 @@ namespace Cx
     }
 
 
-    Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(const std::string& fileName) const
+    Gx::ResourcePtr<sf::InputStream> OjmArchive::Open(const std::filesystem::path& fileName) const
     {
         if (m_type == ArchiveType::M30)
             return M30Archive::Open(fileName);
@@ -51,7 +51,7 @@ namespace Cx
         return nullptr;
     }
 
-    bool OjmArchive::Contains(const std::string& name) const
+    bool OjmArchive::Contains(const std::filesystem::path& name) const
     {
         if (m_type == ArchiveType::M30)
             return M30Archive::Contains(name);
@@ -71,7 +71,7 @@ namespace Cx
         return {};
     }
 
-    std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<Gx::FileInfo> OjmArchive::GetFileInfo(const std::filesystem::path& fileName) const
     {
         if (m_type == ArchiveType::M30)
             return M30Archive::GetFileInfo(fileName);
@@ -81,7 +81,7 @@ namespace Cx
         return {};
     }
 
-    std::optional<std::size_t> OjmArchive::ReadFile(const std::string& fileName, void* data, std::size_t size) const
+    std::optional<std::size_t> OjmArchive::ReadFile(const std::filesystem::path& fileName, void* data, std::size_t size) const
     {
         if (m_type == ArchiveType::M30)
             return M30Archive::ReadFile(fileName, data, size);
@@ -91,7 +91,7 @@ namespace Cx
         return std::nullopt;
     }
 
-    std::optional<std::size_t> OjmArchive::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> OjmArchive::GetFileSize(const std::filesystem::path& fileName) const
     {
         if (m_type == ArchiveType::M30)
             return M30Archive::GetFileSize(fileName);

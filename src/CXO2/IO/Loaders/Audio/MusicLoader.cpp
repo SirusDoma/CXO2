@@ -8,13 +8,13 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
-        if (Gx::StringHelper::IsGlobMatch(fileName, "*.json", false))
+        if (Gx::StringHelper::IsGlobMatch(fileName.string(), "*.json", false))
             return ResourceLoader::LoadFromFile(fileName, ctx);
 
         auto metadata = MusicMetadata();
-        metadata.Source = fileName;
+        metadata.Source = fileName.string();
 
         return LoadFromMetadata(metadata, ctx);
     }

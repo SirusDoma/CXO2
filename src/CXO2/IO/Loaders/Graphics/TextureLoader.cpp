@@ -8,11 +8,11 @@ namespace Cx
         m_smooth = smooth;
     }
 
-    Gx::ResourcePtr<sf::Texture> TextureLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<sf::Texture> TextureLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto resource = std::make_unique<sf::Texture>();
         if (!resource->loadFromStream(*stream))

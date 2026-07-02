@@ -3,17 +3,17 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<O2JamChartMetadata> O2JamChartMetadataLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto& inputStream = *stream;
         auto metadata = LoadFromStream(inputStream, ctx);
 
         if (metadata)
-            metadata->Source = fileName;
+            metadata->Source = fileName.string();
 
         return metadata;
     }

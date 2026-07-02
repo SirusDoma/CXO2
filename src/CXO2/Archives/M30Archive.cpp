@@ -4,7 +4,7 @@
 
 namespace Cx
 {
-    bool M30Archive::LoadFromFile(const std::string& fileName)
+    bool M30Archive::LoadFromFile(const std::filesystem::path& fileName)
     {
         if (!Archive::LoadFromFile(Gx::LocalFileSystem::Instance().GetFullName(fileName)))
             return false;
@@ -25,11 +25,11 @@ namespace Cx
         return !entries.empty();
     }
 
-    Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::string& fileName) const
+    Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const std::filesystem::path& fileName) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         const auto data = new std::uint8_t[header->GetSize()];
         if (!ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()).has_value())
@@ -67,11 +67,12 @@ namespace Cx
         });
     }
 
-    std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::string& fileName) const
+    std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::filesystem::path& fileName) const
     {
-        if (Gx::StringHelper::StartsWith(fileName, Gx::StringHelper::Split(GetPrefix(), '/').front()) && fileName.find(':') != std::string::npos)
+        const auto name = fileName.string();
+        if (Gx::StringHelper::StartsWith(name, Gx::StringHelper::Split(GetPrefix(), '/').front()) && name.find(':') != std::string::npos)
         {
-            const auto tokens = Gx::StringHelper::Split(fileName, ':');
+            const auto tokens = Gx::StringHelper::Split(name, ':');
             if (tokens.size() != 2)
                 return nullptr;
 
@@ -83,7 +84,7 @@ namespace Cx
 
         for (auto const& [key, header] : m_entries)
         {
-            if (header.GetName() == fileName)
+            if (header.GetName() == name)
                 return std::make_unique<FileInfo>(header);
         }
 
@@ -99,25 +100,25 @@ namespace Cx
         return ReadFile(iterator->second, data, size);
     }
 
-    std::optional<std::size_t> M30Archive::ReadFile(const std::string& fileName, void* data, const std::size_t size) const
+    std::optional<std::size_t> M30Archive::ReadFile(const std::filesystem::path& fileName, void* data, const std::size_t size) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         return ReadFile(dynamic_cast<FileInfo&>(*header), data, size);
     }
 
-    bool M30Archive::Contains(const std::string& name) const
+    bool M30Archive::Contains(const std::filesystem::path& name) const
     {
         return GetFileInfo(name) != nullptr;
     }
 
-    std::optional<std::size_t> M30Archive::GetFileSize(const std::string& fileName) const
+    std::optional<std::size_t> M30Archive::GetFileSize(const std::filesystem::path& fileName) const
     {
         const auto header = GetFileInfo(fileName);
         if (!header)
-            throw Gx::ResourceAccessException(fileName, "The specified name is not found for this archive");
+            throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         return header->GetSize();
     }

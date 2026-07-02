@@ -7,6 +7,7 @@
 #include <CXO2/Archives/FileInfo.hpp>
 
 #include <unordered_map>
+#include <filesystem>
 
 namespace Cx
 {
@@ -38,22 +39,22 @@ namespace Cx
     public:
         M30Archive() = default;
 
-        bool LoadFromFile(const std::string& fileName) override;
+        bool LoadFromFile(const std::filesystem::path& fileName) override;
 
         virtual Gx::ResourcePtr<sf::InputStream> Open(unsigned int index) const;
-        Gx::ResourcePtr<sf::InputStream> Open(const std::string& fileName) const override;
+        Gx::ResourcePtr<sf::InputStream> Open(const std::filesystem::path& fileName) const override;
 
-        bool Contains(const std::string& name) const override;
+        bool Contains(const std::filesystem::path& name) const override;
 
         std::vector<std::unique_ptr<Gx::FileInfo>> GetFileEntries() const override;
-        std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::string& fileName) const override;
+        std::unique_ptr<Gx::FileInfo> GetFileInfo(const std::filesystem::path& fileName) const override;
 
         std::optional<std::size_t> ReadFile(unsigned int index, void* data, std::size_t size) const;
-        std::optional<std::size_t> ReadFile(const std::string& fileName, void* data, std::size_t size) const override;
+        std::optional<std::size_t> ReadFile(const std::filesystem::path& fileName, void* data, std::size_t size) const override;
 
-        void WriteFile(const std::string& fileName, const void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
+        void WriteFile(const std::filesystem::path& fileName, const void* data, std::size_t size) override { throw Gx::NotSupportedException(); }
 
-        std::optional<std::size_t> GetFileSize(const std::string& fileName) const override;
+        std::optional<std::size_t> GetFileSize(const std::filesystem::path& fileName) const override;
 
     private:
         bool ReadStream(void* data, std::uint64_t size) const;

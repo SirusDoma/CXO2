@@ -5,11 +5,11 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<std::vector<ControlList::Bound>> BoundLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<std::vector<ControlList::Bound>> BoundLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, ctx);

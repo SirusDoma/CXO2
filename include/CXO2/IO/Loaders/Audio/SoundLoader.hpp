@@ -11,8 +11,8 @@ namespace Cx
     public :
         SoundLoader() = default;
 
-        Gx::ResourcePtr<sf::Sound> LoadFromFile(const std::string& fileName, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<sf::Sound> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<sf::Sound> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<sf::Sound> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<sf::Sound> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<sf::Sound> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const override;
     };
 }

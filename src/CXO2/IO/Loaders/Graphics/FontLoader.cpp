@@ -15,11 +15,11 @@ namespace Cx
         m_smooth = smooth;
     }
 
-    Gx::ResourcePtr<Gx::Font> FontLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<Gx::Font> FontLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         const auto inputStream = stream.release();
         auto resource = Gx::ResourcePtr<Gx::Font>(new Gx::Font(), [inputStream] (auto ptr)

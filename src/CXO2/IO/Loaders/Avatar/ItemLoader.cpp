@@ -58,7 +58,7 @@ namespace Cx
         {
             if (metadata->SmallThumbnail.type() == Gx::Json::value_t::string)
             {
-                if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->SmallThumbnail, ctx))
+                if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->SmallThumbnail.get<std::string>(), ctx))
                     item->SetSmallThumbnail(std::move(*thumbnail));
             }
             else
@@ -72,7 +72,7 @@ namespace Cx
         {
             if (metadata->LargeThumbnail.type() == Gx::Json::value_t::string)
             {
-                if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->LargeThumbnail, ctx))
+                if (const auto thumbnail = spriteLoader.LoadFromFile(metadata->LargeThumbnail.get<std::string>(), ctx))
                     item->SetLargeThumbnail(std::move(*thumbnail));
             }
             else
@@ -87,7 +87,7 @@ namespace Cx
             for (const auto& ref : metadata->References)
             {
                 auto animation = ref.Reference.type() == Gx::Json::value_t::string ?
-                    animationLoader.LoadFromFile(ref.Reference, ctx) : animationLoader.LoadFromJson(ref.Reference, ctx);
+                    animationLoader.LoadFromFile(ref.Reference.get<std::string>(), ctx) : animationLoader.LoadFromJson(ref.Reference, ctx);
 
                 if (!animation)
                     continue;

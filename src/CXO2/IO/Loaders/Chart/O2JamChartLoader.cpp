@@ -22,15 +22,15 @@ namespace Cx
         return chart;
     }
 
-    Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromFile(const std::string& fileName, const Gx::ResourceContext& ctx) const
+    Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName);
+            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
 
         auto& inputStream = *stream.get();
-        auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName));
-        chart->Source     = fileName;
+        auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
+        chart->Source     = fileName.string();
 
         return chart;
     }
@@ -102,7 +102,7 @@ namespace Cx
         if (chart->GetSampleCount() == 0)
         {
             auto archive = OjmArchive();
-            if (archive.LoadFromFile(Gx::StringHelper::Trim(metadata.OJM)))
+            if (archive.LoadFromFile(Gx::StringHelper::Trim(metadata.OJM).toAnsiString()))
                 loadSamples(&archive);
         }
 
