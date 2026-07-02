@@ -31,7 +31,7 @@ namespace Cx
             if (param.empty())
             {
                 if (!optional)
-                    throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Invalid number parameters.");
+                    throw Gx::ResourceLoadException(std::string(), "Invalid ControlList: Invalid number parameters.");
 
                 return 0;
             }
