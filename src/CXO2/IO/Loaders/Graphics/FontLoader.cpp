@@ -19,7 +19,7 @@ namespace Cx
     {
         auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         const auto inputStream = stream.release();
         auto resource = Gx::ResourcePtr<Gx::Font>(new Gx::Font(), [inputStream] (auto ptr)

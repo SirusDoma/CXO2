@@ -40,7 +40,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ChannelBoardMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
 
         auto channelBoard = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);

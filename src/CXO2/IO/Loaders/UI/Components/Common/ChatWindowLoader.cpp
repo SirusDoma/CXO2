@@ -68,7 +68,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ChatWindowMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
 
         auto window = Instantiate(context);
         window->SetName(metadata->Name);

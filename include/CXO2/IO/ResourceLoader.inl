@@ -26,7 +26,7 @@ namespace Cx
 
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, ctx);
@@ -58,7 +58,7 @@ namespace Cx
 
         auto bytes = std::vector<std::uint8_t>(size);
         if (!stream.read(bytes.data(), size).has_value())
-            throw Gx::ResourceLoadException("Failed to load the resource");
+            throw Gx::ResourceLoadException(ctx.GetID());
 
         const auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(bytes.data()), size));
 

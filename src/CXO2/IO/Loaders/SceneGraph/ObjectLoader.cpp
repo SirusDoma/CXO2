@@ -20,7 +20,7 @@ namespace Cx
             metadata = metaLoader.LoadFromJson(json, context);
 
         if (metadata == nullptr)
-            throw Gx::ResourceLoadException("Failed to load metadata");
+            throw Gx::ResourceLoadException(context.GetID(), "Failed to load metadata");
 
         const auto type = std::string(magic_enum::enum_name(metadata->Type));
         switch (metadata->Type)

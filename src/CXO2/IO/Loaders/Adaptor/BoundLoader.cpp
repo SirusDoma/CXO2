@@ -9,7 +9,7 @@ namespace Cx
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, ctx);
@@ -29,17 +29,17 @@ namespace Cx
 
         std::uint32_t signature;
         if (stream.read(&signature, sizeof(signature)) != sizeof(signature))
-            throw Gx::ResourceLoadException("Failed to load bound file");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load bound file");
 
         std::uint16_t count;
         if (stream.read(&count, sizeof(count)) != sizeof(count))
-            throw Gx::ResourceLoadException("Failed to load bound file");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load bound file");
 
         for (std::size_t i = 0; i < count; i++)
         {
             auto bound = ControlList::Bound();
             if (stream.read(&bound, sizeof(bound)) != sizeof(bound))
-                throw Gx::ResourceLoadException("Failed to load bound file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load bound file");
 
             bounds.push_back(bound);
         }

@@ -41,11 +41,11 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const MusicMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
 
         const auto size = Gx::FileSystem::GetFileSize(metadata->Source);
         if (!size.has_value())
-            throw Gx::ResourceLoadException("Failed to determine resource size.");
+            throw Gx::ResourceLoadException(context.GetID(), "Failed to determine resource size.");
 
         auto data = new std::uint8_t[size.value()];
         if (!Gx::FileSystem::ReadFile(metadata->Source, data, size.value()).has_value())

@@ -64,7 +64,7 @@ namespace Cx
         auto avatar = std::make_unique<Avatar>();
         const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
 
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (metadata->Position != sf::Vector2f())

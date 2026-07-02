@@ -31,7 +31,7 @@ namespace Cx
             if (param.empty())
             {
                 if (!optional)
-                    throw Gx::ResourceLoadException("Invalid ControlList: Invalid number parameters.");
+                    throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Invalid number parameters.");
 
                 return 0;
             }
@@ -59,7 +59,7 @@ namespace Cx
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(ctx.GetID(), fileName.string());
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, ctx);
@@ -78,7 +78,7 @@ namespace Cx
         source.resize(size);
 
         if (!stream.read(source.data(), source.size()).has_value())
-            throw Gx::ResourceLoadException("Failed to load the resource");
+            throw Gx::ResourceLoadException(ctx.GetID(), ctx.GetID());
 
 
         return Parse(std::istringstream(source.data()), m_mapBounds, ctx);
@@ -119,7 +119,7 @@ namespace Cx
                         return result;
                 }
                 else
-                    throw Gx::ResourceLoadException("Invalid count token: " + token);
+                    throw Gx::ResourceLoadException(ctx.GetID(), "Invalid count token: " + token);
 
                 continue;
             }
@@ -147,7 +147,7 @@ namespace Cx
 
                 readLine = ReadLine(source);
                 if (!readLine.has_value())
-                    throw Gx::ResourceLoadException("Invalid ControlList: Expected '}' token. Got: EOF");
+                    throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Expected '}' token. Got: EOF");
 
                 line = readLine.value();
                 if (line.empty() || Gx::StringHelper::StartsWith(line, "//"))
@@ -156,7 +156,7 @@ namespace Cx
                 if (!started)
                 {
                     if (!Gx::StringHelper::StartsWith(line, "{"))
-                        throw Gx::ResourceLoadException("Invalid ControlList: Expected '{' token. Got: " + token);
+                        throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Expected '{' token. Got: " + token);
 
                     started = true;
                     continue;
@@ -171,7 +171,7 @@ namespace Cx
                 if (token == "BOUND")
                 {
                     if (!bounds.empty())
-                        throw Gx::ResourceLoadException("Invalid ControlList: Duplicate 'BOUND's");
+                        throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Duplicate 'BOUND's");
 
                     std::string fileName;
                     stream >> fileName;
@@ -183,7 +183,7 @@ namespace Cx
                     auto boundLoader = BoundLoader();
                     auto bnd = boundLoader.LoadFromFile(fileName, ctx);
                     if (bnd == nullptr)
-                        throw Gx::ResourceLoadException("Invalid ControlList: Invalid number of 'BOUND' element");
+                        throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Invalid number of 'BOUND' element");
 
                     for (const auto& b : *bnd)
                         bounds.push_back(b);
@@ -200,7 +200,7 @@ namespace Cx
                     {
                         readLine = ReadLine(source);
                         if (!readLine.has_value())
-                            throw Gx::ResourceLoadException("Invalid ControlList: Expected '}' token. Got: EOF");
+                            throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Expected '}' token. Got: EOF");
 
                         line = readLine.value();
                         if (Gx::StringHelper::StartsWith(line, "//"))
@@ -209,7 +209,7 @@ namespace Cx
                         if (!setStarted)
                         {
                             if (!Gx::StringHelper::StartsWith(line, "{"))
-                                throw Gx::ResourceLoadException("Invalid ControlList: Expected '{' token. Got: " + token);
+                                throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Expected '{' token. Got: " + token);
 
                             setStarted = true;
                             continue;
@@ -225,7 +225,7 @@ namespace Cx
                         stream >> token;
 
                         if (token == "SET")
-                            throw Gx::ResourceLoadException("Invalid ControlList: Nested 'SET' is not supported");
+                            throw Gx::ResourceLoadException(ctx.GetID(), "Invalid ControlList: Nested 'SET' is not supported");
 
                         auto control = ParseControl(stream, token);
                         if (!bounds.empty())

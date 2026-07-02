@@ -263,7 +263,7 @@ namespace Cx
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
@@ -287,17 +287,17 @@ namespace Cx
 
         std::uint16_t signature;
         if (stream.read(&signature, sizeof(signature)) != sizeof(signature))
-            throw Gx::ResourceLoadException("Failed to read file signature");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read file signature");
 
         if (signature != 0 && signature != 1)
-            throw Gx::ResourceLoadException(fmt::format("Invalid signature ({})", std::to_string(signature)));
+            throw Gx::ResourceLoadException(ctx.GetID(), fmt::format("Invalid signature ({})", std::to_string(signature)));
 
         TextureFormat format;
         if (stream.read(&format, sizeof(format)) != sizeof(format))
-            throw Gx::ResourceLoadException("Failed to read texture format");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read texture format");
 
         if (format != TextureFormat::OJS && format != TextureFormat::OJA)
-            throw Gx::ResourceLoadException(fmt::format("Invalid texture format ({})", std::to_string(static_cast<std::uint16_t>(format))));
+            throw Gx::ResourceLoadException(ctx.GetID(), fmt::format("Invalid texture format ({})", std::to_string(static_cast<std::uint16_t>(format))));
 
         auto fileName = ctx.GetID();
         std::transform(fileName.begin(), fileName.end(), fileName.begin(),
@@ -310,14 +310,14 @@ namespace Cx
 
         std::uint16_t frameCount;
         if (stream.read(&frameCount, sizeof(frameCount)) != sizeof(frameCount))
-            throw Gx::ResourceLoadException("Failed to read frame count");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read frame count");
 
         if (frameCount == 0)
             return nullptr;
 
         std::uint16_t transCode;
         if (stream.read(&transCode, sizeof(transCode)) != sizeof(transCode))
-            throw Gx::ResourceLoadException("Failed to read alpha channel");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read alpha channel");
 
         auto transparencyColor = sf::Color(255, 82, 255);
         if (transCode != 0)
@@ -332,7 +332,7 @@ namespace Cx
         {
             sf::Rect<std::int16_t> frame;
             if (stream.read(&frame, sizeof(frame)) != sizeof(frame))
-                throw Gx::ResourceLoadException("Failed to read sprite bound");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read sprite bound");
 
             frames.push_back(sf::IntRect{
                 {frame.position.x, frame.position.y} ,
@@ -341,13 +341,13 @@ namespace Cx
 
             std::uint32_t offset;
             if (stream.read(&offset, sizeof(offset)) != sizeof(offset))
-                throw Gx::ResourceLoadException("Failed to read texture offset");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read texture offset");
 
             offset += dataOffset;
 
             std::uint32_t size;
             if (stream.read(&size, sizeof(size)) != sizeof(size))
-                throw Gx::ResourceLoadException("Failed to read texture size");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read texture size");
 
             std::uint32_t unk;
             if (stream.read(&unk, sizeof(unk)) != sizeof(unk))
@@ -355,17 +355,17 @@ namespace Cx
 
             const std::size_t position = stream.tell().value_or(0);
             if (position == 0)
-                throw Gx::ResourceLoadException("Unsupported stream");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Unsupported stream");
 
             if (stream.seek(offset).value_or(0) != offset)
-                throw Gx::ResourceLoadException("Unsupported stream");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Unsupported stream");
 
             auto bytes = std::vector<std::uint8_t>(size);
             if (stream.read(bytes.data(), size) != size)
-                throw Gx::ResourceLoadException("Failed to read texture data");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read texture data");
 
             if (stream.seek(position).value_or(0) != position)
-                throw Gx::ResourceLoadException("Unsupported stream");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Unsupported stream");
 
             auto image = sf::Image();
             if (format == TextureFormat::OJI)

@@ -18,14 +18,14 @@ namespace Cx
 
         const auto inputStream = Gx::FileSystem::Open(fileName);
         if (!inputStream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         auto& stream = *inputStream.get();
 
         auto itemData = Instantiate(ctx);
         std::uint32_t count;
         if (stream.read(&count, sizeof(count)) != sizeof(uint32_t))
-            throw Gx::ResourceLoadException("Failed to load ItemData file");
+            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
         struct ItemInfo
         {
@@ -45,21 +45,21 @@ namespace Cx
         {
             bool valid;
             if (input.read(&valid, sizeof(valid)) != sizeof(bool))
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             if (!valid)
                 return Gx::Json::object();
 
             std::uint32_t refLength;
             if (input.read(&refLength, sizeof(refLength)) != sizeof(uint32_t))
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             if (refLength == 0)
                 return Gx::Json::object();
 
             auto refBytes = std::vector<char>(refLength);
             if (input.read(refBytes.data(), refLength) != refLength)
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             auto ref = std::string(refBytes.begin(), refBytes.end());
             if (!Gx::FileSystem::Contains(ref))
@@ -79,27 +79,27 @@ namespace Cx
         {
             ItemInfo info;
             if (stream.read(&info, sizeof(ItemInfo)) != sizeof(ItemInfo))
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             std::uint8_t part;
             if (stream.read(&part, 1) != 1)
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             std::uint32_t fnLength;
             if (stream.read(&fnLength, sizeof(fnLength)) != sizeof(uint32_t))
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             auto fn = std::vector<char>(fnLength);
             if (stream.read(fn.data(), fnLength) != fnLength)
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             std::uint32_t dsLength;
             if (stream.read(&dsLength, sizeof(dsLength)) != sizeof(uint32_t))
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             auto ds = std::vector<char>(dsLength);
             if (stream.read(ds.data(), dsLength) != dsLength)
-                throw Gx::ResourceLoadException("Failed to load ItemData file");
+                throw Gx::ResourceLoadException(ctx.GetID(), "Failed to load ItemData file");
 
             auto item = ItemMetadata();
             item.ID            = info.ID;
@@ -193,7 +193,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ItemData*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
 
         return std::make_unique<ItemData>(*metadata);
     }

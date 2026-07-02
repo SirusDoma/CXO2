@@ -12,7 +12,7 @@ namespace Cx
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(fileName.string());
 
         auto resource = std::make_unique<sf::Texture>();
         if (!resource->loadFromStream(*stream))

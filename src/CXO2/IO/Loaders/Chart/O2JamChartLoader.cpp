@@ -26,7 +26,7 @@ namespace Cx
     {
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
-            throw Gx::ResourceLoadException("Failed to open the file: " + fileName.string());
+            throw Gx::ResourceLoadException(ctx.GetID(), fileName.string());
 
         auto& inputStream = *stream.get();
         auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
@@ -51,7 +51,7 @@ namespace Cx
 
         auto metadata = O2JamChartMetadata{};
         if (!stream.seek(0).has_value())
-            throw Gx::ResourceLoadException("Failed to open the stream");
+            throw Gx::ResourceLoadException(ctx.GetID());
 
         if (stream.read(&metadata, O2JamChartMetadata::Size) != O2JamChartMetadata::Size)
             return nullptr;
@@ -147,7 +147,7 @@ namespace Cx
             {
                 auto block = NoteBlockHeader();
                 if (stream.read(&block, sizeof(NoteBlockHeader)) != sizeof(NoteBlockHeader))
-                    throw Gx::ResourceLoadException("Failed to read the note block");
+                    throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read the note block");
 
                 // ====================================================================================================
                 // WARNING: Channel::Background will not map, but this will retain the original channel value.
@@ -173,7 +173,7 @@ namespace Cx
                     {
                         float value;
                         if (stream.read(&value, sizeof(value)) != sizeof(value))
-                            throw Gx::ResourceLoadException("Failed to read time event value");
+                            throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read time event value");
 
                         if (value == 0.f)
                             continue;
@@ -187,7 +187,7 @@ namespace Cx
 
                     auto note = NoteEventHeader();
                     if (stream.read(&note, sizeof(NoteEventHeader)) != sizeof(NoteEventHeader))
-                        throw Gx::ResourceLoadException("Failed to read note event id");
+                        throw Gx::ResourceLoadException(ctx.GetID(), "Failed to read note event id");
 
                     // Ignore padding event
                     if (note.ID == 0)

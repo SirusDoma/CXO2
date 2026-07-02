@@ -17,7 +17,7 @@ namespace Cx
     {
         StateMetadata metadata;
         if (json.find("name") == json.end())
-            throw Gx::ResourceLoadException("State must have a name");
+            throw Gx::ResourceLoadException(ctx.GetID(), "State must have a name");
 
         if (!MetadataLoader::Parse(json, metadata, ctx))
             return nullptr;

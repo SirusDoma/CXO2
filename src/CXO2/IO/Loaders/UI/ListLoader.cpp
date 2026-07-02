@@ -132,7 +132,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException("The specified metadata is incompatible");
+            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
     
         auto list = Instantiate(context);
         list->SetName(metadata->Name);
