@@ -49,7 +49,8 @@ jobs:
             dist_name: win32
             c_compiler: cl
             cpp_compiler: cl
-            cmake_flags: '-T host=x86 -A Win32'
+            msvc_arch: x86
+            cmake_flags: '-G Ninja'
             output_dir: /bin/windows/
           - os: macos-14
             enabled: ${{ inputs.osx_arm64 }}
@@ -131,6 +132,29 @@ jobs:
             libflac-dev
         fi
 
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          # Configure msvc arch
+          VSWHERE="/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+          VS_PATH=$("$VSWHERE" -latest -property installationPath | tr -d '\r')
+          VCVARS_BAT="$(cygpath -u "$RUNNER_TEMP")/vcvars_dump.bat"
+          {
+            echo '@echo off'
+            echo "call \"$VS_PATH\\VC\\Auxiliary\\Build\\vcvarsall.bat\" ${{ matrix.msvc_arch }} >nul"
+            echo 'set'
+          } > "$VCVARS_BAT"
+          # Diff the environment before/after vcvarsall and export only what it changed.
+          comm -13 \
+            <(cmd.exe //C set | tr -d '\r' | sort) \
+            <(cmd.exe //C "$(cygpath -w "$VCVARS_BAT")" | tr -d '\r' | sort) \
+          | while IFS='=' read -r name value; do
+              case "$name" in
+                ''|*' '*) ;;
+                Path|PATH) printf '%s\n' "$value" | tr ';' '\n' >> "$GITHUB_PATH" ;;
+                *) printf '%s=%s\n' "$name" "$value" >> "$GITHUB_ENV" ;;
+              esac
+            done
+        fi
+
         # Strings variables
         echo "build-type=${{ matrix.build_type }}" >> "$GITHUB_OUTPUT"
         echo "build-type-flag=$(echo '${{ matrix.build_type }}' | tr '[:lower:]' '[:upper:]')" >> "$GITHUB_OUTPUT"
@@ -151,7 +175,6 @@ jobs:
       if: ${{ matrix.enabled }}
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -G Ninja
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
