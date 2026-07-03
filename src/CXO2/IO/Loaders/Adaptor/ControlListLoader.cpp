@@ -21,7 +21,7 @@ namespace Cx
             if (!std::getline(source, line))
                 return std::nullopt;
 
-            return Gx::StringHelper::Trim(line);
+            return Gx::StringHelper::Trim(line).toAnsiString();
         }
 
         std::uint32_t ParseNextIntegerParam(std::istringstream& stream, const bool optional = false)

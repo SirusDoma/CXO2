@@ -160,7 +160,7 @@ namespace Cx
                 items.push_back(item.ID);
         }
 
-        characterInfo["name"]       = m_characterInfo.Name;
+        characterInfo["name"]       = m_characterInfo.Name.toAnsiString();
         characterInfo["gender"]     = magic_enum::enum_name(m_characterInfo.Gender);
         characterInfo["level"]      = m_characterInfo.Level;
         characterInfo["gems"]       = m_characterInfo.Wallet.Gem;

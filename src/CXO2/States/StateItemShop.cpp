@@ -930,25 +930,39 @@ namespace Cx
                         constexpr unsigned int bounds = 160;
                         auto string = item->GetDescription();
 
-                        std::size_t checkpoint = 0;
-                        for (std::size_t c = 0; c < string.getSize(); c++)
+                        bool wrapped = true;
+                        while (wrapped)
                         {
-                            if (string[c] == '\n')
-                                continue;
+                            wrapped = false;
 
-                            if (string[c] == ' ')
+                            std::size_t checkpoint = 0;
+                            for (const auto& glyph : descriptionLabel->GetShapedGlyphs())
                             {
-                                checkpoint = c;
-                                continue;
-                            }
+                                const auto c = static_cast<std::size_t>(glyph.cluster);
+                                if (c >= string.getSize() || string[c] == '\n')
+                                    continue;
 
-                            const auto position = descriptionLabel->FindCharacterPosition(c);
-                            if (position.x > descriptionLabel->GetPosition().x + bounds)
-                            {
-                                string.replace(checkpoint, 1, "\n");
-                                descriptionLabel->SetString(string);
+                                if (string[c] == ' ')
+                                {
+                                    checkpoint = c;
+                                    continue;
+                                }
 
-                                c = 0;
+                                const auto position = descriptionLabel->GetTransform().transformPoint(glyph.position);
+                                if (position.x > descriptionLabel->GetPosition().x + bounds)
+                                {
+                                    if (string[checkpoint] == '\n')
+                                    {
+                                        checkpoint = 0;
+                                        continue;
+                                    }
+
+                                    string.replace(checkpoint, 1, "\n");
+                                    descriptionLabel->SetString(string);
+
+                                    wrapped = true;
+                                    break;
+                                }
                             }
                         }
 

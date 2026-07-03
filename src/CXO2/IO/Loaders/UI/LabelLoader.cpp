@@ -88,7 +88,7 @@ namespace Cx
         label->SetOrigin(metadata->Origin);
         label->SetScale(metadata->Scale);
         label->SetRotation(metadata->Rotation);
-        label->SetAlignment(metadata->Alignment);
+        label->SetLineAlignment(metadata->Alignment);
 
         if (metadata->Kerning > 0)
             label->SetLetterSpacing(metadata->Kerning);
@@ -172,15 +172,12 @@ namespace Cx
             metadata.OutlineColor = sf::Color::Transparent;
         }
 
+        metadata.Alignment = Gx::Text::LineAlignment::Default;
         if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
         {
-            if (auto parsed = magic_enum::enum_cast<Gx::Label::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            if (auto parsed = magic_enum::enum_cast<Gx::Text::LineAlignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                 metadata.Alignment = parsed.value();
-            else
-                metadata.Alignment = Gx::Label::Alignment::None;
         }
-        else
-            metadata.Alignment = Gx::Label::Alignment::None;
 
         return true;
     }

@@ -279,7 +279,7 @@ namespace Cx
             {
                 // TODO: Handle Big Endian
                 auto* ptr = reinterpret_cast<std::uint32_t*>(bytes.data());
-                data = sf::String::fromUtf16(ptr, ptr + bytes.size() / sizeof(std::uint32_t));
+                data = sf::String::fromUtf32(ptr, ptr + bytes.size() / sizeof(std::uint32_t));
 
                 break;
             }
