@@ -153,7 +153,7 @@ namespace Cx
         const ChartMetadata& GetMetadata() const;
         void SetMetadata(const ChartMetadata& metadata);
 
-        template<typename T>
+        template<typename T, std::enable_if_t<std::is_base_of_v<Event, T>, int> = 0>
         T* AddEvent(Difficulty diff, T &&ev);
         const EventList& GetEvents(Difficulty diff) const;
         std::size_t GetEventCount(Difficulty diff) const;

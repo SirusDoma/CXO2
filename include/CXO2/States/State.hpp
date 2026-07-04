@@ -33,13 +33,13 @@ namespace Cx
         explicit State(const std::string& name);
         State(const std::string& name, Gx::ResourceManager& resources);
 
-        template<typename R>
+        template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R> || std::is_base_of_v<sf::SoundSource, R>, int> = 0>
         R* Instantiate(const std::string& source, ResourceScope scope = ResourceScope::Local);
 
-        template<typename R>
+        template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R>, int> = 0>
         R* Instantiate(const R& prefab, ResourceScope scope = ResourceScope::Immediate);
 
-        template<typename R>
+        template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R>, int> = 0>
         R* Import(Gx::ResourcePtr<R> resource, ResourceScope scope = ResourceScope::Local);
 
         template<typename R>

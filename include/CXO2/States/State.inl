@@ -7,15 +7,9 @@
 
 namespace Cx
 {
-    template<typename R>
+    template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R> || std::is_base_of_v<sf::SoundSource, R>, int>>
     R* State::Instantiate(const std::string& source, const ResourceScope scope)
     {
-        static_assert(
-            std::is_base_of_v<Gx::Node, R> ||
-            std::is_base_of_v<sf::SoundSource, R>,
-            "Parameter must be a Gx::Node or sf::SoundSource"
-        );
-
         if constexpr (std::is_base_of_v<Gx::Node, R>)
         {
             if (auto resource = FindChild<R>(source))
@@ -55,14 +49,9 @@ namespace Cx
         return instance;
     }
 
-    template<typename R>
+    template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R>, int>>
     R* State::Instantiate(const R& prefab, const ResourceScope scope)
     {
-        static_assert(
-            std::is_base_of_v<Gx::Node, R>,
-            "Parameter must be a Gx::Node"
-        );
-
         auto resources = m_tempResources.get();
         if (scope == ResourceScope::Shared)
             resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
@@ -79,14 +68,9 @@ namespace Cx
         return &instance;
     }
 
-    template<typename R>
+    template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R>, int>>
     R* State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
     {
-        static_assert(
-            std::is_base_of_v<Gx::Node, R>,
-            "Parameter must be a Gx::Node"
-        );
-
         if (const auto node = dynamic_cast<Gx::Node*>(resource.get()); node)
             return Import<R>(GetName() + "/" + node->GetName(), std::move(resource), scope);
 

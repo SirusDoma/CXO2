@@ -2,11 +2,9 @@
 
 namespace Cx
 {
-    template<typename T>
+    template<typename T, std::enable_if_t<std::is_base_of_v<Chart::Event, T>, int>>
     T* Chart::AddEvent(const Difficulty diff, T &&ev)
     {
-        static_assert(std::is_base_of_v<Event, T>, "Parameter must be an Event");
-
         double position = ev.Position;
         if constexpr (std::is_same_v<NoteEvent, T>)
             position += ev.Length;
