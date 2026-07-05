@@ -4,6 +4,7 @@
 #include <CXO2/Core/Chart.hpp>
 #include <CXO2/Core/ChartRenderer.hpp>
 #include <CXO2/Config/GameConfig.hpp>
+#include <CXO2/Services/PlayingService.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
@@ -14,12 +15,6 @@
 
 namespace Cx
 {
-    struct PlayingMemberStatsUpdateEventData;
-    struct PlayingMemberScoreSubmissionEventData;
-    struct PlayingMemberLeftEventData;
-    struct GameCompletedEventData;
-
-    class PlayingService;
     class SessionContext;
     class RoomContext;
     class GameContext;
@@ -47,10 +42,10 @@ namespace Cx
         unsigned int GetViewport() const;
         void SetViewport(unsigned int viewport);
 
-        void OnMemberStatsUpdate(const PlayingMemberStatsUpdateEventData& ev);
-        void OnMemberScoreSubmitted(const PlayingMemberScoreSubmissionEventData& ev);
-        void OnMemberLeft(const PlayingMemberLeftEventData& ev);
-        void OnGameCompleted(const GameCompletedEventData& ev);
+        void OnMemberStatsUpdate(const MessageEnvelope<PlayingMemberStatsUpdateEventData>& ev);
+        void OnMemberScoreSubmitted(const MessageEnvelope<PlayingMemberScoreSubmissionEventData>& ev);
+        void OnMemberLeft(const MessageEnvelope<PlayingMemberLeftEventData>& ev);
+        void OnGameCompleted(const MessageEnvelope<GameCompletedEventData>& ev);
 
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
         void OnKeyReleased(const sf::Event::KeyReleased& ev) override;

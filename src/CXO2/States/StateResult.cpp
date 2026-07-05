@@ -201,29 +201,42 @@ namespace Cx
             sender.SetEnabled(false);
             btnBack->SetEnabled(false);
 
-            const auto errorCallback = [this] (const auto& ex)
+            const auto showError = [this] (const Gx::Exception& e)
             {
-                Invoke([=]
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [this] (bool)
                 {
-                    ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                    {
-                        GetDirector().Dismiss<StatePlanet>();
-                    });
+                    GetDirector().Dismiss<StatePlanet>();
                 });
             };
 
-
-            m_service.ConfirmResult(nullptr, nullptr);
-            m_waiting.UpdateReadyState([=]
+            m_service.ConfirmResult();
+            m_waiting.UpdateReadyState([=] (const auto& ev)
             {
-                m_waiting.StartGame([=]
+                try
                 {
-                    GetDirector().Present<StateLoading>();
-                },
-                errorCallback);
-            },
-            errorCallback);
+                    const auto& _ = ev.Open();
+                }
+                catch (const Gx::Exception& e)
+                {
+                    showError(e);
+                    return;
+                }
 
+                m_waiting.StartGame([=] (const auto& e)
+                {
+                    try
+                    {
+                        const auto& _ = e.Open();
+                    }
+                    catch (const Gx::Exception& e)
+                    {
+                        showError(e);
+                        return;
+                    }
+
+                    GetDirector().Present<StateLoading>();
+                });
+            });
         });
 
 
@@ -236,23 +249,22 @@ namespace Cx
         btnBack->SetClickCallback([this] (auto& sender, const auto&)
         {
             sender.SetEnabled(false);
-            m_service.ConfirmResult([=]
+            m_service.ConfirmResult([=] (const auto& ev)
             {
-                Invoke([=]
+                try
                 {
+                    const auto& _ = ev.Open();
+
                     GetDirector().Dismiss<StateWaiting7K>();
-                });
-            },
-            [=] (const auto& ex)
-            {
-                Invoke([=]
+                }
+                catch (const Gx::Exception& e)
                 {
                     StopAll();
-                    ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                    ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                     {
                         GetDirector().Dismiss<StatePlanet>();
                     });
-                });
+                }
             });
         });
 

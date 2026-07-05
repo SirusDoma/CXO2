@@ -4,11 +4,14 @@
 #include <CXO2/O2.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
 
-#include <CXO2/Network/NetworkAdapter.hpp>
+#include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Messages/Requests/AuthRequest.hpp>
+#include <CXO2/Messages/Requests/PingRequest.hpp>
 #include <CXO2/Messages/Responses/AuthResponse.hpp>
+#include <CXO2/Messages/Responses/PingResponse.hpp>
 
 #include <CXO2/Models/Planet.hpp>
+#include <CXO2/Services/MessageService.hpp>
 #include <CXO2/UI/Planet/ChannelBoard.hpp>
 
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
@@ -16,8 +19,6 @@
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
-#include <CXO2/Services/AuthService.hpp>
-#include <CXO2/Services/NetworkService.hpp>
 
 namespace Cx
 {
@@ -25,10 +26,16 @@ namespace Cx
 
     class AuthService;
     class PlanetService;
-    StatePlanet::StatePlanet(Gx::AudioMixer& mixer, SessionContext& session, NetworkService& network, AuthService& auth, PlanetService& service) :
+    StatePlanet::StatePlanet(
+        Gx::AudioMixer& mixer,
+        SessionContext& session,
+        MessageService& messages,
+        AuthService& auth,
+        PlanetService& service
+    ) :
         m_mixer(mixer),
+        m_messages(messages),
         m_auth(auth),
-        m_network(network),
         m_service(service),
         m_session(session)
     {
@@ -37,7 +44,8 @@ namespace Cx
     void StatePlanet::Initialize()
     {
         State::Initialize();
-        m_network.StopHeartbeat();
+
+        m_messages.StopHeartbeat();
 
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_MAIN_ROOM);
         auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -151,19 +159,19 @@ namespace Cx
             return;
         }
 
-        m_service.GetChannelList([=] (const ChannelListResponse& response)
+        m_service.GetChannelList([=] (const auto& ev)
         {
-            OnChannelListUpdated(response);
-        },
-        [=](const auto&)
-        {
-            Invoke([=]
+            try
+            {
+                OnChannelListUpdated(ev.Open());
+            }
+            catch (const NetworkException&)
             {
                 const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
                 container->SetEnabled(true);
 
                 ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
-            });
+            }
         });
     }
 
@@ -185,12 +193,17 @@ namespace Cx
             return;
         }
 
-        m_network.StartHeartbeat();
-        Invoke([=]
+        m_messages.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
         {
-            auto& director = GetDirector();
-            director.Present<StateRoom>();
+            auto state = dynamic_cast<State*>(&Gx::Application::Instance().GetModule<Gx::SceneDirector>().GetPresentingScene());
+            state->ShowDialog("Network is not in a good condition. Please try again a little while later.", DialogStyle::Information, false, [] (bool)
+            {
+                Gx::Application::Instance().GetModule<Gx::SceneDirector>().Present<StatePlanet>();
+            });
         });
+
+        auto& director = GetDirector();
+        director.Present<StateRoom>();
     }
 
     void StatePlanet::OnMusicHallSelected(const MusicHall hall)
@@ -201,36 +214,20 @@ namespace Cx
         const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
         channelBoard->SetEnabled(false);
 
-        m_network.Start(hall, [=] (const bool success)
+        m_auth.Authenticate(hall, AuthRequest{m_session.GetToken()},
+        [=] (const auto& ev)
         {
-            Invoke([=]
+            try
             {
-                if (!success)
-                {
-                    container->SetEnabled(true);
-                    ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
-
-                    return;
-                }
-
-                m_auth.Authenticate(hall, m_session.GetToken(),
-                [=] (const auto& response)
-                {
-                    Invoke([=]
-                    {
-                        m_session.SetMusicHall(hall);
-                        OnAuthenticated(response.ResultCode);
-                    });
-                },
-                [=] (const auto& ex)
-                {
-                    Invoke([=]
-                    {
-                        container->SetEnabled(true);
-                        ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
-                    });
-                });
-            });
+                const auto& response = ev.Open();
+                m_session.SetMusicHall(hall);
+                OnAuthenticated(response.ResultCode);
+            }
+            catch (const NetworkException&)
+            {
+                container->SetEnabled(true);
+                ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+            }
         });
     }
 
@@ -246,18 +243,18 @@ namespace Cx
         m_session.SetChannelID(channelID);
 
         m_service.Login(ChannelLoginRequest{serverID, channelID},
-        [=] (const ChannelLoginResponse& response)
+        [=] (const auto& ev)
         {
-            OnChannelLogin(response);
-        },
-        [=] (const auto&)
-        {
-            Invoke([=]
+            try
+            {
+                OnChannelLogin(ev.Open());
+            }
+            catch (const NetworkException&)
             {
                 ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
                 container->SetEnabled(true);
                 channelBoard->SetEnabled(true);
-            });
+            }
         });
     }
 }

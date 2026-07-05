@@ -84,7 +84,7 @@ namespace Cx
             {
                 m_mixer.Play(*sfxEnter, Sound::Channel::SFX);
                 if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < static_cast<int>(m_channels.size()))
-                    m_callback(m_hall, m_channels[m_selectedChannel].ServerID, m_channels[m_selectedChannel].ID);
+                    m_callback(m_hall, m_channels[m_selectedChannel].GatewayID, m_channels[m_selectedChannel].ID);
             }
         );
 

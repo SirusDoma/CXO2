@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CXO2/Models/Room.hpp>
+#include <CXO2/Models/Character.hpp>
 #include <CXO2/Network/Packet.hpp>
 #include <CXO2/Messages/Commands.hpp>
 #include <CXO2/Messages/MapInfo.hpp>
@@ -27,7 +28,7 @@ namespace Cx
         {
             std::string Name{};
             int         Level{};
-            Cx::Gender    Gender{};
+            Cx::Gender  Gender{};
             bool        IsRoomMaster{};
             RoomTeam    Team{};
             bool        Ready{};
@@ -43,16 +44,16 @@ namespace Cx
             MemberInfo    Member{};
         };
 
-        JoinResult    Result{};
-        std::uint8_t  SlotID{};
-        RoomTeam      Team{};
-        std::string   Title{};
-        std::uint32_t MusicID{};
-        MapInfo       Map{};
-        GameMode      Mode{};
-        Cx::Difficulty  Difficulty{};
-        std::uint8_t  SpeedID{};
-        std::uint32_t UserCount{};
+        JoinResult     Result{};
+        std::uint8_t   SlotID{};
+        RoomTeam       Team{};
+        std::string    Title{};
+        std::uint32_t  MusicID{};
+        MapInfo        Map{};
+        GameMode       Mode{};
+        Cx::Difficulty Difficulty{};
+        std::uint8_t   SpeedID{};
+        std::uint32_t  UserCount{};
 
         CollectionEnvelope<std::vector<SlotInfo>> Slots{8, 8};
     };

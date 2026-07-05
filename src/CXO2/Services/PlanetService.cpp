@@ -2,7 +2,7 @@
 
 #include <CXO2/Contexts/SessionContext.hpp>
 
-#include <CXO2/Network/NetworkAdapter.hpp>
+#include <CXO2/Services/MessageService.hpp>
 #include <CXO2/Messages/Requests/ChannelListRequest.hpp>
 #include <CXO2/Messages/Requests/ChannelLoginRequest.hpp>
 #include <CXO2/Messages/Requests/SendMusicListRequest.hpp>
@@ -12,55 +12,62 @@
 
 namespace Cx
 {
-    PlanetOnlineService::PlanetOnlineService(NetworkAdapter& adapter, SessionContext& session) :
-        m_adapter(adapter),
+    PlanetOnlineService::PlanetOnlineService(MessageService& messages, SessionContext& session) :
+        m_messages(messages),
         m_session(session)
     {
     }
 
     void PlanetOnlineService::GetChannelList(
-        const std::function<void(const ChannelListResponse&)> callback,
-        const std::function<void(const NetworkException&)> errorCallback
+        const MessageCallback<ChannelListResponse>& callback
     ) const
     {
-        m_adapter.Exchange<ChannelListRequest, ChannelListResponse>(
+        m_messages.Dispatch<ChannelListRequest, ChannelListResponse>(
             ChannelListRequest{},
-            callback,
-            errorCallback
+            callback
         );
     }
 
     void PlanetOnlineService::Login(
         const ChannelLoginRequest& request,
-        const std::function<void(const ChannelLoginResponse&)> callback,
-        const std::function<void(const NetworkException&)> errorCallback
+        const MessageCallback<ChannelLoginResponse>& callback
     ) const
     {
-        m_adapter.Exchange<ChannelLoginRequest, ChannelLoginResponse>(request, [=] (const ChannelLoginResponse& response)
+        m_messages.Dispatch<ChannelLoginRequest, ChannelLoginResponse>(request, [this, callback] (const MessageEnvelope<ChannelLoginResponse>& envelope)
         {
-            if (!response.Full)
+            try
             {
-                auto list = std::vector<std::uint32_t>();
-                for (auto& header : m_session.GetInstalledMusic())
-                    list.push_back(header.ID);
-
-                const auto status = m_adapter.Send(SendMusicListRequest{ list });
-                if (status != sf::Socket::Status::Done)
+                const auto& response = envelope.Open();
+                if (!response.Full)
                 {
-                    if (errorCallback)
-                        errorCallback(ConnectionException(status));
+                    auto list = std::vector<std::uint32_t>();
+                    for (auto& header : m_session.GetInstalledMusic())
+                        list.push_back(header.ID);
 
-                    return;
+                    m_messages.Dispatch<SendMusicListRequest>(SendMusicListRequest{ list },
+                    [callback, envelope] (const MessageEnvelope<SendMusicListRequest>& result)
+                    {
+                        try
+                        {
+                            const auto& _ = result.Open();
+                            callback(envelope);
+                        }
+                        catch (...)
+                        {
+                            callback(std::current_exception());
+                        }
+                    });
                 }
             }
-
-            callback(response);
-        }, errorCallback);
+            catch (...)
+            {
+                callback(std::current_exception());
+            }
+        });
     }
 
     void PlanetOfflineService::GetChannelList(
-        const std::function<void(const ChannelListResponse&)> callback,
-        std::function<void(const NetworkException&)> /*onError*/
+        const MessageCallback<ChannelListResponse>& callback
     ) const
     {
         ChannelListResponse response;
@@ -70,7 +77,7 @@ namespace Cx
             for (unsigned int i = 1; i <= 20; i++)
             {
                 ChannelListResponse::ChannelState state;
-                state.ServerID  = 0;
+                state.GatewayID = 0;
                 state.ID        = static_cast<std::uint16_t>((x * 20) + i);
                 state.Capacity  = 100;
                 state.UserCount = static_cast<std::uint32_t>((i / 20.f) * 100.f);
@@ -85,8 +92,7 @@ namespace Cx
 
     void PlanetOfflineService::Login(
         const ChannelLoginRequest& /*request*/,
-        const std::function<void(const ChannelLoginResponse&)> callback,
-        std::function<void(const NetworkException&)> /*onError*/
+        const MessageCallback<ChannelLoginResponse>& callback
     ) const
     {
         ChannelLoginResponse response;

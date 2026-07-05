@@ -12,7 +12,7 @@ namespace Cx
     class NetworkException : public Gx::Exception
     {
     public:
-        explicit NetworkException(const std::runtime_error& ex) : Exception(ex.what()) {}
+        explicit NetworkException(const std::exception& ex) : Exception(ex.what()) {}
 
     protected:
         explicit NetworkException(const std::string& message) : Exception(message) {}
@@ -35,6 +35,12 @@ namespace Cx
 
     private:
         sf::Socket::Status m_status;
+    };
+
+    class ProtocolException : public NetworkException
+    {
+    public:
+        explicit ProtocolException(const std::string& message = "Invalid network protocol.") : NetworkException(message) {}
     };
 
     class TimeoutException : public NetworkException

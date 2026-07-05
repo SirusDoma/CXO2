@@ -2,9 +2,41 @@
 
 #include <magic_enum/magic_enum.hpp>
 #include <cstring>
+#include <limits>
 
 namespace Cx
 {
+    template<typename T>
+    Packet::Prefix Packet::Prefix::Of()
+    {
+        auto prefix = Prefix();
+        prefix.m_size = sizeof(T);
+        prefix.m_max  = static_cast<std::size_t>(std::numeric_limits<T>::max());
+
+        prefix.m_encode = [](void* buffer, const std::size_t value)
+        {
+            const auto prefixValue = static_cast<T>(value);
+            std::memcpy(buffer, &prefixValue, sizeof(T));
+        };
+
+        prefix.m_decode = [](const void* buffer) -> std::size_t
+        {
+            T prefixValue{};
+            std::memcpy(&prefixValue, buffer, sizeof(T));
+
+            return static_cast<std::size_t>(prefixValue);
+        };
+
+        return prefix;
+    }
+
+    template<typename T>
+    std::enable_if_t<std::is_unsigned_v<T> && !std::is_same_v<T, bool>, void>
+    Packet::UsePrefix()
+    {
+        m_prefix = Prefix::Of<T>();
+    }
+
     template<typename T>
     std::enable_if_t<std::is_enum_v<T>, Packet&>
     Packet::operator>>(T& data)
@@ -22,7 +54,7 @@ namespace Cx
     {
         boost::pfr::for_each_field(data, [this] (auto& value)
         {
-           auto _ = *this >> value;
+            auto _ = *this >> value;
         });
 
         return *this;

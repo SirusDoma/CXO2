@@ -11,7 +11,7 @@ namespace Cx
 
         struct ChannelState
         {
-            std::uint16_t ServerID   = 0;
+            std::uint16_t GatewayID  = 0;
             std::uint16_t ID         = 0;
             std::uint32_t Capacity   = 100;
             std::uint32_t UserCount  = 0;

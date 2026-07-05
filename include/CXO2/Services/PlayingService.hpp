@@ -1,95 +1,127 @@
 #pragma once
 
-#include <CXO2/Services/EventService.hpp>
+#include <CXO2/Services/Service.hpp>
+#include <CXO2/Services/MessageService.hpp>
+
+#include <CXO2/Messages/Requests/ConfirmMusicLoadedRequest.hpp>
+#include <CXO2/Messages/Requests/ExitPlayingRequest.hpp>
+#include <CXO2/Messages/Requests/SubmitScoreRequest.hpp>
+#include <CXO2/Messages/Requests/UpdateGameStatsRequest.hpp>
+
+#include <CXO2/Messages/Events/MemberMusicLoadedEventData.hpp>
+#include <CXO2/Messages/Events/PlayingMemberStatsUpdateEventData.hpp>
+#include <CXO2/Messages/Events/PlayingMemberScoreSubmissionEventData.hpp>
+#include <CXO2/Messages/Events/PlayingMemberLeftEventData.hpp>
+#include <CXO2/Messages/Events/GameCompletedEventData.hpp>
+
 #include <functional>
 
 namespace Cx
 {
-    struct ScoreResultEntry;
-    struct SubmitScoreRequest;
-    struct GameCompletedEventData;
-
-    class NetworkAdapter;
-    class NetworkException;
     class GameContext;
     class SessionContext;
     class PlayingService : public virtual Service
     {
     public:
         virtual void ConfirmMusicLoaded(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ConfirmMusicLoadedRequest>& callback = nullptr
         ) const = 0;
 
         virtual void SubmitScore(
-            const SubmitScoreRequest& score,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const SubmitScoreRequest& request,
+            const MessageCallback<SubmitScoreRequest>& callback = nullptr
         ) const = 0;
 
-        virtual void UpdateLife(
-            std::uint16_t life,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
-        ) const = 0;
-
-        virtual void UpdateJam(
-            std::uint16_t jams,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+        virtual void UpdateGameStats(
+            const UpdateGameStatsRequest& request,
+            const MessageCallback<UpdateGameStatsRequest>& callback = nullptr
         ) const = 0;
 
         virtual void ExitPlaying(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const = 0;
 
         virtual void ConfirmResult(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const = 0;
+
+        virtual void SetMemberMusicLoadedEventCallback(
+            const MessageCallback<MemberMusicLoadedEventData>& callback
+        ) = 0;
+
+        virtual void SetMemberStatsUpdateEventCallback(
+            const MessageCallback<PlayingMemberStatsUpdateEventData>& callback
+        ) = 0;
+
+        virtual void SetMemberScoreSubmittedEventCallback(
+            const MessageCallback<PlayingMemberScoreSubmissionEventData>& callback
+        ) = 0;
+
+        virtual void SetMemberLeftEventCallback(
+            const MessageCallback<PlayingMemberLeftEventData>& callback
+        ) = 0;
+
+        virtual void SetGameCompletedEventCallback(
+            const MessageCallback<GameCompletedEventData>& callback
+        ) = 0;
     };
 
-    class PlayingOnlineService : public PlayingService, public EventService
+    class MessageService;
+    class PlayingOnlineService : public PlayingService
     {
     public:
-        PlayingOnlineService(NetworkAdapter& adapter, SessionContext& session, GameContext& game);
+        PlayingOnlineService(MessageService& messages, GameContext& game);
 
         void ConfirmMusicLoaded(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ConfirmMusicLoadedRequest>& callback = nullptr
         ) const override;
 
         void SubmitScore(
             const SubmitScoreRequest& request,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<SubmitScoreRequest>& callback = nullptr
         ) const override;
 
-        void UpdateLife(
-            std::uint16_t life,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
-        ) const override;
-
-        void UpdateJam(
-            std::uint16_t jams,
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+        void UpdateGameStats(
+            const UpdateGameStatsRequest& request,
+            const MessageCallback<UpdateGameStatsRequest>& callback = nullptr
         ) const override;
 
         void ExitPlaying(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const override;
 
         void ConfirmResult(
-            std::function<void()> callback,
-            const std::function<void(const NetworkException&)>& errorCallback = nullptr
+            const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const override;
 
+        void SetMemberMusicLoadedEventCallback(
+            const MessageCallback<MemberMusicLoadedEventData>& callback
+        ) override;
+
+        void SetMemberStatsUpdateEventCallback(
+            const MessageCallback<PlayingMemberStatsUpdateEventData>& callback
+        ) override;
+
+        void SetMemberScoreSubmittedEventCallback(
+            const MessageCallback<PlayingMemberScoreSubmissionEventData>& callback
+        ) override;
+
+        void SetMemberLeftEventCallback(
+            const MessageCallback<PlayingMemberLeftEventData>& callback
+        ) override;
+
+        void SetGameCompletedEventCallback(
+            const MessageCallback<GameCompletedEventData>& callback
+        ) override;
+
     private:
-        SessionContext& m_session;
-        GameContext& m_game;
+        MessageService& m_messages;
+        GameContext&    m_game;
+
+        MessageSubscriber<MemberMusicLoadedEventData>            m_musicLoadedSubscriber;
+        MessageSubscriber<PlayingMemberStatsUpdateEventData>     m_statsSubscriber;
+        MessageSubscriber<PlayingMemberScoreSubmissionEventData> m_scoreSubscriber;
+        MessageSubscriber<PlayingMemberLeftEventData>            m_leftSubscriber;
+        MessageSubscriber<GameCompletedEventData>                m_completedSubscriber;
     };
 }

@@ -36,7 +36,7 @@ namespace Cx
     {
         Normal     = 0,
         Kick       = 1,
-        Termianted = 2
+        Terminated = 2
     };
 
     enum class RoomTeam : std::uint8_t

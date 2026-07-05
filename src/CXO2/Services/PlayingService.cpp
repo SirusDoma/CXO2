@@ -1,106 +1,104 @@
 #include <CXO2/Services/PlayingService.hpp>
 
-#include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/GameContext.hpp>
 
-#include <CXO2/Network/NetworkAdapter.hpp>
-
 #include <CXO2/Messages/Requests/ExitWaitingRequest.hpp>
-#include <CXO2/Messages/Requests/ConfirmMusicLoadedRequest.hpp>
-#include <CXO2/Messages/Requests/ExitPlayingRequest.hpp>
-#include <CXO2/Messages/Requests/SubmitScoreRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateGameStatsRequest.hpp>
-
-#include <CXO2/Messages/Events/PlayingMemberStatsUpdateEventData.hpp>
-
 
 namespace Cx
 {
-    PlayingOnlineService::PlayingOnlineService(NetworkAdapter& adapter, SessionContext& session, GameContext& game) :
-        EventService(adapter),
-        m_session(session),
+    PlayingOnlineService::PlayingOnlineService(MessageService& messages, GameContext& game) :
+        m_messages(messages),
         m_game(game)
     {
     }
 
-    void PlayingOnlineService::ConfirmMusicLoaded(
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void PlayingOnlineService::ConfirmMusicLoaded(const MessageCallback<ConfirmMusicLoadedRequest>& callback) const
     {
-        GetNetworkAdapter().SendAsync<ConfirmMusicLoadedRequest>(
-            ConfirmMusicLoadedRequest{},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(ConfirmMusicLoadedRequest{}, callback);
     }
 
     void PlayingOnlineService::SubmitScore(
         const SubmitScoreRequest& request,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
+        const MessageCallback<SubmitScoreRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<SubmitScoreRequest>(
-            request,
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
-    void PlayingOnlineService::UpdateLife(
-        const std::uint16_t life,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
+    void PlayingOnlineService::UpdateGameStats(
+        const UpdateGameStatsRequest& request,
+        const MessageCallback<UpdateGameStatsRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateGameStatsRequest>(
-            UpdateGameStatsRequest{ UpdateStatsType::Life, life },
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
-    void PlayingOnlineService::UpdateJam(
-        const std::uint16_t jams,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void PlayingOnlineService::ExitPlaying(const MessageCallback<ExitPlayingRequest>& callback) const
     {
-        GetNetworkAdapter().SendAsync<UpdateGameStatsRequest>(
-            UpdateGameStatsRequest{ UpdateStatsType::Jam, jams },
-            callback,
-            errorCallback
-        );
-    }
-
-    void PlayingOnlineService::ExitPlaying(
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
-    {
-        GetNetworkAdapter().SendAsync<ExitPlayingRequest>(
-            ExitPlayingRequest{},
-            [=]
+        m_messages.Dispatch<ExitPlayingRequest>(ExitPlayingRequest{}, [this, callback] (const MessageEnvelope<ExitPlayingRequest>& result)
+        {
+            try
             {
-                if (m_game.GetMode() != GameMode::Single)
-                    GetNetworkAdapter().SendAsync<ExitWaitingRequest>(ExitWaitingRequest{}, callback, errorCallback);
-                else if (callback)
-                    callback();
-            },
-            errorCallback
-        );
+                const auto& _ = result.Open();
+            }
+            catch (...)
+            {
+                if (callback)
+                    callback(std::current_exception());
+
+                return;
+            }
+
+            if (m_game.GetMode() != GameMode::Single)
+            {
+                m_messages.Dispatch<ExitWaitingRequest>(ExitWaitingRequest{}, [callback] (const MessageEnvelope<ExitWaitingRequest>& result)
+                {
+                    try
+                    {
+                        const auto& _ = result.Open();
+
+                        if (callback)
+                            callback(ExitPlayingRequest{});
+                    }
+                    catch (...)
+                    {
+                        if (callback)
+                            callback(std::current_exception());
+                    }
+                });
+            }
+            else if (callback)
+                callback(result);
+        });
     }
 
-    void PlayingOnlineService::ConfirmResult(
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void PlayingOnlineService::ConfirmResult(const MessageCallback<ExitPlayingRequest>& callback) const
     {
-        GetNetworkAdapter().SendAsync<ExitPlayingRequest>(
-            ExitPlayingRequest{},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(ExitPlayingRequest{}, callback);
+    }
+
+    void PlayingOnlineService::SetMemberMusicLoadedEventCallback(const MessageCallback<MemberMusicLoadedEventData>& callback)
+    {
+        m_musicLoadedSubscriber = m_messages.On<MemberMusicLoadedEventData>(callback);
+    }
+
+    void PlayingOnlineService::SetMemberStatsUpdateEventCallback(const MessageCallback<PlayingMemberStatsUpdateEventData>& callback)
+    {
+        m_statsSubscriber = m_messages.On<PlayingMemberStatsUpdateEventData>(callback);
+    }
+
+    void PlayingOnlineService::SetMemberScoreSubmittedEventCallback(const MessageCallback<PlayingMemberScoreSubmissionEventData>& callback)
+    {
+        m_scoreSubscriber = m_messages.On<PlayingMemberScoreSubmissionEventData>(callback);
+    }
+
+    void PlayingOnlineService::SetMemberLeftEventCallback(const MessageCallback<PlayingMemberLeftEventData>& callback)
+    {
+        m_leftSubscriber = m_messages.On<PlayingMemberLeftEventData>(callback);
+    }
+
+    void PlayingOnlineService::SetGameCompletedEventCallback(const MessageCallback<GameCompletedEventData>& callback)
+    {
+        m_completedSubscriber = m_messages.On<GameCompletedEventData>(callback);
     }
 }

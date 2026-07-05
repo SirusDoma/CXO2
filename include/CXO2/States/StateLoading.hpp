@@ -4,6 +4,7 @@
 
 #include <CXO2/Core/Chart.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
+#include <CXO2/Services/PlayingService.hpp>
 
 #include <unordered_set>
 #include <condition_variable>
@@ -11,9 +12,6 @@
 namespace Cx
 {
     struct WaitingMemberLeftEventData;
-    struct MemberMusicLoadedEventData;
-
-    class PlayingService;
     class GameContext;
     class RoomContext;
     class SessionContext;
@@ -26,7 +24,7 @@ namespace Cx
 
         static bool IsTrackable();
 
-        void OnMemberConfirmMusicLoaded(const MemberMusicLoadedEventData& ev);
+        void OnMemberConfirmMusicLoaded(const MessageEnvelope<MemberMusicLoadedEventData>& envelope);
         void OnMemberLeft(const WaitingMemberLeftEventData& ev);
 
     private:

@@ -9,8 +9,8 @@ namespace Cx
     {
         static constexpr Cx::Command Command = RequestCommand::CreateRoom;
 
-        std::string  Title{};
-        Cx::GameMode   GameMode{};
+        sf::String   Title{};
+        Cx::GameMode GameMode{};
         bool         Locked{};
         std::string  Password{};
         std::uint8_t MinLevelLimit{};

@@ -3,6 +3,7 @@
 #include <CXO2/Messages/Commands.hpp>
 #include <CXO2/Messages/CollectionEnvelope.hpp>
 #include <CXO2/Models/Room.hpp>
+#include <CXO2/Models/Character.hpp>
 
 namespace Cx
 {

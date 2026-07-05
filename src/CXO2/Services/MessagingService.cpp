@@ -1,157 +1,69 @@
 #include <CXO2/Services/MessagingService.hpp>
 
-#include <CXO2/Models/Character.hpp>
-
-#include <CXO2/Messages/Requests/AnnouncementRequest.hpp>
-#include <CXO2/Messages/Requests/MainRoomMessageRequest.hpp>
-#include <CXO2/Messages/Requests/WaitingMessageRequest.hpp>
-#include <CXO2/Messages/Requests/WhisperMessageRequest.hpp>
-
-#include <CXO2/Messages/Responses/MainRoomAdminMessageResponse.hpp>
-#include <CXO2/Messages/Responses/MainRoomUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingAdminMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WhisperMessageResponse.hpp>
-
-#include <CXO2/Messages/Events/WhisperEventData.hpp>
-
-#include <CXO2/States/StatePlaying7K.hpp>
-#include <CXO2/States/StateWaiting7K.hpp>
-
-#include <Genode/SceneGraph/SceneDirector.hpp>
+#include <CXO2/States/State.hpp>
 
 namespace Cx
 {
-    MessagingOnlineService::MessagingOnlineService(NetworkAdapter& adapter) :
-        EventService(adapter)
+    MessagingOnlineService::MessagingOnlineService(MessageService& messages) :
+        m_messages(messages)
     {
+        m_announcementSubscriber = m_messages.On<AnnouncementEventData>([] (const MessageEnvelope<AnnouncementEventData>& envelope)
+        {
+            try
+            {
+                State::Announce(envelope.Open().Content);
+            }
+            catch (const Gx::Exception&)
+            {
+            }
+        });
     }
 
-    void MessagingOnlineService::SendAnnouncement(const sf::String& message, std::function<void()> callback)
+    void MessagingOnlineService::SendAnnouncement(const AnnouncementRequest& request, const MessageCallback<AnnouncementRequest>& callback)
     {
-        GetNetworkAdapter().SendAsync(AnnouncementRequest{message}, callback);
+        m_messages.Dispatch(request, callback);
     }
 
-    void MessagingOnlineService::SendMessage(const sf::String& message, const std::function<void()> callback)
+    void MessagingOnlineService::SendMainRoomMessage(const MainRoomMessageRequest& request, const MessageCallback<MainRoomMessageRequest>& callback)
     {
-        const auto& director = Gx::Application::Instance().GetSceneDirector();
-        if (!director.IsPresenting<StateWaiting7K>() && !director.IsPresenting<StatePlaying7K>())
-            GetNetworkAdapter().SendAsync(MainRoomMessageRequest{message}, callback);
-        else
-            GetNetworkAdapter().SendAsync(WaitingMessageRequest{message}, callback);
+        m_messages.Dispatch(request, callback);
+    }
+
+    void MessagingOnlineService::SendWaitingMessage(const WaitingMessageRequest& request, const MessageCallback<WaitingMessageRequest>& callback)
+    {
+        m_messages.Dispatch(request, callback);
     }
 
     void MessagingOnlineService::SendWhisper(
-        const sf::String& recipient,
-        const sf::String& message,
-        const std::function<void(bool)> callback
+        const WhisperMessageRequest& request,
+        const MessageCallback<WhisperMessageResponse>& callback
     )
     {
-        GetNetworkAdapter().Exchange<WhisperMessageRequest, WhisperMessageResponse>(
-            WhisperMessageRequest{ recipient, message },
-            [callback] (const auto& response)
-            {
-                if (callback)
-                    callback(!response.Invalid);
-            }
-        );
+        m_messages.Dispatch<WhisperMessageRequest, WhisperMessageResponse>(request, callback);
     }
 
-    void MessagingOnlineService::OnMessageReceive(std::function<void(const CharacterInfo&, const sf::String&, bool)> callback)
+    void MessagingOnlineService::SetWhisperEventCallback(const MessageCallback<WhisperEventData>& callback)
     {
-        Subscribe<WhisperEventData>([callback] (const auto& response)
-        {
-            if (callback)
-            {
-                callback(
-                    CharacterInfo{
-                        response.Sender,
-                        Gender::Any,
-                        Role::Normal
-                    },
-                    response.Content,
-                    true
-                );
-            }
-        });
-
-        const auto& director = Gx::Application::Instance().GetSceneDirector();
-        if (!director.IsPresenting<StateWaiting7K>() && !director.IsPresenting<StatePlaying7K>())
-        {
-            Subscribe<MainRoomUserMessageResponse>([callback] (const auto& response)
-            {
-                if (callback)
-                {
-                    callback(
-                        CharacterInfo{
-                            response.Sender,
-                            Gender::Any,
-                            Role::Normal
-                        },
-                        response.Content,
-                        false
-                    );
-                }
-            });
-
-            Subscribe<MainRoomAdminMessageResponse>([callback] (const auto& response)
-            {
-                if (callback)
-                {
-                    callback(
-                        CharacterInfo{
-                            response.Sender,
-                            Gender::Any,
-                            Role::Administrator
-                        },
-                        response.Content,
-                        false
-                    );
-                }
-            });
-        }
-        else
-        {
-            Subscribe<WaitingUserMessageResponse>([callback] (const auto& response)
-            {
-                if (callback)
-                {
-                    callback(
-                        CharacterInfo{
-                            response.Sender,
-                            Gender::Any,
-                            Role::Normal
-                        },
-                        response.Content,
-                        false
-                    );
-                }
-            });
-
-            Subscribe<WaitingAdminMessageResponse>([callback] (const auto& response)
-            {
-                if (callback)
-                {
-                    callback(
-                        CharacterInfo{
-                            response.Sender,
-                            Gender::Any,
-                            Role::Administrator
-                        },
-                        response.Content,
-                        false
-                    );
-                }
-            });
-        }
+        m_whisperSubscriber = m_messages.On<WhisperEventData>(callback);
     }
 
-    void MessagingOnlineService::UnsubscribeEvents()
+    void MessagingOnlineService::SetMainRoomUserMessageCallback(const MessageCallback<MainRoomUserMessageResponse>& callback)
     {
-        Unsubscribe<WhisperEventData>();
-        Unsubscribe<MainRoomUserMessageResponse>();
-        Unsubscribe<MainRoomAdminMessageResponse>();
-        Unsubscribe<WaitingUserMessageResponse>();
-        Unsubscribe<WaitingAdminMessageResponse>();
+        m_mainRoomUserSubscriber = m_messages.On<MainRoomUserMessageResponse>(callback);
+    }
+
+    void MessagingOnlineService::SetMainRoomAdminMessageCallback(const MessageCallback<MainRoomAdminMessageResponse>& callback)
+    {
+        m_mainRoomAdminSubscriber = m_messages.On<MainRoomAdminMessageResponse>(callback);
+    }
+
+    void MessagingOnlineService::SetWaitingUserMessageCallback(const MessageCallback<WaitingUserMessageResponse>& callback)
+    {
+        m_waitingUserSubscriber = m_messages.On<WaitingUserMessageResponse>(callback);
+    }
+
+    void MessagingOnlineService::SetWaitingAdminMessageCallback(const MessageCallback<WaitingAdminMessageResponse>& callback)
+    {
+        m_waitingAdminSubscriber = m_messages.On<WaitingAdminMessageResponse>(callback);
     }
 }

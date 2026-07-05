@@ -6,45 +6,41 @@
 #include <CXO2/Messages/Responses/ChannelLoginResponse.hpp>
 
 #include <functional>
+#include <CXO2/Messages/MessageEnvelope.hpp>
 
 namespace Cx
 {
     class SessionContext;
-    class NetworkAdapter;
-    class NetworkException;
+    class MessageService;
     class PlanetService : public Service
     {
     public:
         virtual void GetChannelList(
-            std::function<void(const ChannelListResponse&)> callback,
-            std::function<void(const NetworkException&)> onError = nullptr
+            const MessageCallback<ChannelListResponse>& callback
         ) const = 0;
 
         virtual void Login(
             const ChannelLoginRequest& request,
-            std::function<void(const ChannelLoginResponse&)> callback,
-            std::function<void(const NetworkException&)> onError = nullptr
+            const MessageCallback<ChannelLoginResponse>& callback
         ) const = 0;
     };
 
     class PlanetOnlineService : public PlanetService
     {
     public:
-        PlanetOnlineService(NetworkAdapter& adapter, SessionContext& session);
+        PlanetOnlineService(MessageService& messages, SessionContext& session);
 
         void GetChannelList(
-            std::function<void(const ChannelListResponse&)> callback,
-            std::function<void(const NetworkException&)> errorCallback = nullptr
+            const MessageCallback<ChannelListResponse>& callback
         ) const override;
 
         void Login(
             const ChannelLoginRequest& request,
-            std::function<void(const ChannelLoginResponse&)> callback,
-            std::function<void(const NetworkException&)> errorCallback = nullptr
+            const MessageCallback<ChannelLoginResponse>& callback
         ) const override;
 
     private:
-        NetworkAdapter& m_adapter;
+        MessageService& m_messages;
         SessionContext& m_session;
     };
 
@@ -52,16 +48,12 @@ namespace Cx
     {
     public:
         void GetChannelList(
-            std::function<void(const ChannelListResponse&)> callback,
-            std::function<void(const NetworkException&)> onError = nullptr
+            const MessageCallback<ChannelListResponse>& callback
         ) const override;
 
         void Login(
             const ChannelLoginRequest& request,
-            std::function<void(const ChannelLoginResponse&)> callback,
-            std::function<void(const NetworkException&)> onError = nullptr
+            const MessageCallback<ChannelLoginResponse>& callback
         ) const override;
     };
-
-
 }

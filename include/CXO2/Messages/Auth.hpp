@@ -46,10 +46,11 @@ namespace Cx
         auto code = StringEnvelope(2, 2, false);
         packet >> code;
 
-        if (const auto parsed = magic_enum::enum_cast<BillingCode>(code.GetContainer()); parsed.has_value())
+        auto data = code.GetContainer();
+        if (const auto parsed = magic_enum::enum_cast<BillingCode>(data); parsed.has_value())
             billingCode = parsed.value();
         else
-            throw Gx::InvalidOperationException(fmt::format("Billing Error( Code: {} )", code.GetContainer()));
+            throw Gx::InvalidOperationException(fmt::format("Billing Error( Code: {} )", data));
 
         return packet;
     }

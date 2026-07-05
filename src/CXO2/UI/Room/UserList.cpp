@@ -10,14 +10,14 @@
 #include <fmt/format.h>
 #include <cmath>
 #include <Genode/UI/Image.hpp>
-#include <CXO2/Services/RoomService.hpp>
+#include <CXO2/Services/ChannelService.hpp>
 #include <CXO2/States/State.hpp>
 
 namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    UserList::UserList(RoomService& service) :
+    UserList::UserList(ChannelService& service) :
         m_service(service),
         m_users(),
         m_selectedUser(),
@@ -100,22 +100,31 @@ namespace Cx
             return;
 
         m_refreshing = true;
-        m_service.GetUserList([this] (const auto& users)
+        m_service.GetUserList([this] (const auto& ev)
         {
-            auto parent = GetParent<Cx::State>();
-            parent->Invoke([this, users]
+            try
             {
+                const auto& response = ev.Open();
+
                 Clear();
-                for (auto& user : users)
-                    AddUser(user);
+                for (auto& user : response.Users.GetContainer())
+                {
+                    AddUser(CharacterInfo
+                    {
+                        user.Name,
+                        Gender::Any,
+                        Role::Normal,
+                        user.Level
+                    });
+                }
 
                 Invalidate();
                 m_refreshing = false;
-            });
-        },
-        [this] (const auto&)
-        {
-            m_refreshing = false;
+            }
+            catch (...)
+            {
+                m_refreshing = false;
+            }
         });
     }
 

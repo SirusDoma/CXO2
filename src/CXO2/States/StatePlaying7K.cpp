@@ -95,6 +95,11 @@ namespace Cx
     {
         State::Initialize();
 
+        m_service.SetMemberStatsUpdateEventCallback([this] (const auto& ev) { OnMemberStatsUpdate(ev); });
+        m_service.SetMemberScoreSubmittedEventCallback([this] (const auto& ev) { OnMemberScoreSubmitted(ev); });
+        m_service.SetMemberLeftEventCallback([this] (const auto& ev) { OnMemberLeft(ev); });
+        m_service.SetGameCompletedEventCallback([this] (const auto& ev) { OnGameCompleted(ev); });
+
         // Setup providers
         m_context.SetViewport(GetViewport());
         m_scoreTracker.Initialize(m_context.GetDifficulty());
@@ -449,18 +454,18 @@ namespace Cx
                 const auto currentLife = m_lifeSystem.GetCurrentLifePoint();
                 if (lastLife != currentLife)
                 {
-                    m_service.UpdateLife(
-                        currentLife,
-                        [] {},
-                        [=] (const auto& ex)
+                    m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Life, static_cast<std::uint16_t>(currentLife) }, [=] (const auto& ev)
+                    {
+                        try
                         {
-                            Invoke([=]
-                            {
-                                ShowDialog(std::string(ex.what()), DialogStyle::Information, false);
-                                GetDirector().Dismiss<StatePlanet>();
-                            });
+                            const auto& _ = ev.Open();
                         }
-                    );
+                        catch (const Gx::Exception& e)
+                        {
+                            ShowDialog(std::string(e.what()), DialogStyle::Information, false);
+                            GetDirector().Dismiss<StatePlanet>();
+                        }
+                    });
                 }
 
                 m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
@@ -527,35 +532,41 @@ namespace Cx
 
             PlayAvatarJamCombo(m_self, jamCombo);
 
-            m_service.UpdateJam(
-                jamCombo,
-                [] {},
-                [=] (const auto& ex)
+            m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Jam, static_cast<std::uint16_t>(jamCombo) }, [=] (const auto& ev)
+            {
+                try
                 {
-                    Invoke([=]
-                    {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false);
-                        GetDirector().Dismiss<StatePlanet>();
-                    });
+                    const auto& _ = ev.Open();
                 }
-            );
+                catch (const Gx::Exception& e)
+                {
+                    ShowDialog(std::string(e.what()), DialogStyle::Information, false);
+                    GetDirector().Dismiss<StatePlanet>();
+                }
+            });
         });
 
         // Exit button
         const auto exitButton = Instantiate<Gx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
-        exitButton->SetClickCallback([this] (const auto& sender, const auto& ev)
+        exitButton->SetClickCallback([this] (const auto& sender, const auto&)
         {
-            m_service.ExitPlaying([=]
+            m_service.ExitPlaying([=] (const auto& ev)
             {
-                Invoke([=]
+                try
                 {
-                    if (m_context.GetMode() != GameMode::Single)
-                    {
-                        GetDirector().Dismiss<StateRoom>();
-                    }
-                    else
-                        GetDirector().Dismiss();
-                });
+                    const auto& _ = ev.Open();
+                }
+                catch (const Gx::Exception&)
+                {
+                    return;
+                }
+
+                if (m_context.GetMode() != GameMode::Single)
+                {
+                    GetDirector().Dismiss<StateRoom>();
+                }
+                else
+                    GetDirector().Dismiss();
             });
 
         });
@@ -639,84 +650,130 @@ namespace Cx
         m_viewport = viewport;
     }
 
-    void StatePlaying7K::OnMemberStatsUpdate(const PlayingMemberStatsUpdateEventData& ev)
+    void StatePlaying7K::OnMemberStatsUpdate(const MessageEnvelope<PlayingMemberStatsUpdateEventData>& ev)
     {
-        if (ev.Type == UpdateStatsType::Life)
+        try
         {
-            const auto it = m_states.find(ev.ID);
-            if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
-                return;
-
-            it->second.Life = ev.Value;
-            if (const auto avatar = it->second.Avatar)
+            const auto& response = ev.Open();
+            if (response.Type == UpdateStatsType::Life)
             {
-                avatar->GetAvatarInfo()->GetLifeBar()->SetValue(ev.Value);
-                if (ev.Value == 0)
-                    avatar->Die();
-            }
+                const auto it = m_states.find(response.ID);
+                if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
+                    return;
 
-            if (ev.Value == 0)
-                it->second.Completed = true;
+                it->second.Life = response.Value;
+                if (const auto avatar = it->second.Avatar)
+                {
+                    avatar->GetAvatarInfo()->GetLifeBar()->SetValue(response.Value);
+                    if (response.Value == 0)
+                        avatar->Die();
+                }
+
+                if (response.Value == 0)
+                    it->second.Completed = true;
+            }
+            else
+            {
+                const auto it = m_states.find(response.ID);
+                if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
+                    return;
+
+                if (const auto avatar = it->second.Avatar)
+                {
+                    if (response.Value != 0)
+                        PlayAvatarJamCombo(avatar, response.Value);
+                }
+            }
         }
-        else
+        catch (const Gx::Exception& ex)
         {
-            const auto it = m_states.find(ev.ID);
-            if (it == m_states.end() || !it->second.Valid || it->second.Avatar == m_self)
-                return;
-
-            if (const auto avatar = it->second.Avatar)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
             {
-                if (ev.Value != 0)
-                    PlayAvatarJamCombo(avatar, ev.Value);
-            }
+                GetDirector().Present<StatePlanet>();
+            });
         }
     }
 
-    void StatePlaying7K::OnMemberScoreSubmitted(const PlayingMemberScoreSubmissionEventData& ev)
+    void StatePlaying7K::OnMemberScoreSubmitted(const MessageEnvelope<PlayingMemberScoreSubmissionEventData>& ev)
     {
-        const auto it = m_states.find(ev.ID);
-        if (it == m_states.end() || !it->second.Valid)
-            return;
-
-        it->second.Completed = true;
-    }
-
-    void StatePlaying7K::OnMemberLeft(const PlayingMemberLeftEventData& ev)
-    {
-        if (const auto it = m_states.find(ev.ID); it != m_states.end())
+        try
         {
+            const auto& response = ev.Open();
+
+            const auto it = m_states.find(response.ID);
+            if (it == m_states.end() || !it->second.Valid)
+                return;
+
             it->second.Completed = true;
-            it->second.Valid = false;
-
-            if (it->second.Avatar)
-                it->second.Avatar->SetVisible(false);
-
-            if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-                return;
-
-            auto& slot = m_room.GetSlot(ev.ID);
-            auto name = slot.Member->Name;
-
-            slot.State    = RoomSlotState::Unoccupied;
-            slot.IsMaster = false;
-            slot.Ready    = false;
-            slot.Member   = std::nullopt;
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
         }
     }
 
-    void StatePlaying7K::OnGameCompleted(const GameCompletedEventData& ev)
+    void StatePlaying7K::OnMemberLeft(const MessageEnvelope<PlayingMemberLeftEventData>& ev)
     {
-        auto entries = std::array<ScoreEntry, RoomContext::MaxCapacity>();
-
-        const auto& container = ev.Entries.GetContainer();
-        for (std::size_t i = 0; i < entries.size(); i++)
+        try
         {
-            if (i < container.size() && container[i].Active)
-                entries[i] = container[i];
-        }
+            const auto& response = ev.Open();
+            if (const auto it = m_states.find(response.ID); it != m_states.end())
+            {
+                it->second.Completed = true;
+                it->second.Valid = false;
 
-        m_context.SetScoreEntries(entries);
-        OnRenderComplete();
+                if (it->second.Avatar)
+                    it->second.Avatar->SetVisible(false);
+
+                if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                    return;
+
+                auto& slot = m_room.GetSlot(response.ID);
+                auto name = slot.Member->Name;
+
+                slot.State    = RoomSlotState::Unoccupied;
+                slot.IsMaster = false;
+                slot.Ready    = false;
+                slot.Member   = std::nullopt;
+            }
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StatePlaying7K::OnGameCompleted(const MessageEnvelope<GameCompletedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            auto entries = std::array<ScoreEntry, RoomContext::MaxCapacity>();
+
+            const auto& container = response.Entries.GetContainer();
+            for (std::size_t i = 0; i < entries.size(); i++)
+            {
+                if (i < container.size() && container[i].Active)
+                    entries[i] = container[i];
+            }
+
+            m_context.SetScoreEntries(entries);
+            OnRenderComplete();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
     }
 
     void StatePlaying7K::Update(const sf::Time& delta)
@@ -829,16 +886,19 @@ namespace Cx
             /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
             /* .Life        = */ static_cast<std::uint8_t>(m_lifeSystem.GetCurrentLifePoint() / m_lifeSystem.GetMaxLifePoint() * 100),
         },
-        [=]{},
-        [=] (const auto& ex)
+        [=] (const auto& ev)
         {
-            Invoke([=]
+            try
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                const auto& _ = ev.Open();
+            }
+            catch (const Gx::Exception& e)
+            {
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 

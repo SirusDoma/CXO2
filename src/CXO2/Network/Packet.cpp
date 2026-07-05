@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2024 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -444,14 +444,13 @@ namespace Cx
 
     void Packet::Read(void* data, const std::size_t size)
     {
-        if (m_readPos + size <= m_data.size())
+        const bool overflowDetected = m_readPos + size < m_readPos;
+        m_isValid                   = m_isValid && (m_readPos + size <= m_data.size()) && !overflowDetected;
+
+        if (m_isValid)
         {
             std::memcpy(data, &m_data[m_readPos], size);
             m_readPos += size;
-        }
-        else
-        {
-            m_isValid = false;
         }
     }
 }

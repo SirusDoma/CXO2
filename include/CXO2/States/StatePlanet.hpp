@@ -5,8 +5,6 @@
 
 #include <Genode/Audio/AudioMixer.hpp>
 
-#include <future>
-
 namespace Cx
 {
     enum class AuthResult : std::uint32_t;
@@ -15,8 +13,7 @@ namespace Cx
     struct ChannelListResponse;
 
     class SessionContext;
-    class NetworkAdapter;
-    class NetworkService;
+    class MessageService;
     class AuthService;
     class PlanetService;
     class StatePlanet : public State
@@ -25,7 +22,7 @@ namespace Cx
         explicit StatePlanet(
             Gx::AudioMixer& mixer,
             SessionContext& session,
-            NetworkService& network,
+            MessageService& messages,
             AuthService& auth,
             PlanetService& service
         );
@@ -41,11 +38,9 @@ namespace Cx
         void OnChannelEnterButtonClicked(MusicHall hall, std::uint16_t serverID, std::uint16_t channelID);
 
         Gx::AudioMixer& m_mixer;
+        MessageService& m_messages;
         AuthService& m_auth;
-        NetworkService& m_network;
         PlanetService& m_service;
         SessionContext& m_session;
-
-        std::future<void> m_task{};
     };
 }

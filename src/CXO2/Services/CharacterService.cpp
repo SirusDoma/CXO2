@@ -1,67 +1,31 @@
 #include <CXO2/Services/CharacterService.hpp>
-#include <CXO2/Network/NetworkAdapter.hpp>
+#include <CXO2/Services/MessageService.hpp>
+
 #include <CXO2/Messages/Requests/CharacterInfoRequest.hpp>
 #include <CXO2/Messages/Responses/CharacterInfoResponse.hpp>
 #include <CXO2/Messages/Responses/EquipItemResponse.hpp>
 
 namespace Cx
 {
-    CharacterOnlineService::CharacterOnlineService(NetworkAdapter& adapter) :
-        m_adapter(adapter)
+    CharacterOnlineService::CharacterOnlineService(MessageService& messages) :
+        m_messages(messages)
     {
     }
 
-    void CharacterOnlineService::GetCharacterInfo(const std::function<void(const CharacterInfo&)> callback) const
+    void CharacterOnlineService::GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const
     {
-        m_adapter.Exchange<CharacterInfoRequest, CharacterInfoResponse>
+        m_messages.Dispatch<CharacterInfoRequest, CharacterInfoResponse>
         (
             CharacterInfoRequest{},
-            [callback] (const auto& response)
-            {
-                auto charInfo = CharacterInfo
-                {
-                    response.Name,
-                    response.Gender,
-                    response.Role,
-                    response.Level,
-                    response.Experience,
-                    CharacterInfo::RankStatsInfo{
-                        0,
-                        response.Wins,
-                        response.Loses,
-                        response.Draws
-                    },
-                    CharacterInfo::WalletInfo{
-                        response.Gem,
-                        response.Point
-                    },
-                    response.EquippedItemIDs.GetContainer(),
-                    {},
-                    {}
-                };
-
-                for (const std::uint32_t id : response.Inventory.GetContainer())
-                    charInfo.Inventory.push_back(id);
-
-                callback(charInfo);
-            }
+            callback
         );
     }
 
     void CharacterOnlineService::Equip(
         const EquipItemRequest& request,
-        std::function<void(const EquipItemResponse&)> callback,
-        const std::function<void(const NetworkException&)> errorCallback
+        const MessageCallback<EquipItemResponse>& callback
     ) const
     {
-        m_adapter.Exchange<EquipItemRequest, EquipItemResponse>(
-            request,
-            [callback] (const auto& response)
-            {
-                if (callback)
-                    callback(response);
-            },
-            errorCallback
-        );
+        m_messages.Dispatch<EquipItemRequest, EquipItemResponse>(request, callback);
     }
 }

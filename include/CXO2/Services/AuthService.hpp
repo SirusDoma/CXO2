@@ -1,6 +1,10 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
+#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Messages/Responses/AuthResponse.hpp>
+
+#include <Genode/System/Exception.hpp>
 
 #include <cstdint>
 #include <string>
@@ -10,7 +14,7 @@ namespace Cx
 {
     enum class MusicHall : std::uint8_t;
 
-    struct AuthResponse;
+    struct AuthRequest;
 
     class SessionContext;
     class CommandLineContext;
@@ -20,42 +24,36 @@ namespace Cx
     public:
         virtual void Authenticate(
             MusicHall server,
-            const std::string& token,
-            std::function<void(const AuthResponse& response)> callback,
-            std::function<void(const NetworkException&)> errorCallback = nullptr
+            const AuthRequest& request,
+            const MessageCallback<AuthResponse>& callback
         ) const = 0;
     };
 
-    class NetworkAdapter;
+    class MessageService;
     class AuthOnlineService : public AuthService
     {
     public:
-        explicit AuthOnlineService(NetworkAdapter& adapter, SessionContext& session, CommandLineContext& args);
+        AuthOnlineService(MessageService& messages, SessionContext& session, CommandLineContext& args);
 
         void Authenticate(
             MusicHall server,
-            const std::string& token,
-            std::function<void(const AuthResponse& response)> callback,
-            std::function<void(const NetworkException&)> errorCallback = nullptr
+            const AuthRequest& request,
+            const MessageCallback<AuthResponse>& callback
         ) const override;
 
     private:
-        NetworkAdapter& m_adapter;
+        MessageService& m_messages;
         SessionContext& m_session;
         CommandLineContext& m_args;
     };
-
 
     class AuthOfflineService : public AuthService
     {
     public:
         void Authenticate(
             MusicHall server,
-            const std::string& token,
-            std::function<void(const AuthResponse& response)> callback,
-            std::function<void(const NetworkException&)> errorCallback = nullptr
+            const AuthRequest& request,
+            const MessageCallback<AuthResponse>& callback
         ) const override;
     };
-
-
 }

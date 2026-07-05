@@ -13,6 +13,8 @@
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/InputField.hpp>
 #include <CXO2/States/StateWaiting7K.hpp>
+#include <CXO2/States/StatePlaying7K.hpp>
+#include <CXO2/Models/Character.hpp>
 
 namespace Cx
 {
@@ -29,25 +31,85 @@ namespace Cx
         UiContainer::Initialize();
 
         const auto chatWindow = GetChatWindow();
-        m_service.OnMessageReceive([=] (const auto& actor, const auto& text, const bool isWhisper)
+
+        const auto onMessage = [=] (const CharacterInfo& actor, const sf::String& text)
         {
-            auto parent = GetParent<Cx::State>();
-            parent->Invoke([=]
+            if (Gx::StringHelper::StartsWith(text, "/"))
             {
-                if (!isWhisper)
-                {
-                    if (Gx::StringHelper::StartsWith(text, "/"))
-                    {
-                        if (const auto waiting = dynamic_cast<StateWaiting7K*>(parent))
-                            waiting->OnMemberEmoticon(actor, text);
-                    }
-                    else
-                        chatWindow->PushMessage(actor, text);
-                }
-                else
-                    chatWindow->PushWhisper(actor, m_session.GetCharacterInfo(), text);
-            });
+                if (const auto waiting = GetParent<StateWaiting7K>())
+                    waiting->OnMemberEmoticon(actor, text);
+            }
+            else
+                chatWindow->PushMessage(actor, text);
+        };
+
+        m_service.SetWhisperEventCallback([=] (const MessageEnvelope<WhisperEventData>& ev)
+        {
+            try
+            {
+                const auto& response = ev.Open();
+                chatWindow->PushWhisper(
+                    CharacterInfo{response.Sender, Gender::Any, Role::Normal},
+                    m_session.GetCharacterInfo(),
+                    response.Content);
+            }
+            catch (const Gx::Exception&)
+            {
+            }
         });
+
+        if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
+        {
+            m_service.SetWaitingUserMessageCallback([=] (const MessageEnvelope<WaitingUserMessageResponse>& ev)
+            {
+                try
+                {
+                    const auto& response = ev.Open();
+                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+                }
+                catch (const Gx::Exception&)
+                {
+                }
+            });
+
+            m_service.SetWaitingAdminMessageCallback([=] (const MessageEnvelope<WaitingAdminMessageResponse>& ev)
+            {
+                try
+                {
+                    const auto& response = ev.Open();
+                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+                }
+                catch (const Gx::Exception&)
+                {
+                }
+            });
+        }
+        else
+        {
+            m_service.SetMainRoomUserMessageCallback([=] (const MessageEnvelope<MainRoomUserMessageResponse>& ev)
+            {
+                try
+                {
+                    const auto& response = ev.Open();
+                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+                }
+                catch (const Gx::Exception&)
+                {
+                }
+            });
+
+            m_service.SetMainRoomAdminMessageCallback([=] (const MessageEnvelope<MainRoomAdminMessageResponse>& ev)
+            {
+                try
+                {
+                    const auto& response = ev.Open();
+                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+                }
+                catch (const Gx::Exception&)
+                {
+                }
+            });
+        }
 
         if (const auto controls = FindChild<UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS))
         {
@@ -162,35 +224,49 @@ namespace Cx
 
 
                 auto message = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
-                m_service.SendWhisper(tokens[1], message, [=] (const bool success)
+                m_service.SendWhisper(WhisperMessageRequest{tokens[1], message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
                 {
-                    if (success)
-                        chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, message);
-                    else
-                        chatWindow->PushSystemMessage(fmt::format("The message was not delivered to {}", tokens[1]));
+                    try
+                    {
+                        if (!ev.Open().Invalid)
+                        {
+                            chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, message);
+                            return;
+                        }
+                    }
+                    catch (const Gx::Exception&)
+                    {
+                    }
+
+                    chatWindow->PushSystemMessage(fmt::format("The message was not delivered to {}", tokens[1]));
                 });
             }
             else if (!m_recipient.isEmpty())
             {
-                m_service.SendWhisper(m_recipient, text, [=] (const bool success)
+                m_service.SendWhisper(WhisperMessageRequest{m_recipient, text}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
                 {
-                    if (success)
-                        chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, text);
-                    else
-                        chatWindow->PushSystemMessage(sf::String(fmt::format(L"The message was not delivered to {}", m_recipient)));
+                    try
+                    {
+                        if (!ev.Open().Invalid)
+                        {
+                            chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, text);
+                            return;
+                        }
+                    }
+                    catch (const Gx::Exception&)
+                    {
+                    }
+
+                    chatWindow->PushSystemMessage(sf::String(fmt::format(L"The message was not delivered to {}", m_recipient)));
                 });
             }
             else if (Gx::StringHelper::StartsWith(text, "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
-                m_service.SendAnnouncement(Gx::StringHelper::Trim(text.substring(2)));
+                m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
+            else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
+                m_service.SendWaitingMessage(WaitingMessageRequest{text});
             else
-                m_service.SendMessage(text);
+                m_service.SendMainRoomMessage(MainRoomMessageRequest{text});
         });
-    }
-
-    void ChatPanel::Finalize()
-    {
-        UiContainer::Finalize();
-        m_service.UnsubscribeEvents();
     }
 
     ChatWindow* ChatPanel::GetChatWindow() const

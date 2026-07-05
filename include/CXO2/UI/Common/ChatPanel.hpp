@@ -12,10 +12,9 @@ namespace Cx
     class ChatPanel : public Gx::UiContainer
     {
     public:
-        explicit ChatPanel(SessionContext& session, MessagingService& service);
+        ChatPanel(SessionContext& session, MessagingService& service);
 
         void Initialize() override;
-        void Finalize() override;
 
         void SetInputEnabled(bool enabled);
         void SetMaximumTextLength(unsigned int length);

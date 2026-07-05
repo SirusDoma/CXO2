@@ -6,7 +6,6 @@
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 
-#include <CXO2/Network/NetworkAdapter.hpp>
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
@@ -47,7 +46,6 @@ namespace Cx
     {
         Scene::Finalize();
 
-        // Require<NetworkAdapter>().ResetQueue();
         Require<Gx::AudioMixer>().Reset(true);
 
         m_exitPrompted = false;
@@ -266,7 +264,7 @@ namespace Cx
 
             m_exitDialog->SetCancelCallback([&]
             {
-                auto& mixer = Gx::Application::Instance().GetContext().Require<Gx::AudioMixer>();
+                auto& mixer = Gx::Application::Instance().GetModule<Gx::Context>().Require<Gx::AudioMixer>();
 
                 mixer.Play(*m_cancelSound, Sound::Channel::SFX);
                 m_exitPrompted = false;

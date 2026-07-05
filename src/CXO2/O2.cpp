@@ -70,19 +70,20 @@
 
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
-#include <CXO2/Network/NetworkAdapter.hpp>
-#include <CXO2/Services/NetworkService.hpp>
+#include <CXO2/Network/NetworkClient.hpp>
+#include <CXO2/Services/MessageService.hpp>
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Services/PlanetService.hpp>
 #include <CXO2/Services/CharacterService.hpp>
 #include <CXO2/Services/MessagingService.hpp>
-#include <CXO2/Services/RoomService.hpp>
+#include <CXO2/Services/ChannelService.hpp>
 #include <CXO2/Services/ItemShopService.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
 #include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
 
 #include <CXO2/Avatar/ItemFactory.hpp>
@@ -106,6 +107,7 @@
 #include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Utilities/Console.hpp>
 #include <CXO2/Resources.hpp>
+
 
 namespace Cx
 {
@@ -149,13 +151,13 @@ namespace Cx
             Gx::Application::SetView(GetLetterBoxView(window.getView(), window.getSize()));
 
         // Initialize singleton providers
-        auto& context = GetContext();
-        context.Provide<NetworkAdapter>([](auto&)
+        auto& context = GetModule<Gx::Context>();
+        context.Provide<NetworkClient>([](auto&)
         {
-            auto adapter = std::make_unique<NetworkAdapter>();
-            adapter->UsePrefixSizeType<std::uint16_t>();
+            auto client = std::make_unique<NetworkClient>();
+            client->UseDefaultPrefix<std::uint16_t>();
 
-            return adapter;
+            return client;
         }, Gx::Context::Scope::Singleton);
 
         context.Provide<GameConfig>([](auto&)
@@ -200,15 +202,10 @@ namespace Cx
             return std::make_unique<SessionContext>(token);
         }, Gx::Context::Scope::Singleton);
 
-        context.Provide<CartContext>([&] (auto&)
-        {
-            return std::make_unique<CartContext>();
-        }, Gx::Context::Scope::Singleton);
-
-        context.Provide<ScoreTracker>([] (auto&)
-        {
-            return std::make_unique<ScoreTracker>();
-        }, Gx::Context::Scope::Singleton);
+        context.Provide<GameContext>(Gx::Context::Scope::Singleton);
+        context.Provide<RoomContext>(Gx::Context::Scope::Singleton);
+        context.Provide<CartContext>(Gx::Context::Scope::Singleton);
+        context.Provide<ScoreTracker>(Gx::Context::Scope::Singleton);
 
         // Initialize local providers
         context.Provide<JudgementStrategy>([] (auto&)
@@ -216,16 +213,18 @@ namespace Cx
             return std::make_unique<RenderPositionJudgementStrategy>();
         });
 
+        // Initializes application modules
+        Install<MessageService>();
+
         // Register services
         context.Provide<AuthService, AuthOnlineService>();
         context.Provide<PlanetService, PlanetOnlineService>();
         context.Provide<CharacterService, CharacterOnlineService>();
         context.Provide<MessagingService, MessagingOnlineService>();
         context.Provide<ItemShopService, ItemShopOnlineService>();
-        context.Provide<RoomService, RoomOnlineService>();
+        context.Provide<ChannelService, ChannelOnlineService>();
         context.Provide<WaitingService, WaitingOnlineService>();
         context.Provide<PlayingService, PlayingOnlineService>();
-        context.Provide<NetworkService, OnlineNetworkService>();
 
         // Asset Path
         Gx::LocalFileSystem::AddAssetPath("./assets");
@@ -470,7 +469,7 @@ namespace Cx
             Console::Instance().SetMaximumLines(10);
         }
 
-        auto director = SceneDirectorDecorator::Decorate(GetSceneDirector());
+        auto director = SceneDirectorDecorator::Decorate(GetModule<Gx::SceneDirector>());
         if (InInteropMode(InteropMode::Interface))
         {
             // Cache textures
@@ -535,7 +534,7 @@ namespace Cx
     {
         Gx::Application::OnWindowCreated(window);
 
-        const auto& context = GetContext();
+        const auto& context = GetModule<Gx::Context>();
         const auto& config  = context.Require<GameConfig>();
 
         if (m_icon.has_value())
@@ -549,13 +548,13 @@ namespace Cx
     {
         Gx::Application::OnFocusChanged(focus);
 
-        const auto& context = GetContext();
+        const auto& context = GetModule<Gx::Context>();
         const auto& config  = context.Require<GameConfig>();
         auto& mixer         = context.Require<Gx::AudioMixer>();
 
-        const bool ignored = GetSceneDirector().IsPresenting<StateAvi>()       ||
-                             GetSceneDirector().IsPresenting<StatePlaying7K>() ||
-                             GetSceneDirector().IsPresenting<StateResult>();
+        const bool ignored = GetModule<Gx::SceneDirector>().IsPresenting<StateAvi>()       ||
+                             GetModule<Gx::SceneDirector>().IsPresenting<StatePlaying7K>() ||
+                             GetModule<Gx::SceneDirector>().IsPresenting<StateResult>();
 
         auto& bgm = mixer.GetSoundGroup(Sound::Channel::BGM);
         auto& sfx = mixer.GetSoundGroup(Sound::Channel::SFX);
@@ -592,9 +591,9 @@ namespace Cx
 
     int O2::Shutdown()
     {
-        auto& director  = GetSceneDirector();
-        auto& mixer     = GetContext().Require<Gx::AudioMixer>();
-        auto& resources = GetContext().Require<Gx::ResourceManager>();
+        auto& director  = GetModule<Gx::SceneDirector>();
+        auto& mixer     = GetModule<Gx::Context>().Require<Gx::AudioMixer>();
+        auto& resources = GetModule<Gx::Context>().Require<Gx::ResourceManager>();
 
         director.Reset();
         mixer.Reset(false);

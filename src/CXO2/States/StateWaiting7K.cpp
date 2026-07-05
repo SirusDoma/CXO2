@@ -43,6 +43,9 @@
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
+
+#include <algorithm>
+#include <limits>
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
@@ -144,6 +147,8 @@ namespace Cx
     void StateWaiting7K::Initialize()
     {
         State::Initialize();
+
+        RegisterMessageEvents();
 
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_WAITING);
 
@@ -281,141 +286,264 @@ namespace Cx
         m_mixer.Play(*bgm, Sound::Channel::BGM);
     }
 
-    void StateWaiting7K::OnSlotChanged(const WaitingSlotChangedEventData& ev)
+    void StateWaiting7K::InitializeAvatars()
     {
-        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-            return;
+        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
-        auto& slot = m_room.GetSlot(ev.ID);
-        auto oldSlot = slot;
-        switch (ev.Type)
+        int memberID = 0;
+        for (const auto child : avatarList->GetChildren())
         {
-            case RoomSlotEventType::Unlock:
-            {
-                assert(!slot.Member.has_value() && "Slot is not empty");
-
-                slot.State = RoomSlotState::Unoccupied;
-                slot.Member = std::nullopt;
-
-                InvalidateMembers();
+            if (memberID >= RoomContext::MaxCapacity)
                 break;
-            }
-            case RoomSlotEventType::Lock:
+
+            const auto container = dynamic_cast<Gx::UiContainer*>(child);
+            if (!container)
+                continue;
+
+            const auto avatar = container->FindChild<Avatar>(Resource::Waiting7K::Avatar::IDC_AVATAR);
+            if (!avatar)
+                continue;
+
+            auto& emoticonContainer = Create<Gx::UiContainer>();
+            emoticonContainer.SetName(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
+            emoticonContainer.SetVisible(false);
+            avatar->AddChild(emoticonContainer);
+
+            const auto avatarInfo = avatar->FindChild<AvatarInfo>(Resource::Waiting7K::Avatar::IDC_AVATAR_INFO);
+            auto& slot = m_room.GetSlot(memberID);
+
+            if (slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name)
             {
-                assert(!slot.Member.has_value() && "Slot is not empty");
-
-                slot.State = RoomSlotState::Locked;
-                slot.Member = std::nullopt;
-
-                InvalidateMembers();
-                break;
+                m_slot       = &slot;
+                m_avatarInfo = avatarInfo;
+                m_mainAvatar = avatar;
             }
-            case RoomSlotEventType::Kicked:
-            {
-                assert(slot.Member.has_value() && "Slot is empty");
-                slot.State = RoomSlotState::Unoccupied;
 
-                auto name = slot.Member->Name;
-                slot.Member = std::nullopt;
-
-                const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
-                const auto chatWindow = chatPanel->GetChatWindow();
-                chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} forced out", name));
-
-                InvalidateMembers();
-                break;
-            }
+            memberID++;
         }
     }
 
-    void StateWaiting7K::OnMemberJoined(const WaitingMemberJoinedEventData& ev)
+    void StateWaiting7K::RegisterMessageEvents()
     {
-        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-            return;
-
-        auto& slot    = m_room.GetSlot(ev.ID);
-        slot.State    = RoomSlotState::Occupied;
-        slot.Ready    = ev.Ready;
-        slot.Team     = ev.Team;
-        slot.IsMaster = false;
-        slot.Member   = CharacterInfo
-        {
-            /* .Name            = */ ev.Name,
-            /* .Gender          = */ ev.Gender,
-            /* .Role            = */ Role::Normal,
-            /* .Level           = */ ev.Level,
-            /* .Experience      = */ 0,
-            /* .RankStats       = */ {},
-            /* .Wallet          = */ {},
-            /* .EquippedItemIDs = */ ev.EquippedItemIDs,
-            /* .Inventory       = */ {},
-            /* .MusicIDs        = */ ev.MusicIDs
-        };
-
-        const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
-        const auto chatWindow = chatPanel->GetChatWindow();
-
-        chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", slot.Member->Name));
-        InvalidateMembers();
-
-        const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
-        selectMusicDialog->Initialize();
+        m_service.SetSlotChangedEventCallback([this] (const auto& ev) { OnSlotChanged(ev); });
+        m_service.SetMemberJoinedEventCallback([this] (const auto& ev) { OnMemberJoined(ev); });
+        m_service.SetMemberLeftEventCallback([this] (const auto& ev) { OnMemberLeft(ev); });
+        m_service.SetMemberTeamChangedEventCallback([this] (const auto& ev) { OnMemberTeamChanged(ev); });
+        m_service.SetMemberReadyStateChangedEventCallback([this] (const auto& ev) { OnMemberReadyStateChanged(ev); });
+        m_service.SetMusicChangedEventCallback([this] (const auto& ev) { OnMusicChanged(ev); });
+        m_service.SetTitleChangedEventCallback([this] (const auto& ev) { OnTitleChanged(ev); });
+        m_service.SetMapChangedEventCallback([this] (const auto& ev) { OnMapChanged(ev); });
+        m_service.SetKickedEventCallback([this] (const auto& ev) { OnKicked(ev); });
+        m_service.SetStartGameEventCallback([this] (const auto& ev) { OnStartGame(ev); });
     }
 
-    void StateWaiting7K::OnMemberLeft(const WaitingMemberLeftEventData& ev)
+    void StateWaiting7K::OnSlotChanged(const MessageEnvelope<WaitingSlotChangedEventData>& ev)
     {
-        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-            return;
-
-        auto& slot = m_room.GetSlot(ev.ID);
-        auto name = slot.Member->Name;
-
-        if (slot.IsMaster)
+        try
         {
-            if (ev.RoomMasterID < 0 || ev.RoomMasterID >= RoomContext::MaxCapacity)
+            const auto& response = ev.Open();
+            if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& newMaster    = m_room.GetSlot(ev.RoomMasterID);
-            newMaster.IsMaster = true;
-            newMaster.Ready    = true;
+            auto& slot = m_room.GetSlot(response.ID);
+            auto oldSlot = slot;
+            switch (response.Type)
+            {
+                case RoomSlotEventType::Unlock:
+                {
+                    assert(!slot.Member.has_value() && "Slot is not empty");
+
+                    slot.State = RoomSlotState::Unoccupied;
+                    slot.Member = std::nullopt;
+
+                    InvalidateMembers();
+                    break;
+                }
+                case RoomSlotEventType::Lock:
+                {
+                    assert(!slot.Member.has_value() && "Slot is not empty");
+
+                    slot.State = RoomSlotState::Locked;
+                    slot.Member = std::nullopt;
+
+                    InvalidateMembers();
+                    break;
+                }
+                case RoomSlotEventType::Kicked:
+                {
+                    assert(slot.Member.has_value() && "Slot is empty");
+                    slot.State = RoomSlotState::Unoccupied;
+
+                    auto name = slot.Member->Name;
+                    slot.Member = std::nullopt;
+
+                    const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+                    const auto chatWindow = chatPanel->GetChatWindow();
+                    chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} forced out", name));
+
+                    InvalidateMembers();
+                    break;
+                }
+            }
         }
-
-        slot.State    = RoomSlotState::Unoccupied;
-        slot.IsMaster = false;
-        slot.Ready    = false;
-        slot.Member   = std::nullopt;
-
-        const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
-        const auto chatWindow = chatPanel->GetChatWindow();
-        chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} has left", name));
-
-        InvalidateMembers();
-        InvalidateRoomInfo();
-
-        const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
-        selectMusicDialog->Initialize();
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
     }
 
-    void StateWaiting7K::OnMemberTeamChanged(const WaitingMemberTeamChangedEventData& ev)
+    void StateWaiting7K::OnKicked(const MessageEnvelope<WaitingKickEventData>& ev)
     {
-        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-            return;
+        try
+        {
+            const auto& _ = ev.Open();
 
-        auto& slot = m_room.GetSlot(ev.ID);
-        slot.Team  = ev.Team;
-
-        InvalidateAvatarInfo();
+            GetDirector().Dismiss<StateRoom>(RoomTransitionEventType::Kick);
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
     }
 
-    void StateWaiting7K::OnMemberReadyStateChanged(const WaitingMemberReadyStateChangedEventData& ev)
+    void StateWaiting7K::OnMemberJoined(const MessageEnvelope<WaitingMemberJoinedEventData>& ev)
     {
-        if (ev.ID < 0 || ev.ID >= RoomContext::MaxCapacity)
-            return;
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                return;
 
-        auto& slot = m_room.GetSlot(ev.ID);
-        slot.Ready = ev.Ready;
+            auto& slot    = m_room.GetSlot(response.ID);
+            slot.State    = RoomSlotState::Occupied;
+            slot.Ready    = response.Ready;
+            slot.Team     = response.Team;
+            slot.IsMaster = false;
+            slot.Member   = CharacterInfo
+            {
+                /* .Name            = */ response.Name,
+                /* .Gender          = */ response.Gender,
+                /* .Role            = */ Role::Normal,
+                /* .Level           = */ response.Level,
+                /* .Experience      = */ 0,
+                /* .RankStats       = */ {},
+                /* .Wallet          = */ {},
+                /* .EquippedItemIDs = */ response.EquippedItemIDs,
+                /* .Inventory       = */ {},
+                /* .MusicIDs        = */ response.MusicIDs
+            };
 
-        InvalidateAvatarInfo();
+            const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+            const auto chatWindow = chatPanel->GetChatWindow();
+
+            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", slot.Member->Name));
+            InvalidateMembers();
+
+            const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
+            selectMusicDialog->Initialize();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateWaiting7K::OnMemberLeft(const MessageEnvelope<WaitingMemberLeftEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                return;
+
+            auto& slot = m_room.GetSlot(response.ID);
+            auto name = slot.Member->Name;
+
+            if (slot.IsMaster)
+            {
+                if (response.RoomMasterID < 0 || response.RoomMasterID >= RoomContext::MaxCapacity)
+                    return;
+
+                auto& newMaster    = m_room.GetSlot(response.RoomMasterID);
+                newMaster.IsMaster = true;
+                newMaster.Ready    = true;
+            }
+
+            slot.State    = RoomSlotState::Unoccupied;
+            slot.IsMaster = false;
+            slot.Ready    = false;
+            slot.Member   = std::nullopt;
+
+            const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+            const auto chatWindow = chatPanel->GetChatWindow();
+            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} has left", name));
+
+            InvalidateMembers();
+            InvalidateRoomInfo();
+
+            const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
+            selectMusicDialog->Initialize();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateWaiting7K::OnMemberTeamChanged(const MessageEnvelope<WaitingMemberTeamChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                return;
+
+            auto& slot = m_room.GetSlot(response.ID);
+            slot.Team  = response.Team;
+
+            InvalidateAvatarInfo();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateWaiting7K::OnMemberReadyStateChanged(const MessageEnvelope<WaitingMemberReadyStateChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                return;
+
+            auto& slot = m_room.GetSlot(response.ID);
+            slot.Ready = response.Ready;
+
+            InvalidateAvatarInfo();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
     }
 
     void StateWaiting7K::OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData)
@@ -490,115 +618,153 @@ namespace Cx
             ShowEmoticon(avatar, code);
     }
 
-    void StateWaiting7K::OnMusicChanged(const WaitingMusicChangedEventData& ev)
+    void StateWaiting7K::OnMusicChanged(const MessageEnvelope<WaitingMusicChangedEventData>& ev)
     {
-        InvalidateRoomInfo();
-        InvalidateAvatarInfo();
-    }
-
-    void StateWaiting7K::OnTitleChanged(const WaitingTitleChangedEventData& ev)
-    {
-        m_room.SetTitle(ev.Title);
-        InvalidateRoomInfo();
-    }
-
-    void StateWaiting7K::OnMapChanged(const WaitingMapChangedEventData& ev)
-    {
-        InvalidateRoomInfo();
-    }
-
-    void StateWaiting7K::OnKicked(const WaitingKickEventData& ev)
-    {
-        GetDirector().Dismiss<StateRoom>(RoomTransitionEventType::Kick);
-    }
-
-    void StateWaiting7K::OnStartGame(const StartGameEventData& ev)
-    {
-        const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
-        const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
-
-        if (ev.ResultCode != StartGameResult::Success)
+        try
         {
-            auto message = std::string();
-            switch (ev.ResultCode)
+            const auto& response = ev.Open();
+
+            std::uint32_t musicID = response.MusicID;
+            if (response.MusicID > std::numeric_limits<std::uint16_t>::max())
             {
-                case StartGameResult::NotReady:
+                std::uint8_t randomBit = static_cast<std::uint8_t>((musicID >> 28) & 0xFF);
+                constexpr int max = static_cast<int>(LevelCategory::Level1) |
+                                    static_cast<int>(LevelCategory::Level2) |
+                                    static_cast<int>(LevelCategory::Level3) |
+                                    static_cast<int>(LevelCategory::Level4);
+
+                if (randomBit >= 1 && randomBit <= max)
                 {
-                    message = "There are users not ready yet";
-                    break;
+                    m_room.SetRandomLevel(static_cast<LevelCategory>(randomBit));
+                    musicID = response.MusicID & 0xFF;
                 }
-                case StartGameResult::InsufficientPlayers:
-                {
-                    message = "For VS mode, more than one player is required.";
-                    break;
-                }
-                case StartGameResult::TeamUnbalanced:
-                {
-                    message = "The team is not in harmony.";
-                    break;
-                }
-                default: break;
+            }
+            else
+            {
+                m_room.SetRandomLevel(static_cast<LevelCategory>(0));
             }
 
-            startButton->SetCheckedState(false);
-            startButton->SetEnabled(true);
-            backButton->SetEnabled(true);
+            const auto& musicList = m_session.GetInstalledMusic();
 
-            ShowDialog(message, DialogStyle::Information);
-            return;
+            // TODO: Get music list header without relying OJNList
+            const auto it = std::find_if(musicList.begin(), musicList.end(), [id = musicID] (const auto& header) {
+                return id == header.ID;
+            });
+
+            m_room.SetMusic(it == musicList.end() ? ChartMetadata{musicID} : *it);
+            m_room.SetDifficulty(response.Difficulty);
+            m_room.SetSpeedID(response.SpeedID);
+
+            InvalidateRoomInfo();
+            InvalidateAvatarInfo();
         }
-
-        if (!m_game.GetChart() || m_game.GetChart()->Source != m_room.GetMusic().Source)
+        catch (const Gx::Exception& ex)
         {
-            auto chart    = std::make_unique<Chart>();
-            chart->Source = m_room.GetMusic().Source;
-
-            m_game.SetChart(std::move(chart));
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
         }
-
-        m_game.SetMode(m_room.GetMode());
-        m_game.SetDifficulty(m_room.GetDifficulty());
-        m_game.SetSpeed(m_room.GetSpeed());
-        m_game.SetMapID(m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0 ? m_room.GetRandomizedMapID() : m_room.GetMapID());
-        m_game.SetEffectID(m_room.GetEffectID());
-
-        GetDirector().Present<StateLoading>();
     }
 
-    void StateWaiting7K::InitializeAvatars()
+    void StateWaiting7K::OnTitleChanged(const MessageEnvelope<WaitingTitleChangedEventData>& ev)
     {
-        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
-
-        int memberID = 0;
-        for (const auto child : avatarList->GetChildren())
+        try
         {
-            if (memberID >= RoomContext::MaxCapacity)
-                break;
-
-            const auto container = dynamic_cast<Gx::UiContainer*>(child);
-            if (!container)
-                continue;
-
-            const auto avatar = container->FindChild<Avatar>(Resource::Waiting7K::Avatar::IDC_AVATAR);
-            if (!avatar)
-                continue;
-
-            auto& emoticonContainer = Create<Gx::UiContainer>();
-            emoticonContainer.SetName(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
-            emoticonContainer.SetVisible(false);
-            avatar->AddChild(emoticonContainer);
-
-            const auto avatarInfo = avatar->FindChild<AvatarInfo>(Resource::Waiting7K::Avatar::IDC_AVATAR_INFO);
-            auto& slot = m_room.GetSlot(memberID);
-
-            if (slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name)
+            const auto& response = ev.Open();
+            m_room.SetTitle(response.Title);
+            InvalidateRoomInfo();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
             {
-                m_slot       = &slot;
-                m_avatarInfo = avatarInfo;
-                m_mainAvatar = avatar;
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateWaiting7K::OnMapChanged(const MessageEnvelope<WaitingMapChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            m_room.SetMapID(response.Map.GetMapID());
+            m_room.SetRandomizedMapID(response.Map.GetRandomizedMap());
+
+            InvalidateRoomInfo();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateWaiting7K::OnStartGame(const MessageEnvelope<StartGameEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
+            const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+
+            if (response.ResultCode != StartGameResult::Success)
+            {
+                auto message = std::string();
+                switch (response.ResultCode)
+                {
+                    case StartGameResult::NotReady:
+                    {
+                        message = "There are users not ready yet";
+                        break;
+                    }
+                    case StartGameResult::InsufficientPlayers:
+                    {
+                        message = "For VS mode, more than one player is required.";
+                        break;
+                    }
+                    case StartGameResult::TeamUnbalanced:
+                    {
+                        message = "The team is not in harmony.";
+                        break;
+                    }
+                    default: break;
+                }
+
+                startButton->SetCheckedState(false);
+                startButton->SetEnabled(true);
+                backButton->SetEnabled(true);
+
+                ShowDialog(message, DialogStyle::Information);
+                return;
             }
 
-            memberID++;
+            if (!m_game.GetChart() || m_game.GetChart()->Source != m_room.GetMusic().Source)
+            {
+                auto chart    = std::make_unique<Chart>();
+                chart->Source = m_room.GetMusic().Source;
+
+                m_game.SetChart(std::move(chart));
+            }
+
+            m_game.SetMode(m_room.GetMode());
+            m_game.SetDifficulty(m_room.GetDifficulty());
+            m_game.SetSpeed(m_room.GetSpeed());
+            m_game.SetMapID(m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0 ? m_room.GetRandomizedMapID() : m_room.GetMapID());
+            m_game.SetEffectID(m_room.GetEffectID());
+
+            GetDirector().Present<StateLoading>();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
         }
     }
 
@@ -611,23 +777,22 @@ namespace Cx
         backButton->SetEnabled(false);
         teamButtons->SetEnabled(!sender.IsChecked());
 
-        m_service.UpdateReadyState([=, &sender]
+        m_service.UpdateReadyState([=, &sender] (const auto& ev)
         {
-            Invoke([=, &sender]
+            try
             {
+                const auto& _ = ev.Open();
+
                 sender.SetEnabled(true);
                 backButton->SetEnabled(true);
-            });
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+            }
+            catch (const Gx::Exception& e)
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 
@@ -658,18 +823,19 @@ namespace Cx
         backButton->SetEnabled(false);
 
         sender.SetEnabled(false);
-        m_service.StartGame([=]
+        m_service.StartGame([=] (const auto& ev)
         {
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+            try
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                const auto& _ = ev.Open();
+            }
+            catch (const Gx::Exception& e)
+            {
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 
@@ -741,28 +907,24 @@ namespace Cx
             request.MusicID = m_room.GetMusic().ID;
         }
 
-        m_service.UpdateMusic
-        (
-            request,
-            [=]
+        m_service.UpdateMusic(request, [=] (const auto& ev)
+        {
+            try
             {
-                Invoke([=]
-                {
-                    selectMusicButton->SetEnabled(true);
-                    InvalidateRoomInfo();
-                });
-            }, [=] (const auto& ex)
+                const auto& _ = ev.Open();
+
+                selectMusicButton->SetEnabled(true);
+                InvalidateRoomInfo();
+            }
+            catch (const Gx::Exception& e)
             {
-                Invoke([=]
+                selectMusicButton->SetEnabled(true);
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
-                    selectMusicButton->SetEnabled(true);
-                    ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                    {
-                        GetDirector().Dismiss<StatePlanet>();
-                    });
+                    GetDirector().Dismiss<StatePlanet>();
                 });
             }
-        );
+        });
     }
 
     void StateWaiting7K::OnChangeTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
@@ -797,23 +959,22 @@ namespace Cx
         if (titleBox->GetString().isEmpty())
             return;
 
-        m_service.UpdateRoomTitle(titleBox->GetString(), [=]
+        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{titleBox->GetString()}, [=] (const auto& ev)
         {
-            Invoke([=]
+            try
             {
+                const auto& _ = ev.Open();
+
                 m_room.SetTitle(titleBox->GetString());
                 InvalidateRoomInfo();
-            });
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+            }
+            catch (const Gx::Exception& e)
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 
@@ -822,27 +983,26 @@ namespace Cx
         if (!sender.IsChecked() || !m_avatarInfo)
             return;
 
-        m_service.UpdateTeam(team, [=]
+        m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev)
         {
-            Invoke([=]
+            try
             {
+                const auto& _ = ev.Open();
+
                 const auto sfxTeam = Instantiate<sf::Sound>(Sound::Effects::EF_34);
                 if (const auto member = m_avatarInfo->GetSlot(); member)
                     member->Team = team;
 
                 m_avatarInfo->Invalidate();
                 m_mixer.Play(*sfxTeam, Sound::Channel::SFX);
-            });
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+            }
+            catch (const Gx::Exception& e)
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 
@@ -885,7 +1045,7 @@ namespace Cx
 
         m_room.SetMapID(mapID);
         m_room.SetRandomizedMapID(mapInfo.GetRandomizedMap());
-        m_service.UpdateMap(UpdateMapRequest{ mapInfo }, [] {});
+        m_service.UpdateMap(UpdateMapRequest{ mapInfo });
     }
 
     void StateWaiting7K::OnEmoticonButtonClicked(Gx::Control&, Gx::Control::Event&)
@@ -930,22 +1090,24 @@ namespace Cx
 
     void StateWaiting7K::OnBackButtonClicked(Gx::Control&, Gx::Control::Event&)
     {
-        m_service.ExitRoom([&]
+        m_service.ExitRoom([this] (const MessageEnvelope<ExitWaitingResponse>& ev)
         {
-            if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_36))
-                m_mixer.Play(*sfx, Sound::Channel::SFX);
-
-            GetDirector().Dismiss();
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+            try
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                const auto& _ = ev.Open();
+
+                if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_36))
+                    m_mixer.Play(*sfx, Sound::Channel::SFX);
+
+                GetDirector().Dismiss();
+            }
+            catch (const Gx::Exception& e)
+            {
+                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [this] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 
@@ -978,7 +1140,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num1:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 190, 200, 179, 231 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);
                         break;
@@ -986,7 +1148,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num2:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 176, 237 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);
                         break;
@@ -994,7 +1156,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num3:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 183, 185, 181, 240 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);
                         break;
@@ -1002,7 +1164,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num4:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 193, 193, 190, 198 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);
                         break;
@@ -1010,7 +1172,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num5:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 189, 200, 190, 238 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);
                         break;
@@ -1018,7 +1180,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num6:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 200, 229, 200, 229 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);
                         break;
@@ -1026,7 +1188,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num7:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 199, 207, 199, 207 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);
                         break;
@@ -1034,7 +1196,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num8:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 197, 169, 197, 169 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY);
                         break;
@@ -1042,7 +1204,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num9:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 192, 185 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);
                         break;
@@ -1050,7 +1212,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num0:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 46, 46, 46 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);
                         break;
@@ -1066,7 +1228,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num1:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 33 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);
                         break;
@@ -1074,7 +1236,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num2:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 63 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);
                         break;
@@ -1082,7 +1244,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num3:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 187, 231, 182, 251, 199, 216 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);
                         break;
@@ -1090,7 +1252,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num4:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 51, 50, 49 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);
                         break;
@@ -1098,7 +1260,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num5:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 126 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);
                         break;
@@ -1106,7 +1268,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num6:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 33, 33 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2);
                         break;
@@ -1114,7 +1276,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num7:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 185, 204, 191, 246 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);
                         break;
@@ -1122,7 +1284,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num8:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 55 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);
                         break;
@@ -1130,7 +1292,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num9:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 178, 201 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);
                         break;
@@ -1138,7 +1300,7 @@ namespace Cx
                     case sf::Keyboard::Key::Num0:
                     {
                         auto code = std::vector<std::uint8_t>{ 47, 185, 221, 194, 166 };
-                        m_messaging.SendMessage(std::string(code.begin(), code.end()), nullptr);
+                        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
 
                         ShowEmoticon(m_mainAvatar, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);
                         break;
@@ -1166,11 +1328,11 @@ namespace Cx
             ShowDialog("Would you like to kick out?", DialogStyle::YesNo, false, [=] (const bool confirm)
             {
                 if (confirm)
-                    m_service.UpdateRoomSlot(static_cast<std::uint8_t>(slotID), nullptr);
+                    m_service.UpdateRoomSlot(UpdateRoomSlotRequest{static_cast<std::uint8_t>(slotID)});
             });
         }
         else
-            m_service.UpdateRoomSlot(static_cast<std::uint8_t>(slotID), nullptr);
+            m_service.UpdateRoomSlot(UpdateRoomSlotRequest{static_cast<std::uint8_t>(slotID)});
     }
 
     void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoticonID)

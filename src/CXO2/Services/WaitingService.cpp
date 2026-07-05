@@ -1,8 +1,6 @@
-#include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Messages/Events/StartGameEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMapChangedEventData.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 
+#include <CXO2/Messages/Requests/StartGameRequest.hpp>
 #include <CXO2/Messages/Requests/UpdateMemberReadyStateRequest.hpp>
 #include <CXO2/Messages/Requests/UpdateRoomMusicRequest.hpp>
 #include <CXO2/Messages/Requests/UpdateMapRequest.hpp>
@@ -10,131 +8,116 @@
 #include <CXO2/Messages/Requests/UpdateMemberTeamRequest.hpp>
 #include <CXO2/Messages/Requests/UpdateRoomTitleRequest.hpp>
 #include <CXO2/Messages/Requests/ExitWaitingRequest.hpp>
-#include <CXO2/Messages/Responses/ExitWaitingResponse.hpp>
-
-#include <CXO2/Messages/Events/WaitingMemberJoinedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberLeftEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberReadyStateChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberTeamChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMusicChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingSlotChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingTitleChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingKickEventData.hpp>
-#include <CXO2/Messages/Requests/StartGameRequest.hpp>
 
 namespace Cx
 {
-    WaitingOnlineService::WaitingOnlineService(NetworkAdapter& adapter, SessionContext& session) :
-        EventService(adapter),
-        m_session(session)
+    WaitingOnlineService::WaitingOnlineService(MessageService& messages) :
+        m_messages(messages)
     {
     }
 
-    void WaitingOnlineService::StartGame(
-        std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void WaitingOnlineService::StartGame(const MessageCallback<StartGameRequest>& callback) const
     {
-        GetNetworkAdapter().SendAsync<StartGameRequest>(
-            StartGameRequest{},
-            [callback]
-            {
-                if (callback)
-                    callback();
-            },
-            errorCallback
-        );
+        m_messages.Dispatch(StartGameRequest{}, callback);
     }
 
-    void WaitingOnlineService::UpdateReadyState(
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void WaitingOnlineService::UpdateReadyState(const MessageCallback<UpdateMemberReadyStateRequest>& callback) const
     {
-        GetNetworkAdapter().SendAsync<UpdateMemberReadyStateRequest>(
-            UpdateMemberReadyStateRequest{},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(UpdateMemberReadyStateRequest{}, callback);
     }
 
     void WaitingOnlineService::UpdateMusic(
         const UpdateRoomMusicRequest& request,
-        const std::function<void()> callback, const std::function<void(const NetworkException&)>& errorCallback
+        const MessageCallback<UpdateRoomMusicRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateRoomMusicRequest>(
-            request,
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
     void WaitingOnlineService::UpdateRoomSlot(
-        const std::uint8_t id,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback) const
+        const UpdateRoomSlotRequest& request,
+        const MessageCallback<UpdateRoomSlotRequest>& callback
+    ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateRoomSlotRequest>(
-            UpdateRoomSlotRequest{id},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
     void WaitingOnlineService::UpdateTeam(
-        const RoomTeam team,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
+        const UpdateMemberTeamRequest& request,
+        const MessageCallback<UpdateMemberTeamRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateMemberTeamRequest>(
-            UpdateMemberTeamRequest{team},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
     void WaitingOnlineService::UpdateRoomTitle(
-        const std::string& title,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
+        const UpdateRoomTitleRequest& request,
+        const MessageCallback<UpdateRoomTitleRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateRoomTitleRequest>(
-            UpdateRoomTitleRequest{title},
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
     void WaitingOnlineService::UpdateMap(
         const UpdateMapRequest& request,
-        const std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
+        const MessageCallback<UpdateMapRequest>& callback
     ) const
     {
-        GetNetworkAdapter().SendAsync<UpdateMapRequest>(
-            request,
-            callback,
-            errorCallback
-        );
+        m_messages.Dispatch(request, callback);
     }
 
-    void WaitingOnlineService::ExitRoom(
-        std::function<void()> callback,
-        const std::function<void(const NetworkException&)>& errorCallback
-    ) const
+    void WaitingOnlineService::ExitRoom(const MessageCallback<ExitWaitingResponse>& callback) const
     {
-        GetNetworkAdapter().Exchange<ExitWaitingRequest, ExitWaitingResponse>(
-            ExitWaitingRequest{},
-            [callback] (const auto&)
-            {
-                if (callback)
-                    callback();
-            },
-            errorCallback
-        );
+        m_messages.Dispatch<ExitWaitingRequest, ExitWaitingResponse>(ExitWaitingRequest{}, callback);
     }
 
+    void WaitingOnlineService::SetSlotChangedEventCallback(const MessageCallback<WaitingSlotChangedEventData>& callback)
+    {
+        m_slotSubscriber = m_messages.On<WaitingSlotChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMemberJoinedEventCallback(const MessageCallback<WaitingMemberJoinedEventData>& callback)
+    {
+        m_joinSubscriber = m_messages.On<WaitingMemberJoinedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMemberLeftEventCallback(const MessageCallback<WaitingMemberLeftEventData>& callback)
+    {
+        m_leftSubscriber = m_messages.On<WaitingMemberLeftEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMemberTeamChangedEventCallback(const MessageCallback<WaitingMemberTeamChangedEventData>& callback)
+    {
+        m_teamSubscriber = m_messages.On<WaitingMemberTeamChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMemberReadyStateChangedEventCallback(const MessageCallback<WaitingMemberReadyStateChangedEventData>& callback)
+    {
+        m_readySubscriber = m_messages.On<WaitingMemberReadyStateChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMusicChangedEventCallback(const MessageCallback<WaitingMusicChangedEventData>& callback)
+    {
+        m_musicSubscriber = m_messages.On<WaitingMusicChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetTitleChangedEventCallback(const MessageCallback<WaitingTitleChangedEventData>& callback)
+    {
+        m_titleSubscriber = m_messages.On<WaitingTitleChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetMapChangedEventCallback(const MessageCallback<WaitingMapChangedEventData>& callback)
+    {
+        m_mapSubscriber = m_messages.On<WaitingMapChangedEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetKickedEventCallback(const MessageCallback<WaitingKickEventData>& callback)
+    {
+        m_kickSubscriber = m_messages.On<WaitingKickEventData>(callback);
+    }
+
+    void WaitingOnlineService::SetStartGameEventCallback(const MessageCallback<StartGameEventData>& callback)
+    {
+        m_startSubscriber = m_messages.On<StartGameEventData>(callback);
+    }
 }

@@ -12,7 +12,7 @@ namespace Cx
         static constexpr Cx::Command Command = ResponseCommand::Authorize;
 
         AuthResult       ResultCode{};
-        Cx::BillingCode    BillingCode{};
+        Cx::BillingCode  BillingCode{};
         StringEnvelope<> Timestamp{12, 12, false};
         std::uint32_t    SubscriptionRemainingTimeMinutes{};
     };

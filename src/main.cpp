@@ -51,7 +51,7 @@ int main(int argc , char** argv)
         }
 
         auto cxo2 = Cx::O2("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);
-        cxo2.GetContext().Provide<Cx::CommandLineContext>([ctx] (const auto&)
+        cxo2.GetModule<Gx::Context>().Provide<Cx::CommandLineContext>([ctx] (const auto&)
         {
             return std::make_unique<Cx::CommandLineContext>(ctx);
         }, Gx::Context::Scope::Singleton);

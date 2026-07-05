@@ -56,8 +56,8 @@ namespace Cx
         using ItemList     = std::vector<ItemInfo>;
 
         sf::String    Name;
-        Cx::Gender      Gender;
-        Cx::Role        Role;
+        Cx::Gender    Gender;
+        Cx::Role      Role;
         std::int32_t  Level;
         std::int32_t  Experience;
         RankStatsInfo RankStats;

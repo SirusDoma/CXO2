@@ -1,6 +1,10 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
+#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Messages/Responses/CharacterInfoResponse.hpp>
+#include <CXO2/Messages/Requests/EquipItemRequest.hpp>
+#include <CXO2/Messages/Responses/EquipItemResponse.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -11,49 +15,42 @@ namespace Cx
 
     struct CharacterInfo;
 
-    struct EquipItemRequest;
-    struct EquipItemResponse;
-
-    class NetworkException;
     class CharacterService : public Service
     {
     public:
-        virtual void GetCharacterInfo(std::function<void(const CharacterInfo&)> callback) const = 0;
+        virtual void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const = 0;
 
         virtual void Equip(
             const EquipItemRequest& request,
-            std::function<void(const EquipItemResponse&)> callback,
-            std::function<void(const NetworkException&)> errorCallback
+            const MessageCallback<EquipItemResponse>& callback
         ) const = 0;
     };
 
-    class NetworkAdapter;
+    class MessageService;
     class CharacterOnlineService : public CharacterService
     {
     public:
-        explicit CharacterOnlineService(NetworkAdapter& adapter);
+        explicit CharacterOnlineService(MessageService& messages);
 
-        void GetCharacterInfo(std::function<void(const CharacterInfo&)> callback) const override;
+        void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const override;
 
         void Equip(
             const EquipItemRequest& request,
-            std::function<void(const EquipItemResponse&)> callback,
-            std::function<void(const NetworkException&)> errorCallback
+            const MessageCallback<EquipItemResponse>& callback
         ) const override;
 
     private:
-        NetworkAdapter& m_adapter;
+        MessageService& m_messages;
     };
 
     class CharacterOfflineService : CharacterService
     {
     public:
-        void GetCharacterInfo(std::function<void(const CharacterInfo&)> callback) const override;
+        void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const override;
 
         void Equip(
             const EquipItemRequest& request,
-            std::function<void(const EquipItemResponse&)> callback,
-            std::function<void(const NetworkException&)> errorCallback
+            const MessageCallback<EquipItemResponse>& callback
         ) const override;
     };
 }

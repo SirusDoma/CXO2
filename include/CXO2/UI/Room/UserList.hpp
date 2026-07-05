@@ -7,11 +7,11 @@
 
 namespace Cx
 {
-    class RoomService;
+    class ChannelService;
     class UserList : public Gx::UiContainer
     {
     public:
-        explicit UserList(RoomService& service);
+        explicit UserList(ChannelService& service);
         void Initialize() override;
 
         void AddUser(const CharacterInfo& user);
@@ -24,7 +24,7 @@ namespace Cx
 
         bool m_refreshing{false};
 
-        RoomService& m_service;
+        ChannelService& m_service;
         std::vector<CharacterInfo> m_users;
         std::string m_selectedUser;
         unsigned int m_page = 1;

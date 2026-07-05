@@ -2,6 +2,7 @@
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Services/WaitingService.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/ToggleButton.hpp>
 
@@ -11,21 +12,8 @@
 
 namespace Cx
 {
-    enum class RoomTeam : std::uint8_t;
-
     struct RoomSlot;
     struct ItemMetadata;
-
-    struct WaitingMapChangedEventData;
-    struct WaitingTitleChangedEventData;
-    struct WaitingMusicChangedEventData;
-    struct WaitingMemberReadyStateChangedEventData;
-    struct WaitingMemberTeamChangedEventData;
-    struct WaitingMemberLeftEventData;
-    struct WaitingMemberJoinedEventData;
-    struct WaitingSlotChangedEventData;
-    struct WaitingKickEventData;
-    struct StartGameEventData;
 
     class Avatar;
     class AvatarInfo;
@@ -33,7 +21,6 @@ namespace Cx
     class SessionContext;
     class RoomContext;
     class GameContext;
-    class WaitingService;
     class MessagingService;
     class StateWaiting7K : public State
     {
@@ -42,20 +29,24 @@ namespace Cx
 
         void Initialize() override;
 
-        void OnSlotChanged(const WaitingSlotChangedEventData& ev);
-        void OnMemberJoined(const WaitingMemberJoinedEventData& ev);
-        void OnMemberLeft(const WaitingMemberLeftEventData& ev);
-        void OnMemberTeamChanged(const WaitingMemberTeamChangedEventData& ev);
-        void OnMemberReadyStateChanged(const WaitingMemberReadyStateChangedEventData& ev);
         void OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData);
-        void OnMusicChanged(const WaitingMusicChangedEventData& ev);
-        void OnTitleChanged(const WaitingTitleChangedEventData& ev);
-        void OnMapChanged(const WaitingMapChangedEventData& ev);
-        void OnKicked(const WaitingKickEventData& ev);
-        void OnStartGame(const StartGameEventData& ev);
 
     private:
         void InitializeAvatars();
+        void RegisterMessageEvents();
+
+        void OnSlotChanged(const MessageEnvelope<WaitingSlotChangedEventData>& ev);
+        void OnKicked(const MessageEnvelope<WaitingKickEventData>& ev);
+
+        void OnMemberJoined(const MessageEnvelope<WaitingMemberJoinedEventData>& ev);
+        void OnMemberLeft(const MessageEnvelope<WaitingMemberLeftEventData>& ev);
+        void OnMemberTeamChanged(const MessageEnvelope<WaitingMemberTeamChangedEventData>& ev);
+        void OnMemberReadyStateChanged(const MessageEnvelope<WaitingMemberReadyStateChangedEventData>& ev);
+
+        void OnMusicChanged(const MessageEnvelope<WaitingMusicChangedEventData>& ev);
+        void OnTitleChanged(const MessageEnvelope<WaitingTitleChangedEventData>& ev);
+        void OnMapChanged(const MessageEnvelope<WaitingMapChangedEventData>& ev);
+        void OnStartGame(const MessageEnvelope<StartGameEventData>& ev);
 
         void OnReadyStateChanged(Gx::ToggleButton& sender);
         void OnStartStateChanged(Gx::ToggleButton& sender);

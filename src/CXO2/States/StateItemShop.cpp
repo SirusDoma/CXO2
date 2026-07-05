@@ -12,6 +12,8 @@
 
 #include <CXO2/Network/Exception.hpp>
 #include <CXO2/Services/ItemShopService.hpp>
+#include <CXO2/Messages/Requests/PurchaseItemRequest.hpp>
+#include <CXO2/Messages/Requests/SellItemRequest.hpp>
 
 #include <CXO2/Messages/Responses/PurchaseItemResponse.hpp>
 #include <CXO2/Messages/Responses/SellItemResponse.hpp>
@@ -759,10 +761,11 @@ namespace Cx
             if (slotID >= charInfo.Inventory.size())
                 return;
 
-            m_service.SellItem(slotID, [=, &charInfo] (const SellItemResponse& response)
+            m_service.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=, &charInfo] (const MessageEnvelope<SellItemResponse>& ev)
             {
-                Invoke([=, &charInfo]
+                try
                 {
+                    const auto& response = ev.Open();
                     if (response.Result == SellItemResult::Failed)
                     {
                         ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
@@ -783,7 +786,11 @@ namespace Cx
 
                     // m_session.Save();
                     InvalidateMyBag();
-                });
+                }
+                catch (const Gx::Exception& ex)
+                {
+                    ShowDialog(std::string(ex.what()), DialogStyle::Information);
+                }
             });
         });
     }
@@ -1315,10 +1322,11 @@ namespace Cx
                         return;
                     }
 
-                    m_service.PurchaseItem(metadata.ID, [=, &charInfo] (const PurchaseItemResponse& response)
+                    m_service.PurchaseItem(PurchaseItemRequest{metadata.ID}, [=] (const MessageEnvelope<PurchaseItemResponse>& ev)
                     {
-                        Invoke([=]
+                        try
                         {
+                            const auto& response = ev.Open();
                             if (response.ResultCode != PurchaseItemResult::Success)
                             {
                                 if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
@@ -1350,17 +1358,14 @@ namespace Cx
 
                             const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
                             bagButton->PerformClick();
-                        });
-                    },
-                    [=] (const NetworkException& ex)
-                    {
-                        Invoke([=]
+                        }
+                        catch (const Gx::Exception& ex)
                         {
                             ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
                             {
                                 GetDirector().Present<StatePlanet>();
                             });
-                        });
+                        }
                     });
 
                     return;

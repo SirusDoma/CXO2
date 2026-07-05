@@ -18,7 +18,7 @@ namespace Cx
 
         auto resources = m_resources.get();
         if (scope == ResourceScope::Shared)
-            resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
+            resources = &GetApplication().GetModule<Gx::Context>().Require<Gx::ResourceManager>();
 
         if (!resources)
             return nullptr;
@@ -54,7 +54,7 @@ namespace Cx
     {
         auto resources = m_tempResources.get();
         if (scope == ResourceScope::Shared)
-            resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
+            resources = &GetApplication().GetModule<Gx::Context>().Require<Gx::ResourceManager>();
         else if (scope == ResourceScope::Local)
             resources = m_resources.get();
 
@@ -109,7 +109,7 @@ namespace Cx
     {
         auto resources = m_resources.get();
         if (scope == ResourceScope::Shared)
-            resources = &Gx::Application::Instance().GetContext().Require<Gx::ResourceManager>();
+            resources = &GetApplication().GetModule<Gx::Context>().Require<Gx::ResourceManager>();
         else if (scope == ResourceScope::Immediate)
             resources = m_tempResources.get();
 

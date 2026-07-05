@@ -24,7 +24,7 @@
 #include <CXO2/UI/Dialogs/OptionDialog.hpp>
 #include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
 
-#include <CXO2/Services/RoomService.hpp>
+#include <CXO2/Services/ChannelService.hpp>
 #include <CXO2/Services/CharacterService.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 
@@ -62,7 +62,7 @@ namespace Cx
     using namespace StringTable::Identifiers;
 
     StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room,
-        GameContext& game, RoomService& roomService, CharacterService& charService, ItemFactory& items) :
+        GameContext& game, ChannelService& roomService, CharacterService& charService, ItemFactory& items) :
         m_mixer(mixer),
         m_charService(charService),
         m_service(roomService),
@@ -82,8 +82,9 @@ namespace Cx
     {
         State::Initialize();
 
-        LoadCharacterInfo();
-        LoadChannelInfo();
+        SyncCharacterInfo();
+        SyncChannelInfo();
+        RegisterMessageEvents();
 
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_ROOM);
         bgm->setLooping(true);
@@ -122,14 +123,14 @@ namespace Cx
         chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
         chatWindow->PushSystemMessage("F10               : Toggle Vsync on/off");
 
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        roomList->SetEnterRoomCallback(std::bind(&StateRoom::JoinRoom, this, std::placeholders::_1));
-
         const auto createRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_CREATE_ROOM);
         createRoomButton->SetClickCallback(std::bind(&StateRoom::OnCreateRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
         const auto quickJoinButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_QUICK_JOIN);
         quickJoinButton->SetClickCallback(std::bind(&StateRoom::OnQuickJoinRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
+
+        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+        roomList->SetEnterRoomCallback(std::bind(&StateRoom::OnRoomButtonClicked, this, std::placeholders::_1));
 
         const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
         const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
@@ -175,152 +176,29 @@ namespace Cx
         }
     }
 
-    void StateRoom::OnRoomCreated(const RoomCreatedEventData& ev)
+    void StateRoom::SyncCharacterInfo()
     {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        roomList->Upsert(RoomInfo
+        m_charService.GetCharacterInfo([this] (const auto& ev)
         {
-            /* .ID            = */ ev.ID,
-            /* .State         = */ RoomState::Waiting,
-            /* .Title         = */ ev.Title,
-            /* .Locked        = */ ev.Locked,
-            /* .MusicID       = */ 0,
-            /* .Difficulty    = */ Difficulty::EX,
-            /* .Mode          = */ ev.GameMode,
-            /* .SpeedID       = */ 1,
-            /* .Capacity      = */ 8,
-            /* .UserCount     = */ 1,
-            /* .MinLevelLimit = */ ev.MinLevelLimit,
-            /* .MaxLevelLimit = */ ev.MaxLevelLimit
-        });
-
-        roomList->Invalidate();
-    }
-
-    void StateRoom::OnRoomMusicChanged(const RoomMusicChangedEventData& ev)
-    {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        auto& room = roomList->GetRoom(ev.ID);
-
-        room.MusicID    = ev.MusicID;
-        room.Difficulty = ev.Difficulty;
-        room.SpeedID    = ev.SpeedID;
-        roomList->Invalidate();
-    }
-
-    void StateRoom::OnRoomStateChanged(const RoomStateChangedEventData& ev)
-    {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        auto& room = roomList->GetRoom(ev.ID);
-
-        room.State = ev.State;
-        roomList->Invalidate();
-    }
-
-    void StateRoom::OnRoomTitleChanged(const RoomTitleChangedEventData& ev)
-    {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        auto& room = roomList->GetRoom(ev.ID);
-
-        room.Title = ev.Title;
-        roomList->Invalidate();
-    }
-
-    void StateRoom::OnRoomUserCountChanged(const RoomUserCountChangedEventData& ev)
-    {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        auto& room = roomList->GetRoom(ev.ID);
-
-        room.UserCount = ev.UserCount;
-        room.Capacity  = ev.Capacity;
-
-        roomList->Invalidate();
-    }
-
-    void StateRoom::OnRoomRemoved(const RoomRemovedEventData& ev)
-    {
-        const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        roomList->Remove(ev.ID);
-    }
-
-    void StateRoom::LoadCharacterInfo()
-    {
-        m_charService.GetCharacterInfo([=](const auto& charInfo)
-        {
-            Invoke([this, charInfo]
-            {
-                m_session.SetCharacterInfo(charInfo);
-
-                const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
-                nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
-
-                const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
-                avatar->SetGender(charInfo.Gender);
-
-                for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
-                    avatar->SetDefaultItem(std::move(item));
-
-                for (const auto id : charInfo.EquippedItemIDs)
-                    avatar->Equip(m_items.Create(id));
-
-                avatar->SetVisible(true);
-            });
+            OnCharacterInfoLoad(ev);
         });
     }
 
-    void StateRoom::LoadChannelInfo()
+    void StateRoom::SyncChannelInfo()
     {
-        m_service.GetChannelInfo([this] (const auto& response)
-        {
-            Invoke([this, response]
-            {
+        m_service.GetChannelInfo(
+            [this] (const auto& ev) { OnRoomListLoad(ev); },
+            [this] (const auto& ev) { OnUserListLoad(ev); }
+        );
+    }
 
-                const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-                roomList->Clear();
-
-                for (const RoomInfo& room : response.Rooms)
-                {
-                    if (room.State != RoomState::Unavailable)
-                        roomList->Upsert(room);
-                }
-
-                roomList->Invalidate();
-            });
-        },
-        [this] (const auto& response)
-        {
-            if (response.Users->empty())
-                return;
-
-            Invoke([this, users = response.Users.GetContainer()]
-            {
-                const auto userList  = Instantiate<UserList>(Resource::Room::IDC_USER_LIST);
-                userList->Clear();
-
-                for (const auto& user : users)
-                {
-                    userList->AddUser(CharacterInfo
-                    {
-                        user.Name,
-                        Gender::Any,
-                        Role::Normal,
-                        user.Level
-                    });
-                }
-
-                userList->Invalidate();
-            });
-        },
-        [this] (const auto& ex)
-        {
-            Invoke([this, ex]
-            {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
-                {
-                    GetDirector().Present<StatePlanet>();
-                });
-            });
-        });
+    void StateRoom::RegisterMessageEvents()
+    {
+        m_service.SetRoomCreatedEventCallback([this] (const auto& ev) { OnRoomCreated(ev); });
+        m_service.SetRoomMusicChangedEventCallback([this] (const auto& ev) { OnRoomMusicChanged(ev); });
+        m_service.SetRoomTitleChangedEventCallback([this] (const auto& ev) { OnRoomTitleChanged(ev); });
+        m_service.SetRoomUserCountChangedEventCallback([this] (const auto& ev) { OnRoomUserCountChanged(ev); });
+        m_service.SetRoomRemovedEventCallback([this] (const auto& ev) { OnRoomRemoved(ev); });
     }
 
     void StateRoom::CreateRoom(
@@ -344,7 +222,7 @@ namespace Cx
             return;
         }
 
-        const auto& music = musicList[0];
+        const auto& music  = musicList[0];
         const auto request = CreateRoomRequest
         {
             title,
@@ -355,70 +233,14 @@ namespace Cx
             static_cast<std::uint8_t>(maxLevelLimit)
         };
 
-        m_service.CreateRoom(
-            request,
-            [=] (const CreateRoomResponse& response)
-            {
-                Invoke([=]
-                {
-                    if (response.ResultCode != CreateRoomResult::Success)
-                    {
-                        ShowDialog("Channel is full.", DialogStyle::Information);
-                        return;
-                    }
-
-                    const auto room = RoomInfo
-                    {
-                        /* .ID            = */ response.ID,
-                        /* .State         = */ RoomState::Waiting,
-                        /* .Title         = */ title.toAnsiString(),
-                        /* .Locked        = */ !password.empty(),
-                        /* .MusicID       = */ music.ID,
-                        /* .Difficulty    = */ Difficulty::EX,
-                        /* .Mode          = */ mode,
-                        /* .SpeedID       = */ 0,
-                        /* .Capacity      = */ 8,
-                        /* .UserCount     = */ 1,
-                        /* .MinLevelLimit = */ static_cast<std::uint8_t>(minLevelLimit),
-                        /* .MaxLevelLimit = */ static_cast<std::uint8_t>(maxLevelLimit)
-                    };
-
-
-                    m_room.UpdateFrom(room);
-                    m_room.SetMapID(MapInfo::RandomID);
-                    m_room.SetRandomizedMapID(0);
-
-                    auto& master = m_room.GetSlot(0);
-                    master = RoomSlot
-                    {
-                        /* .Member   = */ m_session.GetCharacterInfo(),
-                        /* .State    = */ RoomSlotState::Occupied,
-                        /* .IsMaster = */ true,
-                        /* .Ready    = */ true,
-                        /* .Team     = */ RoomTeam::A
-                    };
-
-                    GetDirector().Present<StateWaiting7K>();
-                });
-            },
-            [=] (const auto& ex)
-            {
-                Invoke([=]
-                {
-                    ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                    {
-                        GetDirector().Dismiss<StatePlanet>();
-                    });
-                });
-            }
-        );
+        m_service.CreateRoom(request, [this, request, music] (const auto& ev)
+        {
+            OnCreateRoomResponded(request, music, ev);
+        });
     }
 
     void StateRoom::JoinRoom(const RoomInfo& room)
     {
-        if (m_busy)
-            return;
-
         if (room.Mode == GameMode::Single)
         {
             ShowDialog("As it is a single room, any user cannot enter.", DialogStyle::Information);
@@ -454,10 +276,10 @@ namespace Cx
         else
         {
             const std::uint8_t randomBit = static_cast<std::uint8_t>((room.MusicID >> 28) & 0xFF);
-            constexpr int randomMaxBit = static_cast<int>(LevelCategory::Level1) |
-                                         static_cast<int>(LevelCategory::Level2) |
-                                         static_cast<int>(LevelCategory::Level3) |
-                                         static_cast<int>(LevelCategory::Level4);
+            constexpr int randomMaxBit   = static_cast<int>(LevelCategory::Level1) |
+                                           static_cast<int>(LevelCategory::Level2) |
+                                           static_cast<int>(LevelCategory::Level3) |
+                                           static_cast<int>(LevelCategory::Level4);
 
             if (randomBit == 0 || randomBit > randomMaxBit)
             {
@@ -466,109 +288,13 @@ namespace Cx
             }
         }
 
-        auto callback = [=] (const std::string& password)
+        auto join = [=] (const std::string& password)
         {
             m_busy = true;
-            m_service.JoinRoom(
-                JoinRoomRequest{room.ID, password},
-                [=](const JoinRoomResponse& response)
-                {
-                    if (response.Result != JoinResult::Success)
-                    {
-                        if (response.Result == JoinResult::Full)
-                            ShowDialog("The room is filled.", DialogStyle::Information);
-                        else if (response.Result == JoinResult::InvalidPassword)
-                            ShowDialog("Wrong password", DialogStyle::Information);
-                        else if (response.Result == JoinResult::InvalidMode)
-                            ShowDialog("The room is single playmode", DialogStyle::Information);
-                        else if (response.Result == JoinResult::InProgress)
-                            ShowDialog("The game already has started.", DialogStyle::Information);
-                        else
-                            ShowDialog("[Fail] Please contact administrator when this message shows.",
-                                       DialogStyle::Information);
-
-                        m_busy = false;
-                        return;
-                    }
-
-                    std::uint32_t musicID = response.MusicID;
-                    auto random = static_cast<LevelCategory>(0);
-                    if (musicID >= std::numeric_limits<std::uint16_t>::max())
-                    {
-                        const std::uint8_t randomBit = static_cast<std::uint8_t>((room.MusicID >> 28) & 0xFF);
-                        constexpr int randomMaxBit = static_cast<int>(LevelCategory::Level1) |
-                                                     static_cast<int>(LevelCategory::Level2) |
-                                                     static_cast<int>(LevelCategory::Level3) |
-                                                     static_cast<int>(LevelCategory::Level4);
-
-                        if (randomBit >= 1 && randomBit <= randomMaxBit)
-                        {
-                            random  = static_cast<LevelCategory>(randomBit);
-                            musicID = response.MusicID & 0xFF;
-                        }
-                    }
-
-                    m_room.UpdateFrom(RoomInfo
-                    {
-                        /* .ID            = */ room.ID,
-                        /* .State         = */ RoomState::Waiting,
-                        /* .Title         = */ response.Title,
-                        /* .Locked        = */ !password.empty(),
-                        /* .MusicID       = */ musicID,
-                        /* .Difficulty    = */ response.Difficulty,
-                        /* .Mode          = */ response.Mode,
-                        /* .SpeedID       = */ response.SpeedID,
-                        /* .Capacity      = */ 8,
-                        /* .UserCount     = */ 1,
-                        /* .MinLevelLimit = */ room.MinLevelLimit,
-                        /* .MaxLevelLimit = */ room.MaxLevelLimit
-                    });
-
-                    m_room.SetMapID(response.Map.GetMapID());
-                    m_room.SetRandomizedMapID(response.Map.GetRandomizedMap());
-
-                    m_room.SetRandomLevel(random);
-                    for (const auto& source: response.Slots)
-                    {
-                        auto& slot = m_room.GetSlot(source.Index);
-                        slot.State = source.State;
-
-                        if (slot.State == RoomSlotState::Unoccupied || slot.State == RoomSlotState::Locked)
-                        {
-                            slot.Member = std::nullopt;
-                            continue;
-                        }
-
-                        slot.IsMaster = source.Member.IsRoomMaster;
-                        slot.Team = source.Member.Team;
-                        slot.Ready = source.Member.IsRoomMaster || source.Member.Ready;
-                        slot.Member = CharacterInfo
-                        {
-                            /* .Name            = */ source.Member.Name,
-                            /* .Gender          = */ source.Member.Gender,
-                            /* .Role            = */ Role::Normal,
-                            /* .Level           = */ source.Member.Level,
-                            /* .Experience      = */ 0,
-                            /* .RankStats       = */ {},
-                            /* .Wallet          = */ {},
-                            /* .EquippedItemIDs = */ source.Member.EquippedItemIDs,
-                            /* .Inventory       = */ {},
-                            /* .MusicIDs        = */ source.Member.MusicIDs
-                        };
-                    }
-
-                    GetDirector().Present<StateWaiting7K>();
-                }, [=](const auto& ex)
-                {
-                    Invoke([=]
-                    {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=](bool)
-                        {
-                            GetDirector().Dismiss<StatePlanet>();
-                        });
-                    });
-                }
-            );
+            m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this, room] (const auto& ev)
+            {
+                OnJoinRoomResponded(room, ev);
+            });
         };
 
         if (room.Locked)
@@ -581,7 +307,7 @@ namespace Cx
 
             passwordDialog->SetAcceptCallback([=]
             {
-                callback(field->GetString());
+                join(field->GetString().toAnsiString());
             });
 
             auto ctx = Gx::DialogPresentationContext();
@@ -591,17 +317,423 @@ namespace Cx
             Present(*passwordDialog, ctx);
         }
         else
-            callback("1");
+            join("1");
+    }
+
+    void StateRoom::OnCharacterInfoLoad(const MessageEnvelope<CharacterInfoResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            auto charInfo = CharacterInfo
+            {
+                response.Name,
+                response.Gender,
+                response.Role,
+                response.Level,
+                response.Experience,
+                CharacterInfo::RankStatsInfo{
+                    0,
+                    response.Wins,
+                    response.Loses,
+                    response.Draws
+                },
+                CharacterInfo::WalletInfo{
+                    response.Gem,
+                    response.Point
+                },
+                response.EquippedItemIDs.GetContainer(),
+                {},
+                {}
+            };
+
+            for (const std::uint32_t id : response.Inventory.GetContainer())
+                charInfo.Inventory.push_back(id);
+
+            m_session.SetCharacterInfo(charInfo);
+
+            const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
+            nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
+
+            const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
+            avatar->SetGender(charInfo.Gender);
+
+            for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+                avatar->SetDefaultItem(std::move(item));
+
+            for (const auto id : charInfo.EquippedItemIDs)
+                avatar->Equip(m_items.Create(id));
+
+            avatar->SetVisible(true);
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomListLoad(const MessageEnvelope<RoomListResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            roomList->Clear();
+
+            for (const RoomInfo& room : response.Rooms)
+            {
+                if (room.State != RoomState::Unavailable)
+                    roomList->Upsert(room);
+            }
+
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnUserListLoad(const MessageEnvelope<UserListResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.Users->empty())
+                return;
+
+            const auto userList  = Instantiate<UserList>(Resource::Room::IDC_USER_LIST);
+            userList->Clear();
+
+            for (const auto& user : response.Users.GetContainer())
+            {
+                userList->AddUser(CharacterInfo
+                {
+                    user.Name,
+                    Gender::Any,
+                    Role::Normal,
+                    user.Level
+                });
+            }
+
+            userList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnCreateRoomResponded(const CreateRoomRequest& request, const ChartMetadata& music, const MessageEnvelope<CreateRoomResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ResultCode != CreateRoomResult::Success)
+            {
+                ShowDialog("Channel is full.", DialogStyle::Information);
+                return;
+            }
+
+            const auto room = RoomInfo
+            {
+                /* .ID            = */ response.ID,
+                /* .State         = */ RoomState::Waiting,
+                /* .Title         = */ request.Title.toAnsiString(),
+                /* .Locked        = */ !request.Password.empty(),
+                /* .MusicID       = */ music.ID,
+                /* .Difficulty    = */ Difficulty::EX,
+                /* .Mode          = */ request.GameMode,
+                /* .SpeedID       = */ 0,
+                /* .Capacity      = */ 8,
+                /* .UserCount     = */ 1,
+                /* .MinLevelLimit = */ static_cast<std::uint8_t>(request.MinLevelLimit),
+                /* .MaxLevelLimit = */ static_cast<std::uint8_t>(request.MaxLevelLimit)
+            };
+
+
+            m_room.UpdateFrom(room);
+            m_room.SetMapID(MapInfo::RandomID);
+            m_room.SetRandomizedMapID(0);
+
+            auto& master = m_room.GetSlot(0);
+            master = RoomSlot
+            {
+                /* .Member   = */ m_session.GetCharacterInfo(),
+                /* .State    = */ RoomSlotState::Occupied,
+                /* .IsMaster = */ true,
+                /* .Ready    = */ true,
+                /* .Team     = */ RoomTeam::A
+            };
+
+            GetDirector().Present<StateWaiting7K>();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnJoinRoomResponded(const RoomInfo& room, const MessageEnvelope<JoinRoomResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.Result != JoinResult::Success)
+            {
+                if (response.Result == JoinResult::Full)
+                    ShowDialog("The room is filled.", DialogStyle::Information);
+                else if (response.Result == JoinResult::InvalidPassword)
+                    ShowDialog("Wrong password", DialogStyle::Information);
+                else if (response.Result == JoinResult::InvalidMode)
+                    ShowDialog("The room is single playmode", DialogStyle::Information);
+                else if (response.Result == JoinResult::InProgress)
+                    ShowDialog("The game already has started.", DialogStyle::Information);
+                else
+                    ShowDialog("[Fail] Please contact administrator when this message shows.",
+                               DialogStyle::Information);
+
+                m_busy = false;
+                return;
+            }
+
+            std::uint32_t musicID = response.MusicID;
+            auto random = static_cast<LevelCategory>(0);
+            if (musicID >= std::numeric_limits<std::uint16_t>::max())
+            {
+                const std::uint8_t randomBit = static_cast<std::uint8_t>((room.MusicID >> 28) & 0xFF);
+                constexpr int randomMaxBit = static_cast<int>(LevelCategory::Level1) |
+                                             static_cast<int>(LevelCategory::Level2) |
+                                             static_cast<int>(LevelCategory::Level3) |
+                                             static_cast<int>(LevelCategory::Level4);
+
+                if (randomBit >= 1 && randomBit <= randomMaxBit)
+                {
+                    random  = static_cast<LevelCategory>(randomBit);
+                    musicID = response.MusicID & 0xFF;
+                }
+            }
+
+            m_room.UpdateFrom(RoomInfo
+            {
+                /* .ID            = */ room.ID,
+                /* .State         = */ RoomState::Waiting,
+                /* .Title         = */ response.Title,
+                /* .Locked        = */ room.Locked,
+                /* .MusicID       = */ musicID,
+                /* .Difficulty    = */ response.Difficulty,
+                /* .Mode          = */ response.Mode,
+                /* .SpeedID       = */ response.SpeedID,
+                /* .Capacity      = */ 8,
+                /* .UserCount     = */ 1,
+                /* .MinLevelLimit = */ room.MinLevelLimit,
+                /* .MaxLevelLimit = */ room.MaxLevelLimit
+            });
+
+            m_room.SetMapID(response.Map.GetMapID());
+            m_room.SetRandomizedMapID(response.Map.GetRandomizedMap());
+
+            m_room.SetRandomLevel(random);
+            for (const auto& source: response.Slots)
+            {
+                auto& slot = m_room.GetSlot(source.Index);
+                slot.State = source.State;
+
+                if (slot.State == RoomSlotState::Unoccupied || slot.State == RoomSlotState::Locked)
+                {
+                    slot.Member = std::nullopt;
+                    continue;
+                }
+
+                slot.IsMaster = source.Member.IsRoomMaster;
+                slot.Team = source.Member.Team;
+                slot.Ready = source.Member.IsRoomMaster || source.Member.Ready;
+                slot.Member = CharacterInfo
+                {
+                    /* .Name            = */ source.Member.Name,
+                    /* .Gender          = */ source.Member.Gender,
+                    /* .Role            = */ Role::Normal,
+                    /* .Level           = */ source.Member.Level,
+                    /* .Experience      = */ 0,
+                    /* .RankStats       = */ {},
+                    /* .Wallet          = */ {},
+                    /* .EquippedItemIDs = */ source.Member.EquippedItemIDs,
+                    /* .Inventory       = */ {},
+                    /* .MusicIDs        = */ source.Member.MusicIDs
+                };
+            }
+
+            GetDirector().Present<StateWaiting7K>();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomCreated(const MessageEnvelope<RoomCreatedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            roomList->Upsert(RoomInfo
+            {
+                /* .ID            = */ response.ID,
+                /* .State         = */ RoomState::Waiting,
+                /* .Title         = */ response.Title,
+                /* .Locked        = */ response.Locked,
+                /* .MusicID       = */ 0,
+                /* .Difficulty    = */ Difficulty::EX,
+                /* .Mode          = */ response.GameMode,
+                /* .SpeedID       = */ 1,
+                /* .Capacity      = */ 8,
+                /* .UserCount     = */ 1,
+                /* .MinLevelLimit = */ response.MinLevelLimit,
+                /* .MaxLevelLimit = */ response.MaxLevelLimit
+            });
+
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomMusicChanged(const MessageEnvelope<RoomMusicChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            auto& room = roomList->GetRoom(response.ID);
+
+            room.MusicID    = response.MusicID;
+            room.Difficulty = response.Difficulty;
+            room.SpeedID    = response.SpeedID;
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomStateChanged(const MessageEnvelope<RoomStateChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            auto& room = roomList->GetRoom(response.ID);
+
+            room.State = response.State;
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomTitleChanged(const MessageEnvelope<RoomTitleChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            auto& room = roomList->GetRoom(response.ID);
+
+            room.Title = response.Title;
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomUserCountChanged(const MessageEnvelope<RoomUserCountChangedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            auto& room = roomList->GetRoom(response.ID);
+
+            room.UserCount = response.UserCount;
+            room.Capacity  = response.Capacity;
+
+            roomList->Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateRoom::OnRoomRemoved(const MessageEnvelope<RoomRemovedEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
+            roomList->Remove(response.ID);
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
     }
 
     void StateRoom::OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        const auto createRoomDialog = Instantiate<CreateRoomDialog>(Resource::Room::IDC_DIALOG_CREATE_ROOM);
-
         if (m_busy)
             return;
 
-        const auto sfxAccept   = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+        const auto createRoomDialog = Instantiate<CreateRoomDialog>(Resource::Room::IDC_DIALOG_CREATE_ROOM);
+        const auto sfxAccept        = Instantiate<sf::Sound>(Sound::Effects::EF_02);
         m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
 
         Present(*createRoomDialog, Gx::PresentationContext::Default);
@@ -617,8 +749,19 @@ namespace Cx
         });
     }
 
+    void StateRoom::OnRoomButtonClicked(const RoomInfo& room)
+    {
+        if (m_busy)
+            return;
+
+        JoinRoom(room);
+    }
+
     void StateRoom::OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
+        if (m_busy)
+            return;
+
         const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
         const auto room = roomList->GetWaitingRoom();
 
@@ -749,23 +892,27 @@ namespace Cx
         if (m_busy)
             return;
 
-        m_service.ChannelLogout([this]
+        m_service.Logout([this] (const auto& envelope)
         {
-            auto& director = GetDirector();
-            if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-                m_mixer.Play(*sfx, Sound::Channel::SFX);
+            try
+            {
+                const auto& response = envelope.Open();
+                if (!response.Invalid)
+                {
+                    auto& director = GetDirector();
+                    if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+                        m_mixer.Play(*sfx, Sound::Channel::SFX);
 
-            director.Dismiss<StatePlanet>();
-        },
-        [=] (const auto& ex)
-        {
-            Invoke([=]
+                    director.Dismiss<StatePlanet>();
+                }
+            }
+            catch (const Gx::Exception& ex)
             {
                 ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });
-            });
+            }
         });
     }
 }

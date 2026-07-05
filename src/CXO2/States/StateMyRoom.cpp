@@ -13,6 +13,7 @@
 #include <CXO2/Services/ItemShopService.hpp>
 
 #include <CXO2/Messages/Requests/EquipItemRequest.hpp>
+#include <CXO2/Messages/Requests/SellItemRequest.hpp>
 #include <CXO2/Messages/Responses/EquipItemResponse.hpp>
 #include <CXO2/Messages/Responses/SellItemResponse.hpp>
 
@@ -235,10 +236,11 @@ namespace Cx
                 if (slotID >= charInfo.Inventory.size())
                     return;
 
-                m_shopService.SellItem(slotID, [=, &charInfo] (const SellItemResponse& response)
+                m_shopService.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=, &charInfo] (const MessageEnvelope<SellItemResponse>& ev)
                 {
-                    Invoke([=, &charInfo]
+                    try
                     {
+                        const auto& response = ev.Open();
                         if (response.Result == SellItemResult::Failed)
                         {
                             ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
@@ -259,7 +261,11 @@ namespace Cx
 
                         // m_session.Save();
                         Invalidate();
-                    });
+                    }
+                    catch (const Gx::Exception& ex)
+                    {
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information);
+                    }
                 });
             });
         });
@@ -437,41 +443,41 @@ namespace Cx
                     return;
 
                 m_busy = true;
-                m_service.Equip
-                (
-                    EquipItemRequest{ GetItemEquipSlotType(item->GetType()), static_cast<std::uint32_t>(target) },
-                    [=] (const EquipItemResponse& response)
+                const auto request = EquipItemRequest{
+                    GetItemEquipSlotType(item->GetType()),
+                    static_cast<std::uint32_t>(target)
+                };
+
+                m_service.Equip(request, [=] (const auto& ev)
+                {
+                    m_busy = false;
+
+                    try
                     {
-                        m_busy = false;
+                        const auto& response = ev.Open();
                         if (response.Invalid)
                             return;
 
-                        Invoke([=]
-                        {
-                            avatar->Equip(m_inventory[response.SlotID]);
+                        avatar->Equip(m_inventory[response.SlotID]);
 
-                            charInfo->EquippedItemIDs.insert(response.NewEquippedItemId);
-                            charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
-                            charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
-                            m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
+                        charInfo->EquippedItemIDs.insert(response.NewEquippedItemId);
+                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
+                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
-                            m_selectedItem = nullptr;
-                            // m_session.Save();
+                        m_selectedItem = nullptr;
+                        // m_session.Save();
 
-                            Invalidate();
-                        });
-                    },
-                    [=] (const auto& ex)
+                        Invalidate();
+                    }
+                    catch (const Gx::Exception& ex)
                     {
-                        Invoke([=]
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
                         {
-                            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                            {
-                                GetDirector().Dismiss<StatePlanet>();
-                            });
+                            GetDirector().Dismiss<StatePlanet>();
                         });
                     }
-                );
+                });
             });
         }
 
@@ -570,41 +576,41 @@ namespace Cx
                 });
 
                 const size_t target = slotIt != inventory.end() ? static_cast<size_t>(std::distance(inventory.begin(), slotIt)) : inventory.size();
-                m_service.Equip
-                (
-                    EquipItemRequest{ GetItemEquipSlotType(item->GetType()), static_cast<std::uint32_t>(target) },
-                    [=] (const EquipItemResponse& response)
+                const auto request  = EquipItemRequest{
+                    GetItemEquipSlotType(item->GetType()),
+                    static_cast<std::uint32_t>(target)
+                };
+
+                m_service.Equip(request, [=] (const auto& ev)
+                {
+                    try
                     {
                         m_busy = false;
+                        const auto& response = ev.Open();
+
                         if (response.Invalid)
                             return;
 
-                        Invoke([=]
-                        {
-                            const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
-                            m_mixer.Play(*sfxDress, Sound::Channel::SFX);
+                        const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
+                        m_mixer.Play(*sfxDress, Sound::Channel::SFX);
 
-                            avatar->Unequip(item->GetType());
+                        avatar->Unequip(item->GetType());
 
-                            charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
-                            charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
-                            m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
+                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
+                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
-                            // m_session.Save();
-                            Invalidate();
-                        });
-                    },
-                    [=] (const auto& ex)
+                        // m_session.Save();
+                        Invalidate();
+                    }
+                    catch (const Gx::Exception& ex)
                     {
-                        Invoke([=]
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
                         {
-                            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                            {
-                                GetDirector().Dismiss<StatePlanet>();
-                            });
+                            GetDirector().Dismiss<StatePlanet>();
                         });
                     }
-                );
+                });
             });
         }
     }

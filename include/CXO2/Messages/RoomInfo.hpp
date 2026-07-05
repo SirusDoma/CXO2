@@ -24,7 +24,7 @@ namespace Cx
         StringEnvelope<> Title{0, 21};
         bool             Locked{};
         std::uint32_t    MusicID{};
-        Cx::Difficulty     Difficulty{};
+        Cx::Difficulty   Difficulty{};
         GameMode         Mode{};
         std::uint8_t     SpeedID{};
         std::uint8_t     Capacity{};

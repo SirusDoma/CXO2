@@ -50,6 +50,8 @@ namespace Cx
     {
         State::Initialize();
 
+        m_service.SetMemberMusicLoadedEventCallback([this] (const auto& ev) { OnMemberConfirmMusicLoaded(ev); });
+
         std::size_t index = 0;
         auto imageSet = std::vector<Gx::Image*>();
         for (const auto child : GetChildren())
@@ -134,21 +136,33 @@ namespace Cx
         return false;
     }
 
-    void StateLoading::OnMemberConfirmMusicLoaded(const MemberMusicLoadedEventData& ev)
+    void StateLoading::OnMemberConfirmMusicLoaded(const MessageEnvelope<MemberMusicLoadedEventData>& envelope)
     {
-        auto lock = std::lock_guard(m_mutex);
-
-        m_loadedUsers.insert(ev.ID);
-        m_signal.notify_one();
-
-        const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
-        if (ev.ID < list->GetChildrenCount())
+        try
         {
-            if (const auto container = dynamic_cast<Gx::UiContainer*>(list->GetChildren()[ev.ID]))
+            const auto& ev = envelope.Open();
+
+            auto lock = std::lock_guard(m_mutex);
+
+            m_loadedUsers.insert(ev.ID);
+            m_signal.notify_one();
+
+            const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
+            if (ev.ID < list->GetChildrenCount())
             {
-                if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
-                    sign->SetFrame("Completed");
+                if (const auto container = dynamic_cast<Gx::UiContainer*>(list->GetChildren()[ev.ID]))
+                {
+                    if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
+                        sign->SetFrame("Completed");
+                }
             }
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
         }
     }
 
@@ -184,8 +198,18 @@ namespace Cx
 
     void StateLoading::OnChartLoaded(const Chart* chart)
     {
-        m_service.ConfirmMusicLoaded([this, chart]
+        m_service.ConfirmMusicLoaded([this] (const auto& ev)
         {
+            try
+            {
+                const auto& _ = ev.Open();
+            }
+            catch (const Gx::Exception&)
+            {
+                GetDirector().Dismiss<StatePlanet>();
+                return;
+            }
+
             std::uint8_t userCount = 0;
             for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
             {
@@ -194,24 +218,30 @@ namespace Cx
                     userCount++;
             }
 
-            auto lock = std::unique_lock(m_mutex);
-            m_signal.wait_for(lock, sf::seconds(15).toDuration(),
-            [this, userCount]
+            std::thread([this, userCount]
             {
-                return m_loadedUsers.size() >= userCount;
-            });
+                {
+                    auto lock = std::unique_lock(m_mutex);
+                    m_signal.wait_for(lock, sf::seconds(15).toDuration(),
+                    [this, userCount]
+                    {
+                        return m_loadedUsers.size() >= userCount;
+                    });
+                }
 
-            auto ctx = PlayingResourceContext();
-            ctx.SetFxEnabled(m_context.GetConfig().UseFx);
-            ctx.SetMapID(m_context.GetMapID());
-            ctx.SetEffectID(m_context.GetEffectID());
-            ctx.SetMode(m_context.GetMode());
+                Invoke([this]
+                {
+                    m_service.SetMemberMusicLoadedEventCallback(nullptr);
 
-            GetDirector().Present<StatePlaying7K>(ctx);
-        },
-        [=] (const auto& ex)
-        {
-            GetDirector().Dismiss<StatePlanet>();
+                    auto ctx = PlayingResourceContext();
+                    ctx.SetFxEnabled(m_context.GetConfig().UseFx);
+                    ctx.SetMapID(m_context.GetMapID());
+                    ctx.SetEffectID(m_context.GetEffectID());
+                    ctx.SetMode(m_context.GetMode());
+
+                    GetDirector().Present<StatePlaying7K>(ctx);
+                });
+            }).detach();
         });
     }
 }
