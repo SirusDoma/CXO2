@@ -57,14 +57,14 @@ jobs:
             dist_name: osx-arm64
             c_compiler: clang
             cpp_compiler: clang++
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=arm64 -G Xcode'
             output_dir: /bin/osx/arm64/
           - os: macos-15-intel
             enabled: ${{ inputs.osx_x64_86 }}
             dist_name: osx-x86_64
             c_compiler: clang
             cpp_compiler: clang++
-            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }} -G Xcode'
+            cmake_flags: '-DCMAKE_OSX_ARCHITECTURES=x86_64 -G Xcode'
             output_dir: /bin/osx/x86_64/
           - os: ubuntu-latest
             enabled: ${{ inputs.linux }}
@@ -89,12 +89,12 @@ jobs:
         P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
-        if [ "$RUNNER_OS" == "macOS" ] && [ -z "$P12_BUILD_CERTIFICATE_BASE64" ] && [ "${{ matrix.build_type }}" != "Debug" ]; then
-          echo "::error::macOS ${{ matrix.build_type }} build requires signing credentials (P12_BUILD_CERTIFICATE_BASE64, P12_PASSWORD, KEYCHAIN_PASSWORD). Only Debug builds are permitted without them."
-          exit 1
-        fi
+        if [ "$RUNNER_OS" == "macOS" ] && [ "${{ matrix.build_type }}" == "Release" ]; then
+          if [ -z "$P12_BUILD_CERTIFICATE_BASE64" ]; then
+            echo "::error::macOS Release build requires signing credentials (P12_BUILD_CERTIFICATE_BASE64, P12_PASSWORD, KEYCHAIN_PASSWORD)."
+            exit 1
+          fi
 
-        if [ "$RUNNER_OS" == "macOS" ] && [ -n "$P12_BUILD_CERTIFICATE_BASE64" ]; then
           # Setup credentials paths
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
@@ -111,8 +111,11 @@ jobs:
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
+
+          echo "codesign-flags=-DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }}" >> "$GITHUB_OUTPUT"
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          echo "No signing certificate provided; skipping macOS code signing setup (unsigned build)."
+          echo "Non-Release macOS build; skipping code signing (unsigned build)."
+          echo "codesign-flags=-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO" >> "$GITHUB_OUTPUT"
         fi
         
         if [ "$RUNNER_OS" == "Linux" ]; then
@@ -126,10 +129,13 @@ jobs:
             libudev-dev \
             libgl1-mesa-dev \
             libfreetype-dev \
+            libharfbuzz-dev \
             libfontconfig1-dev \
             libogg-dev \
             libvorbis-dev \
-            libflac-dev
+            libflac-dev \
+            libmbedtls-dev \
+            libssh2-1-dev
         fi
 
         if [ "$RUNNER_OS" == "Windows" ]; then
@@ -181,6 +187,7 @@ jobs:
         -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${{ steps.strings.outputs.build-type-flag }}=${{ steps.strings.outputs.binary-output-dir }}
         -S ${{ github.workspace }}
         ${{ matrix.cmake_flags }}
+        ${{ steps.strings.outputs.codesign-flags }}
 
     - name: Build resource compiler
       if: ${{ matrix.enabled }}
