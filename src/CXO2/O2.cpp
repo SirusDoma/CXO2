@@ -1,7 +1,6 @@
 #include <CXO2/O2.hpp>
 
 #include <Genode.hpp>
-#include <CXO2/Utilities/Reflection.hpp>
 
 #include <CXO2/Archives/OpiArchive.hpp>
 #include <CXO2/Archives/OjmArchive.hpp>

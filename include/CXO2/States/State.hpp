@@ -1,5 +1,4 @@
 #pragma once
-#include <CXO2/Utilities/Reflection.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/Dialog.hpp>
