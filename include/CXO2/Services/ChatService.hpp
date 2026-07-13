@@ -21,7 +21,7 @@
 
 namespace Cx
 {
-    class MessagingService : public virtual Service
+    class ChatService : public virtual Service
     {
     public:
         virtual void SendAnnouncement(
@@ -66,10 +66,10 @@ namespace Cx
     };
 
     class MessageService;
-    class MessagingOnlineService : public MessagingService
+    class ChatOnlineService : public ChatService
     {
     public:
-        explicit MessagingOnlineService(MessageService& messages);
+        explicit ChatOnlineService(MessageService& messages);
 
         void SendAnnouncement(
             const AnnouncementRequest& request,
@@ -122,7 +122,7 @@ namespace Cx
         MessageSubscriber<AnnouncementEventData>        m_announcementSubscriber;
     };
 
-    class MessagingOfflineService : public MessagingService
+    class ChatOfflineService : public ChatService
     {
     };
 }

@@ -49,7 +49,7 @@
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <CXO2/Services/MessagingService.hpp>
+#include <CXO2/Services/ChatService.hpp>
 
 namespace Cx
 {
@@ -133,7 +133,7 @@ namespace Cx
         }
     }
 
-    StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, MessagingService& messaging, ItemFactory& items) :
+    StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ChatService& messaging, ItemFactory& items) :
         m_mixer(mixer),
         m_session(session),
         m_room(room),

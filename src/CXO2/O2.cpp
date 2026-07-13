@@ -75,7 +75,7 @@
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Services/PlanetService.hpp>
 #include <CXO2/Services/CharacterService.hpp>
-#include <CXO2/Services/MessagingService.hpp>
+#include <CXO2/Services/ChatService.hpp>
 #include <CXO2/Services/ChannelService.hpp>
 #include <CXO2/Services/ItemShopService.hpp>
 #include <CXO2/Services/WaitingService.hpp>
@@ -220,7 +220,7 @@ namespace Cx
         context.Provide<AuthService, AuthOnlineService>();
         context.Provide<PlanetService, PlanetOnlineService>();
         context.Provide<CharacterService, CharacterOnlineService>();
-        context.Provide<MessagingService, MessagingOnlineService>();
+        context.Provide<ChatService, ChatOnlineService>();
         context.Provide<ItemShopService, ItemShopOnlineService>();
         context.Provide<ChannelService, ChannelOnlineService>();
         context.Provide<WaitingService, WaitingOnlineService>();

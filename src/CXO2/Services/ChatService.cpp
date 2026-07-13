@@ -1,10 +1,10 @@
-#include <CXO2/Services/MessagingService.hpp>
+#include <CXO2/Services/ChatService.hpp>
 
 #include <CXO2/States/State.hpp>
 
 namespace Cx
 {
-    MessagingOnlineService::MessagingOnlineService(MessageService& messages) :
+    ChatOnlineService::ChatOnlineService(MessageService& messages) :
         m_messages(messages)
     {
         m_announcementSubscriber = m_messages.On<AnnouncementEventData>([] (const MessageEnvelope<AnnouncementEventData>& envelope)
@@ -19,22 +19,22 @@ namespace Cx
         });
     }
 
-    void MessagingOnlineService::SendAnnouncement(const AnnouncementRequest& request, const MessageCallback<AnnouncementRequest>& callback)
+    void ChatOnlineService::SendAnnouncement(const AnnouncementRequest& request, const MessageCallback<AnnouncementRequest>& callback)
     {
         m_messages.Dispatch(request, callback);
     }
 
-    void MessagingOnlineService::SendMainRoomMessage(const MainRoomMessageRequest& request, const MessageCallback<MainRoomMessageRequest>& callback)
+    void ChatOnlineService::SendMainRoomMessage(const MainRoomMessageRequest& request, const MessageCallback<MainRoomMessageRequest>& callback)
     {
         m_messages.Dispatch(request, callback);
     }
 
-    void MessagingOnlineService::SendWaitingMessage(const WaitingMessageRequest& request, const MessageCallback<WaitingMessageRequest>& callback)
+    void ChatOnlineService::SendWaitingMessage(const WaitingMessageRequest& request, const MessageCallback<WaitingMessageRequest>& callback)
     {
         m_messages.Dispatch(request, callback);
     }
 
-    void MessagingOnlineService::SendWhisper(
+    void ChatOnlineService::SendWhisper(
         const WhisperMessageRequest& request,
         const MessageCallback<WhisperMessageResponse>& callback
     )
@@ -42,27 +42,27 @@ namespace Cx
         m_messages.Dispatch<WhisperMessageRequest, WhisperMessageResponse>(request, callback);
     }
 
-    void MessagingOnlineService::SetWhisperEventCallback(const MessageCallback<WhisperEventData>& callback)
+    void ChatOnlineService::SetWhisperEventCallback(const MessageCallback<WhisperEventData>& callback)
     {
         m_whisperSubscriber = m_messages.On<WhisperEventData>(callback);
     }
 
-    void MessagingOnlineService::SetMainRoomUserMessageCallback(const MessageCallback<MainRoomUserMessageResponse>& callback)
+    void ChatOnlineService::SetMainRoomUserMessageCallback(const MessageCallback<MainRoomUserMessageResponse>& callback)
     {
         m_mainRoomUserSubscriber = m_messages.On<MainRoomUserMessageResponse>(callback);
     }
 
-    void MessagingOnlineService::SetMainRoomAdminMessageCallback(const MessageCallback<MainRoomAdminMessageResponse>& callback)
+    void ChatOnlineService::SetMainRoomAdminMessageCallback(const MessageCallback<MainRoomAdminMessageResponse>& callback)
     {
         m_mainRoomAdminSubscriber = m_messages.On<MainRoomAdminMessageResponse>(callback);
     }
 
-    void MessagingOnlineService::SetWaitingUserMessageCallback(const MessageCallback<WaitingUserMessageResponse>& callback)
+    void ChatOnlineService::SetWaitingUserMessageCallback(const MessageCallback<WaitingUserMessageResponse>& callback)
     {
         m_waitingUserSubscriber = m_messages.On<WaitingUserMessageResponse>(callback);
     }
 
-    void MessagingOnlineService::SetWaitingAdminMessageCallback(const MessageCallback<WaitingAdminMessageResponse>& callback)
+    void ChatOnlineService::SetWaitingAdminMessageCallback(const MessageCallback<WaitingAdminMessageResponse>& callback)
     {
         m_waitingAdminSubscriber = m_messages.On<WaitingAdminMessageResponse>(callback);
     }

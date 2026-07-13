@@ -8,11 +8,11 @@
 namespace Cx
 {
     class SessionContext;
-    class MessagingService;
+    class ChatService;
     class ChatPanel : public Gx::UiContainer
     {
     public:
-        ChatPanel(SessionContext& session, MessagingService& service);
+        ChatPanel(SessionContext& session, ChatService& service);
 
         void Initialize() override;
 
@@ -24,6 +24,6 @@ namespace Cx
     private:
         sf::String m_recipient{};
         SessionContext& m_session;
-        MessagingService& m_service;
+        ChatService& m_service;
     };
 }

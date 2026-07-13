@@ -4,7 +4,7 @@
 #include <CXO2/States/State.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Services/MessagingService.hpp>
+#include <CXO2/Services/ChatService.hpp>
 
 #include <CXO2/Utilities/StringFormatter.hpp>
 #include <CXO2/StringTable/Identifiers/ChatPanel.hpp>
@@ -20,7 +20,7 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    ChatPanel::ChatPanel(SessionContext& session, MessagingService& service) :
+    ChatPanel::ChatPanel(SessionContext& session, ChatService& service) :
         m_session(session),
         m_service(service)
     {

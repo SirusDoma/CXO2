@@ -21,11 +21,11 @@ namespace Cx
     class SessionContext;
     class RoomContext;
     class GameContext;
-    class MessagingService;
+    class ChatService;
     class StateWaiting7K : public State
     {
     public:
-        StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, MessagingService& messaging, ItemFactory& items);
+        StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ChatService& messaging, ItemFactory& items);
 
         void Initialize() override;
 
@@ -82,7 +82,7 @@ namespace Cx
         RoomContext& m_room;
         GameContext& m_game;
         WaitingService& m_service;
-        MessagingService& m_messaging;
+        ChatService& m_messaging;
         ItemFactory& m_items;
 
         Avatar* m_mainAvatar{};
