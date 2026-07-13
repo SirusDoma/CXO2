@@ -2,7 +2,7 @@
 
 namespace Cx
 {
-    MessageDispatcher::MessageDispatcher(NetworkClient& client) :
+    MessageDispatcher::MessageDispatcher(Gx::TcpNetworkClient& client) :
         m_client(client)
     {
     }
@@ -17,7 +17,7 @@ namespace Cx
     {
         for (std::size_t i = 0; i < m_dispatches.size();)
         {
-            auto status    = RequestStatus::Pending;
+            auto status    = Gx::RequestStatus::Pending;
             auto exception = std::exception_ptr();
 
             try
@@ -29,7 +29,7 @@ namespace Cx
                 exception = std::current_exception();
             }
 
-            if (!exception && status == RequestStatus::Pending)
+            if (!exception && status == Gx::RequestStatus::Pending)
             {
                 m_dispatches[i].Elapsed += delta;
                 if (m_dispatches[i].Timeout == sf::Time::Zero || m_dispatches[i].Elapsed < m_dispatches[i].Timeout)
@@ -38,10 +38,10 @@ namespace Cx
                     continue;
                 }
 
-                exception = std::make_exception_ptr(TimeoutException());
+                exception = std::make_exception_ptr(Gx::TimeoutException());
             }
 
-            if (!exception && status == RequestStatus::Failed)
+            if (!exception && status == Gx::RequestStatus::Failed)
             {
                 sf::Socket::Status connStatus{};
 
@@ -58,7 +58,7 @@ namespace Cx
                 if (!exception)
                 {
                     exception = std::make_exception_ptr(
-                        ConnectionException(connStatus, "Failed to deliver the request to the server")
+                        Gx::ConnectionException(connStatus, "Failed to deliver the request to the server")
                     );
                 }
             }
@@ -118,7 +118,7 @@ namespace Cx
                 auto entry = std::move(m_acquires[i]);
                 m_acquires.erase(m_acquires.begin() + i);
 
-                entry.OnError(std::make_exception_ptr(TimeoutException()));
+                entry.OnError(std::make_exception_ptr(Gx::TimeoutException()));
                 continue;
             }
 

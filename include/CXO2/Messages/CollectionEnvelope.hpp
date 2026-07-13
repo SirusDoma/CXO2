@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CXO2/Network/Packet.hpp>
+#include <Genode/Network/Packet.hpp>
 #include <Genode/Utilities/Extensions.hpp>
 
 #include <type_traits>
@@ -8,18 +8,18 @@
 
 namespace Cx
 {
-    class Envelope
+    class MessageFieldEnvelope
     {
     protected:
-        virtual ~Envelope() = default;
+        virtual ~MessageFieldEnvelope() = default;
 
         virtual std::size_t NormalizeEnvelopeSize(std::size_t size) const = 0;
 
-        virtual std::size_t ReadEnvelopeSize(Packet& packet) const = 0;
-        virtual void WriteEnvelopeSize(Packet& packet) const = 0;
+        virtual std::size_t ReadEnvelopeSize(Gx::Packet& packet) const = 0;
+        virtual void WriteEnvelopeSize(Gx::Packet& packet) const = 0;
 
-        virtual void OnSend(Packet& packet) const = 0;
-        virtual void OnReceive(Packet& packet) = 0;
+        virtual void OnSend(Gx::Packet& packet) const = 0;
+        virtual void OnReceive(Gx::Packet& packet) = 0;
 
         virtual std::size_t GetContainerSize() const = 0;
     };
@@ -29,7 +29,7 @@ namespace Cx
         typename TPrefixSize = void,
         typename = std::enable_if_t<std::is_integral_v<TPrefixSize> || std::is_void_v<TPrefixSize>>
     >
-    class CollectionEnvelope : public Envelope
+    class CollectionEnvelope : public MessageFieldEnvelope
     {
     public:
         CollectionEnvelope();
@@ -43,13 +43,13 @@ namespace Cx
         CollectionEnvelope(const Gx::type_identity_t<TContainer>& container, std::size_t minSize, std::size_t maxSize);
         CollectionEnvelope(Gx::type_identity_t<TContainer>&& container, std::size_t minSize, std::size_t maxSize);
 
-        friend Packet& operator<<(Packet& packet, const CollectionEnvelope<TContainer, TPrefixSize>& envelope)
+        friend Gx::Packet& operator<<(Gx::Packet& packet, const CollectionEnvelope<TContainer, TPrefixSize>& envelope)
         {
             envelope.OnSend(packet);
             return packet;
         }
 
-        friend Packet& operator>>(Packet& packet, CollectionEnvelope<TContainer, TPrefixSize>& envelope)
+        friend Gx::Packet& operator>>(Gx::Packet& packet, CollectionEnvelope<TContainer, TPrefixSize>& envelope)
         {
             envelope.OnReceive(packet);
             return packet;
@@ -99,11 +99,11 @@ namespace Cx
 
         std::size_t NormalizeEnvelopeSize(std::size_t size) const override;
 
-        std::size_t ReadEnvelopeSize(Packet& packet) const override;
-        void WriteEnvelopeSize(Packet& packet) const override;
+        std::size_t ReadEnvelopeSize(Gx::Packet& packet) const override;
+        void WriteEnvelopeSize(Gx::Packet& packet) const override;
 
-        void OnSend(Packet& packet) const override;
-        void OnReceive(Packet& packet) override;
+        void OnSend(Gx::Packet& packet) const override;
+        void OnReceive(Gx::Packet& packet) override;
 
         std::size_t GetContainerSize() const override;
 
@@ -113,8 +113,8 @@ namespace Cx
         TContainer m_container;
         std::optional<std::size_t> m_minSize{std::nullopt};
         std::optional<std::size_t> m_maxSize{std::numeric_limits<std::uint16_t>::max()};
-        std::function<void(Packet&, std::size_t)> m_sizeWriter;
-        std::function<std::size_t(Packet&)> m_sizeReader;
+        std::function<void(Gx::Packet&, std::size_t)> m_sizeWriter;
+        std::function<std::size_t(Gx::Packet&)> m_sizeReader;
     };
 
 }

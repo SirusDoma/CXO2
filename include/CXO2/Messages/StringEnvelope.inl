@@ -76,7 +76,7 @@ namespace Cx
     }
 
     template<typename TString, typename TPrefixSize, typename T0>
-    void StringEnvelope<TString, TPrefixSize, T0>::OnSend(Packet& packet) const
+    void StringEnvelope<TString, TPrefixSize, T0>::OnSend(Gx::Packet& packet) const
     {
         this->WriteEnvelopeSize(packet);
 
@@ -107,7 +107,7 @@ namespace Cx
     struct always_false : std::false_type {};
 
     template<typename TString, typename TPrefixSize, typename T0>
-    void StringEnvelope<TString, TPrefixSize, T0>::OnReceive(Packet& packet)
+    void StringEnvelope<TString, TPrefixSize, T0>::OnReceive(Gx::Packet& packet)
     {
         const std::size_t size = this->NormalizeEnvelopeSize(this->ReadEnvelopeSize(packet));
 

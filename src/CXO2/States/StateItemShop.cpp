@@ -10,7 +10,6 @@
 
 #include <CXO2/Avatar/ItemFactory.hpp>
 
-#include <CXO2/Network/Exception.hpp>
 #include <CXO2/Services/ItemShopService.hpp>
 #include <CXO2/Messages/Requests/PurchaseItemRequest.hpp>
 #include <CXO2/Messages/Requests/SellItemRequest.hpp>
@@ -22,6 +21,7 @@
 #include <CXO2/StringTable/Identifiers/ItemShop.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
+#include <Genode/Network/Exception.hpp>
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/ScrollBar.hpp>

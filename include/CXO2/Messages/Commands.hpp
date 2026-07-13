@@ -1,6 +1,9 @@
 #pragma once
 
-#include <CXO2/Network/Packet.hpp>
+#include <CXO2/Messages/EnumEncoder.hpp>
+#include <CXO2/Messages/StringEncoder.hpp>
+
+#include <Genode/Network/Packet.hpp>
 #include <Genode/System/Exception.hpp>
 
 #include <cstdint>
@@ -194,7 +197,7 @@ namespace Cx
     struct IsMessage<T, std::void_t<decltype(T::Command)>> 
         : std::bool_constant<std::is_same_v<decltype(T::Command), const Command>> {};
 
-    inline Packet& operator>>(Packet& packet, Command& cmd)
+    inline Gx::Packet& operator>>(Gx::Packet& packet, Command& cmd)
     {
         std::uint16_t code{};
         packet >> code;
@@ -205,7 +208,7 @@ namespace Cx
         return packet;
     }
 
-    inline Packet& operator<<(Packet& packet, const Command& cmd)
+    inline Gx::Packet& operator<<(Gx::Packet& packet, const Command& cmd)
     {
         packet << cmd.code();
         return packet;

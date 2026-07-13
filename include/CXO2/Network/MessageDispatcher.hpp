@@ -2,8 +2,9 @@
 
 #include <CXO2/Messages/Commands.hpp>
 #include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Network/Exception.hpp>
-#include <CXO2/Network/NetworkClient.hpp>
+
+#include <Genode/Network/Exception.hpp>
+#include <Genode/Network/TcpNetworkClient.hpp>
 
 #include <Genode/Entities/Updatable.hpp>
 
@@ -18,7 +19,7 @@ namespace Cx
     class MessageDispatcher : public Gx::Updatable
     {
     public:
-        explicit MessageDispatcher(NetworkClient& client);
+        explicit MessageDispatcher(Gx::TcpNetworkClient& client);
 
         void Update(const sf::Time& delta) override;
 
@@ -61,9 +62,9 @@ namespace Cx
     private:
         struct DispatchRequest
         {
-            Request  Tracker{};
-            sf::Time Elapsed{};
-            sf::Time Timeout{};
+            Gx::Request Tracker{};
+            sf::Time    Elapsed{};
+            sf::Time    Timeout{};
 
             std::function<void()>                          OnCompleted{};
             std::function<void(const std::exception_ptr&)> OnError{};
@@ -75,7 +76,7 @@ namespace Cx
             sf::Time      Elapsed{};
             sf::Time      Timeout{};
 
-            std::function<void(Packet&)>                   OnMessage{};
+            std::function<void(Gx::Packet&)>               OnMessage{};
             std::function<void(const std::exception_ptr&)> OnError{};
         };
 
@@ -90,12 +91,12 @@ namespace Cx
         void ProcessDispatch(const sf::Time& delta);
         void ProcessAcquire(const sf::Time& delta);
 
-        NetworkClient& m_client;
+        Gx::TcpNetworkClient& m_client;
 
         std::deque<DispatchRequest> m_dispatches{};
         std::deque<AcquireRequest>  m_acquires{};
 
-        std::unordered_map<std::uint16_t, std::deque<Packet>> m_messages{};
+        std::unordered_map<std::uint16_t, std::deque<Gx::Packet>> m_messages{};
     };
 }
 

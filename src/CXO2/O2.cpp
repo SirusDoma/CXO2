@@ -70,7 +70,6 @@
 
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
-#include <CXO2/Network/NetworkClient.hpp>
 #include <CXO2/Services/MessageService.hpp>
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Services/PlanetService.hpp>
@@ -107,7 +106,6 @@
 #include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Utilities/Console.hpp>
 #include <CXO2/Resources.hpp>
-
 
 namespace Cx
 {
@@ -152,9 +150,9 @@ namespace Cx
 
         // Initialize singleton providers
         auto& context = GetModule<Gx::Context>();
-        context.Provide<NetworkClient>([](auto&)
+        context.Provide<Gx::TcpNetworkClient>([](auto&)
         {
-            auto client = std::make_unique<NetworkClient>();
+            auto client = std::make_unique<Gx::TcpNetworkClient>();
             client->UseDefaultPrefix<std::uint16_t>();
 
             return client;

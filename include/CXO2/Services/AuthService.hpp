@@ -18,7 +18,6 @@ namespace Cx
 
     class SessionContext;
     class CommandLineContext;
-    class NetworkException;
     class AuthService : public Service
     {
     public:

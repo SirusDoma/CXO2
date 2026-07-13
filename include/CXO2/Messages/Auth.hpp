@@ -1,7 +1,7 @@
 #pragma once
 
-#include <CXO2/Network/Packet.hpp>
 #include <CXO2/Messages/StringEnvelope.hpp>
+#include <Genode/Network/Packet.hpp>
 
 #include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
@@ -35,13 +35,13 @@ namespace Cx
         LM
     };
 
-    inline Packet& operator<<(Packet& packet, const BillingCode& billingCode)
+    inline Gx::Packet& operator<<(Gx::Packet& packet, const BillingCode& billingCode)
     {
         packet << magic_enum::enum_name<BillingCode>(billingCode).data();
         return packet;
     }
 
-    inline Packet& operator>>(Packet& packet, BillingCode& billingCode)
+    inline Gx::Packet& operator>>(Gx::Packet& packet, BillingCode& billingCode)
     {
         auto code = StringEnvelope(2, 2, false);
         packet >> code;

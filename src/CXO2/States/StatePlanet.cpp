@@ -165,7 +165,7 @@ namespace Cx
             {
                 OnChannelListUpdated(ev.Open());
             }
-            catch (const NetworkException&)
+            catch (const Gx::NetworkException&)
             {
                 const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
                 container->SetEnabled(true);
@@ -223,7 +223,7 @@ namespace Cx
                 m_session.SetMusicHall(hall);
                 OnAuthenticated(response.ResultCode);
             }
-            catch (const NetworkException&)
+            catch (const Gx::NetworkException&)
             {
                 container->SetEnabled(true);
                 ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
@@ -249,7 +249,7 @@ namespace Cx
             {
                 OnChannelLogin(ev.Open());
             }
-            catch (const NetworkException&)
+            catch (const Gx::NetworkException&)
             {
                 ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
                 container->SetEnabled(true);

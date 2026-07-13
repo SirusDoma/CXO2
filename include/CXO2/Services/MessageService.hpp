@@ -17,11 +17,10 @@ namespace Cx
     >
     using MessageSubscriber = Gx::Subscriber<std::uint16_t, MessageEnvelope<TMessage>>;
 
-    class NetworkClient;
     class MessageService : public MessageDispatcher, public Gx::Module
     {
     public:
-        MessageService(NetworkClient& client, Gx::EventDispatcher& events);
+        MessageService(Gx::TcpNetworkClient& client, Gx::EventDispatcher& events);
 
         void Connect(
             const sf::IpAddress& ipAddress,
@@ -97,7 +96,7 @@ namespace Cx
             std::function<void()> Beat{};
         };
 
-        NetworkClient&                                  m_client;
+        Gx::TcpNetworkClient&                              m_client;
         Gx::EventDispatcher&                            m_events;
         std::unordered_map<std::uint16_t, Subscription> m_subscriptions{};
         Heartbeat                                       m_heartbeat{};

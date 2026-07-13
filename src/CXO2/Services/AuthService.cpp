@@ -32,7 +32,7 @@ namespace Cx
 
         if (it == gateways.end())
         {
-            callback(std::make_exception_ptr(ConnectionException(sf::Socket::Status::Disconnected)));
+            callback(std::make_exception_ptr(Gx::ConnectionException(sf::Socket::Status::Disconnected)));
             return;
         }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CXO2/Messages/CollectionEnvelope.hpp>
+#include <CXO2/Messages/StringEncoder.hpp>
 #include <SFML/System/String.hpp>
 
 #include <string>
@@ -43,8 +44,8 @@ namespace Cx
         // ReSharper restore CppNonExplicitConversionOperator
 
     protected:
-        void OnSend(Packet& packet) const override;
-        void OnReceive(Packet& packet) override;
+        void OnSend(Gx::Packet& packet) const override;
+        void OnReceive(Gx::Packet& packet) override;
 
     private:
         bool m_nullTerminated{true};

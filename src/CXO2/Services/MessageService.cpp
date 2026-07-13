@@ -2,7 +2,7 @@
 
 namespace Cx
 {
-    MessageService::MessageService(NetworkClient& client, Gx::EventDispatcher& events) :
+    MessageService::MessageService(Gx::TcpNetworkClient& client, Gx::EventDispatcher& events) :
         MessageDispatcher(client),
         m_client(client),
         m_events(events)
@@ -67,7 +67,7 @@ namespace Cx
                 if (!exception && status != sf::Socket::Status::Done)
                 {
                     exception = std::make_exception_ptr(
-                        ConnectionException(status, "Failed to connect to the server"));
+                        Gx::ConnectionException(status, "Failed to connect to the server"));
                 }
 
                 if (!exception)

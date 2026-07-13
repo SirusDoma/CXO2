@@ -55,13 +55,13 @@ namespace Cx
     template<typename TContainer, typename TPrefixSize, typename T0>
     void CollectionEnvelope<TContainer, TPrefixSize, T0>::UsePrefixSizeType()
     {
-        m_sizeWriter = [](Packet& packet, std::size_t size)
+        m_sizeWriter = [](Gx::Packet& packet, std::size_t size)
         {
             if constexpr (!std::is_void_v<TPrefixSize>)
                 packet << static_cast<TPrefixSize>(size);
         };
 
-        m_sizeReader = [this](Packet& packet) -> std::size_t
+        m_sizeReader = [this](Gx::Packet& packet) -> std::size_t
         {
             if constexpr (!std::is_void_v<TPrefixSize>)
             {
@@ -184,20 +184,20 @@ namespace Cx
     }
 
     template<typename TContainer, typename TPrefixSize, typename T0>
-    std::size_t CollectionEnvelope<TContainer, TPrefixSize, T0>::ReadEnvelopeSize(Packet& packet) const
+    std::size_t CollectionEnvelope<TContainer, TPrefixSize, T0>::ReadEnvelopeSize(Gx::Packet& packet) const
     {
         return m_sizeReader(packet);
     }
 
     template<typename TContainer, typename TPrefixSize, typename T0>
-    void CollectionEnvelope<TContainer, TPrefixSize, T0>::WriteEnvelopeSize(Packet& packet) const
+    void CollectionEnvelope<TContainer, TPrefixSize, T0>::WriteEnvelopeSize(Gx::Packet& packet) const
     {
         const std::size_t normalizedSize = NormalizeEnvelopeSize(GetContainerSize());
         m_sizeWriter(packet, normalizedSize);
     }
 
     template<typename TContainer, typename TPrefixSize, typename T0>
-    void CollectionEnvelope<TContainer, TPrefixSize, T0>::OnSend(Packet& packet) const
+    void CollectionEnvelope<TContainer, TPrefixSize, T0>::OnSend(Gx::Packet& packet) const
     {
         WriteEnvelopeSize(packet);
 
@@ -211,7 +211,7 @@ namespace Cx
     }
 
     template<typename TContainer, typename TPrefixSize, typename T0>
-    void CollectionEnvelope<TContainer, TPrefixSize, T0>::OnReceive(Packet& packet)
+    void CollectionEnvelope<TContainer, TPrefixSize, T0>::OnReceive(Gx::Packet& packet)
     {
         const std::size_t size = NormalizeEnvelopeSize(ReadEnvelopeSize(packet));
 

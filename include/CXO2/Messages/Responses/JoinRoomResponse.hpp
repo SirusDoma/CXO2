@@ -2,10 +2,11 @@
 
 #include <CXO2/Models/Room.hpp>
 #include <CXO2/Models/Character.hpp>
-#include <CXO2/Network/Packet.hpp>
 #include <CXO2/Messages/Commands.hpp>
 #include <CXO2/Messages/MapInfo.hpp>
 #include <CXO2/Messages/RoomInfo.hpp>
+
+#include <Genode/Network/Packet.hpp>
 
 namespace Cx
 {
@@ -58,7 +59,7 @@ namespace Cx
         CollectionEnvelope<std::vector<SlotInfo>> Slots{8, 8};
     };
 
-    inline Packet& operator<<(Packet& packet, const JoinRoomResponse::SlotInfo& slot)
+    inline Gx::Packet& operator<<(Gx::Packet& packet, const JoinRoomResponse::SlotInfo& slot)
     {
         packet << slot.Index << slot.State;
         if (slot.State == RoomSlotState::Occupied)
@@ -67,7 +68,7 @@ namespace Cx
         return packet;
     }
 
-    inline Packet& operator>>(Packet& packet, JoinRoomResponse::SlotInfo& slot)
+    inline Gx::Packet& operator>>(Gx::Packet& packet, JoinRoomResponse::SlotInfo& slot)
     {
         packet >> slot.Index >> slot.State;
         if (slot.State == RoomSlotState::Occupied)

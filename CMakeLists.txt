@@ -213,6 +213,9 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 # Link Magic Enum
 target_link_libraries(${TARGET} PRIVATE magic_enum::magic_enum)
 
+# Link Boost PFR
+target_link_libraries(${TARGET} PRIVATE Boost::pfr)
+
 # Link Genode
 target_link_libraries(${TARGET} PRIVATE Genode)
 

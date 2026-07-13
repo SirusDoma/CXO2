@@ -93,7 +93,7 @@ namespace Cx
         request.Code    = TMessage::Command.code();
         request.Timeout = timeout;
 
-        request.OnMessage = [callback](Packet& packet)
+        request.OnMessage = [callback](Gx::Packet& packet)
         {
             auto envelope = MessageEnvelope<TMessage>();
 
@@ -135,7 +135,7 @@ namespace Cx
         std::function<void(const std::exception_ptr&)> onError,
         const sf::Time timeout)
     {
-        auto packet = Packet();
+        auto packet = Gx::Packet();
 
         try
         {
