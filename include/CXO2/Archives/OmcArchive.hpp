@@ -63,7 +63,7 @@ namespace Cx
         std::string GetExtension(const std::filesystem::path& name) const;
 
     private:
-        static std::uint8_t* DecodeWave(std::uint8_t* in, int length, int* accKeyByte, int* accCounter);
+        static std::uint8_t* DecodeWave(const std::uint8_t* in, int length, int* accKeyByte, int* accCounter);
 
         bool ReadStream(void* data, std::uint64_t size) const;
 

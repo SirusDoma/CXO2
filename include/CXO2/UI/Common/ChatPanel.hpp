@@ -52,7 +52,7 @@ namespace Cx
         void OnChatAllCheckChanged(Gx::RadioButton& radio);
         void OnChatFallbackCheckChanged(Gx::RadioButton& radio);
         void OnChatWhisperCheckChanged(Gx::RadioButton& radio);
-        void OnWhisperDialogAccepted(Gx::InputField* nicknameInput, Gx::RadioButton& radio);
+        void OnWhisperDialogAccepted(Gx::InputField& nicknameInput, Gx::RadioButton& radio);
 
         void OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text);
 

@@ -970,7 +970,7 @@ namespace Cx
         if (titleBox->GetString().isEmpty())
             return;
 
-        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{titleBox->GetString()}, [=] (const auto& ev) { OnUpdateRoomTitleResponded(ev); });
+        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{titleBox->GetString().toAnsiString()}, [=] (const auto& ev) { OnUpdateRoomTitleResponded(ev); });
     }
 
     void StateWaiting7K::OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev)

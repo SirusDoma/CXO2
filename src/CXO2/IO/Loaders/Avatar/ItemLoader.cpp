@@ -130,7 +130,7 @@ namespace Cx
             {
                 for (auto [priceKey, priceValue] : price->items())
                 {
-                    std::string currencyString = Gx::StringHelper::ToPascalCase(priceKey);
+                    std::string currencyString = Gx::StringHelper::ToPascalCase(priceKey).toAnsiString();
                     if (auto parse = magic_enum::enum_cast<Currency>(currencyString, magic_enum::case_insensitive); parse.has_value())
                         metadata.Prices[parse.value()] = priceValue.get<unsigned int>();
                 }
@@ -154,7 +154,7 @@ namespace Cx
                 auto renderPart = RenderPart::Body;
                 auto instrument = Instrument::None;
 
-                if (auto parse = magic_enum::enum_cast<Gender>(std::string(Gx::StringHelper::ToPascalCase(itemKey))); parse.has_value())
+                if (auto parse = magic_enum::enum_cast<Gender>(Gx::StringHelper::ToPascalCase(itemKey).toAnsiString()); parse.has_value())
                     gender = parse.value();
                 else
                     continue;
@@ -162,19 +162,19 @@ namespace Cx
                 auto partAttributes = std::any_cast<Gx::Json>(partData);
                 for (auto [partKey, instrumentAttributes] : partAttributes.items())
                 {
-                    if (auto parse = magic_enum::enum_cast<RenderPart>(std::string(Gx::StringHelper::ToPascalCase(partKey))); parse.has_value())
+                    if (auto parse = magic_enum::enum_cast<RenderPart>(Gx::StringHelper::ToPascalCase(partKey).toAnsiString()); parse.has_value())
                         renderPart = parse.value();
                     else
                         continue;
 
                     for (auto [instrumentKey, reference] : instrumentAttributes.items())
                     {
-                        auto key = Gx::StringHelper::ToPascalCase(instrumentKey);
+                        auto key = Gx::StringHelper::ToPascalCase(instrumentKey).toAnsiString();
                         // Hack: transform "Default" to "None", which one should we preserve?
                         if (key == "Default")
                             key = "None";
 
-                        if (auto parse = magic_enum::enum_cast<Instrument>(std::string(key)); parse.has_value())
+                        if (auto parse = magic_enum::enum_cast<Instrument>(key); parse.has_value())
                             instrument = parse.value();
                         else
                             continue;

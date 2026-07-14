@@ -3,6 +3,8 @@
 
 #include <Genode/Utilities/StringHelper.hpp>
 
+#include <SFML/Network/Dns.hpp>
+
 #include <array>
 #include <regex>
 
@@ -71,11 +73,11 @@ namespace Cx
 
         try
         {
-            int gatewayCount = std::stoi(m_arguments[3]);
+            const int gatewayCount = std::stoi(m_arguments[3]);
 
             // Different halls order for 3.10 compatibility
             auto gateways = std::vector<GatewayInfo>();
-            auto halls = std::array<MusicHall, 6>
+            constexpr auto halls = std::array<MusicHall, 6>
             {
                 MusicHall::Melpomin,
                 MusicHall::Kalliope,
@@ -87,9 +89,23 @@ namespace Cx
 
             for (std::size_t i = 0; i < gatewayCount; i++)
             {
+                auto address = sf::IpAddress::Any;
+                if (auto addresses = sf::Dns::resolve(m_arguments[4 + i * 2]); addresses.has_value())
+                {
+                    addresses->erase(
+                        std::remove_if(addresses->begin(), addresses->end(), [](const auto& entry)
+                        {
+                            return !entry.isV4();
+                        }),addresses->end()
+                    );
+
+                    if (!addresses->empty())
+                        address = addresses->front();
+                }
+
                 gateways.push_back({
                     halls[i],
-                    sf::IpAddress::resolve(m_arguments[4 + i * 2]).value_or(sf::IpAddress::Any),
+                    address,
                     static_cast<std::uint16_t>(std::stoi(m_arguments[4 + i * 2 + 1]))
                 });
             }

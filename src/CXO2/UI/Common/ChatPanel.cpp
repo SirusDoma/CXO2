@@ -47,8 +47,7 @@ namespace Cx
 
         if (const auto controls = FindChild<UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS))
         {
-            const auto scrollChat = controls->FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
-            if (scrollChat)
+            if (const auto scrollChat = controls->FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT))
                 chatWindow->SetScrollBar(*scrollChat);
 
             if (const auto btnChatScrollUp = controls->FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_UP))
@@ -82,7 +81,7 @@ namespace Cx
     {
         const auto chatWindow = GetChatWindow();
 
-        if (Gx::StringHelper::StartsWith(text, "/"))
+        if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/"))
         {
             if (const auto waiting = GetParent<StateWaiting7K>())
                 waiting->OnMemberEmoticon(actor, text);
@@ -235,50 +234,46 @@ namespace Cx
         {
             if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER); dialog)
             {
-                const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME);
-                if (nicknameInput)
+                if (const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME))
                 {
                     nicknameInput->SetMaximumTextLength(20);
                     nicknameInput->SetString(m_recipient);
                     nicknameInput->SetFocus(true);
                     nicknameInput->SelectAll();
+
+                    dialog->SetAcceptCallback([=, &radio]
+                    {
+                        OnWhisperDialogAccepted(*nicknameInput, radio);
+                    });
+
+                    dialog->SetCancelCallback([=, &radio]
+                    {
+                        OnChatFallbackCheckChanged(radio);
+                    });
+
+                    auto ctx   = Gx::DialogPresentationContext();
+                    ctx.Bounds = {{}, parent->GetView().getSize()};
+                    ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
+
+                    parent->Present(*dialog, ctx);
                 }
-
-                dialog->SetAcceptCallback([=, &radio]
-                {
-                    OnWhisperDialogAccepted(nicknameInput, radio);
-                });
-
-                dialog->SetCancelCallback([=, &radio]
-                {
-                    OnChatFallbackCheckChanged(radio);
-                });
-
-                auto ctx   = Gx::DialogPresentationContext();
-                ctx.Bounds = {{}, parent->GetView().getSize()};
-                ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
-
-                parent->Present(*dialog, ctx);
             }
         }
     }
 
-    void ChatPanel::OnWhisperDialogAccepted(Gx::InputField* nicknameInput, Gx::RadioButton& radio)
+    void ChatPanel::OnWhisperDialogAccepted(Gx::InputField& nicknameInput, Gx::RadioButton& radio)
     {
-        if (nicknameInput)
-        {
-            if (nicknameInput->GetString().isEmpty())
-                OnChatFallbackCheckChanged(radio);
+        if (nicknameInput.GetString().isEmpty())
+            OnChatFallbackCheckChanged(radio);
 
-            m_recipient = nicknameInput->GetString();
-        }
+        m_recipient = nicknameInput.GetString();
     }
 
     void ChatPanel::OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text)
     {
-        if (Gx::StringHelper::StartsWith(text, "/w"))
+        if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/w"))
         {
-            const auto tokens = Gx::StringHelper::Split(text);
+            const auto tokens = Gx::StringHelper::Split(text.toAnsiString());
             if (tokens.size() < 3)
                 return;
 
@@ -317,7 +312,7 @@ namespace Cx
                 OnSendWhisperResponded(ev, text);
             });
         }
-        else if (Gx::StringHelper::StartsWith(text, "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
+        else if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
             m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
         else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
             m_service.SendWaitingMessage(WaitingMessageRequest{text});

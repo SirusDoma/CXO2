@@ -98,7 +98,7 @@ namespace Cx
             if (!m_fileStream.seek(m_fileStream.tell().value() + waveHeader.ChunkSize).has_value())
                 continue;
 
-            auto entry = FileInfo(*this, Gx::StringHelper::Trim(waveHeader.Name), waveHeader.ChunkSize + 44, i, offset.value());
+            auto entry = FileInfo(*this, Gx::StringHelper::Trim(waveHeader.Name).toAnsiString(), waveHeader.ChunkSize + 44, i, offset.value());
             m_entries[i] = entry;
 
             result.push_back(std::make_unique<FileInfo>(entry));
@@ -120,7 +120,7 @@ namespace Cx
             if (!m_fileStream.seek(m_fileStream.tell().value() + oggHeader.Size).has_value())
                 continue;
 
-            auto entry = FileInfo(*this, Gx::StringHelper::Trim(oggHeader.Name), oggHeader.Size, i + 1000, offset.value());
+            auto entry = FileInfo(*this, Gx::StringHelper::Trim(oggHeader.Name).toAnsiString(), oggHeader.Size, i + 1000, offset.value());
             m_entries[i + 1000] = entry;
 
             result.push_back(std::make_unique<FileInfo>(entry));
@@ -336,7 +336,7 @@ namespace Cx
         0x04, 0x00
     };
 
-    std::uint8_t* OmcArchive::DecodeWave(std::uint8_t* in, const int length, int *accKeyByte, int *accCounter)
+    std::uint8_t* OmcArchive::DecodeWave(const std::uint8_t* in, const int length, int *accKeyByte, int *accCounter)
     {
         auto* out = new std::uint8_t[length];
         int key = ((length % 17) << 4) + (length % 17);
@@ -354,7 +354,8 @@ namespace Cx
 
         for (unsigned int i = 0; i < length; i++)
         {
-            std::uint8_t currentByte = out[i], temp = out[i];
+            std::uint8_t currentByte = out[i];
+            const std::uint8_t temp  = out[i];
             if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)
                 currentByte = static_cast<std::uint8_t>(~currentByte);
 

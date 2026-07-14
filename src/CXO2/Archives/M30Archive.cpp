@@ -147,7 +147,7 @@ namespace Cx
             unsigned int reference = sampleHeader.Reference + (sampleHeader.CodecCode == 0 ? 1000 : 0);
             auto entry = FileInfo(
                 *this,
-                Gx::StringHelper::Trim(std::string(sampleHeader.Name, sizeof(sampleHeader.Name))),
+                Gx::StringHelper::Trim(std::string(sampleHeader.Name, sizeof(sampleHeader.Name))).toAnsiString(),
                 sampleHeader.Size,
                 reference,
                 offset.value()

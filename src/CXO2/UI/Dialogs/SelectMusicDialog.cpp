@@ -70,17 +70,11 @@ namespace Cx
                 m_music = m_displayList[m_displayList.size() - 1];
         }
 
-        auto leftButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT);
-        if (leftButton)
-        {
+        if (auto leftButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT))
             leftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnLeftButtonClicked(sender, ev); });
-        }
 
-        auto rightButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_RIGHT);
-        if (rightButton)
-        {
+        if (auto rightButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_RIGHT))
             rightButton->SetClickCallback([this] (auto& sender, auto& ev) { OnRightButtonClicked(sender, ev); });
-        }
 
         if (auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
         {
@@ -282,7 +276,7 @@ namespace Cx
 
     void SelectMusicDialog::OnMusicButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        if (auto focusHighlighter = sender.template FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
+        if (const auto focusHighlighter = sender.template FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
             focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
     }
 
@@ -291,13 +285,13 @@ namespace Cx
         const auto listSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
         if (!sender.IsChecked())
         {
-            if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
+            if (const auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
                 activeHighlighter->SetVisible(false);
 
             return;
         }
 
-        if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
+        if (const auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
             activeHighlighter->SetVisible(true);
 
         const unsigned int itemListCount = listSelector->GetChildrenCount();
@@ -788,9 +782,9 @@ namespace Cx
                 std::sort(m_displayList.begin(), m_displayList.end(), [this] (auto& a, auto& b)
                 {
                     if (m_order == MusicSortOrder::Ascending)
-                        return std::string(a.Title) < std::string(b.Title);
+                        return a.Title.toAnsiString() < b.Title.toAnsiString();
 
-                    return std::string(a.Title) > std::string(b.Title);
+                    return a.Title.toAnsiString() > b.Title.toAnsiString();
                 });
                 break;
             case MusicSortMode::Level:

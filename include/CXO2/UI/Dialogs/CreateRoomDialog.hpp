@@ -22,7 +22,7 @@ namespace Cx
 
         GameMode GetRoomMode() const;
 
-        const sf::String& GetRoomName() const;
+        sf::String GetRoomName() const;
         std::string GetRoomPassword() const;
         unsigned int GetMinLevelLimit() const;
         unsigned int GetMaxLevelLimit() const;

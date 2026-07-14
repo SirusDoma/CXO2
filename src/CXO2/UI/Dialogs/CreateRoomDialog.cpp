@@ -249,8 +249,8 @@ namespace Cx
             }
 
             toolTip->SetString("");
-            const unsigned int min = std::stoi(std::string(minLevelLimitInput->GetString()));
-            const unsigned int max = std::stoi(std::string(maxLevelLimitInput->GetString()));
+            const unsigned int min = std::stoi(minLevelLimitInput->GetString().toAnsiString());
+            const unsigned int max = std::stoi(maxLevelLimitInput->GetString().toAnsiString());
 
             if (min > 100 || max > 100)
                 toolTip->SetString("Wrong level selected. You can enter level range from 1 to 100");
@@ -282,7 +282,7 @@ namespace Cx
         return GameMode::Versus;
     }
 
-    const sf::String& CreateRoomDialog::GetRoomName() const
+    sf::String CreateRoomDialog::GetRoomName() const
     {
         if (const auto titleInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE); titleInput)
             return titleInput->GetString();

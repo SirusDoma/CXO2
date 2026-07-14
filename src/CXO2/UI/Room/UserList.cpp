@@ -119,7 +119,7 @@ namespace Cx
     {
         const size_t index = ((m_page - 1) * m_userButtonCount) + m_userButtonIndices.at(&sender);
         if (index < m_users.size() && sender.IsChecked())
-            m_selectedUser = m_users[index].Name;
+            m_selectedUser = m_users[index].Name.toAnsiString();
     }
 
     void UserList::OnUserButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)

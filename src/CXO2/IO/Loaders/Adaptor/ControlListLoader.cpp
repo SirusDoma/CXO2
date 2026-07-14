@@ -46,7 +46,7 @@ namespace Cx
             auto fn = std::string();
             stream >> fn;
 
-            return ControlList::Control(token, id, Gx::StringHelper::Unquote(fn));
+            return ControlList::Control(token, id, Gx::StringHelper::Unquote(fn).toAnsiString());
         }
     }
 
@@ -176,7 +176,7 @@ namespace Cx
                     std::string fileName;
                     stream >> fileName;
 
-                    fileName = Gx::StringHelper::Unquote(fileName);
+                    fileName = Gx::StringHelper::Unquote(fileName).toAnsiString();
                     if (!Gx::FileSystem::Contains(fileName))
                         continue;
 

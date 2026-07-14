@@ -82,7 +82,7 @@ namespace Cx
             if (!ReadStream(&item, sizeof(OpiItemHeader)))
                 continue;
 
-            auto header = FileInfo(*this, Gx::StringHelper::Trim(item.Name), item.GetSize(), i, item.Reference);
+            auto header = FileInfo(*this, Gx::StringHelper::Trim(item.Name).toAnsiString(), item.GetSize(), i, item.Reference);
             m_entries[header.GetName()] = header;
 
             result.push_back(std::make_unique<FileInfo>(header));
@@ -133,7 +133,7 @@ namespace Cx
         return iterator->second.GetSize();
     }
 
-    bool OpiArchive::ReadStream(void* data, std::uint64_t size) const
+    bool OpiArchive::ReadStream(void* data, const std::uint64_t size) const
     {
         const auto read = m_fileStream.read(data, static_cast<std::int64_t>(size));
         return read == size;
