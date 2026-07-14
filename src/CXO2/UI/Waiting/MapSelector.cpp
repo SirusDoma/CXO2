@@ -64,16 +64,10 @@ namespace Cx
             effect2->SetVisible(true);
 
         const auto mapLeftButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_LEFT);
-        mapLeftButton->SetClickCallback([=] (auto&, auto&)
-        {
-            SetMapID(static_cast<int>(m_mapID) - 1);
-        });
+        mapLeftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMapLeftButtonClicked(sender, ev); });
 
         const auto mapRightButton = FindChild<Gx::Button>(Resource::Map::IDC_BUTTON_MAP_RIGHT);
-        mapRightButton->SetClickCallback([=] (auto&, auto&)
-        {
-            SetMapID(static_cast<int>(m_mapID) + 1);
-        });
+        mapRightButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMapRightButtonClicked(sender, ev); });
 
         if (const auto mapLeftCover = FindChild<Gx::Image>(Resource::Map::IDC_IMAGE_COVER_LEFT))
             mapLeftCover->SetVisible(false);
@@ -82,18 +76,10 @@ namespace Cx
             mapRightCover->SetVisible(false);
 
         const auto mapEffectTopButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_TOP);
-        mapEffectTopButton->SetCheckStateChangeCallback([=] (auto& sender)
-        {
-            if (sender.IsChecked())
-                SetEffectID(1);
-        });
+        mapEffectTopButton->SetCheckStateChangeCallback([this] (auto& sender) { OnMapSelectTopCheckChanged(sender); });
 
         const auto mapEffectBottomButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_BOTTOM);
-        mapEffectBottomButton->SetCheckStateChangeCallback([=] (auto& sender)
-        {
-            if (sender.IsChecked())
-                SetEffectID(2);
-        });
+        mapEffectBottomButton->SetCheckStateChangeCallback([this] (auto& sender) { OnMapSelectBottomCheckChanged(sender); });
     }
 
     unsigned int MapSelector::GetMapID() const
@@ -236,5 +222,27 @@ namespace Cx
     void MapSelector::SetEffectChangedCallback(const std::function<void(unsigned int)> &callback)
     {
         m_effectCallback = callback;
+    }
+
+    void MapSelector::OnMapLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SetMapID(static_cast<int>(m_mapID) - 1);
+    }
+
+    void MapSelector::OnMapRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SetMapID(static_cast<int>(m_mapID) + 1);
+    }
+
+    void MapSelector::OnMapSelectTopCheckChanged(Gx::RadioButton& sender)
+    {
+        if (sender.IsChecked())
+            SetEffectID(1);
+    }
+
+    void MapSelector::OnMapSelectBottomCheckChanged(Gx::RadioButton& sender)
+    {
+        if (sender.IsChecked())
+            SetEffectID(2);
     }
 }

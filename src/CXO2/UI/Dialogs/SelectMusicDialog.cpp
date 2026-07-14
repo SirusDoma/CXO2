@@ -73,35 +73,13 @@ namespace Cx
         auto leftButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT);
         if (leftButton)
         {
-            leftButton->SetClickCallback([this] (auto& sender, auto& ev)
-            {
-                if (m_random != static_cast<LevelCategory>(0) || m_page == 0)
-                    return;
-
-                m_page--;
-                m_music = ChartMetadata{};
-                Invalidate();
-            });
+            leftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnLeftButtonClicked(sender, ev); });
         }
 
         auto rightButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_RIGHT);
         if (rightButton)
         {
-            rightButton->SetClickCallback([this] (auto& sender, auto& ev)
-            {
-                const auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
-                if (!musicSelector)
-                    return;
-
-                const unsigned int itemListCount = musicSelector->GetChildrenCount();
-                const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
-                if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
-                    return;
-
-                m_page++;
-                m_music = ChartMetadata{};
-                Invalidate();
-            });
+            rightButton->SetClickCallback([this] (auto& sender, auto& ev) { OnRightButtonClicked(sender, ev); });
         }
 
         if (auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
@@ -119,78 +97,35 @@ namespace Cx
                 if (auto focusHighlighter = button->FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
                     focusHighlighter->SetVisible(false);
 
-                button->SetFocusChangedCallback([] (auto& sender, auto& ev)
-                {
-                    if (auto focusHighlighter = sender.template FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
-                        focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
-                });
+                button->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnMusicButtonFocusChanged(sender, ev); });
 
-                button->SetCheckStateChangeCallback([this, i] (auto& sender)
-                {
-                    const auto listSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
-                    if (!sender.IsChecked())
-                    {
-                        if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
-                            activeHighlighter->SetVisible(false);
-
-                        return;
-                    }
-
-                    if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
-                        activeHighlighter->SetVisible(true);
-
-                    const unsigned int itemListCount = listSelector->GetChildrenCount();
-                    const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
-                    if (m_music.Source == music.Source)
-                        return;
-
-                    m_music = music;
-
-                    Invalidate();
-                });
+                m_musicButtonIndices[button] = i;
+                button->SetCheckStateChangeCallback([this] (auto& sender) { OnMusicButtonCheckChanged(sender); });
             }
 
-            list->SetScrollWheelCallback([=] (auto& sender, auto& ev)
-            {
-                if (leftButton && ev.Delta > 0)
-                    leftButton->PerformClick();
-                else if (rightButton && ev.Delta < 0)
-                    rightButton->PerformClick();
-            });
+            list->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnMusicSelectorScrolled(sender, ev); });
         }
 
         if (auto sortSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SORT_SELECTOR); sortSelector)
         {
             if (auto newButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_NEW); newButton)
             {
-                newButton->SetClickCallback([this] (auto& sender, auto& ev)
-                {
-                    Sort(MusicSortMode::ID, m_sort != MusicSortMode::ID || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
-                });
+                newButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSortNewButtonClicked(sender, ev); });
             }
 
             if (auto titleButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_TITLE); titleButton)
             {
-                titleButton->SetClickCallback([this] (auto& sender, auto& ev)
-                {
-                    Sort(MusicSortMode::Title, m_sort != MusicSortMode::Title || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
-                });
+                titleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSortTitleButtonClicked(sender, ev); });
             }
 
             if (auto levelButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_DIFF); levelButton)
             {
-                levelButton->SetClickCallback([this] (auto& sender, auto& ev)
-                {
-                    Sort(MusicSortMode::Level, m_sort != MusicSortMode::Level || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
-                });
+                levelButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSortLevelButtonClicked(sender, ev); });
             }
 
             if (auto durationButton = sortSelector->FindChild<Gx::Button>(Resource::SelectMusic::Sort::IDC_BUTTON_SORT_TIME); durationButton)
             {
-                durationButton->SetClickCallback([this] (auto& sender, auto& ev)
-                {
-                    Sort(MusicSortMode::Duration, m_sort != MusicSortMode::Duration || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
-                });
+                durationButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSortDurationButtonClicked(sender, ev); });
             }
         }
 
@@ -220,35 +155,8 @@ namespace Cx
                 if (!button)
                     continue;
 
-                button->SetCheckStateChangeCallback([this, genre = genre] (auto& sender)
-                {
-                    if (!sender.IsChecked())
-                        return;
-
-                    if (m_random != static_cast<LevelCategory>(0))
-                    {
-                        sender.SetCheckedState(false);
-                        return;
-                    }
-
-                    m_genre = genre;
-                    m_music = ChartMetadata{};
-                    m_page  = 0;
-                    m_displayList.clear();
-                    for (auto& metadata : m_musicList)
-                    {
-                        auto musicGenre = magic_enum::enum_cast<Genre>(metadata.Genre.toAnsiString())
-                            .value_or(Genre::Etc);
-
-                        if (!m_genre.has_value() || musicGenre == m_genre)
-                            m_displayList.push_back(metadata);
-                    }
-
-                    if (m_sort.has_value() && m_order.has_value())
-                        Sort(m_sort.value(), m_order.value());
-                    else
-                        Invalidate();
-                });
+                m_genreButtonValues[button] = genre;
+                button->SetCheckStateChangeCallback([this] (auto& sender) { OnGenreButtonCheckChanged(sender); });
             }
         }
 
@@ -267,66 +175,8 @@ namespace Cx
                 if (!button)
                     continue;
 
-                button->SetCheckStateChangeCallback([this, lv = level] (auto& sender)
-                {
-                    if (sender.IsChecked())
-                        m_random = static_cast<LevelCategory>(static_cast<int>(m_random) | static_cast<int>(lv));
-                    else
-                        m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
-
-                    if (const auto genreSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_GENRE_SELECTOR); genreSelector)
-                    {
-                        std::unordered_map<std::string, Genre> genreMap = {
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL,         static_cast<Genre>(-1)},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD,      Genre::Ballad},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK,        Genre::Rock},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE,       Genre::Dance},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO,      Genre::Techno},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP,      Genre::HipHop},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL,        Genre::Soul},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ,        Genre::Jazz},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK,        Genre::Funk},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL,   Genre::Classical},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TRADITIONAL, Genre::Traditional},
-                            {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC,         Genre::Etc},
-                        };
-
-                        for (auto [key, genre]: genreMap)
-                        {
-                            if (genre != m_genre)
-                                continue;
-
-                            if (const auto genreButton = genreSelector->FindChild<Gx::RadioButton>(key); genreButton)
-                            {
-                                genreButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
-                                break;
-                            }
-                        }
-                    }
-
-                    if (const auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
-                    {
-                        std::unordered_map<std::string, Difficulty> diffMap = {
-                            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX, Difficulty::EX},
-                            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX, Difficulty::NX},
-                            {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX, Difficulty::HX},
-                        };
-
-                        for (auto [key, diff]: diffMap)
-                        {
-                            if (diff != m_difficulty)
-                                continue;
-
-                            if (const auto diffButton = levelSelector->FindChild<Gx::RadioButton>(key); diffButton)
-                            {
-                                diffButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
-                                break;
-                            }
-                        }
-                    }
-
-                    Invalidate();
-                });
+                m_randomLevelButtonValues[button] = level;
+                button->SetCheckStateChangeCallback([this] (auto& sender) { OnRandomLevelButtonCheckChanged(sender); });
             }
         }
 
@@ -335,65 +185,17 @@ namespace Cx
             if (auto exButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX); exButton)
             {
                 exButton->SetCheckedState(true);
-                exButton->SetCheckStateChangeCallback([this] (auto& sender)
-                {
-                    if (!sender.IsChecked())
-                        return;
-
-                    if (m_random != static_cast<LevelCategory>(0))
-                    {
-                        sender.SetCheckedState(false);
-                        return;
-                    }
-
-                    m_difficulty = Difficulty::EX;
-                    if (m_sort.has_value() && m_order.has_value())
-                        Sort(m_sort.value(), m_order.value());
-                    else
-                        Invalidate();
-                });
+                exButton->SetCheckStateChangeCallback([this] (auto& sender) { OnExButtonCheckChanged(sender); });
             }
 
             if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX); nxButton)
             {
-                nxButton->SetCheckStateChangeCallback([this] (auto& sender)
-                {
-                    if (!sender.IsChecked())
-                        return;
-
-                    if (m_random != static_cast<LevelCategory>(0))
-                    {
-                        sender.SetCheckedState(false);
-                        return;
-                    }
-
-                    m_difficulty = Difficulty::NX;
-                    if (m_sort.has_value() && m_order.has_value())
-                        Sort(m_sort.value(), m_order.value());
-                    else
-                        Invalidate();
-                });
+                nxButton->SetCheckStateChangeCallback([this] (auto& sender) { OnNxButtonCheckChanged(sender); });
             }
 
             if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX); hxButton)
             {
-                hxButton->SetCheckStateChangeCallback([this] (auto& sender)
-                {
-                    if (!sender.IsChecked())
-                        return;
-
-                    if (m_random != static_cast<LevelCategory>(0))
-                    {
-                        sender.SetCheckedState(false);
-                        return;
-                    }
-
-                    m_difficulty = Difficulty::HX;
-                    if (m_sort.has_value() && m_order.has_value())
-                        Sort(m_sort.value(), m_order.value());
-                    else
-                        Invalidate();
-                });
+                hxButton->SetCheckStateChangeCallback([this] (auto& sender) { OnHxButtonCheckChanged(sender); });
             }
         }
 
@@ -443,18 +245,239 @@ namespace Cx
                 if (speed == m_speed)
                     button->SetCheckedState(true);
 
-                button->SetCheckStateChangeCallback([this, speed] (auto& sender)
-                {
-                    if (!sender.IsChecked())
-                        return;
-
-                    m_speed = speed;
-                });
+                m_speedButtonValues[button] = speed;
+                button->SetCheckStateChangeCallback([this] (auto& sender) { OnSpeedButtonCheckChanged(sender); });
             }
         }
 
         Sort(m_room.GetMusicSortMode(), m_room.GetMusicSortOrder());
         m_initialized = true;
+    }
+
+    void SelectMusicDialog::OnLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_random != static_cast<LevelCategory>(0) || m_page == 0)
+            return;
+
+        m_page--;
+        m_music = ChartMetadata{};
+        Invalidate();
+    }
+
+    void SelectMusicDialog::OnRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
+        if (!musicSelector)
+            return;
+
+        const unsigned int itemListCount = musicSelector->GetChildrenCount();
+        const unsigned int maxPage = std::ceil(static_cast<float>(m_displayList.size()) / static_cast<float>(itemListCount));
+        if (m_random != static_cast<LevelCategory>(0) || m_page == maxPage - 1)
+            return;
+
+        m_page++;
+        m_music = ChartMetadata{};
+        Invalidate();
+    }
+
+    void SelectMusicDialog::OnMusicButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (auto focusHighlighter = sender.template FindChild<Gx::Image>(Resource::SelectMusic::IDC_IMAGE_MUSIC_HIGHLIGHT); focusHighlighter)
+            focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
+    }
+
+    void SelectMusicDialog::OnMusicButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        const auto listSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
+        if (!sender.IsChecked())
+        {
+            if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
+                activeHighlighter->SetVisible(false);
+
+            return;
+        }
+
+        if (auto activeHighlighter = sender.template FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter)
+            activeHighlighter->SetVisible(true);
+
+        const unsigned int itemListCount = listSelector->GetChildrenCount();
+        const auto i = m_musicButtonIndices.at(&sender);
+        const auto music = m_displayList[i + static_cast<int>(m_page * itemListCount)];
+        if (m_music.Source == music.Source)
+            return;
+
+        m_music = music;
+
+        Invalidate();
+    }
+
+    void SelectMusicDialog::OnMusicSelectorScrolled(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto leftButton  = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT);
+        const auto rightButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_RIGHT);
+
+        if (leftButton && ev.Delta > 0)
+            leftButton->PerformClick();
+        else if (rightButton && ev.Delta < 0)
+            rightButton->PerformClick();
+    }
+
+    void SelectMusicDialog::ToggleSort(const MusicSortMode mode)
+    {
+        Sort(mode, m_sort != mode || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
+    }
+
+    void SelectMusicDialog::OnSortNewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ToggleSort(MusicSortMode::ID);
+    }
+
+    void SelectMusicDialog::OnSortTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ToggleSort(MusicSortMode::Title);
+    }
+
+    void SelectMusicDialog::OnSortLevelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ToggleSort(MusicSortMode::Level);
+    }
+
+    void SelectMusicDialog::OnSortDurationButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ToggleSort(MusicSortMode::Duration);
+    }
+
+    void SelectMusicDialog::OnGenreButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        if (m_random != static_cast<LevelCategory>(0))
+        {
+            sender.SetCheckedState(false);
+            return;
+        }
+
+        m_genre = m_genreButtonValues.at(&sender);
+        m_music = ChartMetadata{};
+        m_page  = 0;
+        m_displayList.clear();
+        for (auto& metadata : m_musicList)
+        {
+            auto musicGenre = magic_enum::enum_cast<Genre>(metadata.Genre.toAnsiString())
+                .value_or(Genre::Etc);
+
+            if (!m_genre.has_value() || musicGenre == m_genre)
+                m_displayList.push_back(metadata);
+        }
+
+        if (m_sort.has_value() && m_order.has_value())
+            Sort(m_sort.value(), m_order.value());
+        else
+            Invalidate();
+    }
+
+    void SelectMusicDialog::OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender)
+    {
+        const auto lv = m_randomLevelButtonValues.at(&sender);
+        if (sender.IsChecked())
+            m_random = static_cast<LevelCategory>(static_cast<int>(m_random) | static_cast<int>(lv));
+        else
+            m_random = static_cast<LevelCategory>(static_cast<int>(m_random) & ~static_cast<int>(lv));
+
+        if (const auto genreSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_GENRE_SELECTOR); genreSelector)
+        {
+            std::unordered_map<std::string, Genre> genreMap = {
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ALL,         static_cast<Genre>(-1)},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_BALLAD,      Genre::Ballad},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ROCK,        Genre::Rock},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_DANCE,       Genre::Dance},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TECHNO,      Genre::Techno},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_HIPHOP,      Genre::HipHop},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_SOUL,        Genre::Soul},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_JAZZ,        Genre::Jazz},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_FUNK,        Genre::Funk},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_CLASSICAL,   Genre::Classical},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_TRADITIONAL, Genre::Traditional},
+                {Resource::SelectMusic::Genre::IDC_RADIO_GENRE_ETC,         Genre::Etc},
+            };
+
+            for (auto [key, genre]: genreMap)
+            {
+                if (genre != m_genre)
+                    continue;
+
+                if (const auto genreButton = genreSelector->FindChild<Gx::RadioButton>(key); genreButton)
+                {
+                    genreButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
+                    break;
+                }
+            }
+        }
+
+        if (const auto levelSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_DIFFICULTY_SELECTOR); levelSelector)
+        {
+            std::unordered_map<std::string, Difficulty> diffMap = {
+                {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX, Difficulty::EX},
+                {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX, Difficulty::NX},
+                {Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX, Difficulty::HX},
+            };
+
+            for (auto [key, diff]: diffMap)
+            {
+                if (diff != m_difficulty)
+                    continue;
+
+                if (const auto diffButton = levelSelector->FindChild<Gx::RadioButton>(key); diffButton)
+                {
+                    diffButton->SetCheckedState(m_random == static_cast<LevelCategory>(0));
+                    break;
+                }
+            }
+        }
+
+        Invalidate();
+    }
+
+    void SelectMusicDialog::SelectDifficulty(Gx::RadioButton& sender, const Difficulty difficulty)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        if (m_random != static_cast<LevelCategory>(0))
+        {
+            sender.SetCheckedState(false);
+            return;
+        }
+
+        m_difficulty = difficulty;
+        if (m_sort.has_value() && m_order.has_value())
+            Sort(m_sort.value(), m_order.value());
+        else
+            Invalidate();
+    }
+
+    void SelectMusicDialog::OnExButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectDifficulty(sender, Difficulty::EX);
+    }
+
+    void SelectMusicDialog::OnNxButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectDifficulty(sender, Difficulty::NX);
+    }
+
+    void SelectMusicDialog::OnHxButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectDifficulty(sender, Difficulty::HX);
+    }
+
+    void SelectMusicDialog::OnSpeedButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        m_speed = m_speedButtonValues.at(&sender);
     }
 
     void SelectMusicDialog::OnKeyPressed(const sf::Event::KeyPressed& ev)

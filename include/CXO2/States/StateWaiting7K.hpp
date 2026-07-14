@@ -8,7 +8,16 @@
 
 #include <SFML/System/String.hpp>
 
+#include <cstdint>
+#include <string>
+#include <unordered_map>
 #include <vector>
+
+namespace Gx
+{
+    class RadioButton;
+    class Sprite;
+}
 
 namespace Cx
 {
@@ -48,6 +57,13 @@ namespace Cx
         void OnMapChanged(const MessageEnvelope<WaitingMapChangedEventData>& ev);
         void OnStartGame(const MessageEnvelope<StartGameEventData>& ev);
 
+        void OnStartGameResponded(const MessageEnvelope<StartGameRequest>& ev);
+        void OnUpdateReadyStateResponded(Gx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev);
+        void OnUpdateMusicResponded(const MessageEnvelope<UpdateRoomMusicRequest>& ev);
+        void OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev);
+        void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, RoomTeam team);
+        void OnExitRoomResponded(const MessageEnvelope<ExitWaitingResponse>& ev);
+
         void OnReadyStateChanged(Gx::ToggleButton& sender);
         void OnStartStateChanged(Gx::ToggleButton& sender);
 
@@ -57,13 +73,16 @@ namespace Cx
         void OnChangeTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChangeTitleDialogAccepted();
 
-        void OnTeamButtonStateChanged(const Gx::ToggleButton& sender, RoomTeam team);
+        void OnTeamButtonStateChanged(Gx::RadioButton& sender);
         void OnInstrumentSelectorStateChanged(const ItemMetadata& metadata) const;
         void OnMapSelectorStateChanged(unsigned int mapID);
+        void OnEffectSelectorStateChanged(unsigned int effectID);
 
         void OnEmoticonButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnEmoticonNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnEmoticonPreviousPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnExtendButtonDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         void OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
@@ -72,10 +91,12 @@ namespace Cx
 
         void ExtendSlot(unsigned int slotID);
         void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
+        void SendEmoticon(const std::vector<std::uint8_t>& code, const std::string& emoticonID);
 
         void InvalidateRoomInfo();
         void InvalidateAvatarInfo();
         void InvalidateMembers();
+        void InvalidateSlotMarkers(Gx::Sprite* bossMark, Gx::Sprite* noMusic, const RoomSlot& slot);
 
         Gx::AudioMixer& m_mixer;
         SessionContext& m_session;
@@ -90,5 +111,8 @@ namespace Cx
         RoomSlot* m_slot{};
 
         std::vector<Avatar*> m_avatars;
+
+        std::unordered_map<Gx::RadioButton*, RoomTeam> m_teamButtons;
+        std::unordered_map<Gx::Control*, int> m_extendButtonSlotIDs;
     };
 }

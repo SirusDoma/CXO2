@@ -88,70 +88,27 @@ namespace Cx
         currentCash->SetValue(charInfo.Wallet.Cash);
 
         const auto myRoomButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MY_ROOM);
-        myRoomButton->SetClickCallback([this] (auto&, auto&)
-        {
-            GetDirector().Present<StateMyRoom>();
-        });
-
-        const auto shopMasterLipsAnimationCallback = [=] (Gx::Animation& animation)
-        {
-            animation.SetVisible(
-                animation.GetState() == Gx::Animation::AnimationState::Playing ||
-                animation.GetState() == Gx::Animation::AnimationState::Initial
-            );
-        };
-
-        const auto shopMasterWireAnimation = [=] (const Gx::UiContainer* shopMaster)
-        {
-            if (!shopMaster)
-                return;
-
-            if (const auto speech = shopMaster->FindChild<Gx::Animation>(Resource::ItemShop::ShopMaster::IDC_ANIMATION_SPEECH))
-            {
-                speech->SetAnimationCallback(shopMasterLipsAnimationCallback);
-                speech->Stop();
-            }
-        };
-
-        const auto shopMasterWireSpeech = [this] (Gx::UiContainer* shopMaster)
-        {
-            const auto main = shopMaster->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_MAIN);
-            main->SetClickCallback([this, shopMaster] (auto&, auto&)
-            {
-                m_shopMasterSpeechCounter++;
-                if (m_shopMasterSpeechCounter >= m_shopMasterSpeech.size())
-                    m_shopMasterSpeechCounter = 0;
-
-                for (std::size_t i = 0; i < m_shopMasterSpeech.size(); i++)
-                {
-                    if (i == m_shopMasterSpeechCounter)
-                        m_mixer.Play(*m_shopMasterSpeech[i], Sound::Channel::SFX);
-                    else
-                        m_shopMasterSpeech[i]->stop();
-                }
-            });
-        };
+        myRoomButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMyRoomButtonClicked(sender, ev); });
 
         const auto shopMasterContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SHOP_MASTER);
         const auto shopMasterMain = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_MAIN);
-        shopMasterWireAnimation(shopMasterMain);
-        shopMasterWireSpeech(shopMasterMain);
+        InitializeShopMaster(shopMasterMain, true);
 
         const auto shopMasterO2P = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_O2P);
         shopMasterO2P->SetVisible(false);
-        shopMasterWireAnimation(shopMasterO2P);
+        InitializeShopMaster(shopMasterO2P);
 
         const auto shopMasterAqua = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_AQUA);
         shopMasterAqua->SetVisible(false);
-        shopMasterWireAnimation(shopMasterAqua);
+        InitializeShopMaster(shopMasterAqua);
 
         const auto shopMasterGraffiti = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_GRAFFITI);
         shopMasterGraffiti->SetVisible(false);
-        shopMasterWireAnimation(shopMasterGraffiti);
+        InitializeShopMaster(shopMasterGraffiti);
 
         const auto shopMasterEvent = shopMasterContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::ShopMaster::IDC_IMAGE_SHOP_MASTER_EVENT);
         shopMasterEvent->SetVisible(false);
-        shopMasterWireAnimation(shopMasterEvent);
+        InitializeShopMaster(shopMasterEvent);
 
         m_shopMasters = {
             { Planet::Unknown,    shopMasterMain     },
@@ -172,12 +129,7 @@ namespace Cx
         tooltipMessage->SetLocalBounds(tooltip->GetLocalBounds());
 
         const auto defaultButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_DEFAULT);
-        defaultButton->SetClickCallback([=] (auto&, auto&)
-        {
-            avatar->ClearEquipments();
-            for (const auto id : charInfo.EquippedItemIDs)
-                avatar->Equip(m_items.Create(id));
-        });
+        defaultButton->SetClickCallback([this] (auto& sender, auto& ev) { OnDefaultButtonClicked(sender, ev); });
 
         const auto categoryButtonsContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CATEGORY_BUTTONS);
         const std::unordered_map<ShopCategory, Gx::RadioButton*> shopCategoryButtonMap =
@@ -189,7 +141,7 @@ namespace Cx
             { ShopCategory::Instrument, categoryButtonsContainer->FindChild<Gx::RadioButton>(Resource::ItemShop::IDC_BUTTON_INSTRUMENT) },
        };
 
-        const std::unordered_map<ShopCategory, Gx::UiContainer*> shopCategoryContainerMap =
+        m_shopCategoryContainerMap =
         {
             { ShopCategory::Special,    Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SPECIAL_CATEGORY) },
             { ShopCategory::Fashion,    Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_FASHION_CATEGORY) },
@@ -198,7 +150,7 @@ namespace Cx
             { ShopCategory::Instrument, Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_INSTRUMENT_CATEGORY) },
         };
 
-        const std::unordered_map<ShopCategory, std::vector<EquipmentType>> itemCategoryMap = []
+        m_itemCategoryMap = []
         {
             if (O2::InInteropMode(InteropMode::Avatar))
             {
@@ -232,60 +184,21 @@ namespace Cx
         }
         for (auto [category, button] : shopCategoryButtonMap)
         {
-            shopCategoryContainerMap.at(category)->SetEnabled(category == m_shopCategory);
-            shopCategoryContainerMap.at(category)->SetVisible(category == m_shopCategory);
+            m_shopCategoryContainerMap.at(category)->SetEnabled(category == m_shopCategory);
+            m_shopCategoryContainerMap.at(category)->SetVisible(category == m_shopCategory);
 
             button->SetCheckedState(category == m_shopCategory);
-            button->SetCheckStateChangeCallback([this, sfxMenu, category = category, shopCategoryContainerMap, itemCategoryMap] (auto& sender)
-            {
-                if (!sender.IsChecked())
-                    return;
+            m_shopCategoryButtons[button] = category;
+            button->SetCheckStateChangeCallback([this] (auto& sender) { OnShopCategoryCheckChanged(sender); });
 
-                m_shopCategory = category;
-                m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
-
-                for (const auto iterator : shopCategoryContainerMap)
-                {
-                    iterator.second->SetEnabled(iterator.first == category);
-                    iterator.second->SetVisible(iterator.first == category);
-
-                    if (iterator.first != category)
-                        continue;
-
-                    for (const auto child : iterator.second->GetChildren())
-                    {
-                        if (const auto radio = dynamic_cast<Gx::RadioButton*>(child))
-                        {
-                            if (radio->IsChecked())
-                            {
-                                m_itemCategory = itemCategoryMap.at(m_shopCategory).at(0);
-                                InvalidateShopItemList(true);
-                            }
-                            else
-                                radio->SetCheckedState(true);
-
-                            break;
-                        }
-                    }
-                }
-            });
-
-            auto children = shopCategoryContainerMap.at(category)->GetChildren();
+            auto children = m_shopCategoryContainerMap.at(category)->GetChildren();
             for (std::size_t i = 0; i < children.size(); i++)
             {
                 if (const auto radio = dynamic_cast<Gx::RadioButton*>(children[i]))
                 {
                     radio->SetCheckedState(category == m_shopCategory && i == 0);
-                    radio->SetCheckStateChangeCallback([this, i, sfxMenu, category = category, itemCategoryMap] (auto& sender)
-                    {
-                        if (!sender.IsChecked())
-                            return;
-
-                        m_itemCategory = itemCategoryMap.at(category).at(i);
-                        m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
-
-                        InvalidateShopItemList(true);
-                    });
+                    m_itemCategoryButtons[radio] = { category, i };
+                    radio->SetCheckStateChangeCallback([this] (auto& sender) { OnItemCategoryCheckChanged(sender); });
                 }
             }
         }
@@ -293,62 +206,11 @@ namespace Cx
         const auto planetPrevButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_PLANET_UP);
         const auto planetNextButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_PLANET_DOWN);
 
-        planetPrevButton->SetClickCallback([=] (auto&, auto&)
-        {
-            const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
-            if (m_shopPlanetCategory == Planet::Unknown)
-            {
-                m_shopPlanetCategory = Planet::Event;
-            }
-            else if (planet->GetFrameCount() >= 12)
-            {
-                m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
-            }
-            else
-            {
-                auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
-                auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
-                    return m_shopPlanetCategory == p;
-                });
-
-                if (it && it != categories.end())
-                    m_shopPlanetCategory = *(--it);
-            }
-
-            m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
-            InvalidateShopMaster(true);
-            InvalidateShopItemList(true);
-        });
-
-        planetNextButton->SetClickCallback([=] (auto&, auto&)
-        {
-            const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
-            if (m_shopPlanetCategory == Planet::Event)
-            {
-                m_shopPlanetCategory = Planet::Unknown;
-            }
-            else if (planet->GetFrameCount() >= 12)
-            {
-                m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
-            }
-            else
-            {
-                auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
-                auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
-                    return m_shopPlanetCategory == p;
-                });
-
-                if (it && it != categories.end())
-                    m_shopPlanetCategory = *(++it);
-            }
-
-            m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
-            InvalidateShopMaster(true);
-            InvalidateShopItemList(true);
-        });
+        planetPrevButton->SetClickCallback([this] (auto& sender, auto& ev) { OnPlanetUpButtonClicked(sender, ev); });
+        planetNextButton->SetClickCallback([this] (auto& sender, auto& ev) { OnPlanetDownButtonClicked(sender, ev); });
 
         const auto extButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_EXT_MENU);
-        extButton->SetClickCallback([this] (auto&, auto&) { OnExtensionButtonClicked(); });
+        extButton->SetClickCallback([this] (auto& sender, auto& ev) { OnExtensionButtonClicked(sender, ev); });
 
         const auto planetExt = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_EXT_MENU);
         planetExt->SetTexCoords({});
@@ -371,16 +233,8 @@ namespace Cx
 
         for (auto [planet, button] : shopPlanetExtMap)
         {
-            button->SetClickCallback([=, p = planet] (auto&, auto&)
-            {
-                if (m_shopPlanetCategory == p)
-                    return;
-
-                m_shopPlanetCategory = p;
-                m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
-                InvalidateShopMaster(true);
-                InvalidateShopItemList(true);
-            });
+            m_planetExtensionButtons[button] = planet;
+            button->SetClickCallback([this] (auto& sender, auto& ev) { OnPlanetExtensionButtonClicked(sender, ev); });
         }
 
         const auto maleButton   = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MALE);
@@ -391,40 +245,8 @@ namespace Cx
         femaleButton->SetEnabled(m_genderCategory == Gender::Female);
         femaleButton->SetVisible(m_genderCategory == Gender::Female);
 
-        maleButton->SetClickCallback([=] (auto&, auto&)
-        {
-            m_genderCategory = m_genderCategory = Gender::Female;
-
-            maleButton->SetEnabled(false);
-            maleButton->SetVisible(false);
-
-            femaleButton->SetEnabled(true);
-            femaleButton->SetVisible(true);
-
-            m_mixer.Play(*sfxGender, Sound::Channel::SFX);
-
-            if (m_itemCategory == EquipmentType::Costume)
-                InvalidateShopSetItemList(true);
-            else
-                InvalidateShopItemList(true);
-        });
-
-        femaleButton->SetClickCallback([=] (auto&, auto&)
-        {
-            m_genderCategory = m_genderCategory = Gender::Male;
-
-            femaleButton->SetEnabled(false);
-            femaleButton->SetVisible(false);
-
-            maleButton->SetEnabled(true);
-            maleButton->SetVisible(true);
-
-            m_mixer.Play(*sfxGender, Sound::Channel::SFX);
-            if (m_itemCategory == EquipmentType::Costume)
-                InvalidateShopSetItemList(true);
-            else
-                InvalidateShopItemList(true);
-        });
+        maleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMaleButtonClicked(sender, ev); });
+        femaleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnFemaleButtonClicked(sender, ev); });
 
         m_shopCurrentPage = 0;
         const auto itemScrollControls = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
@@ -434,41 +256,20 @@ namespace Cx
         // TODO: Detect vertical count?
         constexpr int verticalCount = 2; //itemList->GetVerticalCount()
         shopScrollBar->SetMaximumValue(m_shopItemList.size() < itemList->GetChildrenCount() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_shopItemList.size() - itemList->GetChildrenCount()) / verticalCount)));
-        shopScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
-        {
-            if (value < m_myBagCurrentPage)
-                m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
-            else
-                m_mixer.Play(*sfxNext, Sound::Channel::SFX);
-
-            m_shopCurrentPage = static_cast<unsigned int>(value);
-            InvalidateShopItemList();
-        });
+        shopScrollBar->SetValueChangedCallback([this] (auto& sender, auto& ev) { OnShopScrollBarValueChanged(sender, ev); });
 
         const auto shopScrollLeft = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_LEFT);
-        shopScrollLeft->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Decrease(); });
+        shopScrollLeft->SetClickCallback([this] (auto& sender, auto& ev) { OnShopScrollLeftButtonClicked(sender, ev); });
 
         const auto shopScrollRight = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_RIGHT);
-        shopScrollRight->SetClickCallback([=] (auto&, auto&) { shopScrollBar->Increase(); });
+        shopScrollRight->SetClickCallback([this] (auto& sender, auto& ev) { OnShopScrollRightButtonClicked(sender, ev); });
 
         const auto shopItemList = Instantiate<Gx::List>(Resource::ItemShop::IDC_LIST_ITEM);
-        shopItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
-        {
-            if (ev.Delta > 0)
-                shopScrollRight->PerformClick();
-            else
-                shopScrollLeft->PerformClick();
-        });
+        shopItemList->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnShopItemListScrolled(sender, ev); });
 
         const auto setItemContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_SET_ITEM);
         const auto setItemList      = setItemContainer->FindChild<Gx::List>(Resource::ItemShop::IDC_LIST_SET_ITEM);
-        setItemList->SetScrollWheelCallback([=] (auto&, auto& ev)
-        {
-            if (ev.Delta > 0)
-                shopScrollRight->PerformClick();
-            else
-                shopScrollLeft->PerformClick();
-        });
+        setItemList->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnShopItemListScrolled(sender, ev); });
 
         const auto myBagContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
         m_myBagSelectIndicator = myBagContainer->FindChild<Gx::Image>(Resource::ItemShop::MyBag::IDC_IMAGE_MYBAG_SELECT);
@@ -481,99 +282,45 @@ namespace Cx
         const auto bagScrollControls = myBagContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
         const auto bagScrollBar = bagScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
         bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / bagList->GetVerticalCount())));
-        bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
-        {
-            if (value < m_myBagCurrentPage)
-                m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
-            else
-                m_mixer.Play(*sfxNext, Sound::Channel::SFX);
-
-            m_myBagCurrentPage = static_cast<unsigned int>(value);
-            InvalidateMyBag();
-        });
+        bagScrollBar->SetValueChangedCallback([this] (auto& sender, auto& ev) { OnMyBagScrollBarValueChanged(sender, ev); });
 
         const auto bagScrollLeftButton = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_LEFT);
-        bagScrollLeftButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Decrease(); });
+        bagScrollLeftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMyBagScrollLeftButtonClicked(sender, ev); });
 
         const auto bagScrollRightButton = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_RIGHT);
-        bagScrollRightButton->SetClickCallback([=] (auto&, auto&) { bagScrollBar->Increase(); });
+        bagScrollRightButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMyBagScrollRightButtonClicked(sender, ev); });
 
-        bagList->SetScrollWheelCallback([=] (auto&, auto& ev)
-        {
-            if (ev.Delta > 0)
-                bagScrollRightButton->PerformClick();
-            else
-                bagScrollLeftButton->PerformClick();
-        });
+        bagList->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnMyBagListScrolled(sender, ev); });
 
         const auto sellButton = myBagContainer->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_SELL);
-        sellButton->SetClickCallback([this] (auto&, auto&) { OnItemSellClicked(); });
+        sellButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSellButtonClicked(sender, ev); });
 
         m_cartCurrentPage = 0;
         const auto cartContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
 
         const auto buyButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_BUY);
-        buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
+        buyButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBuyButtonClicked(sender, ev); });
 
         const auto giftButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_GIFT);
-        giftButton->SetClickCallback([this] (auto&, auto&) { OnGiftButtonClicked(); });
+        giftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnGiftButtonClicked(sender, ev); });
 
         const auto cartList           = cartContainer->FindChild<Gx::List>(Resource::ItemShop::Cart::IDC_LIST_CART);
         const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_LEFT);
         const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_RIGHT);
 
-        cartPrevPageButton->SetClickCallback([this] (auto&, auto&)
-        {
-            if (m_cartCurrentPage > 0)
-            {
-                m_cartCurrentPage--;
-                InvalidateCart();
-            }
-        });
+        cartPrevPageButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartPrevPageButtonClicked(sender, ev); });
+        cartNextPageButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartNextPageButtonClicked(sender, ev); });
 
-        cartNextPageButton->SetClickCallback([this] (auto&, auto&)
-        {
-            m_cartCurrentPage++;
-            InvalidateCart();
-        });
-
-        cartList->SetScrollWheelCallback([=] (auto&, auto& ev)
-        {
-            if (ev.Delta > 0)
-                cartNextPageButton->PerformClick();
-            else
-                cartPrevPageButton->PerformClick();
-        });
+        cartList->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnCartListScrolled(sender, ev); });
 
         const auto myBagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
         const auto cartButton  = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
 
-        myBagButton->SetClickCallback([=] (auto&, auto&)
-        {
-            myBagContainer->SetEnabled(true);
-            myBagContainer->SetVisible(true);
-
-            cartContainer->SetEnabled(false);
-            cartContainer->SetVisible(false);
-        });
-
-        cartButton->SetClickCallback([=] (auto&, auto&)
-        {
-            myBagContainer->SetEnabled(false);
-            myBagContainer->SetVisible(false);
-
-            cartContainer->SetEnabled(true);
-            cartContainer->SetVisible(true);
-        });
+        myBagButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMyBagButtonClicked(sender, ev); });
+        cartButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartButtonClicked(sender, ev); });
 
         const auto backButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_BACK);
-        backButton->SetClickCallback([this] (auto&, auto&)
-        {
-            if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-                m_mixer.Play(*sfx, Sound::Channel::SFX);
-
-            GetDirector().Dismiss<StateRoom>();
-        });
+        backButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBackButtonClicked(sender, ev); });
 
         myBagButton->PerformClick();
         InvalidateMyBag();
@@ -585,7 +332,113 @@ namespace Cx
         m_mixer.Play(*sfxWelcome, Sound::Channel::SFX);
     }
 
-    void StateItemShop::OnExtensionButtonClicked()
+    void StateItemShop::InitializeShopMaster(Gx::UiContainer* shopMaster, bool useSpeech)
+    {
+        if (!shopMaster)
+            return;
+
+        if (const auto speech = shopMaster->FindChild<Gx::Animation>(Resource::ItemShop::ShopMaster::IDC_ANIMATION_SPEECH))
+        {
+            speech->SetAnimationCallback([=] (Gx::Animation& animation)
+            {
+                animation.SetVisible(
+                    animation.GetState() == Gx::Animation::AnimationState::Playing ||
+                    animation.GetState() == Gx::Animation::AnimationState::Initial
+                );
+            });
+
+            speech->Stop();
+        }
+
+        if (useSpeech)
+        {
+            const auto main = shopMaster->FindChild<Gx::Image>(Resource::ItemShop::ShopMaster::IDC_IMAGE_MAIN);
+            main->SetClickCallback([this] (auto& sender, auto& ev) { OnShopMasterClicked(sender, ev); });
+        }
+    }
+
+    void StateItemShop::OnPurchaseItemResponded(const MessageEnvelope<PurchaseItemResponse>& ev, const ItemMetadata& metadata)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.ResultCode != PurchaseItemResult::Success)
+            {
+                if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
+                    ShowDialog("You need more money.", DialogStyle::Information);
+                else if (response.ResultCode == PurchaseItemResult::InventoryFull)
+                    ShowDialog("No more room in your Bag.", DialogStyle::Information);
+
+                return;
+            }
+
+            auto& inventory = m_session.GetCharacterInfo().Inventory;
+            if (inventory[response.SlotID] != 0)
+            {
+                ShowDialog("Invalid inventory slot.", DialogStyle::Information);
+                return;
+            }
+
+            inventory[response.SlotID] = metadata.ID;
+
+            m_session.GetCharacterInfo().Wallet = CharacterInfo::WalletInfo
+            {
+                response.Gem,
+                response.Cash
+            };
+
+            // m_session.Save();
+            m_inventory.clear();
+            InvalidateMyBag();
+
+            const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
+            bagButton->PerformClick();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+            {
+                GetDirector().Present<StatePlanet>();
+            });
+        }
+    }
+
+    void StateItemShop::OnSellItemResponded(const MessageEnvelope<SellItemResponse>& ev)
+    {
+        auto& charInfo       = m_session.GetCharacterInfo();
+        const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+
+        try
+        {
+            const auto& response = ev.Open();
+            if (response.Result == SellItemResult::Failed)
+            {
+                ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+                return;
+            }
+
+            charInfo.Inventory[response.SlotID] = 0;
+            m_inventory[response.SlotID] = Item{};
+
+            charInfo.Wallet = CharacterInfo::WalletInfo
+            {
+                response.Gem,
+                response.Cash
+            };
+
+            m_myBagSelectedItem = nullptr;
+            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
+
+            // m_session.Save();
+            InvalidateMyBag();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information);
+        }
+    }
+
+    void StateItemShop::OnExtensionButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_extensionMenuEffect.GetState() == Gx::TaskState::Running)
             return;
@@ -676,7 +529,7 @@ namespace Cx
         Run(m_extensionMenuEffect);
     }
 
-    void StateItemShop::OnBuyButtonClicked()
+    void StateItemShop::OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_cart.GetItems().size() == 0)
         {
@@ -697,7 +550,7 @@ namespace Cx
         });
     }
 
-    void StateItemShop::OnGiftButtonClicked()
+    void StateItemShop::OnGiftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_cart.GetItems().size() == 0)
         {
@@ -708,12 +561,8 @@ namespace Cx
         ShowDialog("Gift is currently not available", DialogStyle::Information);
     }
 
-    void StateItemShop::OnItemSellClicked()
+    void StateItemShop::OnSellButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        auto& charInfo       = m_session.GetCharacterInfo();
-        const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
-        const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
-
         if (!m_myBagSelectedItem)
         {
             ShowDialog("No selected item.", DialogStyle::Information);
@@ -740,59 +589,606 @@ namespace Cx
         const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
             m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-        ShowDialog(message, DialogStyle::OkCancel, false, [=, &charInfo] (auto accepted)
-        {
-            if (!accepted)
-            {
-                m_mixer.Play(*sfxCancel, Sound::Channel::SFX);
-                return;
-            }
+        ShowDialog(message, DialogStyle::OkCancel, false, [this] (auto accepted) { OnSellItemConfirmed(accepted); });
+    }
 
-            std::size_t slotID = charInfo.Inventory.size() + 1;
-            for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+    void StateItemShop::OnSellItemConfirmed(const bool accepted)
+    {
+        const auto& charInfo = m_session.GetCharacterInfo();
+        const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
+
+        if (!accepted)
+        {
+            m_mixer.Play(*sfxCancel, Sound::Channel::SFX);
+            return;
+        }
+
+        std::size_t slotID = charInfo.Inventory.size() + 1;
+        for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+        {
+            if (charInfo.Inventory[i] == m_myBagSelectedItem->GetID())
             {
-                if (charInfo.Inventory[i] == m_myBagSelectedItem->GetID())
+                slotID = i;
+                break;
+            }
+        }
+
+        if (slotID >= charInfo.Inventory.size())
+            return;
+
+        m_service.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [this] (const auto& ev)
+        {
+            OnSellItemResponded(ev);
+        });
+    }
+
+    void StateItemShop::OnMyRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        GetDirector().Present<StateMyRoom>();
+    }
+
+    void StateItemShop::OnShopMasterClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_shopMasterSpeechCounter++;
+        if (m_shopMasterSpeechCounter >= m_shopMasterSpeech.size())
+            m_shopMasterSpeechCounter = 0;
+
+        for (std::size_t i = 0; i < m_shopMasterSpeech.size(); i++)
+        {
+            if (i == m_shopMasterSpeechCounter)
+                m_mixer.Play(*m_shopMasterSpeech[i], Sound::Channel::SFX);
+            else
+                m_shopMasterSpeech[i]->stop();
+        }
+    }
+
+    void StateItemShop::OnDefaultButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto& charInfo = m_session.GetCharacterInfo();
+        const auto avatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+
+        avatar->ClearEquipments();
+        for (const auto id : charInfo.EquippedItemIDs)
+            avatar->Equip(m_items.Create(id));
+    }
+
+    void StateItemShop::OnShopCategoryCheckChanged(Gx::RadioButton& sender)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        const auto sfxMenu  = Instantiate<sf::Sound>(Sound::Effects::EF_11);
+        const auto category = m_shopCategoryButtons.at(&sender);
+
+        m_shopCategory = category;
+        m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
+
+        for (const auto iterator : m_shopCategoryContainerMap)
+        {
+            iterator.second->SetEnabled(iterator.first == category);
+            iterator.second->SetVisible(iterator.first == category);
+
+            if (iterator.first != category)
+                continue;
+
+            for (const auto child : iterator.second->GetChildren())
+            {
+                if (const auto radio = dynamic_cast<Gx::RadioButton*>(child))
                 {
-                    slotID = i;
+                    if (radio->IsChecked())
+                    {
+                        m_itemCategory = m_itemCategoryMap.at(m_shopCategory).at(0);
+                        InvalidateShopItemList(true);
+                    }
+                    else
+                        radio->SetCheckedState(true);
+
                     break;
                 }
             }
+        }
+    }
 
-            if (slotID >= charInfo.Inventory.size())
+    void StateItemShop::OnItemCategoryCheckChanged(Gx::RadioButton& sender)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        const auto sfxMenu        = Instantiate<sf::Sound>(Sound::Effects::EF_11);
+        const auto& [category, i] = m_itemCategoryButtons.at(&sender);
+
+        m_itemCategory = m_itemCategoryMap.at(category).at(i);
+        m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
+
+        InvalidateShopItemList(true);
+    }
+
+    void StateItemShop::OnPlanetUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
+        const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
+        if (m_shopPlanetCategory == Planet::Unknown)
+        {
+            m_shopPlanetCategory = Planet::Event;
+        }
+        else if (planet->GetFrameCount() >= 12)
+        {
+            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
+        }
+        else
+        {
+            auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
+            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
+                return m_shopPlanetCategory == p;
+            });
+
+            if (it && it != categories.end())
+                m_shopPlanetCategory = *(--it);
+        }
+
+        m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
+        InvalidateShopMaster(true);
+        InvalidateShopItemList(true);
+    }
+
+    void StateItemShop::OnPlanetDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
+        const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
+        if (m_shopPlanetCategory == Planet::Event)
+        {
+            m_shopPlanetCategory = Planet::Unknown;
+        }
+        else if (planet->GetFrameCount() >= 12)
+        {
+            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
+        }
+        else
+        {
+            auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
+            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
+                return m_shopPlanetCategory == p;
+            });
+
+            if (it && it != categories.end())
+                m_shopPlanetCategory = *(++it);
+        }
+
+        m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
+        InvalidateShopMaster(true);
+        InvalidateShopItemList(true);
+    }
+
+    void StateItemShop::OnPlanetExtensionButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
+        const auto p         = m_planetExtensionButtons.at(&sender);
+
+        if (m_shopPlanetCategory == p)
+            return;
+
+        m_shopPlanetCategory = p;
+        m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
+        InvalidateShopMaster(true);
+        InvalidateShopItemList(true);
+    }
+
+    void StateItemShop::OnMaleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectGender(Gender::Female);
+    }
+
+    void StateItemShop::OnFemaleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectGender(Gender::Male);
+    }
+
+    void StateItemShop::SelectGender(const Gender gender)
+    {
+        const auto sfxGender      = Instantiate<sf::Sound>(Sound::Effects::EF_15);
+        const auto maleButton     = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MALE);
+        const auto femaleButton   = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_FEMALE);
+        const auto disabledButton = gender == Gender::Female ? maleButton : femaleButton;
+        const auto enabledButton  = gender == Gender::Female ? femaleButton : maleButton;
+
+        m_genderCategory = m_genderCategory = gender;
+
+        disabledButton->SetEnabled(false);
+        disabledButton->SetVisible(false);
+
+        enabledButton->SetEnabled(true);
+        enabledButton->SetVisible(true);
+
+        m_mixer.Play(*sfxGender, Sound::Channel::SFX);
+
+        if (m_itemCategory == EquipmentType::Costume)
+            InvalidateShopSetItemList(true);
+        else
+            InvalidateShopItemList(true);
+    }
+
+    void StateItemShop::OnShopScrollBarValueChanged(Gx::ScrollBar& sender, Gx::ScrollBar::ValueChangedEvent& ev)
+    {
+        const auto sfxPrev = Instantiate<sf::Sound>(Sound::Effects::EF_19_1);
+        const auto sfxNext = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
+
+        if (ev.Value < m_myBagCurrentPage)
+            m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
+        else
+            m_mixer.Play(*sfxNext, Sound::Channel::SFX);
+
+        m_shopCurrentPage = static_cast<unsigned int>(ev.Value);
+        InvalidateShopItemList();
+    }
+
+    void StateItemShop::OnShopScrollLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto itemScrollControls = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+        const auto shopScrollBar      = itemScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+
+        shopScrollBar->Decrease();
+    }
+
+    void StateItemShop::OnShopScrollRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto itemScrollControls = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+        const auto shopScrollBar      = itemScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::IDC_SCROLL_ITEM);
+
+        shopScrollBar->Increase();
+    }
+
+    void StateItemShop::OnShopItemListScrolled(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto itemScrollControls = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_ITEM_SCROLL_CONTROLS);
+        const auto shopScrollLeft     = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_LEFT);
+        const auto shopScrollRight    = itemScrollControls->FindChild<Gx::Button>(Resource::ItemShop::IDC_BUTTON_ITEM_SCROLL_RIGHT);
+
+        if (ev.Delta > 0)
+            shopScrollRight->PerformClick();
+        else
+            shopScrollLeft->PerformClick();
+    }
+
+    void StateItemShop::OnMyBagScrollBarValueChanged(Gx::ScrollBar& sender, Gx::ScrollBar::ValueChangedEvent& ev)
+    {
+        const auto sfxPrev = Instantiate<sf::Sound>(Sound::Effects::EF_19_1);
+        const auto sfxNext = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
+
+        if (ev.Value < m_myBagCurrentPage)
+            m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
+        else
+            m_mixer.Play(*sfxNext, Sound::Channel::SFX);
+
+        m_myBagCurrentPage = static_cast<unsigned int>(ev.Value);
+        InvalidateMyBag();
+    }
+
+    void StateItemShop::OnMyBagScrollLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto myBagContainer    = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto bagScrollControls = myBagContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
+        const auto bagScrollBar      = bagScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
+
+        bagScrollBar->Decrease();
+    }
+
+    void StateItemShop::OnMyBagScrollRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto myBagContainer    = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto bagScrollControls = myBagContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
+        const auto bagScrollBar      = bagScrollControls->FindChild<Gx::ScrollBar>(Resource::ItemShop::MyBag::IDC_SCROLL_MYBAG);
+
+        bagScrollBar->Increase();
+    }
+
+    void StateItemShop::OnMyBagListScrolled(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto myBagContainer       = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto bagScrollControls    = myBagContainer->FindChild<Gx::UiContainer>(Resource::ItemShop::MyBag::IDC_CONTAINER_MYBAG_SCROLL_CONTROLS);
+        const auto bagScrollLeftButton  = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_LEFT);
+        const auto bagScrollRightButton = bagScrollControls->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_MYBAG_SCROLL_RIGHT);
+
+        if (ev.Delta > 0)
+            bagScrollRightButton->PerformClick();
+        else
+            bagScrollLeftButton->PerformClick();
+    }
+
+    void StateItemShop::OnMyBagSlotClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxClick = Instantiate<sf::Sound>(Sound::Effects::EF_25);
+        const auto item     = m_myBagSlotItems.at(&sender);
+
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+        if (m_myBagSelectedItem == item || item->GetID() == 0)
+            return;
+
+        m_myBagSelectedItem = item;
+        m_myBagSelectIndicator->SetVisible(true);
+
+        sender.AddChild(*m_myBagSelectIndicator);
+    }
+
+    void StateItemShop::OnMyBagSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto container = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto item      = m_myBagSlotItems.at(&sender);
+        const auto quantity  = m_myBagSlotQuantities.at(&sender);
+
+        if (!item || item->GetID() == 0)
+            return;
+
+        if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
+        {
+            if (const auto dialog = Instantiate<Gx::Dialog>(Resource::ItemShop::IDC_DIALOG_SKILL_INFO); dialog)
+            {
+                const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_NAME);
+                const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
+                const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_SKILL);
+                const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
+                const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::ItemShop::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
+
+                nameLabel->SetString(item->GetName());
+                quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-");
+                skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
+                descriptionLabel->SetString(item->GetDescription());
+
+                constexpr unsigned int bounds = 160;
+                auto string = item->GetDescription();
+
+                bool wrapped = true;
+                while (wrapped)
+                {
+                    wrapped = false;
+
+                    std::size_t checkpoint = 0;
+                    for (const auto& glyph : descriptionLabel->GetShapedGlyphs())
+                    {
+                        const auto c = static_cast<std::size_t>(glyph.cluster);
+                        if (c >= string.getSize() || string[c] == '\n')
+                            continue;
+
+                        if (string[c] == ' ')
+                        {
+                            checkpoint = c;
+                            continue;
+                        }
+
+                        const auto position = descriptionLabel->GetTransform().transformPoint(glyph.position);
+                        if (position.x > descriptionLabel->GetPosition().x + bounds)
+                        {
+                            if (string[checkpoint] == '\n')
+                            {
+                                checkpoint = 0;
+                                continue;
+                            }
+
+                            string.replace(checkpoint, 1, "\n");
+                            descriptionLabel->SetString(string);
+
+                            wrapped = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (const auto texture = item->GetLargeThumbnail().GetTexture())
+                    skillThumbnail->SetTexture(*texture, true);
+
+                Present(*dialog, Gx::PresentationContext::Default);
+            }
+        }
+        else
+        {
+            const auto sellButton = container->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_SELL);
+            sellButton->PerformClick();
+        }
+    }
+
+    void StateItemShop::OnCartPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_cartCurrentPage > 0)
+        {
+            m_cartCurrentPage--;
+            InvalidateCart();
+        }
+    }
+
+    void StateItemShop::OnCartNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_cartCurrentPage++;
+        InvalidateCart();
+    }
+
+    void StateItemShop::OnCartListScrolled(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto cartContainer      = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
+        const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_LEFT);
+        const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::ItemShop::Cart::IDC_BUTTON_RIGHT);
+
+        if (ev.Delta > 0)
+            cartNextPageButton->PerformClick();
+        else
+            cartPrevPageButton->PerformClick();
+    }
+
+    void StateItemShop::OnCartItemDeleteButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto index = m_cartItemDeleteButtons.at(&sender);
+
+        m_cart.Remove(index);
+        InvalidateCart();
+    }
+
+    void StateItemShop::OnMyBagButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto myBagContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto cartContainer  = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
+
+        myBagContainer->SetEnabled(true);
+        myBagContainer->SetVisible(true);
+
+        cartContainer->SetEnabled(false);
+        cartContainer->SetVisible(false);
+    }
+
+    void StateItemShop::OnCartButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto myBagContainer = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
+        const auto cartContainer  = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_CART);
+
+        myBagContainer->SetEnabled(false);
+        myBagContainer->SetVisible(false);
+
+        cartContainer->SetEnabled(true);
+        cartContainer->SetVisible(true);
+    }
+
+    void StateItemShop::OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
+
+        GetDirector().Dismiss<StateRoom>();
+    }
+
+    void StateItemShop::OnShopItemAddButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto& metadata = m_shopItemAddButtons.at(&sender);
+        if (O2::InInteropMode(InteropMode::Interface))
+        {
+            auto& charInfo = m_session.GetCharacterInfo();
+            const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID = metadata.ID] (auto id)
+            {
+                return id == itemID;
+            });
+
+            if (it != charInfo.Inventory.end())
                 return;
 
-            m_service.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=, &charInfo] (const MessageEnvelope<SellItemResponse>& ev)
+            bool purchasable = false;
+            for (auto c : { Currency::Gem, Currency::Cash })
             {
-                try
+                const auto money = c == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
+                if (auto pIt = metadata.Prices.find(c); pIt != metadata.Prices.end())
                 {
-                    const auto& response = ev.Open();
-                    if (response.Result == SellItemResult::Failed)
+                    if (pIt->second != 0 && pIt->second <= money)
                     {
-                        ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
-                        return;
+                        purchasable = true;
+                        break;
                     }
-
-                    charInfo.Inventory[response.SlotID] = 0;
-                    m_inventory[response.SlotID] = Item{};
-
-                    charInfo.Wallet = CharacterInfo::WalletInfo
-                    {
-                        response.Gem,
-                        response.Cash
-                    };
-
-                    m_myBagSelectedItem = nullptr;
-                    m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
-
-                    // m_session.Save();
-                    InvalidateMyBag();
                 }
-                catch (const Gx::Exception& ex)
-                {
-                    ShowDialog(std::string(ex.what()), DialogStyle::Information);
-                }
+            }
+
+            if (!purchasable)
+            {
+                ShowDialog("Not enough money to buy.", DialogStyle::Information);
+                return;
+            }
+
+            m_service.PurchaseItem(PurchaseItemRequest{metadata.ID}, [=] (const auto& envelope)
+            {
+                OnPurchaseItemResponded(envelope, metadata);
             });
-        });
+
+            return;
+        }
+
+        if (metadata.EquipmentType == EquipmentType::AttributiveItem)
+        {
+            ShowDialog("Skill item is currently not available", DialogStyle::Information);
+            return;
+        }
+
+        const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
+        bool updated = false;
+        if (metadata.EquipmentType == EquipmentType::Costume)
+            updated = m_cart.AddEquipmentSet(metadata.ID);
+        else
+            updated = m_cart.AddEquipment(metadata.ID);
+
+        if (updated)
+        {
+            m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
+            InvalidateCart();
+        }
+
+        cartButton->PerformClick();
+
+    }
+
+    void StateItemShop::OnShopItemPreviewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto avatar          = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+        const auto& [metadata, id] = m_shopItemPreviewButtons.at(&sender);
+        const auto& charInfo       = m_session.GetCharacterInfo();
+        if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
+        {
+            ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
+            return;
+        }
+
+        avatar->Equip(m_items.Create(id));
+    }
+
+    void StateItemShop::OnShopSetItemAddButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
+        const auto& metadata  = m_shopSetItemAddButtons.at(&sender);
+        if (m_cart.AddEquipmentSet(metadata.ID))
+        {
+            m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
+            InvalidateCart();
+        }
+
+        cartButton->PerformClick();
+    }
+
+    void StateItemShop::OnShopSetItemPreviewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto currentAvatar   = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
+        const auto& [metadata, id] = m_shopSetItemPreviewButtons.at(&sender);
+        const auto& charInfo       = m_session.GetCharacterInfo();
+        if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
+        {
+            ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
+            return;
+        }
+
+        currentAvatar->ClearEquipments();
+        for (const auto& itemMetadata : m_shopSetItemList[id])
+            currentAvatar->Equip(m_items.Create(itemMetadata.ID));
+    }
+
+    void StateItemShop::OnItemThumbnailFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto tooltip      = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
+        const auto& tooltipInfo = m_itemThumbnailTooltips.at(&sender);
+        const auto& description = tooltipInfo.first;
+        const auto slot         = tooltipInfo.second;
+        Stop(m_tooltipDelay);
+        if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
+        {
+            m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=]
+            {
+                const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
+                message->SetString(description);
+                message->SetLocalBounds(tooltip->GetLocalBounds());
+
+                tooltip->SetVisible(slot->IsVisible());
+                InvalidateShopMaster();
+            });
+
+            Run(m_tooltipDelay);
+        }
+        else
+        {
+            if (!sender.IsFocused())
+                m_tooltipDelay.Reset();
+
+            tooltip->SetVisible(false);
+            InvalidateShopMaster();
+        }
     }
 
     void StateItemShop::InvalidateShopMaster(const bool moveIn)
@@ -902,89 +1298,11 @@ namespace Cx
             }
 
             slot->SetVisible(true);
-            slot->SetClickCallback([=] (auto&, auto&)
-            {
-                m_mixer.Play(*sfxClick, Sound::Channel::SFX);
-                if (m_myBagSelectedItem == item || item->GetID() == 0)
-                    return;
+            m_myBagSlotItems[slot] = item;
+            m_myBagSlotQuantities[slot] = quantity;
+            slot->SetClickCallback([this] (auto& sender, auto& ev) { OnMyBagSlotClicked(sender, ev); });
 
-                m_myBagSelectedItem = item;
-                m_myBagSelectIndicator->SetVisible(true);
-
-                slot->AddChild(*m_myBagSelectIndicator);
-            });
-
-            slot->SetDoubleClickCallback([=] (auto&, auto&)
-            {
-                if (!item || item->GetID() == 0)
-                    return;
-
-                if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
-                {
-                    if (const auto dialog = Instantiate<Gx::Dialog>(Resource::ItemShop::IDC_DIALOG_SKILL_INFO); dialog)
-                    {
-                        const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_NAME);
-                        const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
-                        const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_SKILL);
-                        const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::ItemShop::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
-                        const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::ItemShop::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
-
-                        nameLabel->SetString(item->GetName());
-                        quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-");
-                        skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
-                        descriptionLabel->SetString(item->GetDescription());
-
-                        constexpr unsigned int bounds = 160;
-                        auto string = item->GetDescription();
-
-                        bool wrapped = true;
-                        while (wrapped)
-                        {
-                            wrapped = false;
-
-                            std::size_t checkpoint = 0;
-                            for (const auto& glyph : descriptionLabel->GetShapedGlyphs())
-                            {
-                                const auto c = static_cast<std::size_t>(glyph.cluster);
-                                if (c >= string.getSize() || string[c] == '\n')
-                                    continue;
-
-                                if (string[c] == ' ')
-                                {
-                                    checkpoint = c;
-                                    continue;
-                                }
-
-                                const auto position = descriptionLabel->GetTransform().transformPoint(glyph.position);
-                                if (position.x > descriptionLabel->GetPosition().x + bounds)
-                                {
-                                    if (string[checkpoint] == '\n')
-                                    {
-                                        checkpoint = 0;
-                                        continue;
-                                    }
-
-                                    string.replace(checkpoint, 1, "\n");
-                                    descriptionLabel->SetString(string);
-
-                                    wrapped = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (const auto texture = item->GetLargeThumbnail().GetTexture())
-                            skillThumbnail->SetTexture(*texture, true);
-
-                        Present(*dialog, Gx::PresentationContext::Default);
-                    }
-                }
-                else
-                {
-                    const auto sellButton = container->FindChild<Gx::Button>(Resource::ItemShop::MyBag::IDC_BUTTON_SELL);
-                    sellButton->PerformClick();
-                }
-            });
+            slot->SetDoubleClickCallback([this] (auto& sender, auto& ev) { OnMyBagSlotDoubleClicked(sender, ev); });
         }
 
         if (!currentSlot)
@@ -1153,11 +1471,8 @@ namespace Cx
                 type->SetFrame("Music");
             }
 
-            deleteButton->SetClickCallback([this, index = j - 1] (auto&, auto&)
-            {
-                m_cart.Remove(index);
-                InvalidateCart();
-            });
+            m_cartItemDeleteButtons[deleteButton] = j - 1;
+            deleteButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartItemDeleteButtonClicked(sender, ev); });
         }
 
         const auto currentPage = container->FindChild<Gx::BitmapNumber>(Resource::ItemShop::Cart::IDC_NUMBER_CURRENT_PAGE);
@@ -1289,122 +1604,11 @@ namespace Cx
             });
 
 
-            addButton->SetClickCallback([this, metadata] (auto&, auto&)
-            {
-                if (O2::InInteropMode(InteropMode::Interface))
-                {
-                    auto& charInfo = m_session.GetCharacterInfo();
-                    const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID = metadata.ID] (auto id)
-                    {
-                        return id == itemID;
-                    });
+            m_shopItemAddButtons[addButton] = metadata;
+            addButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShopItemAddButtonClicked(sender, ev); });
 
-                    if (it != charInfo.Inventory.end())
-                        return;
-
-                    bool purchasable = false;
-                    for (auto c : { Currency::Gem, Currency::Cash })
-                    {
-                        const auto money = c == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
-                        if (auto pIt = metadata.Prices.find(c); pIt != metadata.Prices.end())
-                        {
-                            if (pIt->second != 0 && pIt->second <= money)
-                            {
-                                purchasable = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!purchasable)
-                    {
-                        ShowDialog("Not enough money to buy.", DialogStyle::Information);
-                        return;
-                    }
-
-                    m_service.PurchaseItem(PurchaseItemRequest{metadata.ID}, [=] (const MessageEnvelope<PurchaseItemResponse>& ev)
-                    {
-                        try
-                        {
-                            const auto& response = ev.Open();
-                            if (response.ResultCode != PurchaseItemResult::Success)
-                            {
-                                if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
-                                    ShowDialog("You need more money.", DialogStyle::Information);
-                                else if (response.ResultCode == PurchaseItemResult::InventoryFull)
-                                    ShowDialog("No more room in your Bag.", DialogStyle::Information);
-
-                                return;
-                            }
-
-                            auto& inventory = m_session.GetCharacterInfo().Inventory;
-                            if (inventory[response.SlotID] != 0)
-                            {
-                                ShowDialog("Invalid inventory slot.", DialogStyle::Information);
-                                return;
-                            }
-
-                            inventory[response.SlotID] = metadata.ID;
-
-                            m_session.GetCharacterInfo().Wallet = CharacterInfo::WalletInfo
-                            {
-                                response.Gem,
-                                response.Cash
-                            };
-
-                            // m_session.Save();
-                            m_inventory.clear();
-                            InvalidateMyBag();
-
-                            const auto bagButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MYBAG);
-                            bagButton->PerformClick();
-                        }
-                        catch (const Gx::Exception& ex)
-                        {
-                            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
-                            {
-                                GetDirector().Present<StatePlanet>();
-                            });
-                        }
-                    });
-
-                    return;
-                }
-
-                if (metadata.EquipmentType == EquipmentType::AttributiveItem)
-                {
-                    ShowDialog("Skill item is currently not available", DialogStyle::Information);
-                    return;
-                }
-
-                const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
-                bool updated = false;
-                if (metadata.EquipmentType == EquipmentType::Costume)
-                    updated = m_cart.AddEquipmentSet(metadata.ID);
-                else
-                    updated = m_cart.AddEquipment(metadata.ID);
-
-                if (updated)
-                {
-                    m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
-                    InvalidateCart();
-                }
-
-                cartButton->PerformClick();
-
-            });
-
-            previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
-            {
-                const auto& charInfo = m_session.GetCharacterInfo();
-                if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
-                {
-                    ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
-                    return;
-                }
-
-                avatar->Equip(m_items.Create(id));
-            });
+            m_shopItemPreviewButtons[previewButton] = { metadata, metadata.ID };
+            previewButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShopItemPreviewButtonClicked(sender, ev); });
 
             thumbnail->SetVisible(false);
             thumbnail->SetFocusChangedCallback(nullptr);
@@ -1424,33 +1628,8 @@ namespace Cx
             thumbnail->SetTexture(*sprite.GetTexture());
             thumbnail->SetTexCoords(sprite.GetTexCoords());
 
-            thumbnail->SetFocusChangedCallback([=, description = metadata.Description] (auto& sender, auto&)
-            {
-                const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
-                Stop(m_tooltipDelay);
-                if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
-                {
-                    m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=]
-                    {
-                        const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
-                        message->SetString(description);
-                        message->SetLocalBounds(tooltip->GetLocalBounds());
-
-                        tooltip->SetVisible(slot->IsVisible());
-                        InvalidateShopMaster();
-                    });
-
-                    Run(m_tooltipDelay);
-                }
-                else
-                {
-                    if (!sender.IsFocused())
-                        m_tooltipDelay.Reset();
-
-                    tooltip->SetVisible(false);
-                    InvalidateShopMaster();
-                }
-            });
+            m_itemThumbnailTooltips[thumbnail] = { metadata.Description, slot };
+            thumbnail->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnItemThumbnailFocusChanged(sender, ev); });
 
             if (thumbnail->IsFocused())
             {
@@ -1621,31 +1800,11 @@ namespace Cx
                 currencyTag->GetPosition().y
             });
 
-            addButton->SetClickCallback([this, metadata] (auto&, auto&)
-            {
-                const auto cartButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_CART);
-                if (m_cart.AddEquipmentSet(metadata.ID))
-                {
-                    m_cartCurrentPage = std::numeric_limits<std::uint32_t>::max();
-                    InvalidateCart();
-                }
+            m_shopSetItemAddButtons[addButton] = metadata;
+            addButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShopSetItemAddButtonClicked(sender, ev); });
 
-                cartButton->PerformClick();
-            });
-
-            previewButton->SetClickCallback([=, id = metadata.ID] (auto&, auto&)
-            {
-                const auto& charInfo = m_session.GetCharacterInfo();
-                if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
-                {
-                    ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
-                    return;
-                }
-
-                currentAvatar->ClearEquipments();
-                for (const auto& itemMetadata : m_shopSetItemList[id])
-                    currentAvatar->Equip(m_items.Create(itemMetadata.ID));
-            });
+            m_shopSetItemPreviewButtons[previewButton] = { metadata, metadata.ID };
+            previewButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShopSetItemPreviewButtonClicked(sender, ev); });
 
             const auto pieces = pieceList->GetChildren();
             for (std::size_t p = 0; p < pieces.size(); p++)
@@ -1661,33 +1820,8 @@ namespace Cx
             }
 
             thumbnail->SetVisible(false);
-            thumbnail->SetFocusChangedCallback([=, description = metadata.Description] (auto& sender, auto&)
-            {
-                const auto tooltip = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_TOOLTIP);
-                Stop(m_tooltipDelay);
-                if (sender.IsFocused() && m_tooltipDelay.GetState() != Gx::TaskState::Running && m_tooltipDelay.GetState() != Gx::TaskState::Completed)
-                {
-                    m_tooltipDelay = Gx::Delay(sf::milliseconds(500), [=]
-                    {
-                        const auto message = tooltip->FindChild<Gx::Label>(Resource::ItemShop::IDC_TEXT_MESSAGE);
-                        message->SetString(description);
-                        message->SetLocalBounds(tooltip->GetLocalBounds());
-
-                        tooltip->SetVisible(slot->IsVisible());
-                        InvalidateShopMaster();
-                    });
-
-                    Run(m_tooltipDelay);
-                }
-                else
-                {
-                    if (!sender.IsFocused())
-                        m_tooltipDelay.Reset();
-
-                    tooltip->SetVisible(false);
-                    InvalidateShopMaster();
-                }
-            });
+            m_itemThumbnailTooltips[thumbnail] = { metadata.Description, slot };
+            thumbnail->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnItemThumbnailFocusChanged(sender, ev); });
 
             if (thumbnail->IsFocused())
             {

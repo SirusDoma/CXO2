@@ -29,92 +29,39 @@ namespace Cx
     {
         Node::Initialize();
 
-        const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+        m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
         if (const auto previousButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_LEFT); previousButton)
-        {
-            previousButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
-            {
-                m_mixer.Play(*sound, Sound::Channel::SFX);
-                if (m_currentInstrument == Instrument::None)
-                    return;
-
-                m_currentIndex--;
-                Invalidate();
-            });
-        }
+            previousButton->SetClickCallback([this] (auto& sender, auto& ev) { OnInstrumentLeftButtonClicked(sender, ev); });
 
         if (const auto nextButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_RIGHT); nextButton)
-        {
-            nextButton->SetClickCallback([this, sound = sfxNavigate] (auto& sender, auto& ev)
-            {
-                m_mixer.Play(*sound, Sound::Channel::SFX);
-                if (m_currentInstrument == Instrument::None)
-                    return;
-
-                m_currentIndex++;
-                Invalidate();
-            });
-        }
+            nextButton->SetClickCallback([this] (auto& sender, auto& ev) { OnInstrumentRightButtonClicked(sender, ev); });
 
         if (const auto guitar = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_GUITAR); guitar)
         {
             guitar->SetVisible(false);
             guitar->SetEnabled(false);
-            guitar->SetCheckStateChangeCallback([this] (auto& sender)
-            {
-                if (!sender.IsChecked() || m_currentInstrument == Instrument::Guitar)
-                    return;
-
-                m_currentIndex = 0;
-                m_currentInstrument = Instrument::Guitar;
-                Invalidate();
-            });
+            guitar->SetCheckStateChangeCallback([this] (auto& sender) { OnGuitarCheckChanged(sender); });
         }
 
         if (const auto bass = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); bass)
         {
             bass->SetVisible(false);
             bass->SetEnabled(false);
-            bass->SetCheckStateChangeCallback([this] (auto& sender)
-            {
-                if (!sender.IsChecked() || m_currentInstrument == Instrument::Bass)
-                    return;
-
-                m_currentIndex = 0;
-                m_currentInstrument = Instrument::Bass;
-                Invalidate();
-            });
+            bass->SetCheckStateChangeCallback([this] (auto& sender) { OnBassCheckChanged(sender); });
         }
 
         if (const auto drum = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); drum)
         {
             drum->SetVisible(false);
             drum->SetEnabled(false);
-            drum->SetCheckStateChangeCallback([this] (auto& sender)
-            {
-                if (!sender.IsChecked() || m_currentInstrument == Instrument::Drum)
-                    return;
-
-                m_currentIndex = 0;
-                m_currentInstrument = Instrument::Drum;
-
-                Invalidate();
-            });
+            drum->SetCheckStateChangeCallback([this] (auto& sender) { OnDrumCheckChanged(sender); });
         }
 
         if (const auto keyboard = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); keyboard)
         {
             keyboard->SetVisible(false);
             keyboard->SetEnabled(false);
-            keyboard->SetCheckStateChangeCallback([this] (auto& sender)
-            {
-                if (!sender.IsChecked() || m_currentInstrument == Instrument::Keyboard)
-                    return;
-
-                m_currentIndex = 0;
-                m_currentInstrument = Instrument::Keyboard;
-                Invalidate();
-            });
+            keyboard->SetCheckStateChangeCallback([this] (auto& sender) { OnKeyboardCheckChanged(sender); });
         }
 
         Invalidate();
@@ -218,7 +165,10 @@ namespace Cx
     void InstrumentSelector::SetInstrumentSelectCallback(const std::function<void(const ItemMetadata&)>& callback) const
     {
         if (const auto selectButton = FindChild<Gx::Button>(Resource::Instrument::IDC_BUTTON_INSTRUMENT_SELECT); selectButton)
-            selectButton->SetClickCallback([this, callback] (auto&, auto&) { callback(m_currentItemHeader); });
+        {
+            m_selectCallback = callback;
+            selectButton->SetClickCallback([this] (auto& sender, auto& ev) { OnInstrumentSelectButtonClicked(sender, ev); });
+        }
     }
 
     void InstrumentSelector::Invalidate()
@@ -261,5 +211,62 @@ namespace Cx
             if (instrumentLabel)
                 instrumentLabel->SetString(m_currentItem.GetName());
         }
+    }
+
+    void InstrumentSelector::SelectInstrument(Gx::RadioButton& sender, const Instrument instrument)
+    {
+        if (!sender.IsChecked() || m_currentInstrument == instrument)
+            return;
+
+        m_currentIndex = 0;
+        m_currentInstrument = instrument;
+        Invalidate();
+    }
+
+    void InstrumentSelector::OnInstrumentLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+        m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
+        if (m_currentInstrument == Instrument::None)
+            return;
+
+        m_currentIndex--;
+        Invalidate();
+    }
+
+    void InstrumentSelector::OnInstrumentRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxNavigate = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+        m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
+        if (m_currentInstrument == Instrument::None)
+            return;
+
+        m_currentIndex++;
+        Invalidate();
+    }
+
+    void InstrumentSelector::OnGuitarCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectInstrument(sender, Instrument::Guitar);
+    }
+
+    void InstrumentSelector::OnBassCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectInstrument(sender, Instrument::Bass);
+    }
+
+    void InstrumentSelector::OnDrumCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectInstrument(sender, Instrument::Drum);
+    }
+
+    void InstrumentSelector::OnKeyboardCheckChanged(Gx::RadioButton& sender)
+    {
+        SelectInstrument(sender, Instrument::Keyboard);
+    }
+
+    void InstrumentSelector::OnInstrumentSelectButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    {
+        m_selectCallback(m_currentItemHeader);
     }
 }

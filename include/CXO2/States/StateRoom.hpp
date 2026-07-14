@@ -61,8 +61,8 @@ namespace Cx
         void OnRoomListLoad(const MessageEnvelope<RoomListResponse>& ev);
         void OnUserListLoad(const MessageEnvelope<UserListResponse>& ev);
 
-        void OnCreateRoomResponded(const CreateRoomRequest& request, const ChartMetadata& music, const MessageEnvelope<CreateRoomResponse>& ev);
-        void OnJoinRoomResponded(const RoomInfo& room, const MessageEnvelope<JoinRoomResponse>& ev);
+        void OnCreateRoomResponded(const MessageEnvelope<CreateRoomResponse>& ev, const CreateRoomRequest& request, const ChartMetadata& music);
+        void OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev, const RoomInfo& room);
 
         void OnRoomCreated(const MessageEnvelope<RoomCreatedEventData>& ev);
         void OnRoomMusicChanged(const MessageEnvelope<RoomMusicChangedEventData>& ev);
@@ -71,8 +71,9 @@ namespace Cx
         void OnRoomUserCountChanged(const MessageEnvelope<RoomUserCountChangedEventData>& ev);
         void OnRoomRemoved(const MessageEnvelope<RoomRemovedEventData>& ev);
 
+        void OnRoomEntered(const RoomInfo& room);
+
         void OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnRoomButtonClicked(const RoomInfo& room);
         void OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         void OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);

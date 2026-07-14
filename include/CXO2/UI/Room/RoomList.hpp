@@ -8,6 +8,11 @@
 #include <memory>
 #include <map>
 
+namespace sf
+{
+    class Sound;
+}
+
 namespace Gx
 {
     class AudioMixer;
@@ -44,11 +49,17 @@ namespace Cx
     private:
         constexpr static unsigned int MAX_NUMBER_OF_ROOM = 100;
 
+        void OnRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnEnterRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
+
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;
 
         std::map<unsigned int, RoomInfo> m_rooms;
         unsigned int m_page;
         bool m_waiting;
+
+        mutable sf::Sound* m_sfxInvalid{nullptr};
+        mutable std::function<void(const RoomInfo&)> m_enterRoomCallback;
     };
 }

@@ -5,6 +5,8 @@
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Image.hpp>
 
+#include <unordered_map>
+
 namespace Cx
 {
     class CartContext;
@@ -17,10 +19,31 @@ namespace Cx
         void Initialize() override;
 
     private:
-        void OnBuyButtonClicked();
-        void OnGiftButtonClicked();
-
+        void SelectMusicFilter(bool showAll);
+        void SelectShopTab(bool download);
         void InvalidateCart();
+
+        void OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnShowBuyableButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnDownloadTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnMusicItemFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicItemToggleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicItemToggleFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicItemClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBuyDialogAnswered(bool answer);
+        void OnGiftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnCartPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartListScrolled(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartItemDeleteButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         Gx::AudioMixer& m_mixer;
         SessionContext& m_session;
@@ -28,6 +51,7 @@ namespace Cx
         ItemFactory& m_items;
 
         unsigned int m_cartCurrentPage;
+        std::unordered_map<Gx::Control*, std::size_t> m_cartDeleteButtonIndices;
 
         Gx::Image* m_selector;
     };

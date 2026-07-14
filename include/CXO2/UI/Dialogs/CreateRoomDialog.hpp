@@ -3,6 +3,12 @@
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 
+namespace Gx
+{
+    class RadioButton;
+    class ToggleButton;
+}
+
 namespace Cx
 {
     enum class GameMode : std::uint8_t;
@@ -15,7 +21,8 @@ namespace Cx
         void Initialize() override;
 
         GameMode GetRoomMode() const;
-        std::string GetRoomName() const;
+
+        const sf::String& GetRoomName() const;
         std::string GetRoomPassword() const;
         unsigned int GetMinLevelLimit() const;
         unsigned int GetMaxLevelLimit() const;
@@ -25,6 +32,15 @@ namespace Cx
         void OnAccepted() override;
 
     private:
+        void OnJamModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnVersusModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnSingleModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnJamModeButtonCheckChanged(Gx::RadioButton& sender);
+        void OnVersusModeButtonCheckChanged(Gx::RadioButton& sender);
+        void OnSingleModeButtonCheckChanged(Gx::RadioButton& sender);
+
+        void OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender);
+
         bool m_initialized = false;
         SessionContext& m_session;
         Gx::AudioMixer& m_mixer;

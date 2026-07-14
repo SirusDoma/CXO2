@@ -119,14 +119,14 @@ namespace Cx
         // TODO: Detect vertical count?
         constexpr unsigned int verticalCount = 2; //bagList->GetVerticalCount();
         bagScrollBar->SetMaximumValue(m_inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(m_inventory.size() - bagSlots.size()) / verticalCount)));
-        bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, const float value)
+        bagScrollBar->SetValueChangedCallback([this, sfxPrev, sfxNext] (auto&, auto& ev)
         {
-            if (value < m_bagCurrentPage)
+            if (ev.Value < m_bagCurrentPage)
                 m_mixer.Play(*sfxPrev, Sound::Channel::SFX);
             else
                 m_mixer.Play(*sfxNext, Sound::Channel::SFX);
 
-            m_bagCurrentPage = static_cast<unsigned int>(value);
+            m_bagCurrentPage = static_cast<unsigned int>(ev.Value);
             Invalidate();
         });
 

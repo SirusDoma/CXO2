@@ -58,42 +58,11 @@ namespace Cx
         const auto showAllButton     = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_ALL);
         const auto showBuyableButton = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_BUYABLE);
 
-        showAllButton->SetClickCallback([=] (auto&, auto&)
-        {
-            showAllButton->SetEnabled(false);
-            showAllButton->SetVisible(false);
+        showAllButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShowAllButtonClicked(sender, ev); });
+        showBuyableButton->SetClickCallback([this] (auto& sender, auto& ev) { OnShowBuyableButtonClicked(sender, ev); });
 
-            showBuyableButton->SetEnabled(true);
-            showBuyableButton->SetVisible(true);
-        });
-
-        showBuyableButton->SetClickCallback([=] (auto&, auto&)
-        {
-            showAllButton->SetEnabled(true);
-            showAllButton->SetVisible(true);
-
-            showBuyableButton->SetEnabled(false);
-            showBuyableButton->SetVisible(false);
-        });
-
-
-        downloadTabButton->SetClickCallback([=] (auto&, auto&)
-        {
-            downloadContainer->SetEnabled(true);
-            downloadContainer->SetVisible(true);
-
-            cartContainer->SetEnabled(false);
-            cartContainer->SetVisible(false);
-        });
-
-        cartTabButton->SetClickCallback([=] (auto&, auto&)
-        {
-            downloadContainer->SetEnabled(false);
-            downloadContainer->SetVisible(false);
-
-            cartContainer->SetEnabled(true);
-            cartContainer->SetVisible(true);
-        });
+        downloadTabButton->SetClickCallback([this] (auto& sender, auto& ev) { OnDownloadTabButtonClicked(sender, ev); });
+        cartTabButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartTabButtonClicked(sender, ev); });
 
         const auto musicList = musicContainer->FindChild<Gx::List>(Resource::MusicShop::IDC_LIST_MUSIC);
         for (const auto child : musicList->GetChildren())
@@ -108,29 +77,13 @@ namespace Cx
             if (const auto selector = item->FindChild<Gx::Image>(Resource::MusicShop::MusicItem::IDC_IMAGE_SELECTOR))
             {
                 selector->SetVisible(false);
-                item->SetFocusChangedCallback([=] (auto& sender, auto&)
-                {
-                    selector->SetVisible(sender.IsFocused());
-                    if (const auto toggleButton = item->FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT); sender.IsFocused() && toggleButton)
-                        toggleButton->SetFocus(sender.IsFocused());
-                });
+                item->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnMusicItemFocusChanged(sender, ev); });
 
                 if (const auto toggleButton = item->FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT))
                 {
-                    toggleButton->SetClickCallback([=] (auto&, auto& ev)
-                    {
-                        ev.Handled = true; // Use item click callback
-                    });
-
-                    toggleButton->SetFocusChangedCallback([=] (auto&, auto& ev)
-                    {
-                        ev.State = item->IsFocused() ? Gx::Control::State::Hover : Gx::Control::State::Normal;
-                    });
-
-                    item->SetClickCallback([=] (auto&, auto&)
-                    {
-                        toggleButton->SetCheckedState(!toggleButton->IsChecked());
-                    });
+                    toggleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMusicItemToggleClicked(sender, ev); });
+                    toggleButton->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnMusicItemToggleFocusChanged(sender, ev); });
+                    item->SetClickCallback([this] (auto& sender, auto& ev) { OnMusicItemClicked(sender, ev); });
                 }
             }
         }
@@ -142,46 +95,21 @@ namespace Cx
         totalGauge->SetValue(35);
 
         const auto buyButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_BUY);
-        buyButton->SetClickCallback([this] (auto&, auto&) { OnBuyButtonClicked(); });
+        buyButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBuyButtonClicked(sender, ev); });
 
         const auto giftButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_GIFT);
-        giftButton->SetClickCallback([this] (auto&, auto&) { OnGiftButtonClicked(); });
+        giftButton->SetClickCallback([this] (auto& sender, auto& ev) { OnGiftButtonClicked(sender, ev); });
 
         const auto cartList           = cartContainer->FindChild<Gx::List>(Resource::MusicShop::Cart::IDC_LIST_CART);
         const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_LEFT);
         const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_RIGHT);
 
-        cartPrevPageButton->SetClickCallback([this] (auto&, auto&)
-        {
-            if (m_cartCurrentPage > 0)
-            {
-                m_cartCurrentPage--;
-                InvalidateCart();
-            }
-        });
-
-        cartNextPageButton->SetClickCallback([this] (auto&, auto&)
-        {
-            m_cartCurrentPage++;
-            InvalidateCart();
-        });
-
-        cartList->SetScrollWheelCallback([=] (auto&, auto& ev)
-        {
-            if (ev.Delta > 0)
-                cartNextPageButton->PerformClick();
-            else
-                cartPrevPageButton->PerformClick();
-        });
+        cartPrevPageButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartPrevPageButtonClicked(sender, ev); });
+        cartNextPageButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartNextPageButtonClicked(sender, ev); });
+        cartList->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnCartListScrolled(sender, ev); });
 
         const auto backButton = Instantiate<Gx::Button>(Resource::MusicShop::IDC_BUTTON_BACK);
-        backButton->SetClickCallback([this] (auto&, auto&)
-        {
-            if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
-                m_mixer.Play(*sfx, Sound::Channel::SFX);
-
-            GetDirector().Dismiss<StateRoom>();
-        });
+        backButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBackButtonClicked(sender, ev); });
 
         showBuyableButton->PerformClick();
         downloadTabButton->PerformClick();
@@ -191,38 +119,30 @@ namespace Cx
         m_mixer.Play(*bgm, Sound::Channel::BGM);
     }
 
-    void StateMusicShop::OnBuyButtonClicked()
+    void StateMusicShop::SelectMusicFilter(const bool showAll)
     {
-        if (m_cart.GetItems().size() == 0)
-        {
-            ShowDialog("Shopping bag is empty", DialogStyle::Information);
-            return;
-        }
+        const auto shopContainer     = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_SHOP);
+        const auto showAllButton     = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_ALL);
+        const auto showBuyableButton = shopContainer->FindChild<Gx::Button>(Resource::MusicShop::IDC_BUTTON_SHOW_BUYABLE);
 
-        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, false, [=] (const bool answer)
-        {
-            if (answer)
-            {
-                m_cart.SetCheckoutType(CartContext::CheckoutType::Music);
-                m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_02), Sound::Channel::SFX);
-                GetDirector().Present<StatePayment>();
-            }
-            else
-                m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_03), Sound::Channel::SFX);
-        });
+        showAllButton->SetEnabled(!showAll);
+        showAllButton->SetVisible(!showAll);
+
+        showBuyableButton->SetEnabled(showAll);
+        showBuyableButton->SetVisible(showAll);
     }
 
-    void StateMusicShop::OnGiftButtonClicked()
+    void StateMusicShop::SelectShopTab(const bool download)
     {
-        if (m_cart.GetItems().size() == 0)
-        {
-            ShowDialog("Shopping bag is empty", DialogStyle::Information);
-            return;
-        }
+        const auto downloadContainer = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_DOWNLOAD);
+        const auto cartContainer     = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_CART);
 
-        ShowDialog("Gift is currently not available", DialogStyle::Information);
+        downloadContainer->SetEnabled(download);
+        downloadContainer->SetVisible(download);
+
+        cartContainer->SetEnabled(!download);
+        cartContainer->SetVisible(!download);
     }
-
 
     void StateMusicShop::InvalidateCart()
     {
@@ -365,11 +285,8 @@ namespace Cx
                 type->SetFrame("Music");
             }
 
-            deleteButton->SetClickCallback([this, index = j - 1] (auto&, auto&)
-            {
-                m_cart.Remove(index);
-                InvalidateCart();
-            });
+            m_cartDeleteButtonIndices[deleteButton] = j - 1;
+            deleteButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartItemDeleteButtonClicked(sender, ev); });
         }
 
         const auto currentPage = container->FindChild<Gx::BitmapNumber>(Resource::MusicShop::Cart::IDC_NUMBER_CURRENT_PAGE);
@@ -381,5 +298,129 @@ namespace Cx
         totalPage->SetValue(maxPage);
         totalGem->SetValue(gem);
         totalCash->SetValue(cash);
+    }
+
+    void StateMusicShop::OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectMusicFilter(true);
+    }
+
+    void StateMusicShop::OnShowBuyableButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectMusicFilter(false);
+    }
+
+    void StateMusicShop::OnDownloadTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectShopTab(true);
+    }
+
+    void StateMusicShop::OnCartTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        SelectShopTab(false);
+    }
+
+    void StateMusicShop::OnMusicItemFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto selector = sender.FindChild<Gx::Image>(Resource::MusicShop::MusicItem::IDC_IMAGE_SELECTOR);
+
+        selector->SetVisible(sender.IsFocused());
+        if (const auto toggleButton = sender.FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT); sender.IsFocused() && toggleButton)
+            toggleButton->SetFocus(sender.IsFocused());
+    }
+
+    void StateMusicShop::OnMusicItemToggleClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ev.Handled = true; // Use item click callback
+    }
+
+    void StateMusicShop::OnMusicItemToggleFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto item = sender.GetParent<Gx::UiContainer>();
+        ev.State = item->IsFocused() ? Gx::Control::State::Hover : Gx::Control::State::Normal;
+    }
+
+    void StateMusicShop::OnMusicItemClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto toggleButton = sender.FindChild<Gx::ToggleButton>(Resource::MusicShop::MusicItem::IDC_TOGGLE_SELECT);
+        toggleButton->SetCheckedState(!toggleButton->IsChecked());
+    }
+
+    void StateMusicShop::OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_cart.GetItems().size() == 0)
+        {
+            ShowDialog("Shopping bag is empty", DialogStyle::Information);
+            return;
+        }
+
+        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, false, [=] (const bool answer)
+        {
+            OnBuyDialogAnswered(answer);
+        });
+    }
+
+    void StateMusicShop::OnBuyDialogAnswered(const bool answer)
+    {
+        if (answer)
+        {
+            m_cart.SetCheckoutType(CartContext::CheckoutType::Music);
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_02), Sound::Channel::SFX);
+            GetDirector().Present<StatePayment>();
+        }
+        else
+            m_mixer.Play(*Instantiate<sf::Sound>(Sound::Effects::EF_03), Sound::Channel::SFX);
+    }
+
+    void StateMusicShop::OnGiftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_cart.GetItems().size() == 0)
+        {
+            ShowDialog("Shopping bag is empty", DialogStyle::Information);
+            return;
+        }
+
+        ShowDialog("Gift is currently not available", DialogStyle::Information);
+    }
+
+    void StateMusicShop::OnCartPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_cartCurrentPage > 0)
+        {
+            m_cartCurrentPage--;
+            InvalidateCart();
+        }
+    }
+
+    void StateMusicShop::OnCartNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_cartCurrentPage++;
+        InvalidateCart();
+    }
+
+    void StateMusicShop::OnCartListScrolled(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto cartContainer      = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_CART);
+        const auto cartPrevPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_LEFT);
+        const auto cartNextPageButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_RIGHT);
+
+        if (ev.Delta > 0)
+            cartNextPageButton->PerformClick();
+        else
+            cartPrevPageButton->PerformClick();
+    }
+
+    void StateMusicShop::OnCartItemDeleteButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_cart.Remove(m_cartDeleteButtonIndices.at(&sender));
+        InvalidateCart();
+    }
+
+    void StateMusicShop::OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_35))
+            m_mixer.Play(*sfx, Sound::Channel::SFX);
+
+        GetDirector().Dismiss<StateRoom>();
     }
 }

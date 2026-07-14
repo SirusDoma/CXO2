@@ -51,91 +51,128 @@ namespace Cx
         const auto minLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
         const auto maxLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
-        const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
-
         titleInput->SetMaximumTextLength(21);
 
         passwordInput->SetMasked(true);
         passwordInput->SetMaximumTextLength(12);
 
-        levelLimitToggleButton->SetCheckStateChangeCallback([=] (auto& sender)
-        {
-            minLevelLimitInput->SetEnabled(sender.IsChecked());
-            maxLevelLimitInput->SetEnabled(sender.IsChecked());
-
-            if (!sender.IsChecked())
-            {
-                minLevelLimitInput->SetString("");
-                maxLevelLimitInput->SetString("");
-            }
-        });
+        levelLimitToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnLevelLimitToggleCheckChanged(sender); });
 
         minLevelLimitInput->SetNumericModeEnabled(true);
         maxLevelLimitInput->SetNumericModeEnabled(true);
 
-        jamModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
-        });
-
-        jamModeButton->SetCheckStateChangeCallback([=] (auto& sender)
+        jamModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnJamModeButtonClicked(sender, ev); });
+        jamModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnJamModeButtonCheckChanged(sender); });
+        jamAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
-            if (!sender.IsChecked())
-                return;
-
-            if (jamAnimation->GetState() != Gx::Animation::AnimationState::Playing)
-            {
-                jamAnimation->Reset();
-                jamAnimation->SetVisible(true);
-            }
-
-            toolTip->SetString("JAM Mode is not available.");
-            toolTip->Show(this);
-
-            jamModeButton->SetCheckedState(false);
-            versusModeButton->SetCheckedState(true);
-        });
-
-        jamAnimation->SetAnimationCallback([=] (const Gx::Animation& sender) {
             jamAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
         });
 
-        versusModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
-        });
-
-        versusModeButton->SetCheckStateChangeCallback([=] (auto& sender)
+        versusModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnVersusModeButtonClicked(sender, ev); });
+        versusModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnVersusModeButtonCheckChanged(sender); });
+        versusAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
-            versusAnimation->Reset();
-            versusAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
-        });
-
-        versusAnimation->SetAnimationCallback([=] (const Gx::Animation& sender) {
             versusAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
         });
 
-        singleModeButton->SetClickCallback([=] (auto& sender, auto& ev) {
-            m_mixer.Play(*sfxClick, Sound::Channel::SFX);
-        });
-
-        singleModeButton->SetCheckStateChangeCallback([=] (auto& sender)
+        singleModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSingleModeButtonClicked(sender, ev); });
+        singleModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnSingleModeButtonCheckChanged(sender); });
+        singleAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
-            singleAnimation->Reset();
-            singleAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
-
-            levelLimitToggleButton->SetEnabled(!sender.IsChecked());
-            if (sender.IsChecked())
-                levelLimitToggleButton->SetCheckedState(false);
-
-            passwordInput->SetEnabled(!sender.IsChecked());
-            if (!passwordInput->IsEnabled())
-                passwordInput->SetString("");
-        });
-
-        singleAnimation->SetAnimationCallback([=] (const Gx::Animation& sender) {
             singleAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
         });
 
         m_initialized = true;
+    }
+
+    void CreateRoomDialog::OnJamModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto parent   = dynamic_cast<Cx::State*>(GetPresentableParent());
+        const auto sfxClick = parent->Instantiate<sf::Sound>(Sound::Effects::EF_10);
+
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+    }
+
+    void CreateRoomDialog::OnVersusModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto parent   = dynamic_cast<Cx::State*>(GetPresentableParent());
+        const auto sfxClick = parent->Instantiate<sf::Sound>(Sound::Effects::EF_10);
+
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+    }
+
+    void CreateRoomDialog::OnSingleModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto parent   = dynamic_cast<Cx::State*>(GetPresentableParent());
+        const auto sfxClick = parent->Instantiate<sf::Sound>(Sound::Effects::EF_10);
+
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+    }
+
+    void CreateRoomDialog::OnJamModeButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        if (!sender.IsChecked())
+            return;
+
+        const auto jamModeButton    = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_JAM_MODE);
+        const auto versusModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
+        const auto jamAnimation     = jamModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_JAM);
+        const auto toolTip          = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
+
+        if (jamAnimation->GetState() != Gx::Animation::AnimationState::Playing)
+        {
+            jamAnimation->Reset();
+            jamAnimation->SetVisible(true);
+        }
+
+        toolTip->SetString("JAM Mode is not available.");
+        toolTip->Show(this);
+
+        jamModeButton->SetCheckedState(false);
+        versusModeButton->SetCheckedState(true);
+    }
+
+    void CreateRoomDialog::OnVersusModeButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        const auto versusModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
+        const auto versusAnimation  = versusModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_VERSUS);
+
+        versusAnimation->Reset();
+        versusAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
+    }
+
+    void CreateRoomDialog::OnSingleModeButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        const auto singleModeButton       = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_SINGLE_MODE);
+        const auto singleAnimation        = singleModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_SINGLE);
+        const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+        const auto passwordInput          = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD);
+
+        singleAnimation->Reset();
+        singleAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
+
+        levelLimitToggleButton->SetEnabled(!sender.IsChecked());
+        if (sender.IsChecked())
+            levelLimitToggleButton->SetCheckedState(false);
+
+        passwordInput->SetEnabled(!sender.IsChecked());
+        if (!passwordInput->IsEnabled())
+            passwordInput->SetString("");
+    }
+
+    void CreateRoomDialog::OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender)
+    {
+        const auto minLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
+        const auto maxLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
+
+        minLevelLimitInput->SetEnabled(sender.IsChecked());
+        maxLevelLimitInput->SetEnabled(sender.IsChecked());
+
+        if (!sender.IsChecked())
+        {
+            minLevelLimitInput->SetString("");
+            maxLevelLimitInput->SetString("");
+        }
     }
 
     void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
@@ -245,7 +282,7 @@ namespace Cx
         return GameMode::Versus;
     }
 
-    std::string CreateRoomDialog::GetRoomName() const
+    const sf::String& CreateRoomDialog::GetRoomName() const
     {
         if (const auto titleInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_TITLE); titleInput)
             return titleInput->GetString();
@@ -256,18 +293,18 @@ namespace Cx
     std::string CreateRoomDialog::GetRoomPassword() const
     {
         if (const auto passwordInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_PASSWORD); passwordInput)
-            return passwordInput->GetString();
+            return passwordInput->GetString().toAnsiString();
 
         return {};
     }
 
     unsigned int CreateRoomDialog::GetMinLevelLimit() const
     {
-        const auto levelLimitToggleButton   = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
-        const auto minLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
+        const auto levelLimitToggleButton = FindChild<Gx::ToggleButton>(Resource::Room::CreateRoom::IDC_TOGGLE_LEVEL_LIMIT);
+        const auto minLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
 
         if (minLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
-            return std::stoi(std::string(minLevelLimitInput->GetString()));
+            return std::stoi(minLevelLimitInput->GetString().toAnsiString());
 
         return 0;
     }
@@ -278,9 +315,8 @@ namespace Cx
         const auto maxLevelLimitInput     = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);
 
         if (maxLevelLimitInput && levelLimitToggleButton && levelLimitToggleButton->IsChecked())
-            return std::stoi(std::string(maxLevelLimitInput->GetString()));
+            return std::stoi(maxLevelLimitInput->GetString().toAnsiString());
 
         return 0;
     }
-
 }

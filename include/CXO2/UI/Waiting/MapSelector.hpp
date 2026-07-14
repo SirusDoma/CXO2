@@ -5,6 +5,7 @@
 namespace Gx
 {
     class AudioMixer;
+    class RadioButton;
     class ResourceManager;
 }
 
@@ -34,6 +35,11 @@ namespace Cx
         std::size_t GetMapCount() const;
 
     private:
+        void OnMapLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMapRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMapSelectTopCheckChanged(Gx::RadioButton& sender);
+        void OnMapSelectBottomCheckChanged(Gx::RadioButton& sender);
+
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;
 

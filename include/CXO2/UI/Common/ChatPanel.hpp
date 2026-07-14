@@ -4,6 +4,19 @@
 
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/InputField.hpp>
+#include <Genode/UI/RadioButton.hpp>
+
+#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Messages/Responses/WhisperMessageResponse.hpp>
+#include <CXO2/Messages/Responses/MainRoomUserMessageResponse.hpp>
+#include <CXO2/Messages/Responses/MainRoomAdminMessageResponse.hpp>
+#include <CXO2/Messages/Responses/WaitingUserMessageResponse.hpp>
+#include <CXO2/Messages/Responses/WaitingAdminMessageResponse.hpp>
+
+#include <CXO2/Messages/Events/WhisperEventData.hpp>
+
+#include <string>
+#include <vector>
 
 namespace Cx
 {
@@ -22,6 +35,27 @@ namespace Cx
         ChatWindow* GetChatWindow() const;
 
     private:
+        void OnMessage(const CharacterInfo& actor, const sf::String& text);
+
+        void OnWhisper(const MessageEnvelope<WhisperEventData>& ev);
+        void OnWaitingUserMessage(const MessageEnvelope<WaitingUserMessageResponse>& ev);
+        void OnWaitingAdminMessage(const MessageEnvelope<WaitingAdminMessageResponse>& ev);
+        void OnMainRoomUserMessage(const MessageEnvelope<MainRoomUserMessageResponse>& ev);
+        void OnMainRoomAdminMessage(const MessageEnvelope<MainRoomAdminMessageResponse>& ev);
+
+        void OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const std::vector<std::string>& tokens, const sf::String& message);
+        void OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const sf::String& text);
+
+        void OnChatScrollUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChatScrollDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnChatAllCheckChanged(Gx::RadioButton& radio);
+        void OnChatFallbackCheckChanged(Gx::RadioButton& radio);
+        void OnChatWhisperCheckChanged(Gx::RadioButton& radio);
+        void OnWhisperDialogAccepted(Gx::InputField* nicknameInput, Gx::RadioButton& radio);
+
+        void OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text);
+
         sf::String m_recipient{};
         SessionContext& m_session;
         ChatService& m_service;

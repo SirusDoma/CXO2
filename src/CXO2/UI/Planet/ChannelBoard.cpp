@@ -39,38 +39,22 @@ namespace Cx
     {
         Image::Initialize();
 
-        auto sfxNavigate     = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
-        auto sfxEnter        = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_10);
+        m_sfxNavigate        = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_07);
+        m_sfxEnter           = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_10);
         const auto container = FindChild<Gx::UiContainer>(Resource::Planet::ChannelBoard::IDC_CONTAINER_CHANNEL_CONTROLS);
 
         const auto channelTabButton = FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_CHANNEL_TAB);
         channelTabButton->SetEnabled(false);
-        channelTabButton->SetClickCallback(
-            [=] (auto&, auto& ev)
-            {
-                if (m_tab == Tab::ChannelList || m_transitioning || m_hall == MusicHall::None)
-                {
-                    ev.Handled = true;
-                    return;
-                }
-
-                SwitchTab(Tab::ChannelList);
-            }
-        );
+        channelTabButton->SetClickCallback([this] (auto& sender, auto& ev)
+        {
+            OnChannelTabButtonClicked(sender, ev);
+        });
 
         const auto noticeTabButton = FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_NOTICE_TAB);
-        noticeTabButton->SetClickCallback(
-            [=] (auto&, auto& ev)
-            {
-                if (m_tab == Tab::Notice || m_transitioning)
-                {
-                    ev.Handled = true;
-                    return;
-                }
-
-                SwitchTab(Tab::Notice);
-            }
-        );
+        noticeTabButton->SetClickCallback([this] (auto& sender, auto& ev)
+        {
+            OnNoticeTabButtonClicked(sender, ev);
+        });
 
         const auto channelList       = container->FindChild<Gx::List>(Resource::Planet::ChannelBoard::IDC_LIST_CHANNEL);
         const auto currentPageNumber = FindChild<Gx::BitmapNumber>(Resource::Planet::ChannelBoard::IDC_NUMBER_CURRENT_CHANNEL_PAGE);
@@ -79,69 +63,38 @@ namespace Cx
         maxPageNumber->SetDigitCount(2);
 
         const auto enterButton = container->FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_CHANNEL_ENTER);
-        enterButton->SetClickCallback(
-            [this, sfxEnter] (auto&, auto&)
-            {
-                m_mixer.Play(*sfxEnter, Sound::Channel::SFX);
-                if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < static_cast<int>(m_channels.size()))
-                    m_callback(m_hall, m_channels[m_selectedChannel].GatewayID, m_channels[m_selectedChannel].ID);
-            }
-        );
+        enterButton->SetClickCallback([this] (auto& sender, auto& ev)
+        {
+            OnChannelEnterButtonClicked(sender, ev);
+        });
 
         const auto channelButtons = channelList->GetChildren();
         for (std::size_t i = 0; i < channelButtons.size(); i++)
         {
-            auto channelButton = dynamic_cast<ChannelButton*>(channelButtons[i]);
+            const auto channelButton = dynamic_cast<ChannelButton*>(channelButtons[i]);
             channelButton->SetChannelNumber(i + 1);
-            channelButton->SetClickCallback(
-                [&] (auto&, auto&)
-                {
-                    m_selectedChannel = channelButton->GetChannelNumber() - 1;
-                }
-            );
-            channelButton->SetDoubleClickCallback(
-                [=] (auto&, auto&)
-                {
-                    enterButton->PerformClick();
-                }
-            );
+            channelButton->SetClickCallback([this] (auto& sender, auto& ev)
+            {
+                OnChannelButtonClicked(sender, ev);
+            });
+
+            channelButton->SetDoubleClickCallback([this] (auto& sender, auto& ev)
+            {
+                OnChannelButtonDoubleClicked(sender, ev);
+            });
         }
 
         const auto leftButton = FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_CHANNEL_LEFT);
-        leftButton->SetClickCallback(
-            [this, sfxNavigate] (auto&, auto&)
-            {
-                m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
-                if (m_tab == Tab::ChannelList)
-                {
-                    if (m_channelPageIndex > 1)
-                        ShowChannelList(m_channelPageIndex - 1);
-                }
-                else
-                {
-                    if (m_noticePageIndex > 1)
-                        ShowNotice(m_noticePageIndex - 1);
-                }
-            }
-        );
+        leftButton->SetClickCallback([this] (auto& sender, auto& ev)
+        {
+            OnChannelLeftButtonClicked(sender, ev);
+        });
 
         const auto rightButton = FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_CHANNEL_RIGHT);
-        rightButton->SetClickCallback(
-            [this, sfxNavigate] (auto&, auto&)
-            {
-                m_mixer.Play(*sfxNavigate, Sound::Channel::SFX);
-                if (m_tab == Tab::ChannelList)
-                {
-                    if (m_channelPageIndex < m_channelMaxPage)
-                        ShowChannelList(m_channelPageIndex + 1);
-                }
-                else
-                {
-                    if (m_noticePageIndex < m_noticeMaxPage)
-                        ShowNotice(m_noticePageIndex + 1);
-                }
-            }
-        );
+        rightButton->SetClickCallback([this] (auto& sender, auto& ev)
+        {
+            OnChannelRightButtonClicked(sender, ev);
+        });
 
         const auto notice = FindChild<Image>(Resource::Planet::ChannelBoard::IDC_IMAGE_CHANNEL_NOTICE);
         m_noticePageIndex = 1;
@@ -413,9 +366,10 @@ namespace Cx
             channelButton->SetChannelPopulation(channel.UserCount, channel.Capacity);
             channelButton->SetVisible(true);
             channelButton->SetEnabled(true);
-            channelButton->SetClickCallback([=] (auto&, auto&)
+            m_channelButtonIndices[channelButton] = channelIndex;
+            channelButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
-                m_selectedChannel = channelIndex;
+                OnChannelClicked(sender, ev);
             });
         }
     }
@@ -434,6 +388,84 @@ namespace Cx
         m_noticePageIndex = page;
         currentPageNumber->SetValue(m_noticePageIndex);
         notice->SetFrame(m_noticePageIndex - 1);
+    }
+
+    void ChannelBoard::OnChannelTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_tab == Tab::ChannelList || m_transitioning || m_hall == MusicHall::None)
+        {
+            ev.Handled = true;
+            return;
+        }
+
+        SwitchTab(Tab::ChannelList);
+    }
+
+    void ChannelBoard::OnNoticeTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        if (m_tab == Tab::Notice || m_transitioning)
+        {
+            ev.Handled = true;
+            return;
+        }
+
+        SwitchTab(Tab::Notice);
+    }
+
+    void ChannelBoard::OnChannelEnterButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_mixer.Play(*m_sfxEnter, Sound::Channel::SFX);
+        if (m_callback && m_selectedChannel >= 0 && m_selectedChannel < static_cast<int>(m_channels.size()))
+            m_callback(m_hall, m_channels[m_selectedChannel].GatewayID, m_channels[m_selectedChannel].ID);
+    }
+
+    void ChannelBoard::OnChannelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto channelButton = dynamic_cast<ChannelButton*>(&sender);
+        m_selectedChannel = channelButton->GetChannelNumber() - 1;
+    }
+
+    void ChannelBoard::OnChannelButtonDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto container   = FindChild<Gx::UiContainer>(Resource::Planet::ChannelBoard::IDC_CONTAINER_CHANNEL_CONTROLS);
+        const auto enterButton = container->FindChild<Gx::Button>(Resource::Planet::ChannelBoard::IDC_BUTTON_CHANNEL_ENTER);
+
+        enterButton->PerformClick();
+    }
+
+    void ChannelBoard::OnChannelLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_mixer.Play(*m_sfxNavigate, Sound::Channel::SFX);
+        if (m_tab == Tab::ChannelList)
+        {
+            if (m_channelPageIndex > 1)
+                ShowChannelList(m_channelPageIndex - 1);
+        }
+        else
+        {
+            if (m_noticePageIndex > 1)
+                ShowNotice(m_noticePageIndex - 1);
+        }
+    }
+
+    void ChannelBoard::OnChannelRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_mixer.Play(*m_sfxNavigate, Sound::Channel::SFX);
+        if (m_tab == Tab::ChannelList)
+        {
+            if (m_channelPageIndex < m_channelMaxPage)
+                ShowChannelList(m_channelPageIndex + 1);
+        }
+        else
+        {
+            if (m_noticePageIndex < m_noticeMaxPage)
+                ShowNotice(m_noticePageIndex + 1);
+        }
+    }
+
+    void ChannelBoard::OnChannelClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_selectedChannel = m_channelButtonIndices.at(&sender);
     }
 
     void ChannelBoard::Update(const sf::Time& delta)

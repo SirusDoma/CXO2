@@ -9,6 +9,7 @@
 namespace Gx
 {
     class AudioMixer;
+    class RadioButton;
     class ResourceManager;
 }
 
@@ -33,6 +34,16 @@ namespace Cx
         void Invalidate() override;
 
     private:
+        void SelectInstrument(Gx::RadioButton& sender, Instrument instrument);
+
+        void OnInstrumentLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnInstrumentRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnGuitarCheckChanged(Gx::RadioButton& sender);
+        void OnBassCheckChanged(Gx::RadioButton& sender);
+        void OnDrumCheckChanged(Gx::RadioButton& sender);
+        void OnKeyboardCheckChanged(Gx::RadioButton& sender);
+        void OnInstrumentSelectButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
+
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;
         ItemFactory& m_items;
@@ -42,5 +53,6 @@ namespace Cx
         Instrument m_currentInstrument;
         int m_currentIndex;
         std::unordered_map<Instrument, std::vector<ItemMetadata>> m_headers;
+        mutable std::function<void(const ItemMetadata&)> m_selectCallback;
     };
 }

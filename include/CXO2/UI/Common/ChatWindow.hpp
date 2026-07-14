@@ -48,6 +48,8 @@ namespace Cx
         void OnMouseWheelScrolled(const sf::Event::MouseWheelScrolled& ev) override;
         void Invalidate() override;
 
+        void OnScrollValueChanged(Gx::ScrollBar& sender, Gx::ScrollBar::ValueChangedEvent& ev);
+
         const Gx::Font* m_font;
         sf::Color m_textColor;
         Gx::ScrollBar* m_scroll;

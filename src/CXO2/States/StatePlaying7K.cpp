@@ -86,6 +86,8 @@ namespace Cx
            }
         ),
        m_self(),
+       m_comboCounter(),
+       m_judgementIndicator(),
        m_chatBox(),
        m_viewport()
     {
@@ -107,16 +109,7 @@ namespace Cx
 
         // Add chart renderer
         m_renderer.SetName(Resource::Playing7K::IDC_CHART_RENDERER);
-        m_renderer.SetRenderCompleteCallback([this]
-        {
-            if (m_states.size() == 0)
-            {
-                OnRenderComplete();
-                return;
-            }
-
-            SubmitScore();
-        });
+        m_renderer.SetRenderCompleteCallback([this] { OnChartRenderCompleted(); });
         AddChild(m_renderer);
 
         m_renderer.Initialize(*m_context.GetChart(), m_context);
@@ -180,12 +173,7 @@ namespace Cx
                     continue;
 
                 auto charInfo = m_session.GetCharacterInfo();
-                avatar->SetGender(charInfo.Gender);
-                for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
-                    avatar->SetDefaultItem(std::move(item));
-
-                for (const auto id : charInfo.EquippedItemIDs)
-                    avatar->Equip(m_items.Create(id));
+                EquipAvatar(avatar, charInfo);
 
                 auto slot = RoomSlot
                 {
@@ -196,12 +184,7 @@ namespace Cx
                     /* .Team     = */ RoomTeam::A
                 };
 
-                const auto info = avatar->GetAvatarInfo();
-                info->SetSlot(slot);
-
-                const auto lifeBar = info->GetLifeBar();
-                lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-                lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+                SetupAvatarInfo(avatar, slot);
 
                 m_self = avatar;
                 m_avatars[i] = avatar;
@@ -219,12 +202,7 @@ namespace Cx
 
                 slot.Ready = slot.IsMaster; // reset ready state early
 
-                avatar->SetGender(slot.Member->Gender);
-                for (auto [_, item] : m_items.GetDefaultItems(slot.Member->Gender))
-                    avatar->SetDefaultItem(std::move(item));
-
-                for (const auto id : slot.Member->EquippedItemIDs)
-                    avatar->Equip(m_items.Create(id));
+                EquipAvatar(avatar, *slot.Member);
 
                 auto efc = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
                 auto& effectContainer = efc ? *efc : Create<Gx::UiContainer>();
@@ -272,12 +250,7 @@ namespace Cx
                 if (!efc)
                     avatar->AddChild(effectContainer);
 
-                const auto info = avatar->GetAvatarInfo();
-                info->SetSlot(slot);
-
-                const auto lifeBar = info->GetLifeBar();
-                lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
-                lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+                SetupAvatarInfo(avatar, slot);
 
                 if (m_session.GetCharacterInfo().Name == slot.Member->Name)
                     m_self = avatar;
@@ -322,10 +295,10 @@ namespace Cx
         const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
         const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
         const auto bufferContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_BUFFER);
-        const auto buffers = bufferContainer->GetChildren();
-        for (std::size_t i = 0; i < buffers.size(); i++)
+        m_buffers = bufferContainer->GetChildren();
+        for (std::size_t i = 0; i < m_buffers.size(); i++)
         {
-            const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
+            const auto renderable = dynamic_cast<Gx::Renderable*>(m_buffers[i]);
             renderable->SetVisible(false);
         }
 
@@ -350,15 +323,15 @@ namespace Cx
         });
 
         // Setup Combo Counter
-        auto& comboCounter = Create<ComboCounter>(
+        m_comboCounter = &Create<ComboCounter>(
             Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COMBO),
             Find<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
         );
-        comboCounter.SetName(Resource::Playing7K::IDC_CONTAINER_COMBO);
-        AddChild(comboCounter);
+        m_comboCounter->SetName(Resource::Playing7K::IDC_CONTAINER_COMBO);
+        AddChild(*m_comboCounter);
 
         // Setup Judgement Indicator
-        auto& judgementIndicator = Create<JudgementIndicator>(
+        m_judgementIndicator = &Create<JudgementIndicator>(
             std::unordered_map<Accuracy, Gx::Animation*>
             {
                 { Accuracy::Cool, Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COOL) },
@@ -367,8 +340,8 @@ namespace Cx
                 { Accuracy::Miss, Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_MISS) },
             }, m_config.UseFx
         );
-        judgementIndicator.SetName(Resource::Playing7K::IDC_NOTE_JUDGEMENT_INDICATOR);
-        AddChild(judgementIndicator);
+        m_judgementIndicator->SetName(Resource::Playing7K::IDC_NOTE_JUDGEMENT_INDICATOR);
+        AddChild(*m_judgementIndicator);
 
         // Setup Long Note effects
         if (const auto longNoteEffectList = Find<Gx::List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
@@ -420,156 +393,23 @@ namespace Cx
         }
 
         // Setup Key Effects
-        m_renderer.SetInputCallback([=] (auto channel, bool state)
-        {
-            m_inputStates[channel] = state;
-            if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
-                keyEffect->second->SetVisible(state);
-
-            if (const auto guideKeyEffect = m_guideKeyEffects.find(channel); guideKeyEffect != m_guideKeyEffects.end())
-            {
-                guideKeyEffect->second->SetVisible(state);
-                if (state)
-                    guideKeyEffect->second->SetFrame(fmt::format("{}B", static_cast<int>(channel) - 2));
-                else
-                    guideKeyEffect->second->SetFrame(fmt::format("{}A", static_cast<int>(channel) - 2));
-            }
-
-            if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
-                keyDown->second->SetVisible(state);
-        });
+        m_renderer.SetInputCallback([=] (auto channel, bool state) { OnChartInput(channel, state); });
 
         // Setup Score changes
-        m_scoreTracker.AddIncrementListener([=, &comboCounter, &judgementIndicator] (auto& ev, auto acc, auto count)
+        m_scoreTracker.AddIncrementListener([this] (auto& ev, auto acc, auto count)
         {
-            if (!m_scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
-                return;
-
-            // Life System
-            if (m_scoreTracker.IsEnabled())
-            {
-                const auto lastLife = m_lifeSystem.GetCurrentLifePoint();
-                m_lifeSystem.Update(acc, count);
-
-                const auto currentLife = m_lifeSystem.GetCurrentLifePoint();
-                if (lastLife != currentLife)
-                {
-                    m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Life, static_cast<std::uint16_t>(currentLife) }, [=] (const auto& ev)
-                    {
-                        try
-                        {
-                            const auto& _ = ev.Open();
-                        }
-                        catch (const Gx::Exception& e)
-                        {
-                            ShowDialog(std::string(e.what()), DialogStyle::Information, false);
-                            GetDirector().Dismiss<StatePlanet>();
-                        }
-                    });
-                }
-
-                m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
-                lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
-
-                if (m_lifeSystem.GetCurrentLifePoint() == 0)
-                {
-                    m_scoreTracker.SetEnabled(false);
-                    m_self->Die();
-
-                    SubmitScore();
-                    if (m_context.GetDifficulty() != Difficulty::EX && m_states.size() == 0)
-                    {
-                        Run<Gx::Delay>(sf::milliseconds(2000), [this]
-                        {
-                            OnRenderComplete();
-                        });
-
-                        return;
-                    }
-                }
-            }
-
-            // Note Click and Long Note Effects
-            m_noteClicks[ev.Channel]->Reset();
-            m_longNoteEffects[ev.Channel]->SetVisible(false);
-            if (acc == Accuracy::Bad || acc == Accuracy::Miss)
-            {
-                m_noteClicks[ev.Channel]->Stop();
-                if (m_config.UseFx)
-                    m_longNoteEffects[ev.Channel]->SetVisible(false);
-            }
-            else if (ev.Type == Chart::NoteType::Hold && m_config.UseFx)
-            {
-                m_longNoteEffects[ev.Channel]->Reset();
-                m_longNoteEffects[ev.Channel]->SetVisible(true);
-            }
-
-            // Combo
-            comboCounter.SetCombo(m_scoreTracker.GetCombo());
-            if (m_lifeSystem.GetCurrentLifePoint() > 0 || acc != Accuracy::Miss)
-                judgementIndicator.Play(acc);
-            else
-                judgementIndicator.Play(Accuracy::None);
-
-            // Score and Jam Combo
-            scoreNumber->SetValue(m_scoreTracker.GetScorePoint());
-            jamGauge->SetValue(m_scoreTracker.GetJamProgress());
-
-            // Buffer
-            for (std::size_t i = 0; i < buffers.size(); i++)
-            {
-                const auto renderable = dynamic_cast<Gx::Renderable*>(buffers[i]);
-                renderable->SetVisible(i < m_scoreTracker.GetBufferCount());
-            }
+            OnScoreIncremented(ev, acc, count);
         });
 
         // Setup jam combo effect
         m_scoreTracker.AddJamComboListener([=] (auto& ev, auto acc, auto jamCombo)
         {
-            jamNumber->SetValue(jamCombo);
-            jamAnimation->Reset();
-            jamContainer->SetVisible(true);
-
-            PlayAvatarJamCombo(m_self, jamCombo);
-
-            m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Jam, static_cast<std::uint16_t>(jamCombo) }, [=] (const auto& ev)
-            {
-                try
-                {
-                    const auto& _ = ev.Open();
-                }
-                catch (const Gx::Exception& e)
-                {
-                    ShowDialog(std::string(e.what()), DialogStyle::Information, false);
-                    GetDirector().Dismiss<StatePlanet>();
-                }
-            });
+            OnJamComboIncremented(ev, acc, jamCombo);
         });
 
         // Exit button
         const auto exitButton = Instantiate<Gx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
-        exitButton->SetClickCallback([this] (const auto& sender, const auto&)
-        {
-            m_service.ExitPlaying([=] (const auto& ev)
-            {
-                try
-                {
-                    const auto& _ = ev.Open();
-                }
-                catch (const Gx::Exception&)
-                {
-                    return;
-                }
-
-                if (m_context.GetMode() != GameMode::Single)
-                {
-                    GetDirector().Dismiss<StateRoom>();
-                }
-                else
-                    GetDirector().Dismiss();
-            });
-
-        });
+        exitButton->SetClickCallback([this] (auto& sender, auto& ev) { OnExitButtonClicked(sender, ev); });
 
         for (auto [_, avatar] : m_avatars)
             avatar->GetAvatarInfo()->GetLifeBar()->SetValue(avatar->GetAvatarInfo()->GetLifeBar()->GetMaximumValue());
@@ -776,6 +616,188 @@ namespace Cx
         }
     }
 
+    void StatePlaying7K::OnUpdateGameStatsResponded(const MessageEnvelope<UpdateGameStatsRequest>& ev)
+    {
+        try
+        {
+            const auto& _ = ev.Open();
+        }
+        catch (const Gx::Exception& e)
+        {
+            ShowDialog(std::string(e.what()), DialogStyle::Information, false);
+            GetDirector().Dismiss<StatePlanet>();
+        }
+    }
+
+    void StatePlaying7K::OnSubmitScoreResponded(const MessageEnvelope<SubmitScoreRequest>& ev)
+    {
+        try
+        {
+            const auto& _ = ev.Open();
+        }
+        catch (const Gx::Exception& e)
+        {
+            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            {
+                GetDirector().Dismiss<StatePlanet>();
+            });
+        }
+    }
+
+    void StatePlaying7K::OnExitPlayingResponded(const MessageEnvelope<ExitPlayingRequest>& ev)
+    {
+        try
+        {
+            const auto& _ = ev.Open();
+        }
+        catch (const Gx::Exception&)
+        {
+            return;
+        }
+
+        if (m_context.GetMode() != GameMode::Single)
+        {
+            GetDirector().Dismiss<StateRoom>();
+        }
+        else
+            GetDirector().Dismiss();
+    }
+
+    void StatePlaying7K::OnChartRenderCompleted()
+    {
+        if (m_states.size() == 0)
+        {
+            OnRenderComplete();
+            return;
+        }
+
+        SubmitScore();
+    }
+
+    void StatePlaying7K::OnChartInput(const Chart::Channel channel, const bool state)
+    {
+        m_inputStates[channel] = state;
+        if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
+            keyEffect->second->SetVisible(state);
+
+        if (const auto guideKeyEffect = m_guideKeyEffects.find(channel); guideKeyEffect != m_guideKeyEffects.end())
+        {
+            guideKeyEffect->second->SetVisible(state);
+            if (state)
+                guideKeyEffect->second->SetFrame(fmt::format("{}B", static_cast<int>(channel) - 2));
+            else
+                guideKeyEffect->second->SetFrame(fmt::format("{}A", static_cast<int>(channel) - 2));
+        }
+
+        if (const auto keyDown = m_keyDowns.find(channel); keyDown != m_keyDowns.end())
+            keyDown->second->SetVisible(state);
+    }
+
+    void StatePlaying7K::OnScoreIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long count)
+    {
+        const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
+        const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
+        const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
+
+        if (!m_scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
+            return;
+
+        // Life System
+        if (m_scoreTracker.IsEnabled())
+        {
+            const auto lastLife = m_lifeSystem.GetCurrentLifePoint();
+            m_lifeSystem.Update(acc, count);
+
+            const auto currentLife = m_lifeSystem.GetCurrentLifePoint();
+            if (lastLife != currentLife)
+            {
+                m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Life, static_cast<std::uint16_t>(currentLife) }, [=] (const auto& ev)
+                {
+                    OnUpdateGameStatsResponded(ev);
+                });
+            }
+
+            m_self->GetAvatarInfo()->GetLifeBar()->SetValue(m_lifeSystem.GetCurrentLifePoint());
+            lifeBar->SetValue(m_lifeSystem.GetCurrentLifePoint());
+
+            if (m_lifeSystem.GetCurrentLifePoint() == 0)
+            {
+                m_scoreTracker.SetEnabled(false);
+                m_self->Die();
+
+                SubmitScore();
+                if (m_context.GetDifficulty() != Difficulty::EX && m_states.size() == 0)
+                {
+                    Run<Gx::Delay>(sf::milliseconds(2000), [this]
+                    {
+                        OnRenderComplete();
+                    });
+
+                    return;
+                }
+            }
+        }
+
+        // Note Click and Long Note Effects
+        m_noteClicks[ev.Channel]->Reset();
+        m_longNoteEffects[ev.Channel]->SetVisible(false);
+        if (acc == Accuracy::Bad || acc == Accuracy::Miss)
+        {
+            m_noteClicks[ev.Channel]->Stop();
+            if (m_config.UseFx)
+                m_longNoteEffects[ev.Channel]->SetVisible(false);
+        }
+        else if (ev.Type == Chart::NoteType::Hold && m_config.UseFx)
+        {
+            m_longNoteEffects[ev.Channel]->Reset();
+            m_longNoteEffects[ev.Channel]->SetVisible(true);
+        }
+
+        // Combo
+        m_comboCounter->SetCombo(m_scoreTracker.GetCombo());
+        if (m_lifeSystem.GetCurrentLifePoint() > 0 || acc != Accuracy::Miss)
+            m_judgementIndicator->Play(acc);
+        else
+            m_judgementIndicator->Play(Accuracy::None);
+
+        // Score and Jam Combo
+        scoreNumber->SetValue(m_scoreTracker.GetScorePoint());
+        jamGauge->SetValue(m_scoreTracker.GetJamProgress());
+
+        // Buffer
+        for (std::size_t i = 0; i < m_buffers.size(); i++)
+        {
+            const auto renderable = dynamic_cast<Gx::Renderable*>(m_buffers[i]);
+            renderable->SetVisible(i < m_scoreTracker.GetBufferCount());
+        }
+    }
+
+    void StatePlaying7K::OnJamComboIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long jamCombo)
+    {
+        const auto jamContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
+        const auto jamAnimation = jamContainer->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_JAM);
+        const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
+
+        jamNumber->SetValue(jamCombo);
+        jamAnimation->Reset();
+        jamContainer->SetVisible(true);
+
+        PlayAvatarJamCombo(m_self, jamCombo);
+
+        m_service.UpdateGameStats(UpdateGameStatsRequest{ UpdateStatsType::Jam, static_cast<std::uint16_t>(jamCombo) }, [=] (const auto& ev)
+        {
+            OnUpdateGameStatsResponded(ev);
+        });
+    }
+
+    void StatePlaying7K::OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_service.ExitPlaying([=] (const auto& ev)
+        {
+            OnExitPlayingResponded(ev);
+        });
+    }
+
     void StatePlaying7K::Update(const sf::Time& delta)
     {
         State::Update(delta);
@@ -872,6 +894,26 @@ namespace Cx
         }
     }
 
+    void StatePlaying7K::EquipAvatar(Avatar* avatar, const CharacterInfo& charInfo)
+    {
+        avatar->SetGender(charInfo.Gender);
+        for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+            avatar->SetDefaultItem(std::move(item));
+
+        for (const auto id : charInfo.EquippedItemIDs)
+            avatar->Equip(m_items.Create(id));
+    }
+
+    void StatePlaying7K::SetupAvatarInfo(Avatar* avatar, RoomSlot& slot)
+    {
+        const auto info = avatar->GetAvatarInfo();
+        info->SetSlot(slot);
+
+        const auto lifeBar = info->GetLifeBar();
+        lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
+        lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+    }
+
     void StatePlaying7K::SubmitScore()
     {
         m_service.SubmitScore(SubmitScoreRequest
@@ -888,17 +930,7 @@ namespace Cx
         },
         [=] (const auto& ev)
         {
-            try
-            {
-                const auto& _ = ev.Open();
-            }
-            catch (const Gx::Exception& e)
-            {
-                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
-                {
-                    GetDirector().Dismiss<StatePlanet>();
-                });
-            }
+            OnSubmitScoreResponded(ev);
         });
     }
 

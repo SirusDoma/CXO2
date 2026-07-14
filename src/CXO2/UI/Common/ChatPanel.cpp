@@ -32,83 +32,17 @@ namespace Cx
 
         const auto chatWindow = GetChatWindow();
 
-        const auto onMessage = [=] (const CharacterInfo& actor, const sf::String& text)
-        {
-            if (Gx::StringHelper::StartsWith(text, "/"))
-            {
-                if (const auto waiting = GetParent<StateWaiting7K>())
-                    waiting->OnMemberEmoticon(actor, text);
-            }
-            else
-                chatWindow->PushMessage(actor, text);
-        };
-
-        m_service.SetWhisperEventCallback([=] (const MessageEnvelope<WhisperEventData>& ev)
-        {
-            try
-            {
-                const auto& response = ev.Open();
-                chatWindow->PushWhisper(
-                    CharacterInfo{response.Sender, Gender::Any, Role::Normal},
-                    m_session.GetCharacterInfo(),
-                    response.Content);
-            }
-            catch (const Gx::Exception&)
-            {
-            }
-        });
+        m_service.SetWhisperEventCallback([this] (const auto& ev) { OnWhisper(ev); });
 
         if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
         {
-            m_service.SetWaitingUserMessageCallback([=] (const MessageEnvelope<WaitingUserMessageResponse>& ev)
-            {
-                try
-                {
-                    const auto& response = ev.Open();
-                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
-                }
-                catch (const Gx::Exception&)
-                {
-                }
-            });
-
-            m_service.SetWaitingAdminMessageCallback([=] (const MessageEnvelope<WaitingAdminMessageResponse>& ev)
-            {
-                try
-                {
-                    const auto& response = ev.Open();
-                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
-                }
-                catch (const Gx::Exception&)
-                {
-                }
-            });
+            m_service.SetWaitingUserMessageCallback([this] (const auto& ev) { OnWaitingUserMessage(ev); });
+            m_service.SetWaitingAdminMessageCallback([this] (const auto& ev) { OnWaitingAdminMessage(ev); });
         }
         else
         {
-            m_service.SetMainRoomUserMessageCallback([=] (const MessageEnvelope<MainRoomUserMessageResponse>& ev)
-            {
-                try
-                {
-                    const auto& response = ev.Open();
-                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
-                }
-                catch (const Gx::Exception&)
-                {
-                }
-            });
-
-            m_service.SetMainRoomAdminMessageCallback([=] (const MessageEnvelope<MainRoomAdminMessageResponse>& ev)
-            {
-                try
-                {
-                    const auto& response = ev.Open();
-                    onMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
-                }
-                catch (const Gx::Exception&)
-                {
-                }
-            });
+            m_service.SetMainRoomUserMessageCallback([this] (const auto& ev) { OnMainRoomUserMessage(ev); });
+            m_service.SetMainRoomAdminMessageCallback([this] (const auto& ev) { OnMainRoomAdminMessage(ev); });
         }
 
         if (const auto controls = FindChild<UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS))
@@ -118,10 +52,10 @@ namespace Cx
                 chatWindow->SetScrollBar(*scrollChat);
 
             if (const auto btnChatScrollUp = controls->FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_UP))
-                btnChatScrollUp->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Decrease(); });
+                btnChatScrollUp->SetClickCallback([this] (auto& sender, auto& ev) { OnChatScrollUpButtonClicked(sender, ev); });
 
             if (const auto btnChatScrollDown = controls->FindChild<Gx::Button>(Resource::ChatPanel::IDC_BUTTON_SCROLL_DOWN))
-                btnChatScrollDown->SetClickCallback([=] (auto& sender, auto& ev) { scrollChat->Increase(); });
+                btnChatScrollDown->SetClickCallback([this] (auto& sender, auto& ev) { OnChatScrollDownButtonClicked(sender, ev); });
         }
 
         if (const auto chatButtonList = FindChild<Gx::List>(Resource::ChatPanel::IDC_LIST_CHAT_BUTTON))
@@ -132,141 +66,263 @@ namespace Cx
             const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER);
 
             btnChatAll->SetCheckedState(true);
-            btnChatAll->SetCheckStateChangeCallback([=] (const Gx::RadioButton& radio)
-            {
-                if (radio.IsChecked())
-                    m_recipient = {};
-            });
+            btnChatAll->SetCheckStateChangeCallback([this] (auto& radio) { OnChatAllCheckChanged(radio); });
 
-            const auto fallbackCheckStateCallback = [=] (const Gx::RadioButton& radio)
-            {
-                if (radio.IsChecked())
-                    btnChatAll->SetCheckedState(true);
-            };
-
-            btnChatFriend->SetCheckStateChangeCallback(fallbackCheckStateCallback);
-            btnChatGuild->SetCheckStateChangeCallback(fallbackCheckStateCallback);
-            btnChatWhisper->SetCheckStateChangeCallback([=] (auto& radio)
-            {
-                const auto parent = GetParent<Cx::State>();
-                if (!parent)
-                    return;
-
-                if (radio.IsChecked())
-                {
-                    if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER); dialog)
-                    {
-                        const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME);
-                        if (nicknameInput)
-                        {
-                            nicknameInput->SetMaximumTextLength(20);
-                            nicknameInput->SetString(m_recipient);
-                            nicknameInput->SetFocus(true);
-                            nicknameInput->SelectAll();
-                        }
-
-                        dialog->SetAcceptCallback([=, &radio]
-                        {
-                            if (nicknameInput)
-                            {
-                                if (nicknameInput->GetString().isEmpty())
-                                    fallbackCheckStateCallback(radio);
-
-                                m_recipient = nicknameInput->GetString();
-                            }
-                        });
-
-                        dialog->SetCancelCallback([=, &radio]
-                        {
-                            fallbackCheckStateCallback(radio);
-                        });
-
-                        auto ctx   = Gx::DialogPresentationContext();
-                        ctx.Bounds = {{}, parent->GetView().getSize()};
-                        ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
-
-                        parent->Present(*dialog, ctx);
-                    }
-                }
-            });
+            btnChatFriend->SetCheckStateChangeCallback([this] (auto& radio) { OnChatFallbackCheckChanged(radio); });
+            btnChatGuild->SetCheckStateChangeCallback([this] (auto& radio) { OnChatFallbackCheckChanged(radio); });
+            btnChatWhisper->SetCheckStateChangeCallback([this] (auto& radio) { OnChatWhisperCheckChanged(radio); });
         }
 
         const auto chatInput = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT);
         chatInput->SetPermanentFocusEnabled(true);
-        chatInput->SetTextEnteredCallback([=] (auto& sender, const sf::String& text)
+        chatInput->SetTextEnteredCallback([this] (auto& sender, const sf::String& text) { OnChatInputTextEntered(sender, text); });
+    }
+
+    void ChatPanel::OnMessage(const CharacterInfo& actor, const sf::String& text)
+    {
+        const auto chatWindow = GetChatWindow();
+
+        if (Gx::StringHelper::StartsWith(text, "/"))
         {
-            if (Gx::StringHelper::StartsWith(text, "/w"))
+            if (const auto waiting = GetParent<StateWaiting7K>())
+                waiting->OnMemberEmoticon(actor, text);
+        }
+        else
+            chatWindow->PushMessage(actor, text);
+    }
+
+    void ChatPanel::OnWhisper(const MessageEnvelope<WhisperEventData>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            const auto chatWindow = GetChatWindow();
+            chatWindow->PushWhisper(
+                CharacterInfo{response.Sender, Gender::Any, Role::Normal},
+                m_session.GetCharacterInfo(),
+                response.Content);
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+    }
+
+    void ChatPanel::OnWaitingUserMessage(const MessageEnvelope<WaitingUserMessageResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+    }
+
+    void ChatPanel::OnWaitingAdminMessage(const MessageEnvelope<WaitingAdminMessageResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+    }
+
+    void ChatPanel::OnMainRoomUserMessage(const MessageEnvelope<MainRoomUserMessageResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+    }
+
+    void ChatPanel::OnMainRoomAdminMessage(const MessageEnvelope<MainRoomAdminMessageResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+    }
+
+    void ChatPanel::OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const std::vector<std::string>& tokens, const sf::String& message)
+    {
+        const auto chatWindow = GetChatWindow();
+
+        try
+        {
+            if (!ev.Open().Invalid)
             {
-                const auto tokens = Gx::StringHelper::Split(text);
-                if (tokens.size() < 3)
-                    return;
+                chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, message);
+                return;
+            }
+        }
+        catch (const Gx::Exception&)
+        {
+        }
 
-                m_recipient = tokens[1];
-                if (const auto chatButtonList = FindChild<Gx::List>(Resource::ChatPanel::IDC_LIST_CHAT_BUTTON))
+        chatWindow->PushSystemMessage(fmt::format("The message was not delivered to {}", tokens[1]));
+    }
+
+    void ChatPanel::OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const sf::String& text)
+    {
+        const auto chatWindow = GetChatWindow();
+
+        try
+        {
+            if (!ev.Open().Invalid)
+            {
+                chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, text);
+                return;
+            }
+        }
+        catch (const Gx::Exception&)
+        {
+        }
+
+        chatWindow->PushSystemMessage(sf::String(fmt::format(L"The message was not delivered to {}", m_recipient)));
+    }
+
+    void ChatPanel::OnChatScrollUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto controls   = FindChild<UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS);
+        const auto scrollChat = controls->FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
+
+        scrollChat->Decrease();
+    }
+
+    void ChatPanel::OnChatScrollDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto controls   = FindChild<UiContainer>(Resource::ChatPanel::IDC_CONTAINER_CHAT_SCROLL_CONTROLS);
+        const auto scrollChat = controls->FindChild<Gx::ScrollBar>(Resource::ChatPanel::IDC_SCROLL_BAR_CHAT);
+
+        scrollChat->Increase();
+    }
+
+    void ChatPanel::OnChatAllCheckChanged(Gx::RadioButton& radio)
+    {
+        if (radio.IsChecked())
+            m_recipient = {};
+    }
+
+    void ChatPanel::OnChatFallbackCheckChanged(Gx::RadioButton& radio)
+    {
+        const auto chatButtonList = FindChild<Gx::List>(Resource::ChatPanel::IDC_LIST_CHAT_BUTTON);
+        const auto btnChatAll     = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_ALL);
+
+        if (radio.IsChecked())
+            btnChatAll->SetCheckedState(true);
+    }
+
+    void ChatPanel::OnChatWhisperCheckChanged(Gx::RadioButton& radio)
+    {
+        const auto parent = GetParent<Cx::State>();
+        if (!parent)
+            return;
+
+        if (radio.IsChecked())
+        {
+            if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER); dialog)
+            {
+                const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME);
+                if (nicknameInput)
                 {
-                    if (const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER))
-                    {
-                        btnChatWhisper->SetEnabled(false);
-                        btnChatWhisper->SetCheckedState(true);
-
-                        btnChatWhisper->SetEnabled(true);
-                    }
-
-                    if (const auto parent = GetParent<Cx::State>())
-                    {
-                        if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER))
-                        {
-                            if (const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME))
-                                nicknameInput->SetString(m_recipient);
-                        }
-                    }
+                    nicknameInput->SetMaximumTextLength(20);
+                    nicknameInput->SetString(m_recipient);
+                    nicknameInput->SetFocus(true);
+                    nicknameInput->SelectAll();
                 }
 
-
-                auto message = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
-                m_service.SendWhisper(WhisperMessageRequest{tokens[1], message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+                dialog->SetAcceptCallback([=, &radio]
                 {
-                    try
-                    {
-                        if (!ev.Open().Invalid)
-                        {
-                            chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, message);
-                            return;
-                        }
-                    }
-                    catch (const Gx::Exception&)
-                    {
-                    }
-
-                    chatWindow->PushSystemMessage(fmt::format("The message was not delivered to {}", tokens[1]));
+                    OnWhisperDialogAccepted(nicknameInput, radio);
                 });
+
+                dialog->SetCancelCallback([=, &radio]
+                {
+                    OnChatFallbackCheckChanged(radio);
+                });
+
+                auto ctx   = Gx::DialogPresentationContext();
+                ctx.Bounds = {{}, parent->GetView().getSize()};
+                ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
+
+                parent->Present(*dialog, ctx);
             }
-            else if (!m_recipient.isEmpty())
+        }
+    }
+
+    void ChatPanel::OnWhisperDialogAccepted(Gx::InputField* nicknameInput, Gx::RadioButton& radio)
+    {
+        if (nicknameInput)
+        {
+            if (nicknameInput->GetString().isEmpty())
+                OnChatFallbackCheckChanged(radio);
+
+            m_recipient = nicknameInput->GetString();
+        }
+    }
+
+    void ChatPanel::OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text)
+    {
+        if (Gx::StringHelper::StartsWith(text, "/w"))
+        {
+            const auto tokens = Gx::StringHelper::Split(text);
+            if (tokens.size() < 3)
+                return;
+
+            m_recipient = tokens[1];
+            if (const auto chatButtonList = FindChild<Gx::List>(Resource::ChatPanel::IDC_LIST_CHAT_BUTTON))
             {
-                m_service.SendWhisper(WhisperMessageRequest{m_recipient, text}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+                if (const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER))
                 {
-                    try
-                    {
-                        if (!ev.Open().Invalid)
-                        {
-                            chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, text);
-                            return;
-                        }
-                    }
-                    catch (const Gx::Exception&)
-                    {
-                    }
+                    btnChatWhisper->SetEnabled(false);
+                    btnChatWhisper->SetCheckedState(true);
 
-                    chatWindow->PushSystemMessage(sf::String(fmt::format(L"The message was not delivered to {}", m_recipient)));
-                });
+                    btnChatWhisper->SetEnabled(true);
+                }
+
+                if (const auto parent = GetParent<Cx::State>())
+                {
+                    if (const auto dialog = parent->Instantiate<Gx::Dialog>(Resource::ChatPanel::IDC_DIALOG_WHISPER))
+                    {
+                        if (const auto nicknameInput = dialog->FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_NICKNAME))
+                            nicknameInput->SetString(m_recipient);
+                    }
+                }
             }
-            else if (Gx::StringHelper::StartsWith(text, "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
-                m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
-            else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
-                m_service.SendWaitingMessage(WaitingMessageRequest{text});
-            else
-                m_service.SendMainRoomMessage(MainRoomMessageRequest{text});
-        });
+
+
+            auto message = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
+            m_service.SendWhisper(WhisperMessageRequest{tokens[1], message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+            {
+                OnSendWhisperResponded(ev, tokens, message);
+            });
+        }
+        else if (!m_recipient.isEmpty())
+        {
+            m_service.SendWhisper(WhisperMessageRequest{m_recipient, text}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+            {
+                OnSendWhisperResponded(ev, text);
+            });
+        }
+        else if (Gx::StringHelper::StartsWith(text, "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
+            m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
+        else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
+            m_service.SendWaitingMessage(WaitingMessageRequest{text});
+        else
+            m_service.SendMainRoomMessage(MainRoomMessageRequest{text});
     }
 
     ChatWindow* ChatPanel::GetChatWindow() const

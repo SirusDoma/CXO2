@@ -3,6 +3,10 @@
 #include <CXO2/Models/Character.hpp>
 #include <Genode/UI/UiContainer.hpp>
 
+#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Messages/Responses/UserListResponse.hpp>
+
+#include <unordered_map>
 #include <vector>
 
 namespace Cx
@@ -20,7 +24,14 @@ namespace Cx
         void Invalidate() override;
 
     private:
-        void OnRefreshButtonClicked();
+        void OnUserListLoad(const MessageEnvelope<UserListResponse>& ev);
+
+        void OnUserButtonCheckChanged(Gx::RadioButton& sender);
+        void OnUserButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnRefreshButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnUserLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnUserRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         bool m_refreshing{false};
 
@@ -28,5 +39,8 @@ namespace Cx
         std::vector<CharacterInfo> m_users;
         std::string m_selectedUser;
         unsigned int m_page = 1;
+
+        std::size_t m_userButtonCount{0};
+        std::unordered_map<Gx::Control*, std::size_t> m_userButtonIndices;
     };
 }

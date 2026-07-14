@@ -130,7 +130,7 @@ namespace Cx
         quickJoinButton->SetClickCallback(std::bind(&StateRoom::OnQuickJoinRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
         const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        roomList->SetEnterRoomCallback(std::bind(&StateRoom::OnRoomButtonClicked, this, std::placeholders::_1));
+        roomList->SetEnterRoomCallback(std::bind(&StateRoom::OnRoomEntered, this, std::placeholders::_1));
 
         const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
         const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
@@ -235,7 +235,7 @@ namespace Cx
 
         m_service.CreateRoom(request, [this, request, music] (const auto& ev)
         {
-            OnCreateRoomResponded(request, music, ev);
+            OnCreateRoomResponded(ev, request, music);
         });
     }
 
@@ -293,7 +293,7 @@ namespace Cx
             m_busy = true;
             m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this, room] (const auto& ev)
             {
-                OnJoinRoomResponded(room, ev);
+                OnJoinRoomResponded(ev, room);
             });
         };
 
@@ -434,7 +434,7 @@ namespace Cx
         }
     }
 
-    void StateRoom::OnCreateRoomResponded(const CreateRoomRequest& request, const ChartMetadata& music, const MessageEnvelope<CreateRoomResponse>& ev)
+    void StateRoom::OnCreateRoomResponded(const MessageEnvelope<CreateRoomResponse>& ev, const CreateRoomRequest& request, const ChartMetadata& music)
     {
         try
         {
@@ -487,7 +487,7 @@ namespace Cx
         }
     }
 
-    void StateRoom::OnJoinRoomResponded(const RoomInfo& room, const MessageEnvelope<JoinRoomResponse>& ev)
+    void StateRoom::OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev, const RoomInfo& room)
     {
         try
         {
@@ -727,6 +727,14 @@ namespace Cx
         }
     }
 
+    void StateRoom::OnRoomEntered(const RoomInfo& room)
+    {
+        if (m_busy)
+            return;
+
+        JoinRoom(room);
+    }
+
     void StateRoom::OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_busy)
@@ -747,14 +755,6 @@ namespace Cx
                 createRoomDialog->GetMaxLevelLimit()
             );
         });
-    }
-
-    void StateRoom::OnRoomButtonClicked(const RoomInfo& room)
-    {
-        if (m_busy)
-            return;
-
-        JoinRoom(room);
     }
 
     void StateRoom::OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)

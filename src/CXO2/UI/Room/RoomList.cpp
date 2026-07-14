@@ -26,14 +26,13 @@ namespace Cx
     {
         List::Initialize();
 
-        auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
+        m_sfxInvalid = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
         for (const auto child : GetChildren())
         {
             auto roomButton = dynamic_cast<RoomButton*>(child);
-            roomButton->SetClickCallback([this, sfx = sfxInvalid, button = roomButton] (auto&, auto&)
+            roomButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
-               if (!button->IsActive())
-                   m_mixer.Play(*sfx, Sound::Channel::SFX);
+                OnRoomButtonClicked(sender, ev);
             });
         }
     }
@@ -119,22 +118,36 @@ namespace Cx
 
     void RoomList::SetEnterRoomCallback(std::function<void(const RoomInfo&)> callback) const
     {
-        auto sfxInvalid = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
+        m_sfxInvalid        = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
+        m_enterRoomCallback = std::move(callback);
         for (const auto child : GetChildren())
         {
             auto roomButton = dynamic_cast<RoomButton*>(child);
-            roomButton->SetClickCallback([this, callback, sfx = sfxInvalid, button = roomButton] (auto&, auto&)
+            roomButton->SetClickCallback([this] (auto& sender, auto& ev)
             {
-               if (!button->IsActive())
-               {
-                   m_mixer.Play(*sfx, Sound::Channel::SFX);
-                   return;
-               }
-
-                if (callback)
-                    callback(button->GetRoomInfo());
+                OnEnterRoomButtonClicked(sender, ev);
             });
         }
+    }
+
+    void RoomList::OnRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto button = dynamic_cast<RoomButton*>(&sender);
+        if (!button->IsActive())
+            m_mixer.Play(*m_sfxInvalid, Sound::Channel::SFX);
+    }
+
+    void RoomList::OnEnterRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    {
+        const auto button = dynamic_cast<RoomButton*>(&sender);
+        if (!button->IsActive())
+        {
+            m_mixer.Play(*m_sfxInvalid, Sound::Channel::SFX);
+            return;
+        }
+
+        if (m_enterRoomCallback)
+            m_enterRoomCallback(button->GetRoomInfo());
     }
 
     void RoomList::Invalidate()

@@ -15,6 +15,12 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 
 #include <functional>
+#include <unordered_map>
+
+namespace sf
+{
+    class Sound;
+}
 
 namespace Cx
 {
@@ -53,6 +59,15 @@ namespace Cx
     private:
         void CaptureCurrentState();
 
+        void OnChannelTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnNoticeTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelEnterButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelButtonDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChannelClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
         void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
@@ -60,6 +75,8 @@ namespace Cx
 
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;
+        sf::Sound* m_sfxNavigate{nullptr};
+        sf::Sound* m_sfxEnter{nullptr};
 
         ChannelButton* m_channelButton;
         Gx::Image m_captureImage;
@@ -71,6 +88,7 @@ namespace Cx
 
         std::vector<ChannelListResponse::ChannelState> m_channels;
         std::function<void(MusicHall, std::uint16_t, std::uint16_t)> m_callback;
+        std::unordered_map<Gx::Control*, int> m_channelButtonIndices;
 
         bool m_transitioning, m_animationEnabled;
         int m_selectedChannel;

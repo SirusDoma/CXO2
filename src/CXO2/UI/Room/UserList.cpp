@@ -31,15 +31,15 @@ namespace Cx
 
         const auto list = FindChild<Gx::List>(Resource::Room::UserList::IDC_LIST_USER_BUTTON);
         const auto listChildren = list->GetChildren();
+        m_userButtonCount = listChildren.size();
         for (std::size_t i = 0; i < listChildren.size(); i++)
         {
             const auto userButton    = dynamic_cast<Gx::RadioButton*>(listChildren[i]);
             auto userNickLabel = userButton->FindChild<Gx::Label>(Resource::Room::UserList::IDC_TEXT_USER_NAME);
-            userButton->SetCheckStateChangeCallback([=] (auto& sender)
+            m_userButtonIndices[userButton] = i;
+            userButton->SetCheckStateChangeCallback([this] (auto& sender)
             {
-                const size_t index = ((m_page - 1) * listChildren.size()) + i;
-                if (index < m_users.size() && sender.IsChecked())
-                    m_selectedUser = m_users[index].Name;
+                OnUserButtonCheckChanged(sender);
             });
 
             for (const auto child : userButton->GetChildren())
@@ -48,13 +48,9 @@ namespace Cx
                     subControl->SetVisible(false);
             }
 
-            userButton->SetFocusChangedCallback([=] (auto& sender, auto& ev)
+            userButton->SetFocusChangedCallback([this] (auto& sender, auto& ev)
             {
-                for (auto child : sender.GetChildren())
-                {
-                    if (const auto subControl = dynamic_cast<Gx::Image*>(child))
-                        subControl->SetVisible(sender.IsFocused());
-                }
+                OnUserButtonFocusChanged(sender, ev);
             });
 
             userButton->SetVisible(false);
@@ -66,21 +62,19 @@ namespace Cx
         const auto btnUserLeft  = FindChild<Gx::Button>(Resource::Room::UserList::IDC_BUTTON_USER_LEFT);
         const auto btnUserRight = FindChild<Gx::Button>(Resource::Room::UserList::IDC_BUTTON_USER_RIGHT);
 
-        btnUserRefresh->SetClickCallback([=] (auto&, auto&)
+        btnUserRefresh->SetClickCallback([this] (auto& sender, auto& ev)
         {
-            OnRefreshButtonClicked();
+            OnRefreshButtonClicked(sender, ev);
         });
 
-        btnUserLeft->SetClickCallback([=] (auto&, auto&)
+        btnUserLeft->SetClickCallback([this] (auto& sender, auto& ev)
         {
-            m_page--;
-            Invalidate();
+            OnUserLeftButtonClicked(sender, ev);
         });
 
-        btnUserRight->SetClickCallback([=] (auto&, auto&)
+        btnUserRight->SetClickCallback([this] (auto& sender, auto& ev)
         {
-            m_page++;
-            Invalidate();
+            OnUserRightButtonClicked(sender, ev);
         });
     }
 
@@ -94,38 +88,71 @@ namespace Cx
         m_users.clear();
     }
 
-    void UserList::OnRefreshButtonClicked()
+    void UserList::OnUserListLoad(const MessageEnvelope<UserListResponse>& ev)
+    {
+        try
+        {
+            const auto& response = ev.Open();
+
+            Clear();
+            for (auto& user : response.Users.GetContainer())
+            {
+                AddUser(CharacterInfo
+                {
+                    user.Name,
+                    Gender::Any,
+                    Role::Normal,
+                    user.Level
+                });
+            }
+
+            Invalidate();
+            m_refreshing = false;
+        }
+        catch (...)
+        {
+            m_refreshing = false;
+        }
+    }
+
+    void UserList::OnUserButtonCheckChanged(Gx::RadioButton& sender)
+    {
+        const size_t index = ((m_page - 1) * m_userButtonCount) + m_userButtonIndices.at(&sender);
+        if (index < m_users.size() && sender.IsChecked())
+            m_selectedUser = m_users[index].Name;
+    }
+
+    void UserList::OnUserButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        for (auto child : sender.GetChildren())
+        {
+            if (const auto subControl = dynamic_cast<Gx::Image*>(child))
+                subControl->SetVisible(sender.IsFocused());
+        }
+    }
+
+    void UserList::OnRefreshButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_refreshing)
             return;
 
         m_refreshing = true;
-        m_service.GetUserList([this] (const auto& ev)
+        m_service.GetUserList([this] (const auto& envelope)
         {
-            try
-            {
-                const auto& response = ev.Open();
-
-                Clear();
-                for (auto& user : response.Users.GetContainer())
-                {
-                    AddUser(CharacterInfo
-                    {
-                        user.Name,
-                        Gender::Any,
-                        Role::Normal,
-                        user.Level
-                    });
-                }
-
-                Invalidate();
-                m_refreshing = false;
-            }
-            catch (...)
-            {
-                m_refreshing = false;
-            }
+            OnUserListLoad(envelope);
         });
+    }
+
+    void UserList::OnUserLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_page--;
+        Invalidate();
+    }
+
+    void UserList::OnUserRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        m_page++;
+        Invalidate();
     }
 
     void UserList::Invalidate()

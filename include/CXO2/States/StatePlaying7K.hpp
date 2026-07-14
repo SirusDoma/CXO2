@@ -12,14 +12,20 @@
 #include <Genode/UI/InputField.hpp>
 
 #include <unordered_map>
+#include <vector>
 
 namespace Cx
 {
+    struct CharacterInfo;
+    struct RoomSlot;
+
     class SessionContext;
     class RoomContext;
     class GameContext;
     class ItemFactory;
     class Avatar;
+    class ComboCounter;
+    class JudgementIndicator;
     class StatePlaying7K : public State
     {
     public:
@@ -64,11 +70,25 @@ namespace Cx
         void Update(const sf::Time& delta) override;
 
         void PlayAvatarJamCombo(const Avatar* avatar, std::uint16_t jams);
+        void EquipAvatar(Avatar* avatar, const CharacterInfo& charInfo);
+        void SetupAvatarInfo(Avatar* avatar, RoomSlot& slot);
 
         void SubmitScore();
 
         void OnRenderComplete();
         void CaptureScreen();
+
+        void OnUpdateGameStatsResponded(const MessageEnvelope<UpdateGameStatsRequest>& ev);
+        void OnSubmitScoreResponded(const MessageEnvelope<SubmitScoreRequest>& ev);
+        void OnExitPlayingResponded(const MessageEnvelope<ExitPlayingRequest>& ev);
+
+        void OnChartRenderCompleted();
+        void OnChartInput(Chart::Channel channel, bool state);
+
+        void OnScoreIncremented(const Chart::NoteEvent& ev, Accuracy acc, unsigned long long count);
+        void OnJamComboIncremented(const Chart::NoteEvent& ev, Accuracy acc, unsigned long long jamCombo);
+
+        void OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
         using InputStateMap = std::unordered_map<Chart::Channel, bool>;
@@ -89,6 +109,9 @@ namespace Cx
         AnimationMap m_noteClicks;
         AnimationMap m_longNoteEffects;
         Avatar* m_self;
+        ComboCounter* m_comboCounter;
+        JudgementIndicator* m_judgementIndicator;
+        std::vector<Gx::Node*> m_buffers;
 
         Gx::InputField* m_chatBox;
         ImageMap m_keyDowns, m_keyEffects, m_guideKeyEffects;

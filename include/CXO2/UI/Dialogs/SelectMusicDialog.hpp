@@ -8,12 +8,15 @@
 #include <Genode/IO/Resource.hpp>
 #include <Genode/UI/Dialog.hpp>
 
+#include <unordered_map>
 #include <vector>
 
 namespace Gx
 {
     class AudioMixer;
+    class RadioButton;
     class ResourceManager;
+    class ToggleButton;
 }
 
 namespace Cx
@@ -46,6 +49,27 @@ namespace Cx
         void Invalidate() override;
 
     private:
+        void ToggleSort(MusicSortMode mode);
+        void SelectDifficulty(Gx::RadioButton& sender, Difficulty difficulty);
+
+        void OnLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnMusicButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicButtonCheckChanged(Gx::RadioButton& sender);
+        void OnMusicSelectorScrolled(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnSortNewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnSortTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnSortLevelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnSortDurationButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnGenreButtonCheckChanged(Gx::RadioButton& sender);
+        void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender);
+        void OnExButtonCheckChanged(Gx::RadioButton& sender);
+        void OnNxButtonCheckChanged(Gx::RadioButton& sender);
+        void OnHxButtonCheckChanged(Gx::RadioButton& sender);
+        void OnSpeedButtonCheckChanged(Gx::RadioButton& sender);
+
         bool         m_initialized = false;
         unsigned int m_page = 0;
         unsigned int m_randomMusicCount = 0;
@@ -67,5 +91,10 @@ namespace Cx
         Gx::ResourcePtr<sf::Texture> m_thumbnail;
         std::vector<ChartMetadata>   m_musicList;
         std::vector<ChartMetadata>   m_displayList;
+
+        std::unordered_map<Gx::RadioButton*, std::size_t>          m_musicButtonIndices;
+        std::unordered_map<Gx::RadioButton*, std::optional<Genre>> m_genreButtonValues;
+        std::unordered_map<Gx::ToggleButton*, LevelCategory>       m_randomLevelButtonValues;
+        std::unordered_map<Gx::RadioButton*, float>                m_speedButtonValues;
     };
 }

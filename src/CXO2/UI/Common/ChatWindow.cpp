@@ -108,11 +108,7 @@ namespace Cx
         if (m_scroll != &scrollBar)
         {
             m_scroll = &scrollBar;
-            m_scroll->SetValueChangedCallback([=] (auto& sender, const float value)
-            {
-                m_offset = static_cast<unsigned int>(value);
-               Invalidate();
-            });
+            m_scroll->SetValueChangedCallback([this] (auto& sender, auto& ev) { OnScrollValueChanged(sender, ev); });
         }
     }
 
@@ -299,5 +295,11 @@ namespace Cx
             else
                 m_labels[index]->SetString(chat.Content);
         }
+    }
+
+    void ChatWindow::OnScrollValueChanged(Gx::ScrollBar& sender, Gx::ScrollBar::ValueChangedEvent& ev)
+    {
+        m_offset = static_cast<unsigned int>(ev.Value);
+        Invalidate();
     }
 }
