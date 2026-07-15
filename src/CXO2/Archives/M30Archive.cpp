@@ -1,6 +1,6 @@
 #include <CXO2/Archives/M30Archive.hpp>
+#include <Genode/IO/BufferedInputStream.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
-#include <SFML/System/MemoryInputStream.hpp>
 
 namespace Cx
 {
@@ -31,18 +31,12 @@ namespace Cx
         if (!header)
             throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
-        const auto data = new std::uint8_t[header->GetSize()];
-        if (!ReadFile(dynamic_cast<FileInfo&>(*header), data, header->GetSize()).has_value())
-        {
-            delete[] data;
+        auto data = std::vector<std::byte>(header->GetSize());
+        if (!ReadFile(dynamic_cast<FileInfo&>(*header), data.data(), data.size()).has_value())
             return nullptr;
-        }
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> stream = std::make_unique<Gx::BufferedInputStream>(std::move(data));
+        return stream;
     }
 
     Gx::ResourcePtr<sf::InputStream> M30Archive::Open(const unsigned int index) const
@@ -52,19 +46,13 @@ namespace Cx
             throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bounds for this archive");
 
         const auto header = &iterator->second;
-        const auto data = new std::uint8_t[header->GetSize()];
+        auto data = std::vector<std::byte>(header->GetSize());
 
-        if (!ReadFile(*header, data, header->GetSize()).has_value())
-        {
-            delete[] data;
+        if (!ReadFile(*header, data.data(), data.size()).has_value())
             return nullptr;
-        }
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> stream = std::make_unique<Gx::BufferedInputStream>(std::move(data));
+        return stream;
     }
 
     std::unique_ptr<Gx::FileInfo> M30Archive::GetFileInfo(const std::filesystem::path& fileName) const

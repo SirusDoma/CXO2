@@ -1,9 +1,9 @@
 #include <CXO2/Archives/OmcArchive.hpp>
 
+#include <Genode/IO/BufferedInputStream.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
-#include <SFML/System/MemoryInputStream.hpp>
-
+#include <algorithm>
 #include <sstream>
 
 namespace Cx
@@ -37,18 +37,12 @@ namespace Cx
             throw Gx::ResourceAccessException(std::to_string(index), "The specified index is out of bound for this archive");
 
         const auto header = it->second;
-        const auto data = new std::uint8_t[header.GetSize()];
-        if (!ReadFile(index, data, header.GetSize()).has_value())
-        {
-            delete[] data;
+        auto data = std::vector<std::byte>(header.GetSize());
+        if (!ReadFile(index, data.data(), data.size()).has_value())
             return nullptr;
-        }
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> stream = std::make_unique<Gx::BufferedInputStream>(std::move(data));
+        return stream;
     }
 
     Gx::ResourcePtr<sf::InputStream> OmcArchive::Open(const std::filesystem::path& fileName) const
@@ -58,18 +52,12 @@ namespace Cx
             throw Gx::ResourceAccessException(fileName.string(), "The specified name is not found for this archive");
 
         const auto& entry = static_cast<FileInfo&>(*header);
-        const auto data   = new std::uint8_t[header->GetSize()];
-        if (!ReadFile(entry.GetIndex(), data, header->GetSize()).has_value())
-        {
-            delete[] data;
+        auto data = std::vector<std::byte>(header->GetSize());
+        if (!ReadFile(entry.GetIndex(), data.data(), data.size()).has_value())
             return nullptr;
-        }
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header->GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> stream = std::make_unique<Gx::BufferedInputStream>(std::move(data));
+        return stream;
     }
 
     bool OmcArchive::Contains(const std::filesystem::path& name) const
@@ -184,34 +172,25 @@ namespace Cx
                     return std::nullopt;
                 }
 
-                const auto encodedData = new std::uint8_t[waveHeader.ChunkSize];
-                if (!ReadStream(encodedData, waveHeader.ChunkSize))
-                {
-                    delete[] encodedData;
+                std::vector<std::uint8_t> encodedData(waveHeader.ChunkSize);
+                if (!ReadStream(encodedData.data(), waveHeader.ChunkSize))
                     throw Gx::ResourceLoadException(std::to_string(index), "Failed to read the encoded WAV data");
-                }
 
-                std::uint8_t* decodedData = nullptr;
+                std::vector<std::uint8_t> decodedData;
                 if (std::string(m_header.Signature, 3) == "OJM")
                 {
                     // OJM wav is not encrypted
-                    decodedData = new std::uint8_t[waveHeader.ChunkSize];
-                    memcpy(decodedData, encodedData, waveHeader.ChunkSize);
+                    decodedData = std::move(encodedData);
                 }
                 else
                 {
                     // Still need to decode even not desired sample to increment accKeyByte and accCounter
-                    decodedData = DecodeWave(encodedData, waveHeader.ChunkSize, &accKeyByte, &accCounter);
+                    decodedData = DecodeWave(encodedData, accKeyByte, accCounter);
                 }
-
 
                 int pcm = 16, fileSize = waveHeader.ChunkSize + 36;
                 if (i != index)
-                {
-                    delete[] encodedData;
-                    delete[] decodedData;
                     continue;
-                }
 
                 // Build complete wave sample
                 std::stringstream waveStream;
@@ -228,7 +207,7 @@ namespace Cx
                 waveStream.write(reinterpret_cast<char*>(&waveHeader.BitsPerSample), sizeof(waveHeader.BitsPerSample));
                 waveStream.write("data", 4);
                 waveStream.write(reinterpret_cast<char*>(&waveHeader.ChunkSize), sizeof(waveHeader.ChunkSize));
-                waveStream.write(reinterpret_cast<char*>(decodedData), waveHeader.ChunkSize);
+                waveStream.write(reinterpret_cast<const char*>(decodedData.data()), waveHeader.ChunkSize);
 
                 const auto buffer = waveStream.str();
                 const unsigned int read = buffer.length();
@@ -237,8 +216,6 @@ namespace Cx
                     size = read;
 
                 memcpy(data, buffer.data(), size);
-                delete[] encodedData;
-                delete[] decodedData;
 
                 return read;
             }
@@ -336,36 +313,29 @@ namespace Cx
         0x04, 0x00
     };
 
-    std::uint8_t* OmcArchive::DecodeWave(const std::uint8_t* in, const int length, int *accKeyByte, int *accCounter)
+    std::vector<std::uint8_t> OmcArchive::DecodeWave(const std::vector<std::uint8_t>& in, int& accKeyByte, int& accCounter)
     {
-        auto* out = new std::uint8_t[length];
-        int key = ((length % 17) << 4) + (length % 17);
-        const int blockSize = length / 17;
+        auto out = in;
+        std::size_t key = ((in.size() % 17) << 4) + (in.size() % 17);
+        const std::size_t blockSize = in.size() / 17;
 
-        memcpy(out, in, length);
         for (unsigned int block = 0; block < 17; block++)
         {
-            const int inOffset = blockSize * block;
-            const int outOffset = blockSize * WAVE_REARRANGE_TABLE[key];
-
-            memcpy(&out[outOffset], &in[inOffset], blockSize);
+            std::copy_n(in.data() + blockSize * block, blockSize, out.data() + blockSize * WAVE_REARRANGE_TABLE[key]);
             key++;
         }
 
-        for (unsigned int i = 0; i < length; i++)
+        for (auto& current : out)
         {
-            std::uint8_t currentByte = out[i];
-            const std::uint8_t temp  = out[i];
-            if (const int accXor = (*accKeyByte << *accCounter) & 0x80; accXor != 0)
-                currentByte = static_cast<std::uint8_t>(~currentByte);
+            const std::uint8_t temp = current;
+            if (const int accXor = (accKeyByte << accCounter) & 0x80; accXor != 0)
+                current = static_cast<std::uint8_t>(~current);
 
-            out[i] = currentByte;
-            *accCounter += 1;
-
-            if (*accCounter > 7)
+            accCounter += 1;
+            if (accCounter > 7)
             {
-                *accCounter = 0;
-                *accKeyByte = temp;
+                accCounter = 0;
+                accKeyByte = temp;
             }
         }
 

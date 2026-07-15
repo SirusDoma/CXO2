@@ -3,6 +3,8 @@
 #include <CXO2/Archives/OjmArchive.hpp>
 #include <CXO2/Contexts/GameContext.hpp>
 
+#include <Genode/IO/BufferedInputStream.hpp>
+
 #include <SFML/System/MemoryInputStream.hpp>
 #include <magic_enum/magic_enum.hpp>
 
@@ -376,7 +378,7 @@ namespace Cx
 
         // Discard 8-byte header and decrypt the rest reading backwards
         const std::size_t payloadSize = totalSize - 8;
-        auto output = new std::uint8_t[payloadSize];
+        auto output = std::vector<std::byte>(payloadSize);
 
         for (std::size_t i = 0; i < payloadSize; i += blockSize)
         {
@@ -387,15 +389,12 @@ namespace Cx
                     break;
 
                 const std::size_t srcIndex = (totalSize - 1) - offset; // read backward from end of file
-                output[offset] = static_cast<std::uint8_t>(data[srcIndex] ^ encryptKey[j]);
+                output[offset] = static_cast<std::byte>(data[srcIndex] ^ encryptKey[j]);
             }
         }
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(output, payloadSize), [output] (const sf::InputStream* ms)
-        {
-            delete[] output;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> decrypted = std::make_unique<Gx::BufferedInputStream>(std::move(output));
+        return decrypted;
     }
 
     void O2JamChartLoader::SetCoverLoadCallback(const std::function<void(const sf::Image*)> &onCoverLoaded)

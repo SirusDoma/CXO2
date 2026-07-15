@@ -1,6 +1,6 @@
 #include <Genode/Utilities/StringHelper.hpp>
+#include <Genode/IO/BufferedInputStream.hpp>
 #include <CXO2/Archives/OpiArchive.hpp>
-#include <SFML/System/MemoryInputStream.hpp>
 
 #pragma warning(disable: 6054)
 
@@ -45,15 +45,12 @@ namespace Cx
             throw Gx::ResourceAccessException(name, "The specified index is out of bound for this archive");
 
         const auto header = it->second;
-        const auto data = new std::uint8_t[header.GetSize()];
-        if (!ReadFile(fileName, data, header.GetSize()).has_value())
-            delete[] data;
+        auto data = std::vector<std::byte>(header.GetSize());
+        if (!ReadFile(fileName, data.data(), data.size()).has_value())
+            return nullptr;
 
-        return Gx::ResourcePtr<sf::InputStream>(new sf::MemoryInputStream(data, header.GetSize()), [data] (const sf::InputStream* ms)
-        {
-            delete[] data;
-            delete ms;
-        });
+        std::unique_ptr<sf::InputStream> stream = std::make_unique<Gx::BufferedInputStream>(std::move(data));
+        return stream;
     }
 
     bool OpiArchive::Contains(const std::filesystem::path& name) const

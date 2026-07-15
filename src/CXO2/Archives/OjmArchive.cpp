@@ -13,7 +13,7 @@ namespace Cx
         if (fs->read(&sign[0], 3) != 3)
             return false;
 
-        delete fs.release(); // Force releasing file handle
+        fs.reset(); // Force releasing file handle
 
         const auto signature = std::string(sign, 3);
         if (signature == "M30")
