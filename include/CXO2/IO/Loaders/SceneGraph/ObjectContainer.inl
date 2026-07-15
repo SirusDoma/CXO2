@@ -16,7 +16,7 @@ namespace Cx
             if constexpr (std::is_base_of_v<Gx::Node, R>)
             {
                 result->SetName(name);
-                if (!m_importOnly && result && !std::is_base_of_v<Gx::Dialog, R>)
+                if (!m_importOnly && result && !std::is_base_of_v<Gx::Dialog, R> && !dynamic_cast<Gx::Dialog*>(result))
                     state->AddChild(*result);
             }
         }

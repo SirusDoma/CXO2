@@ -39,26 +39,6 @@ namespace Cx
                 container.Add(name, LoadFromJson<sf::Music>(name, json, context), context);
                 break;
             }
-            case ResourceMetadata::ResourceType::OptionDialog:
-            {
-                container.Add(name, LoadFromJson<OptionDialog>(name, type, json, context), context);
-                break;
-            }
-            case ResourceMetadata::ResourceType::CreateRoomDialog:
-            {
-                container.Add(name, LoadFromJson<CreateRoomDialog>(name, type, json, context), context);
-                break;
-            }
-            case ResourceMetadata::ResourceType::SelectMusicDialog:
-            {
-                container.Add(name, LoadFromJson<SelectMusicDialog>(name, type, json, context), context);
-                break;
-            }
-            case ResourceMetadata::ResourceType::Dialog:
-            {
-                container.Add(name, LoadFromJson<Gx::Dialog>(name, type, json, context), context);
-                break;
-            }
             default:
             {
                 container.Add(name, LoadFromJson<Gx::Node>(name, type, json, context), context);

@@ -196,7 +196,7 @@ namespace Cx
         m_messages.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
         {
             auto state = dynamic_cast<State*>(&Gx::Application::Instance().GetModule<Gx::SceneDirector>().GetPresentingScene());
-            state->ShowDialog("Network is not in a good condition. Please try again a little while later.", DialogStyle::Information, false, [] (bool)
+            state->ShowDialog("Network is not in a good condition.\nPlease try again a little while later.", DialogStyle::Information, false, [] (bool)
             {
                 Gx::Application::Instance().GetModule<Gx::SceneDirector>().Present<StatePlanet>();
             });

@@ -5,6 +5,8 @@
 #include <Genode/Utilities/StringHelper.hpp>
 #include <SFML/Audio/SoundSource.hpp>
 
+#include <fmt/format.h>
+
 namespace Cx
 {
     template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R> || std::is_base_of_v<sf::SoundSource, R>, int>>
@@ -26,12 +28,15 @@ namespace Cx
         R* instance = nullptr;
         if (instance = resources->Find<R>(source); !instance)
         {
-            if (instance = resources->Find<R>(GetName() + "/" + source); !instance)
+            if (instance = resources->Find<R>(fmt::format("{}/{}",  GetName(), source)); !instance)
             {
                 if constexpr (std::is_base_of_v<Gx::Node, R>)
                 {
                     if (instance = dynamic_cast<R*>(resources->Find<Gx::Node>(source)); !instance)
-                        instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+                    {
+                        if (instance = dynamic_cast<R*>(resources->Find<Gx::Node>(fmt::format("{}/{}",  GetName(), source))); !instance)
+                            instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+                    }
                 }
                 else
                 {
@@ -58,7 +63,7 @@ namespace Cx
         else if (scope == ResourceScope::Local)
             resources = m_resources.get();
 
-        auto name     = GetName() + "/" + prefab.GetName() + "_" + std::to_string(resources->Count<R>());
+        auto name     = fmt::format("{}/{}_{}", GetName(), prefab.GetName(), std::to_string(resources->Count<R>()));
         auto resource = Gx::ResourcePtr<R>(new R(prefab), [] (auto ptr) { delete ptr; });
         auto instance = resources->Store<R>(name, std::move(resource), Gx::CacheMode::None);
 
@@ -72,7 +77,7 @@ namespace Cx
     R* State::Import(Gx::ResourcePtr<R> resource, const ResourceScope scope)
     {
         if (const auto node = dynamic_cast<Gx::Node*>(resource.get()); node)
-            return Import<R>(GetName() + "/" + node->GetName(), std::move(resource), scope);
+            return Import<R>(fmt::format("{}/{}", GetName(), node->GetName()), std::move(resource), scope);
 
         return nullptr;
     }
@@ -101,7 +106,7 @@ namespace Cx
         auto name      = Gx::StringHelper::GetTypeName<R>();
 
         Gx::ResourcePtr<R> resource = std::make_unique<R>(std::forward<Args>(args)...);
-        return resources->Store(GetName() + "/" + name + "_" + std::to_string(resources->Count<R>()), std::move(resource), Gx::CacheMode::None);
+        return resources->Store(fmt::format("{}/{}_{}", GetName(), name, std::to_string(resources->Count<R>())), std::move(resource), Gx::CacheMode::None);
     }
 
     template<typename R>
@@ -119,7 +124,7 @@ namespace Cx
         if (auto resource = resources->Find<R>(id))
             return resource;
 
-        if (auto resource = resources->Find<R>(GetName() + "/" + id))
+        if (auto resource = resources->Find<R>(fmt::format("{}/{}", GetName(), id)))
             return resource;
 
         if constexpr (std::is_base_of_v<Gx::Node, R>)
@@ -127,7 +132,7 @@ namespace Cx
             if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(id)))
                 return resource;
 
-            if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(GetName() + "/" + id)))
+            if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(fmt::format("{}/{}", GetName(), id))))
                 return resource;
         }
 
