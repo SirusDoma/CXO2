@@ -4,11 +4,42 @@
 #include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 #include <CXO2/Metadata/UI/UiContainerMetadata.hpp>
 #include <CXO2/UI/Room/UserList.hpp>
+#include <CXO2/UI/Common/ChatPanel.hpp>
+#include <CXO2/UI/Waiting/MapSelector.hpp>
+#include <CXO2/UI/Waiting/InstrumentSelector.hpp>
 
 #include <CXO2/StringTable/Identifiers/Room.hpp>
+
+#include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Services/ChatService.hpp>
+#include <CXO2/Services/ChannelService.hpp>
+#include <CXO2/Avatar/ItemFactory.hpp>
+
+#include <Genode/Audio/AudioMixer.hpp>
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+
 namespace Cx
 {
     using namespace StringTable::Identifiers;
+
+    void UiContainerLoader::OnRegistered(const std::string& id)
+    {
+        ResourceLoader<Gx::UiContainer>::OnRegistered(id);
+
+        Gx::ResourceLoaderFactory::Map<Gx::UiContainer,
+            ChatPanel,
+            UserList,
+            MapSelector,
+            InstrumentSelector
+        >();
+        Gx::ResourceLoaderFactory::Map<Gx::Node,
+            ChatPanel,
+            UserList,
+            MapSelector,
+            InstrumentSelector
+        >();
+    }
 
     Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {

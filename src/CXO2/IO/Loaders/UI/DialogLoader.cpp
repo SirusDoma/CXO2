@@ -8,9 +8,39 @@
 
 #include <CXO2/StringTable/Identifiers/Cache.hpp>
 
+#include <CXO2/UI/Dialogs/OptionDialog.hpp>
+#include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
+#include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
+
+#include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/RoomContext.hpp>
+#include <CXO2/Config/GameConfig.hpp>
+#include <CXO2/Services/WaitingService.hpp>
+
+#include <Genode/Audio/AudioMixer.hpp>
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+
 namespace Cx
 {
     using namespace StringTable::Identifiers;
+
+    void DialogLoader::OnRegistered(const std::string& id)
+    {
+        ResourceLoader<Gx::Dialog>::OnRegistered(id);
+
+        Gx::ResourceLoaderFactory::Map<Gx::Dialog,
+            OptionDialog,
+            CreateRoomDialog,
+            SelectMusicDialog
+        >();
+
+        Gx::ResourceLoaderFactory::Map<Gx::Node,
+            OptionDialog,
+            CreateRoomDialog,
+            SelectMusicDialog
+        >();
+    }
 
     Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {

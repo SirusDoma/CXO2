@@ -4,6 +4,36 @@
 #include <CXO2/IO/TextureCacheBuilder.hpp>
 #include <CXO2/Metadata/SceneGraph/StateMetadata.hpp>
 
+#include <CXO2/States/StateAvi.hpp>
+#include <CXO2/States/StatePlanet.hpp>
+#include <CXO2/States/StateRoom.hpp>
+#include <CXO2/States/StateMusicShop.hpp>
+#include <CXO2/States/StateItemShop.hpp>
+#include <CXO2/States/StateMyRoom.hpp>
+#include <CXO2/States/StateBulletin.hpp>
+#include <CXO2/States/StatePayment.hpp>
+#include <CXO2/States/StateWaiting7K.hpp>
+#include <CXO2/States/StateLoading.hpp>
+#include <CXO2/States/StateResult.hpp>
+
+#include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/RoomContext.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Contexts/CartContext.hpp>
+#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/AuthService.hpp>
+#include <CXO2/Services/PlanetService.hpp>
+#include <CXO2/Services/ChatService.hpp>
+#include <CXO2/Services/ChannelService.hpp>
+#include <CXO2/Services/CharacterService.hpp>
+#include <CXO2/Services/WaitingService.hpp>
+#include <CXO2/Services/PlayingService.hpp>
+#include <CXO2/Services/ItemShopService.hpp>
+#include <CXO2/Avatar/ItemFactory.hpp>
+#include <CXO2/Core/ScoreTracker.hpp>
+
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+
 #include <magic_enum/magic_enum.hpp>
 
 namespace Cx
@@ -11,6 +41,23 @@ namespace Cx
     StateLoader::StateLoader(Gx::ResourceManager& resources)
         : m_resources(resources)
     {
+    }
+
+    void StateLoader::OnRegistered(const std::string&)
+    {
+        Gx::ResourceLoaderFactory::Map<State,
+            StateAvi,
+            StatePlanet,
+            StateRoom,
+            StateMusicShop,
+            StateItemShop,
+            StateMyRoom,
+            StateBulletin,
+            StatePayment,
+            StateWaiting7K,
+            StateLoading,
+            StateResult
+        >();
     }
 
     Gx::ResourcePtr<State> StateLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const

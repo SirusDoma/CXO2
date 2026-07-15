@@ -269,72 +269,12 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
         Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
         Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
-        // O2Jam Derived Components
-        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, ChatPanel>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, UserList>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, MapSelector>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, InstrumentSelector>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::List, RoomList>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Image, RoomButton>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Image, PlayMenu>();
-        // O2Jam Dialogs
-        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, OptionDialog>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, CreateRoomDialog>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, SelectMusicDialog>();
         // O2Jam Core Resources
         Gx::ResourceLoaderFactory::Register<O2JamChartMetadata, O2JamChartMetadataLoader>();
         Gx::ResourceLoaderFactory::Register<Chart, O2JamChartLoader>();
         // SceneGraph
         Gx::ResourceLoaderFactory::Register<State, StateLoader>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateAvi>();
-        Gx::ResourceLoaderFactory::Reuse<State, StatePlanet>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateRoom>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateMusicShop>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateItemShop>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateMyRoom>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateBulletin>();
-        Gx::ResourceLoaderFactory::Reuse<State, StatePayment>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateWaiting7K>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateLoading>();
-        Gx::ResourceLoaderFactory::Reuse<State, StateResult>();
         Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
-
-        // Map various node loaders so that `Gx::ResourceLoader<Gx::Node>` can be retrieved from these types
-        Gx::ResourceLoaderFactory::Map<Gx::Node,
-            Gx::Shape,
-            Gx::Sprite,
-            Gx::Animation,
-            Gx::Image,
-            Gx::Label,
-            Gx::ToolTip,
-            Gx::BitmapNumber,
-            Gx::Button,
-            Gx::ToggleButton,
-            Gx::RadioButton,
-            Gx::Gauge,
-            Gx::List,
-            Gx::Dialog,
-            Gx::InputField,
-            Gx::ScrollBar,
-            Gx::UiContainer,
-            Avatar,
-            Marquee,
-            ChatWindow,
-            ChannelButton,
-            ChannelBoard,
-            AvatarInfo,
-            Equalizer,
-            ChatPanel,
-            UserList,
-            MapSelector,
-            InstrumentSelector,
-            RoomList,
-            RoomButton,
-            PlayMenu,
-            OptionDialog,
-            CreateRoomDialog,
-            SelectMusicDialog
-        >();
 
         // Load global interface assets
         auto& resources = context.Require<Gx::ResourceManager>();

@@ -4,10 +4,26 @@
 #include <CXO2/IO/Loaders/SceneGraph/ObjectContainer.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
+#include <CXO2/Metadata/UI/ListMetadata.hpp>
+
+#include <CXO2/UI/Room/RoomList.hpp>
+
+#include <Genode/Audio/AudioMixer.hpp>
+#include <Genode/IO/ResourceManager.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+
 #include <magic_enum/magic_enum.hpp>
 
 namespace Cx
 {
+    void ListLoader::OnRegistered(const std::string& id)
+    {
+        ResourceLoader<Gx::List>::OnRegistered(id);
+
+        Gx::ResourceLoaderFactory::Map<Gx::List, RoomList>();
+        Gx::ResourceLoaderFactory::Map<Gx::Node, RoomList>();
+    }
+
     Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = ListMetadata();

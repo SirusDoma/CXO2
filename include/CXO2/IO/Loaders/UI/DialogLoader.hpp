@@ -12,6 +12,8 @@ namespace Cx
     public :
         DialogLoader() = default;
 
+        static void OnRegistered(const std::string& id);
+
         Gx::ResourcePtr<Gx::Dialog> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         Gx::ResourcePtr<Gx::Dialog> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };

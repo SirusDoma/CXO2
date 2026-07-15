@@ -11,6 +11,8 @@ namespace Cx
     public :
         UiContainerLoader() = default;
 
+        static void OnRegistered(const std::string& id);
+
         Gx::ResourcePtr<Gx::UiContainer> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         Gx::ResourcePtr<Gx::UiContainer> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };

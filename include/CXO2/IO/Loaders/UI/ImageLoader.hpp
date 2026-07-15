@@ -10,6 +10,8 @@ namespace Cx
     public :
         ImageLoader() = default;
 
+        static void OnRegistered(const std::string& id);
+
         Gx::ResourcePtr<Gx::Image> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         Gx::ResourcePtr<Gx::Image> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 

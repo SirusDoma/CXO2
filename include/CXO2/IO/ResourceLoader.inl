@@ -4,6 +4,8 @@
 #include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+#include <Genode/SceneGraph/Node.hpp>
 
 #include <SFML/System/MemoryInputStream.hpp>
 
@@ -12,6 +14,22 @@
 
 namespace Cx
 {
+    template<typename R>
+    template<typename U>
+    void ResourceLoader<R>::OnRegistered(const U& id)
+    {
+        if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_same_v<Gx::Node, R>)
+            Gx::ResourceLoaderFactory::Map<Gx::Node, R, U>(id);
+    }
+
+    template<typename R>
+    template<typename U>
+    void ResourceLoader<R>::OnRemoved(const U& id)
+    {
+        if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_same_v<Gx::Node, R>)
+            Gx::ResourceLoaderFactory::Remove<Gx::Node, U>(id);
+    }
+
     template<typename R>
     Gx::ResourcePtr<R> ResourceLoader<R>::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {

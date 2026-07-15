@@ -18,6 +18,12 @@ namespace Cx
 
         bool IsStreaming() const override { return Gx::ResourceLoader<R>::IsStreaming(); }
 
+        template<typename U>
+        static void OnRegistered(const U& id);
+
+        template<typename U>
+        static void OnRemoved(const U& id);
+
         virtual Gx::ResourcePtr<R> LoadFromMetadata(const ResourceMetadata& metadata, const Gx::ResourceContext& context) const = 0;
 
         Gx::ResourcePtr<R> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const override;

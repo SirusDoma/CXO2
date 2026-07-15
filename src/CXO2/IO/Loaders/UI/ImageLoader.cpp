@@ -6,10 +6,33 @@
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
 
+#include <CXO2/UI/Room/RoomButton.hpp>
+#include <CXO2/UI/Playing/PlayMenu.hpp>
+
+#include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
+
+#include <Genode/IO/ResourceLoaderFactory.hpp>
+
 #include <magic_enum/magic_enum.hpp>
 
 namespace Cx
 {
+    void ImageLoader::OnRegistered(const std::string& id)
+    {
+        ResourceLoader<Gx::Image>::OnRegistered(id);
+
+        Gx::ResourceLoaderFactory::Map<Gx::Image,
+            RoomButton,
+            PlayMenu
+        >();
+
+        Gx::ResourceLoaderFactory::Map<Gx::Node,
+            RoomButton,
+            PlayMenu
+        >();
+    }
+
     Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         ImageMetadata metadata;
