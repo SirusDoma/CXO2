@@ -106,6 +106,9 @@
 #include <CXO2/Utilities/Console.hpp>
 #include <CXO2/Resources.hpp>
 
+#include <algorithm>
+#include <filesystem>
+
 namespace Cx
 {
     O2::O2(std::string title, const sf::VideoMode& mode, const sf::View& view, const bool fullScreen, const sf::ContextSettings& settings) :
@@ -227,6 +230,7 @@ namespace Cx
         Gx::LocalFileSystem::AddAssetPath("./assets");
         Gx::LocalFileSystem::AddAssetPath("./assets/Music");
         Gx::LocalFileSystem::AddAssetPath("./Image");
+        Gx::LocalFileSystem::AddAssetPath("./Image/TEMP");
         Gx::LocalFileSystem::AddAssetPath("./Music");
 
         // -- Register resource metadata loaders
@@ -338,29 +342,77 @@ namespace Cx
             window.setIcon(*m_icon);
         }
 
+        // Mount patch packages instead of applying them to the master archive.
+        // This will keep master archive pristine while still accounting patches that are not applied by the game.
+
+        auto mountPatches = [&resources] (const std::string& target)
+        {
+            auto patches = std::vector<std::pair<unsigned long, std::string>>();
+            for (const auto& extension : { ".opi", ".opa" })
+            {
+                for (const auto& file : Gx::FileSystem::Scan(target + "*" + extension))
+                {
+                    const auto fileName = file->GetName();
+                    const auto suffix   = std::filesystem::path(fileName).stem().string().substr(target.size());
+
+                    const auto delimiter = suffix.find('_');
+                    if (delimiter == std::string::npos)
+                        continue;
+
+                    const auto archive = suffix.substr(0, delimiter);
+                    if (!archive.empty() && archive.find_first_not_of("0123456789") != std::string::npos)
+                        continue;
+
+                    const auto version = suffix.substr(delimiter + 1);
+                    if (version.empty() || version.size() > 9 || version.find_first_not_of("0123456789") != std::string::npos)
+                        continue;
+
+                    patches.emplace_back(std::stoul(version), fileName);
+                }
+            }
+
+            std::sort(patches.begin(), patches.end(), [] (const auto& a, const auto& b) { return a.first > b.first; });
+            for (const auto& entry : patches)
+            {
+                if (auto& patch = resources.Create<OpiArchive>(entry.second); patch.LoadFromFile(entry.second))
+                {
+                    patch.SetPathPrefix(target + "/");
+                    Gx::FileSystem::Mount(patch);
+                }
+            }
+        };
+
         // Do NOT throw error when master archives cannot be loaded below.
         // There could be assets that override them completely.
 
+        mountPatches("Interface");
         for (std::string name : { "Interface.opi", "Interface1.opi" })
         {
             if (image.LoadFromFile(name))
             {
+                image.SetPathPrefix("Interface/");
                 Gx::FileSystem::Mount(image);
                 break;
             }
         }
 
+        mountPatches("Playing");
         for (std::string name : { "Playing.opi", "Playing1.opi" })
         {
             if (playing.LoadFromFile(name))
             {
+                playing.SetPathPrefix("Playing/");
                 Gx::FileSystem::Mount(playing);
                 break;
             }
         }
 
+        mountPatches("Avatar");
         if (avatar.LoadFromFile("avatar.opa"))
+        {
+            avatar.SetPathPrefix("Avatar/");
             Gx::FileSystem::Mount(avatar);
+        }
 
         // Load global music assets
         auto& bgm       = resources.Create<OjmArchive>("BGM");
