@@ -240,47 +240,47 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<sf::SoundBuffer, SoundBufferLoader>();
         Gx::ResourceLoaderFactory::Register<sf::Sound, SoundLoader>();
         Gx::ResourceLoaderFactory::Register<sf::Music, MusicLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Shape, ShapeLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Sprite, SpriteLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Animation, AnimationLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Shape, ShapeLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();
         // UI
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Image, ImageLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Label, LabelLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ToolTip, ToolTipLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::BitmapNumber, BitmapNumberLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Button, ButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ToggleButton, ToggleButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::RadioButton, RadioButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Gauge, GaugeLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::List, ListLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::Dialog, DialogLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::InputField, InputFieldLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::ScrollBar, ScrollBarLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Gx::UiContainer, UiContainerLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::BitmapNumber, BitmapNumberLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::ToggleButton, ToggleButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::InputField, InputFieldLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
+        Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
         // Avatar
         Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
         Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
         Gx::ResourceLoaderFactory::Register<SetInfoData, SetInfoDataLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Avatar, AvatarLoader>();
+        Gx::ResourceLoaderFactory::Register<Avatar, AvatarLoader>();
         // O2Jam Exclusive Components
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Marquee, MarqueeLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, ChatWindow, ChatWindowLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, ChannelButton, ChannelButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, ChannelBoard, ChannelBoardLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, AvatarInfo, AvatarInfoLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Node, Equalizer, EqualizerLoader>();
+        Gx::ResourceLoaderFactory::Register<Marquee, MarqueeLoader>();
+        Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
+        Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
+        Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
+        Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
         // O2Jam Derived Components
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, ChatPanel>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, UserList>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, MapSelector>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::UiContainer, InstrumentSelector>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::List, RoomList>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Image, RoomButton>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Image, PlayMenu>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, ChatPanel>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, UserList>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, MapSelector>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::UiContainer, InstrumentSelector>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::List, RoomList>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::Image, RoomButton>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::Image, PlayMenu>();
         // O2Jam Dialogs
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, OptionDialog>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, CreateRoomDialog>();
-        Gx::ResourceLoaderFactory::Reuse<Gx::Node, Gx::Dialog, SelectMusicDialog>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, OptionDialog>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, CreateRoomDialog>();
+        Gx::ResourceLoaderFactory::Reuse<Gx::Dialog, SelectMusicDialog>();
         // O2Jam Core Resources
         Gx::ResourceLoaderFactory::Register<O2JamChartMetadata, O2JamChartMetadataLoader>();
         Gx::ResourceLoaderFactory::Register<Chart, O2JamChartLoader>();
@@ -298,6 +298,43 @@ namespace Cx
         Gx::ResourceLoaderFactory::Reuse<State, StateLoading>();
         Gx::ResourceLoaderFactory::Reuse<State, StateResult>();
         Gx::ResourceLoaderFactory::Register<StatePlaying7K, StatePlaying7KLoader>();
+
+        // Map various node loaders so that `Gx::ResourceLoader<Gx::Node>` can be retrieved from these types
+        Gx::ResourceLoaderFactory::Map<Gx::Node,
+            Gx::Shape,
+            Gx::Sprite,
+            Gx::Animation,
+            Gx::Image,
+            Gx::Label,
+            Gx::ToolTip,
+            Gx::BitmapNumber,
+            Gx::Button,
+            Gx::ToggleButton,
+            Gx::RadioButton,
+            Gx::Gauge,
+            Gx::List,
+            Gx::Dialog,
+            Gx::InputField,
+            Gx::ScrollBar,
+            Gx::UiContainer,
+            Avatar,
+            Marquee,
+            ChatWindow,
+            ChannelButton,
+            ChannelBoard,
+            AvatarInfo,
+            Equalizer,
+            ChatPanel,
+            UserList,
+            MapSelector,
+            InstrumentSelector,
+            RoomList,
+            RoomButton,
+            PlayMenu,
+            OptionDialog,
+            CreateRoomDialog,
+            SelectMusicDialog
+        >();
 
         // Load global interface assets
         auto& resources = context.Require<Gx::ResourceManager>();
