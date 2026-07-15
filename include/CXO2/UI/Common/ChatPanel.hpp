@@ -49,9 +49,9 @@ namespace Cx
         void OnChatScrollUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChatScrollDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
-        void OnChatAllCheckChanged(Gx::RadioButton& radio);
+        void OnChatAllCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev);
         void OnChatFallbackCheckChanged(Gx::RadioButton& radio);
-        void OnChatWhisperCheckChanged(Gx::RadioButton& radio);
+        void OnChatWhisperCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev);
         void OnWhisperDialogAccepted(Gx::InputField& nicknameInput, Gx::RadioButton& radio);
 
         void OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text);

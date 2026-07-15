@@ -189,7 +189,7 @@ namespace Cx
 
             button->SetCheckedState(category == m_shopCategory);
             m_shopCategoryButtons[button] = category;
-            button->SetCheckStateChangeCallback([this] (auto& sender) { OnShopCategoryCheckChanged(sender); });
+            button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnShopCategoryCheckChanged(sender, ev); });
 
             auto children = m_shopCategoryContainerMap.at(category)->GetChildren();
             for (std::size_t i = 0; i < children.size(); i++)
@@ -198,7 +198,7 @@ namespace Cx
                 {
                     radio->SetCheckedState(category == m_shopCategory && i == 0);
                     m_itemCategoryButtons[radio] = { category, i };
-                    radio->SetCheckStateChangeCallback([this] (auto& sender) { OnItemCategoryCheckChanged(sender); });
+                    radio->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnItemCategoryCheckChanged(sender, ev); });
                 }
             }
         }
@@ -652,7 +652,7 @@ namespace Cx
             avatar->Equip(m_items.Create(id));
     }
 
-    void StateItemShop::OnShopCategoryCheckChanged(Gx::RadioButton& sender)
+    void StateItemShop::OnShopCategoryCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;
@@ -689,7 +689,7 @@ namespace Cx
         }
     }
 
-    void StateItemShop::OnItemCategoryCheckChanged(Gx::RadioButton& sender)
+    void StateItemShop::OnItemCategoryCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;

@@ -38,10 +38,10 @@ namespace Cx
 
         void OnInstrumentLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnInstrumentRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnGuitarCheckChanged(Gx::RadioButton& sender);
-        void OnBassCheckChanged(Gx::RadioButton& sender);
-        void OnDrumCheckChanged(Gx::RadioButton& sender);
-        void OnKeyboardCheckChanged(Gx::RadioButton& sender);
+        void OnGuitarCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnBassCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnDrumCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnKeyboardCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
         void OnInstrumentSelectButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
 
         Gx::AudioMixer& m_mixer;

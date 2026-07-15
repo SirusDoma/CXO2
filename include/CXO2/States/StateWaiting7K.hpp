@@ -64,8 +64,8 @@ namespace Cx
         void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, RoomTeam team);
         void OnExitRoomResponded(const MessageEnvelope<ExitWaitingResponse>& ev);
 
-        void OnReadyStateChanged(Gx::ToggleButton& sender);
-        void OnStartStateChanged(Gx::ToggleButton& sender);
+        void OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnStartStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
 
         void OnSelectMusicButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnSelectMusicDialogAccepted();
@@ -73,7 +73,7 @@ namespace Cx
         void OnChangeTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChangeTitleDialogAccepted();
 
-        void OnTeamButtonStateChanged(Gx::RadioButton& sender);
+        void OnTeamButtonStateChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
         void OnInstrumentSelectorStateChanged(const ItemMetadata& metadata) const;
         void OnMapSelectorStateChanged(unsigned int mapID);
         void OnEffectSelectorStateChanged(unsigned int effectID);

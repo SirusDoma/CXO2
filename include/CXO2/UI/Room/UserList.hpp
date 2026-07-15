@@ -26,7 +26,7 @@ namespace Cx
     private:
         void OnUserListLoad(const MessageEnvelope<UserListResponse>& ev);
 
-        void OnUserButtonCheckChanged(Gx::RadioButton& sender);
+        void OnUserButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
         void OnUserButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
 
         void OnRefreshButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);

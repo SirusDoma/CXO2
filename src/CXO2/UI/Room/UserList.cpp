@@ -37,9 +37,9 @@ namespace Cx
             const auto userButton    = dynamic_cast<Gx::RadioButton*>(listChildren[i]);
             auto userNickLabel = userButton->FindChild<Gx::Label>(Resource::Room::UserList::IDC_TEXT_USER_NAME);
             m_userButtonIndices[userButton] = i;
-            userButton->SetCheckStateChangeCallback([this] (auto& sender)
+            userButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev)
             {
-                OnUserButtonCheckChanged(sender);
+                OnUserButtonCheckChanged(sender, ev);
             });
 
             for (const auto child : userButton->GetChildren())
@@ -115,7 +115,7 @@ namespace Cx
         }
     }
 
-    void UserList::OnUserButtonCheckChanged(Gx::RadioButton& sender)
+    void UserList::OnUserButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         const size_t index = ((m_page - 1) * m_userButtonCount) + m_userButtonIndices.at(&sender);
         if (index < m_users.size() && sender.IsChecked())

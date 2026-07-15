@@ -42,10 +42,10 @@ namespace Cx
 
         void Invalidate() override;
 
-        void OnGfxToggleCheckChanged(Gx::ToggleButton& sender);
-        void OnCursorToggleCheckChanged(Gx::ToggleButton& sender);
-        void OnKeyTestToggleCheckChanged(Gx::ToggleButton& sender);
-        void OnBgmToggleCheckChanged(Gx::ToggleButton& sender);
+        void OnGfxToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnCursorToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnKeyTestToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnBgmToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
 
         void OnKeyTextClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
@@ -59,8 +59,8 @@ namespace Cx
         void OnSaveButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnDefaultButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
-        void OnKeyTabCheckChanged(Gx::RadioButton& sender);
-        void OnSoundTabCheckChanged(Gx::RadioButton& sender);
+        void OnKeyTabCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnSoundTabCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
 
         Cx::State* m_parent;
         std::map<Chart::Channel, Gx::Image*> m_keyTexts, m_keyDowns;

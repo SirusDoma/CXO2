@@ -197,7 +197,7 @@ namespace Cx
                 continue;
 
             m_teamButtons[teamButton] = team;
-            teamButton->SetCheckStateChangeCallback([this] (auto& sender) { OnTeamButtonStateChanged(sender); });
+            teamButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnTeamButtonStateChanged(sender, ev); });
         }
 
         // Emoticon dialog
@@ -261,12 +261,12 @@ namespace Cx
         const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
         startButton->SetVisible(m_room.GetCurrentSlot().IsMaster);
         startButton->SetEnabled(startButton->IsVisible());
-        startButton->SetCheckStateChangeCallback([this] (auto& sender) { OnStartStateChanged(sender); });
+        startButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnStartStateChanged(sender, ev); });
 
         const auto readyButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
         readyButton->SetVisible(!m_room.GetCurrentSlot().IsMaster);
         readyButton->SetEnabled(readyButton->IsVisible());
-        readyButton->SetCheckStateChangeCallback([this] (auto& sender) { OnReadyStateChanged(sender); });
+        readyButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnReadyStateChanged(sender, ev); });
 
         const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBackButtonClicked(sender, ev); });
@@ -769,7 +769,7 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnReadyStateChanged(Gx::ToggleButton& sender)
+    void StateWaiting7K::OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
         const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
@@ -801,7 +801,7 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnStartStateChanged(Gx::ToggleButton& sender)
+    void StateWaiting7K::OnStartStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
          if (!sender.IsChecked())
             return;
@@ -994,7 +994,7 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnTeamButtonStateChanged(Gx::RadioButton& sender)
+    void StateWaiting7K::OnTeamButtonStateChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked() || !m_avatarInfo)
             return;

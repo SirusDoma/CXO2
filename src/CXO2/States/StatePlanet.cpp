@@ -89,7 +89,7 @@ namespace Cx
                     m_mixer.Play(*hoverSfx, Sound::Channel::SFX);
             });
 
-            radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender)
+            radio->SetCheckStateChangeCallback([&, channelBoard, hall = musicHall, clickSfx] (auto& sender, auto& ev)
             {
                 if (!sender.IsChecked() || channelBoard->InTransition())
                     return;

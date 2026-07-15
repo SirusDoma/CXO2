@@ -65,11 +65,11 @@ namespace Cx
             const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER);
 
             btnChatAll->SetCheckedState(true);
-            btnChatAll->SetCheckStateChangeCallback([this] (auto& radio) { OnChatAllCheckChanged(radio); });
+            btnChatAll->SetCheckStateChangeCallback([this] (auto& radio, auto& ev) { OnChatAllCheckChanged(radio, ev); });
 
-            btnChatFriend->SetCheckStateChangeCallback([this] (auto& radio) { OnChatFallbackCheckChanged(radio); });
-            btnChatGuild->SetCheckStateChangeCallback([this] (auto& radio) { OnChatFallbackCheckChanged(radio); });
-            btnChatWhisper->SetCheckStateChangeCallback([this] (auto& radio) { OnChatWhisperCheckChanged(radio); });
+            btnChatFriend->SetCheckStateChangeCallback([this] (auto& radio, auto&) { OnChatFallbackCheckChanged(radio); });
+            btnChatGuild->SetCheckStateChangeCallback([this] (auto& radio, auto&) { OnChatFallbackCheckChanged(radio); });
+            btnChatWhisper->SetCheckStateChangeCallback([this] (auto& radio, auto& ev) { OnChatWhisperCheckChanged(radio, ev); });
         }
 
         const auto chatInput = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT);
@@ -209,7 +209,7 @@ namespace Cx
         scrollChat->Increase();
     }
 
-    void ChatPanel::OnChatAllCheckChanged(Gx::RadioButton& radio)
+    void ChatPanel::OnChatAllCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev)
     {
         if (radio.IsChecked())
             m_recipient = {};
@@ -224,7 +224,7 @@ namespace Cx
             btnChatAll->SetCheckedState(true);
     }
 
-    void ChatPanel::OnChatWhisperCheckChanged(Gx::RadioButton& radio)
+    void ChatPanel::OnChatWhisperCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev)
     {
         const auto parent = GetParent<Cx::State>();
         if (!parent)

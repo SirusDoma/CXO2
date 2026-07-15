@@ -37,8 +37,8 @@ namespace Cx
     private:
         void OnMapLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnMapRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMapSelectTopCheckChanged(Gx::RadioButton& sender);
-        void OnMapSelectBottomCheckChanged(Gx::RadioButton& sender);
+        void OnMapSelectTopCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnMapSelectBottomCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
 
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;

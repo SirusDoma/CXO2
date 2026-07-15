@@ -62,8 +62,8 @@ namespace Cx
         void OnShopMasterClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnDefaultButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
-        void OnShopCategoryCheckChanged(Gx::RadioButton& sender);
-        void OnItemCategoryCheckChanged(Gx::RadioButton& sender);
+        void OnShopCategoryCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnItemCategoryCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
 
         void OnPlanetUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnPlanetDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);

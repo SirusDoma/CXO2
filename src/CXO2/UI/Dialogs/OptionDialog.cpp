@@ -58,11 +58,11 @@ namespace Cx
         const auto keyBar    = keySelect->FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_KEY_BAR);
 
         const auto gfxToggleButton = gameOption->FindChild<Gx::ToggleButton>(Resource::Option::IDC_TOGGLE_GFX);
-        gfxToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnGfxToggleCheckChanged(sender); });
+        gfxToggleButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnGfxToggleCheckChanged(sender, ev); });
         const auto cursorToggleButton  = gameOption->FindChild<Gx::ToggleButton>(Resource::Option::IDC_TOGGLE_CURSOR);
-        cursorToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnCursorToggleCheckChanged(sender); });
+        cursorToggleButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnCursorToggleCheckChanged(sender, ev); });
         const auto keyTestToggleButton = gameOption->FindChild<Gx::ToggleButton>(Resource::Option::IDC_TOGGLE_KEY_TEST);
-        keyTestToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnKeyTestToggleCheckChanged(sender); });
+        keyTestToggleButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnKeyTestToggleCheckChanged(sender, ev); });
         keyTestToggleButton->SetCheckedState(false);
 
         m_keyChannel = Chart::Channel::Note1;
@@ -86,7 +86,7 @@ namespace Cx
         }
 
         const auto bgmToggleButton = musicOption->FindChild<Gx::ToggleButton>(Resource::Option::IDC_TOGGLE_BGM);
-        bgmToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnBgmToggleCheckChanged(sender); });
+        bgmToggleButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnBgmToggleCheckChanged(sender, ev); });
 
         const auto btnMasterVolumeUp   = musicOption->FindChild<Gx::Button>(Resource::Option::IDC_BUTTON_MASTER_UP);
         const auto btnMasterVolumeDown = musicOption->FindChild<Gx::Button>(Resource::Option::IDC_BUTTON_MASTER_DOWN);
@@ -114,23 +114,23 @@ namespace Cx
         const auto keyTab   = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_KEY_TAB);
         const auto soundTab = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_SOUND_TAB);
 
-        keyTab->SetCheckStateChangeCallback([this] (auto& sender) { OnKeyTabCheckChanged(sender); });
-        soundTab->SetCheckStateChangeCallback([this] (auto& sender) { OnSoundTabCheckChanged(sender); });
+        keyTab->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnKeyTabCheckChanged(sender, ev); });
+        soundTab->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnSoundTabCheckChanged(sender, ev); });
 
         m_initialized = true;
     }
 
-    void OptionDialog::OnGfxToggleCheckChanged(Gx::ToggleButton& sender)
+    void OptionDialog::OnGfxToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         m_tempConfig.UseFx = sender.IsChecked();
     }
 
-    void OptionDialog::OnCursorToggleCheckChanged(Gx::ToggleButton& sender)
+    void OptionDialog::OnCursorToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         m_tempConfig.UseWindowCursor = sender.IsChecked();
     }
 
-    void OptionDialog::OnKeyTestToggleCheckChanged(Gx::ToggleButton& sender)
+    void OptionDialog::OnKeyTestToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         const auto gameOption = FindChild<Gx::UiContainer>(Resource::Option::IDC_CONTAINER_GAME_OPTION);
         const auto keySelect  = gameOption->FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_KEY_SELECT);
@@ -141,7 +141,7 @@ namespace Cx
         keySelect->SetVisible(!m_keyTestEnabled);
     }
 
-    void OptionDialog::OnBgmToggleCheckChanged(Gx::ToggleButton& sender)
+    void OptionDialog::OnBgmToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         m_tempConfig.UseBGM = sender.IsChecked();
     }
@@ -307,7 +307,7 @@ namespace Cx
         toolTip->Show(this);
     }
 
-    void OptionDialog::OnKeyTabCheckChanged(Gx::RadioButton& sender)
+    void OptionDialog::OnKeyTabCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;
@@ -351,7 +351,7 @@ namespace Cx
         musicOption->SetVisible(false);
     }
 
-    void OptionDialog::OnSoundTabCheckChanged(Gx::RadioButton& sender)
+    void OptionDialog::OnSoundTabCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;

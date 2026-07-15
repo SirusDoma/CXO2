@@ -40,28 +40,28 @@ namespace Cx
         {
             guitar->SetVisible(false);
             guitar->SetEnabled(false);
-            guitar->SetCheckStateChangeCallback([this] (auto& sender) { OnGuitarCheckChanged(sender); });
+            guitar->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnGuitarCheckChanged(sender, ev); });
         }
 
         if (const auto bass = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_BASS); bass)
         {
             bass->SetVisible(false);
             bass->SetEnabled(false);
-            bass->SetCheckStateChangeCallback([this] (auto& sender) { OnBassCheckChanged(sender); });
+            bass->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnBassCheckChanged(sender, ev); });
         }
 
         if (const auto drum = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_DRUM); drum)
         {
             drum->SetVisible(false);
             drum->SetEnabled(false);
-            drum->SetCheckStateChangeCallback([this] (auto& sender) { OnDrumCheckChanged(sender); });
+            drum->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnDrumCheckChanged(sender, ev); });
         }
 
         if (const auto keyboard = FindChild<Gx::RadioButton>(Resource::Instrument::IDC_RADIO_KEYBOARD); keyboard)
         {
             keyboard->SetVisible(false);
             keyboard->SetEnabled(false);
-            keyboard->SetCheckStateChangeCallback([this] (auto& sender) { OnKeyboardCheckChanged(sender); });
+            keyboard->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnKeyboardCheckChanged(sender, ev); });
         }
 
         Invalidate();
@@ -245,22 +245,22 @@ namespace Cx
         Invalidate();
     }
 
-    void InstrumentSelector::OnGuitarCheckChanged(Gx::RadioButton& sender)
+    void InstrumentSelector::OnGuitarCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectInstrument(sender, Instrument::Guitar);
     }
 
-    void InstrumentSelector::OnBassCheckChanged(Gx::RadioButton& sender)
+    void InstrumentSelector::OnBassCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectInstrument(sender, Instrument::Bass);
     }
 
-    void InstrumentSelector::OnDrumCheckChanged(Gx::RadioButton& sender)
+    void InstrumentSelector::OnDrumCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectInstrument(sender, Instrument::Drum);
     }
 
-    void InstrumentSelector::OnKeyboardCheckChanged(Gx::RadioButton& sender)
+    void InstrumentSelector::OnKeyboardCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectInstrument(sender, Instrument::Keyboard);
     }

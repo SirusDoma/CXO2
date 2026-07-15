@@ -35,11 +35,11 @@ namespace Cx
         void OnJamModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnVersusModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnSingleModeButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnJamModeButtonCheckChanged(Gx::RadioButton& sender);
-        void OnVersusModeButtonCheckChanged(Gx::RadioButton& sender);
-        void OnSingleModeButtonCheckChanged(Gx::RadioButton& sender);
+        void OnJamModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnVersusModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnSingleModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
 
-        void OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender);
+        void OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
 
         bool m_initialized = false;
         SessionContext& m_session;

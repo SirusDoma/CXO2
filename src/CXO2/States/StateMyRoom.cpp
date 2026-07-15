@@ -271,7 +271,7 @@ namespace Cx
         });
 
         const auto inventoryButton = Instantiate<Gx::ToggleButton>(Resource::MyRoom::IDC_TOGGLE_INVENTORY);
-        inventoryButton->SetCheckStateChangeCallback([=] (auto& sender)
+        inventoryButton->SetCheckStateChangeCallback([=] (auto& sender, auto& ev)
         {
             statusPanel->SetVisible(sender.IsChecked());
             statusPanel->SetEnabled(sender.IsChecked());

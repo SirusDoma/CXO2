@@ -56,27 +56,27 @@ namespace Cx
         passwordInput->SetMasked(true);
         passwordInput->SetMaximumTextLength(12);
 
-        levelLimitToggleButton->SetCheckStateChangeCallback([this] (auto& sender) { OnLevelLimitToggleCheckChanged(sender); });
+        levelLimitToggleButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnLevelLimitToggleCheckChanged(sender, ev); });
 
         minLevelLimitInput->SetNumericModeEnabled(true);
         maxLevelLimitInput->SetNumericModeEnabled(true);
 
         jamModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnJamModeButtonClicked(sender, ev); });
-        jamModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnJamModeButtonCheckChanged(sender); });
+        jamModeButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnJamModeButtonCheckChanged(sender, ev); });
         jamAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
             jamAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
         });
 
         versusModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnVersusModeButtonClicked(sender, ev); });
-        versusModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnVersusModeButtonCheckChanged(sender); });
+        versusModeButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnVersusModeButtonCheckChanged(sender, ev); });
         versusAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
             versusAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
         });
 
         singleModeButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSingleModeButtonClicked(sender, ev); });
-        singleModeButton->SetCheckStateChangeCallback([this] (auto& sender) { OnSingleModeButtonCheckChanged(sender); });
+        singleModeButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnSingleModeButtonCheckChanged(sender, ev); });
         singleAnimation->SetAnimationCallback([=] (const Gx::Animation& sender)
         {
             singleAnimation->SetVisible(sender.GetState() == Gx::Animation::AnimationState::Initial || sender.GetState() == Gx::Animation::AnimationState::Playing);
@@ -109,7 +109,7 @@ namespace Cx
         m_mixer.Play(*sfxClick, Sound::Channel::SFX);
     }
 
-    void CreateRoomDialog::OnJamModeButtonCheckChanged(Gx::RadioButton& sender)
+    void CreateRoomDialog::OnJamModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;
@@ -132,7 +132,7 @@ namespace Cx
         versusModeButton->SetCheckedState(true);
     }
 
-    void CreateRoomDialog::OnVersusModeButtonCheckChanged(Gx::RadioButton& sender)
+    void CreateRoomDialog::OnVersusModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         const auto versusModeButton = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_VERSUS_MODE);
         const auto versusAnimation  = versusModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_VERSUS);
@@ -141,7 +141,7 @@ namespace Cx
         versusAnimation->SetRepeatCount(sender.IsChecked() ? 3 : 1);
     }
 
-    void CreateRoomDialog::OnSingleModeButtonCheckChanged(Gx::RadioButton& sender)
+    void CreateRoomDialog::OnSingleModeButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         const auto singleModeButton       = FindChild<Gx::RadioButton>(Resource::Room::CreateRoom::IDC_RADIO_SINGLE_MODE);
         const auto singleAnimation        = singleModeButton->FindChild<Gx::Animation>(Resource::Room::CreateRoom::IDC_ANIMATION_SINGLE);
@@ -160,7 +160,7 @@ namespace Cx
             passwordInput->SetString("");
     }
 
-    void CreateRoomDialog::OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender)
+    void CreateRoomDialog::OnLevelLimitToggleCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         const auto minLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MIN_LEVEL_LIMIT);
         const auto maxLevelLimitInput = FindChild<Gx::InputField>(Resource::Room::CreateRoom::IDC_EDIT_MAX_LEVEL_LIMIT);

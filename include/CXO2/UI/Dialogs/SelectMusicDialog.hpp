@@ -56,19 +56,19 @@ namespace Cx
         void OnRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
         void OnMusicButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicButtonCheckChanged(Gx::RadioButton& sender);
+        void OnMusicButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
         void OnMusicSelectorScrolled(Gx::Control& sender, Gx::Control::Event& ev);
 
         void OnSortNewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnSortTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnSortLevelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnSortDurationButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnGenreButtonCheckChanged(Gx::RadioButton& sender);
-        void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender);
-        void OnExButtonCheckChanged(Gx::RadioButton& sender);
-        void OnNxButtonCheckChanged(Gx::RadioButton& sender);
-        void OnHxButtonCheckChanged(Gx::RadioButton& sender);
-        void OnSpeedButtonCheckChanged(Gx::RadioButton& sender);
+        void OnGenreButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnExButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnNxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnHxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnSpeedButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
 
         bool         m_initialized = false;
         unsigned int m_page = 0;

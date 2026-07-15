@@ -76,10 +76,10 @@ namespace Cx
             mapRightCover->SetVisible(false);
 
         const auto mapEffectTopButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_TOP);
-        mapEffectTopButton->SetCheckStateChangeCallback([this] (auto& sender) { OnMapSelectTopCheckChanged(sender); });
+        mapEffectTopButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnMapSelectTopCheckChanged(sender, ev); });
 
         const auto mapEffectBottomButton = FindChild<Gx::RadioButton>(Resource::Map::IDC_RADIO_MAP_SELECT_BOTTOM);
-        mapEffectBottomButton->SetCheckStateChangeCallback([this] (auto& sender) { OnMapSelectBottomCheckChanged(sender); });
+        mapEffectBottomButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnMapSelectBottomCheckChanged(sender, ev); });
     }
 
     unsigned int MapSelector::GetMapID() const
@@ -234,13 +234,13 @@ namespace Cx
         SetMapID(static_cast<int>(m_mapID) + 1);
     }
 
-    void MapSelector::OnMapSelectTopCheckChanged(Gx::RadioButton& sender)
+    void MapSelector::OnMapSelectTopCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (sender.IsChecked())
             SetEffectID(1);
     }
 
-    void MapSelector::OnMapSelectBottomCheckChanged(Gx::RadioButton& sender)
+    void MapSelector::OnMapSelectBottomCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (sender.IsChecked())
             SetEffectID(2);

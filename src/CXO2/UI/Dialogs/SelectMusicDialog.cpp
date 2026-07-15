@@ -94,7 +94,7 @@ namespace Cx
                 button->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnMusicButtonFocusChanged(sender, ev); });
 
                 m_musicButtonIndices[button] = i;
-                button->SetCheckStateChangeCallback([this] (auto& sender) { OnMusicButtonCheckChanged(sender); });
+                button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnMusicButtonCheckChanged(sender, ev); });
             }
 
             list->SetScrollWheelCallback([this] (auto& sender, auto& ev) { OnMusicSelectorScrolled(sender, ev); });
@@ -150,7 +150,7 @@ namespace Cx
                     continue;
 
                 m_genreButtonValues[button] = genre;
-                button->SetCheckStateChangeCallback([this] (auto& sender) { OnGenreButtonCheckChanged(sender); });
+                button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnGenreButtonCheckChanged(sender, ev); });
             }
         }
 
@@ -170,7 +170,7 @@ namespace Cx
                     continue;
 
                 m_randomLevelButtonValues[button] = level;
-                button->SetCheckStateChangeCallback([this] (auto& sender) { OnRandomLevelButtonCheckChanged(sender); });
+                button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnRandomLevelButtonCheckChanged(sender, ev); });
             }
         }
 
@@ -179,17 +179,17 @@ namespace Cx
             if (auto exButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_EX); exButton)
             {
                 exButton->SetCheckedState(true);
-                exButton->SetCheckStateChangeCallback([this] (auto& sender) { OnExButtonCheckChanged(sender); });
+                exButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnExButtonCheckChanged(sender, ev); });
             }
 
             if (auto nxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_NX); nxButton)
             {
-                nxButton->SetCheckStateChangeCallback([this] (auto& sender) { OnNxButtonCheckChanged(sender); });
+                nxButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnNxButtonCheckChanged(sender, ev); });
             }
 
             if (auto hxButton = levelSelector->FindChild<Gx::RadioButton>(Resource::SelectMusic::Difficulty::IDC_RADIO_NOTE_HX); hxButton)
             {
-                hxButton->SetCheckStateChangeCallback([this] (auto& sender) { OnHxButtonCheckChanged(sender); });
+                hxButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnHxButtonCheckChanged(sender, ev); });
             }
         }
 
@@ -240,7 +240,7 @@ namespace Cx
                     button->SetCheckedState(true);
 
                 m_speedButtonValues[button] = speed;
-                button->SetCheckStateChangeCallback([this] (auto& sender) { OnSpeedButtonCheckChanged(sender); });
+                button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnSpeedButtonCheckChanged(sender, ev); });
             }
         }
 
@@ -280,7 +280,7 @@ namespace Cx
             focusHighlighter->SetVisible(sender.IsEnabled() && ev.State != State::Normal);
     }
 
-    void SelectMusicDialog::OnMusicButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnMusicButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         const auto listSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
         if (!sender.IsChecked())
@@ -341,7 +341,7 @@ namespace Cx
         ToggleSort(MusicSortMode::Duration);
     }
 
-    void SelectMusicDialog::OnGenreButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnGenreButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;
@@ -371,7 +371,7 @@ namespace Cx
             Invalidate();
     }
 
-    void SelectMusicDialog::OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender)
+    void SelectMusicDialog::OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
         const auto lv = m_randomLevelButtonValues.at(&sender);
         if (sender.IsChecked())
@@ -451,22 +451,22 @@ namespace Cx
             Invalidate();
     }
 
-    void SelectMusicDialog::OnExButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnExButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectDifficulty(sender, Difficulty::EX);
     }
 
-    void SelectMusicDialog::OnNxButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnNxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectDifficulty(sender, Difficulty::NX);
     }
 
-    void SelectMusicDialog::OnHxButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnHxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         SelectDifficulty(sender, Difficulty::HX);
     }
 
-    void SelectMusicDialog::OnSpeedButtonCheckChanged(Gx::RadioButton& sender)
+    void SelectMusicDialog::OnSpeedButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
     {
         if (!sender.IsChecked())
             return;
