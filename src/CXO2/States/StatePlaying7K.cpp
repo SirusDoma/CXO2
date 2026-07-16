@@ -419,9 +419,9 @@ namespace Cx
         (
             sf::seconds(2.f),
             sf::seconds(1.f / 60.f),
-            [this, lifeBar] (const auto& task, auto delta)
+            [this, lifeBar] (const auto& task, const sf::Time& delta)
             {
-                lifeBar->SetValue(lifeBar->GetValue() + m_lifeSystem.GetMaxLifePoint() / (2.f / (delta / 1000.f)));
+                lifeBar->SetValue(lifeBar->GetValue() + m_lifeSystem.GetMaxLifePoint() / (2.f / delta.asSeconds()));
                 if (task.GetState() == Gx::TaskState::Completed)
                 {
                     lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
