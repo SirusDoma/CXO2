@@ -200,7 +200,6 @@ message("-- Output Directory: " ${OUTPUT_DIR})
 # Application includes
 target_include_directories(${TARGET} PRIVATE src)
 target_include_directories(${TARGET} PRIVATE include)
-target_include_directories(${TARGET} PRIVATE modules/Genode/include)
 target_include_directories(${TARGET} PRIVATE extlibs/headers)
 target_include_directories(${TARGET} PRIVATE extlibs/libs/internal)
 
@@ -236,7 +235,6 @@ add_executable(ResourceCompiler
 # Resource Compiler includes and dependencies
 target_include_directories(ResourceCompiler PRIVATE include)
 target_include_directories(ResourceCompiler PRIVATE extlibs/headers)
-target_include_directories(ResourceCompiler PRIVATE modules/Genode/include)
 target_link_libraries(ResourceCompiler PRIVATE Genode)
 target_link_libraries(ResourceCompiler PRIVATE nlohmann_json::nlohmann_json)
 
