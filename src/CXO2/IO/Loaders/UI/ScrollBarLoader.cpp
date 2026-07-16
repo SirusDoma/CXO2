@@ -3,7 +3,7 @@
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Metadata/UI/ScrollBarMetadata.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 namespace Cx
 {
@@ -55,15 +55,15 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
-    
-        auto scrollBar =Instantiate(context);
+            return Instantiate(context);
+
+        auto scrollBar = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             scrollBar->SetTexture(*texture);
             scrollBar->SetTexCoords(metadata->TexCoords);
-            scrollBar->SetPosition(metadata->Position);
+            scrollBar->SetPosition(metadata->Position.value_or(sf::Vector2f()));
             scrollBar->SetLocalBounds({
                 {
                     static_cast<float>(metadata->Bounds.position.x),
@@ -82,14 +82,14 @@ namespace Cx
                 scrollBar->SetTexture(sheet->GetTexture());
                 if (metadata->TexCoords != sf::IntRect())
                     scrollBar->SetTexCoords(metadata->TexCoords);
-                else
+                else if (!sheet->TexCoords.empty())
                     scrollBar->SetTexCoords(sheet->TexCoords[0]);
             }
 
             const auto bound = ctx.Require<sf::IntRect>(*metadata);
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                scrollBar->SetPosition(metadata->Position);
+                scrollBar->SetPosition(*metadata->Position);
             }
             else if (bound)
             {
@@ -133,7 +133,7 @@ namespace Cx
         scrollBar->SetScale(metadata->Scale);
         scrollBar->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(scrollBar.get());
+        auto container = SceneComposer::Compose(*scrollBar);
         LoadChildren(container, meta, context);
 
         return scrollBar;

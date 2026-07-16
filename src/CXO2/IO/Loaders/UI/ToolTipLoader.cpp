@@ -2,7 +2,7 @@
 #include <CXO2/IO/Loaders/UI/LabelLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 namespace Cx
 {
@@ -104,7 +104,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto toolTip = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -127,11 +127,11 @@ namespace Cx
         toolTip->SetString(metadata->String);
 
         toolTip->SetOrigin(metadata->Origin);
-        toolTip->SetPosition(metadata->Position);
+        toolTip->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         toolTip->SetScale(metadata->Scale);
         toolTip->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(toolTip.get());
+        auto container = SceneComposer::Compose(*toolTip);
         LoadChildren(container, meta, context);
 
         return toolTip;

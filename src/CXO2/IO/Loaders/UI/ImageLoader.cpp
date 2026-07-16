@@ -4,7 +4,7 @@
 
 #include <CXO2/Metadata/UI/ImageMetadata.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/UI/Room/RoomButton.hpp>
 #include <CXO2/UI/Playing/PlayMenu.hpp>
@@ -18,9 +18,9 @@
 
 namespace Cx
 {
-    void ImageLoader::OnRegistered(const std::string& id)
+    void ImageLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::Image>::OnRegistered(id);
+        ResourceLoader<Gx::Image>::OnRegistered(id, builder);
 
         Gx::ResourceLoaderFactory::Map<Gx::Image,
             RoomButton,
@@ -56,7 +56,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto image = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -83,9 +83,9 @@ namespace Cx
                 image->SetLocalBounds(metadata->Bounds);
             }
 
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                image->SetPosition(metadata->Position);
+                image->SetPosition(*metadata->Position);
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -117,7 +117,10 @@ namespace Cx
                         if (frame.Value.TexCoords == sf::IntRect())
                         {
                             if (frame.ID.has_value())
-                                frame.Value.TexCoords = sheet->TexCoords[frame.ID.value()];
+                            {
+                                if (frame.ID.value() < sheet->TexCoords.size())
+                                    frame.Value.TexCoords = sheet->TexCoords[frame.ID.value()];
+                            }
                             else if (i < sheet->TexCoords.size())
                                 frame.Value.TexCoords = sheet->TexCoords[i];
                         }
@@ -126,11 +129,14 @@ namespace Cx
                         {
                             if (frame.ID.has_value())
                             {
-                                const auto& base = sheet->Frames[frame.ID.value()];
-                                frame.Value.Position = {
-                                    static_cast<float>(base.position.x),
-                                    static_cast<float>(base.position.y),
-                                };
+                                if (frame.ID.value() < sheet->Frames.size())
+                                {
+                                    const auto& base = sheet->Frames[frame.ID.value()];
+                                    frame.Value.Position = {
+                                        static_cast<float>(base.position.x),
+                                        static_cast<float>(base.position.y),
+                                    };
+                                }
                             }
                             else
                                 frame.Value.Position = image->GetPosition();
@@ -153,8 +159,9 @@ namespace Cx
                 }
                 else
                 {
-                    image->SetTexCoords(sheet->TexCoords[0]);
-                    if (image->GetPosition() == sf::Vector2f())
+                    if (!sheet->TexCoords.empty())
+                        image->SetTexCoords(sheet->TexCoords[0]);
+                    if (image->GetPosition() == sf::Vector2f() && !sheet->Frames.empty())
                     {
                         image->SetPosition(sf::Vector2f{
                             static_cast<float>(sheet->Frames[0].position.x),
@@ -171,7 +178,7 @@ namespace Cx
         image->SetScale(metadata->Scale);
         image->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(image.get());
+        auto container = SceneComposer::Compose(*image);
         LoadChildren(container, meta, context);
 
         return image;
@@ -220,7 +227,7 @@ namespace Cx
                 {
                     metadata.TexCoords,
                     metadata.Origin,
-                    metadata.Position,
+                    metadata.Position.value_or(sf::Vector2f()),
                     metadata.Rotation,
                     metadata.Scale
                 }
@@ -232,7 +239,7 @@ namespace Cx
         for (auto [frameName, frameAttr] : frames->items())
         {
             auto frame = Gx::Image::Frame();
-            auto position = metadata.Position;
+            auto position = metadata.Position.value_or(sf::Vector2f());
             if (auto p = frameAttr.find("position"); p != frameAttr.end())
             {
                 position = sf::Vector2f();

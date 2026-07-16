@@ -36,13 +36,10 @@ namespace Cx
         if (!parent)
             return sf::IntRect{};
 
-        auto resolve = [] (const std::any& resource) -> std::string
+        auto resolve = [] (const Gx::Json& resource) -> std::string
         {
-            if (resource.type() == typeid(Gx::Json))
-                return std::any_cast<Gx::Json>(resource).get<std::string>();
-
-            if (resource.type() == typeid(std::string))
-                return std::any_cast<std::string>(resource);
+            if (resource.is_string())
+                return resource.get<std::string>();
 
             return std::string();
         };

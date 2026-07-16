@@ -3,7 +3,7 @@
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/Metadata/UI/RadioButtonMetadata.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/IO/Loaders/UI/ButtonLoader.hpp>
 
 namespace Cx
@@ -28,14 +28,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const RadioButtonMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto radio = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             radio->SetTexture(*texture);
-            radio->SetPosition(metadata->Position);
+            radio->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             for (const auto& [state, frame] : metadata->States)
                 radio->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
@@ -43,9 +43,9 @@ namespace Cx
         else
         {
             auto bound = sf::IntRect();
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                radio->SetPosition(metadata->Position);
+                radio->SetPosition(*metadata->Position);
             }
             else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
             {
@@ -70,7 +70,7 @@ namespace Cx
                 radio->SetTexture(sheet->GetTexture());
                 if (sheet->Frames.size() > 1)
                 {
-                    if (metadata->Position == sf::Vector2f() && sheet->Frames[0].position != sf::Vector2i())
+                    if (!metadata->Position.has_value() && sheet->Frames[0].position != sf::Vector2i())
                     {
                         auto base = ctx.GetParentBound();
                         radio->SetPosition(sf::Vector2f{
@@ -160,7 +160,7 @@ namespace Cx
         radio->SetScale(metadata->Scale);
         radio->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(radio.get());
+        auto container = SceneComposer::Compose(*radio);
         LoadChildren(container, meta, context);
 
         return radio;

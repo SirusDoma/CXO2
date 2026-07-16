@@ -1,6 +1,6 @@
 #include <CXO2/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/IO/TextureCacheBuilder.hpp>
 #include <CXO2/Metadata/SceneGraph/StateMetadata.hpp>
 
@@ -43,7 +43,7 @@ namespace Cx
     {
     }
 
-    void StateLoader::OnRegistered(const std::string&)
+    void StateLoader::OnRegistered(const std::string&, const Builder&)
     {
         Gx::ResourceLoaderFactory::Map<State,
             StateAvi,
@@ -81,33 +81,25 @@ namespace Cx
         auto state = Instantiate(context);
         state->SetName(meta.Name);
 
-        for (auto [key, value] : meta.Require)
+        auto load = [&] (const std::string& key, const Gx::Json& object, const bool instantiate)
         {
-            auto reference = std::any_cast<Gx::Json>(value);
-            if (reference.type() != Gx::Json::value_t::string)
-                continue;
-
-            // Rewire resource manager to the local scene
-            auto container = ObjectContainer::Decorate(state.get(), true);
+            auto composer = SceneComposer::Compose(*state, instantiate);
             auto name = fmt::format("{}/{}", meta.Name, key);
             auto ctx  = Gx::ResourceContext(name, m_resources, context.GetCacheMode());
-            for (const auto& [key, value] : context.GetProperties())
-                ctx.SetProperty(key, value);
+            for (const auto& [property, value] : context.GetProperties())
+                ctx.SetProperty(property, value);
 
-            ObjectLoader::LoadFromJson(name, reference, container, ctx);
+            composer.Add(name, object, ctx);
+        };
+
+        for (const auto& [key, reference] : meta.Require)
+        {
+            if (reference.is_string())
+                load(key, reference, false);
         }
 
         for (const auto& [key, object] : metadata->Objects)
-        {
-            // Rewire resource manager to the local scene
-            auto container = ObjectContainer::Decorate(state.get());
-            auto name = fmt::format("{}/{}", meta.Name, key);
-            auto ctx  = Gx::ResourceContext(name, m_resources, context.GetCacheMode());
-            for (const auto& [key, value] : context.GetProperties())
-                ctx.SetProperty(key, value);
-
-            ObjectLoader::LoadFromJson(name, object, container, ctx);
-        }
+            load(key, object, true);
 
         return state;
     }

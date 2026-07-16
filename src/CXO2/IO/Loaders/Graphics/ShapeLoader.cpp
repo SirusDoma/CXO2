@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/Graphics/ShapeLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/Metadata/Graphics/ShapeMetadata.hpp>
@@ -39,7 +39,7 @@ namespace Cx
                 auto circle = dynamic_cast<CircleMetadata*>(metadata.get());
 
                 auto radius = attributes.find("radius");
-                if (type != attributes.end())
+                if (radius != attributes.end())
                     circle->Radius = radius->get<float>();
                 else
                     circle->Radius = 0;
@@ -104,7 +104,7 @@ namespace Cx
                     rectangle->Height = 0;
 
                 auto radius = attributes.find("cornerRadius");
-                if (type != attributes.end())
+                if (radius != attributes.end())
                     rectangle->CornerRadius = radius->get<float>();
                 else
                     rectangle->CornerRadius = 1.f;
@@ -185,34 +185,38 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ShapeMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
-    
+            return Instantiate(context);
+
         std::unique_ptr<Gx::Shape> shape;
         if (metadata->ShapeType == ShapeMetadata::Type::Circle)
         {
-            const auto circle = dynamic_cast<const CircleMetadata*>(&meta);
-            shape = std::make_unique<Gx::Circle>(circle->Radius, circle->PointCount);
-
+            if (const auto circle = dynamic_cast<const CircleMetadata*>(&meta))
+                shape = std::make_unique<Gx::Circle>(circle->Radius, circle->PointCount);
         }
         else if (metadata->ShapeType == ShapeMetadata::Type::Polygon)
         {
-            const auto polyMeta = dynamic_cast<const PolygonMetadata*>(&meta);
-            auto polygon = std::make_unique<Gx::Polygon>(polyMeta->PointCount);
-            for (std::size_t i = 0; i < polyMeta->Points.size(); i++)
-                polygon->SetPoint(i, polyMeta->Points[i]);
+            if (const auto polyMeta = dynamic_cast<const PolygonMetadata*>(&meta))
+            {
+                auto polygon = std::make_unique<Gx::Polygon>(polyMeta->PointCount);
+                for (std::size_t i = 0; i < polyMeta->Points.size(); i++)
+                    polygon->SetPoint(i, polyMeta->Points[i]);
 
-            shape = std::move(polygon);
+                shape = std::move(polygon);
+            }
         }
         else if (metadata->ShapeType == ShapeMetadata::Type::Rectangle)
         {
-            const auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta);
-            shape = std::make_unique<Gx::Rectangle>(sf::Vector2f(rectangle->Width, rectangle->Height));
+            if (const auto rectangle = dynamic_cast<const RectangleMetadata*>(&meta))
+                shape = std::make_unique<Gx::Rectangle>(sf::Vector2f(rectangle->Width, rectangle->Height));
         }
         else if (metadata->ShapeType == ShapeMetadata::Type::RoundedRectangle)
         {
-            const auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta);
-            shape = std::make_unique<Gx::RoundedRectangle>(sf::Vector2f(rectangle->Width, rectangle->Height), rectangle->CornerRadius, rectangle->CornerPointCount);
+            if (const auto rectangle = dynamic_cast<const RoundedRectangleMetadata*>(&meta))
+                shape = std::make_unique<Gx::RoundedRectangle>(sf::Vector2f(rectangle->Width, rectangle->Height), rectangle->CornerRadius, rectangle->CornerPointCount);
         }
+
+        if (!shape)
+            return Instantiate(context);
 
         shape->SetTexCoords(metadata->TexCoords);
 
@@ -223,9 +227,9 @@ namespace Cx
         for (auto& [i, color] : metadata->ColorMap)
             shape->SetColor(i, color);
 
-        if (metadata->Position != sf::Vector2f())
+        if (metadata->Position.has_value())
         {
-            shape->SetPosition(metadata->Position);
+            shape->SetPosition(*metadata->Position);
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
@@ -242,7 +246,7 @@ namespace Cx
         shape->SetScale(metadata->Scale);
         shape->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(shape.get());
+        auto container = SceneComposer::Compose(*shape);
         LoadChildren(container, meta, context);
 
         return shape;

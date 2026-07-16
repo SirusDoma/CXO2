@@ -2,7 +2,6 @@
 
 #include <Genode/IO/Json.hpp>
 
-#include <any>
 #include <unordered_map>
 
 namespace Cx
@@ -81,8 +80,8 @@ namespace Cx
 
         virtual ~ResourceMetadata() = default;
 
-        using RequireMap = std::unordered_map<std::string, std::any>;
-        using ObjectMap  = std::vector<ObjectMetadata>; //std::unordered_map<std::string, Gx::Json>;
+        using RequireMap = std::unordered_map<std::string, Gx::Json>;
+        using ObjectMap  = std::vector<ObjectMetadata>;
 
         std::string  Name;
         std::string  SourceFormat;

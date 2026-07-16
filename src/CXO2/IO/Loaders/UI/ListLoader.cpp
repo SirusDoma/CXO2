@@ -1,8 +1,7 @@
 #include <CXO2/IO/Loaders/UI/ListLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectContainer.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/Metadata/UI/ListMetadata.hpp>
 
@@ -16,9 +15,9 @@
 
 namespace Cx
 {
-    void ListLoader::OnRegistered(const std::string& id)
+    void ListLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::List>::OnRegistered(id);
+        ResourceLoader<Gx::List>::OnRegistered(id, builder);
 
         Gx::ResourceLoaderFactory::Map<Gx::List, RoomList>();
         Gx::ResourceLoaderFactory::Map<Gx::Node, RoomList>();
@@ -88,7 +87,7 @@ namespace Cx
         }
 
         auto ctx = ResourceContextDecorator::Decorate(context);
-        if (const auto bound = ctx.Require<sf::IntRect>(metadata); bound && metadata.Position == sf::Vector2f())
+        if (const auto bound = ctx.Require<sf::IntRect>(metadata); bound && !metadata.Position.has_value())
         {
             metadata.Position = {
                 static_cast<float>(bound->position.x),
@@ -98,7 +97,7 @@ namespace Cx
 
         if (const auto it = metadata.Require.find("template"); it != metadata.Require.end())
         {
-            const auto prefab = std::any_cast<Gx::Json>(it->second);
+            const auto prefab = it->second;
             if (const auto data = prefab.find("count"); data != prefab.end())
                 metadata.ItemCount = data->get<int>();
 
@@ -116,10 +115,8 @@ namespace Cx
                 {
                     if (auto bnd = metadata.Require.find(std::string(field)); bnd != metadata.Require.end())
                     {
-                        if (bnd->second.type() == typeid(std::string))
-                            base = context.Acquire<sf::IntRect>(std::any_cast<std::string>(bnd->second));
-                        else if (bnd->second.type() == typeid(Gx::Json))
-                            base = context.Acquire<sf::IntRect>(std::any_cast<Gx::Json>(bnd->second).get<std::string>());
+                        if (bnd->second.is_string())
+                            base = context.Acquire<sf::IntRect>(bnd->second.get<std::string>());
 
                         break;
                     }
@@ -148,14 +145,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto list = Instantiate(context);
         list->SetName(metadata->Name);
         list->SetVerticalRepeat(metadata->VerticalCount, metadata->VerticalSpacing);
         list->SetHorizontalRepeat(metadata->HorizontalCount, metadata->HorizontalSpacing);
         list->SetOrigin(metadata->Origin);
-        list->SetPosition(metadata->Position);
+        list->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         list->SetScale(metadata->Scale);
         list->SetRotation(metadata->Rotation);
         list->SetOrder(metadata->Order);
@@ -163,12 +160,12 @@ namespace Cx
         if (!metadata->Layouts.empty())
         {
             for (const auto& layout : metadata->Layouts)
-                list->AddLayout({ layout.Origin, layout.Position, layout.Rotation, layout.Scale });
+                list->AddLayout({ layout.Origin, layout.Position.value_or(sf::Vector2f()), layout.Rotation, layout.Scale });
         }
 
         if (context.Available())
         {
-            auto container = ObjectContainer::Decorate(list.get());
+            auto container = SceneComposer::Compose(*list);
             if (!metadata->ItemSource.empty())
             {
                 list->SetBatchingEnabled(true);
@@ -177,7 +174,7 @@ namespace Cx
                     auto name = fmt::format("{}/{}{}", meta.Name, metadata->ItemName, i + 1);
                     auto ctx  = Gx::ResourceContext::Rebind(context, name);
 
-                    ObjectLoader::LoadFromJson(name, metadata->ItemSource, container, ctx);
+                    container.Add(name, metadata->ItemSource, ctx);
                 }
             }
             else if (!metadata->Objects.empty())

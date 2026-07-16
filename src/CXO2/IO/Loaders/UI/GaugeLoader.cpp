@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/UI/GaugeLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/Metadata/UI/GaugeMetadata.hpp>
 
@@ -44,8 +44,6 @@ namespace Cx
 
                     auto transform = frame.value().find("transform");
                     std::optional position = frameMetadata.Position;
-                    if (transform == frame.value().end() || transform.value().find("position") == transform->end())
-                        position = std::nullopt;
 
                     std::optional scale = frameMetadata.Scale;
                     if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
@@ -91,7 +89,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const GaugeMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto gauge = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -99,16 +97,16 @@ namespace Cx
         {
             gauge->SetTexture(*texture);
             gauge->SetTexCoords(metadata->TexCoords);
-            gauge->SetPosition(metadata->Position);
+            gauge->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             for (const auto& frame : metadata->AnimationFrames)
                 gauge->AddAnimationFrame(frame);
         }
         else
         {
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                gauge->SetPosition(metadata->Position);
+                gauge->SetPosition(*metadata->Position);
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -127,18 +125,24 @@ namespace Cx
                 if (metadata->TexCoords != sf::IntRect())
                     gauge->SetTexCoords(metadata->TexCoords);
                 else if (metadata->FrameID.has_value())
-                    gauge->SetTexCoords(sheet->TexCoords[metadata->FrameID.value()]);
-                else
+                {
+                    if (metadata->FrameID.value() < sheet->TexCoords.size())
+                        gauge->SetTexCoords(sheet->TexCoords[metadata->FrameID.value()]);
+                }
+                else if (!sheet->TexCoords.empty())
                     gauge->SetTexCoords(sheet->TexCoords[0]);
 
                 if (gauge->GetPosition() == sf::Vector2f() && !sheet->Frames.empty())
                 {
                     if (metadata->FrameID.has_value())
                     {
-                        gauge->SetPosition({
-                            static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.x),
-                            static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.y),
-                        });
+                        if (metadata->FrameID.value() < sheet->Frames.size())
+                        {
+                            gauge->SetPosition({
+                                static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.x),
+                                static_cast<float>(sheet->Frames[metadata->FrameID.value()].position.y),
+                            });
+                        }
                     }
                     else if (sheet->Frames[0].position != sf::Vector2i())
                     {
@@ -169,7 +173,7 @@ namespace Cx
         gauge->SetScale(metadata->Scale);
         gauge->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(gauge.get());
+        auto container = SceneComposer::Compose(*gauge);
         LoadChildren(container, meta, context);
 
         return gauge;

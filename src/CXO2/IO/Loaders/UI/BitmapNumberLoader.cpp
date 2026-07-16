@@ -3,7 +3,7 @@
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Metadata/UI/BitmapNumberMetadata.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -35,7 +35,7 @@ namespace Cx
                 metadata.DigitCount = 1;
 
             if (auto duration = attributes.find("duration"); duration != attributes.end())
-                metadata.Duration = sf::milliseconds(duration->get<float>());
+                metadata.Duration = sf::milliseconds(duration->get<std::int32_t>());
 
             if (auto digits = attributes.find("digits"); digits != attributes.end())
             {
@@ -119,14 +119,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const BitmapNumberMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto number = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             number->SetTexture(*texture);
-            number->SetPosition(metadata->Position);
+            number->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             number->SetDigitsSize(metadata->DigitSize);
             for (auto [digit, frames] : metadata->DigitFrames)
@@ -157,7 +157,7 @@ namespace Cx
                 }
                 else if (sheet->TexCoords.size() > 10)
                 {
-                    const int digitFrameCount = sheet->TexCoords.size() / 10;
+                    const std::size_t digitFrameCount = sheet->TexCoords.size() / 10;
                     for (std::size_t d = 0; d < 10; d++)
                     {
                         auto frames = std::vector<sf::IntRect>();
@@ -177,9 +177,9 @@ namespace Cx
                 }
             }
 
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                number->SetPosition(metadata->Position);
+                number->SetPosition(*metadata->Position);
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -210,7 +210,7 @@ namespace Cx
         number->SetAlignment(metadata->Alignment);
         number->SetBlendMode(metadata->BlendMode);
 
-        auto container = ObjectContainer::Decorate(number.get());
+        auto container = SceneComposer::Compose(*number);
         LoadChildren(container, meta, context);
 
         return number;

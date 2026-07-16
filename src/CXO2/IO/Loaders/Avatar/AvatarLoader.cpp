@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/Avatar/AvatarLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/Metadata/Avatar/AvatarMetadata.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
@@ -64,12 +64,12 @@ namespace Cx
         auto avatar = std::make_unique<Avatar>();
         const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         const auto ctx = ResourceContextDecorator::Decorate(context);
-        if (metadata->Position != sf::Vector2f())
+        if (metadata->Position.has_value())
         {
-            avatar->SetPosition(metadata->Position);
+            avatar->SetPosition(*metadata->Position);
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
@@ -92,7 +92,7 @@ namespace Cx
         for (const auto id : metadata->ItemIDs)
             avatar->Equip(m_items->Create(id));
 
-        auto container = ObjectContainer::Decorate(avatar.get());
+        auto container = SceneComposer::Compose(*avatar);
         LoadChildren(container, meta, context);
 
         return avatar;

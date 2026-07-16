@@ -5,7 +5,7 @@
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
 
 #include <CXO2/Metadata/UI/Components/Planet/ChannelBoardMetadata.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectContainer.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/StringTable/Identifiers/Planet.hpp>
 
 #include <fmt/format.h>
@@ -40,7 +40,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ChannelBoardMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto channelBoard = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -56,14 +56,14 @@ namespace Cx
             else
                 channelBoard->SetTexCoords(metadata->TexCoords);
 
-            channelBoard->SetPosition(metadata->Position);
+            channelBoard->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else
         {
             auto position = sf::Vector2f();
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                position = metadata->Position;
+                position = *metadata->Position;
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -82,7 +82,11 @@ namespace Cx
                     const std::vector<std::string> names = { "Notice", "ChannelList" };
 
                     for (const auto& frame : sheet->TexCoords)
-                        channelBoard->AddFrame(names[i < names.size() - 1 ? i++ : i], { frame, {}, position, {}, {1.f, 1.f} });
+                    {
+                        channelBoard->AddFrame(names[i], { frame, {}, position, {}, {1.f, 1.f} });
+                        if (i < names.size() - 1)
+                            i++;
+                    }
 
                     if (sheet->TexCoords.size() < 2)
                         channelBoard->AddFrame(names[1], Gx::Image::Frame{ {}, {}, position, {}, {1.f, 1.f} });
@@ -106,7 +110,7 @@ namespace Cx
         channelBoard->SetScale(metadata->Scale);
         channelBoard->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(channelBoard.get());
+        auto container = SceneComposer::Compose(*channelBoard);
         LoadChildren(container, meta, context);
 
         return channelBoard;

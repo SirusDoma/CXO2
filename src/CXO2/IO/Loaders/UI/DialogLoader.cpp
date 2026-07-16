@@ -4,7 +4,7 @@
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <CXO2/StringTable/Identifiers/Cache.hpp>
 
@@ -25,9 +25,9 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    void DialogLoader::OnRegistered(const std::string& id)
+    void DialogLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::Dialog>::OnRegistered(id);
+        ResourceLoader<Gx::Dialog>::OnRegistered(id, builder);
 
         Gx::ResourceLoaderFactory::Map<Gx::Dialog,
             OptionDialog,
@@ -96,7 +96,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto dialog = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -110,7 +110,7 @@ namespace Cx
             dialog->SetTexture(sheet->GetTexture());
             if (metadata->TexCoords != sf::IntRect())
                 dialog->SetTexCoords(metadata->TexCoords);
-            else
+            else if (!sheet->TexCoords.empty())
                 dialog->SetTexCoords(sheet->TexCoords[0]);
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
@@ -121,7 +121,7 @@ namespace Cx
                 dialog->SetTexCoords(*bound);
         }
 
-        auto container = ObjectContainer::Decorate(dialog.get());
+        auto container = SceneComposer::Compose(*dialog);
         LoadChildren(container, meta, context);
 
         const auto labelLoader = LabelLoader();
@@ -138,7 +138,7 @@ namespace Cx
 
         dialog->SetName(metadata->Name);
         dialog->SetOrigin(metadata->Origin);
-        dialog->SetPosition(metadata->Position);
+        dialog->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         dialog->SetScale(metadata->Scale);
         dialog->SetRotation(metadata->Rotation);
 

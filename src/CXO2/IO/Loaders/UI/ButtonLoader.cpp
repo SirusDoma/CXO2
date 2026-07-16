@@ -2,7 +2,7 @@
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 namespace Cx
 {
@@ -15,9 +15,6 @@ namespace Cx
         if (const auto it = json.find("attributes"); it != json.end())
         {
             const auto& attributes = it.value();
-            if (!SpriteLoader::ParseMetadata(attributes, metadata, context))
-                return Instantiate(context);
-
             if (!ParseMetadata(attributes, metadata, context))
                 return Instantiate(context);
         }
@@ -29,14 +26,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ButtonMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto button = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             button->SetTexture(*texture);
-            button->SetPosition(metadata->Position);
+            button->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             for (const auto& [state, frame] : metadata->States)
                 button->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
@@ -44,9 +41,9 @@ namespace Cx
         else
         {
             auto bound = sf::IntRect();
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                button->SetPosition(metadata->Position);
+                button->SetPosition(*metadata->Position);
             }
             else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
             {
@@ -71,7 +68,7 @@ namespace Cx
                 button->SetTexture(sheet->GetTexture());
                 if (sheet->Frames.size() > 1)
                 {
-                    if (metadata->Position == sf::Vector2f() && sheet->Frames[0].position != sf::Vector2i())
+                    if (!metadata->Position.has_value() && sheet->Frames[0].position != sf::Vector2i())
                     {
                         auto base = ctx.GetParentBound();
                         button->SetPosition(sf::Vector2f{
@@ -161,7 +158,7 @@ namespace Cx
         button->SetScale(metadata->Scale);
         button->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(button.get());
+        auto container = SceneComposer::Compose(*button);
         LoadChildren(container, meta, context);
 
         return button;

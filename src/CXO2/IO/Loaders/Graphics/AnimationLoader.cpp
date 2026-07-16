@@ -40,8 +40,6 @@ namespace Cx
                     auto transform = frame.value().find("transform");
 
                     std::optional position = frameMetadata.Position;
-                    if (transform == frame.value().end() || transform.value().find("position") == transform->end())
-                        position = std::nullopt;
 
                     std::optional scale = frameMetadata.Scale;
                     if (transform == frame.value().end() || transform.value().find("scale") == transform->end())
@@ -109,7 +107,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const AnimationMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto animation = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -124,14 +122,14 @@ namespace Cx
                 animation->SetTexCoords(metadata->TexCoords);
 
             animation->SetDuration(metadata->Duration);
-            animation->SetPosition(metadata->Position);
+            animation->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else
         {
             auto position = sf::Vector2f();
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                position = metadata->Position;
+                position = *metadata->Position;
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -147,7 +145,7 @@ namespace Cx
                 animation->SetTexture(sheet->GetTexture());
                 if (metadata->TexCoords != sf::IntRect())
                     animation->SetTexCoords(metadata->TexCoords);
-                else
+                else if (!sheet->TexCoords.empty())
                     animation->SetTexCoords(sheet->TexCoords[0]);
 
                 if (!metadata->Frames.empty())
@@ -157,7 +155,7 @@ namespace Cx
                         auto frame = metadata->Frames[i];
                         if (!frame.Position.has_value())
                         {
-                            if (metadata->Position != sf::Vector2f())
+                            if (metadata->Position.has_value())
                             {
                                 frame.Position = metadata->Position;
                             }
@@ -171,7 +169,7 @@ namespace Cx
                             }
                         }
 
-                        if (frame.ID.has_value())
+                        if (frame.ID.has_value() && frame.ID.value() < sheet->TexCoords.size())
                             frame.TexCoords = sheet->TexCoords[frame.ID.value()];
                         else if (frame.TexCoords == sf::IntRect() && i < sheet->TexCoords.size())
                             frame.TexCoords = sheet->TexCoords[i];
@@ -235,7 +233,7 @@ namespace Cx
                         std::optional<sf::Vector2f> origin = std::nullopt;
                         if (i < sheet->Frames.size())
                         {
-                            if (!isFrameEmpty && metadata->Position == sf::Vector2f())
+                            if (!isFrameEmpty && !metadata->Position.has_value())
                             {
                                 position = {
                                     static_cast<float>(sheet->Frames[i].position.x - base.position.x),

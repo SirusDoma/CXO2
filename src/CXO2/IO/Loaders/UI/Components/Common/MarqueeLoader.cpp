@@ -41,7 +41,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const MarqueeMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto marquee = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
@@ -61,7 +61,7 @@ namespace Cx
                 }
             });
 
-            marquee->SetPosition(metadata->Position);
+            marquee->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {

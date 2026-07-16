@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <Genode/IO/FileSystem/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
@@ -16,7 +16,7 @@ namespace Cx
 {
     template<typename R>
     template<typename U>
-    void ResourceLoader<R>::OnRegistered(const U& id)
+    void ResourceLoader<R>::OnRegistered(const U& id, const Builder&)
     {
         if constexpr (std::is_base_of_v<Gx::Node, R> && !std::is_same_v<Gx::Node, R>)
             Gx::ResourceLoaderFactory::Map<Gx::Node, R, U>(id);
@@ -39,12 +39,14 @@ namespace Cx
                 return LoadFromMetadata(*metadata, ctx);
         }
 
-        // if (!Gx::FileSystem::Contains(fileName))
-        //     return Instantiate(ctx);
-
         const auto stream = Gx::FileSystem::Open(fileName);
         if (!stream)
+        {
+            if (IsFailSafe())
+                return this->Instantiate(ctx);
+
             throw Gx::ResourceLoadException(fileName.string());
+        }
 
         auto& inputStream = *stream.get();
         return LoadFromStream(inputStream, ctx);
@@ -76,15 +78,31 @@ namespace Cx
 
         auto bytes = std::vector<std::uint8_t>(size);
         if (!stream.read(bytes.data(), size).has_value())
-            throw Gx::ResourceLoadException(ctx.GetID());
+        {
+            if (IsFailSafe())
+                return this->Instantiate(ctx);
 
-        const auto json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(bytes.data()), size));
+            throw Gx::ResourceLoadException(ctx.GetID());
+        }
+
+        auto json = Gx::Json();
+        try
+        {
+            json = Gx::Json::parse(std::string(reinterpret_cast<const char*>(bytes.data()), size));
+        }
+        catch (const Gx::Json::exception&)
+        {
+            if (IsFailSafe())
+                return this->Instantiate(ctx);
+
+            throw;
+        }
 
         return LoadFromJson(json, ctx);
     }
 
     template<typename R>
-    void ResourceLoader<R>::LoadChildren(ObjectContainer& container, const ResourceMetadata& metadata, const Gx::ResourceContext& context)
+    void ResourceLoader<R>::LoadChildren(SceneComposer& composer, const ResourceMetadata& metadata, const Gx::ResourceContext& context)
     {
         if (!metadata.Objects.empty())
         {
@@ -93,7 +111,7 @@ namespace Cx
                 auto name = fmt::format("{}/{}", metadata.Name, key);
                 auto objectCtx = ResourceContextDecorator::Decorate(Gx::ResourceContext::Rebind(context, name), metadata);
 
-                ObjectLoader::LoadFromJson(name, object, container, objectCtx);
+                composer.Add(name, object, objectCtx);
             }
         }
     }

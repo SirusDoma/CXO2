@@ -19,6 +19,9 @@ namespace Cx
     Gx::ResourcePtr<Chart> O2JamChartLoader::LoadFromMetadata(const O2JamChartMetadata& meta, const Gx::ResourceContext& ctx) const
     {
         auto chart = LoadFromFile(meta.Source, ctx);
+        if (!chart)
+            return nullptr;
+
         chart->Source = meta.Source;
 
         return chart;
@@ -32,6 +35,9 @@ namespace Cx
 
         auto& inputStream = *stream.get();
         auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
+        if (!chart)
+            return nullptr;
+
         chart->Source     = fileName.string();
 
         return chart;

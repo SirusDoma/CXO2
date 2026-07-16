@@ -177,12 +177,14 @@ namespace Cx
         }
 
         metadata.Items = std::map<unsigned int, ItemMetadata>();
-        auto items = std::any_cast<Gx::Json>(metadata.Require["items"]);
-        for (auto [key, resource] : items.items())
+        const auto items = metadata.Require.find("items");
+        if (items == metadata.Require.end())
+            return nullptr;
+
+        for (auto [key, resource] : items->second.items())
         {
             unsigned int id = std::stoi(key);
-            const auto data = std::any_cast<Gx::Json>(resource);
-            if (auto itemMetadata = ItemMetadata(); ItemLoader::ParseMetadata(data, itemMetadata, context))
+            if (auto itemMetadata = ItemMetadata(); ItemLoader::ParseMetadata(resource, itemMetadata, context))
                 metadata.Items[id] = itemMetadata;
         }
 

@@ -7,19 +7,23 @@
 
 namespace Cx
 {
-    class ObjectContainer;
+    class SceneComposer;
     struct ResourceMetadata;
 
     template<typename R>
     class ResourceLoader : public Gx::ResourceLoader<R>
     {
     public:
+        using Builder = typename Gx::ResourceLoader<R>::Builder;
+
         ResourceLoader() = default;
 
         bool IsStreaming() const override { return Gx::ResourceLoader<R>::IsStreaming(); }
 
+        [[nodiscard]] virtual bool IsFailSafe() const { return true; }
+
         template<typename U>
-        static void OnRegistered(const U& id);
+        static void OnRegistered(const U& id, const Builder& builder);
 
         template<typename U>
         static void OnRemoved(const U& id);
@@ -32,7 +36,7 @@ namespace Cx
         Gx::ResourcePtr<R> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& ctx) const override = 0;
 
     protected:
-        static void LoadChildren(ObjectContainer& container, const ResourceMetadata& metadata, const Gx::ResourceContext& context);
+        static void LoadChildren(SceneComposer& composer, const ResourceMetadata& metadata, const Gx::ResourceContext& context);
     };
 
 }

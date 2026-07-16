@@ -1,8 +1,7 @@
 #include <CXO2/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectContainer.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/UI/Components/Waiting/AvatarInfoMetadata.hpp>
 
 #include <magic_enum/magic_enum.hpp>
@@ -48,13 +47,13 @@ namespace Cx
             return Instantiate(context);
 
         auto avatarinfo = Instantiate(context);
-        auto container  = ObjectContainer::Decorate(avatarinfo.get());
+        auto container  = SceneComposer::Compose(*avatarinfo);
         auto ctx        = ResourceContextDecorator::Decorate(context);
         avatarinfo->SetName(metadata->Name);
 
-        if (metadata->Position != sf::Vector2f())
+        if (metadata->Position.has_value())
         {
-            avatarinfo->SetPosition(metadata->Position);
+            avatarinfo->SetPosition(*metadata->Position);
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {

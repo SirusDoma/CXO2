@@ -1,6 +1,7 @@
 #include <Genode/Utilities/StringHelper.hpp>
 #include <CXO2/IO/Loaders/Audio/SoundLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/Metadata/Audio/SoundMetadata.hpp>
 
@@ -8,6 +9,14 @@
 
 namespace Cx
 {
+    void SoundLoader::OnRegistered(const std::string& id, const Builder&)
+    {
+        SceneComposer::Register(id, [] (const std::string& name, const Gx::Json& json, SceneComposer& composer, Gx::ResourceContext& context)
+        {
+            composer.Add<sf::Sound>(name, json, context);
+        });
+    }
+
     Gx::ResourcePtr<sf::Sound> SoundLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& context) const
     {
         if (Gx::StringHelper::IsGlobMatch(fileName.string(), "*.json", false))

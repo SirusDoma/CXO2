@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/UI/UiContainerLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/UI/UiContainerMetadata.hpp>
 #include <CXO2/UI/Room/UserList.hpp>
 #include <CXO2/UI/Common/ChatPanel.hpp>
@@ -23,9 +23,9 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    void UiContainerLoader::OnRegistered(const std::string& id)
+    void UiContainerLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::UiContainer>::OnRegistered(id);
+        ResourceLoader<Gx::UiContainer>::OnRegistered(id, builder);
 
         Gx::ResourceLoaderFactory::Map<Gx::UiContainer,
             ChatPanel,
@@ -45,7 +45,7 @@ namespace Cx
     {
         UiContainerMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
-            return nullptr;
+            return Instantiate(context);
 
         if (const auto attributes = json.find("attributes"); attributes != json.end())
         {
@@ -68,7 +68,7 @@ namespace Cx
                 else if (bounds->type() == Gx::Json::value_t::string)
                 {
                     const auto& bound = context.Acquire<sf::IntRect>(bounds.value().get<std::string>());
-                    metadata.Bounds = sf::IntRect{ {}, bound.position };
+                    metadata.Bounds = sf::IntRect{ {}, bound.size };
                 }
             }
         }
@@ -80,16 +80,16 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const UiContainerMetadata*>(&meta);
         if (metadata == nullptr)
-            return nullptr;
+            return Instantiate(context);
 
         auto container = Instantiate(context);
-        auto populator = ObjectContainer::Decorate(container.get());
+        auto populator = SceneComposer::Compose(*container);
         const auto ctx = ResourceContextDecorator::Decorate(context);
 
         auto bound = sf::IntRect();
-        if (metadata->Position != sf::Vector2f())
+        if (metadata->Position.has_value())
         {
-            container->SetPosition(metadata->Position);
+            container->SetPosition(*metadata->Position);
             container->SetLocalBounds({
                 {
                     static_cast<float>(metadata->Bounds.position.x),
@@ -104,17 +104,10 @@ namespace Cx
         else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
         {
             bound = *bnd;
-            if (metadata->Position != sf::Vector2f())
-            {
-                container->SetPosition(metadata->Position);
-            }
-            else
-            {
-                container->SetPosition(sf::Vector2f{
-                    static_cast<float>(bnd->position.x),
-                    static_cast<float>(bnd->position.y),
-                });
-            }
+            container->SetPosition(sf::Vector2f{
+                static_cast<float>(bnd->position.x),
+                static_cast<float>(bnd->position.y),
+            });
 
             if (metadata->Bounds != sf::IntRect())
             {

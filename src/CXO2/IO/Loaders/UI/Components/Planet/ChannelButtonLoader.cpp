@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/UI/Components/Planet/ChannelButtonLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/SpriteLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/UI/Components/Planet/ChannelButtonMetadata.hpp>
 
 #include <magic_enum/magic_enum.hpp>
@@ -65,14 +65,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ChannelButtonMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto channelButton = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata))
         {
             channelButton->SetTexture(*texture);
-            channelButton->SetPosition(metadata->Position);
+            channelButton->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             for (const auto& [mode, data] : metadata->States)
             {
@@ -107,9 +107,9 @@ namespace Cx
                 }
             }
 
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                channelButton->SetPosition(metadata->Position);
+                channelButton->SetPosition(*metadata->Position);
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {
@@ -126,7 +126,7 @@ namespace Cx
         channelButton->SetScale(metadata->Scale);
         channelButton->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(channelButton.get());
+        auto container = SceneComposer::Compose(*channelButton);
         LoadChildren(container, meta, context);
 
         return channelButton;

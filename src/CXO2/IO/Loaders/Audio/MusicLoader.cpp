@@ -1,5 +1,6 @@
 #include <CXO2/IO/Loaders/Audio/MusicLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/Audio/MusicMetadata.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
@@ -8,6 +9,14 @@
 
 namespace Cx
 {
+    void MusicLoader::OnRegistered(const std::string& id, const Builder&)
+    {
+        SceneComposer::Register(id, [] (const std::string& name, const Gx::Json& json, SceneComposer& composer, Gx::ResourceContext& context)
+        {
+            composer.Add<sf::Music>(name, json, context);
+        });
+    }
+
     Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const
     {
         if (Gx::StringHelper::IsGlobMatch(fileName.string(), "*.json", false))
@@ -21,18 +30,18 @@ namespace Cx
 
     Gx::ResourcePtr<sf::Music> MusicLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
-        MusicMetadata metadata;
+        auto metadata = MusicMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
             return nullptr;
 
         if (const auto it = metadata.Require.find("music"); it != metadata.Require.end())
-        {
-            const auto source = std::any_cast<Gx::Json>(it->second);
-            metadata.Source = source.get<std::string>();
-        }
+            metadata.Source = it->second.get<std::string>();
 
-        auto attributes = json.at("attributes");
-        metadata.IsLoop = attributes["loop"].get<bool>();
+        if (const auto attributes = json.find("attributes"); attributes != json.end())
+        {
+            if (const auto loop = attributes->find("loop"); loop != attributes->end())
+                metadata.IsLoop = loop->get<bool>();
+        }
 
         return LoadFromMetadata(metadata, context);
     }

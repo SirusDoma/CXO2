@@ -1,6 +1,6 @@
 #include <CXO2/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/SceneGraph/StatePlayingMetadata.hpp>
 #include <CXO2/IO/PlayingResourceContext.hpp>
 
@@ -68,26 +68,26 @@ namespace Cx
 
         if (ctx.GetMode() == GameMode::Tutorial)
         {
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::string(), ctx);
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::string(), ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, true), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::string(), ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::string(), ctx);
         }
         else
         {
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::to_string(mapID), ctx);
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::to_string(mapID), ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, true), metadata, Resource::Playing7K::Require::IDC_IMAGE_PLAYING_BG, std::to_string(mapID), ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_BG,    std::to_string(mapID), ctx);
         }
 
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK,      std::string(), ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT,std::string(), ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE1,  std::string(), ctx, 1);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE2,  std::string(), ctx, 1);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK,      std::string(), ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT,std::string(), ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE1,  std::string(), ctx, 1);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_IMAGE_NOTE_MEASURE2,  std::string(), ctx, 1);
 
         for (unsigned int i = 1; i <= 7; i++) // Channel
         {
             for (unsigned int s = 0; s <= 1; s++) // Shape (Circle, Square)
             {
-                LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_NORMAL, i, s), std::string(), ctx, 1);
-                LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_LONG  , i, s), std::string(), ctx, 1);
+                LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_NORMAL, i, s), std::string(), ctx, 1);
+                LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, fmt::format("{}{}_{}", Resource::Playing7K::Require::IDC_ANIMATION_NOTE_LONG  , i, s), std::string(), ctx, 1);
             }
         }
 
@@ -95,23 +95,23 @@ namespace Cx
         if (ctx.IsFxEnabled())
             sfxSuffix = std::to_string(mapID);
 
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COMBO, sfxSuffix, ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_NOTE_COMBO, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COMBO, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_NUMBER_NOTE_COMBO, sfxSuffix, ctx);
 
         if (metadata->Require.find(fmt::format("{}{}", Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix)) != metadata->Require.end())
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix, ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_EFFECT_JAM, sfxSuffix, ctx);
 
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COOL, sfxSuffix, ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_GOOD, sfxSuffix, ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_BAD, sfxSuffix, ctx);
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_MISS, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_COOL, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_GOOD, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_BAD, sfxSuffix, ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_MISS, sfxSuffix, ctx);
 
         if (metadata->Require.find(Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM) != metadata->Require.end())
-            LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM, std::string(), ctx);
+            LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_NUMBER_EFFECT_JAM, std::string(), ctx);
 
-        LoadRequiredResource(ObjectContainer::Decorate(state.get(), true), metadata, Resource::Playing7K::Require::IDC_CONTAINER_NOTE_JAM, std::string(), ctx);
+        LoadRequiredResource(SceneComposer::Compose(*state, false), metadata, Resource::Playing7K::Require::IDC_CONTAINER_NOTE_JAM, std::string(), ctx);
 
-        auto container = ObjectContainer::Decorate(state.get());
+        auto composer = SceneComposer::Compose(*state);
         for (const auto& [key, object] : metadata->Objects)
         {
             // Rewire resource manager to the local scene
@@ -120,18 +120,18 @@ namespace Cx
             for (const auto& [key, value] : ctx.GetProperties())
                 rctx.SetProperty(key, value);
 
-            ObjectLoader::LoadFromJson(name, object, container, rctx);
+            composer.Add(name, object, rctx);
         }
 
         if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)
         {
             if (ctx.GetMode() == GameMode::Tutorial)
             {
-                LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::string(), ctx, 7);
-                LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_GUIDE_KEY_EFFECT, std::string(), ctx, 7);
+                LoadRequiredResource(SceneComposer::Compose(*keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::string(), ctx, 7);
+                LoadRequiredResource(SceneComposer::Compose(*keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_GUIDE_KEY_EFFECT, std::string(), ctx, 7);
             }
             else
-                LoadRequiredResource(ObjectContainer::Decorate(keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::to_string(mapID), ctx, 7);
+                LoadRequiredResource(SceneComposer::Compose(*keyEffectContainer), metadata, Resource::Playing7K::Require::IDC_IMAGE_KEY_EFFECT, std::to_string(mapID), ctx, 7);
 
             keyEffectContainer->SetBatchingEnabled(true);
         }
@@ -165,7 +165,7 @@ namespace Cx
                 noteClickSuffix = fmt::format("{}_{}", mapID, ctx.GetEffectID());
 
             if (noteClickList->GetChildrenCount() == 0)
-                LoadRequiredResource(ObjectContainer::Decorate(noteClickList),  metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_CLICK, noteClickSuffix, ctx, 7);
+                LoadRequiredResource(SceneComposer::Compose(*noteClickList),  metadata, Resource::Playing7K::Require::IDC_ANIMATION_NOTE_CLICK, noteClickSuffix, ctx, 7);
 
             for (auto child :noteClickList->GetChildren())
             {
@@ -190,12 +190,12 @@ namespace Cx
         return state;
     }
 
-    void StatePlaying7KLoader::LoadRequiredResource(ObjectContainer container, const StateMetadata* metadata, const std::string& key, const std::string& suffix, const PlayingResourceContext& context, const unsigned int count)
+    void StatePlaying7KLoader::LoadRequiredResource(SceneComposer composer, const StateMetadata* metadata, const std::string& key, const std::string& suffix, const PlayingResourceContext& context, const unsigned int count)
     {
         if (const auto it = metadata->Require.find(key + suffix); it != metadata->Require.end())
         {
-            const auto name      = fmt::format("{}/{}", container.GetName(), key);
-            const auto reference = std::any_cast<Gx::Json>(it->second);
+            const auto name      = fmt::format("{}/{}", composer.GetName(), key);
+            const auto reference = it->second;
             auto ctx             = Gx::ResourceContext::Rebind(context, name);
 
             for (const auto& [key, value] : context.GetProperties())
@@ -204,10 +204,10 @@ namespace Cx
             if (count > 1)
             {
                 for (auto i = 1; i <= count; i++)
-                    ObjectLoader::LoadFromJson(fmt::format("{}{}", name, i), reference, container, ctx);
+                    composer.Add(fmt::format("{}{}", name, i), reference, ctx);
             }
             else
-                ObjectLoader::LoadFromJson(name, reference, container, ctx);
+                composer.Add(name, reference, ctx);
         }
         else
             throw Gx::Exception(fmt::format("{} is not found within required resource references", key));

@@ -3,7 +3,7 @@
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/Metadata/UI/InputFieldMetadata.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 namespace Cx
 {
@@ -67,22 +67,20 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const InputFieldMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto input = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto font = ctx.Require<Gx::Font>(*metadata); font)
             input->SetFont(*font);
 
-        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && ffIt->second.has_value())
+        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && !ffIt->second.is_null())
         {
             auto ffResource = ffIt->second;
             auto fallbackFonts = std::vector<std::string>();
 
-            if (ffResource.type() == typeid(Gx::Json))
-                fallbackFonts = std::any_cast<Gx::Json>(ffResource);
-            else if (ffResource.type() == typeid(std::vector<std::string>()))
-                fallbackFonts = std::any_cast<std::vector<std::string>>(ffResource);
+            if (ffResource.is_array())
+                fallbackFonts = ffResource.get<std::vector<std::string>>();
 
             for (const auto& fontPath : fallbackFonts)
             {
@@ -106,11 +104,11 @@ namespace Cx
                 }
             });
 
-            input->SetPosition(metadata->Position);
+            input->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
-            if (metadata->Position == sf::Vector2f())
+            if (!metadata->Position.has_value())
             {
                 input->SetPosition(sf::Vector2f(
                     static_cast<float>(bound->position.x),
@@ -118,7 +116,7 @@ namespace Cx
                 ) + sf::Vector2f(2.f, 2.f));
             }
             else
-                input->SetPosition(metadata->Position);
+                input->SetPosition(*metadata->Position);
 
             input->SetLocalBounds({
                 {},
@@ -143,7 +141,7 @@ namespace Cx
         input->SetScale(metadata->Scale);
         input->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(input.get());
+        auto container = SceneComposer::Compose(*input);
         LoadChildren(container, meta, context);
 
         return input;

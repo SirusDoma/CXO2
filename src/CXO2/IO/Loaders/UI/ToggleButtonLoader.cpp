@@ -1,6 +1,6 @@
 #include <CXO2/IO/Loaders/UI/ToggleButtonLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/IO/Loaders/UI/ButtonLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 
@@ -28,14 +28,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ToggleButtonMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto toggleButton = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             toggleButton->SetTexture(*texture);
-            toggleButton->SetPosition(metadata->Position);
+            toggleButton->SetPosition(metadata->Position.value_or(sf::Vector2f()));
 
             for (const auto& [state, frame] : metadata->States)
                 toggleButton->SetFrame(state, {frame.TexCoords, frame.LocalBounds});
@@ -43,9 +43,9 @@ namespace Cx
         else
         {
             auto bound = sf::IntRect();
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                toggleButton->SetPosition(metadata->Position);
+                toggleButton->SetPosition(*metadata->Position);
             }
             else if (const auto bnd = ctx.Require<sf::IntRect>(*metadata); bnd)
             {
@@ -70,7 +70,7 @@ namespace Cx
                 toggleButton->SetTexture(sheet->GetTexture());
                 if (sheet->Frames.size() > 1)
                 {
-                    if (metadata->Position == sf::Vector2f() && sheet->Frames[0].position != sf::Vector2i())
+                    if (!metadata->Position.has_value() && sheet->Frames[0].position != sf::Vector2i())
                     {
                         auto base = ctx.GetParentBound();
                         toggleButton->SetPosition(sf::Vector2f{
@@ -160,7 +160,7 @@ namespace Cx
         toggleButton->SetScale(metadata->Scale);
         toggleButton->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(toggleButton.get());
+        auto container = SceneComposer::Compose(*toggleButton);
         LoadChildren(container, meta, context);
 
         return toggleButton;

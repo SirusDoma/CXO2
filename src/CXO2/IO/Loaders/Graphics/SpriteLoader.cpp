@@ -30,20 +30,20 @@ namespace Cx
         const auto ctx = ResourceContextDecorator::Decorate(context);
         const auto metadata = dynamic_cast<const SpriteMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto sprite = Instantiate(context);
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
         {
             sprite->SetTexture(*texture);
             sprite->SetTexCoords(metadata->TexCoords);
-            sprite->SetPosition(metadata->Position);
+            sprite->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else
         {
-            if (metadata->Position != sf::Vector2f())
+            if (metadata->Position.has_value())
             {
-                sprite->SetPosition(metadata->Position);
+                sprite->SetPosition(*metadata->Position);
             }
             else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
             {

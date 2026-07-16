@@ -69,6 +69,9 @@ namespace Cx
     private:
         void LoadCommonResources();
 
+        template<typename R>
+        R* Locate(Gx::ResourceManager& resources, const std::string& id);
+
         std::unique_ptr<Gx::ResourceManager> m_resources;
         std::unique_ptr<Gx::ResourceManager> m_tempResources;
 

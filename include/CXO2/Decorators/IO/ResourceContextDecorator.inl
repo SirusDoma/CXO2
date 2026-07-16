@@ -12,8 +12,6 @@
 
 #include <fmt/format.h>
 
-#include <any>
-
 namespace Cx
 {
     template<typename T>
@@ -46,20 +44,6 @@ namespace Cx
     }
 
     template<typename R>
-    R* ResourceContextDecorator::Require() const
-    {
-        const auto resources = GetResourceManager();
-        if (!resources)
-            throw Gx::ResourceAccessException(GetID(), "ResourceManager is not set within this context.");
-
-        auto metadata = resources->AddFromDeserializer<ResourceMetadata>(GetID(), [&] { return Deserialize<ResourceMetadata>(GetID()); });
-        if constexpr (std::is_base_of_v<R, ResourceMetadata>)
-            return *metadata;
-
-        return Find<R>(metadata);
-    }
-
-    template<typename R>
     R* ResourceContextDecorator::Require(const ResourceMetadata& metadata, Gx::CacheMode cacheMode) const
     {
         const auto resources = GetResourceManager();
@@ -70,13 +54,10 @@ namespace Cx
         if (require.empty())
             return nullptr;
 
-        auto resolve = [] (const std::any& resource) -> std::string
+        auto resolve = [] (const Gx::Json& resource) -> std::string
         {
-            if (resource.type() == typeid(Gx::Json))
-                return std::any_cast<Gx::Json>(resource).get<std::string>();
-
-            if (resource.type() == typeid(std::string))
-                return std::any_cast<std::string>(resource);
+            if (resource.is_string())
+                return resource.get<std::string>();
 
             return std::string();
         };
@@ -136,8 +117,15 @@ namespace Cx
         if (id.empty())
             return nullptr;
 
-        // TODO: try-catch return nullptr
-        auto resource = &resources->AddFromDeserializer<R>(id, [&] { return Deserialize<R>(id); }, cacheMode);
+        R* resource = nullptr;
+        try
+        {
+            resource = &resources->AddFromDeserializer<R>(id, [&] { return Deserialize<R>(id); }, cacheMode);
+        }
+        catch (...)
+        {
+            return nullptr;
+        }
 
         // Genode Scene Graph system only work with local bound
         // Convert global bound to local bound

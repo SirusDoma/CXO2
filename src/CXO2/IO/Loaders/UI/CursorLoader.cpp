@@ -3,7 +3,7 @@
 
 #include <CXO2/Metadata/UI/CursorMetadata.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -13,7 +13,7 @@ namespace Cx
     {
         CursorMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
-            return nullptr;
+            return Instantiate(context);
 
         if (const auto it = json.find("attributes"); it != json.end())
         {
@@ -70,9 +70,9 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const CursorMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
-    
-        auto cursor = std::make_unique<Gx::Cursor>();
+            return Instantiate(context);
+
+        auto cursor = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
 
         if (const auto texture = ctx.Require<sf::Texture>(*metadata); texture)
@@ -84,7 +84,7 @@ namespace Cx
                 {
                     auto image = sf::Image(sf::Vector2u(state.TexCoords.size.x, state.TexCoords.size.y), sf::Color::Transparent);
                     if (!image.copy(source, sf::Vector2u(), state.TexCoords, true))
-                        throw Gx::ResourceLoadException(context.GetID(), fmt::format("Failed to load cursor state ({})", magic_enum::enum_name(state.Type)));
+                        return Instantiate(context);
 
                     cursor->Register(state.Type, image, state.Hotspot);
                 }
@@ -102,12 +102,12 @@ namespace Cx
                 for (const auto& state : metadata->States)
                 {
                     auto texCoords = state.TexCoords;
-                    if (state.ID.has_value())
+                    if (state.ID.has_value() && state.ID.value() < sheet->TexCoords.size())
                         texCoords = sheet->TexCoords[state.ID.value()];
 
                     auto image = sf::Image(sf::Vector2u(texCoords.size.x, texCoords.size.y), sf::Color::Transparent);
                     if (!image.copy(source, sf::Vector2u(), texCoords, true))
-                        throw Gx::ResourceLoadException(context.GetID(), fmt::format("Failed to load cursor state ({})", magic_enum::enum_name(state.Type)));
+                        return Instantiate(context);
 
                     cursor->Register(state.Type, image, state.Hotspot);
                 }

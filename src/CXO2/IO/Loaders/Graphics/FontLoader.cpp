@@ -3,6 +3,8 @@
 
 #include <Genode/Graphics/Font.hpp>
 
+#include <cstring>
+
 namespace Cx
 {
     bool FontLoader::IsStreaming() const
@@ -37,8 +39,16 @@ namespace Cx
 
     Gx::ResourcePtr<Gx::Font> FontLoader::LoadFromMemory(void* data, const std::size_t size, const Gx::ResourceContext& ctx) const
     {
-        auto resource = std::make_unique<Gx::Font>();
-        if (!resource->LoadFromMemory(data, size))
+        auto buffer = new std::uint8_t[size];
+        std::memcpy(buffer, data, size);
+
+        auto resource = Gx::ResourcePtr<Gx::Font>(new Gx::Font(), [buffer] (auto ptr)
+        {
+            delete ptr;
+            delete[] buffer;
+        });
+
+        if (!resource->LoadFromMemory(buffer, size))
             return nullptr;
 
         resource->SetSmooth(m_smooth);
@@ -47,8 +57,26 @@ namespace Cx
 
     Gx::ResourcePtr<Gx::Font> FontLoader::LoadFromStream(sf::InputStream& stream, const Gx::ResourceContext& ctx) const
     {
-        auto resource = std::make_unique<Gx::Font>();
-        if (!resource->LoadFromStream(stream))
+        const auto size = stream.getSize();
+        const auto position = stream.tell();
+        if (!size.has_value() || !position.has_value())
+            return nullptr;
+
+        const auto remaining = size.value() - position.value();
+        auto buffer = new std::uint8_t[remaining];
+        if (stream.read(buffer, remaining) != remaining)
+        {
+            delete[] buffer;
+            return nullptr;
+        }
+
+        auto resource = Gx::ResourcePtr<Gx::Font>(new Gx::Font(), [buffer] (auto ptr)
+        {
+            delete ptr;
+            delete[] buffer;
+        });
+
+        if (!resource->LoadFromMemory(buffer, remaining))
             return nullptr;
 
         resource->SetSmooth(m_smooth);

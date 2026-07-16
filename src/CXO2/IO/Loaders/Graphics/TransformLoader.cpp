@@ -10,9 +10,11 @@ namespace Cx
         TransformMetadata metadata;
         MetadataLoader::Parse(json, metadata, ctx);
 
-        auto attributes = json.at("attributes");
-        if (const auto data = attributes.find("transform"); data != attributes.end())
-            ParseMetadata(data.value(), metadata, ctx);
+        if (const auto attributes = json.find("attributes"); attributes != json.end())
+        {
+            if (const auto data = attributes->find("transform"); data != attributes->end())
+                ParseMetadata(data.value(), metadata, ctx);
+        }
 
         return LoadFromMetadata(metadata, ctx);
     }
@@ -21,10 +23,10 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const TransformMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return std::make_unique<sf::Transform>();
 
         auto transform = sf::Transform();
-        transform.translate(metadata->Position);
+        transform.translate(metadata->Position.value_or(sf::Vector2f()));
         transform.scale(metadata->Scale);
         transform.rotate(sf::degrees(metadata->Rotation));
 
@@ -36,14 +38,13 @@ namespace Cx
         if (transform.empty())
             return false;
 
-        const auto p = transform.find("position");
-        auto position = sf::Vector2f();
-        if (p != transform.end())
+        if (const auto p = transform.find("position"); p != transform.end())
         {
+            auto position = sf::Vector2f();
             p->at("x").get_to(position.x);
             p->at("y").get_to(position.y);
+            metadata.Position = position;
         }
-        metadata.Position = position;
 
         const auto s = transform.find("scale");
         auto scale = sf::Vector2f(1.f, 1.f);

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
+#include <CXO2/Metadata/Avatar/SetInfoData.hpp>
 
 namespace Cx
 {
-    struct SetInfoData;
     class SetInfoDataLoader : public ResourceLoader<SetInfoData>
     {
     public :

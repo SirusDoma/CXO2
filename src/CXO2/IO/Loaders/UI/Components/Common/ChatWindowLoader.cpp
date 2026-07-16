@@ -4,7 +4,7 @@
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 namespace Cx
 {
@@ -40,13 +40,11 @@ namespace Cx
             else
                 metadata.Color = sf::Color::White;
 
-            metadata.MaximumChatsLength = attributes.at("maximumChatLength").get<unsigned int>();
+            if (const auto maxChatLength = attributes.find("maximumChatLength"); maxChatLength != attributes.end())
+                metadata.MaximumChatsLength = maxChatLength->get<unsigned int>();
+
             if (const auto lineSpacing = attributes.find("lineSpacing"); lineSpacing != attributes.end())
-            {
-                metadata.LineSpacing = lineSpacing->get<unsigned int>();
-                if (metadata.LineSpacing < 0)
-                    metadata.LineSpacing = 0;
-            }
+                metadata.LineSpacing = lineSpacing->get<float>();
             else
                 metadata.LineSpacing = 0;
 
@@ -68,7 +66,7 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const ChatWindowMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
         auto window = Instantiate(context);
         window->SetName(metadata->Name);
@@ -78,15 +76,13 @@ namespace Cx
         window->SetLineSpacing(metadata->LineSpacing);
 
         const auto ctx = ResourceContextDecorator::Decorate(context);
-        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && ffIt->second.has_value())
+        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && !ffIt->second.is_null())
         {
             auto ffResource = ffIt->second;
             auto fallbackFonts = std::vector<std::string>();
 
-            if (ffResource.type() == typeid(Gx::Json))
-                fallbackFonts = std::any_cast<Gx::Json>(ffResource);
-            else if (ffResource.type() == typeid(std::vector<std::string>()))
-                fallbackFonts = std::any_cast<std::vector<std::string>>(ffResource);
+            if (ffResource.is_array())
+                fallbackFonts = ffResource.get<std::vector<std::string>>();
 
             for (const auto& fontPath : fallbackFonts)
             {
@@ -113,11 +109,11 @@ namespace Cx
                 }
             });
 
-            window->SetPosition(metadata->Position);
+            window->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
-            if (metadata->Position == sf::Vector2f())
+            if (!metadata->Position.has_value())
             {
                 window->SetPosition({
                     static_cast<float>(bound->position.x),
@@ -125,7 +121,7 @@ namespace Cx
                 });
             }
             else
-                window->SetPosition(metadata->Position);
+                window->SetPosition(*metadata->Position);
 
             window->SetLocalBounds({
                 {},
@@ -141,7 +137,7 @@ namespace Cx
         window->SetScale(metadata->Scale);
         window->SetRotation(metadata->Rotation);
 
-        auto container = ObjectContainer::Decorate(window.get());
+        auto container = SceneComposer::Compose(*window);
         LoadChildren(container, meta, context);
     
         return window;

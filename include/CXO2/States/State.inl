@@ -9,6 +9,27 @@
 
 namespace Cx
 {
+    template<typename R>
+    R* State::Locate(Gx::ResourceManager& resources, const std::string& id)
+    {
+        if (auto resource = resources.Find<R>(id))
+            return resource;
+
+        if (auto resource = resources.Find<R>(fmt::format("{}/{}", GetName(), id)))
+            return resource;
+
+        if constexpr (std::is_base_of_v<Gx::Node, R>)
+        {
+            if (auto resource = dynamic_cast<R*>(resources.Find<Gx::Node>(id)))
+                return resource;
+
+            if (auto resource = dynamic_cast<R*>(resources.Find<Gx::Node>(fmt::format("{}/{}", GetName(), id))))
+                return resource;
+        }
+
+        return nullptr;
+    }
+
     template<typename R, std::enable_if_t<std::is_base_of_v<Gx::Node, R> || std::is_base_of_v<sf::SoundSource, R>, int>>
     R* State::Instantiate(const std::string& source, const ResourceScope scope)
     {
@@ -25,26 +46,19 @@ namespace Cx
         if (!resources)
             return nullptr;
 
-        R* instance = nullptr;
-        if (instance = resources->Find<R>(source); !instance)
+        auto instance = Locate<R>(*resources, source);
+        if (!instance)
         {
-            if (instance = resources->Find<R>(fmt::format("{}/{}",  GetName(), source)); !instance)
+            if constexpr (std::is_base_of_v<Gx::Node, R>)
             {
-                if constexpr (std::is_base_of_v<Gx::Node, R>)
-                {
-                    if (instance = dynamic_cast<R*>(resources->Find<Gx::Node>(source)); !instance)
-                    {
-                        if (instance = dynamic_cast<R*>(resources->Find<Gx::Node>(fmt::format("{}/{}",  GetName(), source))); !instance)
-                            instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
-                    }
-                }
+                instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
+            }
+            else
+            {
+                if (Gx::FileSystem::Contains(source))
+                    instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
                 else
-                {
-                    if (Gx::FileSystem::Contains(source))
-                        instance = &resources->AddFromFile<R>(Gx::StringHelper::RemoveExtension(source), source);
-                    else
-                        instance = &resources->AddFromDeserializer<R>(Gx::StringHelper::RemoveExtension(source), [this] { return GetContext().Instantiate<R>(); });
-                }
+                    instance = &resources->AddFromDeserializer<R>(Gx::StringHelper::RemoveExtension(source), [this] { return GetContext().Instantiate<R>(); });
             }
         }
 
@@ -121,21 +135,6 @@ namespace Cx
         if (!resources)
             return nullptr;
 
-        if (auto resource = resources->Find<R>(id))
-            return resource;
-
-        if (auto resource = resources->Find<R>(fmt::format("{}/{}", GetName(), id)))
-            return resource;
-
-        if constexpr (std::is_base_of_v<Gx::Node, R>)
-        {
-            if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(id)))
-                return resource;
-
-            if (auto resource = dynamic_cast<R*>(resources->Find<Gx::Node>(fmt::format("{}/{}", GetName(), id))))
-                return resource;
-        }
-
-        return nullptr;
+        return Locate<R>(*resources, id);
     }
 }

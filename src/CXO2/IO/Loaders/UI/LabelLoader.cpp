@@ -1,7 +1,7 @@
 #include <CXO2/IO/Loaders/UI/LabelLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/Metadata/UI/LabelMetadata.hpp>
 
@@ -28,22 +28,18 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
     
         auto label = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto font = ctx.Require<Gx::Font>(*metadata); font)
             label->SetFont(*font);
 
-        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && ffIt->second.has_value())
+        if (const auto ffIt = metadata->Require.find("fallbackFonts"); ffIt != metadata->Require.end() && !ffIt->second.is_null())
         {
-            auto ffResource = ffIt->second;
             auto fallbackFonts = std::vector<std::string>();
-
-            if (ffResource.type() == typeid(Gx::Json))
-                fallbackFonts = std::any_cast<Gx::Json>(ffResource);
-            else if (ffResource.type() == typeid(std::vector<std::string>()))
-                fallbackFonts = std::any_cast<std::vector<std::string>>(ffResource);
+            if (ffIt->second.is_array())
+                fallbackFonts = ffIt->second.get<std::vector<std::string>>();
 
             for (const auto& fontPath : fallbackFonts)
             {
@@ -54,9 +50,9 @@ namespace Cx
             }
         }
 
-        if (metadata->Position != sf::Vector2f())
+        if (metadata->Position.has_value())
         {
-            label->SetPosition(metadata->Position);
+            label->SetPosition(*metadata->Position);
         }
         else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
@@ -93,7 +89,7 @@ namespace Cx
         if (metadata->Kerning > 0)
             label->SetLetterSpacing(metadata->Kerning);
 
-        auto container = ObjectContainer::Decorate(label.get());
+        auto container = SceneComposer::Compose(*label);
         LoadChildren(container, meta, context);
 
         return label;
@@ -106,7 +102,7 @@ namespace Cx
 
         if (const auto transform = attributes.find("transform"); transform != attributes.end())
         {
-            if (!TransformLoader::ParseMetadata(transform.value(), metadata))
+            if (!TransformLoader::ParseMetadata(transform.value(), metadata, context))
                 return false;
         }
 

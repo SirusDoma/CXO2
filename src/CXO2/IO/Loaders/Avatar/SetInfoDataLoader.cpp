@@ -24,11 +24,14 @@ namespace Cx
         }
 
         metadata.Sets = std::map<unsigned int, SetInfoMetadata>();
-        auto sets = std::any_cast<Gx::Json>(metadata.Require["sets"]);
-        for (auto [key, resource] : sets.items())
+        const auto sets = metadata.Require.find("sets");
+        if (sets == metadata.Require.end())
+            return nullptr;
+
+        for (auto [key, resource] : sets->second.items())
         {
             unsigned int id = std::stoi(key);
-            auto setInfoData = std::any_cast<Gx::Json>(resource);
+            auto setInfoData = resource;
 
             auto setInfoMetadata = SetInfoMetadata();
             if (!MetadataLoader::Parse(setInfoData, setInfoMetadata, context))
@@ -38,10 +41,9 @@ namespace Cx
             if (require.empty())
                 continue;
 
-            if (const auto it = require.find("items"); it != require.end() && it->second.type() == typeid(Gx::Json))
+            if (const auto it = require.find("items"); it != require.end())
             {
-                auto table = std::any_cast<Gx::Json>(it->second);
-                for (const auto& itemID : table.items())
+                for (const auto& itemID : it->second.items())
                     setInfoMetadata.ItemsIDs.insert(itemID.value().get<unsigned int>());
             }
 

@@ -141,7 +141,7 @@ namespace Cx
         {
             if (auto it = metadata.Require.find("thumbnail"); it != metadata.Require.end())
             {
-                if (auto thumbnail = std::any_cast<Gx::Json>(it->second); !thumbnail.empty())
+                if (const auto& thumbnail = it->second; !thumbnail.empty())
                 {
                     metadata.SmallThumbnail = thumbnail.at("small").get<std::string>();
                     metadata.LargeThumbnail = thumbnail.at("large").get<std::string>();
@@ -159,8 +159,7 @@ namespace Cx
                 else
                     continue;
 
-                auto partAttributes = std::any_cast<Gx::Json>(partData);
-                for (auto [partKey, instrumentAttributes] : partAttributes.items())
+                for (auto [partKey, instrumentAttributes] : partData.items())
                 {
                     if (auto parse = magic_enum::enum_cast<RenderPart>(Gx::StringHelper::ToPascalCase(partKey).toAnsiString()); parse.has_value())
                         renderPart = parse.value();

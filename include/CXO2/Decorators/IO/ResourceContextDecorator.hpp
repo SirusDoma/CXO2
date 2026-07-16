@@ -17,9 +17,6 @@ namespace Cx
         static ResourceContextDecorator Rebind(const Gx::ResourceContext& ctx, const std::string& name);
 
         template<typename R>
-        R* Require() const;
-
-        template<typename R>
         R* Require(const ResourceMetadata& metadata, Gx::CacheMode cacheMode = Gx::CacheMode::Reuse) const;
 
         const ResourceMetadata* GetParent() const;

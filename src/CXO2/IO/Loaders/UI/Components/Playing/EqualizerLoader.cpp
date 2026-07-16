@@ -3,8 +3,7 @@
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <CXO2/IO/Loaders/UI/UiContainerLoader.hpp>
 #include <CXO2/IO/Loaders/MetadataLoader.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectContainer.hpp>
-#include <CXO2/IO/Loaders/SceneGraph/ObjectLoader.hpp>
+#include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -14,7 +13,7 @@ namespace Cx
     {
         auto metadata = EqualizerMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
-            return nullptr;
+            return Instantiate(context);
 
         if (const auto attributes = json.find("attributes"); attributes != json.end())
         {
@@ -41,14 +40,14 @@ namespace Cx
     {
         const auto metadata = dynamic_cast<const EqualizerMetadata*>(&meta);
         if (!metadata)
-            throw Gx::ResourceLoadException(context.GetID(), "The specified metadata is incompatible");
+            return Instantiate(context);
 
-        auto equalizer  = std::make_unique<Equalizer>();
-        auto container  = ObjectContainer::Decorate(equalizer.get());
+        auto equalizer  = Instantiate(context);
+        auto container  = SceneComposer::Compose(*equalizer);
         auto ctx        = ResourceContextDecorator::Decorate(context);
         equalizer->SetName(metadata->Name);
         equalizer->SetOrigin(metadata->Origin);
-        equalizer->SetPosition(metadata->Position);
+        equalizer->SetPosition(metadata->Position.value_or(sf::Vector2f()));
         equalizer->SetScale(metadata->Scale);
         equalizer->SetRotation(metadata->Rotation);
         equalizer->SetLocalBounds(
@@ -67,12 +66,11 @@ namespace Cx
         auto metaLoader = MetadataLoader();
         for (auto [key, value] : meta.Require)
         {
-            auto reference = std::any_cast<Gx::Json>(value);
-            if (reference.type() != Gx::Json::value_t::string)
+            if (value.type() != Gx::Json::value_t::string)
                 continue;
 
             auto name = fmt::format("{}/{}", meta.Name, key);
-            ObjectLoader::LoadFromJson(name, reference, container, ctx);
+            container.Add(name, value, ctx);
         }
 
         LoadChildren(container, meta, context);

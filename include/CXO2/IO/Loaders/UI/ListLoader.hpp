@@ -11,7 +11,7 @@ namespace Cx
     public:
         ListLoader() = default;
 
-        static void OnRegistered(const std::string& id);
+        static void OnRegistered(const std::string& id, const Builder& builder);
 
         Gx::ResourcePtr<Gx::List> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         Gx::ResourcePtr<Gx::List> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;

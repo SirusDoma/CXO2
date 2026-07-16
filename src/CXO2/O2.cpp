@@ -234,6 +234,7 @@ namespace Cx
         Gx::LocalFileSystem::AddAssetPath("./Music");
 
         // -- Register resource metadata loaders
+        // Note: Re-mapping loaders to derived types handled in the individual loader via `OnRegistered` callback
         // Core Resources
         Gx::ResourceLoaderFactory::Register<ResourceMetadata, MetadataLoader>();
         Gx::ResourceLoaderFactory::Register<ControlList, ControlListLoader>();
