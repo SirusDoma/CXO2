@@ -10,7 +10,7 @@
 namespace Cx
 {
     class Avatar;
-    class RoomSlot;
+    struct RoomSlot;
     class AvatarInfo : public Gx::UiContainer
     {
     public:
@@ -34,8 +34,9 @@ namespace Cx
     private:
         using ColorMap = std::unordered_map<RoomTeam, sf::Color>;
 
-        RoomSlot* m_slot;
-        ColorMap  m_teamColors;
+        sf::Color ResolveTeamColor();
 
+        RoomSlot* m_slot = nullptr;
+        ColorMap  m_teamColors;
     };
 }

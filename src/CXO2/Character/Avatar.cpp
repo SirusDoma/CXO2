@@ -2,6 +2,9 @@
 #include <CXO2/Models/Equipment.hpp>
 
 #include <CXO2/StringTable/Identifiers/Avatar.hpp>
+
+#include <utility>
+
 namespace Cx
 {
     using namespace StringTable::Identifiers;
@@ -112,24 +115,9 @@ namespace Cx
         }
     };
 
-    Avatar::Avatar() :
-        m_gender(),
-        m_instrument(Instrument::None),
-        m_alive(true),
-        m_items(),
-        m_defaultItems()
-    {
-    }
-
     Avatar::Avatar(const Gender gender) :
-        Avatar()
+        m_gender(gender)
     {
-        m_gender = gender;
-    }
-
-    void Avatar::Initialize()
-    {
-        Gx::Node::Initialize();
     }
 
     Gender Avatar::GetGender() const
@@ -163,30 +151,18 @@ namespace Cx
 
     void Avatar::Equip(const Item& item)
     {
-        if (item.GetID() == 0)
-            return;
-
-        if (IsEquiped(item))
-            return;
-
-        // Equip only equippable item
-        if (!item.IsEquipable())
+        if (item.GetID() == 0 || IsEquiped(item) || !item.IsEquipable())
             return;
 
         // Check whether the item gender is matching
         if (item.GetGender() != Gender::Any && item.GetGender() != m_gender)
             return;
 
-        // Check whether the item is already equipped
-        if (const auto equipped = m_items.find(item.GetType()); equipped != m_items.end() && equipped->second.GetID() == item.GetID())
+        if (m_items.find(EquipmentType::Costume) != m_items.end())
             return;
 
-        // Check whether a costume is currently equipped
-        if (const auto equipped = m_items.find(EquipmentType::Costume); equipped != m_items.end())
-            return;
-
-        // Unequip existing instrument if the item is an instrument
-        if (item.GetInstrument() != Instrument::None)
+        const auto instrument = item.GetInstrument();
+        if (instrument != Instrument::None)
         {
             for (const auto type : { EquipmentType::Guitar, EquipmentType::Bass, EquipmentType::Drum, EquipmentType::Keyboard })
                 Unequip(type);
@@ -196,15 +172,9 @@ namespace Cx
         if (item.GetType() == EquipmentType::Costume)
             ClearEquipments();
 
-        m_items[item.GetType()] = std::move(item);
-        switch (item.GetType())
-        {
-            case EquipmentType::Keyboard: m_instrument = Instrument::Keyboard; break;
-            case EquipmentType::Bass:     m_instrument = Instrument::Bass;     break;
-            case EquipmentType::Drum:     m_instrument = Instrument::Drum;     break;
-            case EquipmentType::Guitar:   m_instrument = Instrument::Guitar;   break;
-            default: break;
-        }
+        m_items[item.GetType()] = item;
+        if (instrument != Instrument::None)
+            m_instrument = instrument;
 
         ResetRenderables();
     }
@@ -215,25 +185,10 @@ namespace Cx
             return;
 
         const auto iterator = m_items.find(item.GetType());
-        if (iterator == m_items.end())
+        if (iterator == m_items.end() || iterator->second.GetID() != item.GetID())
             return;
 
-        if (iterator->second.GetID() != item.GetID())
-            return;
-
-        switch (item.GetType())
-        {
-            case EquipmentType::Keyboard:
-            case EquipmentType::Bass:
-            case EquipmentType::Drum:
-            case EquipmentType::Guitar:
-                m_instrument = Instrument::None;
-            break;
-            default: break;
-        }
-
-        m_items.erase(iterator);
-        ResetRenderables();
+        Unequip(item.GetType());
     }
 
     void Avatar::Unequip(const EquipmentType type)
@@ -242,18 +197,18 @@ namespace Cx
         if (iterator == m_items.end())
             return;
 
-        switch (type)
-        {
-            case EquipmentType::Keyboard:
-            case EquipmentType::Bass:
-            case EquipmentType::Drum:
-            case EquipmentType::Guitar:
-                m_instrument = Instrument::None;
-                break;
-            default: break;
-        }
+        if (iterator->second.GetInstrument() != Instrument::None)
+            m_instrument = Instrument::None;
 
         m_items.erase(iterator);
+        ResetRenderables();
+    }
+
+    void Avatar::ClearEquipments()
+    {
+        m_items.clear();
+        m_instrument = Instrument::None;
+
         ResetRenderables();
     }
 
@@ -272,19 +227,13 @@ namespace Cx
         m_alive = true;
     }
 
-    void Avatar::ResetRenderables() const
+    void Avatar::ResetRenderables()
     {
         for (auto& [_, item] : m_items)
-        {
-            for (const auto renderable : item.GetRenderables())
-                renderable->Reset();
-        }
+            item.ResetRenderables();
 
         for (auto& [_, item] : m_defaultItems)
-        {
-            for (const auto renderable : item.GetRenderables())
-                renderable->Reset();
-        }
+            item.ResetRenderables();
     }
 
     AvatarInfo* Avatar::GetAvatarInfo() const
@@ -292,7 +241,7 @@ namespace Cx
         return FindChild<AvatarInfo>(Resource::Avatar::IDC_AVATAR_INFO);
     }
 
-    const Instrument& Avatar::GetEquipedInstrumentType() const
+    Instrument Avatar::GetEquipedInstrumentType() const
     {
         return m_instrument;
     }
@@ -328,11 +277,28 @@ namespace Cx
         m_offset = offset;
     }
 
+    Item* Avatar::FindItem(const EquipmentType type)
+    {
+        return const_cast<Item*>(std::as_const(*this).FindItem(type));
+    }
 
-    void Avatar::Update(const sf::Time& delta)
+    const Item* Avatar::FindItem(const EquipmentType type) const
+    {
+        auto iterator = m_items.find(type);
+        if (iterator == m_items.end())
+        {
+            iterator = m_defaultItems.find(type);
+            if (iterator == m_defaultItems.end())
+                return nullptr;
+        }
+
+        return &iterator->second;
+    }
+
+    void Avatar::UpdateOhmEffect()
     {
         const auto ohmEffect = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM_EFFECT);
-        const auto ohm = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM);
+        const auto ohm       = FindChild<Gx::Animation>(Resource::Avatar::IDC_ANIMATION_OHM);
 
         if (m_alive)
         {
@@ -344,35 +310,41 @@ namespace Cx
 
             if (ohm)
                 ohm->SetVisible(false);
-        }
-        else if (ohmEffect && ohm && ohmEffect->GetState() != Gx::Animation::AnimationState::Playing && ohmEffect->GetState() != Gx::Animation::AnimationState::Completed)
-        {
-            ohmEffect->SetAnimationCallback([ohm] (auto& animation)
-            {
-                if (animation.GetState() == Gx::Animation::AnimationState::Completed)
-                {
-                    animation.SetVisible(false);
-                    if (ohm)
-                        ohm->SetVisible(true);
-                }
-            });
 
-            ohmEffect->SetVisible(true);
-            ohmEffect->Reset();
+            return;
         }
 
-        for (auto [type, part] : RenderLayerOrder)
+        if (!ohmEffect || !ohm)
+            return;
+
+        if (ohmEffect->GetState() == Gx::Animation::AnimationState::Playing || ohmEffect->GetState() == Gx::Animation::AnimationState::Completed)
+            return;
+
+        ohmEffect->SetAnimationCallback([ohm] (auto& animation)
         {
-            auto iterator = m_items.find(type);
-            if (iterator == m_items.end())
+            if (animation.GetState() == Gx::Animation::AnimationState::Completed)
             {
-                iterator = m_defaultItems.find(type);
-                if (iterator == m_defaultItems.end())
-                    continue;
+                animation.SetVisible(false);
+                if (ohm)
+                    ohm->SetVisible(true);
             }
+        });
 
-            if (const auto animation = iterator->second.GetRenderableItem(m_gender, part, m_instrument))
-                animation->Update(delta);
+        ohmEffect->SetVisible(true);
+        ohmEffect->Reset();
+    }
+
+    void Avatar::Update(const sf::Time& delta)
+    {
+        UpdateOhmEffect();
+
+        for (const auto [type, part] : RenderLayerOrder)
+        {
+            if (const auto item = FindItem(type))
+            {
+                if (const auto animation = item->GetRenderableItem(m_gender, part, m_instrument))
+                    animation->Update(delta);
+            }
         }
 
         UpdatableContainer::Update(delta);
@@ -384,33 +356,28 @@ namespace Cx
             return states;
 
         states.transform *= GetTransform();
+        if (!m_alive)
+            return RenderableContainer::Render(surface, states);
 
         auto offset = states;
         offset.transform.translate(m_offset);
 
-        if (!m_alive)
-            return RenderableContainer::Render(surface, states);
-
         for (auto [type, part] : RenderLayerOrder)
         {
             // Special layer handling for keyboard
-            if (m_instrument == Instrument::Keyboard)
+            if (m_instrument == Instrument::Keyboard && part == RenderPart::Body)
             {
-                if (type == EquipmentType::LeftArm && part == RenderPart::Body)
+                if (type == EquipmentType::LeftArm)
                     type = EquipmentType::Top;
-                else if (type == EquipmentType::Top && part == RenderPart::Body)
+                else if (type == EquipmentType::Top)
                     type = EquipmentType::LeftArm;
             }
 
-            auto iterator = m_items.find(type);
-            if (iterator == m_items.end())
-            {
-                iterator = m_defaultItems.find(type);
-                if (iterator == m_defaultItems.end())
-                    continue;
-            }
+            const auto item = FindItem(type);
+            if (!item)
+                continue;
 
-            if (const auto& animation = iterator->second.GetRenderableItem(m_gender, part, m_instrument))
+            if (const auto animation = item->GetRenderableItem(m_gender, part, m_instrument))
                 animation->Render(surface, offset);
 
             offset.Layer += 1.f;
@@ -420,13 +387,5 @@ namespace Cx
 
         states.Layer = offset.Layer;
         return RenderableContainer::Render(surface, states);
-    }
-
-    void Avatar::ClearEquipments()
-    {
-        m_items.clear();
-        m_instrument = Instrument::None;
-
-        ResetRenderables();
     }
 }

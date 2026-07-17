@@ -7,7 +7,7 @@
 
 #include <Genode/SceneGraph.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace Cx
 {
@@ -16,10 +16,8 @@ namespace Cx
     public:
         using ItemMap = std::unordered_map<EquipmentType, Item>;
 
-        Avatar();
+        Avatar() = default;
         explicit Avatar(Gender gender);
-
-        void Initialize() override;
 
         Gender GetGender() const;
         void SetGender(Gender gender);
@@ -36,23 +34,28 @@ namespace Cx
         void SetOffset(const sf::Vector2f& offset);
 
         AvatarInfo* GetAvatarInfo() const;
-        const Instrument& GetEquipedInstrumentType() const;
+        Instrument GetEquipedInstrumentType() const;
         std::unordered_map<EquipmentType, const Item*> GetEquipedItems(bool includeDefaultItems = false) const;
 
         bool IsAlive() const;
         void Die();
         void Revive();
 
-        void ResetRenderables() const;
+        void ResetRenderables();
 
     private:
         void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-        Gender       m_gender;
-        Instrument   m_instrument;
-        bool         m_alive;
+        void UpdateOhmEffect();
+
+        Item* FindItem(EquipmentType type);
+        const Item* FindItem(EquipmentType type) const;
+
+        Gender       m_gender{};
+        Instrument   m_instrument{Instrument::None};
+        bool         m_alive{true};
         sf::Vector2f m_offset;
-        mutable ItemMap m_items, m_defaultItems;
+        ItemMap      m_items, m_defaultItems;
     };
 }

@@ -16,6 +16,6 @@ namespace Cx
         [[nodiscard]] Gx::ResourcePtr<sf::Music> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         [[nodiscard]] Gx::ResourcePtr<sf::Music> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
-        bool IsStreaming() const override;
+        [[nodiscard]] bool IsStreaming() const override;
     };
 }

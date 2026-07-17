@@ -12,9 +12,9 @@ namespace Cx
 
         static void OnRegistered(const std::string& id, const Builder& builder);
 
-        Gx::ResourcePtr<Gx::Image> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<Gx::Image> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Image> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Image> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
-        static bool ParseMetadata(const Gx::Json& attributes, ImageMetadata& metadata, const Gx::ResourceContext& context);
+        [[nodiscard]] static bool ParseMetadata(const Gx::Json& attributes, ImageMetadata& metadata, const Gx::ResourceContext& context);
     };
 }

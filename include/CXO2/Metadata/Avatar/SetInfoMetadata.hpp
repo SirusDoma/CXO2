@@ -17,8 +17,8 @@ namespace Cx
     {
         unsigned int                     ID;
         sf::String                       Name, Description;
-        Cx::Planet                         Origin;
-        Cx::Gender                         Gender;
+        Cx::Planet                       Origin;
+        Cx::Gender                       Gender;
         bool                             IsNew;
         DiscountMap                      Discounts = {};
         std::unordered_set<unsigned int> ItemsIDs  = {};

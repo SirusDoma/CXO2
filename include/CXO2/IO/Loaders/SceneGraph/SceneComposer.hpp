@@ -18,8 +18,8 @@ namespace Cx
     public:
         using Handler = std::function<void(const std::string&, const Gx::Json&, SceneComposer&, Gx::ResourceContext&)>;
 
-        static SceneComposer Compose(State& target, bool instantiate = true);
-        static SceneComposer Compose(Gx::Node& target);
+        [[nodiscard]] static SceneComposer Compose(State& target, bool instantiate = true);
+        [[nodiscard]] static SceneComposer Compose(Gx::Node& target);
 
         static void Register(const std::string& type, Handler handler);
 

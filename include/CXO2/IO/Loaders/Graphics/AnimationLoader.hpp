@@ -11,7 +11,7 @@ namespace Cx
     public :
         AnimationLoader() = default;
 
-        Gx::ResourcePtr<Gx::Animation> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<Gx::Animation> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Animation> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Animation> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };
 }

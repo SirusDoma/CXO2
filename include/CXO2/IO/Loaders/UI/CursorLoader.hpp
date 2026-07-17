@@ -10,7 +10,7 @@ namespace Cx
     public :
         CursorLoader() = default;
 
-        Gx::ResourcePtr<Gx::Cursor> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<Gx::Cursor> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Cursor> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::Cursor> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };
 }

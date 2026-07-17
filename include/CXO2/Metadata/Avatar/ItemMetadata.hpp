@@ -14,16 +14,16 @@ namespace Cx
     {
         struct ItemSpriteMetadata
         {
-            Cx::Gender      Gender;
-            Cx::RenderPart  RenderPart;
-            Cx::Instrument  Instrument;
-            Gx::Json      Reference;
+            Cx::Gender     Gender;
+            Cx::RenderPart RenderPart;
+            Cx::Instrument Instrument;
+            Gx::Json       Reference;
         };
 
         unsigned int                     ID;
-        Cx::EquipmentType                  EquipmentType;
-        Cx::Planet                         Origin;
-        Cx::Gender                         Gender;
+        Cx::EquipmentType                EquipmentType;
+        Cx::Planet                       Origin;
+        Cx::Gender                       Gender;
         bool                             IsNew;
         sf::String                       Name, Description;
         Gx::Json                         SmallThumbnail, LargeThumbnail;

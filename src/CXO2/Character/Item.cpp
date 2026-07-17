@@ -2,6 +2,8 @@
 #include <CXO2/Models/Planet.hpp>
 #include <CXO2/Models/Equipment.hpp>
 
+#include <utility>
+
 namespace Cx
 {
     unsigned int Item::GetID() const
@@ -123,24 +125,19 @@ namespace Cx
         m_renderables[RenderableKey(gender, renderType, instrument)] = std::move(animation);
     }
 
-    Gx::Animation* Item::GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument)
+    Gx::Animation* Item::GetRenderableItem(const Gender gender, const RenderPart renderType, const Instrument instrument)
     {
-        const auto find = m_renderables.find(RenderableKey(gender, renderType, instrument));
-        if (find != m_renderables.end())
-            return &find->second;
+        return const_cast<Gx::Animation*>(std::as_const(*this).GetRenderableItem(gender, renderType, instrument));
+    }
+
+    const Gx::Animation* Item::GetRenderableItem(const Gender gender, const RenderPart renderType, const Instrument instrument) const
+    {
+        const auto iterator = m_renderables.find(RenderableKey(gender, renderType, instrument));
+        if (iterator != m_renderables.end())
+            return &iterator->second;
 
         return nullptr;
     }
-
-    std::vector<Gx::Animation*> Item::GetRenderables()
-    {
-        auto renderables = std::vector<Gx::Animation *>();
-        for (auto& [_, renderable] : m_renderables)
-            renderables.push_back(&renderable);
-
-        return renderables;
-    }
-
 
     void Item::ResetRenderables()
     {

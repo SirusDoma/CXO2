@@ -13,7 +13,6 @@
 
 #include <tuple>
 #include <unordered_map>
-#include <memory>
 #include <map>
 
 namespace Cx
@@ -61,7 +60,7 @@ namespace Cx
 
         void SetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument, Gx::Animation&& animation);
         Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument);
-        std::vector<Gx::Animation*> GetRenderables();
+        const Gx::Animation* GetRenderableItem(Gender gender, RenderPart renderType, Instrument instrument) const;
 
         void ResetRenderables();
 
@@ -69,13 +68,13 @@ namespace Cx
         using RenderableKey = std::tuple<Gender, RenderPart, Instrument>;
         using PriceMap      = std::unordered_map<Currency, unsigned int>;
 
-        unsigned int     m_id;
-        EquipmentType    m_type;
-        Planet           m_origin;
-        Gender           m_gender;
-        bool             m_isNew;
-        sf::String       m_name, m_description;
-        mutable PriceMap m_prices;
+        unsigned int  m_id{0};
+        EquipmentType m_type{};
+        Planet        m_origin{};
+        Gender        m_gender{};
+        bool          m_isNew{false};
+        sf::String    m_name, m_description;
+        PriceMap      m_prices;
 
         Gx::Sprite m_smallThumbnail, m_largeThumbnail;
         std::map<RenderableKey, Gx::Animation> m_renderables;

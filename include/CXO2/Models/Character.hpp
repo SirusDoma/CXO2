@@ -25,16 +25,14 @@ namespace Cx
     {
         struct ItemInfo
         {
-            ItemInfo() = default;
-
             // ReSharper disable once CppNonExplicitConvertingConstructor
             ItemInfo(const std::uint32_t id) : ID(id) {}
 
-            std::uint32_t ID{};
-            std::uint32_t Quantity{1};
-
             // ReSharper disable once CppNonExplicitConversionOperator
             operator std::uint32_t() const { return ID;}
+
+            std::uint32_t ID{};
+            std::uint32_t Quantity{1};
         };
 
         struct RankStatsInfo

@@ -61,11 +61,11 @@ namespace Cx
 
     Gx::ResourcePtr<Avatar> AvatarLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
-        auto avatar = std::make_unique<Avatar>();
         const auto metadata = dynamic_cast<const AvatarMetadata*>(&meta);
         if (!metadata)
             return Instantiate(context);
 
+        auto avatar = Instantiate(context);
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (metadata->Position.has_value())
         {

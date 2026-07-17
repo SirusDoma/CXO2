@@ -10,16 +10,16 @@ namespace Cx
     public:
         using Gx::ResourceContext::ResourceContext;
 
-        bool IsFxEnabled() const;
+        [[nodiscard]] bool IsFxEnabled() const;
         void SetFxEnabled(const bool enabled);
 
-        unsigned int GetMapID() const;
+        [[nodiscard]] unsigned int GetMapID() const;
         void SetMapID(const unsigned int mapID);
 
-        unsigned int GetEffectID() const;
+        [[nodiscard]] unsigned int GetEffectID() const;
         void SetEffectID(const unsigned int effectID);
 
-        GameMode GetMode() const;
+        [[nodiscard]] GameMode GetMode() const;
         void SetMode(const GameMode mode);
 
     private:

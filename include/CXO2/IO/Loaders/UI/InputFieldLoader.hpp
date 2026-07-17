@@ -11,7 +11,7 @@ namespace Cx
     public :
         InputFieldLoader() = default;
 
-        Gx::ResourcePtr<Gx::InputField> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        Gx::ResourcePtr<Gx::InputField> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::InputField> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Gx::InputField> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };
 }

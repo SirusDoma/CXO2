@@ -676,11 +676,11 @@ The set info data table defines item set packages available in the item shop. Th
 | +37 | `int32` | Item Price 3 |
 | +41 | `int32` | Item Price 4 |
 | +45 | `int32` | Item Price 5 |
-| +49 | `int32` | Item Discount 1 |
-| +53 | `int32` | Item Discount 2 |
-| +57 | `int32` | Item Discount 3 |
-| +61 | `int32` | Item Discount 4 |
-| +65 | `int32` | Item Discount 5 |
+| +49 | `int32` | Item Sale Price 1 |
+| +53 | `int32` | Item Sale Price 2 |
+| +57 | `int32` | Item Sale Price 3 |
+| +61 | `int32` | Item Sale Price 4 |
+| +65 | `int32` | Item Sale Price 5 |
 | +69 | `int32` | Name Length (in bytes) |
 | +73 | `char[]` | Set Name |
 | +73+n | `int32` | Description Length (in bytes) |

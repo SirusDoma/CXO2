@@ -61,7 +61,7 @@ namespace Cx
         if (!stream.seek(0).has_value())
             throw Gx::ResourceLoadException(ctx.GetID());
 
-        if (stream.read(&metadata, O2JamChartMetadata::Size) != O2JamChartMetadata::Size)
+        if (stream.read(static_cast<O2JamChartHeader*>(&metadata), sizeof(O2JamChartHeader)) != sizeof(O2JamChartHeader))
             return nullptr;
 
         chart->SetMetadata(metadata.ToChartMetadata());

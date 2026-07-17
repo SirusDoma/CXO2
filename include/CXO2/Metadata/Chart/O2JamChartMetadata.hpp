@@ -745,7 +745,7 @@ namespace Cx
         0x59FB92D9
     };
 
-    enum class Genre
+    enum class Genre : std::uint32_t
     {
         Ballad      = 0,
         Rock        = 1,
@@ -760,10 +760,9 @@ namespace Cx
         Etc         = 10
     };
 
-    struct O2JamChartMetadata
+    #pragma pack(push, 1)
+    struct O2JamChartHeader
     {
-        static constexpr std::uint32_t Size = 300;
-
         std::uint32_t ID;
         char Signature[4];
         float EncodingVersion;
@@ -802,7 +801,11 @@ namespace Cx
         std::uint32_t BlockOffsetNx;
         std::uint32_t BlockOffsetHx;
         std::uint32_t CoverOffset;
+    };
+    #pragma pack(pop)
 
+    struct O2JamChartMetadata : O2JamChartHeader
+    {
         std::string Source;
 
         unsigned int GetLevel(const Difficulty difficulty) const

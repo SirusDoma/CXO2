@@ -33,10 +33,8 @@ namespace Cx
         void ClearCache();
 
     private:
-        const ItemMetadata DefaultItemMetadata{};
-
-        ItemData& m_itemData;
-        SetInfoData* m_setInfoData;
-        Gx::ResourceManager* m_resources;
+        Gx::ResourceManager& m_resources;
+        ItemData&            m_itemData;
+        SetInfoData*         m_setInfoData;
     };
 }

@@ -16,7 +16,7 @@ namespace Cx
     public:
         FontLoader() = default;
 
-        bool IsStreaming() const override;
+        [[nodiscard]] bool IsStreaming() const override;
         void UseSmooth(bool smooth);
 
         [[nodiscard]] Gx::ResourcePtr<Gx::Font> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const override;

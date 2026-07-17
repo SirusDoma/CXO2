@@ -30,7 +30,7 @@ namespace Cx
         auto& stream = *decryptedStream.get();
 
         auto metadata = std::make_unique<O2JamChartMetadata>();
-        if (stream.read(metadata.get(), O2JamChartMetadata::Size) != O2JamChartMetadata::Size)
+        if (stream.read(static_cast<O2JamChartHeader*>(metadata.get()), sizeof(O2JamChartHeader)) != sizeof(O2JamChartHeader))
             return nullptr;
 
         metadata->Source = ctx.GetID();
