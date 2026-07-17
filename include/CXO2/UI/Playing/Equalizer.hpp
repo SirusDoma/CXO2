@@ -1,4 +1,5 @@
 #pragma once
+
 #include <CXO2/Core/Chart.hpp>
 
 #include <Genode/Entities/Renderable.hpp>
@@ -9,8 +10,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-
-#include <kissfft/kiss_fft.h>
 
 #include <vector>
 #include <complex>

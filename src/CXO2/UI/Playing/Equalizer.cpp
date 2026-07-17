@@ -3,7 +3,7 @@
 
 #include <Genode/UI/List.hpp>
 
-#include <kissfft/kiss_fft.h>
+#include <dj_fft/dj_fft.h>
 
 #include <algorithm>
 #include <cmath>
@@ -121,8 +121,11 @@ namespace Cx
         if (!combinedSamples.empty())
         {
             auto magnitudes = std::vector<float>();
-            if (combinedSamples.size() % 2 != 0)
-                combinedSamples.push_back(0);
+            std::size_t paddedSize = 1;
+            while (paddedSize < combinedSamples.size())
+                paddedSize <<= 1;
+
+            combinedSamples.resize(paddedSize, 0);
 
             AnalyzeSamples(combinedSamples, magnitudes);
             if (magnitudes.empty())
@@ -147,20 +150,14 @@ namespace Cx
     void Equalizer::AnalyzeSamples(const std::vector<std::int16_t>& samples, std::vector<float>& output) const
     {
         const std::size_t N = samples.size();
-        const auto cfg = std::unique_ptr<kiss_fft_state, std::function<void(kiss_fft_state*)>>
-        (
-            kiss_fft_alloc(N, 0, nullptr, nullptr),
-            [] (kiss_fft_state* ptr) { free(ptr); }
-        );
 
-        std::vector<kiss_fft_cpx> in(N);
-        std::vector<kiss_fft_cpx> out(N);
+        std::vector<std::complex<float>> in(N);
 
         constexpr float normalizeFactor = 32768.f; // SHORT_MAX + 1.f
         for (std::size_t i = 0; i < N; ++i)
             in[i] = { static_cast<float>(samples[i]) / normalizeFactor, 0.f };
 
-        kiss_fft(cfg.get(), in.data(), out.data());
+        const auto out = dj::fft1d(in, dj::fft_dir::DIR_FWD);
 
         constexpr std::array<std::size_t, 23> freqIndices = {
             2,
@@ -188,11 +185,13 @@ namespace Cx
             279
         };
 
-        auto magnitudes = std::vector<float>(m_bufferSampleCount);
+        const float unitaryFactor = std::sqrt(static_cast<float>(N));
+
+        auto magnitudes = std::vector<float>(N);
         for (std::size_t i = 0; i < N; i++)
         {
             constexpr float scaleFactor = 32.f;
-            const float magnitude       = std::hypot(out[i].r, out[i].i) / scaleFactor;
+            const float magnitude       = std::abs(out[i]) * unitaryFactor / scaleFactor;
 
             magnitudes[i] += magnitude;
         }

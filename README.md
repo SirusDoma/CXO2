@@ -71,7 +71,7 @@ List of dependencies:
 - [fmt](https://github.com/fmtlib/fmt)
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [magic_enum](https://github.com/Neargye/magic_enum)
-- [kissfft](https://github.com/mborgerding/kissfft)
+- [dj_fft](https://github.com/jdupuy/dj_fft)
 - [libiconv](https://www.gnu.org/software/libiconv/) (Linux and macOS)
 - [Fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) (Linux, optional)
 - [compact_enc_det](https://github.com/google/compact_enc_det)
