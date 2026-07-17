@@ -1,11 +1,12 @@
 #pragma once
 
-#include <boost/interprocess/sync/file_lock.hpp>
 #include <memory>
 #include <string>
 
 namespace Cx
 {
+    class NamedMutexImpl;
+
     class NamedMutex final
     {
     public:
@@ -18,11 +19,6 @@ namespace Cx
         bool IsLocked() const;
 
     private:
-        std::string m_name;
-
-        void* m_handle;
-        std::unique_ptr<boost::interprocess::file_lock> m_mutex;
-
-        bool m_locked;
+        std::unique_ptr<NamedMutexImpl> m_impl;
     };
 }

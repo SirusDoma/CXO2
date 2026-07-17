@@ -1,7 +1,9 @@
-#include <magic_enum/magic_enum.hpp>
-#include <Genode/IO/FileSystem/LocalFileSystem.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
+
+#include <Genode/IO/LocalFileSystem.hpp>
+
+#include <magic_enum/magic_enum.hpp>
 
 namespace Cx
 {

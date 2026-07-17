@@ -64,7 +64,7 @@ Most of the dependencies are pulled in through the [Genode](https://github.com/S
 
 List of dependencies:
 - [SFML](https://github.com/SFML/SFML)
-- [boost (header-only)](https://www.boost.org/)
+- [Boost.PFR](https://github.com/boostorg/pfr)
 - [freetype2](https://freetype.org/)
 - [HarfBuzz](https://github.com/harfbuzz/harfbuzz)
 - [SheenBidi](https://github.com/Tehreer/SheenBidi)
@@ -76,7 +76,6 @@ List of dependencies:
 - [Fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) (Linux, optional)
 - [compact_enc_det](https://github.com/google/compact_enc_det)
 - [tinyfiledialogs](http://tinyfiledialogs.sourceforge.net)
-- [WinReg](https://github.com/GiovanniDicanio/WinReg) (Windows)
 
 See `CMakeList.txt` if you want to compile the executable with an icon included.
 

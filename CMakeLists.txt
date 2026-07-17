@@ -21,7 +21,7 @@ set(TARGET "CXO2")
 # Executable output name kept as "OTwo" across all platforms (OTwo.exe / OTwo.app / OTwo)
 set(OUTPUT_NAME "OTwo")
 
-# Sources and Headers
+# Sources
 file(GLOB_RECURSE SRCS
     src/main.cpp
     src/CXO2/*.cpp
@@ -30,6 +30,16 @@ file(GLOB_RECURSE SRCS
     extlibs/libs/internal/*.cpp
 )
 
+# Platform-specific sources
+if(WIN32)
+    list(FILTER SRCS EXCLUDE REGEX "/(Unix|macOS)/")
+elseif(APPLE)
+    list(FILTER SRCS EXCLUDE REGEX "/(Win32)/")
+else()
+    list(FILTER SRCS EXCLUDE REGEX "/(Win32|macOS)/")
+endif()
+
+# Headers
 file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE HEADERS include/*.hpp)
 file(GLOB_RECURSE HEADERS extlibs/headers/*.hpp)
@@ -168,13 +178,6 @@ else()
 
     # Freetype
     find_package(Freetype REQUIRED)
-
-    # Fontconfig for font discovery on Linux
-    find_package(Fontconfig QUIET)
-    if (Fontconfig_FOUND)
-        target_link_libraries(${TARGET} PRIVATE Fontconfig::Fontconfig)
-        target_compile_definitions(${TARGET} PRIVATE USE_FONTCONFIG)
-    endif()
 endif()
 
 # Set executable output name
@@ -195,6 +198,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(magic_enum)
 
+# -- Compact Encoding Detector
+FetchContent_Declare(
+    ced
+    GIT_REPOSITORY https://github.com/google/compact_enc_det.git
+    GIT_TAG        d127078cedef9c6642cbe592dacdd2292b50bb19
+    SOURCE_SUBDIR  disabled
+)
+FetchContent_MakeAvailable(ced)
+add_library(ced STATIC
+    ${ced_SOURCE_DIR}/compact_enc_det/compact_enc_det.cc
+    ${ced_SOURCE_DIR}/compact_enc_det/compact_enc_det_hint_code.cc
+    ${ced_SOURCE_DIR}/util/encodings/encodings.cc
+    ${ced_SOURCE_DIR}/util/languages/languages.cc
+)
+target_include_directories(ced PUBLIC ${ced_SOURCE_DIR})
+
 message("-- Output Directory: " ${OUTPUT_DIR})
 
 # Application includes
@@ -211,6 +230,9 @@ target_link_libraries(${TARGET} PRIVATE fmt::fmt)
 
 # Link Magic Enum
 target_link_libraries(${TARGET} PRIVATE magic_enum::magic_enum)
+
+# Link Compact Encoding Detector
+target_link_libraries(${TARGET} PRIVATE ced)
 
 # Link Boost PFR
 target_link_libraries(${TARGET} PRIVATE Boost::pfr)

@@ -3,7 +3,7 @@
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 #include <Genode/SceneGraph/Node.hpp>
 

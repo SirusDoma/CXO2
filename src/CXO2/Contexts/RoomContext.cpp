@@ -1,5 +1,3 @@
-#include <Genode/IO/FileSystem/FileSystem.hpp>
-
 #include <CXO2/Contexts/RoomContext.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
 
@@ -10,6 +8,8 @@
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 
 #include <CXO2/StringTable/Identifiers/Cache.hpp>
+
+#include <Genode/IO/FileSystem.hpp>
 
 namespace Cx
 {

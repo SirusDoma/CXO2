@@ -2,7 +2,7 @@
 
 namespace Cx
 {
-    MessageService::MessageService(Gx::TcpNetworkClient& client, Gx::EventDispatcher& events) :
+    MessageService::MessageService(Gx::TcpNetworkClient& client, Gx::Events::EventDispatcher& events) :
         MessageDispatcher(client),
         m_client(client),
         m_events(events)

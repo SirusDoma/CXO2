@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Genode/IO/FileSystem/FileInfo.hpp>
+#include <Genode/IO/FileInfo.hpp>
 #include <cstdint>
 
 namespace Cx

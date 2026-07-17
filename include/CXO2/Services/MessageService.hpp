@@ -3,7 +3,7 @@
 #include <CXO2/Network/MessageDispatcher.hpp>
 
 #include <Genode/System/Module.hpp>
-#include <Genode/System/EventDispatcher.hpp>
+#include <Genode/Events/EventDispatcher.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -15,12 +15,12 @@ namespace Cx
         class TMessage,
         typename = std::enable_if_t<IsMessage<TMessage>::value>
     >
-    using MessageSubscriber = Gx::Subscriber<std::uint16_t, MessageEnvelope<TMessage>>;
+    using MessageSubscriber = Gx::Events::Subscriber<std::uint16_t, MessageEnvelope<TMessage>>;
 
     class MessageService : public MessageDispatcher, public Gx::Module
     {
     public:
-        MessageService(Gx::TcpNetworkClient& client, Gx::EventDispatcher& events);
+        MessageService(Gx::TcpNetworkClient& client, Gx::Events::EventDispatcher& events);
 
         void Connect(
             const sf::IpAddress& ipAddress,
@@ -96,8 +96,8 @@ namespace Cx
             std::function<void()> Beat{};
         };
 
-        Gx::TcpNetworkClient&                              m_client;
-        Gx::EventDispatcher&                            m_events;
+        Gx::TcpNetworkClient&                           m_client;
+        Gx::Events::EventDispatcher&                    m_events;
         std::unordered_map<std::uint16_t, Subscription> m_subscriptions{};
         Heartbeat                                       m_heartbeat{};
         std::function<void()>                           m_connectedCallback{};

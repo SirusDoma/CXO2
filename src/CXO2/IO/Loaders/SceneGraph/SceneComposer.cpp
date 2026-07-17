@@ -1,6 +1,6 @@
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 
 #include <vector>
 

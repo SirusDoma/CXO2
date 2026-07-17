@@ -4,7 +4,7 @@
 #include <CXO2/Metadata/Audio/MusicMetadata.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 
 namespace Cx

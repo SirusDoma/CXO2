@@ -1,5 +1,5 @@
 #include <CXO2/Archives/OjmArchive.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 
 #include <string>
 

@@ -6,7 +6,7 @@
 #include <CXO2/Metadata/Avatar/ItemData.hpp>
 #include <CXO2/Metadata/Avatar/SetInfoData.hpp>
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 
 #include <fmt/format.h>
 #include <future>

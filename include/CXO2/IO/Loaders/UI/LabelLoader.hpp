@@ -13,6 +13,6 @@ namespace Cx
         [[nodiscard]] Gx::ResourcePtr<Gx::Label> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         [[nodiscard]] Gx::ResourcePtr<Gx::Label> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
-        [[nodiscard]] static bool ParseMetadata(const Gx::Json& attributes, LabelMetadata& metadata, const Gx::ResourceContext& context);
+        static bool ParseMetadata(const Gx::Json& attributes, LabelMetadata& metadata, const Gx::ResourceContext& context);
     };
 }

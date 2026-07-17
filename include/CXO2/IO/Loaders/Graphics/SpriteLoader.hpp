@@ -14,6 +14,6 @@ namespace Cx
         [[nodiscard]] Gx::ResourcePtr<Gx::Sprite> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
         [[nodiscard]] Gx::ResourcePtr<Gx::Sprite> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
-        [[nodiscard]] static bool ParseMetadata(const Gx::Json& attributes, SpriteMetadata& metadata, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
+        static bool ParseMetadata(const Gx::Json& attributes, SpriteMetadata& metadata, const Gx::ResourceContext& ctx = Gx::ResourceContext::Default);
     };
 }

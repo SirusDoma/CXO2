@@ -1,5 +1,5 @@
 #include <CXO2/IO/Loaders/Audio/SoundBufferLoader.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 
 namespace Cx
 {

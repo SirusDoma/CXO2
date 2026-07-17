@@ -1,5 +1,5 @@
 #include <CXO2/IO/Loaders/Graphics/FontLoader.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 
 #include <Genode/Graphics/Font.hpp>
 

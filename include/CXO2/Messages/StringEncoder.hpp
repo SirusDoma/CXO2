@@ -2,7 +2,7 @@
 
 #include <Genode/Network/Packet.hpp>
 
-#include <ced/compact_enc_det.h>
+#include <compact_enc_det/compact_enc_det.h>
 
 // IMPORTANT: this need to be inside Gx namespace
 namespace Gx

@@ -1,5 +1,5 @@
 #include <CXO2/IO/Loaders/Adaptor/O2JamSpriteLoader.hpp>
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <SFML/System/MemoryInputStream.hpp>
 #include <SFML/Graphics/Image.hpp>
 

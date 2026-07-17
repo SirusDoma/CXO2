@@ -4,7 +4,7 @@
 #include <CXO2/IO/TextureCompiler.hpp>
 #include <CXO2/Metadata/Legacy/ControlList.hpp>
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <Genode/Graphics/Font.hpp>
 #include <Genode/UI/Control.hpp>
 

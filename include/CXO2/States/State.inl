@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Genode/IO/FileSystem/FileSystem.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <Genode/System/Application.hpp>
 #include <Genode/Utilities/StringHelper.hpp>
 #include <SFML/Audio/SoundSource.hpp>
