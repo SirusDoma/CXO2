@@ -15,8 +15,8 @@
 #include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 
-#include <CXO2/Messages/RoomInfo.hpp>
-#include <CXO2/Messages/Requests/SubmitScoreRequest.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Network/Requests/SubmitScoreRequest.hpp>
 
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
@@ -38,10 +38,10 @@
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <CXO2/Messages/Events/GameCompletedEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberLeftEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberScoreSubmissionEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberStatsUpdateEventData.hpp>
+#include <CXO2/Network/Events/GameCompletedEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberLeftEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberScoreSubmissionEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberStatsUpdateEventData.hpp>
 #include <CXO2/States/StateRoom.hpp>
 
 namespace Cx

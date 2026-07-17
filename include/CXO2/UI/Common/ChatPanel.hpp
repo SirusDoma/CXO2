@@ -6,14 +6,14 @@
 #include <Genode/UI/InputField.hpp>
 #include <Genode/UI/RadioButton.hpp>
 
-#include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Messages/Responses/WhisperMessageResponse.hpp>
-#include <CXO2/Messages/Responses/MainRoomUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/MainRoomAdminMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingAdminMessageResponse.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/WhisperMessageResponse.hpp>
+#include <CXO2/Network/Responses/MainRoomUserMessageResponse.hpp>
+#include <CXO2/Network/Responses/MainRoomAdminMessageResponse.hpp>
+#include <CXO2/Network/Responses/WaitingUserMessageResponse.hpp>
+#include <CXO2/Network/Responses/WaitingAdminMessageResponse.hpp>
 
-#include <CXO2/Messages/Events/WhisperEventData.hpp>
+#include <CXO2/Network/Events/WhisperEventData.hpp>
 
 #include <string>
 #include <vector>

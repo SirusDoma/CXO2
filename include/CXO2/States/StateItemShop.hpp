@@ -7,9 +7,9 @@
 #include <CXO2/Metadata/Avatar/SetInfoMetadata.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
 
-#include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Messages/Responses/PurchaseItemResponse.hpp>
-#include <CXO2/Messages/Responses/SellItemResponse.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/PurchaseItemResponse.hpp>
+#include <CXO2/Network/Responses/SellItemResponse.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Tasks/Delay.hpp>

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
 
-#include <CXO2/Messages/Responses/PurchaseItemResponse.hpp>
-#include <CXO2/Messages/Responses/SellItemResponse.hpp>
+#include <CXO2/Network/Responses/PurchaseItemResponse.hpp>
+#include <CXO2/Network/Responses/SellItemResponse.hpp>
 
 #include <functional>
 
@@ -27,11 +27,11 @@ namespace Cx
         ) const = 0;
     };
 
-    class MessageService;
+    class NetworkService;
     class ItemShopOnlineService : public ItemShopService
     {
     public:
-        explicit ItemShopOnlineService(MessageService& messages);
+        explicit ItemShopOnlineService(NetworkService& network);
 
         void PurchaseItem(
             const PurchaseItemRequest& request,
@@ -44,7 +44,7 @@ namespace Cx
         ) const override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
     };
 
     class ItemShopOfflineService : public ItemShopService

@@ -2,18 +2,18 @@
 
 #include <CXO2/Contexts/SessionContext.hpp>
 
-#include <CXO2/Services/MessageService.hpp>
-#include <CXO2/Messages/Requests/ChannelListRequest.hpp>
-#include <CXO2/Messages/Requests/ChannelLoginRequest.hpp>
-#include <CXO2/Messages/Requests/SendMusicListRequest.hpp>
+#include <CXO2/Services/NetworkService.hpp>
+#include <CXO2/Network/Requests/ChannelListRequest.hpp>
+#include <CXO2/Network/Requests/ChannelLoginRequest.hpp>
+#include <CXO2/Network/Requests/SendMusicListRequest.hpp>
 
-#include <CXO2/Messages/Responses/ChannelListResponse.hpp>
-#include <CXO2/Messages/Responses/ChannelLoginResponse.hpp>
+#include <CXO2/Network/Responses/ChannelListResponse.hpp>
+#include <CXO2/Network/Responses/ChannelLoginResponse.hpp>
 
 namespace Cx
 {
-    PlanetOnlineService::PlanetOnlineService(MessageService& messages, SessionContext& session) :
-        m_messages(messages),
+    PlanetOnlineService::PlanetOnlineService(NetworkService& network, SessionContext& session) :
+        m_network(network),
         m_session(session)
     {
     }
@@ -22,7 +22,7 @@ namespace Cx
         const MessageCallback<ChannelListResponse>& callback
     ) const
     {
-        m_messages.Dispatch<ChannelListRequest, ChannelListResponse>(
+        m_network.Dispatch<ChannelListRequest, ChannelListResponse>(
             ChannelListRequest{},
             callback
         );
@@ -33,7 +33,7 @@ namespace Cx
         const MessageCallback<ChannelLoginResponse>& callback
     ) const
     {
-        m_messages.Dispatch<ChannelLoginRequest, ChannelLoginResponse>(request, [this, callback] (const MessageEnvelope<ChannelLoginResponse>& envelope)
+        m_network.Dispatch<ChannelLoginRequest, ChannelLoginResponse>(request, [this, callback] (const MessageEnvelope<ChannelLoginResponse>& envelope)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace Cx
                     for (auto& header : m_session.GetInstalledMusic())
                         list.push_back(header.ID);
 
-                    m_messages.Dispatch<SendMusicListRequest>(SendMusicListRequest{ list },
+                    m_network.Dispatch<SendMusicListRequest>(SendMusicListRequest{ list },
                     [callback, envelope] (const MessageEnvelope<SendMusicListRequest>& result)
                     {
                         try

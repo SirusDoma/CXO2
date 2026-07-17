@@ -3,19 +3,19 @@
 #include <CXO2/States/State.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 
-#include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Messages/Responses/CharacterInfoResponse.hpp>
-#include <CXO2/Messages/Responses/CreateRoomResponse.hpp>
-#include <CXO2/Messages/Responses/JoinRoomResponse.hpp>
-#include <CXO2/Messages/Responses/RoomListResponse.hpp>
-#include <CXO2/Messages/Responses/UserListResponse.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/CharacterInfoResponse.hpp>
+#include <CXO2/Network/Responses/CreateRoomResponse.hpp>
+#include <CXO2/Network/Responses/JoinRoomResponse.hpp>
+#include <CXO2/Network/Responses/RoomListResponse.hpp>
+#include <CXO2/Network/Responses/UserListResponse.hpp>
 
-#include <CXO2/Messages/Events/RoomCreatedEventData.hpp>
-#include <CXO2/Messages/Events/RoomMusicChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomRemovedEventData.hpp>
-#include <CXO2/Messages/Events/RoomStateChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomTitleChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomUserCountChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomCreatedEventData.hpp>
+#include <CXO2/Network/Events/RoomMusicChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomRemovedEventData.hpp>
+#include <CXO2/Network/Events/RoomStateChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomTitleChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomUserCountChangedEventData.hpp>
 
 namespace Cx
 {

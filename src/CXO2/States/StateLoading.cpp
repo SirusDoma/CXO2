@@ -7,9 +7,9 @@
 #include <CXO2/Contexts/RoomContext.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
-#include <CXO2/Messages/RoomInfo.hpp>
-#include <CXO2/Messages/Events/MemberMusicLoadedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberLeftEventData.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Network/Events/MemberMusicLoadedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberLeftEventData.hpp>
 
 #include <CXO2/IO/PlayingResourceContext.hpp>
 

@@ -1,26 +1,26 @@
 #include <CXO2/Services/ChannelService.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/ChannelInfoRequest.hpp>
-#include <CXO2/Messages/Requests/UserListRequest.hpp>
-#include <CXO2/Messages/Requests/CreateRoomRequest.hpp>
-#include <CXO2/Messages/Requests/JoinRoomRequest.hpp>
-#include <CXO2/Messages/Requests/ChannelLogoutRequest.hpp>
+#include <CXO2/Network/Requests/ChannelInfoRequest.hpp>
+#include <CXO2/Network/Requests/UserListRequest.hpp>
+#include <CXO2/Network/Requests/CreateRoomRequest.hpp>
+#include <CXO2/Network/Requests/JoinRoomRequest.hpp>
+#include <CXO2/Network/Requests/ChannelLogoutRequest.hpp>
 
-#include <CXO2/Messages/Events/RoomCreatedEventData.hpp>
-#include <CXO2/Messages/Events/RoomMusicChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomRemovedEventData.hpp>
-#include <CXO2/Messages/Events/RoomStateChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomTitleChangedEventData.hpp>
-#include <CXO2/Messages/Events/RoomUserCountChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomCreatedEventData.hpp>
+#include <CXO2/Network/Events/RoomMusicChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomRemovedEventData.hpp>
+#include <CXO2/Network/Events/RoomStateChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomTitleChangedEventData.hpp>
+#include <CXO2/Network/Events/RoomUserCountChangedEventData.hpp>
 
 #include <fmt/format.h>
 
 namespace Cx
 {
-    ChannelOnlineService::ChannelOnlineService(SessionContext& session, MessageService& messages) :
+    ChannelOnlineService::ChannelOnlineService(SessionContext& session, NetworkService& network) :
         m_session(session),
-        m_messages(messages)
+        m_network(network)
     {
     }
 
@@ -29,14 +29,14 @@ namespace Cx
         const MessageCallback<UserListResponse>& userListCallback
     )
     {
-        m_messages.Dispatch<ChannelInfoRequest>(ChannelInfoRequest{}, [this, roomCallback, userListCallback] (const MessageEnvelope<ChannelInfoRequest>& result)
+        m_network.Dispatch<ChannelInfoRequest>(ChannelInfoRequest{}, [this, roomCallback, userListCallback] (const MessageEnvelope<ChannelInfoRequest>& result)
         {
             try
             {
                 const auto& _ = result.Open();
 
-                m_messages.Acquire(roomCallback);
-                m_messages.Acquire(userListCallback);
+                m_network.Acquire(roomCallback);
+                m_network.Acquire(userListCallback);
             }
             catch (...)
             {
@@ -48,7 +48,7 @@ namespace Cx
 
     void ChannelOnlineService::GetUserList(const MessageCallback<UserListResponse>& callback)
     {
-        m_messages.Dispatch(UserListRequest{}, callback);
+        m_network.Dispatch(UserListRequest{}, callback);
     }
 
     void ChannelOnlineService::CreateRoom(
@@ -56,7 +56,7 @@ namespace Cx
         const MessageCallback<CreateRoomResponse>& callback
     )
     {
-        m_messages.Dispatch(request, callback);
+        m_network.Dispatch(request, callback);
     }
 
     void ChannelOnlineService::JoinRoom(
@@ -64,42 +64,42 @@ namespace Cx
         const MessageCallback<JoinRoomResponse>& callback
     )
     {
-        m_messages.Dispatch(request, callback);
+        m_network.Dispatch(request, callback);
     }
 
     void ChannelOnlineService::Logout(const MessageCallback<ChannelLogoutResponse>& callback)
     {
-        m_messages.Dispatch(ChannelLogoutRequest{}, callback);
+        m_network.Dispatch(ChannelLogoutRequest{}, callback);
     }
 
     void ChannelOnlineService::SetRoomCreatedEventCallback(const MessageCallback<RoomCreatedEventData>& callback)
     {
-        m_createSubscriber = m_messages.On<RoomCreatedEventData>(callback);
+        m_createSubscriber = m_network.On<RoomCreatedEventData>(callback);
     }
 
     void ChannelOnlineService::SetRoomMusicChangedEventCallback(const MessageCallback<RoomMusicChangedEventData>& callback)
     {
-        m_musicSubscriber = m_messages.On<RoomMusicChangedEventData>(callback);
+        m_musicSubscriber = m_network.On<RoomMusicChangedEventData>(callback);
     }
 
     void ChannelOnlineService::SetRoomStateChangedEventCallback(const MessageCallback<RoomStateChangedEventData>& callback)
     {
-        m_stateSubscriber = m_messages.On<RoomStateChangedEventData>(callback);
+        m_stateSubscriber = m_network.On<RoomStateChangedEventData>(callback);
     }
 
     void ChannelOnlineService::SetRoomTitleChangedEventCallback(const MessageCallback<RoomTitleChangedEventData>& callback)
     {
-        m_titleSubscriber = m_messages.On<RoomTitleChangedEventData>(callback);
+        m_titleSubscriber = m_network.On<RoomTitleChangedEventData>(callback);
     }
 
     void ChannelOnlineService::SetRoomUserCountChangedEventCallback(const MessageCallback<RoomUserCountChangedEventData>& callback)
     {
-        m_countSubscriber = m_messages.On<RoomUserCountChangedEventData>(callback);
+        m_countSubscriber = m_network.On<RoomUserCountChangedEventData>(callback);
     }
 
     void ChannelOnlineService::SetRoomRemovedEventCallback(const MessageCallback<RoomRemovedEventData>& callback)
     {
-        m_removeSubscriber = m_messages.On<RoomRemovedEventData>(callback);
+        m_removeSubscriber = m_network.On<RoomRemovedEventData>(callback);
     }
 
     void ChannelOfflineService::GetChannelInfo(

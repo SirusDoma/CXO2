@@ -3,31 +3,31 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/CommandLineContext.hpp>
 
-#include <CXO2/Messages/Auth.hpp>
-#include <CXO2/Messages/Requests/AuthRequest.hpp>
-#include <CXO2/Messages/Responses/AuthResponse.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Network/Auth.hpp>
+#include <CXO2/Network/Requests/AuthRequest.hpp>
+#include <CXO2/Network/Responses/AuthResponse.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
 namespace Cx
 {
-    AuthOnlineService::AuthOnlineService(MessageService& messages, SessionContext& session, CommandLineContext& args) :
-        m_messages(messages),
+    AuthOnlineService::AuthOnlineService(NetworkService& network, SessionContext& session, CommandLineContext& args) :
+        m_network(network),
         m_session(session),
         m_args(args)
     {
     }
 
     void AuthOnlineService::Authenticate(
-        MusicHall server,
+        MusicHall gateway,
         const AuthRequest& request,
         const MessageCallback<AuthResponse>& callback
     ) const
     {
-        m_messages.Disconnect();
+        m_network.Disconnect();
         auto gateways = m_args.GetGatewayInfo();
-        const auto it = std::find_if(gateways.begin(), gateways.end(), [server] (const GatewayInfo& info)
+        const auto it = std::find_if(gateways.begin(), gateways.end(), [gateway] (const GatewayInfo& info)
         {
-            return info.Hall == server;
+            return info.Hall == gateway;
         });
 
         if (it == gateways.end())
@@ -36,9 +36,9 @@ namespace Cx
             return;
         }
 
-        m_messages.Connect(it->Address, it->Port, [this, request, callback]
+        m_network.Connect(it->Address, it->Port, [this, request, callback]
         {
-            m_messages.Dispatch(request, callback);
+            m_network.Dispatch(request, callback);
         },
         [callback] (const auto&)
         {

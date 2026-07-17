@@ -1,7 +1,7 @@
 #pragma once
 
-#include <CXO2/Messages/Commands.hpp>
-#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Network/Commands.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
 
 #include <Genode/Network/Exception.hpp>
 #include <Genode/Network/TcpNetworkClient.hpp>

@@ -12,7 +12,7 @@
 #include <CXO2/Services/WaitingService.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
-#include <CXO2/Messages/RoomInfo.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
 
 #include <CXO2/StringTable/Identifiers/Cache.hpp>
 #include <CXO2/StringTable/Identifiers/Sound.hpp>

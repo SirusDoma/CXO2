@@ -3,8 +3,8 @@
 #include <CXO2/Models/Character.hpp>
 #include <Genode/UI/UiContainer.hpp>
 
-#include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Messages/Responses/UserListResponse.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/UserListResponse.hpp>
 
 #include <unordered_map>
 #include <vector>

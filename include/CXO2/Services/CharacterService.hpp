@@ -1,10 +1,10 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Messages/MessageEnvelope.hpp>
-#include <CXO2/Messages/Responses/CharacterInfoResponse.hpp>
-#include <CXO2/Messages/Requests/EquipItemRequest.hpp>
-#include <CXO2/Messages/Responses/EquipItemResponse.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/CharacterInfoResponse.hpp>
+#include <CXO2/Network/Requests/EquipItemRequest.hpp>
+#include <CXO2/Network/Responses/EquipItemResponse.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -26,11 +26,11 @@ namespace Cx
         ) const = 0;
     };
 
-    class MessageService;
+    class NetworkService;
     class CharacterOnlineService : public CharacterService
     {
     public:
-        explicit CharacterOnlineService(MessageService& messages);
+        explicit CharacterOnlineService(NetworkService& network);
 
         void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const override;
 
@@ -40,7 +40,7 @@ namespace Cx
         ) const override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
     };
 
     class CharacterOfflineService : CharacterService

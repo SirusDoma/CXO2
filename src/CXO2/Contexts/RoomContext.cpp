@@ -2,7 +2,7 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 
 #include <CXO2/Services/WaitingService.hpp>
-#include <CXO2/Messages/RoomInfo.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
 
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>

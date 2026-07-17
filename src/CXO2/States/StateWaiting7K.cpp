@@ -15,18 +15,18 @@
 #include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 
-#include <CXO2/Messages/RoomInfo.hpp>
-#include <CXO2/Messages/Requests/UpdateMapRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateRoomMusicRequest.hpp>
-#include <CXO2/Messages/Events/StartGameEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberJoinedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberLeftEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberReadyStateChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberTeamChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingSlotChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMapChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMusicChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingTitleChangedEventData.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Network/Requests/UpdateMapRequest.hpp>
+#include <CXO2/Network/Requests/UpdateRoomMusicRequest.hpp>
+#include <CXO2/Network/Events/StartGameEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberJoinedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberLeftEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberReadyStateChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberTeamChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingSlotChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMapChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMusicChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingTitleChangedEventData.hpp>
 
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
 #include <CXO2/StringTable/Identifiers/Waiting7K.hpp>

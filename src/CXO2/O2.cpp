@@ -69,7 +69,7 @@
 
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Services/PlanetService.hpp>
 #include <CXO2/Services/CharacterService.hpp>
@@ -214,7 +214,7 @@ namespace Cx
         });
 
         // Initializes application modules
-        Install<MessageService>();
+        Install<NetworkService>();
 
         // Register services
         context.Provide<AuthService, AuthOnlineService>();

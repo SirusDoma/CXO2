@@ -11,11 +11,11 @@
 #include <CXO2/Avatar/ItemFactory.hpp>
 
 #include <CXO2/Services/ItemShopService.hpp>
-#include <CXO2/Messages/Requests/PurchaseItemRequest.hpp>
-#include <CXO2/Messages/Requests/SellItemRequest.hpp>
+#include <CXO2/Network/Requests/PurchaseItemRequest.hpp>
+#include <CXO2/Network/Requests/SellItemRequest.hpp>
 
-#include <CXO2/Messages/Responses/PurchaseItemResponse.hpp>
-#include <CXO2/Messages/Responses/SellItemResponse.hpp>
+#include <CXO2/Network/Responses/PurchaseItemResponse.hpp>
+#include <CXO2/Network/Responses/SellItemResponse.hpp>
 
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
 #include <CXO2/StringTable/Identifiers/ItemShop.hpp>

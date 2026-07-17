@@ -5,7 +5,7 @@
 
 #include <CXO2/Models/Game.hpp>
 
-#include <CXO2/Messages/ScoreEntry.hpp>
+#include <CXO2/Network/ScoreEntry.hpp>
 
 #include <CXO2/Config/GameConfig.hpp>
 

@@ -1,21 +1,21 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/AnnouncementRequest.hpp>
-#include <CXO2/Messages/Requests/MainRoomMessageRequest.hpp>
-#include <CXO2/Messages/Requests/WaitingMessageRequest.hpp>
-#include <CXO2/Messages/Requests/WhisperMessageRequest.hpp>
+#include <CXO2/Network/Requests/AnnouncementRequest.hpp>
+#include <CXO2/Network/Requests/MainRoomMessageRequest.hpp>
+#include <CXO2/Network/Requests/WaitingMessageRequest.hpp>
+#include <CXO2/Network/Requests/WhisperMessageRequest.hpp>
 
-#include <CXO2/Messages/Responses/WhisperMessageResponse.hpp>
-#include <CXO2/Messages/Responses/MainRoomUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/MainRoomAdminMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingUserMessageResponse.hpp>
-#include <CXO2/Messages/Responses/WaitingAdminMessageResponse.hpp>
+#include <CXO2/Network/Responses/WhisperMessageResponse.hpp>
+#include <CXO2/Network/Responses/MainRoomUserMessageResponse.hpp>
+#include <CXO2/Network/Responses/MainRoomAdminMessageResponse.hpp>
+#include <CXO2/Network/Responses/WaitingUserMessageResponse.hpp>
+#include <CXO2/Network/Responses/WaitingAdminMessageResponse.hpp>
 
-#include <CXO2/Messages/Events/WhisperEventData.hpp>
-#include <CXO2/Messages/Events/AnnouncementEventData.hpp>
+#include <CXO2/Network/Events/WhisperEventData.hpp>
+#include <CXO2/Network/Events/AnnouncementEventData.hpp>
 
 #include <functional>
 
@@ -65,11 +65,11 @@ namespace Cx
         ) = 0;
     };
 
-    class MessageService;
+    class NetworkService;
     class ChatOnlineService : public ChatService
     {
     public:
-        explicit ChatOnlineService(MessageService& messages);
+        explicit ChatOnlineService(NetworkService& network);
 
         void SendAnnouncement(
             const AnnouncementRequest& request,
@@ -112,7 +112,7 @@ namespace Cx
         ) override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
 
         MessageSubscriber<WhisperEventData>             m_whisperSubscriber;
         MessageSubscriber<MainRoomUserMessageResponse>  m_mainRoomUserSubscriber;

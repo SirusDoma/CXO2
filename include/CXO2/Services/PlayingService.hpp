@@ -1,18 +1,18 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/ConfirmMusicLoadedRequest.hpp>
-#include <CXO2/Messages/Requests/ExitPlayingRequest.hpp>
-#include <CXO2/Messages/Requests/SubmitScoreRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateGameStatsRequest.hpp>
+#include <CXO2/Network/Requests/ConfirmMusicLoadedRequest.hpp>
+#include <CXO2/Network/Requests/ExitPlayingRequest.hpp>
+#include <CXO2/Network/Requests/SubmitScoreRequest.hpp>
+#include <CXO2/Network/Requests/UpdateGameStatsRequest.hpp>
 
-#include <CXO2/Messages/Events/MemberMusicLoadedEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberStatsUpdateEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberScoreSubmissionEventData.hpp>
-#include <CXO2/Messages/Events/PlayingMemberLeftEventData.hpp>
-#include <CXO2/Messages/Events/GameCompletedEventData.hpp>
+#include <CXO2/Network/Events/MemberMusicLoadedEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberStatsUpdateEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberScoreSubmissionEventData.hpp>
+#include <CXO2/Network/Events/PlayingMemberLeftEventData.hpp>
+#include <CXO2/Network/Events/GameCompletedEventData.hpp>
 
 #include <functional>
 
@@ -66,11 +66,11 @@ namespace Cx
         ) = 0;
     };
 
-    class MessageService;
+    class NetworkService;
     class PlayingOnlineService : public PlayingService
     {
     public:
-        PlayingOnlineService(MessageService& messages, GameContext& game);
+        PlayingOnlineService(NetworkService& network, GameContext& game);
 
         void ConfirmMusicLoaded(
             const MessageCallback<ConfirmMusicLoadedRequest>& callback = nullptr
@@ -115,7 +115,7 @@ namespace Cx
         ) override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
         GameContext&    m_game;
 
         MessageSubscriber<MemberMusicLoadedEventData>            m_musicLoadedSubscriber;

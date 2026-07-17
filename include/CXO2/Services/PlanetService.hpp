@@ -1,17 +1,17 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Messages/Responses/ChannelListResponse.hpp>
-#include <CXO2/Messages/Requests/ChannelLoginRequest.hpp>
-#include <CXO2/Messages/Responses/ChannelLoginResponse.hpp>
+#include <CXO2/Network/Responses/ChannelListResponse.hpp>
+#include <CXO2/Network/Requests/ChannelLoginRequest.hpp>
+#include <CXO2/Network/Responses/ChannelLoginResponse.hpp>
 
 #include <functional>
-#include <CXO2/Messages/MessageEnvelope.hpp>
+#include <CXO2/Network/MessageEnvelope.hpp>
 
 namespace Cx
 {
     class SessionContext;
-    class MessageService;
+    class NetworkService;
     class PlanetService : public Service
     {
     public:
@@ -28,7 +28,7 @@ namespace Cx
     class PlanetOnlineService : public PlanetService
     {
     public:
-        PlanetOnlineService(MessageService& messages, SessionContext& session);
+        PlanetOnlineService(NetworkService& network, SessionContext& session);
 
         void GetChannelList(
             const MessageCallback<ChannelListResponse>& callback
@@ -40,7 +40,7 @@ namespace Cx
         ) const override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
         SessionContext& m_session;
     };
 

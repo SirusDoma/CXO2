@@ -11,10 +11,10 @@
 #include <CXO2/Services/CharacterService.hpp>
 #include <CXO2/Services/ItemShopService.hpp>
 
-#include <CXO2/Messages/Requests/EquipItemRequest.hpp>
-#include <CXO2/Messages/Requests/SellItemRequest.hpp>
-#include <CXO2/Messages/Responses/EquipItemResponse.hpp>
-#include <CXO2/Messages/Responses/SellItemResponse.hpp>
+#include <CXO2/Network/Requests/EquipItemRequest.hpp>
+#include <CXO2/Network/Requests/SellItemRequest.hpp>
+#include <CXO2/Network/Responses/EquipItemResponse.hpp>
+#include <CXO2/Network/Responses/SellItemResponse.hpp>
 
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
 #include <CXO2/StringTable/Identifiers/MyRoom.hpp>

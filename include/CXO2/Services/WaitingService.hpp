@@ -1,28 +1,28 @@
 #pragma once
 
 #include <CXO2/Services/Service.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/StartGameRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateMemberReadyStateRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateRoomMusicRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateRoomSlotRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateMemberTeamRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateRoomTitleRequest.hpp>
-#include <CXO2/Messages/Requests/UpdateMapRequest.hpp>
+#include <CXO2/Network/Requests/StartGameRequest.hpp>
+#include <CXO2/Network/Requests/UpdateMemberReadyStateRequest.hpp>
+#include <CXO2/Network/Requests/UpdateRoomMusicRequest.hpp>
+#include <CXO2/Network/Requests/UpdateRoomSlotRequest.hpp>
+#include <CXO2/Network/Requests/UpdateMemberTeamRequest.hpp>
+#include <CXO2/Network/Requests/UpdateRoomTitleRequest.hpp>
+#include <CXO2/Network/Requests/UpdateMapRequest.hpp>
 
-#include <CXO2/Messages/Responses/ExitWaitingResponse.hpp>
+#include <CXO2/Network/Responses/ExitWaitingResponse.hpp>
 
-#include <CXO2/Messages/Events/WaitingSlotChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberJoinedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberLeftEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberTeamChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMemberReadyStateChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMusicChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingTitleChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingMapChangedEventData.hpp>
-#include <CXO2/Messages/Events/WaitingKickEventData.hpp>
-#include <CXO2/Messages/Events/StartGameEventData.hpp>
+#include <CXO2/Network/Events/WaitingSlotChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberJoinedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberLeftEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberTeamChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMemberReadyStateChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMusicChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingTitleChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingMapChangedEventData.hpp>
+#include <CXO2/Network/Events/WaitingKickEventData.hpp>
+#include <CXO2/Network/Events/StartGameEventData.hpp>
 
 #include <functional>
 
@@ -109,11 +109,11 @@ namespace Cx
         ) = 0;
     };
 
-    class MessageService;
+    class NetworkService;
     class WaitingOnlineService : public WaitingService
     {
     public:
-        explicit WaitingOnlineService(MessageService& messages);
+        explicit WaitingOnlineService(NetworkService& network);
 
         void StartGame(
             const MessageCallback<StartGameRequest>& callback = nullptr
@@ -193,7 +193,7 @@ namespace Cx
         ) override;
 
     private:
-        MessageService& m_messages;
+        NetworkService& m_network;
 
         MessageSubscriber<WaitingSlotChangedEventData>             m_slotSubscriber;
         MessageSubscriber<WaitingMemberJoinedEventData>            m_joinSubscriber;

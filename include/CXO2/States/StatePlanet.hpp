@@ -13,7 +13,7 @@ namespace Cx
     struct ChannelListResponse;
 
     class SessionContext;
-    class MessageService;
+    class NetworkService;
     class AuthService;
     class PlanetService;
     class StatePlanet : public State
@@ -22,7 +22,7 @@ namespace Cx
         explicit StatePlanet(
             Gx::AudioMixer& mixer,
             SessionContext& session,
-            MessageService& messages,
+            NetworkService& network,
             AuthService& auth,
             PlanetService& service
         );
@@ -38,7 +38,7 @@ namespace Cx
         void OnChannelEnterButtonClicked(MusicHall hall, std::uint16_t serverID, std::uint16_t channelID);
 
         Gx::AudioMixer& m_mixer;
-        MessageService& m_messages;
+        NetworkService& m_network;
         AuthService& m_auth;
         PlanetService& m_service;
         SessionContext& m_session;

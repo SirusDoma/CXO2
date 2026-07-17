@@ -2,19 +2,19 @@
 
 #include <CXO2/Contexts/GameContext.hpp>
 
-#include <CXO2/Messages/Requests/ExitWaitingRequest.hpp>
+#include <CXO2/Network/Requests/ExitWaitingRequest.hpp>
 
 namespace Cx
 {
-    PlayingOnlineService::PlayingOnlineService(MessageService& messages, GameContext& game) :
-        m_messages(messages),
+    PlayingOnlineService::PlayingOnlineService(NetworkService& network, GameContext& game) :
+        m_network(network),
         m_game(game)
     {
     }
 
     void PlayingOnlineService::ConfirmMusicLoaded(const MessageCallback<ConfirmMusicLoadedRequest>& callback) const
     {
-        m_messages.Dispatch(ConfirmMusicLoadedRequest{}, callback);
+        m_network.Dispatch(ConfirmMusicLoadedRequest{}, callback);
     }
 
     void PlayingOnlineService::SubmitScore(
@@ -22,7 +22,7 @@ namespace Cx
         const MessageCallback<SubmitScoreRequest>& callback
     ) const
     {
-        m_messages.Dispatch(request, callback);
+        m_network.Dispatch(request, callback);
     }
 
     void PlayingOnlineService::UpdateGameStats(
@@ -30,12 +30,12 @@ namespace Cx
         const MessageCallback<UpdateGameStatsRequest>& callback
     ) const
     {
-        m_messages.Dispatch(request, callback);
+        m_network.Dispatch(request, callback);
     }
 
     void PlayingOnlineService::ExitPlaying(const MessageCallback<ExitPlayingRequest>& callback) const
     {
-        m_messages.Dispatch<ExitPlayingRequest>(ExitPlayingRequest{}, [this, callback] (const MessageEnvelope<ExitPlayingRequest>& result)
+        m_network.Dispatch<ExitPlayingRequest>(ExitPlayingRequest{}, [this, callback] (const MessageEnvelope<ExitPlayingRequest>& result)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace Cx
 
             if (m_game.GetMode() != GameMode::Single)
             {
-                m_messages.Dispatch<ExitWaitingRequest>(ExitWaitingRequest{}, [callback] (const MessageEnvelope<ExitWaitingRequest>& result)
+                m_network.Dispatch<ExitWaitingRequest>(ExitWaitingRequest{}, [callback] (const MessageEnvelope<ExitWaitingRequest>& result)
                 {
                     try
                     {
@@ -74,31 +74,31 @@ namespace Cx
 
     void PlayingOnlineService::ConfirmResult(const MessageCallback<ExitPlayingRequest>& callback) const
     {
-        m_messages.Dispatch(ExitPlayingRequest{}, callback);
+        m_network.Dispatch(ExitPlayingRequest{}, callback);
     }
 
     void PlayingOnlineService::SetMemberMusicLoadedEventCallback(const MessageCallback<MemberMusicLoadedEventData>& callback)
     {
-        m_musicLoadedSubscriber = m_messages.On<MemberMusicLoadedEventData>(callback);
+        m_musicLoadedSubscriber = m_network.On<MemberMusicLoadedEventData>(callback);
     }
 
     void PlayingOnlineService::SetMemberStatsUpdateEventCallback(const MessageCallback<PlayingMemberStatsUpdateEventData>& callback)
     {
-        m_statsSubscriber = m_messages.On<PlayingMemberStatsUpdateEventData>(callback);
+        m_statsSubscriber = m_network.On<PlayingMemberStatsUpdateEventData>(callback);
     }
 
     void PlayingOnlineService::SetMemberScoreSubmittedEventCallback(const MessageCallback<PlayingMemberScoreSubmissionEventData>& callback)
     {
-        m_scoreSubscriber = m_messages.On<PlayingMemberScoreSubmissionEventData>(callback);
+        m_scoreSubscriber = m_network.On<PlayingMemberScoreSubmissionEventData>(callback);
     }
 
     void PlayingOnlineService::SetMemberLeftEventCallback(const MessageCallback<PlayingMemberLeftEventData>& callback)
     {
-        m_leftSubscriber = m_messages.On<PlayingMemberLeftEventData>(callback);
+        m_leftSubscriber = m_network.On<PlayingMemberLeftEventData>(callback);
     }
 
     void PlayingOnlineService::SetGameCompletedEventCallback(const MessageCallback<GameCompletedEventData>& callback)
     {
-        m_completedSubscriber = m_messages.On<GameCompletedEventData>(callback);
+        m_completedSubscriber = m_network.On<GameCompletedEventData>(callback);
     }
 }

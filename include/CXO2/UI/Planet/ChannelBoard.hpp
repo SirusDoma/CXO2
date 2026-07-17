@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/Models/Planet.hpp>
-#include <CXO2/Messages/Responses/ChannelListResponse.hpp>
+#include <CXO2/Network/Responses/ChannelListResponse.hpp>
 #include <CXO2/UI/Planet/ChannelButton.hpp>
 #include <CXO2/Services/PlanetService.hpp>
 

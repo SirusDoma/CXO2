@@ -1,13 +1,13 @@
 #include <CXO2/Services/ItemShopService.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/PurchaseItemRequest.hpp>
-#include <CXO2/Messages/Requests/SellItemRequest.hpp>
+#include <CXO2/Network/Requests/PurchaseItemRequest.hpp>
+#include <CXO2/Network/Requests/SellItemRequest.hpp>
 
 namespace Cx
 {
-    ItemShopOnlineService::ItemShopOnlineService(MessageService& messages) :
-        m_messages(messages)
+    ItemShopOnlineService::ItemShopOnlineService(NetworkService& network) :
+        m_network(network)
     {
     }
 
@@ -16,7 +16,7 @@ namespace Cx
         const MessageCallback<PurchaseItemResponse>& callback
     ) const
     {
-        m_messages.Dispatch<PurchaseItemRequest, PurchaseItemResponse>(request, callback);
+        m_network.Dispatch<PurchaseItemRequest, PurchaseItemResponse>(request, callback);
     }
 
     void ItemShopOnlineService::SellItem(
@@ -24,6 +24,6 @@ namespace Cx
         const MessageCallback<SellItemResponse>& callback
     ) const
     {
-        m_messages.Dispatch<SellItemRequest, SellItemResponse>(request, callback);
+        m_network.Dispatch<SellItemRequest, SellItemResponse>(request, callback);
     }
 }

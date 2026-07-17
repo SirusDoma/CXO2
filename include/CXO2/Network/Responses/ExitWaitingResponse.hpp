@@ -1,0 +1,13 @@
+#pragma once
+
+#include <CXO2/Network/Commands.hpp>
+
+namespace Cx
+{
+    struct ExitWaitingResponse
+    {
+        static constexpr Cx::Command Command = ResponseCommand::ExitWaiting;
+
+        std::uint32_t Invalid{};
+    };
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CXO2/Messages/RoomInfo.hpp>
+#include <CXO2/Network/RoomInfo.hpp>
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
 
 #include <Genode/UI/Image.hpp>

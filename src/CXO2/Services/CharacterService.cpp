@@ -1,20 +1,20 @@
 #include <CXO2/Services/CharacterService.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 
-#include <CXO2/Messages/Requests/CharacterInfoRequest.hpp>
-#include <CXO2/Messages/Responses/CharacterInfoResponse.hpp>
-#include <CXO2/Messages/Responses/EquipItemResponse.hpp>
+#include <CXO2/Network/Requests/CharacterInfoRequest.hpp>
+#include <CXO2/Network/Responses/CharacterInfoResponse.hpp>
+#include <CXO2/Network/Responses/EquipItemResponse.hpp>
 
 namespace Cx
 {
-    CharacterOnlineService::CharacterOnlineService(MessageService& messages) :
-        m_messages(messages)
+    CharacterOnlineService::CharacterOnlineService(NetworkService& network) :
+        m_network(network)
     {
     }
 
     void CharacterOnlineService::GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const
     {
-        m_messages.Dispatch<CharacterInfoRequest, CharacterInfoResponse>
+        m_network.Dispatch<CharacterInfoRequest, CharacterInfoResponse>
         (
             CharacterInfoRequest{},
             callback
@@ -26,6 +26,6 @@ namespace Cx
         const MessageCallback<EquipItemResponse>& callback
     ) const
     {
-        m_messages.Dispatch<EquipItemRequest, EquipItemResponse>(request, callback);
+        m_network.Dispatch<EquipItemRequest, EquipItemResponse>(request, callback);
     }
 }

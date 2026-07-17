@@ -5,13 +5,13 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 
 #include <CXO2/Services/AuthService.hpp>
-#include <CXO2/Messages/Requests/AuthRequest.hpp>
-#include <CXO2/Messages/Requests/PingRequest.hpp>
-#include <CXO2/Messages/Responses/AuthResponse.hpp>
-#include <CXO2/Messages/Responses/PingResponse.hpp>
+#include <CXO2/Network/Requests/AuthRequest.hpp>
+#include <CXO2/Network/Requests/PingRequest.hpp>
+#include <CXO2/Network/Responses/AuthResponse.hpp>
+#include <CXO2/Network/Responses/PingResponse.hpp>
 
 #include <CXO2/Models/Planet.hpp>
-#include <CXO2/Services/MessageService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/UI/Planet/ChannelBoard.hpp>
 
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
@@ -29,12 +29,12 @@ namespace Cx
     StatePlanet::StatePlanet(
         Gx::AudioMixer& mixer,
         SessionContext& session,
-        MessageService& messages,
+        NetworkService& network,
         AuthService& auth,
         PlanetService& service
     ) :
         m_mixer(mixer),
-        m_messages(messages),
+        m_network(network),
         m_auth(auth),
         m_service(service),
         m_session(session)
@@ -45,7 +45,7 @@ namespace Cx
     {
         State::Initialize();
 
-        m_messages.StopHeartbeat();
+        m_network.StopHeartbeat();
 
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_MAIN_ROOM);
         auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -193,7 +193,7 @@ namespace Cx
             return;
         }
 
-        m_messages.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
+        m_network.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
         {
             auto state = dynamic_cast<State*>(&Gx::Application::Instance().GetModule<Gx::SceneDirector>().GetPresentingScene());
             state->ShowDialog("Network is not in a good condition.\nPlease try again a little while later.", DialogStyle::Information, false, [] (bool)
