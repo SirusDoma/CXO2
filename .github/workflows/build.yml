@@ -148,13 +148,22 @@ jobs:
             echo 'set'
           } > "$VCVARS_BAT"
           # Diff the environment before/after vcvarsall and export only what it changed.
+          ENV_BEFORE=$(cmd.exe //C set | tr -d '\r' | sort)
+          PATH_BEFORE=$(printf '%s\n' "$ENV_BEFORE" | grep -im1 '^path=' | cut -d= -f2-)
           comm -13 \
-            <(cmd.exe //C set | tr -d '\r' | sort) \
+            <(printf '%s\n' "$ENV_BEFORE") \
             <(cmd.exe //C "$(cygpath -w "$VCVARS_BAT")" | tr -d '\r' | sort) \
           | while IFS='=' read -r name value; do
               case "$name" in
                 ''|*' '*) ;;
-                Path|PATH) printf '%s\n' "$value" | tr ';' '\n' >> "$GITHUB_PATH" ;;
+                Path|PATH)
+                  printf '%s\n' "$value" | tr ';' '\n' | while read -r entry; do
+                    [ -n "$entry" ] || continue
+                    case ";${PATH_BEFORE,,};" in
+                      *";${entry,,};"*) ;;
+                      *) printf '%s\n' "$entry" >> "$GITHUB_PATH" ;;
+                    esac
+                  done ;;
                 *) printf '%s=%s\n' "$name" "$value" >> "$GITHUB_ENV" ;;
               esac
             done
