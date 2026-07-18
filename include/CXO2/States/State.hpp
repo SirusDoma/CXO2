@@ -56,7 +56,7 @@ namespace Cx
         void ShowDialog(const sf::String& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
         void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
 
-        static void Announce(const std::string& content);
+        static void Announce(const sf::String& content);
 
     protected:
         void Initialize() override;

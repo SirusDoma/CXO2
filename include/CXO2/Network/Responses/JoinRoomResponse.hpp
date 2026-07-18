@@ -48,7 +48,7 @@ namespace Cx
         JoinResult     Result{};
         std::uint8_t   SlotID{};
         RoomTeam       Team{};
-        std::string    Title{};
+        sf::String     Title{};
         std::uint32_t  MusicID{};
         MapInfo        Map{};
         GameMode       Mode{};

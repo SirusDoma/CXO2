@@ -1,4 +1,4 @@
-#include <CXO2/Services/AuthService.hpp>
+#include <CXO2/Services/Online/AuthOnlineService.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/CommandLineContext.hpp>
@@ -44,18 +44,5 @@ namespace Cx
         {
             callback(std::current_exception());
         }, sf::seconds(3));
-    }
-
-    void AuthOfflineService::Authenticate(
-        MusicHall server,
-        const AuthRequest& request,
-        const MessageCallback<AuthResponse>& callback
-    ) const
-    {
-        callback(AuthResponse
-        {
-            AuthResult::Success,
-            BillingCode::TB,
-        });
     }
 }

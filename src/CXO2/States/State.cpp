@@ -151,7 +151,7 @@ namespace Cx
         Present(*dialog, ctx);
     }
 
-    void State::Announce(const std::string& content)
+    void State::Announce(const sf::String& content)
     {
         m_dialogNotice->SetVisible(true);
         m_dialogNotice->SetPromptString(content);

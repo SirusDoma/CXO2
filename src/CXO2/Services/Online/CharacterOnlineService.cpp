@@ -1,4 +1,4 @@
-#include <CXO2/Services/CharacterService.hpp>
+#include <CXO2/Services/Online/CharacterOnlineService.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 
 #include <CXO2/Network/Requests/CharacterInfoRequest.hpp>

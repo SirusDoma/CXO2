@@ -142,8 +142,7 @@ namespace Cx
                     if (id.value().is_number_unsigned() && id.value().is_number_integer())
                     {
                         const auto val = id.value().get<unsigned int>();
-                        if (items.find(val) != items.end() && set.insert(val).second)
-                            m_characterInfo.EquippedItemIDs.insert(val);
+                        m_characterInfo.EquippedItemIDs.insert(val);
                     }
                 }
             }

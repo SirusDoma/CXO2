@@ -25,32 +25,4 @@ namespace Cx
             const MessageCallback<EquipItemResponse>& callback
         ) const = 0;
     };
-
-    class NetworkService;
-    class CharacterOnlineService : public CharacterService
-    {
-    public:
-        explicit CharacterOnlineService(NetworkService& network);
-
-        void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const override;
-
-        void Equip(
-            const EquipItemRequest& request,
-            const MessageCallback<EquipItemResponse>& callback
-        ) const override;
-
-    private:
-        NetworkService& m_network;
-    };
-
-    class CharacterOfflineService : CharacterService
-    {
-    public:
-        void GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const override;
-
-        void Equip(
-            const EquipItemRequest& request,
-            const MessageCallback<EquipItemResponse>& callback
-        ) const override;
-    };
 }

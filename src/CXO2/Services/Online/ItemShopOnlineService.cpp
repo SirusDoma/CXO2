@@ -1,4 +1,4 @@
-#include <CXO2/Services/ItemShopService.hpp>
+#include <CXO2/Services/Online/ItemShopOnlineService.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 
 #include <CXO2/Network/Requests/PurchaseItemRequest.hpp>

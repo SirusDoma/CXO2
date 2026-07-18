@@ -90,9 +90,6 @@ namespace Cx
         bgm->setLooping(true);
         m_mixer.Play(*bgm, Sound::Channel::BGM);
 
-        const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
-        avatar->SetVisible(false);
-
         const auto notice = Instantiate<Marquee>(Resource::Room::IDC_TEXT_NOTICE);
         notice->SetString("Welcome to O2Jam! Let's play together~");
 
@@ -178,6 +175,9 @@ namespace Cx
 
     void StateRoom::SyncCharacterInfo()
     {
+        const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
+        avatar->SetVisible(false);
+
         m_charService.GetCharacterInfo([this] (const auto& ev)
         {
             OnCharacterInfoLoad(ev);
@@ -531,7 +531,7 @@ namespace Cx
             {
                 /* .ID            = */ room.ID,
                 /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ response.Title,
+                /* .Title         = */ response.Title.toAnsiString(),
                 /* .Locked        = */ room.Locked,
                 /* .MusicID       = */ musicID,
                 /* .Difficulty    = */ response.Difficulty,

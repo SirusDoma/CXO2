@@ -1,4 +1,4 @@
-#include <CXO2/Services/WaitingService.hpp>
+#include <CXO2/Services/Online/WaitingOnlineService.hpp>
 
 #include <CXO2/Network/Requests/StartGameRequest.hpp>
 #include <CXO2/Network/Requests/UpdateMemberReadyStateRequest.hpp>

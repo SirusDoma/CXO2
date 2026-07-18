@@ -70,14 +70,24 @@
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
 #include <CXO2/Services/NetworkService.hpp>
-#include <CXO2/Services/AuthService.hpp>
-#include <CXO2/Services/PlanetService.hpp>
-#include <CXO2/Services/CharacterService.hpp>
-#include <CXO2/Services/ChatService.hpp>
-#include <CXO2/Services/ChannelService.hpp>
-#include <CXO2/Services/ItemShopService.hpp>
-#include <CXO2/Services/WaitingService.hpp>
-#include <CXO2/Services/PlayingService.hpp>
+
+#include <CXO2/Services/Online/AuthOnlineService.hpp>
+#include <CXO2/Services/Online/PlanetOnlineService.hpp>
+#include <CXO2/Services/Online/CharacterOnlineService.hpp>
+#include <CXO2/Services/Online/ChatOnlineService.hpp>
+#include <CXO2/Services/Online/ChannelOnlineService.hpp>
+#include <CXO2/Services/Online/ItemShopOnlineService.hpp>
+#include <CXO2/Services/Online/WaitingOnlineService.hpp>
+#include <CXO2/Services/Online/PlayingOnlineService.hpp>
+
+#include <CXO2/Services/Offline/AuthOfflineService.hpp>
+#include <CXO2/Services/Offline/PlanetOfflineService.hpp>
+#include <CXO2/Services/Offline/CharacterOfflineService.hpp>
+#include <CXO2/Services/Offline/ChatOfflineService.hpp>
+#include <CXO2/Services/Offline/ChannelOfflineService.hpp>
+#include <CXO2/Services/Offline/ItemShopOfflineService.hpp>
+#include <CXO2/Services/Offline/WaitingOfflineService.hpp>
+#include <CXO2/Services/Offline/PlayingOfflineService.hpp>
 
 #include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
@@ -199,7 +209,11 @@ namespace Cx
             const auto& cmd   = ctx.template Require<CommandLineContext>();
             std::string token = cmd.GetAuthToken();
 
-            return std::make_unique<SessionContext>(token);
+            auto session = std::make_unique<SessionContext>(token);
+            if (cmd.GetArgumentCount() == 0)
+                session->Load();
+
+            return session;
         }, Gx::Context::Scope::Singleton);
 
         context.Provide<GameContext>(Gx::Context::Scope::Singleton);
@@ -213,18 +227,33 @@ namespace Cx
             return std::make_unique<RenderPositionJudgementStrategy>();
         });
 
-        // Initializes application modules
-        Install<NetworkService>();
-
         // Register services
-        context.Provide<AuthService, AuthOnlineService>();
-        context.Provide<PlanetService, PlanetOnlineService>();
-        context.Provide<CharacterService, CharacterOnlineService>();
-        context.Provide<ChatService, ChatOnlineService>();
-        context.Provide<ItemShopService, ItemShopOnlineService>();
-        context.Provide<ChannelService, ChannelOnlineService>();
-        context.Provide<WaitingService, WaitingOnlineService>();
-        context.Provide<PlayingService, PlayingOnlineService>();
+        // Offline services take over when the game is launched without a command line
+        if (context.Require<CommandLineContext>().GetArgumentCount() > 0)
+        {
+            // Initializes application modules
+            Install<NetworkService>();
+
+            context.Provide<AuthService, AuthOnlineService>();
+            context.Provide<PlanetService, PlanetOnlineService>();
+            context.Provide<CharacterService, CharacterOnlineService>();
+            context.Provide<ChatService, ChatOnlineService>();
+            context.Provide<ItemShopService, ItemShopOnlineService>();
+            context.Provide<ChannelService, ChannelOnlineService>();
+            context.Provide<WaitingService, WaitingOnlineService>();
+            context.Provide<PlayingService, PlayingOnlineService>();
+        }
+        else
+        {
+            context.Provide<AuthService, AuthOfflineService>();
+            context.Provide<PlanetService, PlanetOfflineService>();
+            context.Provide<CharacterService, CharacterOfflineService>();
+            context.Provide<ChatService, ChatOfflineService>();
+            context.Provide<ItemShopService, ItemShopOfflineService>();
+            context.Provide<ChannelService, ChannelOfflineService>();
+            context.Provide<WaitingService, WaitingOfflineService>();
+            context.Provide<PlayingService, PlayingOfflineService>();
+        }
 
         // Asset Path
         Gx::LocalFileSystem::AddAssetPath("./assets");

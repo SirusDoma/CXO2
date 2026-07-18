@@ -38,13 +38,14 @@ int main(int argc , char** argv)
             }
         }
 
-        // TODO: Remove validation for offline client
+        // The command line must either be fully valid (online mode) or absent (offline mode)
         const auto ctx = Cx::CommandLineContext(argc, argv);
-        if (ctx.GetArgumentCount() < 6 ||
-            ctx.GetAuthToken().empty() ||
-            ctx.GetFtpUrl().empty() ||
-            ctx.GetGame().empty() ||
-            ctx.GetGatewayInfo().empty())
+        if (ctx.GetArgumentCount() > 0 &&
+            (ctx.GetArgumentCount() < 6 ||
+             ctx.GetAuthToken().empty() ||
+             ctx.GetFtpUrl().empty() ||
+             ctx.GetGame().empty() ||
+             ctx.GetGatewayInfo().empty()))
         {
             Cx::SystemMessageBox::ShowInformation("Please try to run O2jam.exe", "[INFO]");
             return 0;

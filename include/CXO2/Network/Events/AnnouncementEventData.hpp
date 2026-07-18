@@ -10,6 +10,6 @@ namespace Cx
     {
         static constexpr Cx::Command Command = ResponseCommand::Announcement;
 
-        std::string Content{};
+        sf::String Content{};
     };
 }

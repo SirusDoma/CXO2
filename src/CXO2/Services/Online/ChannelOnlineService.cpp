@@ -1,4 +1,4 @@
-#include <CXO2/Services/ChannelService.hpp>
+#include <CXO2/Services/Online/ChannelOnlineService.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 
 #include <CXO2/Network/Requests/ChannelInfoRequest.hpp>
@@ -13,8 +13,6 @@
 #include <CXO2/Network/Events/RoomStateChangedEventData.hpp>
 #include <CXO2/Network/Events/RoomTitleChangedEventData.hpp>
 #include <CXO2/Network/Events/RoomUserCountChangedEventData.hpp>
-
-#include <fmt/format.h>
 
 namespace Cx
 {
@@ -100,76 +98,5 @@ namespace Cx
     void ChannelOnlineService::SetRoomRemovedEventCallback(const MessageCallback<RoomRemovedEventData>& callback)
     {
         m_removeSubscriber = m_network.On<RoomRemovedEventData>(callback);
-    }
-
-    void ChannelOfflineService::GetChannelInfo(
-        const MessageCallback<RoomListResponse>& roomCallback,
-        const MessageCallback<UserListResponse>& userListCallback
-    )
-    {
-        if (roomCallback)
-        {
-            roomCallback(RoomListResponse
-            {
-                std::vector
-                {
-                    RoomInfo
-                    {
-                        /* .ID            = */ 0,
-                        /* .State         = */ RoomState::Playing,
-                        /* .Title         = */std::string("Let's play together~"),
-                        /* .Locked        = */ false,
-                        /* .MusicID       = */ 100,
-                        /* .Difficulty    = */ Difficulty::HX,
-                        /* .Mode          = */ GameMode::Versus,
-                        /* .SpeedID       = */ 1,
-                        /* .Capacity      = */ 8,
-                        /* .UserCount     = */ 2,
-                        /* .MinLevelLimit = */ 0,
-                        /* .MaxLevelLimit = */ 0
-                    },
-                    RoomInfo
-                    {
-                        /* .ID            = */ 5,
-                        /* .State         = */ RoomState::Waiting,
-                        /* .Title         = */ std::string("Another's room"),
-                        /* .Locked        = */ false,
-                        /* .MusicID       = */ 100,
-                        /* .Difficulty    = */ Difficulty::EX,
-                        /* .Mode          = */ GameMode::Single,
-                        /* .SpeedID       = */ 1,
-                        /* .Capacity      = */ 8,
-                        /* .UserCount     = */ 2,
-                        /* .MinLevelLimit = */ 0,
-                        /* .MaxLevelLimit = */ 0
-                    },
-
-                    RoomInfo
-                    {
-                        /* .ID            = */ 3,
-                        /* .State         = */ RoomState::Waiting,
-                        /* .Title         = */ std::string("Someone's room"),
-                        /* .Locked        = */ false,
-                        /* .MusicID       = */ 100,
-                        /* .Difficulty    = */ Difficulty::HX,
-                        /* .Mode          = */ GameMode::Versus,
-                        /* .SpeedID       = */ 1,
-                        /* .Capacity      = */ 8,
-                        /* .UserCount     = */ 1,
-                        /* .MinLevelLimit = */ 20,
-                        /* .MaxLevelLimit = */ 80
-                    }
-                }
-            });
-        }
-
-        if (userListCallback)
-        {
-            auto list = std::vector<UserListResponse::UserInfo>();
-            for (unsigned int i = 0; i < 34; i++)
-                list.push_back({fmt::format("Dummy {}", i), static_cast<signed short>(i) });
-
-            userListCallback(UserListResponse{ list });
-        }
     }
 }

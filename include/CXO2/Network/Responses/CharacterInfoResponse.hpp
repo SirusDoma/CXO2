@@ -14,7 +14,7 @@ namespace Cx
         static constexpr Cx::Command Command = ResponseCommand::GetCharacterInfo;
 
         std::uint32_t Suspended{};
-        std::string   Name{};
+        sf::String    Name{};
         Cx::Gender    Gender{};
         std::uint32_t Gem{};
         std::uint32_t Point{};

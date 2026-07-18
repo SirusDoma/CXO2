@@ -1,4 +1,4 @@
-#include <CXO2/Services/PlayingService.hpp>
+#include <CXO2/Services/Online/PlayingOnlineService.hpp>
 
 #include <CXO2/Contexts/GameContext.hpp>
 

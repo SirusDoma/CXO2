@@ -26,37 +26,4 @@ namespace Cx
             const MessageCallback<SellItemResponse>& callback = nullptr
         ) const = 0;
     };
-
-    class NetworkService;
-    class ItemShopOnlineService : public ItemShopService
-    {
-    public:
-        explicit ItemShopOnlineService(NetworkService& network);
-
-        void PurchaseItem(
-            const PurchaseItemRequest& request,
-            const MessageCallback<PurchaseItemResponse>& callback = nullptr
-        ) const override;
-
-        void SellItem(
-            const SellItemRequest& request,
-            const MessageCallback<SellItemResponse>& callback = nullptr
-        ) const override;
-
-    private:
-        NetworkService& m_network;
-    };
-
-    class ItemShopOfflineService : public ItemShopService
-    {
-        void PurchaseItem(
-            const PurchaseItemRequest& request,
-            const MessageCallback<PurchaseItemResponse>& callback = nullptr
-        ) const override;
-
-        void SellItem(
-            const SellItemRequest& request,
-            const MessageCallback<SellItemResponse>& callback = nullptr
-        ) const override;
-    };
 }

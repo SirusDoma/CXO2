@@ -1,4 +1,4 @@
-#include <CXO2/Services/ChatService.hpp>
+#include <CXO2/Services/Online/ChatOnlineService.hpp>
 
 #include <CXO2/States/State.hpp>
 
