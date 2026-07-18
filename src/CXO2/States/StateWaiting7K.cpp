@@ -14,6 +14,7 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Services/WaitingService.hpp>
+#include <CXO2/Services/ChatService.hpp>
 
 #include <CXO2/Network/RoomInfo.hpp>
 #include <CXO2/Network/Requests/UpdateMapRequest.hpp>
@@ -28,28 +29,29 @@
 #include <CXO2/Network/Events/WaitingMusicChangedEventData.hpp>
 #include <CXO2/Network/Events/WaitingTitleChangedEventData.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Waiting7K.hpp>
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Map.hpp>
-#include <CXO2/Utilities/StringFormatter.hpp>
-
 #include <CXO2/UI/Common/ChatPanel.hpp>
 #include <CXO2/UI/Waiting/AvatarInfo.hpp>
 #include <CXO2/UI/Waiting/MapSelector.hpp>
 #include <CXO2/UI/Waiting/InstrumentSelector.hpp>
 #include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
 
+#include <CXO2/StringTable/Identifiers/Sound.hpp>
+#include <CXO2/StringTable/Identifiers/Waiting7K.hpp>
+#include <CXO2/StringTable/Identifiers/Cache.hpp>
+#include <CXO2/StringTable/Identifiers/Map.hpp>
+#include <CXO2/Utilities/StringFormatter.hpp>
+
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
-
-#include <algorithm>
-#include <limits>
 #include <Genode/UI/Image.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
-#include <CXO2/Services/ChatService.hpp>
+
+#include <fmt/format.h>
+
+#include <algorithm>
+#include <limits>
 
 namespace Cx
 {
@@ -59,16 +61,11 @@ namespace Cx
     {
         std::string GetRoomLevelCode(const RoomContext& room, const bool useNormalMode = false)
         {
-            std::string speedStr(4, '\0');
-            if (room.GetSpeed() > 0)
-            {
-                if (std::fmod(room.GetSpeed(), 1.0f) != 0)
-                    speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", room.GetSpeed()));
-                else
-                    speedStr = std::to_string(static_cast<int>(room.GetSpeed()));
-            }
-            else
-                speedStr = "R";
+            const auto mode = room.GetSpeedMode();
+
+            std::string speedStr = "R";
+            if (mode != SpeedMode::XrSpeed && mode != SpeedMode::TdSpeed && room.GetSpeed() > 0)
+                speedStr = fmt::format("{}", room.GetSpeed());
 
             if (useNormalMode || !room.IsRandomActive())
             {
@@ -654,7 +651,7 @@ namespace Cx
 
             m_room.SetMusic(it == musicList.end() ? ChartMetadata{musicID} : *it);
             m_room.SetDifficulty(response.Difficulty);
-            m_room.SetSpeedID(response.SpeedID);
+            m_room.SetSpeedID(response.Speed);
 
             InvalidateRoomInfo();
             InvalidateAvatarInfo();
@@ -755,6 +752,7 @@ namespace Cx
             m_game.SetMode(m_room.GetMode());
             m_game.SetDifficulty(m_room.GetDifficulty());
             m_game.SetSpeed(m_room.GetSpeed());
+            m_game.SetSpeedMode(m_room.GetSpeedMode());
             m_game.SetMapID(m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0 ? m_room.GetRandomizedMapID() : m_room.GetMapID());
             m_game.SetEffectID(m_room.GetEffectID());
 
@@ -865,6 +863,7 @@ namespace Cx
         auto music = selectMusicDialog->GetSelectedMusic();
         m_room.SetDifficulty(selectMusicDialog->GetSelectedDifficulty());
         m_room.SetSpeed(selectMusicDialog->GetSelectedSpeed());
+        m_room.SetSpeedMode(selectMusicDialog->GetSelectedSpeedMode());
 
         m_room.SetRandomLevel(selectMusicDialog->GetSelectedRandomLevels());
 

@@ -55,7 +55,7 @@ namespace Cx
         room.MusicID       = 0;
         room.Difficulty    = Difficulty::EX;
         room.Mode          = request.GameMode;
-        room.SpeedID       = 1;
+        room.Speed         = Speed::X15;
         room.Capacity      = 8;
         room.UserCount     = 1;
         room.MinLevelLimit = request.MinLevelLimit;
@@ -90,7 +90,7 @@ namespace Cx
         room.State      = RoomState::Waiting;
         room.Title      = std::string("Offline Room");
         room.Difficulty = Difficulty::EX;
-        room.SpeedID    = 1;
+        room.Speed      = Speed::X15;
         room.Capacity   = 8;
 
         const auto it = std::find_if(m_rooms.begin(), m_rooms.end(), [&request] (const RoomInfo& entry)
@@ -132,7 +132,7 @@ namespace Cx
         response.MusicID    = room.MusicID;
         response.Mode       = room.Mode;
         response.Difficulty = room.Difficulty;
-        response.SpeedID    = room.SpeedID;
+        response.Speed      = room.Speed;
         response.UserCount  = 1;
         response.Slots      = slots;
 

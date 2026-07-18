@@ -59,6 +59,16 @@ namespace Cx
         m_speed = speed;
     }
 
+    SpeedMode GameContext::GetSpeedMode() const
+    {
+        return m_speedMode;
+    }
+
+    void GameContext::SetSpeedMode(const SpeedMode mode)
+    {
+        m_speedMode = mode;
+    }
+
     unsigned int GameContext::GetMapID() const
     {
         return m_mapID;
@@ -106,6 +116,7 @@ namespace Cx
         m_difficulty = Difficulty::EX;
         m_mode       = GameMode::Single;
         m_speed      = 0;
+        m_speedMode  = SpeedMode::HiSpeed;
         m_mapID      = 0;
         m_effectID   = 0;
         m_viewport   = 0;

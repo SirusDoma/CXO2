@@ -34,6 +34,7 @@ namespace Cx
             GameConfig&    Config;
             unsigned int   Viewport;
             float          Speed;
+            Cx::SpeedMode  SpeedMode;
             Cx::Difficulty Difficulty;
 
             // TODO: Modifiers

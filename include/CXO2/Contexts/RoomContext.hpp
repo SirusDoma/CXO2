@@ -85,8 +85,11 @@ namespace Cx
         float GetSpeed() const;
         void SetSpeed(float speed);
 
-        std::uint8_t GetSpeedID() const;
-        void SetSpeedID(std::uint8_t speedID);
+        SpeedMode GetSpeedMode() const;
+        void SetSpeedMode(SpeedMode mode);
+
+        Speed GetSpeedID() const;
+        void SetSpeedID(Speed speedID);
 
         std::uint8_t GetCapacity() const;
 
@@ -136,6 +139,7 @@ namespace Cx
         Difficulty    m_difficulty{};
         GameMode      m_mode{};
         float         m_speed;
+        SpeedMode     m_speedMode = SpeedMode::HiSpeed;
         std::uint8_t  m_minLevelLimit{};
         std::uint8_t  m_maxLevelLimit{};
 

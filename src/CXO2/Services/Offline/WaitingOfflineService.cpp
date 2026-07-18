@@ -35,7 +35,7 @@ namespace Cx
     ) const
     {
         if (m_musicCallback)
-            m_musicCallback(MessageEnvelope<WaitingMusicChangedEventData>(WaitingMusicChangedEventData{ request.MusicID, request.Difficulty, request.SpeedID }));
+            m_musicCallback(MessageEnvelope<WaitingMusicChangedEventData>(WaitingMusicChangedEventData{ request.MusicID, request.Difficulty, request.Speed }));
 
         if (callback)
             callback(MessageEnvelope<UpdateRoomMusicRequest>(request));

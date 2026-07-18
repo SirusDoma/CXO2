@@ -126,20 +126,29 @@ namespace Cx
         m_speed = speed;
     }
 
-    std::uint8_t RoomContext::GetSpeedID() const
+    SpeedMode RoomContext::GetSpeedMode() const
     {
-        for (std::size_t i = 0; i < OfficialHiSpeeds.size(); i++)
-        {
-            if (OfficialHiSpeeds[i] == m_speed)
-                return i;
-        }
-
-        return -1;
+        return m_speedMode;
     }
 
-    void RoomContext::SetSpeedID(const std::uint8_t speedID)
+    void RoomContext::SetSpeedMode(const SpeedMode mode)
     {
-        SetSpeed(OfficialHiSpeeds[speedID]);
+        m_speedMode = mode;
+    }
+
+    Speed RoomContext::GetSpeedID() const
+    {
+        if (m_speedMode != SpeedMode::HiSpeed)
+            return Speed::X05;
+
+        return ToSpeed(m_speed).value_or(Speed::X05);
+    }
+
+    void RoomContext::SetSpeedID(const Speed speedID)
+    {
+        SetSpeed(ToSpeedValue(speedID).value_or(0.5f));
+        // The speed mode is inferred from the SpeedButton, not from the network
+        // SetSpeedMode(ToSpeedMode(speedID));
     }
 
     std::uint8_t RoomContext::GetCapacity() const
@@ -298,7 +307,7 @@ namespace Cx
         SetLocked(room.Locked);
         SetDifficulty(room.Difficulty);
         SetMode(room.Mode);
-        SetSpeed(OfficialHiSpeeds[room.SpeedID]);
+        SetSpeedID(room.Speed);
         SetMinLevelLimit(room.MinLevelLimit);
         SetMaxLevelLimit(room.MaxLevelLimit);
 

@@ -9,9 +9,9 @@ namespace Cx
     {
         static constexpr Cx::Command Command = EventCommand::RoomMusicChanged;
 
-        std::uint32_t ID{};
-        std::uint32_t MusicID{};
-        Cx::Difficulty  Difficulty{};
-        std::uint8_t  SpeedID{};
+        std::uint32_t  ID{};
+        std::uint32_t  MusicID{};
+        Cx::Difficulty Difficulty{};
+        Cx::Speed      Speed{};
     };
 }

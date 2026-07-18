@@ -454,7 +454,7 @@ namespace Cx
                 /* .MusicID       = */ music.ID,
                 /* .Difficulty    = */ Difficulty::EX,
                 /* .Mode          = */ request.GameMode,
-                /* .SpeedID       = */ 0,
+                /* .Speed         = */ Speed::X10,
                 /* .Capacity      = */ 8,
                 /* .UserCount     = */ 1,
                 /* .MinLevelLimit = */ static_cast<std::uint8_t>(request.MinLevelLimit),
@@ -536,7 +536,7 @@ namespace Cx
                 /* .MusicID       = */ musicID,
                 /* .Difficulty    = */ response.Difficulty,
                 /* .Mode          = */ response.Mode,
-                /* .SpeedID       = */ response.SpeedID,
+                /* .Speed         = */ response.Speed,
                 /* .Capacity      = */ 8,
                 /* .UserCount     = */ 1,
                 /* .MinLevelLimit = */ room.MinLevelLimit,
@@ -603,7 +603,7 @@ namespace Cx
                 /* .MusicID       = */ 0,
                 /* .Difficulty    = */ Difficulty::EX,
                 /* .Mode          = */ response.GameMode,
-                /* .SpeedID       = */ 1,
+                /* .Speed         = */ Speed::X15,
                 /* .Capacity      = */ 8,
                 /* .UserCount     = */ 1,
                 /* .MinLevelLimit = */ response.MinLevelLimit,
@@ -632,7 +632,7 @@ namespace Cx
 
             room.MusicID    = response.MusicID;
             room.Difficulty = response.Difficulty;
-            room.SpeedID    = response.SpeedID;
+            room.Speed      = response.Speed;
             roomList->Invalidate();
         }
         catch (const Gx::Exception& ex)

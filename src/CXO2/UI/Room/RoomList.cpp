@@ -47,7 +47,7 @@ namespace Cx
             it->second.MusicID       = room.MusicID;
             it->second.Difficulty    = room.Difficulty;
             it->second.Mode          = room.Mode;
-            it->second.SpeedID       = room.SpeedID;
+            it->second.Speed         = room.Speed;
             it->second.Capacity      = room.Capacity;
             it->second.UserCount     = room.UserCount;
             it->second.MinLevelLimit = room.MinLevelLimit;

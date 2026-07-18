@@ -14,7 +14,6 @@ namespace Gx
 
 namespace Cx
 {
-
     class ChartRenderer;
     class GameContext;
     class PlayMenu : public Gx::Image

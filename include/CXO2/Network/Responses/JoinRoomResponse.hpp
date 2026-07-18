@@ -2,6 +2,7 @@
 
 #include <CXO2/Models/Room.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Models/Game.hpp>
 #include <CXO2/Network/Commands.hpp>
 #include <CXO2/Network/MapInfo.hpp>
 #include <CXO2/Network/RoomInfo.hpp>
@@ -53,7 +54,7 @@ namespace Cx
         MapInfo        Map{};
         GameMode       Mode{};
         Cx::Difficulty Difficulty{};
-        std::uint8_t   SpeedID{};
+        Cx::Speed      Speed{};
         std::uint32_t  UserCount{};
 
         CollectionEnvelope<std::vector<SlotInfo>> Slots{8, 8};

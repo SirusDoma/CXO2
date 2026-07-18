@@ -25,6 +25,7 @@ namespace Cx
 {
 
     class SessionContext;
+    class SpeedButton;
     class SelectMusicDialog : public Gx::Dialog
     {
     public:
@@ -39,6 +40,7 @@ namespace Cx
 
         Genre GetSelectedGenre() const;
         float GetSelectedSpeed() const;
+        SpeedMode GetSelectedSpeedMode() const;
 
         void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
 
@@ -88,6 +90,7 @@ namespace Cx
         unsigned int m_randomMusicCount = 0;
         unsigned int m_coverID;
         float        m_speed;
+        SpeedMode    m_speedMode = SpeedMode::HiSpeed;
 
         Gx::AudioMixer&        m_mixer;
         Gx::ResourceManager&   m_resources;
@@ -106,10 +109,11 @@ namespace Cx
         std::vector<ChartMetadata>   m_filteredList;
         sf::Color                    m_titleColor = sf::Color(25, 25, 25);
 
+        std::vector<SpeedButton*> m_speedButtons;
+
         std::unordered_map<Gx::RadioButton*, std::size_t>          m_musicButtonIndices;
         std::unordered_map<Gx::RadioButton*, std::optional<Genre>> m_genreButtonValues;
         std::unordered_map<Gx::RadioButton*, Difficulty>           m_difficultyButtonValues;
         std::unordered_map<Gx::ToggleButton*, LevelCategory>       m_randomLevelButtonValues;
-        std::unordered_map<Gx::RadioButton*, float>                m_speedButtonValues;
     };
 }

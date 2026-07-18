@@ -1,4 +1,5 @@
 #include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
+#include <CXO2/UI/Waiting/SpeedButton.hpp>
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Game.hpp>
@@ -61,6 +62,7 @@ namespace Cx
         m_random     = m_room.GetRandomLevel();
         m_difficulty = m_room.GetDifficulty();
         m_speed      = m_room.GetSpeed();
+        m_speedMode  = m_room.GetSpeedMode();
 
         if (!m_filteredList.empty())
         {
@@ -202,53 +204,22 @@ namespace Cx
             }
         }
 
-        // TODO: Create a special `SpeedButton` to declare the speed properties
         if (auto speedSelector = FindChild<Gx::UiContainer>(Resource::SelectMusic::IDC_CONTAINER_SPEED_SELECTOR); speedSelector)
         {
             for (auto child : speedSelector->GetChildren())
             {
-                auto button = dynamic_cast<Gx::RadioButton*>(child);
+                auto button = dynamic_cast<SpeedButton*>(child);
                 if (!button)
                     continue;
 
-                auto name = button->GetName();
-                if (auto index = name.find_last_of('/'); index != -1)
-                    name = name.substr(index + 1);
-
-                auto prefix = std::string("IDC_RADIO_SPEED_");
-                if (name.compare(0, prefix.size(), prefix) != 0)
+                const float speed = button->GetSpeed();
+                if (button->GetMode() == SpeedMode::HiSpeed && speed <= 0.f)
                     continue;
 
-                auto speedName = name.substr(prefix.size());
-                float speed = 0.f;
-
-                if (speedName == "XR")
-                    speed = XrSpeed;
-                else if (speedName == "3D")
-                    speed = TdSpeed;
-                else if (speedName.size() == 2)
-                    speed = std::stof(std::string(1, speedName[0]) + "." + std::string(1, speedName[1]));
-
-                if (speed != XrSpeed && speed != TdSpeed)
-                {
-                    bool supported = false;
-                    for (float s : SupportedHiSpeeds)
-                    {
-                        if (speed == s)
-                        {
-                            supported = true;
-                            break;
-                        }
-                    }
-
-                    if (!supported)
-                        continue;
-                }
-
-                if (speed == m_speed)
+                if (button->GetMode() == m_speedMode && (m_speedMode != SpeedMode::HiSpeed || speed == m_speed))
                     button->SetCheckedState(true);
 
-                m_speedButtonValues[button] = speed;
+                m_speedButtons.push_back(button);
                 button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnSpeedButtonCheckChanged(sender, ev); });
             }
         }
@@ -285,6 +256,11 @@ namespace Cx
     float SelectMusicDialog::GetSelectedSpeed() const
     {
         return m_speed;
+    }
+
+    SpeedMode SelectMusicDialog::GetSelectedSpeedMode() const
+    {
+        return m_speedMode;
     }
 
     void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder order)
@@ -870,8 +846,9 @@ namespace Cx
             button->SetCheckedState(difficulty == m_difficulty && !IsRandomActive());
 
         m_speed = m_room.GetSpeed();
-        for (auto [button, speed] : m_speedButtonValues)
-            button->SetCheckedState(speed == m_speed);
+        m_speedMode = m_room.GetSpeedMode();
+        for (const auto button : m_speedButtons)
+            button->SetCheckedState(button->GetMode() == m_speedMode && (m_speedMode != SpeedMode::HiSpeed || button->GetSpeed() == m_speed));
 
         for (auto [button, level] : m_randomLevelButtonValues)
             button->SetCheckedState((static_cast<int>(m_random) & static_cast<int>(level)) != 0);
@@ -897,6 +874,7 @@ namespace Cx
         m_room.SetMusicSortOrder(m_order.value_or(MusicSortOrder::None));
         m_room.SetDifficulty(m_difficulty);
         m_room.SetSpeed(m_speed);
+        m_room.SetSpeedMode(m_speedMode);
 
         auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_02);
         m_mixer.Play(sfx, Sound::Channel::SFX);
@@ -1053,6 +1031,10 @@ namespace Cx
         if (!sender.IsChecked())
             return;
 
-        m_speed = m_speedButtonValues.at(&sender);
+        if (const auto button = dynamic_cast<SpeedButton*>(&sender); button)
+        {
+            m_speed     = button->GetSpeed();
+            m_speedMode = button->GetMode();
+        }
     }
 }

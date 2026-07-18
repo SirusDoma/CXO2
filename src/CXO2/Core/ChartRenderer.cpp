@@ -61,6 +61,7 @@ namespace Cx
             context.GetConfig(),
             context.GetViewport(),
             context.GetSpeed(),
+            context.GetSpeedMode(),
             context.GetDifficulty()
         });
     }
@@ -77,12 +78,12 @@ namespace Cx
         const auto speed = settings.Speed;
         for (auto channel : Chart::NoteChannels)
         {
-            if (speed == XrSpeed)
+            if (settings.SpeedMode == SpeedMode::XrSpeed)
             {
                 if (channel == Chart::Channel::Background)
                     m_speeds[channel] = 1.0f;
                 else
-                    m_speeds[channel] = SupportedHiSpeeds[Gx::Randomizer::Randomize(0, static_cast<int>(SupportedHiSpeeds.size()) - 1)];
+                    m_speeds[channel] = OfficialHiSpeeds[Gx::Randomizer::Randomize(0, static_cast<int>(OfficialHiSpeeds.size()) - 1)];
             }
             else
                 m_speeds[channel] = speed;

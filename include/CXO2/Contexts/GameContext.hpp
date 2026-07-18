@@ -33,6 +33,9 @@ namespace Cx
         float GetSpeed() const;
         void SetSpeed(float speed);
 
+        SpeedMode GetSpeedMode() const;
+        void SetSpeedMode(SpeedMode mode);
+
         unsigned int GetMapID() const;
         void SetMapID(const unsigned int mapID);
 
@@ -54,6 +57,7 @@ namespace Cx
         Difficulty m_difficulty;
         GameMode m_mode;
         float m_speed;
+        SpeedMode m_speedMode = SpeedMode::HiSpeed;
         unsigned int m_mapID;
         unsigned int m_effectID;
         unsigned int m_viewport;

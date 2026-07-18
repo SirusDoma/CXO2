@@ -1,7 +1,11 @@
 {
-  "type": "RadioButton",
+  "type": "SpeedButton",
   "require": {
     "refID": "0X29201027",
     "bndID": "0X29201027"
+  },
+  "attributes": {
+    "mode": "HiSpeed",
+    "speed": 1.0
   }
 }

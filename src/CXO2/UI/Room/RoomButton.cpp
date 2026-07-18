@@ -181,18 +181,12 @@ namespace Cx
             default: break;
         }
 
-        const float speed = m_room.SpeedID < OfficialHiSpeeds.size() ? OfficialHiSpeeds[m_room.SpeedID] : -1.f;
-        std::string speedStr(4, '\0');
-
-        if (speed > 0)
+        std::string speedStr = "R";
+        if (ToSpeedMode(m_room.Speed) == SpeedMode::HiSpeed)
         {
-            if (std::fmod(speed, 1.0f) != 0)
-                speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", speed));
-            else
-                speedStr = std::to_string(static_cast<int>(speed));
+            if (const auto speed = ToSpeedValue(m_room.Speed))
+                speedStr = fmt::format("{}", speed.value());
         }
-        else
-            speedStr = "R";
 
         if (m_room.MusicID <= std::numeric_limits<std::uint16_t>::max())
         {

@@ -45,6 +45,7 @@
 #include <CXO2/IO/Loaders/UI/Components/Planet/ChannelButtonLoader.hpp>
 #include <CXO2/IO/Loaders/UI/Components/Planet/ChannelBoardLoader.hpp>
 #include <CXO2/IO/Loaders/UI/Components/Waiting/AvatarInfoLoader.hpp>
+#include <CXO2/IO/Loaders/UI/Components/Waiting/SpeedButtonLoader.hpp>
 #include <CXO2/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
@@ -302,6 +303,7 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
         Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
         Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
+        Gx::ResourceLoaderFactory::Register<SpeedButton, SpeedButtonLoader>();
         Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
         // O2Jam Core Resources
         Gx::ResourceLoaderFactory::Register<O2JamChartMetadata, O2JamChartMetadataLoader>();

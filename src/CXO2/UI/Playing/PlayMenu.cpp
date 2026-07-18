@@ -9,6 +9,8 @@
 #include <Genode/UI/Gauge.hpp>
 #include <Genode/UI/Label.hpp>
 
+#include <fmt/format.h>
+
 namespace Cx
 {
     using namespace StringTable::Identifiers;
@@ -79,17 +81,12 @@ namespace Cx
 
         if (m_level)
         {
-            const auto  speed = m_context.GetSpeed();
-            std::string speedStr(4, '\0');
-            if (speed > 0)
-            {
-                if (std::fmod(speed, 1.0f) != 0)
-                    speedStr.resize(std::snprintf(&speedStr[0], speedStr.size(), "%.1f", speed));
-                else
-                    speedStr = std::to_string(static_cast<int>(speed));
-            }
-            else
-                speedStr = "R";
+            const auto speed = m_context.GetSpeed();
+            const auto mode  = m_context.GetSpeedMode();
+
+            std::string speedStr = "R";
+            if (mode != SpeedMode::XrSpeed && mode != SpeedMode::TdSpeed && speed > 0)
+                speedStr = fmt::format("{}", speed);
 
             std::string diffName;
             switch (m_difficulty)
