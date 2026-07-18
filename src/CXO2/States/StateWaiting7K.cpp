@@ -70,7 +70,7 @@ namespace Cx
             else
                 speedStr = "R";
 
-            if (useNormalMode || static_cast<int>(room.GetRandomLevel()) == 0)
+            if (useNormalMode || !room.IsRandomActive())
             {
                 std::string diffName;
                 switch (room.GetDifficulty())
@@ -84,7 +84,7 @@ namespace Cx
                 return diffName + speedStr;
             }
 
-            if (static_cast<int>(room.GetRandomLevel()) != 0)
+            if (room.IsRandomActive())
             {
                 return "RX" + speedStr;
             }
@@ -274,7 +274,7 @@ namespace Cx
         InvalidateRoomInfo();
         InvalidateMembers();
 
-        if (m_room.GetCurrentSlot().IsMaster && static_cast<int>(m_room.GetRandomLevel()) != 0)
+        if (m_room.GetCurrentSlot().IsMaster && m_room.IsRandomActive())
         {
             selectMusicDialog->Initialize();
             OnSelectMusicDialogAccepted();
@@ -875,7 +875,7 @@ namespace Cx
             m_room.GetSpeedID()
         };
 
-        if (static_cast<int>(m_room.GetRandomLevel()) != 0)
+        if (m_room.IsRandomActive())
         {
             const auto& musicList = m_session.GetInstalledMusic();
             const auto availableMusicIDs = m_room.GetAvailableMusicIDs();
@@ -1352,7 +1352,7 @@ namespace Cx
         m_roomName->SetString(m_room.GetTitle());
 
         const auto musicName = Instantiate<Gx::Label>(Resource::Waiting7K::IDC_TEXT_MUSIC_NAME);
-        if (static_cast<int>(m_room.GetRandomLevel()) != 0)
+        if (m_room.IsRandomActive())
         {
             const auto [start, end] = GetRandomLevelRange(m_room.GetRandomLevel());
 

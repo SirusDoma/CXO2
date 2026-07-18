@@ -9,11 +9,13 @@
 #include <Genode/UI/Dialog.hpp>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace Gx
 {
     class AudioMixer;
+    class List;
     class RadioButton;
     class ResourceManager;
     class ToggleButton;
@@ -33,6 +35,7 @@ namespace Cx
         ChartMetadata GetSelectedMusic() const;
         Difficulty GetSelectedDifficulty() const;
         LevelCategory GetSelectedRandomLevels() const;
+        bool IsRandomActive() const;
 
         Genre GetSelectedGenre() const;
         float GetSelectedSpeed() const;
@@ -46,29 +49,39 @@ namespace Cx
         void OnAccepted() override;
         void OnCancelled() override;
 
-        void Invalidate() override;
-
     private:
+        void FilterMusic();
+        unsigned int CountRandomMusic(int min, int max, std::unordered_set<unsigned int>& scanned);
+
+        unsigned int GetMaxPage() const;
+        unsigned int GetPage() const;
+        void SetPage(unsigned int page);
+
         void ToggleSort(MusicSortMode mode);
         void SelectDifficulty(Gx::RadioButton& sender, Difficulty difficulty);
 
-        void OnLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void InvalidateMusicList();
+        void InvalidateRandomView();
+        void InvalidateSelectors();
+        void InvalidateMusicInfo();
 
-        void OnMusicButtonFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
-        void OnMusicSelectorScrolled(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnLeftButtonClicked(const Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnRightButtonClicked(const Gx::Control& sender, const Gx::Control::Event& ev);
 
-        void OnSortNewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnSortTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnSortLevelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnSortDurationButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnGenreButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
-        void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
-        void OnExButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
-        void OnNxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
-        void OnHxButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
-        void OnSpeedButtonCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnMusicButtonFocusChanged(Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnMusicButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnMusicSelectorScrolled(Gx::Control& sender, const Gx::Control::Event& ev);
+
+        void OnSortNewButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnSortTitleButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnSortLevelButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnSortDurationButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
+        void OnGenreButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, const Gx::Control::Event& ev);
+        void OnExButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnNxButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnHxButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnSpeedButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
 
         bool         m_initialized = false;
         unsigned int m_page = 0;
@@ -90,10 +103,12 @@ namespace Cx
         ChartMetadata                m_music;
         Gx::ResourcePtr<sf::Texture> m_thumbnail;
         std::vector<ChartMetadata>   m_musicList;
-        std::vector<ChartMetadata>   m_displayList;
+        std::vector<ChartMetadata>   m_filteredList;
+        sf::Color                    m_titleColor = sf::Color(25, 25, 25);
 
         std::unordered_map<Gx::RadioButton*, std::size_t>          m_musicButtonIndices;
         std::unordered_map<Gx::RadioButton*, std::optional<Genre>> m_genreButtonValues;
+        std::unordered_map<Gx::RadioButton*, Difficulty>           m_difficultyButtonValues;
         std::unordered_map<Gx::ToggleButton*, LevelCategory>       m_randomLevelButtonValues;
         std::unordered_map<Gx::RadioButton*, float>                m_speedButtonValues;
     };

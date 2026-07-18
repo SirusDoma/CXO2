@@ -98,6 +98,7 @@ namespace Cx
 
         LevelCategory GetRandomLevel() const;
         void SetRandomLevel(LevelCategory random);
+        bool IsRandomActive() const;
 
         MusicSortMode GetMusicSortMode() const;
         void SetMusicSortMode(MusicSortMode sort);

@@ -184,6 +184,11 @@ namespace Cx
         m_random = random;
     }
 
+    bool RoomContext::IsRandomActive() const
+    {
+        return m_random != static_cast<LevelCategory>(0);
+    }
+
     MusicSortMode RoomContext::GetMusicSortMode() const
     {
         return m_sort;
