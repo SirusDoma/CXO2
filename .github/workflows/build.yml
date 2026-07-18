@@ -89,12 +89,7 @@ jobs:
         P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
-        if [ "$RUNNER_OS" == "macOS" ] && [ "${{ matrix.build_type }}" == "Release" ]; then
-          if [ -z "$P12_BUILD_CERTIFICATE_BASE64" ]; then
-            echo "::error::macOS Release build requires signing credentials (P12_BUILD_CERTIFICATE_BASE64, P12_PASSWORD, KEYCHAIN_PASSWORD)."
-            exit 1
-          fi
-
+        if [ "$RUNNER_OS" == "macOS" ] && [ "${{ matrix.build_type }}" == "Release" ] && [ -n "$P12_BUILD_CERTIFICATE_BASE64" ]; then
           # Setup credentials paths
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
@@ -114,7 +109,11 @@ jobs:
 
           echo "codesign-flags=-DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${{ vars.APPLE_TEAM_ID }} -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${{ vars.APPLE_CODESIGN_IDENTITY }}" >> "$GITHUB_OUTPUT"
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          echo "Non-Release macOS build; skipping code signing (unsigned build)."
+          if [ "${{ matrix.build_type }}" == "Release" ]; then
+            echo "::warning::No signing credentials provided (P12_BUILD_CERTIFICATE_BASE64, P12_PASSWORD, KEYCHAIN_PASSWORD); producing an unsigned Release build."
+          else
+            echo "Non-Release macOS build; skipping code signing (unsigned build)."
+          fi
           echo "codesign-flags=-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO" >> "$GITHUB_OUTPUT"
         fi
         
