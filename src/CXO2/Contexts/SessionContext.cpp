@@ -91,7 +91,7 @@ namespace Cx
         if (!size.has_value() || size.value() == 0)
             return;
 
-        auto json = std::vector<std::uint8_t>(size.value());
+        auto json = std::vector<std::byte>(size.value());
         if (const auto read = Gx::LocalFileSystem::Instance().ReadFile("session.json", json.data(), json.size()); !read.has_value() || read.value() != size.value())
             return;
 
@@ -102,7 +102,7 @@ namespace Cx
         if (const auto CharacterInfoInfo = sessionDb.find("CharacterInfo"); CharacterInfoInfo != sessionDb.end())
         {
             if (const auto it = CharacterInfoInfo->find("name"); it != CharacterInfoInfo->end() && it->is_string())
-                m_characterInfo.Name = it->get<std::string>();
+                m_characterInfo.Name = StringTranscoder::Transcode(it->get<std::string>());
 
             if (const auto it = CharacterInfoInfo->find("gender"); it != CharacterInfoInfo->end() && it->is_string())
                 m_characterInfo.Gender = magic_enum::enum_cast<Gender>(it->get<std::string>(), magic_enum::case_insensitive).value_or(Gender::Male);

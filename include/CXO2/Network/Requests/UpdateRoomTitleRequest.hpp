@@ -8,6 +8,6 @@ namespace Cx
     {
         static constexpr Cx::Command Command = RequestCommand::SetRoomTitle;
 
-        std::string Title{};
+        sf::String Title{};
     };
 }

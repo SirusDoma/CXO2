@@ -51,6 +51,7 @@ namespace Cx
         bool m_nullTerminated{true};
     };
 
+    using U8StringEnvelope = StringEnvelope<sf::U8String>;
 }
 
 #include <CXO2/Network/StringEnvelope.inl>

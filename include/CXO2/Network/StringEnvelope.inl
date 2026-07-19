@@ -60,7 +60,14 @@ namespace Cx
     template<typename TString, typename TPrefixSize, typename T0>
     StringEnvelope<TString, TPrefixSize, T0>::operator sf::String() const
     {
-        return sf::String(this->GetContainer());
+        if constexpr (std::is_same_v<TString, sf::U8String>)
+        {
+            return sf::String::fromUtf8(this->GetContainer().begin(), this->GetContainer().end());
+        }
+        else
+        {
+            return sf::String(this->GetContainer());
+        }
     }
 
     template<typename TString, typename TPrefixSize, typename T0>

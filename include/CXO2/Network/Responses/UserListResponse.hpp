@@ -13,7 +13,7 @@ namespace Cx
 
         struct UserInfo
         {
-            std::string  Name{};
+            sf::String   Name{};
             std::int32_t Level{};
         };
 

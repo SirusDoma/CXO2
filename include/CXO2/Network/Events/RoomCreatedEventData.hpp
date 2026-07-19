@@ -10,8 +10,8 @@ namespace Cx
         static constexpr Cx::Command Command = EventCommand::RoomCreated;
 
         std::uint32_t ID{};
-        std::string   Title{};
-        Cx::GameMode    GameMode{};
+        sf::String    Title{};
+        Cx::GameMode  GameMode{};
         bool          Locked{};
         std::uint8_t  MinLevelLimit{};
         std::uint8_t  MaxLevelLimit{};

@@ -15,6 +15,6 @@ namespace Cx
         static constexpr Cx::Command Command = ResponseCommand::CreateRoom;
 
         CreateRoomResult ResultCode{};
-        std::uint32_t ID{};
+        std::uint32_t    ID{};
     };
 }

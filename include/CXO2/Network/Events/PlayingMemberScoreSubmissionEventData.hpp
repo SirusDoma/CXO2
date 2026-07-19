@@ -9,6 +9,6 @@ namespace Cx
     {
         static constexpr Cx::Command Command = EventCommand::ScoreSubmission;
 
-        std::uint8_t    ID{};
+        std::uint8_t ID{};
     };
 }

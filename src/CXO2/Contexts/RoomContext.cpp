@@ -308,6 +308,7 @@ namespace Cx
         SetDifficulty(room.Difficulty);
         SetMode(room.Mode);
         SetSpeedID(room.Speed);
+        SetSpeedMode(ToSpeedMode(room.Speed));
         SetMinLevelLimit(room.MinLevelLimit);
         SetMaxLevelLimit(room.MaxLevelLimit);
 

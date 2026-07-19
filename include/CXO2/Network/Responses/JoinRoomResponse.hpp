@@ -28,7 +28,7 @@ namespace Cx
 
         struct MemberInfo
         {
-            std::string Name{};
+            sf::String  Name{};
             int         Level{};
             Cx::Gender  Gender{};
             bool        IsRoomMaster{};

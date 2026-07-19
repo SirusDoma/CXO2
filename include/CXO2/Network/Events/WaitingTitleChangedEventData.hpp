@@ -9,6 +9,6 @@ namespace Cx
     {
         static constexpr Cx::Command Command = EventCommand::WaitingTitleChanged;
 
-        std::string Title{};
+        sf::String Title{};
     };
 }

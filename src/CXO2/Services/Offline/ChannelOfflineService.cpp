@@ -33,7 +33,7 @@ namespace Cx
         const auto& info = m_session.GetCharacterInfo();
 
         auto list = std::vector<UserListResponse::UserInfo>();
-        list.push_back({ info.Name.toAnsiString(), info.Level });
+        list.push_back({ info.Name, info.Level });
 
         callback(MessageEnvelope<UserListResponse>(UserListResponse{ list }));
     }
@@ -50,7 +50,7 @@ namespace Cx
         auto room = RoomInfo{};
         room.ID            = id;
         room.State         = RoomState::Waiting;
-        room.Title         = request.Title.toAnsiString();
+        room.Title         = request.Title;
         room.Locked        = request.Locked;
         room.MusicID       = 0;
         room.Difficulty    = Difficulty::EX;
@@ -66,7 +66,7 @@ namespace Cx
         {
             m_createCallback(MessageEnvelope<RoomCreatedEventData>(RoomCreatedEventData{
                 id,
-                request.Title.toAnsiString(),
+                request.Title,
                 request.GameMode,
                 request.Locked,
                 request.MinLevelLimit,
@@ -88,7 +88,7 @@ namespace Cx
 
         auto room = RoomInfo{};
         room.State      = RoomState::Waiting;
-        room.Title      = std::string("Offline Room");
+        room.Title      = sf::String("Offline Room");
         room.Difficulty = Difficulty::EX;
         room.Speed      = Speed::X15;
         room.Capacity   = 8;
@@ -103,7 +103,7 @@ namespace Cx
         auto& info = m_session.GetCharacterInfo();
 
         auto member = JoinRoomResponse::MemberInfo{};
-        member.Name            = info.Name.toAnsiString();
+        member.Name            = info.Name;
         member.Level           = info.Level;
         member.Gender          = info.Gender;
         member.IsRoomMaster    = true;
@@ -128,7 +128,7 @@ namespace Cx
         response.Result     = JoinResult::Success;
         response.SlotID     = 0;
         response.Team       = RoomTeam::A;
-        response.Title      = sf::String(room.Title.GetContainer());
+        response.Title      = room.Title;
         response.MusicID    = room.MusicID;
         response.Mode       = room.Mode;
         response.Difficulty = room.Difficulty;

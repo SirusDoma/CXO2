@@ -449,7 +449,7 @@ namespace Cx
             {
                 /* .ID            = */ response.ID,
                 /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ request.Title.toAnsiString(),
+                /* .Title         = */ request.Title,
                 /* .Locked        = */ !request.Password.empty(),
                 /* .MusicID       = */ music.ID,
                 /* .Difficulty    = */ Difficulty::EX,
@@ -531,7 +531,7 @@ namespace Cx
             {
                 /* .ID            = */ room.ID,
                 /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ response.Title.toAnsiString(),
+                /* .Title         = */ response.Title,
                 /* .Locked        = */ room.Locked,
                 /* .MusicID       = */ musicID,
                 /* .Difficulty    = */ response.Difficulty,
