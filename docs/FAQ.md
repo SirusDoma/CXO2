@@ -4,10 +4,6 @@
 You have to find the client that matches with the `Client Version` stated at the top of the [README](../README.md) by yourself and I cannot help you with that.
 And no, the client is not compatible to run with 1.8 client
 
-## The game is flickering. How to fix this?
-This may happen if you have multi monitors, each has different refresh rate.
-This is known issue, in the meantime, you can turn off game V-Sync by pressing F10.
-
 ## Where's the ring/modifier? Why I can't set my speed when joining a room? Why some equip item slots/categories missing? Where's `OJNList.dat`? Where's (insert feature here)?
 One of the project goals is to remake all major O2Jam client versions that were ever published by e-Games and Nowcom.
 Starting from v3.10, because it is the earliest client that is available around the internet.
@@ -34,7 +30,7 @@ You may not notice it, but this issue also appear in the original client. Each O
 For example, using chinese title in O2Jam client v1.8 (9you) will likely work and reliable, but the game will likely fail to display the titile for any song with Korean title. The opposite also happening with O2Jam Korea client.
 
 ## How about mods? What are the file formats the client use?
-The game is a drop-in replacement of original `OTwo.exe`, which mean it can read all files that original O2Jam client can read, including `.opi`/`.opa` and `.ojn`/`.ojm` (and in the future, `OJNList.dat`).  
+The game is a drop-in replacement of original `OTwo.exe`, which mean it can read all files that original O2Jam client can read, including `.opi`/`.opa` and `.ojn`/`.ojm` (and in the future, `OJNList.dat`).
 
 This mean modded `Interface(1).opi`, `Playing(1).opi` and/or `Avatar.opa` may work in this client, **as long as the files are compatible with the `Client Version` specified in the top of the [README](../README.md)**.
 
@@ -48,8 +44,7 @@ Also, since the game use the same network format, you can play alongside with th
 Absolutely, use [Mozart.Encore](https://github.com/SirusDoma/Mozart.Encore/tree/mozart) to host your own server or for local network play.
 
 ## Is offline mode supported?
-It is not possible at the moment but it is already partially implemented inside the code. 
-For now, you will have to use `Mozart.Encore` to setup local server.
+Yes, launching the game normally (via double-click) will launch the game with Offline mode. The client will generate `session.json` which store user profile information, and can be edited manually using a text editor.
 
 ## Is this Illegal?
 I'm not distributing any e-Games/Nowcom/O2Jam IP. You must provide legally obtained game installer to play this game.
