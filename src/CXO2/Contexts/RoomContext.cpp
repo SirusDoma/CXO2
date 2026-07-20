@@ -1,8 +1,8 @@
 #include <CXO2/Contexts/RoomContext.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
 
-#include <CXO2/Services/WaitingService.hpp>
-#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Models/Map.hpp>
 
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
@@ -15,13 +15,9 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    RoomContext::RoomContext(SessionContext& session, WaitingService& service, Gx::ResourceManager& resources) :
+    RoomContext::RoomContext(SessionContext& session, Gx::ResourceManager& resources) :
         m_session(session),
-        m_service(service),
         m_resources(resources),
-        m_difficulty(Difficulty::EX),
-        m_speed(1.0f),
-        m_random(static_cast<LevelCategory>(0)),
         m_sort(MusicSortMode::Level),
         m_order(MusicSortOrder::Ascending)
     {
@@ -31,57 +27,63 @@ namespace Cx
     {
     }
 
-    std::uint32_t RoomContext::GetID() const
+    void RoomContext::Enter(const std::uint32_t id)
     {
-        return m_id;
+        m_state = Room{};
+        m_state.ID = id;
     }
 
-    void RoomContext::SetID(const std::uint32_t id)
+    void RoomContext::Leave()
     {
-        m_id = id;
+        m_state = Room{};
+    }
+
+    std::uint32_t RoomContext::GetID() const
+    {
+        return m_state.ID;
     }
 
     RoomState RoomContext::GetState() const
     {
-        return m_state;
+        return m_state.State;
     }
 
     void RoomContext::SetState(const RoomState state)
     {
-        m_state = state;
+        m_state.State = state;
     }
 
     sf::String RoomContext::GetTitle() const
     {
-        return m_title;
+        return m_state.Title;
     }
 
     void RoomContext::SetTitle(const sf::String& title)
     {
-        m_title = title;
+        m_state.Title = title;
     }
 
     bool RoomContext::IsLocked() const
     {
-        return m_locked;
+        return m_state.Locked;
     }
 
     void RoomContext::SetLocked(const bool locked)
     {
-        m_locked = locked;
+        m_state.Locked = locked;
     }
 
     ChartMetadata RoomContext::GetMusic() const
     {
-        return m_music;
+        return m_state.Music;
     }
 
     void RoomContext::SetMusic(const ChartMetadata& metadata)
     {
-        if (m_music.ID == metadata.ID)
+        if (m_state.Music.ID == metadata.ID)
             return;
 
-        m_music = metadata;
+        m_state.Music = metadata;
         if (!metadata.Source.empty() && Gx::FileSystem::Contains(metadata.Source))
         {
             if (const auto chartMetadata = O2JamChartMetadataLoader().LoadFromFile(metadata.Source, Gx::ResourceContext::Default))
@@ -96,52 +98,66 @@ namespace Cx
             m_resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
     }
 
+    void RoomContext::SetMusicID(const std::uint32_t musicID)
+    {
+        const auto& musicList = m_session.GetInstalledMusic();
+        const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID] (const auto& m)
+        {
+            return m.ID == musicID;
+        });
+
+        if (it != musicList.end())
+            SetMusic(*it);
+        else
+            SetMusic(ChartMetadata{musicID});
+    }
+
     Difficulty RoomContext::GetDifficulty() const
     {
-        return m_difficulty;
+        return m_state.Difficulty;
     }
 
     void RoomContext::SetDifficulty(const Difficulty difficulty)
     {
-        m_difficulty = difficulty;
+        m_state.Difficulty = difficulty;
     }
 
     GameMode RoomContext::GetMode() const
     {
-        return m_mode;
+        return m_state.Mode;
     }
 
     void RoomContext::SetMode(const GameMode mode)
     {
-        m_mode = mode;
+        m_state.Mode = mode;
     }
 
     float RoomContext::GetSpeed() const
     {
-        return m_speed;
+        return m_state.Speed;
     }
 
     void RoomContext::SetSpeed(const float speed)
     {
-        m_speed = speed;
+        m_state.Speed = speed;
     }
 
     SpeedMode RoomContext::GetSpeedMode() const
     {
-        return m_speedMode;
+        return m_state.SpeedMode;
     }
 
     void RoomContext::SetSpeedMode(const SpeedMode mode)
     {
-        m_speedMode = mode;
+        m_state.SpeedMode = mode;
     }
 
     Speed RoomContext::GetSpeedID() const
     {
-        if (m_speedMode != SpeedMode::HiSpeed)
+        if (m_state.SpeedMode != SpeedMode::HiSpeed)
             return Speed::X05;
 
-        return ToSpeed(m_speed).value_or(Speed::X05);
+        return ToSpeed(m_state.Speed).value_or(Speed::X05);
     }
 
     void RoomContext::SetSpeedID(const Speed speedID)
@@ -154,48 +170,28 @@ namespace Cx
     std::uint8_t RoomContext::GetCapacity() const
     {
         std::uint8_t capacity = 0;
-        for (const auto& slot : m_slots)
+        for (const auto& slot : m_state.Slots)
         {
-            if (slot.State != RoomSlotState::Locked)
+            if (slot.State != Room::SlotState::Locked)
                 capacity++;
         }
 
         return capacity;
     }
 
-    std::uint8_t RoomContext::GetMinLevelLimit() const
-    {
-        return m_minLevelLimit;
-    }
-
-    void RoomContext::SetMinLevelLimit(const std::uint8_t minLevelLimit)
-    {
-        m_minLevelLimit = minLevelLimit;
-    }
-
-    std::uint8_t RoomContext::GetMaxLevelLimit() const
-    {
-        return m_maxLevelLimit;
-    }
-
-    void RoomContext::SetMaxLevelLimit(const std::uint8_t maxLevelLimit)
-    {
-        m_maxLevelLimit = maxLevelLimit;
-    }
-
     LevelCategory RoomContext::GetRandomLevel() const
     {
-        return m_random;
+        return m_state.Random;
     }
 
     void RoomContext::SetRandomLevel(const LevelCategory random)
     {
-        m_random = random;
+        m_state.Random = random;
     }
 
     bool RoomContext::IsRandomActive() const
     {
-        return m_random != static_cast<LevelCategory>(0);
+        return m_state.Random != static_cast<LevelCategory>(0);
     }
 
     MusicSortMode RoomContext::GetMusicSortMode() const
@@ -220,37 +216,125 @@ namespace Cx
 
     std::uint8_t RoomContext::GetMapID() const
     {
-        return m_mapID;
+        return m_state.MapID;
     }
 
     void RoomContext::SetMapID(const std::uint8_t mapID)
     {
-        m_mapID = mapID;
+        m_state.MapID = mapID;
     }
 
     std::uint8_t RoomContext::GetRandomizedMapID() const
     {
-        return m_randomizedMapID;
+        return m_state.RandomizedMapID;
     }
 
     void RoomContext::SetRandomizedMapID(const std::uint8_t randomizedMapID)
     {
-        m_randomizedMapID = randomizedMapID;
+        m_state.RandomizedMapID = randomizedMapID;
     }
 
     std::uint8_t RoomContext::GetEffectID() const
     {
-        return m_effectID;
+        return m_state.EffectID;
     }
 
     void RoomContext::SetEffectID(std::uint8_t effectID)
     {
-        m_effectID = effectID;
+        m_state.EffectID = effectID;
     }
 
-    RoomSlot& RoomContext::GetMaster()
+    std::uint8_t RoomContext::GetMinLevelLimit() const
     {
-        const auto it = std::find_if(m_slots.begin(), m_slots.end(), [] (const auto& slot)
+        return m_state.MinLevelLimit;
+    }
+
+    std::uint8_t RoomContext::GetMaxLevelLimit() const
+    {
+        return m_state.MaxLevelLimit;
+    }
+
+    void RoomContext::SetLevelLimits(const std::uint8_t minLevelLimit, const std::uint8_t maxLevelLimit)
+    {
+        m_state.MinLevelLimit = minLevelLimit;
+        m_state.MaxLevelLimit = maxLevelLimit;
+    }
+
+    void RoomContext::Seat(const std::size_t index, const Member& member, const Room::Team team, const bool ready, const bool isMaster)
+    {
+        auto& slot = m_state.Slots[index];
+        slot.State    = Room::SlotState::Occupied;
+        slot.IsMaster = isMaster;
+        slot.Ready    = isMaster || ready;
+        slot.Team     = team;
+
+        slot.Name            = member.Name;
+        slot.Gender          = member.Gender;
+        slot.Level           = member.Level;
+        slot.EquippedItemIDs = member.EquippedItemIDs;
+        slot.MusicIDs        = member.MusicIDs;
+    }
+
+    void RoomContext::Vacate(const std::size_t index)
+    {
+        auto& slot = m_state.Slots[index];
+        slot = Room::Slot{};
+    }
+
+    void RoomContext::Lock(const std::size_t index)
+    {
+        auto& slot = m_state.Slots[index];
+        slot = Room::Slot{};
+        slot.State = Room::SlotState::Locked;
+    }
+
+    void RoomContext::Unlock(const std::size_t index)
+    {
+        Vacate(index);
+    }
+
+    void RoomContext::PromoteMaster(const std::size_t index)
+    {
+        auto& slot = m_state.Slots[index];
+        slot.IsMaster = true;
+        slot.Ready    = true;
+    }
+
+    void RoomContext::SetReady(const std::size_t index, const bool ready)
+    {
+        m_state.Slots[index].Ready = ready;
+    }
+
+    void RoomContext::SetTeam(const std::size_t index, const Room::Team team)
+    {
+        m_state.Slots[index].Team = team;
+    }
+
+    void RoomContext::SetTeamColor(const std::size_t index, const sf::Color& color)
+    {
+        m_state.Slots[index].TeamColor = color;
+    }
+
+    void RoomContext::SetEquipment(const std::size_t index, const EquipmentSet& equippedItemIDs)
+    {
+        m_state.Slots[index].EquippedItemIDs = equippedItemIDs;
+    }
+
+    void RoomContext::SetMasterSlot()
+    {
+        auto member = Member{};
+        member.Name            = m_session.GetName();
+        member.Gender          = m_session.GetGender();
+        member.Level           = m_session.GetLevel();
+        member.EquippedItemIDs = m_session.GetEquippedItemIDs();
+        member.MusicIDs        = m_session.GetMusicIDs();
+
+        Seat(0, member, Room::Team::A, true, true);
+    }
+
+    const Room::Slot& RoomContext::GetMaster() const
+    {
+        const auto it = std::find_if(m_state.Slots.begin(), m_state.Slots.end(), [] (const auto& slot)
         {
             return slot.IsMaster;
         });
@@ -258,20 +342,24 @@ namespace Cx
         return *it;
     }
 
-    RoomSlot& RoomContext::GetCurrentSlot()
+    const Room::Slot& RoomContext::GetCurrentSlot() const
     {
-        const auto it = std::find_if(m_slots.begin(), m_slots.end(), [this] (const auto& slot)
-        {
-            return slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name;
-        });
-
-        return *it;
+        return m_state.Slots[GetCurrentSlotIndex()];
     }
 
-
-    RoomSlot& RoomContext::GetSlot(const std::size_t index)
+    const Room::Slot& RoomContext::GetSlot(const std::size_t index) const
     {
-        return m_slots[index];
+        return m_state.Slots[index];
+    }
+
+    std::size_t RoomContext::GetCurrentSlotIndex() const
+    {
+        const auto it = std::find_if(m_state.Slots.begin(), m_state.Slots.end(), [this] (const auto& slot)
+        {
+            return slot.State == Room::SlotState::Occupied && slot.Name == m_session.GetName();
+        });
+
+        return static_cast<std::size_t>(std::distance(m_state.Slots.begin(), it));
     }
 
     std::unordered_set<std::uint32_t> RoomContext::GetAvailableMusicIDs() const
@@ -282,12 +370,12 @@ namespace Cx
         for (const auto& music : musicList)
         {
             bool available = true;
-            for (const auto& slot : m_slots)
+            for (const auto& slot : m_state.Slots)
             {
-                if (slot.State != RoomSlotState::Occupied || !slot.Member.has_value() || slot.Member->Name == m_session.GetCharacterInfo().Name)
+                if (slot.State != Room::SlotState::Occupied || slot.Name == m_session.GetName())
                     continue;
 
-                available = slot.Member->MusicIDs.find(music.ID) != slot.Member->MusicIDs.end();
+                available = slot.MusicIDs.find(music.ID) != slot.MusicIDs.end();
                 if (!available)
                     break;
             }
@@ -299,38 +387,19 @@ namespace Cx
         return result;
     }
 
-    void RoomContext::UpdateFrom(const RoomInfo& room)
+    GameContext RoomContext::CreateGameContext() const
     {
-        SetID(room.ID);
-        SetState(room.State);
-        SetTitle(room.Title);
-        SetLocked(room.Locked);
-        SetDifficulty(room.Difficulty);
-        SetMode(room.Mode);
-        SetSpeedID(room.Speed);
-        SetSpeedMode(ToSpeedMode(room.Speed));
-        SetMinLevelLimit(room.MinLevelLimit);
-        SetMaxLevelLimit(room.MaxLevelLimit);
+        auto game = GameContext{};
+        game.Chart = std::make_unique<Chart>();
+        game.Chart->Source = m_state.Music.Source;
 
-        m_slots = {};
-        if (room.MusicID > 0)
-        {
-            SetRandomLevel(static_cast<LevelCategory>(0));
+        game.Difficulty = m_state.Difficulty;
+        game.Mode       = m_state.Mode;
+        game.Speed      = m_state.Speed;
+        game.SpeedMode  = m_state.SpeedMode;
+        game.MapID      = m_state.MapID == Map::RandomID || m_state.MapID == 0 ? m_state.RandomizedMapID : m_state.MapID;
+        game.EffectID   = m_state.EffectID;
 
-            const auto& musicList = m_session.GetInstalledMusic();
-            const auto it = std::find_if(musicList.begin(), musicList.end(), [id = room.MusicID] (const auto& m)
-            {
-                return m.ID == id;
-            });
-
-            if (it != musicList.end())
-                SetMusic(*it);
-            else
-                SetMusic(ChartMetadata{});
-        }
-        else
-        {
-            SetRandomLevel(LevelCategory::Level1);
-        }
+        return game;
     }
 }

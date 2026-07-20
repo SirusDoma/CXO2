@@ -44,11 +44,9 @@ namespace Cx
 
     void CharacterOfflineService::GetCharacterInfo(const MessageCallback<CharacterInfoResponse>& callback) const
     {
-        const auto& info = m_session.GetCharacterInfo();
-
         auto response = CharacterInfoResponse{};
         response.Suspended = 0;
-        if (info.Name.isEmpty())
+        if (m_session.GetName().isEmpty())
         {
             response.Name   = sf::String("Player");
             response.Gender = Gender::Male;
@@ -58,22 +56,22 @@ namespace Cx
         }
         else
         {
-            response.Name       = info.Name;
-            response.Gender     = info.Gender;
-            response.Gem        = info.Wallet.Gem;
-            response.Point      = info.Wallet.Cash;
-            response.Level      = info.Level;
-            response.Wins       = info.RankStats.Wins;
-            response.Loses      = info.RankStats.Loses;
-            response.Draws      = info.RankStats.Draws;
-            response.Experience = info.Experience;
-            response.Role       = info.Role;
+            response.Name       = m_session.GetName();
+            response.Gender     = m_session.GetGender();
+            response.Gem        = m_session.GetWallet().Gem;
+            response.Point      = m_session.GetWallet().Cash;
+            response.Level      = m_session.GetLevel();
+            response.Wins       = m_session.GetRankStats().Wins;
+            response.Loses      = m_session.GetRankStats().Loses;
+            response.Draws      = m_session.GetRankStats().Draws;
+            response.Experience = m_session.GetExperience();
+            response.Role       = m_session.GetRole();
         }
 
-        response.EquippedItemIDs = info.EquippedItemIDs;
+        response.EquippedItemIDs = m_session.GetEquippedItemIDs();
 
         auto inventory = std::vector<std::uint32_t>();
-        for (const auto& item : info.Inventory)
+        for (const auto& item : m_session.GetInventory())
         {
             if (item.ID == 0)
                 continue;
@@ -93,19 +91,19 @@ namespace Cx
         const MessageCallback<EquipItemResponse>& callback
     ) const
     {
-        const auto& info = m_session.GetCharacterInfo();
+        const auto& inventory = m_session.GetInventory();
 
         auto response = EquipItemResponse{};
         response.EquipSlot = request.EquipSlot;
         response.SlotID    = request.SlotID;
 
-        if (request.SlotID >= info.Inventory.size())
+        if (request.SlotID >= inventory.size())
             response.Invalid = 1;
         else
         {
-            response.NewEquippedItemId = info.Inventory[request.SlotID].ID;
+            response.NewEquippedItemId = inventory[request.SlotID].ID;
 
-            for (const auto id : info.EquippedItemIDs)
+            for (const auto id : m_session.GetEquippedItemIDs())
             {
                 const auto item = m_items.Create(id);
                 if (GetItemEquipSlotType(item.GetType()) == request.EquipSlot)

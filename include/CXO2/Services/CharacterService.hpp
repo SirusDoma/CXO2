@@ -13,8 +13,6 @@ namespace Cx
 {
     enum class EquipmentType : std::uint8_t;
 
-    struct CharacterInfo;
-
     class CharacterService : public Service
     {
     public:

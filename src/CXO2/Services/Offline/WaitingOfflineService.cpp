@@ -46,8 +46,14 @@ namespace Cx
         const MessageCallback<UpdateRoomSlotRequest>& callback
     ) const
     {
+        const bool locked = m_lockedSlots.find(request.ID) != m_lockedSlots.end();
+        if (locked)
+            m_lockedSlots.erase(request.ID);
+        else
+            m_lockedSlots.insert(request.ID);
+
         if (m_slotCallback)
-            m_slotCallback(MessageEnvelope<WaitingSlotChangedEventData>(WaitingSlotChangedEventData{ request.ID, RoomSlotEventType::Lock }));
+            m_slotCallback(MessageEnvelope<WaitingSlotChangedEventData>(WaitingSlotChangedEventData{ request.ID, locked ? Room::SlotEventType::Unlock : Room::SlotEventType::Lock }));
 
         if (callback)
             callback(MessageEnvelope<UpdateRoomSlotRequest>(request));
@@ -91,6 +97,8 @@ namespace Cx
 
     void WaitingOfflineService::ExitRoom(const MessageCallback<ExitWaitingResponse>& callback) const
     {
+        m_lockedSlots.clear();
+
         if (callback)
             callback(MessageEnvelope<ExitWaitingResponse>(ExitWaitingResponse{}));
     }

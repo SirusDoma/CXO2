@@ -1,6 +1,8 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 
+#include <CXO2/Network/Responses/CharacterInfoResponse.hpp>
+
 #include <Genode/IO/LocalFileSystem.hpp>
 
 #include <magic_enum/magic_enum.hpp>
@@ -9,7 +11,6 @@ namespace Cx
 {
     SessionContext::SessionContext(const std::string& token) :
         m_token(token),
-        m_characterInfo(),
         m_server(MusicHall::None),
         m_channelID(0)
     {
@@ -20,14 +21,139 @@ namespace Cx
         return m_token;
     }
 
-    CharacterInfo& SessionContext::GetCharacterInfo()
+    sf::String SessionContext::GetName() const
     {
-        return m_characterInfo;
+        return m_name;
     }
 
-    void SessionContext::SetCharacterInfo(const CharacterInfo& CharacterInfo)
+    void SessionContext::SetName(const sf::String& name)
     {
-        m_characterInfo = CharacterInfo;
+        m_name = name;
+    }
+
+    Gender SessionContext::GetGender() const
+    {
+        return m_gender;
+    }
+
+    void SessionContext::SetGender(const Gender gender)
+    {
+        m_gender = gender;
+    }
+
+    Role SessionContext::GetRole() const
+    {
+        return m_role;
+    }
+
+    void SessionContext::SetRole(const Role role)
+    {
+        m_role = role;
+    }
+
+    std::int32_t SessionContext::GetLevel() const
+    {
+        return m_level;
+    }
+
+    void SessionContext::SetLevel(const std::int32_t level)
+    {
+        m_level = level;
+    }
+
+    std::int32_t SessionContext::GetExperience() const
+    {
+        return m_experience;
+    }
+
+    void SessionContext::SetExperience(const std::int32_t experience)
+    {
+        m_experience = experience;
+    }
+
+    SessionContext::RankStats SessionContext::GetRankStats() const
+    {
+        return m_rankStats;
+    }
+
+    void SessionContext::SetRankStats(const RankStats& rankStats)
+    {
+        m_rankStats = rankStats;
+    }
+
+    SessionContext::Wallet SessionContext::GetWallet() const
+    {
+        return m_wallet;
+    }
+
+    void SessionContext::SetWallet(const Wallet& wallet)
+    {
+        m_wallet = wallet;
+    }
+
+    const EquipmentSet& SessionContext::GetEquippedItemIDs() const
+    {
+        return m_equippedItemIDs;
+    }
+
+    const SessionContext::ItemList& SessionContext::GetInventory() const
+    {
+        return m_inventory;
+    }
+
+    const MusicList& SessionContext::GetMusicIDs() const
+    {
+        return m_musicIDs;
+    }
+
+    void SessionContext::Equip(const std::uint32_t itemID)
+    {
+        m_equippedItemIDs.insert(itemID);
+    }
+
+    void SessionContext::Unequip(const std::uint32_t itemID)
+    {
+        m_equippedItemIDs.erase(itemID);
+    }
+
+    void SessionContext::SetEquipment(const EquipmentSet& equippedItemIDs)
+    {
+        m_equippedItemIDs = equippedItemIDs;
+    }
+
+    void SessionContext::SetInventoryItem(const std::uint32_t slotID, const Item& item)
+    {
+        m_inventory[slotID] = item;
+    }
+
+    void SessionContext::AddInventoryItem(const std::uint32_t itemID)
+    {
+        m_inventory.push_back(itemID);
+    }
+
+    void SessionContext::UpdateFrom(const CharacterInfoResponse& response)
+    {
+        m_name       = response.Name;
+        m_gender     = response.Gender;
+        m_role       = response.Role;
+        m_level      = response.Level;
+        m_experience = response.Experience;
+
+        m_rankStats.Rank  = 0;
+        m_rankStats.Wins  = response.Wins;
+        m_rankStats.Loses = response.Loses;
+        m_rankStats.Draws = response.Draws;
+
+        m_wallet.Gem  = response.Gem;
+        m_wallet.Cash = response.Point;
+
+        m_equippedItemIDs = response.EquippedItemIDs.GetContainer();
+
+        m_inventory.clear();
+        for (const std::uint32_t id : response.Inventory.GetContainer())
+            m_inventory.push_back(id);
+
+        m_musicIDs.clear();
     }
 
     Planet SessionContext::GetPlanet() const
@@ -99,50 +225,50 @@ namespace Cx
         if (sessionDb.is_discarded())
             return;
 
-        if (const auto CharacterInfoInfo = sessionDb.find("CharacterInfo"); CharacterInfoInfo != sessionDb.end())
+        if (const auto characterInfo = sessionDb.find("CharacterInfo"); characterInfo != sessionDb.end())
         {
-            if (const auto it = CharacterInfoInfo->find("name"); it != CharacterInfoInfo->end() && it->is_string())
-                m_characterInfo.Name = StringTranscoder::Transcode(it->get<std::string>());
+            if (const auto it = characterInfo->find("name"); it != characterInfo->end() && it->is_string())
+                m_name = StringTranscoder::Transcode(it->get<std::string>());
 
-            if (const auto it = CharacterInfoInfo->find("gender"); it != CharacterInfoInfo->end() && it->is_string())
-                m_characterInfo.Gender = magic_enum::enum_cast<Gender>(it->get<std::string>(), magic_enum::case_insensitive).value_or(Gender::Male);
+            if (const auto it = characterInfo->find("gender"); it != characterInfo->end() && it->is_string())
+                m_gender = magic_enum::enum_cast<Gender>(it->get<std::string>(), magic_enum::case_insensitive).value_or(Gender::Male);
 
-            if (const auto it = CharacterInfoInfo->find("level"); it != CharacterInfoInfo->end() && it->is_number_integer())
-                m_characterInfo.Level = it->get<int>();
+            if (const auto it = characterInfo->find("level"); it != characterInfo->end() && it->is_number_integer())
+                m_level = it->get<int>();
 
-            if (const auto it = CharacterInfoInfo->find("gems"); it != CharacterInfoInfo->end() && it->is_number_integer())
-                m_characterInfo.Wallet.Gem = it->get<unsigned int>();
+            if (const auto it = characterInfo->find("gems"); it != characterInfo->end() && it->is_number_integer())
+                m_wallet.Gem = it->get<unsigned int>();
 
-            if (const auto it = CharacterInfoInfo->find("cash"); it != CharacterInfoInfo->end() && it->is_number_integer())
-                m_characterInfo.Wallet.Cash = it->get<unsigned int>();
+            if (const auto it = characterInfo->find("cash"); it != characterInfo->end() && it->is_number_integer())
+                m_wallet.Cash = it->get<unsigned int>();
 
             auto items = std::unordered_set<unsigned int>();
-            if (const auto it = CharacterInfoInfo->find("items"); it != CharacterInfoInfo->end() && it->is_array())
+            if (const auto it = characterInfo->find("items"); it != characterInfo->end() && it->is_array())
             {
-                m_characterInfo.Inventory.clear();
+                m_inventory.clear();
                 for (const auto id : it->items())
                 {
                     if (id.value().is_number_unsigned() && id.value().is_number_integer())
                     {
                         const auto val = id.value().get<unsigned int>();
                         if (items.insert(val).second)
-                            m_characterInfo.Inventory.push_back(val);
-                        else if (const auto in = std::find(m_characterInfo.Inventory.begin(), m_characterInfo.Inventory.end(), val); in != m_characterInfo.Inventory.end())
+                            m_inventory.push_back(val);
+                        else if (const auto in = std::find(m_inventory.begin(), m_inventory.end(), val); in != m_inventory.end())
                             in->Quantity++;
                     }
                 }
             }
 
-            if (const auto it = CharacterInfoInfo->find("equipments"); it != CharacterInfoInfo->end() && it->is_array())
+            if (const auto it = characterInfo->find("equipments"); it != characterInfo->end() && it->is_array())
             {
-                m_characterInfo.EquippedItemIDs.clear();
+                m_equippedItemIDs.clear();
                 auto set = std::unordered_set<unsigned int>();
                 for (const auto id : it->items())
                 {
                     if (id.value().is_number_unsigned() && id.value().is_number_integer())
                     {
                         const auto val = id.value().get<unsigned int>();
-                        m_characterInfo.EquippedItemIDs.insert(val);
+                        m_equippedItemIDs.insert(val);
                     }
                 }
             }
@@ -155,19 +281,19 @@ namespace Cx
         Gx::Json characterInfo;
 
         std::vector<std::uint32_t> items = {};
-        for (auto& item : m_characterInfo.Inventory)
+        for (auto& item : m_inventory)
         {
             for (std::size_t i = 0; i < item.Quantity; i++)
                 items.push_back(item.ID);
         }
 
-        characterInfo["name"]       = m_characterInfo.Name.toAnsiString();
-        characterInfo["gender"]     = magic_enum::enum_name(m_characterInfo.Gender);
-        characterInfo["level"]      = m_characterInfo.Level;
-        characterInfo["gems"]       = m_characterInfo.Wallet.Gem;
-        characterInfo["cash"]       = m_characterInfo.Wallet.Cash;
+        characterInfo["name"]       = m_name.toAnsiString();
+        characterInfo["gender"]     = magic_enum::enum_name(m_gender);
+        characterInfo["level"]      = m_level;
+        characterInfo["gems"]       = m_wallet.Gem;
+        characterInfo["cash"]       = m_wallet.Cash;
         characterInfo["items"]      = items;
-        characterInfo["equipments"] = m_characterInfo.EquippedItemIDs;
+        characterInfo["equipments"] = m_equippedItemIDs;
 
         sessionDb["CharacterInfo"] = characterInfo;
 

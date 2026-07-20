@@ -4,8 +4,8 @@
 #include <CXO2/Models/Character.hpp>
 #include <CXO2/Models/Game.hpp>
 #include <CXO2/Network/Commands.hpp>
-#include <CXO2/Network/MapInfo.hpp>
-#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Network/CollectionEnvelope.hpp>
+#include <CXO2/Network/StringEnvelope.hpp>
 
 #include <Genode/Network/Packet.hpp>
 
@@ -26,53 +26,54 @@ namespace Cx
     {
         static constexpr Cx::Command Command = ResponseCommand::JoinRoom;
 
-        struct MemberInfo
+        struct Member
         {
             sf::String  Name{};
             int         Level{};
             Cx::Gender  Gender{};
             bool        IsRoomMaster{};
-            RoomTeam    Team{};
+            Room::Team  Team{};
             bool        Ready{};
 
             CollectionEnvelope<std::unordered_set<std::uint32_t>> EquippedItemIDs{12, 12};
             CollectionEnvelope<std::unordered_set<std::uint32_t>, std::uint32_t> MusicIDs{};
         };
 
-        struct SlotInfo
+        struct Slot
         {
             std::uint8_t  Index{};
-            RoomSlotState State{};
-            MemberInfo    Member{};
+            Room::SlotState State{};
+
+            JoinRoomResponse::Member Member{};
         };
 
         JoinResult     Result{};
         std::uint8_t   SlotID{};
-        RoomTeam       Team{};
+        Room::Team     Team{};
         sf::String     Title{};
         std::uint32_t  MusicID{};
-        MapInfo        Map{};
+        std::uint32_t  Map{};
         GameMode       Mode{};
         Cx::Difficulty Difficulty{};
         Cx::Speed      Speed{};
         std::uint32_t  UserCount{};
 
-        CollectionEnvelope<std::vector<SlotInfo>> Slots{8, 8};
+        CollectionEnvelope<std::vector<Slot>> Slots{8, 8};
     };
 
-    inline Gx::Packet& operator<<(Gx::Packet& packet, const JoinRoomResponse::SlotInfo& slot)
+    inline Gx::Packet& operator<<(Gx::Packet& packet, const JoinRoomResponse::Slot& slot)
     {
         packet << slot.Index << slot.State;
-        if (slot.State == RoomSlotState::Occupied)
+        if (slot.State == Room::SlotState::Occupied)
             packet << slot.Member;
 
         return packet;
     }
 
-    inline Gx::Packet& operator>>(Gx::Packet& packet, JoinRoomResponse::SlotInfo& slot)
+    inline Gx::Packet& operator>>(Gx::Packet& packet, JoinRoomResponse::Slot& slot)
     {
         packet >> slot.Index >> slot.State;
-        if (slot.State == RoomSlotState::Occupied)
+        if (slot.State == Room::SlotState::Occupied)
             packet >> slot.Member;
 
         return packet;

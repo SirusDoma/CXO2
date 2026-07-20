@@ -76,7 +76,6 @@ namespace Cx
     {
         State::Initialize();
     
-        auto& charInfo       = m_session.GetCharacterInfo();
         const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MY_ROOM);
         const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
         const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
@@ -84,14 +83,14 @@ namespace Cx
         const auto sfxNext   = Instantiate<sf::Sound>(Sound::Effects::EF_19_2);
 
         const auto avatar = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
-        avatar->SetGender(charInfo.Gender);
-        for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+        avatar->SetGender(m_session.GetGender());
+        for (auto [_, item] : m_items.GetDefaultItems(m_session.GetGender()))
             avatar->SetDefaultItem(std::move(item));
 
-        for (const auto id : charInfo.EquippedItemIDs)
+        for (const auto id : m_session.GetEquippedItemIDs())
             avatar->Equip(m_items.Create(id));
 
-        for (const auto id : charInfo.Inventory)
+        for (const auto id : m_session.GetInventory())
         {
             const auto item = m_items.Create(id);
             m_inventory.push_back(std::move(item));
@@ -147,10 +146,10 @@ namespace Cx
         equipmentsContainer->SetVisible(true);
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
-        currentGem->SetValue(charInfo.Wallet.Gem);
+        currentGem->SetValue(m_session.GetWallet().Gem);
 
         const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
-        currentCash->SetValue(charInfo.Wallet.Cash);
+        currentCash->SetValue(m_session.GetWallet().Cash);
 
         const auto statusPanel = Instantiate<Gx::Image>(Resource::MyRoom::IDC_IMAGE_STATUS);
         statusPanel->SetEnabled(false);
@@ -165,13 +164,13 @@ namespace Cx
         const auto ranking  = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_RANKING);
         const auto guild    = statusPanel->FindChild<Gx::Label>(Resource::MyRoom::Status::IDC_TEXT_GUILD);
 
-        nickname->SetString(charInfo.Name);
-        level->SetString(std::to_string(charInfo.Level));
-        epoint->SetString(std::to_string(charInfo.Wallet.Cash));
-        exp->SetString(std::to_string(charInfo.Experience));
+        nickname->SetString(m_session.GetName());
+        level->SetString(std::to_string(m_session.GetLevel()));
+        epoint->SetString(std::to_string(m_session.GetWallet().Cash));
+        exp->SetString(std::to_string(m_session.GetExperience()));
         nextExp->SetString(std::to_string(0));
-        record->SetString(fmt::format("Wins: {} / Draws: {} / Loses: {}", charInfo.RankStats.Wins, charInfo.RankStats.Draws, charInfo.RankStats.Loses));
-        ranking->SetString(std::to_string(charInfo.RankStats.Rank));
+        record->SetString(fmt::format("Wins: {} / Draws: {} / Loses: {}", m_session.GetRankStats().Wins, m_session.GetRankStats().Draws, m_session.GetRankStats().Loses));
+        ranking->SetString(std::to_string(m_session.GetRankStats().Rank));
         guild->SetString("");
 
         const auto albumButton = statusPanel->FindChild<Gx::Button>(Resource::MyRoom::Status::IDC_BUTTON_MY_ALBUM);
@@ -184,7 +183,7 @@ namespace Cx
         });
 
         const auto sellButton = Instantiate<Gx::Button>(Resource::MyRoom::IDC_BUTTON_SELL);
-        sellButton->SetClickCallback([=, &charInfo] (auto&, auto&)
+        sellButton->SetClickCallback([=] (auto&, auto&)
         {
             if (statusPanel->IsVisible())
                 return;
@@ -215,7 +214,7 @@ namespace Cx
             const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
                 m_selectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-            ShowDialog(message, DialogStyle::OkCancel, false, [=, &charInfo] (auto accepted)
+            ShowDialog(message, DialogStyle::OkCancel, false, [=] (auto accepted)
             {
                 if (!accepted)
                 {
@@ -223,20 +222,20 @@ namespace Cx
                     return;
                 }
 
-                std::size_t slotID = charInfo.Inventory.size() + 1;
-                for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+                std::size_t slotID = m_session.GetInventory().size() + 1;
+                for (std::size_t i = 0; i < m_session.GetInventory().size(); i++)
                 {
-                    if (charInfo.Inventory[i] == m_selectedItem->GetID())
+                    if (m_session.GetInventory()[i] == m_selectedItem->GetID())
                     {
                         slotID = i;
                         break;
                     }
                 }
 
-                if (slotID >= charInfo.Inventory.size())
+                if (slotID >= m_session.GetInventory().size())
                     return;
 
-                m_shopService.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=, &charInfo] (const MessageEnvelope<SellItemResponse>& ev)
+                m_shopService.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=] (const MessageEnvelope<SellItemResponse>& ev)
                 {
                     try
                     {
@@ -247,14 +246,10 @@ namespace Cx
                             return;
                         }
 
-                        charInfo.Inventory[response.SlotID] = 0;
+                        m_session.SetInventoryItem(response.SlotID, 0);
                         m_inventory[response.SlotID] = Item{};
 
-                        charInfo.Wallet = CharacterInfo::WalletInfo
-                        {
-                            response.Gem,
-                            response.Cash
-                        };
+                        m_session.SetWallet({ response.Gem, response.Cash });
 
                         m_selectedItem = nullptr;
                         m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
@@ -303,7 +298,6 @@ namespace Cx
 
     void StateMyRoom::Invalidate()
     {
-        const auto charInfo  = &m_session.GetCharacterInfo();
         const auto avatar    = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
         const auto container = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_EQUIPMENTS);
         const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
@@ -315,7 +309,7 @@ namespace Cx
         auto inventory = std::vector<Item*>();
         for (auto& item : m_inventory)
         {
-            if (charInfo->EquippedItemIDs.find(item.GetID()) == charInfo->EquippedItemIDs.end())
+            if (m_session.GetEquippedItemIDs().find(item.GetID()) == m_session.GetEquippedItemIDs().end())
                 inventory.push_back(&item);
         }
 
@@ -338,7 +332,7 @@ namespace Cx
             const auto item = inventory[j++];
             unsigned int quantity = 0;
 
-            if (const auto it = std::find(charInfo->Inventory.begin(), charInfo->Inventory.end(), item->GetID()); it != charInfo->Inventory.end())
+            if (const auto it = std::find(m_session.GetInventory().begin(), m_session.GetInventory().end(), item->GetID()); it != m_session.GetInventory().end())
                 quantity = it->Quantity;
 
             currentSlot = item == m_selectedItem ? slot : currentSlot;
@@ -460,9 +454,9 @@ namespace Cx
 
                         avatar->Equip(m_inventory[response.SlotID]);
 
-                        charInfo->EquippedItemIDs.insert(response.NewEquippedItemId);
-                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
-                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_session.Equip(response.NewEquippedItemId);
+                        m_session.Unequip(response.PreviousEquippedItemId);
+                        m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
                         m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
                         m_selectedItem = nullptr;
@@ -532,10 +526,10 @@ namespace Cx
         bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_GEM);
-        currentGem->SetValue(charInfo->Wallet.Gem);
+        currentGem->SetValue(m_session.GetWallet().Gem);
 
         const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::MyRoom::IDC_NUMBER_CASH);
-        currentCash->SetValue(charInfo->Wallet.Cash);
+        currentCash->SetValue(m_session.GetWallet().Cash);
     }
 
     void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart thumbnailType)
@@ -546,7 +540,6 @@ namespace Cx
         if (thumbnailType != RenderPart::SmallThumbnail)
             thumbnailType = RenderPart::LargeThumbnail;
 
-        const auto charInfo = &m_session.GetCharacterInfo();
 
         const auto avatar        = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
         const auto equippedItems = avatar->GetEquipedItems();
@@ -570,7 +563,7 @@ namespace Cx
 
                 m_busy = true;
 
-                auto& inventory = charInfo->Inventory;
+                const auto& inventory = m_session.GetInventory();
                 auto slotIt = std::find_if(inventory.begin(), inventory.end(), [id = item->GetID()] (const auto& i) {
                     return i.ID == 0;
                 });
@@ -596,8 +589,8 @@ namespace Cx
 
                         avatar->Unequip(item->GetType());
 
-                        charInfo->EquippedItemIDs.erase(response.PreviousEquippedItemId);
-                        charInfo->Inventory[response.SlotID] = CharacterInfo::ItemInfo{response.PreviousEquippedItemId};
+                        m_session.Unequip(response.PreviousEquippedItemId);
+                        m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
                         m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
 
                         // m_session.Save();

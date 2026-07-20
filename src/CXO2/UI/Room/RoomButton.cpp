@@ -45,65 +45,57 @@ namespace Cx
         return bounds;
     }
 
-    const RoomInfo& RoomButton::GetRoomInfo() const
+    const Room& RoomButton::GetRoomInfo() const
     {
         return m_room;
     }
 
-    void RoomButton::SetRoomInfo(const RoomInfo& data)
+    void RoomButton::SetRoomInfo(const Room& data)
     {
         m_room   = data;
         m_music  = ChartMetadata{};
 
-        if (data.MusicID > std::numeric_limits<std::uint16_t>::max())
+        if (data.Random != static_cast<LevelCategory>(0))
         {
-            const std::uint8_t randomBit = static_cast<std::uint8_t>((data.MusicID >> 28) & 0xFF);
-            constexpr int max = static_cast<int>(LevelCategory::Level1) |
-                                static_cast<int>(LevelCategory::Level2) |
-                                static_cast<int>(LevelCategory::Level3) |
-                                static_cast<int>(LevelCategory::Level4);
-
             m_randomStart = 0;
             m_randomEnd   = 0;
-            if (randomBit >= 1 && randomBit <= max)
+
+            const auto levels = static_cast<int>(data.Random);
+            if (levels & static_cast<int>(LevelCategory::Level1))
             {
-                const auto levels = static_cast<int>(randomBit);
-                if (levels & static_cast<int>(LevelCategory::Level1))
-                {
-                    if (m_randomStart == 0 || m_randomStart > 1)
-                        m_randomStart = 1;
+                if (m_randomStart == 0 || m_randomStart > 1)
+                    m_randomStart = 1;
 
-                    if (m_randomEnd < 5)
-                        m_randomEnd = 5;
-                }
-
-                if (levels & static_cast<int>(LevelCategory::Level2))
-                {
-                    if (m_randomStart == 0 || m_randomStart > 5)
-                        m_randomStart = 5;
-
-                    if (m_randomEnd < 9)
-                        m_randomEnd = 9;
-                }
-
-                if (levels & static_cast<int>(LevelCategory::Level3))
-                {
-                    if (m_randomStart == 0 || m_randomStart > 9)
-                        m_randomStart = 9;
-
-                    if (m_randomEnd < 13)
-                        m_randomEnd = 13;
-                }
-
-                if (levels & static_cast<int>(LevelCategory::Level4))
-                    m_randomEnd = 0;
-
-                m_active = true;
+                if (m_randomEnd < 5)
+                    m_randomEnd = 5;
             }
+
+            if (levels & static_cast<int>(LevelCategory::Level2))
+            {
+                if (m_randomStart == 0 || m_randomStart > 5)
+                    m_randomStart = 5;
+
+                if (m_randomEnd < 9)
+                    m_randomEnd = 9;
+            }
+
+            if (levels & static_cast<int>(LevelCategory::Level3))
+            {
+                if (m_randomStart == 0 || m_randomStart > 9)
+                    m_randomStart = 9;
+
+                if (m_randomEnd < 13)
+                    m_randomEnd = 13;
+            }
+
+            if (levels & static_cast<int>(LevelCategory::Level4))
+                m_randomEnd = 0;
+
+            m_active = true;
         }
-        else if (data.MusicID > 0)
+        else if (data.Music.ID > 0 && data.Music.ID <= std::numeric_limits<std::uint16_t>::max())
         {
-            const auto it = std::find_if(m_musicList.begin(), m_musicList.end(), [id = data.MusicID] (const auto& m)
+            const auto it = std::find_if(m_musicList.begin(), m_musicList.end(), [id = data.Music.ID] (const auto& m)
             {
                return m.ID == id;
             });
@@ -121,7 +113,7 @@ namespace Cx
 
     void RoomButton::Reset()
     {
-        m_room   = RoomInfo();
+        m_room   = Room();
         m_music  = ChartMetadata{};
         m_active = false;
 
@@ -182,13 +174,10 @@ namespace Cx
         }
 
         std::string speedStr = "R";
-        if (ToSpeedMode(m_room.Speed) == SpeedMode::HiSpeed)
-        {
-            if (const auto speed = ToSpeedValue(m_room.Speed))
-                speedStr = fmt::format("{}", speed.value());
-        }
+        if (m_room.SpeedMode == SpeedMode::HiSpeed)
+            speedStr = fmt::format("{}", m_room.Speed);
 
-        if (m_room.MusicID <= std::numeric_limits<std::uint16_t>::max())
+        if (m_room.Random == static_cast<LevelCategory>(0))
         {
             std::string diffName;
             switch (m_room.Difficulty)

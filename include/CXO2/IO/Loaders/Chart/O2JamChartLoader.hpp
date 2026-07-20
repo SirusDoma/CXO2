@@ -7,11 +7,10 @@
 
 namespace Cx
 {
-    class GameContext;
     class O2JamChartLoader : public Gx::ResourceLoader<Chart>
     {
     public:
-        explicit O2JamChartLoader(const GameContext& context);
+        O2JamChartLoader(GameMode mode, Difficulty difficulty);
 
         [[nodiscard]] Gx::ResourcePtr<Chart> LoadFromMetadata(const O2JamChartMetadata& meta, const Gx::ResourceContext& ctx) const;
         [[nodiscard]] Gx::ResourcePtr<Chart> LoadFromFile(const std::filesystem::path& fileName, const Gx::ResourceContext& ctx) const override;

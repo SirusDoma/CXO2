@@ -21,8 +21,6 @@ namespace Cx
     struct CreateRoomRequest;
     struct JoinRoomRequest;
 
-    struct RoomInfo;
-
     class ChannelService : public virtual Service
     {
     public:

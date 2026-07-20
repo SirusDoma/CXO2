@@ -35,7 +35,7 @@ namespace Cx
         ChatWindow* GetChatWindow() const;
 
     private:
-        void OnMessage(const CharacterInfo& actor, const sf::String& text);
+        void OnMessage(const sf::String& sender, Role senderRole, const sf::String& text);
 
         void OnWhisper(const MessageEnvelope<WhisperEventData>& ev);
         void OnWaitingUserMessage(const MessageEnvelope<WaitingUserMessageResponse>& ev);

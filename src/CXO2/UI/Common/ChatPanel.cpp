@@ -77,17 +77,17 @@ namespace Cx
         chatInput->SetTextEnteredCallback([this] (auto& sender, const sf::String& text) { OnChatInputTextEntered(sender, text); });
     }
 
-    void ChatPanel::OnMessage(const CharacterInfo& actor, const sf::String& text)
+    void ChatPanel::OnMessage(const sf::String& sender, const Role senderRole, const sf::String& text)
     {
         const auto chatWindow = GetChatWindow();
 
         if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/"))
         {
             if (const auto waiting = GetParent<StateWaiting7K>())
-                waiting->OnMemberEmoticon(actor, text);
+                waiting->OnMemberEmoticon(sender, text);
         }
         else
-            chatWindow->PushMessage(actor, text);
+            chatWindow->PushMessage(sender, senderRole, text);
     }
 
     void ChatPanel::OnWhisper(const MessageEnvelope<WhisperEventData>& ev)
@@ -97,10 +97,7 @@ namespace Cx
             const auto& response = ev.Open();
 
             const auto chatWindow = GetChatWindow();
-            chatWindow->PushWhisper(
-                CharacterInfo{response.Sender, Gender::Any, Role::Normal},
-                m_session.GetCharacterInfo(),
-                response.Content);
+            chatWindow->PushWhisper(response.Sender, m_session.GetName(), response.Content);
         }
         catch (const Gx::Exception&)
         {
@@ -112,7 +109,7 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+            OnMessage(response.Sender, Role::Normal, response.Content);
         }
         catch (const Gx::Exception&)
         {
@@ -124,7 +121,7 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+            OnMessage(response.Sender, Role::Administrator, response.Content);
         }
         catch (const Gx::Exception&)
         {
@@ -136,7 +133,7 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Normal}, response.Content);
+            OnMessage(response.Sender, Role::Normal, response.Content);
         }
         catch (const Gx::Exception&)
         {
@@ -148,7 +145,7 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            OnMessage(CharacterInfo{response.Sender, Gender::Any, Role::Administrator}, response.Content);
+            OnMessage(response.Sender, Role::Administrator, response.Content);
         }
         catch (const Gx::Exception&)
         {
@@ -163,7 +160,7 @@ namespace Cx
         {
             if (!ev.Open().Invalid)
             {
-                chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, message);
+                chatWindow->PushWhisper(m_session.GetName(), m_recipient, message);
                 return;
             }
         }
@@ -182,7 +179,7 @@ namespace Cx
         {
             if (!ev.Open().Invalid)
             {
-                chatWindow->PushWhisper(m_session.GetCharacterInfo(), CharacterInfo{m_recipient}, text);
+                chatWindow->PushWhisper(m_session.GetName(), m_recipient, text);
                 return;
             }
         }
@@ -312,7 +309,7 @@ namespace Cx
                 OnSendWhisperResponded(ev, text);
             });
         }
-        else if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/n") && m_session.GetCharacterInfo().Role == Role::Administrator)
+        else if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/n") && m_session.GetRole() == Role::Administrator)
             m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
         else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
             m_service.SendWaitingMessage(WaitingMessageRequest{text});

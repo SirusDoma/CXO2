@@ -13,10 +13,10 @@
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Models/Map.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 #include <CXO2/Services/ChatService.hpp>
 
-#include <CXO2/Network/RoomInfo.hpp>
 #include <CXO2/Network/Requests/UpdateMapRequest.hpp>
 #include <CXO2/Network/Requests/UpdateRoomMusicRequest.hpp>
 #include <CXO2/Network/Events/StartGameEventData.hpp>
@@ -130,11 +130,10 @@ namespace Cx
         }
     }
 
-    StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ChatService& messaging, ItemFactory& items) :
+    StateWaiting7K::StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, WaitingService& service, ChatService& messaging, ItemFactory& items) :
         m_mixer(mixer),
         m_session(session),
         m_room(room),
-        m_game(game),
         m_service(service),
         m_messaging(messaging),
         m_items(items)
@@ -165,19 +164,19 @@ namespace Cx
 
         // Team buttons
         const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
-        auto teamButtonMatcher = [=] (const RoomTeam team) -> Gx::RadioButton*
+        auto teamButtonMatcher = [=] (const Room::Team team) -> Gx::RadioButton*
         {
             switch (team)
             {
                 default:
-                case RoomTeam::A: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_A);
-                case RoomTeam::B: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_B);
-                case RoomTeam::C: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_C);
-                case RoomTeam::D: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_D);
-                case RoomTeam::E: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_E);
-                case RoomTeam::F: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_F);
-                case RoomTeam::G: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_G);
-                case RoomTeam::H: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_H);
+                case Room::Team::A: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_A);
+                case Room::Team::B: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_B);
+                case Room::Team::C: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_C);
+                case Room::Team::D: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_D);
+                case Room::Team::E: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_E);
+                case Room::Team::F: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_F);
+                case Room::Team::G: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_G);
+                case Room::Team::H: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_H);
             }
         };
 
@@ -187,7 +186,7 @@ namespace Cx
                 currentTeamButton->SetCheckedState(true);
         }
 
-        for (const auto team : { RoomTeam::A, RoomTeam::B, RoomTeam::C, RoomTeam::D, RoomTeam::E, RoomTeam::F, RoomTeam::G, RoomTeam::H })
+        for (const auto team : { Room::Team::A, Room::Team::B, Room::Team::C, Room::Team::D, Room::Team::E, Room::Team::F, Room::Team::G, Room::Team::H })
         {
             const auto teamButton = teamButtonMatcher(team);
             if (!teamButton)
@@ -230,10 +229,10 @@ namespace Cx
         const auto instrumentSelector = Instantiate<InstrumentSelector>(Resource::Waiting7K::IDC_CONTAINER_INSTRUMENT_SELECTOR);
         instrumentSelector->SetInstrumentSelectCallback([this] (const auto& metadata) { OnInstrumentSelectorStateChanged(metadata); });
 
-        for (const auto id : m_session.GetCharacterInfo().Inventory)
+        for (const auto id : m_session.GetInventory())
             instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(id));
 
-        for (const auto id : m_session.GetCharacterInfo().EquippedItemIDs)
+        for (const auto id : m_session.GetEquippedItemIDs())
             instrumentSelector->AddInstrumentMetadata(m_items.GetItemMetadata(id));
 
         // Select music dialog
@@ -277,7 +276,7 @@ namespace Cx
             OnSelectMusicDialogAccepted();
         }
 
-        if (m_room.GetCurrentSlot().IsMaster && (m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0))
+        if (m_room.GetCurrentSlot().IsMaster && (m_room.GetMapID() == Map::RandomID || m_room.GetMapID() == 0))
             OnMapSelectorStateChanged(0);
 
         bgm->setLooping(true);
@@ -308,9 +307,9 @@ namespace Cx
             avatar->AddChild(emoticonContainer);
 
             const auto avatarInfo = avatar->FindChild<AvatarInfo>(Resource::Waiting7K::Avatar::IDC_AVATAR_INFO);
-            auto& slot = m_room.GetSlot(memberID);
+            const auto& slot = m_room.GetSlot(memberID);
 
-            if (slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name)
+            if (slot.State == Room::SlotState::Occupied && slot.Name == m_session.GetName())
             {
                 m_slot       = &slot;
                 m_avatarInfo = avatarInfo;
@@ -343,37 +342,30 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& slot = m_room.GetSlot(response.ID);
-            auto oldSlot = slot;
             switch (response.Type)
             {
-                case RoomSlotEventType::Unlock:
+                case Room::SlotEventType::Unlock:
                 {
-                    assert(!slot.Member.has_value() && "Slot is not empty");
+                    assert(m_room.GetSlot(response.ID).State != Room::SlotState::Occupied && "Slot is not empty");
 
-                    slot.State = RoomSlotState::Unoccupied;
-                    slot.Member = std::nullopt;
-
+                    m_room.Unlock(response.ID);
                     InvalidateMembers();
                     break;
                 }
-                case RoomSlotEventType::Lock:
+                case Room::SlotEventType::Lock:
                 {
-                    assert(!slot.Member.has_value() && "Slot is not empty");
+                    assert(m_room.GetSlot(response.ID).State != Room::SlotState::Occupied && "Slot is not empty");
 
-                    slot.State = RoomSlotState::Locked;
-                    slot.Member = std::nullopt;
-
+                    m_room.Lock(response.ID);
                     InvalidateMembers();
                     break;
                 }
-                case RoomSlotEventType::Kicked:
+                case Room::SlotEventType::Kicked:
                 {
-                    assert(slot.Member.has_value() && "Slot is empty");
-                    slot.State = RoomSlotState::Unoccupied;
+                    assert(m_room.GetSlot(response.ID).State == Room::SlotState::Occupied && "Slot is empty");
 
-                    auto name = slot.Member->Name;
-                    slot.Member = std::nullopt;
+                    auto name = m_room.GetSlot(response.ID).Name;
+                    m_room.Vacate(response.ID);
 
                     const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
                     const auto chatWindow = chatPanel->GetChatWindow();
@@ -399,6 +391,7 @@ namespace Cx
         {
             const auto& _ = ev.Open();
 
+            m_room.Leave();
             GetDirector().Dismiss<StateRoom>(RoomTransitionEventType::Kick);
         }
         catch (const Gx::Exception& ex)
@@ -418,29 +411,19 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& slot    = m_room.GetSlot(response.ID);
-            slot.State    = RoomSlotState::Occupied;
-            slot.Ready    = response.Ready;
-            slot.Team     = response.Team;
-            slot.IsMaster = false;
-            slot.Member   = CharacterInfo
-            {
-                /* .Name            = */ response.Name,
-                /* .Gender          = */ response.Gender,
-                /* .Role            = */ Role::Normal,
-                /* .Level           = */ response.Level,
-                /* .Experience      = */ 0,
-                /* .RankStats       = */ {},
-                /* .Wallet          = */ {},
-                /* .EquippedItemIDs = */ response.EquippedItemIDs,
-                /* .Inventory       = */ {},
-                /* .MusicIDs        = */ response.MusicIDs
-            };
+            auto member = RoomContext::Member{};
+            member.Name            = response.Name;
+            member.Gender          = response.Gender;
+            member.Level           = response.Level;
+            member.EquippedItemIDs = response.EquippedItemIDs;
+            member.MusicIDs        = response.MusicIDs;
+
+            m_room.Seat(response.ID, member, response.Team, response.Ready);
 
             const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
             const auto chatWindow = chatPanel->GetChatWindow();
 
-            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", slot.Member->Name));
+            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", m_room.GetSlot(response.ID).Name));
             InvalidateMembers();
 
             const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
@@ -463,23 +446,18 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& slot = m_room.GetSlot(response.ID);
-            auto name = slot.Member->Name;
+            const auto& slot = m_room.GetSlot(response.ID);
+            auto name = slot.Name;
 
             if (slot.IsMaster)
             {
                 if (response.RoomMasterID < 0 || response.RoomMasterID >= RoomContext::MaxCapacity)
                     return;
 
-                auto& newMaster    = m_room.GetSlot(response.RoomMasterID);
-                newMaster.IsMaster = true;
-                newMaster.Ready    = true;
+                m_room.PromoteMaster(response.RoomMasterID);
             }
 
-            slot.State    = RoomSlotState::Unoccupied;
-            slot.IsMaster = false;
-            slot.Ready    = false;
-            slot.Member   = std::nullopt;
+            m_room.Vacate(response.ID);
 
             const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
             const auto chatWindow = chatPanel->GetChatWindow();
@@ -508,8 +486,7 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& slot = m_room.GetSlot(response.ID);
-            slot.Team  = response.Team;
+            m_room.SetTeam(response.ID, response.Team);
 
             InvalidateAvatarInfo();
         }
@@ -530,8 +507,7 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            auto& slot = m_room.GetSlot(response.ID);
-            slot.Ready = response.Ready;
+            m_room.SetReady(response.ID, response.Ready);
 
             InvalidateAvatarInfo();
         }
@@ -544,7 +520,7 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData)
+    void StateWaiting7K::OnMemberEmoticon(const sf::String& sender, const sf::String& chatData)
     {
         auto code = std::string();
         auto text = chatData.toAnsiString();
@@ -605,7 +581,7 @@ namespace Cx
                 continue;
 
             const auto& slot = m_room.GetSlot(memberID++);
-            if (slot.Member.has_value() && slot.Member->Name == sender.Name)
+            if (slot.State == Room::SlotState::Occupied && slot.Name == sender)
             {
                 avatar = container->FindChild<Avatar>(Resource::Waiting7K::Avatar::IDC_AVATAR);
                 break;
@@ -622,34 +598,10 @@ namespace Cx
         {
             const auto& response = ev.Open();
 
-            std::uint32_t musicID = response.MusicID;
-            if (response.MusicID > std::numeric_limits<std::uint16_t>::max())
-            {
-                std::uint8_t randomBit = static_cast<std::uint8_t>((musicID >> 28) & 0xFF);
-                constexpr int max = static_cast<int>(LevelCategory::Level1) |
-                                    static_cast<int>(LevelCategory::Level2) |
-                                    static_cast<int>(LevelCategory::Level3) |
-                                    static_cast<int>(LevelCategory::Level4);
+            const auto music = MusicSelection{response.MusicID};
 
-                if (randomBit >= 1 && randomBit <= max)
-                {
-                    m_room.SetRandomLevel(static_cast<LevelCategory>(randomBit));
-                    musicID = response.MusicID & 0xFF;
-                }
-            }
-            else
-            {
-                m_room.SetRandomLevel(static_cast<LevelCategory>(0));
-            }
-
-            const auto& musicList = m_session.GetInstalledMusic();
-
-            // TODO: Get music list header without relying OJNList
-            const auto it = std::find_if(musicList.begin(), musicList.end(), [id = musicID] (const auto& header) {
-                return id == header.ID;
-            });
-
-            m_room.SetMusic(it == musicList.end() ? ChartMetadata{musicID} : *it);
+            m_room.SetMusicID(music.ID);
+            m_room.SetRandomLevel(music.Random);
             m_room.SetDifficulty(response.Difficulty);
             m_room.SetSpeedID(response.Speed);
 
@@ -687,8 +639,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            m_room.SetMapID(response.Map.GetMapID());
-            m_room.SetRandomizedMapID(response.Map.GetRandomizedMap());
+            const auto map = Map{response.Map};
+            m_room.SetMapID(map.GetMapID());
+            m_room.SetRandomizedMapID(map.GetRandomizedMap());
 
             InvalidateRoomInfo();
         }
@@ -741,22 +694,7 @@ namespace Cx
                 return;
             }
 
-            if (!m_game.GetChart() || m_game.GetChart()->Source != m_room.GetMusic().Source)
-            {
-                auto chart    = std::make_unique<Chart>();
-                chart->Source = m_room.GetMusic().Source;
-
-                m_game.SetChart(std::move(chart));
-            }
-
-            m_game.SetMode(m_room.GetMode());
-            m_game.SetDifficulty(m_room.GetDifficulty());
-            m_game.SetSpeed(m_room.GetSpeed());
-            m_game.SetSpeedMode(m_room.GetSpeedMode());
-            m_game.SetMapID(m_room.GetMapID() == MapInfo::RandomID || m_room.GetMapID() == 0 ? m_room.GetRandomizedMapID() : m_room.GetMapID());
-            m_game.SetEffectID(m_room.GetEffectID());
-
-            GetDirector().Present<StateLoading>();
+            GetDirector().Present<StateLoading>(m_room.CreateGameContext());
         }
         catch (const Gx::Exception& ex)
         {
@@ -809,11 +747,11 @@ namespace Cx
 
         for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
         {
-            auto& slot = m_room.GetSlot(i);
-            if (slot.State != RoomSlotState::Occupied || slot.IsMaster)
+            const auto& slot = m_room.GetSlot(i);
+            if (slot.State != Room::SlotState::Occupied || slot.IsMaster)
                 continue;
 
-            if (slot.Member->MusicIDs.find(m_room.GetMusic().ID) == slot.Member->MusicIDs.end())
+            if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
             {
                 ShowDialog("There are users who have not the right tune.", DialogStyle::Information);
                 sender.SetCheckedState(false);
@@ -901,7 +839,11 @@ namespace Cx
 
             const auto [diff, music] = pool[Gx::Randomizer::Randomize<std::size_t>(0, pool.size() - 1)];
 
-            request.MusicID    = music.ID | static_cast<int>(m_room.GetRandomLevel()) << 28;
+            auto selection = MusicSelection{};
+            selection.ID     = music.ID;
+            selection.Random = m_room.GetRandomLevel();
+
+            request.MusicID    = selection;
             request.Difficulty = diff;
 
             m_room.SetMusic(music);
@@ -1002,15 +944,18 @@ namespace Cx
         m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev) { OnUpdateTeamResponded(ev, team); });
     }
 
-    void StateWaiting7K::OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, const RoomTeam team)
+    void StateWaiting7K::OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, const Room::Team team)
     {
         try
         {
             const auto& _ = ev.Open();
 
             const auto sfxTeam = Instantiate<sf::Sound>(Sound::Effects::EF_34);
-            if (const auto member = m_avatarInfo->GetSlot(); member)
-                member->Team = team;
+            if (const auto index = m_room.GetCurrentSlotIndex(); index < RoomContext::MaxCapacity && m_avatarInfo->GetSlot())
+            {
+                m_room.SetTeam(index, team);
+                m_room.SetTeamColor(index, m_avatarInfo->ResolveTeamColor());
+            }
 
             m_avatarInfo->Invalidate();
             m_mixer.Play(*sfxTeam, Sound::Channel::SFX);
@@ -1040,12 +985,13 @@ namespace Cx
         else
             m_mainAvatar->Equip(std::move(item));
 
-        auto& member = m_room.GetCurrentSlot().Member.value();
-        const auto defaultItems = m_items.GetDefaultItems(member.Gender);
-        member.EquippedItemIDs.clear();
+        const auto defaultItems = m_items.GetDefaultItems(m_room.GetCurrentSlot().Gender);
 
+        auto equipment = EquipmentSet{};
         for (auto [_, equipedItem] : m_mainAvatar->GetEquipedItems())
-            member.EquippedItemIDs.insert(equipedItem->GetID());
+            equipment.insert(equipedItem->GetID());
+
+        m_room.SetEquipment(m_room.GetCurrentSlotIndex(), equipment);
     }
 
     void StateWaiting7K::OnMapSelectorStateChanged(const unsigned int mapID)
@@ -1054,16 +1000,14 @@ namespace Cx
             return;
 
         const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
-        const auto mapInfo = MapInfo
-        {
-            static_cast<std::uint8_t>((mapID == MapInfo::RandomID || mapID == 0) ? Gx::Randomizer::Randomize<int>(1, mapSelector->GetMapCount()) : mapID),
-            static_cast<std::uint16_t>(0),
-            static_cast<std::uint8_t>((mapID == MapInfo::RandomID || mapID == 0) ? MapInfo::RandomID : 0)
-        };
+
+        auto map = Map{};
+        map.Random = mapID == Map::RandomID || mapID == 0;
+        map.ID     = map.Random ? static_cast<std::uint8_t>(Gx::Randomizer::Randomize<int>(1, mapSelector->GetMapCount())) : static_cast<std::uint8_t>(mapID);
 
         m_room.SetMapID(mapID);
-        m_room.SetRandomizedMapID(mapInfo.GetRandomizedMap());
-        m_service.UpdateMap(UpdateMapRequest{ mapInfo });
+        m_room.SetRandomizedMapID(map.GetRandomizedMap());
+        m_service.UpdateMap(UpdateMapRequest{ map });
     }
 
     void StateWaiting7K::OnEffectSelectorStateChanged(const unsigned int effectID)
@@ -1126,6 +1070,8 @@ namespace Cx
         try
         {
             const auto& _ = ev.Open();
+
+            m_room.Leave();
 
             if (const auto sfx = Find<sf::Sound>(Sound::Effects::EF_36))
                 m_mixer.Play(*sfx, Sound::Channel::SFX);
@@ -1290,9 +1236,9 @@ namespace Cx
     void StateWaiting7K::ExtendSlot(const unsigned int slotID)
     {
         const auto& slot = m_room.GetSlot(slotID);
-        if (slot.Member.has_value() && !slot.Member->Name.isEmpty())
+        if (slot.State == Room::SlotState::Occupied && !slot.Name.isEmpty())
         {
-            if (slot.Member->Name == m_room.GetCurrentSlot().Member->Name)
+            if (slot.Name == m_room.GetCurrentSlot().Name)
                 return;
 
             ShowDialog("Would you like to kick out?", DialogStyle::YesNo, false, [=] (const bool confirm)
@@ -1393,12 +1339,15 @@ namespace Cx
     void StateWaiting7K::InvalidateAvatarInfo()
     {
         const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+
+        int memberIndex = 0;
         for (const auto child : avatarList->GetChildren())
         {
             const auto container = dynamic_cast<Gx::UiContainer*>(child);
             if (!container)
                 continue;
 
+            const auto index = memberIndex++;
             const auto avatar = container->FindChild<Avatar>(Resource::Waiting7K::Avatar::IDC_AVATAR);
             if (!avatar)
                 continue;
@@ -1407,9 +1356,11 @@ namespace Cx
             if (!avatarInfo || !avatarInfo->GetSlot())
                 continue;
 
-            auto& slot = *avatarInfo->GetSlot();
-            if (slot.State != RoomSlotState::Occupied)
+            const auto& slot = *avatarInfo->GetSlot();
+            if (slot.State != Room::SlotState::Occupied)
                 continue;
+
+            m_room.SetTeamColor(index, avatarInfo->ResolveTeamColor());
 
             const auto bossMark = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_BOSS_MARK);
             const auto noMusic  = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_NO_MUSIC);
@@ -1445,9 +1396,9 @@ namespace Cx
             avatar->ClearEquipments();
             avatarInfo->Reset();
 
-            auto& slot = m_room.GetSlot(memberIndex);
+            const auto& slot = m_room.GetSlot(memberIndex);
             if (const auto cover = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_COVER_AVATAR))
-                cover->SetVisible(slot.State == RoomSlotState::Locked);
+                cover->SetVisible(slot.State == Room::SlotState::Locked);
 
             if (const auto btnExtend = container->FindChild<Gx::Button>(Resource::Waiting7K::Avatar::IDC_BUTTON_EXTEND))
             {
@@ -1456,7 +1407,7 @@ namespace Cx
                 btnExtend->SetDoubleClickCallback([this] (auto& sender, auto& ev) { OnExtendButtonDoubleClicked(sender, ev); });
             }
 
-            if (slot.State == RoomSlotState::Unoccupied || (slot.State == RoomSlotState::Occupied && !slot.Member.has_value()))
+            if (slot.State == Room::SlotState::Unoccupied || (slot.State == Room::SlotState::Occupied && slot.Name.isEmpty()))
             {
                 avatar->SetVisible(false);
                 memberIndex++;
@@ -1472,7 +1423,7 @@ namespace Cx
             bossMark->SetVisible(false);
             noMusic->SetVisible(false);
 
-            if (slot.State == RoomSlotState::Locked)
+            if (slot.State == Room::SlotState::Locked)
             {
                 memberIndex++;
                 continue;
@@ -1480,25 +1431,26 @@ namespace Cx
 
             InvalidateSlotMarkers(bossMark, noMusic, slot);
 
-            avatar->SetGender(slot.Member->Gender);
+            avatar->SetGender(slot.Gender);
             avatarInfo->SetSlot(slot);
+            m_room.SetTeamColor(memberIndex, avatarInfo->ResolveTeamColor());
 
-            for (auto [_, item]: m_items.GetDefaultItems(slot.Member->Gender))
+            for (auto [_, item]: m_items.GetDefaultItems(slot.Gender))
                 avatar->SetDefaultItem(std::move(item));
 
-            for (const auto itemID : slot.Member->EquippedItemIDs)
+            for (const auto itemID : slot.EquippedItemIDs)
                 avatar->Equip(m_items.Create(itemID));
 
             memberIndex++;
         }
     }
 
-    void StateWaiting7K::InvalidateSlotMarkers(Gx::Sprite* bossMark, Gx::Sprite* noMusic, const RoomSlot& slot)
+    void StateWaiting7K::InvalidateSlotMarkers(Gx::Sprite* bossMark, Gx::Sprite* noMusic, const Room::Slot& slot)
     {
         bossMark->SetVisible(slot.IsMaster);
         const std::uint32_t musicID = m_room.GetMusic().ID;
 
-        if (m_session.GetCharacterInfo().Name == slot.Member->Name)
+        if (m_session.GetName() == slot.Name)
         {
             const auto& musicList = m_session.GetInstalledMusic();
 
@@ -1510,7 +1462,7 @@ namespace Cx
             noMusic->SetVisible(it == musicList.end());
         }
         else
-            noMusic->SetVisible(slot.Member->MusicIDs.find(musicID) == slot.Member->MusicIDs.end());
+            noMusic->SetVisible(slot.MusicIDs.find(musicID) == slot.MusicIDs.end());
     }
 
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Network/Commands.hpp>
 #include <CXO2/Network/CollectionEnvelope.hpp>
+#include <CXO2/Network/StringEnvelope.hpp>
 
 #include <string>
 #include <cstdint>

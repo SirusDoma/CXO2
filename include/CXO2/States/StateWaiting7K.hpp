@@ -2,6 +2,7 @@
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Models/Room.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/ToggleButton.hpp>
@@ -21,7 +22,6 @@ namespace Gx
 
 namespace Cx
 {
-    struct RoomSlot;
     struct ItemMetadata;
 
     class Avatar;
@@ -29,16 +29,15 @@ namespace Cx
     class ItemFactory;
     class SessionContext;
     class RoomContext;
-    class GameContext;
     class ChatService;
     class StateWaiting7K : public State
     {
     public:
-        StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, WaitingService& service, ChatService& messaging, ItemFactory& items);
+        StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, WaitingService& service, ChatService& messaging, ItemFactory& items);
 
         void Initialize() override;
 
-        void OnMemberEmoticon(const CharacterInfo& sender, const sf::String& chatData);
+        void OnMemberEmoticon(const sf::String& sender, const sf::String& chatData);
 
     private:
         void InitializeAvatars();
@@ -61,7 +60,7 @@ namespace Cx
         void OnUpdateReadyStateResponded(Gx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev);
         void OnUpdateMusicResponded(const MessageEnvelope<UpdateRoomMusicRequest>& ev);
         void OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev);
-        void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, RoomTeam team);
+        void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, Room::Team team);
         void OnExitRoomResponded(const MessageEnvelope<ExitWaitingResponse>& ev);
 
         void OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
@@ -96,23 +95,22 @@ namespace Cx
         void InvalidateRoomInfo();
         void InvalidateAvatarInfo();
         void InvalidateMembers();
-        void InvalidateSlotMarkers(Gx::Sprite* bossMark, Gx::Sprite* noMusic, const RoomSlot& slot);
+        void InvalidateSlotMarkers(Gx::Sprite* bossMark, Gx::Sprite* noMusic, const Room::Slot& slot);
 
         Gx::AudioMixer& m_mixer;
         SessionContext& m_session;
         RoomContext& m_room;
-        GameContext& m_game;
         WaitingService& m_service;
         ChatService& m_messaging;
         ItemFactory& m_items;
 
         Avatar* m_mainAvatar{};
         AvatarInfo* m_avatarInfo{};
-        RoomSlot* m_slot{};
+        const Room::Slot* m_slot{};
 
         std::vector<Avatar*> m_avatars;
 
-        std::unordered_map<Gx::RadioButton*, RoomTeam> m_teamButtons;
+        std::unordered_map<Gx::RadioButton*, Room::Team> m_teamButtons;
         std::unordered_map<Gx::Control*, int> m_extendButtonSlotIDs;
     };
 }

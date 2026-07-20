@@ -92,7 +92,6 @@
 
 #include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
 
 #include <CXO2/Avatar/ItemFactory.hpp>
@@ -217,7 +216,6 @@ namespace Cx
             return session;
         }, Gx::Context::Scope::Singleton);
 
-        context.Provide<GameContext>(Gx::Context::Scope::Singleton);
         context.Provide<RoomContext>(Gx::Context::Scope::Singleton);
         context.Provide<CartContext>(Gx::Context::Scope::Singleton);
         context.Provide<ScoreTracker>(Gx::Context::Scope::Singleton);

@@ -2,6 +2,8 @@
 
 #include <CXO2/States/State.hpp>
 
+#include <CXO2/Config/GameConfig.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Core/Chart.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/Services/PlayingService.hpp>
@@ -12,15 +14,15 @@
 namespace Cx
 {
     struct WaitingMemberLeftEventData;
-    class GameContext;
     class RoomContext;
     class SessionContext;
     class StateLoading : public State
     {
     public:
-        StateLoading(GameContext& game, SessionContext& session, RoomContext& room, PlayingService& service);
+        StateLoading(GameConfig& config, SessionContext& session, RoomContext& room, PlayingService& service);
 
         void Initialize() override;
+        void Initialize(GameContext game);
 
         static bool IsTrackable();
 
@@ -32,7 +34,8 @@ namespace Cx
         void OnChartLoaded(const Chart* chart);
 
         sf::Texture m_texture;
-        GameContext& m_context;
+        GameConfig& m_config;
+        GameContext m_context;
         SessionContext& m_session;
         RoomContext& m_room;
         PlayingService& m_service;

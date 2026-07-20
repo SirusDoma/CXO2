@@ -52,7 +52,6 @@ namespace Cx
     {
         State::Initialize();
 
-        const auto& charInfo  = m_session.GetCharacterInfo();
         const auto bgm        = Instantiate<sf::Music>(Sound::BGM::BG_ITEM_SHOP);
         const auto sfxWelcome = Instantiate<sf::Sound>(Sound::Speech::NPC_1);
         const auto sfxAccept  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -66,26 +65,26 @@ namespace Cx
         for (auto id : { Sound::Speech::NPC_5, Sound::Speech::NPC_6, Sound::Speech::NPC_7 })
             m_shopMasterSpeech.push_back(Instantiate<sf::Sound>(id));
 
-        m_genderCategory = charInfo.Gender;
+        m_genderCategory = m_session.GetGender();
         m_shopCategory   = ShopCategory::Special;
         m_itemCategory   = EquipmentType::Costume;
 
         const auto avatar = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
-        avatar->SetGender(charInfo.Gender);
-        for (auto& [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+        avatar->SetGender(m_session.GetGender());
+        for (auto& [_, item] : m_items.GetDefaultItems(m_session.GetGender()))
             avatar->SetDefaultItem(std::move(item));
 
-        for (const auto id : charInfo.EquippedItemIDs)
+        for (const auto id : m_session.GetEquippedItemIDs())
             avatar->Equip(m_items.Create(id));
 
         const auto nicknameText = Instantiate<Gx::Label>(Resource::ItemShop::IDC_TEXT_NICKNAME);
-        nicknameText->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
+        nicknameText->SetString(fmt::format(L"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
-        currentGem->SetValue(charInfo.Wallet.Gem);
+        currentGem->SetValue(m_session.GetWallet().Gem);
 
         const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
-        currentCash->SetValue(charInfo.Wallet.Cash);
+        currentCash->SetValue(m_session.GetWallet().Cash);
 
         const auto myRoomButton = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MY_ROOM);
         myRoomButton->SetClickCallback([this] (auto& sender, auto& ev) { OnMyRoomButtonClicked(sender, ev); });
@@ -372,20 +371,16 @@ namespace Cx
                 return;
             }
 
-            auto& inventory = m_session.GetCharacterInfo().Inventory;
+            const auto& inventory = m_session.GetInventory();
             if (inventory[response.SlotID] != 0)
             {
                 ShowDialog("Invalid inventory slot.", DialogStyle::Information);
                 return;
             }
 
-            inventory[response.SlotID] = metadata.ID;
+            m_session.SetInventoryItem(response.SlotID, metadata.ID);
 
-            m_session.GetCharacterInfo().Wallet = CharacterInfo::WalletInfo
-            {
-                response.Gem,
-                response.Cash
-            };
+            m_session.SetWallet({ response.Gem, response.Cash });
 
             // m_session.Save();
             m_inventory.clear();
@@ -405,7 +400,6 @@ namespace Cx
 
     void StateItemShop::OnSellItemResponded(const MessageEnvelope<SellItemResponse>& ev)
     {
-        auto& charInfo       = m_session.GetCharacterInfo();
         const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
 
         try
@@ -417,14 +411,10 @@ namespace Cx
                 return;
             }
 
-            charInfo.Inventory[response.SlotID] = 0;
+            m_session.SetInventoryItem(response.SlotID, 0);
             m_inventory[response.SlotID] = Item{};
 
-            charInfo.Wallet = CharacterInfo::WalletInfo
-            {
-                response.Gem,
-                response.Cash
-            };
+            m_session.SetWallet({ response.Gem, response.Cash });
 
             m_myBagSelectedItem = nullptr;
             m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
@@ -594,7 +584,6 @@ namespace Cx
 
     void StateItemShop::OnSellItemConfirmed(const bool accepted)
     {
-        const auto& charInfo = m_session.GetCharacterInfo();
         const auto sfxCancel = Instantiate<sf::Sound>(Sound::Effects::EF_03);
 
         if (!accepted)
@@ -603,17 +592,17 @@ namespace Cx
             return;
         }
 
-        std::size_t slotID = charInfo.Inventory.size() + 1;
-        for (std::size_t i = 0; i < charInfo.Inventory.size(); i++)
+        std::size_t slotID = m_session.GetInventory().size() + 1;
+        for (std::size_t i = 0; i < m_session.GetInventory().size(); i++)
         {
-            if (charInfo.Inventory[i] == m_myBagSelectedItem->GetID())
+            if (m_session.GetInventory()[i] == m_myBagSelectedItem->GetID())
             {
                 slotID = i;
                 break;
             }
         }
 
-        if (slotID >= charInfo.Inventory.size())
+        if (slotID >= m_session.GetInventory().size())
             return;
 
         m_service.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [this] (const auto& ev)
@@ -644,11 +633,10 @@ namespace Cx
 
     void StateItemShop::OnDefaultButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        const auto& charInfo = m_session.GetCharacterInfo();
         const auto avatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
 
         avatar->ClearEquipments();
-        for (const auto id : charInfo.EquippedItemIDs)
+        for (const auto id : m_session.GetEquippedItemIDs())
             avatar->Equip(m_items.Create(id));
     }
 
@@ -1057,19 +1045,18 @@ namespace Cx
         const auto& metadata = m_shopItemAddButtons.at(&sender);
         if (O2::InInteropMode(InteropMode::Interface))
         {
-            auto& charInfo = m_session.GetCharacterInfo();
-            const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID = metadata.ID] (auto id)
+            const auto it = std::find_if(m_session.GetInventory().begin(), m_session.GetInventory().end(), [itemID = metadata.ID] (auto id)
             {
                 return id == itemID;
             });
 
-            if (it != charInfo.Inventory.end())
+            if (it != m_session.GetInventory().end())
                 return;
 
             bool purchasable = false;
             for (auto c : { Currency::Gem, Currency::Cash })
             {
-                const auto money = c == Currency::Gem ? charInfo.Wallet.Gem : charInfo.Wallet.Cash;
+                const auto money = c == Currency::Gem ? m_session.GetWallet().Gem : m_session.GetWallet().Cash;
                 if (auto pIt = metadata.Prices.find(c); pIt != metadata.Prices.end())
                 {
                     if (pIt->second != 0 && pIt->second <= money)
@@ -1121,8 +1108,7 @@ namespace Cx
     {
         const auto avatar          = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
         const auto& [metadata, id] = m_shopItemPreviewButtons.at(&sender);
-        const auto& charInfo       = m_session.GetCharacterInfo();
-        if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
+        if (metadata.Gender != Gender::Any && m_session.GetGender() != metadata.Gender)
         {
             ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
             return;
@@ -1148,8 +1134,7 @@ namespace Cx
     {
         const auto currentAvatar   = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
         const auto& [metadata, id] = m_shopSetItemPreviewButtons.at(&sender);
-        const auto& charInfo       = m_session.GetCharacterInfo();
-        if (metadata.Gender != Gender::Any && charInfo.Gender != metadata.Gender)
+        if (metadata.Gender != Gender::Any && m_session.GetGender() != metadata.Gender)
         {
             ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
             return;
@@ -1238,7 +1223,6 @@ namespace Cx
 
     void StateItemShop::InvalidateMyBag()
     {
-        auto& charInfo       = m_session.GetCharacterInfo();
         const auto avatar    = Instantiate<Avatar>(Resource::ItemShop::IDC_AVATAR);
         const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
         const auto container = Instantiate<Gx::UiContainer>(Resource::ItemShop::IDC_CONTAINER_MYBAG);
@@ -1247,7 +1231,7 @@ namespace Cx
 
         if (m_inventory.empty())
         {
-            for (const auto id : charInfo.Inventory)
+            for (const auto id : m_session.GetInventory())
                 m_inventory.push_back(m_items.Create(id));
         }
 
@@ -1256,7 +1240,7 @@ namespace Cx
         auto inventory = std::vector<Item*>();
         for (auto& item : m_inventory)
         {
-            if (charInfo.EquippedItemIDs.find(item.GetID()) == charInfo.EquippedItemIDs.end())
+            if (m_session.GetEquippedItemIDs().find(item.GetID()) == m_session.GetEquippedItemIDs().end())
                 inventory.push_back(&item);
         }
 
@@ -1277,7 +1261,7 @@ namespace Cx
             const auto item = inventory[j++];
             unsigned int quantity = 0;
 
-            if (const auto it = std::find(charInfo.Inventory.begin(), charInfo.Inventory.end(), item->GetID()); it != charInfo.Inventory.end())
+            if (const auto it = std::find(m_session.GetInventory().begin(), m_session.GetInventory().end(), item->GetID()); it != m_session.GetInventory().end())
                 quantity = it->Quantity;
 
             currentSlot = item == m_myBagSelectedItem ? slot : currentSlot;
@@ -1323,10 +1307,10 @@ namespace Cx
         bagScrollBar->SetMaximumValue(inventory.size() < bagSlots.size() ? 0 : static_cast<int>(std::ceil(static_cast<float>(inventory.size() - bagSlots.size()) / verticalCount)));
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
-        currentGem->SetValue(charInfo.Wallet.Gem);
+        currentGem->SetValue(m_session.GetWallet().Gem);
 
         const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_CASH);
-        currentCash->SetValue(charInfo.Wallet.Cash);
+        currentCash->SetValue(m_session.GetWallet().Cash);
     }
 
     void StateItemShop::InvalidateCart()

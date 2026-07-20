@@ -2,6 +2,8 @@
 
 #include <CXO2/Services/WaitingService.hpp>
 
+#include <unordered_set>
+
 namespace Cx
 {
     class WaitingOfflineService : public WaitingService
@@ -86,6 +88,7 @@ namespace Cx
 
     private:
         mutable bool m_ready{false};
+        mutable std::unordered_set<std::uint8_t> m_lockedSlots;
 
         MessageCallback<WaitingSlotChangedEventData>             m_slotCallback;
         MessageCallback<WaitingMemberJoinedEventData>            m_joinCallback;

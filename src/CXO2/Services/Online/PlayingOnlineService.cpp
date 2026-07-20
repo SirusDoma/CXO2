@@ -1,14 +1,11 @@
 #include <CXO2/Services/Online/PlayingOnlineService.hpp>
 
-#include <CXO2/Contexts/GameContext.hpp>
-
 #include <CXO2/Network/Requests/ExitWaitingRequest.hpp>
 
 namespace Cx
 {
-    PlayingOnlineService::PlayingOnlineService(NetworkService& network, GameContext& game) :
-        m_network(network),
-        m_game(game)
+    PlayingOnlineService::PlayingOnlineService(NetworkService& network) :
+        m_network(network)
     {
     }
 
@@ -33,9 +30,9 @@ namespace Cx
         m_network.Dispatch(request, callback);
     }
 
-    void PlayingOnlineService::ExitPlaying(const MessageCallback<ExitPlayingRequest>& callback) const
+    void PlayingOnlineService::ExitPlaying(const GameMode mode, const MessageCallback<ExitPlayingRequest>& callback) const
     {
-        m_network.Dispatch<ExitPlayingRequest>(ExitPlayingRequest{}, [this, callback] (const MessageEnvelope<ExitPlayingRequest>& result)
+        m_network.Dispatch<ExitPlayingRequest>(ExitPlayingRequest{}, [this, mode, callback] (const MessageEnvelope<ExitPlayingRequest>& result)
         {
             try
             {
@@ -49,7 +46,7 @@ namespace Cx
                 return;
             }
 
-            if (m_game.GetMode() != GameMode::Single)
+            if (mode != GameMode::Single)
             {
                 m_network.Dispatch<ExitWaitingRequest>(ExitWaitingRequest{}, [callback] (const MessageEnvelope<ExitWaitingRequest>& result)
                 {

@@ -11,12 +11,12 @@ namespace Cx
     {
         static constexpr Cx::Command Command = ResponseCommand::GetUserList;
 
-        struct UserInfo
+        struct User
         {
             sf::String   Name{};
             std::int32_t Level{};
         };
 
-        CollectionEnvelope<std::vector<UserInfo>, std::uint32_t> Users{};
+        CollectionEnvelope<std::vector<User>, std::uint32_t> Users{};
     };
 }

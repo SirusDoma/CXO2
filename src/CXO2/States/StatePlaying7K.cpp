@@ -15,7 +15,6 @@
 #include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 
-#include <CXO2/Network/RoomInfo.hpp>
 #include <CXO2/Network/Requests/SubmitScoreRequest.hpp>
 
 #include <CXO2/Avatar/Avatar.hpp>
@@ -44,6 +43,8 @@
 #include <CXO2/Network/Events/PlayingMemberStatsUpdateEventData.hpp>
 #include <CXO2/States/StateRoom.hpp>
 
+#include <algorithm>
+
 namespace Cx
 {
     using namespace StringTable::Identifiers;
@@ -54,7 +55,6 @@ namespace Cx
         PlayingService& service,
         SessionContext& session,
         RoomContext& room,
-        GameContext& context,
         GameConfig& config,
         JudgementStrategy& judgementStrategy,
         ScoreTracker& scoreTracker,
@@ -64,7 +64,6 @@ namespace Cx
         m_service(service),
         m_session(session),
         m_room(room),
-        m_context(context),
         m_config(config),
         m_scoreTracker(scoreTracker),
         m_lifeSystem(lifeSystem),
@@ -93,6 +92,12 @@ namespace Cx
     {
     }
 
+    void StatePlaying7K::Initialize(GameContext game)
+    {
+        m_context = std::move(game);
+        Initialize();
+    }
+
     void StatePlaying7K::Initialize()
     {
         State::Initialize();
@@ -103,21 +108,27 @@ namespace Cx
         m_service.SetGameCompletedEventCallback([this] (const auto& ev) { OnGameCompleted(ev); });
 
         // Setup providers
-        m_context.SetViewport(GetViewport());
-        m_scoreTracker.Initialize(m_context.GetDifficulty());
-        m_lifeSystem.Initialize(m_context.GetDifficulty());
+        m_scoreTracker.Initialize(m_context.Difficulty);
+        m_lifeSystem.Initialize(m_context.Difficulty);
 
         // Add chart renderer
         m_renderer.SetName(Resource::Playing7K::IDC_CHART_RENDERER);
         m_renderer.SetRenderCompleteCallback([this] { OnChartRenderCompleted(); });
         AddChild(m_renderer);
 
-        m_renderer.Initialize(*m_context.GetChart(), m_context);
+        m_renderer.Initialize(*m_context.Chart, ChartRenderer::RenderSettings{
+            false,
+            m_config,
+            GetViewport(),
+            m_context.Speed,
+            m_context.SpeedMode,
+            m_context.Difficulty
+        });
 
         // Setup chat panel
         const auto chatPanel = Instantiate<ChatPanel>(Resource::Playing7K::IDC_CHAT_PANEL);
         m_chatBox = chatPanel->FindChild<Gx::InputField>(Resource::Playing7K::IDC_EDIT_CHAT);
-        if (m_context.GetMode() != GameMode::Tutorial)
+        if (m_context.Mode != GameMode::Tutorial)
         {
             chatPanel->SetMaximumTextLength(50);
             m_chatBox->SetPermanentFocusEnabled(true);
@@ -131,18 +142,18 @@ namespace Cx
 
         // Setup Guide
         if (const auto instructor = Instantiate<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_INSTRUCTOR))
-            instructor->SetVisible(m_context.GetMode() == GameMode::Tutorial);
+            instructor->SetVisible(m_context.Mode == GameMode::Tutorial);
 
         if (const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
             instruction->SetVisible(false);
 
         // Map user states
-        if (m_context.GetMode() != GameMode::Tutorial)
+        if (m_context.Mode != GameMode::Tutorial)
         {
             for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
             {
-                auto& slot = m_room.GetSlot(i);
-                if (slot.State != RoomSlotState::Occupied || !slot.Member.has_value())
+                const auto& slot = m_room.GetSlot(i);
+                if (slot.State != Room::SlotState::Occupied)
                     continue;
 
                 m_states[i] = UserState
@@ -166,23 +177,24 @@ namespace Cx
                 continue;
 
             const auto avatar = container->FindChild<Avatar>(Resource::Playing7K::Avatar::IDC_AVATAR);
-            if (m_context.GetMode() == GameMode::Tutorial)
+            if (m_context.Mode == GameMode::Tutorial)
             {
                 container->SetVisible(i == 4);
                 if (!container->IsVisible())
                     continue;
 
-                auto charInfo = m_session.GetCharacterInfo();
-                EquipAvatar(avatar, charInfo);
+                EquipAvatar(avatar, m_session.GetGender(), m_session.GetEquippedItemIDs());
 
-                auto slot = RoomSlot
-                {
-                    /* .Member   = */ charInfo,
-                    /* .State    = */ RoomSlotState::Occupied,
-                    /* .IsMaster = */ true,
-                    /* .Ready    = */ true,
-                    /* .Team     = */ RoomTeam::A
-                };
+                auto slot = Room::Slot{};
+                slot.Name            = m_session.GetName();
+                slot.Gender          = m_session.GetGender();
+                slot.Level           = m_session.GetLevel();
+                slot.EquippedItemIDs = m_session.GetEquippedItemIDs();
+                slot.MusicIDs        = m_session.GetMusicIDs();
+                slot.State           = Room::SlotState::Occupied;
+                slot.IsMaster        = true;
+                slot.Ready           = true;
+                slot.Team            = Room::Team::A;
 
                 SetupAvatarInfo(avatar, slot);
 
@@ -191,8 +203,8 @@ namespace Cx
             }
             else
             {
-                auto& slot = m_room.GetSlot(i);
-                container->SetVisible(slot.State == RoomSlotState::Occupied);
+                const auto& slot = m_room.GetSlot(i);
+                container->SetVisible(slot.State == Room::SlotState::Occupied);
 
                 if (const auto it = m_states.find(i); it != m_states.end())
                     it->second.Avatar = avatar;
@@ -200,9 +212,9 @@ namespace Cx
                 if (!container->IsVisible())
                     continue;
 
-                slot.Ready = slot.IsMaster; // reset ready state early
+                m_room.SetReady(i, slot.IsMaster);
 
-                EquipAvatar(avatar, *slot.Member);
+                EquipAvatar(avatar, slot.Gender, slot.EquippedItemIDs);
 
                 auto efc = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
                 auto& effectContainer = efc ? *efc : Create<Gx::UiContainer>();
@@ -252,7 +264,7 @@ namespace Cx
 
                 SetupAvatarInfo(avatar, slot);
 
-                if (m_session.GetCharacterInfo().Name == slot.Member->Name)
+                if (m_session.GetName() == slot.Name)
                     m_self = avatar;
 
                 m_avatars[i] = avatar;
@@ -275,7 +287,7 @@ namespace Cx
             keyEffect->SetFrame(id);
             keyEffect->SetVisible(false);
 
-            if (m_context.GetMode() == GameMode::Tutorial)
+            if (m_context.Mode == GameMode::Tutorial)
             {
                 const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
                 guideKeyEffect->SetVisible(false);
@@ -288,7 +300,7 @@ namespace Cx
 
         // Setup Play Menu
         const auto playMenu = Instantiate<PlayMenu>(Resource::Playing7K::IDC_PLAY_MENU);
-        playMenu->SetMetadata(m_context.GetChart()->GetMetadata(), m_context.GetDifficulty());
+        playMenu->SetMetadata(m_context.Chart->GetMetadata(), m_context.Difficulty, m_context.Speed, m_context.SpeedMode);
         playMenu->SetScoreTracker(m_scoreTracker);
 
         // Setup Score Counter
@@ -436,7 +448,7 @@ namespace Cx
 
     void StatePlaying7K::OnRenderComplete()
     {
-        if (m_context.GetMode() == GameMode::Tutorial)
+        if (m_context.Mode == GameMode::Tutorial)
         {
             GetDirector().Dismiss();
             return;
@@ -444,13 +456,13 @@ namespace Cx
 
         if (m_states.size() == 0)
         {
-            auto items = std::array<ScoreEntry, 8>();
+            auto items = std::array<GameCompletedEventData::ScoreEntry, 8>();
             for (std::size_t i = 0; i < items.size(); i++)
             {
-                auto& slot = m_room.GetSlot(i);
-                if (slot.Member.has_value() && slot.Member->Name == m_session.GetCharacterInfo().Name)
+                const auto& slot = m_room.GetSlot(i);
+                if (slot.State == Room::SlotState::Occupied && slot.Name == m_session.GetName())
                 {
-                    items[i] = ScoreEntry
+                    items[i] = GameCompletedEventData::ScoreEntry
                     {
                         /* .ID          = */ static_cast<std::uint8_t>(i),
                         /* .Active      = */ true,
@@ -462,22 +474,22 @@ namespace Cx
                         /* .MaxJamCombo = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxJamCombo()),
                         /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
                         /* .Reward      = */ 0,
-                        /* .Level       = */ m_session.GetCharacterInfo().Level,
-                        /* .Experience  = */ m_session.GetCharacterInfo().Experience,
+                        /* .Level       = */ m_session.GetLevel(),
+                        /* .Experience  = */ m_session.GetExperience(),
                         /* .Winning     = */ true,
                         /* .Reserved    = */ {},
 
                     };
                 }
                 else
-                    items[i] = ScoreEntry{};
+                    items[i] = GameCompletedEventData::ScoreEntry{};
             }
 
-            m_context.SetScoreEntries(items);
+            SetScores(items);
         }
 
         CaptureScreen();
-        GetDirector().Present<StateResult>();
+        GetDirector().Present<StateResult>(std::move(m_context));
     }
 
     unsigned int StatePlaying7K::GetViewport() const
@@ -571,13 +583,8 @@ namespace Cx
                 if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                     return;
 
-                auto& slot = m_room.GetSlot(response.ID);
-                auto name = slot.Member->Name;
-
-                slot.State    = RoomSlotState::Unoccupied;
-                slot.IsMaster = false;
-                slot.Ready    = false;
-                slot.Member   = std::nullopt;
+                auto name = m_room.GetSlot(response.ID).Name;
+                m_room.Vacate(response.ID);
             }
         }
         catch (const Gx::Exception& ex)
@@ -595,8 +602,7 @@ namespace Cx
         {
             const auto& response = ev.Open();
 
-            auto entries = std::array<ScoreEntry, RoomContext::MaxCapacity>();
-
+            auto entries = std::array<GameCompletedEventData::ScoreEntry, 8>();
             const auto& container = response.Entries.GetContainer();
             for (std::size_t i = 0; i < entries.size(); i++)
             {
@@ -604,7 +610,7 @@ namespace Cx
                     entries[i] = container[i];
             }
 
-            m_context.SetScoreEntries(entries);
+            SetScores(entries);
             OnRenderComplete();
         }
         catch (const Gx::Exception& ex)
@@ -655,8 +661,9 @@ namespace Cx
             return;
         }
 
-        if (m_context.GetMode() != GameMode::Single)
+        if (m_context.Mode != GameMode::Single)
         {
+            m_room.Leave();
             GetDirector().Dismiss<StateRoom>();
         }
         else
@@ -699,7 +706,7 @@ namespace Cx
         const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
         const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
 
-        if (!m_scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
+        if (!m_scoreTracker.IsEnabled() && m_context.Difficulty != Difficulty::EX)
             return;
 
         // Life System
@@ -726,7 +733,7 @@ namespace Cx
                 m_self->Die();
 
                 SubmitScore();
-                if (m_context.GetDifficulty() != Difficulty::EX && m_states.size() == 0)
+                if (m_context.Difficulty != Difficulty::EX && m_states.size() == 0)
                 {
                     Run<Gx::Delay>(sf::milliseconds(2000), [this]
                     {
@@ -792,7 +799,7 @@ namespace Cx
 
     void StatePlaying7K::OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        m_service.ExitPlaying([=] (const auto& ev)
+        m_service.ExitPlaying(m_context.Mode, [=] (const auto& ev)
         {
             OnExitPlayingResponded(ev);
         });
@@ -802,7 +809,7 @@ namespace Cx
     {
         State::Update(delta);
 
-        if (m_context.GetMode() == GameMode::Tutorial)
+        if (m_context.Mode == GameMode::Tutorial)
         {
             const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
             const auto frontBuffers = m_renderer.GetFrontBuffers();
@@ -894,17 +901,17 @@ namespace Cx
         }
     }
 
-    void StatePlaying7K::EquipAvatar(Avatar* avatar, const CharacterInfo& charInfo)
+    void StatePlaying7K::EquipAvatar(Avatar* avatar, const Gender gender, const EquipmentSet& equippedItemIDs)
     {
-        avatar->SetGender(charInfo.Gender);
-        for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+        avatar->SetGender(gender);
+        for (auto [_, item] : m_items.GetDefaultItems(gender))
             avatar->SetDefaultItem(std::move(item));
 
-        for (const auto id : charInfo.EquippedItemIDs)
+        for (const auto id : equippedItemIDs)
             avatar->Equip(m_items.Create(id));
     }
 
-    void StatePlaying7K::SetupAvatarInfo(Avatar* avatar, RoomSlot& slot)
+    void StatePlaying7K::SetupAvatarInfo(Avatar* avatar, const Room::Slot& slot)
     {
         const auto info = avatar->GetAvatarInfo();
         info->SetSlot(slot);
@@ -912,6 +919,12 @@ namespace Cx
         const auto lifeBar = info->GetLifeBar();
         lifeBar->SetMaximumValue(m_lifeSystem.GetMaxLifePoint());
         lifeBar->SetValue(m_lifeSystem.GetMaxLifePoint());
+    }
+
+    void StatePlaying7K::SetScores(const std::array<GameCompletedEventData::ScoreEntry, 8>& entries)
+    {
+        m_context.Scores = entries;
+        std::sort(m_context.Scores.begin(), m_context.Scores.end(), [] (auto& a, auto& b) { return a.Score > b.Score; });
     }
 
     void StatePlaying7K::SubmitScore()

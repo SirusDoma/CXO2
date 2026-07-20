@@ -6,13 +6,11 @@
 
 #include <CXO2/Core/ScoreTracker.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
 
 #include <CXO2/Services/WaitingService.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
-#include <CXO2/Network/RoomInfo.hpp>
 
 #include <CXO2/StringTable/Identifiers/Cache.hpp>
 #include <CXO2/StringTable/Identifiers/Sound.hpp>
@@ -30,15 +28,20 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& context, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service) :
+    StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service) :
         m_mixer(mixer),
         m_session(session),
         m_room(room),
-        m_context(context),
         m_waiting(waiting),
         m_service(service),
         m_scoreTracker(scoreTracker)
     {
+    }
+
+    void StateResult::Initialize(GameContext game)
+    {
+        m_context = std::move(game);
+        Initialize();
     }
 
     void StateResult::Initialize()
@@ -101,7 +104,7 @@ namespace Cx
         if (const auto list = bottom->FindChild<Gx::List>(Resource::Result::Bottom::IDC_LIST_RANK_SCORE); list)
         {
             const auto listItems  = list->GetChildren();
-            const auto scoreItems = m_context.GetScoreEntries();
+            const auto& scoreItems = m_context.Scores;
             for (std::size_t i = 0; i < listItems.size(); i++)
             {
                 const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
@@ -116,47 +119,47 @@ namespace Cx
                 if (!entry.Active)
                     continue;
 
-                auto& slot = m_room.GetSlot(entry.ID);
-                if (slot.State != RoomSlotState::Occupied || !slot.Member.has_value())
+                const auto& slot = m_room.GetSlot(entry.ID);
+                if (slot.State != Room::SlotState::Occupied)
                     continue;
 
-                auto& member = slot.Member.value();
+                const auto& member = slot;
                 if (member.Name.isEmpty())
                     continue;
 
                 // TODO: Make this adjustable?
                 item->SetVisible(true);
 
-                auto primaryTeamColor = std::unordered_map<RoomTeam, sf::Color>
+                auto primaryTeamColor = std::unordered_map<Room::Team, sf::Color>
                 ({
-                    { RoomTeam::A, sf::Color(255, 000, 16, 50) },
-                    { RoomTeam::B, sf::Color(255, 190, 16, 50) },
-                    { RoomTeam::C, sf::Color(247, 255, 0, 50) },
-                    { RoomTeam::D, sf::Color(155, 206, 82, 50) },
-                    { RoomTeam::E, sf::Color(107, 235, 230, 50) },
-                    { RoomTeam::F, sf::Color(000, 000, 230, 50) },
-                    { RoomTeam::G, sf::Color(156, 81, 214, 50) },
-                    { RoomTeam::H, sf::Color(181, 77, 025, 50) },
+                    { Room::Team::A, sf::Color(255, 000, 16, 50) },
+                    { Room::Team::B, sf::Color(255, 190, 16, 50) },
+                    { Room::Team::C, sf::Color(247, 255, 0, 50) },
+                    { Room::Team::D, sf::Color(155, 206, 82, 50) },
+                    { Room::Team::E, sf::Color(107, 235, 230, 50) },
+                    { Room::Team::F, sf::Color(000, 000, 230, 50) },
+                    { Room::Team::G, sf::Color(156, 81, 214, 50) },
+                    { Room::Team::H, sf::Color(181, 77, 025, 50) },
                 });
 
-                auto secondaryTeamColor = std::unordered_map<RoomTeam, sf::Color>
+                auto secondaryTeamColor = std::unordered_map<Room::Team, sf::Color>
                 ({
-                    { RoomTeam::A, sf::Color(123, 130, 16, 50) },
-                    { RoomTeam::B, sf::Color(123, 223, 16, 50) },
-                    { RoomTeam::C, sf::Color(123, 125, 0, 50) },
-                    { RoomTeam::D, sf::Color(74, 231, 82, 50) },
-                    { RoomTeam::E, sf::Color(49, 247, 230, 50) },
-                    { RoomTeam::F, sf::Color(000, 000, 230, 50) },
-                    { RoomTeam::G, sf::Color(74, 170, 214, 50) },
-                    { RoomTeam::H, sf::Color(90, 36, 25, 50) },
+                    { Room::Team::A, sf::Color(123, 130, 16, 50) },
+                    { Room::Team::B, sf::Color(123, 223, 16, 50) },
+                    { Room::Team::C, sf::Color(123, 125, 0, 50) },
+                    { Room::Team::D, sf::Color(74, 231, 82, 50) },
+                    { Room::Team::E, sf::Color(49, 247, 230, 50) },
+                    { Room::Team::F, sf::Color(000, 000, 230, 50) },
+                    { Room::Team::G, sf::Color(74, 170, 214, 50) },
+                    { Room::Team::H, sf::Color(90, 36, 25, 50) },
                 });
 
-                if (member.Name == m_session.GetCharacterInfo().Name)
+                if (member.Name == m_session.GetName())
                     banner->SetFrame(i == 0 ? "win" : "lose");
 
                 if (const auto highlighter = item->FindChild<Gx::Rectangle>(Resource::Result::Bottom::Score::IDC_RECTANGLE_HIGHLIGHT); highlighter)
                 {
-                    if (member.Name == m_session.GetCharacterInfo().Name)
+                    if (member.Name == m_session.GetName())
                         highlighter->SetColor(primaryTeamColor[slot.Team]);
                     else
                         highlighter->SetColor(secondaryTeamColor[slot.Team]);
@@ -234,7 +237,7 @@ namespace Cx
                         return;
                     }
 
-                    GetDirector().Present<StateLoading>();
+                    GetDirector().Present<StateLoading>(m_room.CreateGameContext());
                 });
             });
         });

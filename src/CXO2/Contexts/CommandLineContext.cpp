@@ -66,7 +66,7 @@ namespace Cx
         return m_arguments[2];
     }
 
-    std::vector<GatewayInfo> CommandLineContext::GetGatewayInfo() const
+    std::vector<Gateway> CommandLineContext::GetGatewayInfo() const
     {
         if (GetArgumentCount() < 6)
             return {};
@@ -76,7 +76,7 @@ namespace Cx
             const int gatewayCount = std::stoi(m_arguments[3]);
 
             // Different halls order for 3.10 compatibility
-            auto gateways = std::vector<GatewayInfo>();
+            auto gateways = std::vector<Gateway>();
             constexpr auto halls = std::array<MusicHall, 6>
             {
                 MusicHall::Melpomin,

@@ -29,12 +29,12 @@ namespace Cx
 
         void Initialize() override;
 
-        void Upsert(const RoomInfo& room);
-        RoomInfo& GetRoom(std::uint32_t id);
+        void Upsert(const Room& room);
+        Room& GetRoom(std::uint32_t id);
         void Remove(std::uint32_t id);
         void Clear();
 
-        const RoomInfo* GetWaitingRoom();
+        const Room* GetWaitingRoom();
 
         void ShowAll();
         void ShowWaitingOnly();
@@ -42,7 +42,7 @@ namespace Cx
         void NextPage();
         void PreviousPage();
 
-        void SetEnterRoomCallback(std::function<void(const RoomInfo&)> callback) const;
+        void SetEnterRoomCallback(std::function<void(const Room&)> callback) const;
 
         void Invalidate() override;
 
@@ -55,11 +55,11 @@ namespace Cx
         Gx::AudioMixer& m_mixer;
         Gx::ResourceManager& m_resources;
 
-        std::map<unsigned int, RoomInfo> m_rooms;
+        std::map<unsigned int, Room> m_rooms;
         unsigned int m_page;
         bool m_waiting;
 
         mutable sf::Sound* m_sfxInvalid{nullptr};
-        mutable std::function<void(const RoomInfo&)> m_enterRoomCallback;
+        mutable std::function<void(const Room&)> m_enterRoomCallback;
     };
 }

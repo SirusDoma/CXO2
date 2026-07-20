@@ -14,6 +14,8 @@
 #include <CXO2/Network/Events/PlayingMemberLeftEventData.hpp>
 #include <CXO2/Network/Events/GameCompletedEventData.hpp>
 
+#include <CXO2/Models/Game.hpp>
+
 #include <functional>
 
 namespace Cx
@@ -36,6 +38,7 @@ namespace Cx
         ) const = 0;
 
         virtual void ExitPlaying(
+            GameMode mode,
             const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const = 0;
 

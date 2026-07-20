@@ -2,12 +2,11 @@
 #include <CXO2/States/StatePlanet.hpp>
 
 #include <CXO2/States/StatePlaying7K.hpp>
+#include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
-#include <CXO2/Network/RoomInfo.hpp>
 #include <CXO2/Network/Events/MemberMusicLoadedEventData.hpp>
 #include <CXO2/Network/Events/WaitingMemberLeftEventData.hpp>
 
@@ -34,9 +33,9 @@ namespace Cx
 
     using namespace StringTable::Identifiers;
 
-    StateLoading::StateLoading(GameContext& game, SessionContext& session, RoomContext& room, PlayingService& service) :
+    StateLoading::StateLoading(GameConfig& config, SessionContext& session, RoomContext& room, PlayingService& service) :
         m_texture(),
-        m_context(game),
+        m_config(config),
         m_session(session),
         m_room(room),
         m_service(service),
@@ -44,6 +43,12 @@ namespace Cx
         m_mutex(),
         m_loadedUsers()
     {
+    }
+
+    void StateLoading::Initialize(GameContext game)
+    {
+        m_context = std::move(game);
+        Initialize();
     }
 
     void StateLoading::Initialize()
@@ -72,9 +77,9 @@ namespace Cx
         if (!randomized && !imageSet.empty())
             imageSet[0]->SetVisible(true);
 
-        const auto chart      = m_context.GetChart();
+        const auto chart      = m_context.Chart.get();
         const auto& resources = GetResources(ResourceScope::Shared);
-        auto loader           = O2JamChartLoader(m_context);
+        auto loader           = O2JamChartLoader(m_context.Mode, m_context.Difficulty);
 
         const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
         for (std::size_t i = 0; i < list->GetChildrenCount(); i++)
@@ -87,18 +92,18 @@ namespace Cx
                 continue;
 
             const auto& slot = m_room.GetSlot(i);
-            if (slot.State != RoomSlotState::Occupied)
+            if (slot.State != Room::SlotState::Occupied)
             {
                 container->SetVisible(false);
                 continue;
             }
 
             if (const auto level = container->FindChild<Gx::Label>(Resource::Loading::IDC_TEXT_USER_LEVEL))
-                level->SetString(fmt::format("Lv. {}", slot.Member->Level));
+                level->SetString(fmt::format("Lv. {}", slot.Level));
 
             if (const auto name = container->FindChild<Gx::Label>(Resource::Loading::IDC_TEXT_USER_NAME))
             {
-                name->SetString(slot.Member->Name);
+                name->SetString(slot.Name);
                 name->SetColor(slot.TeamColor);
             }
 
@@ -124,8 +129,8 @@ namespace Cx
 
         auto thread = std::thread([=] ()
         {
-            m_context.SetChart(loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default));
-            Invoke([this] { OnChartLoaded(m_context.GetChart()); });
+            m_context.Chart = loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default);
+            Invoke([this] { OnChartLoaded(m_context.Chart.get()); });
         });
 
         thread.detach();
@@ -214,7 +219,7 @@ namespace Cx
             for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
             {
                 const auto& slot = m_room.GetSlot(i);
-                if (slot.State == RoomSlotState::Occupied)
+                if (slot.State == Room::SlotState::Occupied)
                     userCount++;
             }
 
@@ -234,12 +239,12 @@ namespace Cx
                     m_service.SetMemberMusicLoadedEventCallback(nullptr);
 
                     auto ctx = PlayingResourceContext();
-                    ctx.SetFxEnabled(m_context.GetConfig().UseFx);
-                    ctx.SetMapID(m_context.GetMapID());
-                    ctx.SetEffectID(m_context.GetEffectID());
-                    ctx.SetMode(m_context.GetMode());
+                    ctx.SetFxEnabled(m_config.UseFx);
+                    ctx.SetMapID(m_context.MapID);
+                    ctx.SetEffectID(m_context.EffectID);
+                    ctx.SetMode(m_context.Mode);
 
-                    GetDirector().Present<StatePlaying7K>(ctx);
+                    GetDirector().Present<StatePlaying7K>(ctx, std::move(m_context));
                 });
             }).detach();
         });

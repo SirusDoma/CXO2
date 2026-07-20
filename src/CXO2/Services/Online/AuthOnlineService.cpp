@@ -25,7 +25,7 @@ namespace Cx
     {
         m_network.Disconnect();
         auto gateways = m_args.GetGatewayInfo();
-        const auto it = std::find_if(gateways.begin(), gateways.end(), [gateway] (const GatewayInfo& info)
+        const auto it = std::find_if(gateways.begin(), gateways.end(), [gateway] (const Gateway& info)
         {
             return info.Hall == gateway;
         });

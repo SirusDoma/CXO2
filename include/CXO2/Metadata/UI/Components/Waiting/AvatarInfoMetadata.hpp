@@ -8,7 +8,7 @@ namespace Cx
 {
     struct AvatarInfoMetadata : public UiContainerMetadata
     {
-        using ColorMap = std::unordered_map<RoomTeam, sf::Color>;
+        using ColorMap = std::unordered_map<Room::Team, sf::Color>;
 
         ColorMap TeamColors;
     };

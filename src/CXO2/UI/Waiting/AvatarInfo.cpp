@@ -30,23 +30,23 @@ namespace Cx
         return FindChild<Gx::Gauge>(Resource::Avatar::Info::IDC_GAUGE_AVATAR_INFO_LIFE);
     }
 
-    RoomSlot* AvatarInfo::GetSlot() const
+    const Room::Slot* AvatarInfo::GetSlot() const
     {
         return m_slot;
     }
 
-    const sf::Color& AvatarInfo::GetTeamColor(const RoomTeam team)
+    const sf::Color& AvatarInfo::GetTeamColor(const Room::Team team)
     {
         return m_teamColors[team];
     }
 
-    void AvatarInfo::SetSlot(RoomSlot& slot)
+    void AvatarInfo::SetSlot(const Room::Slot& slot)
     {
         m_slot = &slot;
         Invalidate();
     }
 
-    void AvatarInfo::RegisterTeamColor(const RoomTeam team, const sf::Color& color)
+    void AvatarInfo::RegisterTeamColor(const Room::Team team, const sf::Color& color)
     {
         m_teamColors[team] = color;
     }
@@ -57,15 +57,15 @@ namespace Cx
         Invalidate();
     }
 
-    sf::Color AvatarInfo::ResolveTeamColor()
+    sf::Color AvatarInfo::ResolveTeamColor() const
     {
         if (m_teamColors.empty())
             return m_slot->TeamColor;
 
-        const auto& color = GetTeamColor(m_slot->Team);
-        m_slot->TeamColor = color;
+        if (const auto it = m_teamColors.find(m_slot->Team); it != m_teamColors.end())
+            return it->second;
 
-        return color;
+        return m_slot->TeamColor;
     }
 
     void AvatarInfo::Invalidate()
@@ -74,7 +74,7 @@ namespace Cx
 
         if (const auto plate = FindChild<Gx::Colorable>(Resource::Avatar::Info::IDC_IMAGE_AVATAR_INFO_PLATE); plate)
         {
-            if (m_slot && !m_slot->Member->Name.isEmpty())
+            if (m_slot && !m_slot->Name.isEmpty())
                 plate->SetColor(ResolveTeamColor());
             else
                 plate->SetColor(sf::Color::Transparent);
@@ -88,13 +88,13 @@ namespace Cx
 
         if (level)
         {
-            level->SetString(m_slot ? fmt::format("Lv.{}", m_slot->Member->Level) : std::string());
+            level->SetString(m_slot ? fmt::format("Lv.{}", m_slot->Level) : std::string());
 
             if (name)
             {
                 if (m_slot)
                 {
-                    name->SetString(m_slot->Member->Name);
+                    name->SetString(m_slot->Name);
                     name->SetColor(ResolveTeamColor());
                 }
                 else
@@ -104,7 +104,7 @@ namespace Cx
         else if (name)
         {
             if (m_slot)
-                name->SetString(fmt::format(L"Lv:{} {}", m_slot->Member->Level, m_slot->Member->Name));
+                name->SetString(fmt::format(L"Lv:{} {}", m_slot->Level, m_slot->Name));
             else
                 name->SetString(std::string());
         }

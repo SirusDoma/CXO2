@@ -78,7 +78,7 @@ namespace Cx
         });
     }
 
-    void UserList::AddUser(const CharacterInfo& user)
+    void UserList::AddUser(const UserListResponse::User& user)
     {
         m_users.push_back(user);
     }
@@ -95,16 +95,8 @@ namespace Cx
             const auto& response = ev.Open();
 
             Clear();
-            for (auto& user : response.Users.GetContainer())
-            {
-                AddUser(CharacterInfo
-                {
-                    user.Name,
-                    Gender::Any,
-                    Role::Normal,
-                    user.Level
-                });
-            }
+            for (const auto& user : response.Users.GetContainer())
+                AddUser(user);
 
             Invalidate();
             m_refreshing = false;

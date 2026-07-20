@@ -6,7 +6,7 @@
 
 namespace Cx
 {
-    struct GatewayInfo
+    struct Gateway
     {
         MusicHall     Hall;
         sf::IpAddress Address;
@@ -25,7 +25,7 @@ namespace Cx
         std::string GetAuthToken() const;
         std::string GetFtpUrl() const;
         std::string GetGame() const;
-        std::vector<GatewayInfo> GetGatewayInfo() const;
+        std::vector<Gateway> GetGatewayInfo() const;
 
     private:
         std::vector<std::string> m_arguments{};

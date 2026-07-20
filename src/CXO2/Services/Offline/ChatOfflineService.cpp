@@ -21,7 +21,7 @@ namespace Cx
     void ChatOfflineService::SendMainRoomMessage(const MainRoomMessageRequest& request, const MessageCallback<MainRoomMessageRequest>& callback)
     {
         if (m_mainRoomUserCallback)
-            m_mainRoomUserCallback(MessageEnvelope<MainRoomUserMessageResponse>(MainRoomUserMessageResponse{ m_session.GetCharacterInfo().Name, request.Content }));
+            m_mainRoomUserCallback(MessageEnvelope<MainRoomUserMessageResponse>(MainRoomUserMessageResponse{ m_session.GetName(), request.Content }));
 
         if (callback)
             callback(MessageEnvelope<MainRoomMessageRequest>(request));
@@ -30,7 +30,7 @@ namespace Cx
     void ChatOfflineService::SendWaitingMessage(const WaitingMessageRequest& request, const MessageCallback<WaitingMessageRequest>& callback)
     {
         if (m_waitingUserCallback)
-            m_waitingUserCallback(MessageEnvelope<WaitingUserMessageResponse>(WaitingUserMessageResponse{ m_session.GetCharacterInfo().Name, request.Content }));
+            m_waitingUserCallback(MessageEnvelope<WaitingUserMessageResponse>(WaitingUserMessageResponse{ m_session.GetName(), request.Content }));
 
         if (callback)
             callback(MessageEnvelope<WaitingMessageRequest>(request));

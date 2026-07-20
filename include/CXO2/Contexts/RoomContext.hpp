@@ -3,11 +3,11 @@
 #include <CXO2/Metadata/Chart/O2JamChartMetadata.hpp>
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Models/Room.hpp>
 
 #include <SFML/Graphics/Color.hpp>
 
-#include <mutex>
-#include <optional>
+#include <array>
 
 
 namespace Gx
@@ -17,12 +17,7 @@ namespace Gx
 
 namespace Cx
 {
-    enum class RoomSlotEventType : std::uint8_t;
     enum class StartGameResult : std::uint32_t;
-
-    enum class RoomTeam : std::uint8_t;
-    enum class RoomState : std::uint8_t;
-    enum class RoomSlotState : std::uint32_t;
 
     enum class MusicSortMode
     {
@@ -39,30 +34,31 @@ namespace Cx
         Descending
     };
 
-    struct RoomInfo;
-    struct RoomSlot
-    {
-        std::optional<CharacterInfo> Member{std::nullopt};
-        RoomSlotState State{};
-        bool IsMaster{};
-        bool Ready{};
-        RoomTeam Team{};
-        sf::Color TeamColor{sf::Color::Transparent};
-    };
 
+    struct GameContext;
 
     class SessionContext;
-    class WaitingService;
     class RoomContext
     {
     public:
-        static constexpr std::uint8_t MaxCapacity = 8;
+        static constexpr std::uint8_t MaxCapacity = Room::MaxCapacity;
 
-        explicit RoomContext(SessionContext& session, WaitingService& service, Gx::ResourceManager& resources);
+        struct Member
+        {
+            sf::String   Name;
+            Cx::Gender   Gender{};
+            std::int32_t Level{};
+            EquipmentSet EquippedItemIDs;
+            MusicList    MusicIDs;
+        };
+
+        explicit RoomContext(SessionContext& session, Gx::ResourceManager& resources);
         ~RoomContext();
 
+        void Enter(std::uint32_t id);
+        void Leave();
+
         std::uint32_t GetID() const;
-        void SetID(std::uint32_t id);
 
         RoomState GetState() const;
         void SetState(RoomState state);
@@ -75,6 +71,7 @@ namespace Cx
 
         ChartMetadata GetMusic() const;
         void SetMusic(const ChartMetadata& metadata);
+        void SetMusicID(std::uint32_t musicID);
 
         Difficulty GetDifficulty() const;
         void SetDifficulty(Difficulty difficulty);
@@ -92,12 +89,6 @@ namespace Cx
         void SetSpeedID(Speed speedID);
 
         std::uint8_t GetCapacity() const;
-
-        std::uint8_t GetMinLevelLimit() const;
-        void SetMinLevelLimit(std::uint8_t minLevelLimit);
-
-        std::uint8_t GetMaxLevelLimit() const;
-        void SetMaxLevelLimit(std::uint8_t maxLevelLimit);
 
         LevelCategory GetRandomLevel() const;
         void SetRandomLevel(LevelCategory random);
@@ -118,38 +109,36 @@ namespace Cx
         std::uint8_t GetEffectID() const;
         void SetEffectID(std::uint8_t effectID);
 
-        RoomSlot& GetMaster();
-        RoomSlot& GetCurrentSlot();
+        std::uint8_t GetMinLevelLimit() const;
+        std::uint8_t GetMaxLevelLimit() const;
+        void SetLevelLimits(std::uint8_t minLevelLimit, std::uint8_t maxLevelLimit);
 
-        RoomSlot& GetSlot(std::size_t index);
+        void Seat(std::size_t index, const Member& member, Room::Team team, bool ready, bool isMaster = false);
+        void Vacate(std::size_t index);
+        void Lock(std::size_t index);
+        void Unlock(std::size_t index);
+        void PromoteMaster(std::size_t index);
+        void SetReady(std::size_t index, bool ready);
+        void SetTeam(std::size_t index, Room::Team team);
+        void SetTeamColor(std::size_t index, const sf::Color& color);
+        void SetEquipment(std::size_t index, const EquipmentSet& equippedItemIDs);
+        void SetMasterSlot();
+
+        const Room::Slot& GetMaster() const;
+        const Room::Slot& GetCurrentSlot() const;
+        const Room::Slot& GetSlot(std::size_t index) const;
+        std::size_t GetCurrentSlotIndex() const;
 
         std::unordered_set<std::uint32_t> GetAvailableMusicIDs() const;
-        void UpdateFrom(const RoomInfo& room);
+
+        GameContext CreateGameContext() const;
 
     private:
         SessionContext& m_session;
-        WaitingService& m_service;
         Gx::ResourceManager& m_resources;
 
-        std::uint32_t m_id{};
-        RoomState     m_state{};
-        sf::String    m_title{};
-        bool          m_locked{};
-        ChartMetadata m_music{};
-        Difficulty    m_difficulty{};
-        GameMode      m_mode{};
-        float         m_speed;
-        SpeedMode     m_speedMode = SpeedMode::HiSpeed;
-        std::uint8_t  m_minLevelLimit{};
-        std::uint8_t  m_maxLevelLimit{};
-
-        LevelCategory  m_random{};
-        std::uint8_t   m_mapID{};
-        std::uint8_t   m_randomizedMapID{};
-        std::uint8_t   m_effectID{1};
-        MusicSortMode  m_sort{};
-        MusicSortOrder m_order{};
-
-        std::array<RoomSlot, MaxCapacity> m_slots{};
+        Room m_state;
+        MusicSortMode  m_sort;
+        MusicSortOrder m_order;
     };
 }

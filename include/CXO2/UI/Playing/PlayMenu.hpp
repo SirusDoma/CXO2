@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Core/ScoreTracker.hpp>
 
 #include <Genode/Graphics/Animation.hpp>
@@ -15,17 +16,16 @@ namespace Gx
 namespace Cx
 {
     class ChartRenderer;
-    class GameContext;
     class PlayMenu : public Gx::Image
     {
     public:
-        explicit PlayMenu(const GameContext& context);
+        explicit PlayMenu(const GameConfig& config);
 
         void Initialize() override;
 
         ChartMetadata GetMetadata() const;
         Difficulty GetDifficulty() const;
-        void SetMetadata(const ChartMetadata& metadata, const Difficulty diff);
+        void SetMetadata(const ChartMetadata& metadata, Difficulty diff, float speed, SpeedMode speedMode);
 
         void SetScoreTracker(const ScoreTracker& scores);
         const ScoreTracker* GetScoreTracker() const;
@@ -34,7 +34,7 @@ namespace Cx
         void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-        const GameContext& m_context;
+        const GameConfig& m_config;
 
         ChartMetadata m_metadata;
         Difficulty m_difficulty;

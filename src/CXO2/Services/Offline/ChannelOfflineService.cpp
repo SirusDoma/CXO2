@@ -30,10 +30,8 @@ namespace Cx
         if (!callback)
             return;
 
-        const auto& info = m_session.GetCharacterInfo();
-
-        auto list = std::vector<UserListResponse::UserInfo>();
-        list.push_back({ info.Name, info.Level });
+        auto list = std::vector<UserListResponse::User>();
+        list.push_back({ m_session.GetName(), m_session.GetLevel() });
 
         callback(MessageEnvelope<UserListResponse>(UserListResponse{ list }));
     }
@@ -47,7 +45,7 @@ namespace Cx
         for (const auto& room : m_rooms)
             id = std::max(id, room.ID + 1);
 
-        auto room = RoomInfo{};
+        auto room = RoomListResponse::Room{};
         room.ID            = id;
         room.State         = RoomState::Waiting;
         room.Title         = request.Title;
@@ -86,38 +84,36 @@ namespace Cx
         if (!callback)
             return;
 
-        auto room = RoomInfo{};
+        auto room = RoomListResponse::Room{};
         room.State      = RoomState::Waiting;
         room.Title      = sf::String("Offline Room");
         room.Difficulty = Difficulty::EX;
         room.Speed      = Speed::X15;
         room.Capacity   = 8;
 
-        const auto it = std::find_if(m_rooms.begin(), m_rooms.end(), [&request] (const RoomInfo& entry)
+        const auto it = std::find_if(m_rooms.begin(), m_rooms.end(), [&request] (const RoomListResponse::Room& entry)
         {
             return entry.ID == request.ID;
         });
         if (it != m_rooms.end())
             room = *it;
 
-        auto& info = m_session.GetCharacterInfo();
-
-        auto member = JoinRoomResponse::MemberInfo{};
-        member.Name            = info.Name;
-        member.Level           = info.Level;
-        member.Gender          = info.Gender;
+        auto member = JoinRoomResponse::Member{};
+        member.Name            = m_session.GetName();
+        member.Level           = m_session.GetLevel();
+        member.Gender          = m_session.GetGender();
         member.IsRoomMaster    = true;
-        member.Team            = RoomTeam::A;
+        member.Team            = Room::Team::A;
         member.Ready           = false;
-        member.EquippedItemIDs = info.EquippedItemIDs;
-        member.MusicIDs        = info.MusicIDs;
+        member.EquippedItemIDs = m_session.GetEquippedItemIDs();
+        member.MusicIDs        = m_session.GetMusicIDs();
 
-        auto slots = std::vector<JoinRoomResponse::SlotInfo>();
+        auto slots = std::vector<JoinRoomResponse::Slot>();
         for (std::uint8_t i = 0; i < 8; i++)
         {
-            auto slot = JoinRoomResponse::SlotInfo{};
+            auto slot = JoinRoomResponse::Slot{};
             slot.Index = i;
-            slot.State = i == 0 ? RoomSlotState::Occupied : RoomSlotState::Unoccupied;
+            slot.State = i == 0 ? Room::SlotState::Occupied : Room::SlotState::Unoccupied;
             if (i == 0)
                 slot.Member = member;
 
@@ -127,7 +123,7 @@ namespace Cx
         auto response = JoinRoomResponse{};
         response.Result     = JoinResult::Success;
         response.SlotID     = 0;
-        response.Team       = RoomTeam::A;
+        response.Team       = Room::Team::A;
         response.Title      = room.Title;
         response.MusicID    = room.MusicID;
         response.Mode       = room.Mode;

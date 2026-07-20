@@ -19,24 +19,24 @@ namespace Cx
         const MessageCallback<PurchaseItemResponse>& callback
     ) const
     {
-        const auto& info = m_session.GetCharacterInfo();
+        const auto& inventory = m_session.GetInventory();
 
         auto response = PurchaseItemResponse{};
-        response.Gem    = info.Wallet.Gem;
-        response.Cash   = info.Wallet.Cash;
+        response.Gem    = m_session.GetWallet().Gem;
+        response.Cash   = m_session.GetWallet().Cash;
         response.ItemID = request.ItemID;
 
-        const auto it = std::find_if(info.Inventory.begin(), info.Inventory.end(), [] (const auto& item)
+        const auto it = std::find_if(inventory.begin(), inventory.end(), [] (const auto& item)
         {
             return item.ID == 0;
         });
 
-        if (it == info.Inventory.end())
+        if (it == inventory.end())
             response.ResultCode = PurchaseItemResult::InventoryFull;
         else
         {
             response.ResultCode = PurchaseItemResult::Success;
-            response.SlotID     = static_cast<std::uint32_t>(std::distance(info.Inventory.begin(), it));
+            response.SlotID     = static_cast<std::uint32_t>(std::distance(inventory.begin(), it));
         }
 
         if (callback)
@@ -50,14 +50,14 @@ namespace Cx
         const MessageCallback<SellItemResponse>& callback
     ) const
     {
-        const auto& info = m_session.GetCharacterInfo();
+        const auto& inventory = m_session.GetInventory();
 
         auto response = SellItemResponse{};
-        response.Gem    = info.Wallet.Gem;
-        response.Cash   = info.Wallet.Cash;
+        response.Gem    = m_session.GetWallet().Gem;
+        response.Cash   = m_session.GetWallet().Cash;
         response.SlotID = request.SlotID;
 
-        if (request.SlotID < info.Inventory.size() && info.Inventory[request.SlotID].ID != 0)
+        if (request.SlotID < inventory.size() && inventory[request.SlotID].ID != 0)
             response.Result = SellItemResult::Success;
         else
             response.Result = SellItemResult::Failed;

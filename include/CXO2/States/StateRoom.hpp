@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CXO2/States/State.hpp>
+#include <CXO2/Config/GameConfig.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
 
 #include <CXO2/Network/MessageEnvelope.hpp>
@@ -23,11 +24,8 @@ namespace Cx
     enum class RoomTransitionEventType : std::uint8_t;
 
     struct CreateRoomRequest;
-
     struct Room;
-    struct RoomInfo;
 
-    class GameContext;
     class ChartMetadata;
     class ItemFactory;
     class RoomContext;
@@ -37,7 +35,7 @@ namespace Cx
     class StateRoom : public State
     {
     public:
-        StateRoom(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameContext& game, ChannelService& roomService, CharacterService& charService, ItemFactory& items);
+        StateRoom(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, GameConfig& config, ChannelService& roomService, CharacterService& charService, ItemFactory& items);
 
         void Initialize() override;
         void Initialize(RoomTransitionEventType evType);
@@ -55,14 +53,14 @@ namespace Cx
             unsigned int maxLevelLimit
         );
 
-        void JoinRoom(const RoomInfo& room);
+        void JoinRoom(const Room& room);
 
         void OnCharacterInfoLoad(const MessageEnvelope<CharacterInfoResponse>& ev);
         void OnRoomListLoad(const MessageEnvelope<RoomListResponse>& ev);
         void OnUserListLoad(const MessageEnvelope<UserListResponse>& ev);
 
         void OnCreateRoomResponded(const MessageEnvelope<CreateRoomResponse>& ev, const CreateRoomRequest& request, const ChartMetadata& music);
-        void OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev, const RoomInfo& room);
+        void OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev);
 
         void OnRoomCreated(const MessageEnvelope<RoomCreatedEventData>& ev);
         void OnRoomMusicChanged(const MessageEnvelope<RoomMusicChangedEventData>& ev);
@@ -71,7 +69,7 @@ namespace Cx
         void OnRoomUserCountChanged(const MessageEnvelope<RoomUserCountChangedEventData>& ev);
         void OnRoomRemoved(const MessageEnvelope<RoomRemovedEventData>& ev);
 
-        void OnRoomEntered(const RoomInfo& room);
+        void OnRoomEntered(const Room& room);
 
         void OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
@@ -97,7 +95,7 @@ namespace Cx
         ChannelService& m_service;
         SessionContext& m_session;
         RoomContext& m_room;
-        GameContext& m_game;
+        GameConfig& m_config;
         ItemFactory& m_items;
 
         bool m_busy{false};

@@ -1,4 +1,5 @@
 #include <CXO2/UI/Playing/PlayMenu.hpp>
+#include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Core/ChartRenderer.hpp>
 #include <CXO2/States/State.hpp>
 
@@ -15,8 +16,8 @@ namespace Cx
 {
     using namespace StringTable::Identifiers;
 
-    PlayMenu::PlayMenu(const GameContext& context) :
-        m_context(context),
+    PlayMenu::PlayMenu(const GameConfig& config) :
+        m_config(config),
         m_difficulty(Difficulty::EX), m_scoreTracker(),
         m_renderer(nullptr),
         m_title(nullptr),
@@ -65,7 +66,7 @@ namespace Cx
         return m_difficulty;
     }
 
-    void PlayMenu::SetMetadata(const ChartMetadata& metadata, const Difficulty diff)
+    void PlayMenu::SetMetadata(const ChartMetadata& metadata, const Difficulty diff, const float speed, const SpeedMode speedMode)
     {
         m_metadata   = metadata;
         m_difficulty = diff;
@@ -81,11 +82,8 @@ namespace Cx
 
         if (m_level)
         {
-            const auto speed = m_context.GetSpeed();
-            const auto mode  = m_context.GetSpeedMode();
-
             std::string speedStr = "R";
-            if (mode != SpeedMode::XrSpeed && mode != SpeedMode::TdSpeed && speed > 0)
+            if (speedMode != SpeedMode::XrSpeed && speedMode != SpeedMode::TdSpeed && speed > 0)
                 speedStr = fmt::format("{}", speed);
 
             std::string diffName;
@@ -101,10 +99,10 @@ namespace Cx
         }
 
         if (m_bgmVol)
-            m_bgmVol->SetValue(m_context.GetConfig().MusicVolume);
+            m_bgmVol->SetValue(m_config.MusicVolume);
 
         if (m_sfxVol)
-            m_sfxVol->SetValue(m_context.GetConfig().EffectVolume);
+            m_sfxVol->SetValue(m_config.EffectVolume);
     }
 
     void PlayMenu::SetScoreTracker(const ScoreTracker& scores)

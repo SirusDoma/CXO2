@@ -198,7 +198,7 @@ namespace Cx
 
         const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
-        titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetCharacterInfo().Name));
+        titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetName()));
         titleInput->SelectAll();
         passwordInput->SetString("");
 

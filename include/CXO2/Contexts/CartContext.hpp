@@ -3,6 +3,7 @@
 #include <CXO2/Models/Shop.hpp>
 
 #include <functional>
+#include <vector>
 
 namespace Cx
 {
@@ -15,6 +16,12 @@ namespace Cx
             Music
         };
 
+        struct Item
+        {
+            unsigned int ID;
+            CartItemType Type;
+        };
+
         CartContext() = default;
 
         bool AddEquipment(unsigned int id);
@@ -24,7 +31,7 @@ namespace Cx
         bool Remove(std::size_t index);
 
         bool Contains(CartItemType type, unsigned int id);
-        const std::vector<CartItem>& GetItems() const;
+        const std::vector<Item>& GetItems() const;
 
         CheckoutType GetCheckoutType() const;
         void SetCheckoutType(CheckoutType checkoutType);
@@ -32,7 +39,7 @@ namespace Cx
         void Clear();
 
     private:
-        Cart m_cart;
+        std::vector<Item> m_items;
         CheckoutType m_checkoutType;
     };
 }

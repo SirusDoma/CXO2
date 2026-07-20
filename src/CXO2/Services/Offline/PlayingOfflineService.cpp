@@ -23,9 +23,7 @@ namespace Cx
         const MessageCallback<SubmitScoreRequest>& callback
     ) const
     {
-        const auto& info = m_session.GetCharacterInfo();
-
-        auto entry = ScoreEntry{};
+        auto entry = GameCompletedEventData::ScoreEntry{};
         entry.ID          = 0;
         entry.Active      = 1;
         entry.Cool        = request.Cool;
@@ -35,8 +33,8 @@ namespace Cx
         entry.MaxCombo    = request.MaxCombo;
         entry.MaxJamCombo = request.MaxJamCombo;
         entry.Score       = request.Score;
-        entry.Level       = info.Level;
-        entry.Experience  = info.Experience;
+        entry.Level       = m_session.GetLevel();
+        entry.Experience  = m_session.GetExperience();
         entry.IsWinning   = true;
 
         if (m_scoreCallback)
@@ -61,7 +59,7 @@ namespace Cx
             callback(MessageEnvelope<UpdateGameStatsRequest>(request));
     }
 
-    void PlayingOfflineService::ExitPlaying(const MessageCallback<ExitPlayingRequest>& callback) const
+    void PlayingOfflineService::ExitPlaying(const GameMode, const MessageCallback<ExitPlayingRequest>& callback) const
     {
         if (callback)
             callback(MessageEnvelope<ExitPlayingRequest>(ExitPlayingRequest{}));

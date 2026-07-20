@@ -37,32 +37,17 @@ namespace Cx
         }
     }
 
-    void RoomList::Upsert(const RoomInfo& room)
+    void RoomList::Upsert(const Room& room)
     {
-        if (const auto it = m_rooms.find(room.ID); it != m_rooms.end())
-        {
-            it->second.State         = room.State;
-            it->second.Title         = room.Title;
-            it->second.Locked        = room.Locked;
-            it->second.MusicID       = room.MusicID;
-            it->second.Difficulty    = room.Difficulty;
-            it->second.Mode          = room.Mode;
-            it->second.Speed         = room.Speed;
-            it->second.Capacity      = room.Capacity;
-            it->second.UserCount     = room.UserCount;
-            it->second.MinLevelLimit = room.MinLevelLimit;
-            it->second.MaxLevelLimit = room.MaxLevelLimit;
-        }
-        else
-            m_rooms[room.ID] = room;
+        m_rooms[room.ID] = room;
     }
 
-    RoomInfo& RoomList::GetRoom(const std::uint32_t id)
+    Room& RoomList::GetRoom(const std::uint32_t id)
     {
         if (const auto it = m_rooms.find(id); it != m_rooms.end())
             return it->second;
 
-        m_rooms[id] = RoomInfo{};
+        m_rooms[id] = Room{};
         return m_rooms[id];
     }
 
@@ -81,7 +66,7 @@ namespace Cx
         Invalidate();
     }
 
-    const RoomInfo* RoomList::GetWaitingRoom()
+    const Room* RoomList::GetWaitingRoom()
     {
         for (const auto& [id, room] : m_rooms)
         {
@@ -116,7 +101,7 @@ namespace Cx
         Invalidate();
     }
 
-    void RoomList::SetEnterRoomCallback(std::function<void(const RoomInfo&)> callback) const
+    void RoomList::SetEnterRoomCallback(std::function<void(const Room&)> callback) const
     {
         m_sfxInvalid        = &m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_15);
         m_enterRoomCallback = std::move(callback);
@@ -164,7 +149,7 @@ namespace Cx
             auto roomNumber = ((m_page - 1) * children.size()) + i;
             auto room = m_rooms.find(roomNumber);
 
-            if (room != m_rooms.end() && room->second.MusicID != 0 && room->second.State != RoomState::Unavailable && (!m_waiting || room->second.State == RoomState::Waiting))
+            if (room != m_rooms.end() && room->second.Music.ID != 0 && room->second.State != RoomState::Unavailable && (!m_waiting || room->second.State == RoomState::Waiting))
                 roomButton->SetRoomInfo(room->second);
             else
                 roomButton->Reset();

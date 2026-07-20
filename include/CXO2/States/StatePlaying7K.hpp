@@ -1,9 +1,12 @@
 #pragma once
 
 #include <CXO2/States/State.hpp>
+#include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Models/Room.hpp>
 #include <CXO2/Core/Chart.hpp>
 #include <CXO2/Core/ChartRenderer.hpp>
 #include <CXO2/Config/GameConfig.hpp>
+#include <CXO2/Models/Character.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
@@ -16,12 +19,8 @@
 
 namespace Cx
 {
-    struct CharacterInfo;
-    struct RoomSlot;
-
     class SessionContext;
     class RoomContext;
-    class GameContext;
     class ItemFactory;
     class Avatar;
     class ComboCounter;
@@ -35,7 +34,6 @@ namespace Cx
             PlayingService& service,
             SessionContext& session,
             RoomContext& room,
-            GameContext& context,
             GameConfig& config,
             JudgementStrategy& judgementStrategy,
             ScoreTracker& scoreTracker,
@@ -44,6 +42,7 @@ namespace Cx
         );
 
         void Initialize() override;
+        void Initialize(GameContext game);
 
         unsigned int GetViewport() const;
         void SetViewport(unsigned int viewport);
@@ -70,10 +69,11 @@ namespace Cx
         void Update(const sf::Time& delta) override;
 
         void PlayAvatarJamCombo(const Avatar* avatar, std::uint16_t jams);
-        void EquipAvatar(Avatar* avatar, const CharacterInfo& charInfo);
-        void SetupAvatarInfo(Avatar* avatar, RoomSlot& slot);
+        void EquipAvatar(Avatar* avatar, Gender gender, const EquipmentSet& equippedItemIDs);
+        void SetupAvatarInfo(Avatar* avatar, const Room::Slot& slot);
 
         void SubmitScore();
+        void SetScores(const std::array<GameCompletedEventData::ScoreEntry, 8>& entries);
 
         void OnRenderComplete();
         void CaptureScreen();
@@ -98,7 +98,7 @@ namespace Cx
         PlayingService& m_service;
         SessionContext& m_session;
         RoomContext& m_room;
-        GameContext& m_context;
+        GameContext m_context;
         GameConfig& m_config;
         ScoreTracker& m_scoreTracker;
         LifeSystem& m_lifeSystem;

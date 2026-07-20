@@ -27,7 +27,6 @@ namespace Cx
     {
         State::Initialize();
 
-        auto& charInfo          = m_session.GetCharacterInfo();
         const auto& itemData    = m_items.GetItemData();
         const auto& setInfoData = m_items.GetSetInfoData();
 
@@ -48,23 +47,23 @@ namespace Cx
 
             for (auto itemID : itemIDs)
             {
-                const auto it = std::find_if(charInfo.Inventory.begin(), charInfo.Inventory.end(), [itemID] (auto id)
+                const auto it = std::find_if(m_session.GetInventory().begin(), m_session.GetInventory().end(), [itemID] (auto id)
                 {
                     return id == itemID;
                 });
 
-                if (it == charInfo.Inventory.end())
-                    charInfo.Inventory.push_back(itemID);
+                if (it == m_session.GetInventory().end())
+                    m_session.AddInventoryItem(itemID);
             }
         }
         m_cart.Clear();
         m_session.Save();
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_GEM);
-        currentGem->SetValue(charInfo.Wallet.Gem);
+        currentGem->SetValue(m_session.GetWallet().Gem);
 
         const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_CASH);
-        currentCash->SetValue(charInfo.Wallet.Cash);
+        currentCash->SetValue(m_session.GetWallet().Cash);
 
         const auto backButton = Instantiate<Gx::Button>(Resource::Payment::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto&, auto&)

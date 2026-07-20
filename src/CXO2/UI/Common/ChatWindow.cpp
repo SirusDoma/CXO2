@@ -1,5 +1,4 @@
 #include <CXO2/UI/Common/ChatWindow.hpp>
-#include <CXO2/Models/Messaging.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
@@ -140,9 +139,9 @@ namespace Cx
         }
     }
 
-    void ChatWindow::PushMessage(const CharacterInfo& sender, const sf::String& chat)
+    void ChatWindow::PushMessage(const sf::String& sender, const Role senderRole, const sf::String& chat)
     {
-        const auto chatData = ChatMessage{ sender, chat };
+        const auto chatData = ChatMessage{ sender, senderRole, {}, chat };
         if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
             m_offset++;
 
@@ -150,9 +149,9 @@ namespace Cx
         Invalidate();
     }
 
-    void ChatWindow::PushWhisper(const CharacterInfo& sender, const CharacterInfo& recepient, const sf::String& chat)
+    void ChatWindow::PushWhisper(const sf::String& sender, const sf::String& recepient, const sf::String& chat)
     {
-        const auto chatData = ChatMessage{ sender, chat, recepient };
+        const auto chatData = ChatMessage{ sender, Role::Normal, recepient, chat };
         if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
             m_offset++;
 
@@ -162,7 +161,7 @@ namespace Cx
 
     void ChatWindow::PushSystemMessage(const sf::String& chat)
     {
-        PushMessage(CharacterInfo{}, chat);
+        PushMessage(sf::String(), Role::Normal, chat);
     }
 
     Gx::RenderStates ChatWindow::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
@@ -249,14 +248,14 @@ namespace Cx
 
             if (m_textColor == sf::Color::White)
             {
-                if (!chat.Recipient.Name.isEmpty())
+                if (!chat.Recipient.isEmpty())
                 {
-                    if (chat.Sender.Name != m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
+                    if (chat.Sender != m_session.GetName() && chat.Recipient == m_session.GetName())
                         m_labels[index]->SetColor(sf::Color(225, 230, 10));
                     else
                         m_labels[index]->SetColor(sf::Color(0, 160, 180));
                 }
-                else if (chat.Sender.Role == Role::Administrator || chat.Sender.Name.isEmpty())
+                else if (chat.SenderRole == Role::Administrator || chat.Sender.isEmpty())
                     m_labels[index]->SetColor(sf::Color(200, 155, 55));
                 else
                     m_labels[index]->SetColor(sf::Color::White);
@@ -283,15 +282,15 @@ namespace Cx
                 return nickname;
             };
 
-            if (!chat.Sender.Name.isEmpty() && !chat.Recipient.Name.isEmpty())
+            if (!chat.Sender.isEmpty() && !chat.Recipient.isEmpty())
             {
-                if (chat.Sender.Name != m_session.GetCharacterInfo().Name && chat.Recipient.Name == m_session.GetCharacterInfo().Name)
-                    m_labels[index]->SetString(fmt::format(L"[{}] >> {}", padSenderName(chat.Recipient.Name), chat.Content));
+                if (chat.Sender != m_session.GetName() && chat.Recipient == m_session.GetName())
+                    m_labels[index]->SetString(fmt::format(L"[{}] >> {}", padSenderName(chat.Recipient), chat.Content));
                 else
-                    m_labels[index]->SetString(fmt::format(L"[{}] << {}", padSenderName(chat.Recipient.Name), chat.Content));
+                    m_labels[index]->SetString(fmt::format(L"[{}] << {}", padSenderName(chat.Recipient), chat.Content));
             }
-            else if (!chat.Sender.Name.isEmpty())
-                m_labels[index]->SetString(fmt::format(L"[{}] {}", padSenderName(chat.Sender.Name), chat.Content));
+            else if (!chat.Sender.isEmpty())
+                m_labels[index]->SetString(fmt::format(L"[{}] {}", padSenderName(chat.Sender), chat.Content));
             else
                 m_labels[index]->SetString(chat.Content);
         }

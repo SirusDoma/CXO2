@@ -10,7 +10,6 @@
 namespace Cx
 {
     class Avatar;
-    struct RoomSlot;
     class AvatarInfo : public Gx::UiContainer
     {
     public:
@@ -20,23 +19,22 @@ namespace Cx
 
         Avatar* GetAvatar() const;
         Gx::Gauge* GetLifeBar() const;
-        RoomSlot* GetSlot() const;
-        const sf::Color& GetTeamColor(RoomTeam team);
+        const Room::Slot* GetSlot() const;
+        const sf::Color& GetTeamColor(Room::Team team);
+        sf::Color ResolveTeamColor() const;
 
-        void SetSlot(RoomSlot& slot);
+        void SetSlot(const Room::Slot& slot);
 
-        void RegisterTeamColor(RoomTeam team, const sf::Color& color);
+        void RegisterTeamColor(Room::Team team, const sf::Color& color);
 
         void Reset();
 
         void Invalidate() override;
 
     private:
-        using ColorMap = std::unordered_map<RoomTeam, sf::Color>;
+        using ColorMap = std::unordered_map<Room::Team, sf::Color>;
 
-        sf::Color ResolveTeamColor();
-
-        RoomSlot* m_slot = nullptr;
+        const Room::Slot* m_slot = nullptr;
         ColorMap  m_teamColors;
     };
 }

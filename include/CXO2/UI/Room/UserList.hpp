@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CXO2/Models/Character.hpp>
 #include <Genode/UI/UiContainer.hpp>
 
 #include <CXO2/Network/MessageEnvelope.hpp>
@@ -18,7 +17,7 @@ namespace Cx
         explicit UserList(ChannelService& service);
         void Initialize() override;
 
-        void AddUser(const CharacterInfo& user);
+        void AddUser(const UserListResponse::User& user);
         void Clear();
 
         void Invalidate() override;
@@ -36,7 +35,7 @@ namespace Cx
         bool m_refreshing{false};
 
         ChannelService& m_service;
-        std::vector<CharacterInfo> m_users;
+        std::vector<UserListResponse::User> m_users;
         std::string m_selectedUser;
         unsigned int m_page = 1;
 

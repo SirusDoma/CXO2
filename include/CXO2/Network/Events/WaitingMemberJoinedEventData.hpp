@@ -14,8 +14,8 @@ namespace Cx
         std::uint8_t ID{};
         std::string  Name{};
         std::int32_t Level{};
-        Cx::Gender     Gender{};
-        RoomTeam     Team{};
+        Cx::Gender   Gender{};
+        Room::Team   Team{};
         bool         Ready{};
 
         CollectionEnvelope<std::unordered_set<std::uint32_t>> EquippedItemIDs{12, 12};

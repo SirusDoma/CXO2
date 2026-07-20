@@ -1,7 +1,6 @@
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 #include <CXO2/Archives/OjmArchive.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
 
 #include <Genode/IO/BufferedInputStream.hpp>
 
@@ -10,9 +9,9 @@
 
 namespace Cx
 {
-    O2JamChartLoader::O2JamChartLoader(const GameContext& context) :
-        m_mode(context.GetMode()),
-        m_difficulty(context.GetDifficulty())
+    O2JamChartLoader::O2JamChartLoader(const GameMode mode, const Difficulty difficulty) :
+        m_mode(mode),
+        m_difficulty(difficulty)
     {
     }
 

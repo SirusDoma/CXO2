@@ -54,18 +54,6 @@ namespace Cx
         m_mixer.Reset(true);
     }
 
-    void ChartRenderer::Initialize(const Chart& chart, const GameContext& context)
-    {
-        Initialize(chart, RenderSettings{
-            false,
-            context.GetConfig(),
-            context.GetViewport(),
-            context.GetSpeed(),
-            context.GetSpeedMode(),
-            context.GetDifficulty()
-        });
-    }
-
     void ChartRenderer::Initialize(const Chart& chart, const RenderSettings& settings)
     {
         m_chart    = &chart;

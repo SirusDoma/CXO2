@@ -24,7 +24,7 @@ namespace Cx
             {
                 for (auto& [key, color] : teamColors->items())
                 {
-                    if (auto team = magic_enum::enum_cast<RoomTeam>(key, magic_enum::case_insensitive); team.has_value() && !color.empty())
+                    if (auto team = magic_enum::enum_cast<Room::Team>(key, magic_enum::case_insensitive); team.has_value() && !color.empty())
                     {
                         unsigned int a, r, g, b;
                         color.at("a").get_to(a);

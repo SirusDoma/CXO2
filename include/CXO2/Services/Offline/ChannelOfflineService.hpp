@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/Services/ChannelService.hpp>
-#include <CXO2/Network/RoomInfo.hpp>
+#include <CXO2/Network/Responses/RoomListResponse.hpp>
 
 #include <vector>
 
@@ -63,7 +63,7 @@ namespace Cx
     private:
         SessionContext& m_session;
 
-        std::vector<RoomInfo> m_rooms;
+        std::vector<RoomListResponse::Room> m_rooms;
 
         MessageCallback<RoomCreatedEventData>          m_createCallback;
         MessageCallback<RoomMusicChangedEventData>     m_musicCallback;

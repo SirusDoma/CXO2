@@ -10,6 +10,6 @@ namespace Cx
         static constexpr Cx::Command Command = EventCommand::UserTeamChanged;
 
         std::uint8_t ID{};
-        RoomTeam     Team{};
+        Room::Team   Team{};
     };
 }

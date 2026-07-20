@@ -10,7 +10,7 @@
 #include <CXO2/UI/Playing/PlayMenu.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Config/GameConfig.hpp>
 
 #include <Genode/IO/ResourceLoaderFactory.hpp>
 

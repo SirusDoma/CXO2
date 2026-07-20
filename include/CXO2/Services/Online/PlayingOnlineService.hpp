@@ -5,11 +5,10 @@
 
 namespace Cx
 {
-    class GameContext;
     class PlayingOnlineService : public PlayingService
     {
     public:
-        PlayingOnlineService(NetworkService& network, GameContext& game);
+        explicit PlayingOnlineService(NetworkService& network);
 
         void ConfirmMusicLoaded(
             const MessageCallback<ConfirmMusicLoadedRequest>& callback = nullptr
@@ -26,6 +25,7 @@ namespace Cx
         ) const override;
 
         void ExitPlaying(
+            GameMode mode,
             const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const override;
 
@@ -55,7 +55,6 @@ namespace Cx
 
     private:
         NetworkService& m_network;
-        GameContext&    m_game;
 
         MessageSubscriber<MemberMusicLoadedEventData>            m_musicLoadedSubscriber;
         MessageSubscriber<PlayingMemberStatsUpdateEventData>     m_statsSubscriber;

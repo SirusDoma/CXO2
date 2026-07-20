@@ -9,6 +9,6 @@ namespace Cx
     {
         static constexpr Cx::Command Command = RequestCommand::SetUserTeam;
 
-        RoomTeam Team;
+        Room::Team Team;
     };
 }

@@ -5,7 +5,8 @@
 #include <CXO2/Core/LifeSystem.hpp>
 
 #include <CXO2/States/State.hpp>
-#include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Config/GameConfig.hpp>
+#include <CXO2/Models/Game.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
@@ -65,7 +66,6 @@ namespace Cx
         );
         ~ChartRenderer() override;
 
-        void Initialize(const Chart& chart, const GameContext& context);
         void Initialize(const Chart& chart, const RenderSettings& settings);
 
         void StartRender();

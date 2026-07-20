@@ -25,6 +25,7 @@ namespace Cx
         ) const override;
 
         void ExitPlaying(
+            GameMode mode,
             const MessageCallback<ExitPlayingRequest>& callback = nullptr
         ) const override;
 

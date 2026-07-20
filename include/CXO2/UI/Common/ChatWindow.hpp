@@ -1,6 +1,8 @@
 #pragma once
 
-#include <CXO2/Models/Messaging.hpp>
+#include <CXO2/Models/Character.hpp>
+
+#include <SFML/System/String.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
 #include <Genode/UI/List.hpp>
@@ -16,6 +18,14 @@ namespace Cx
     class ChatWindow : public Gx::List
     {
     public:
+        struct ChatMessage
+        {
+            sf::String Sender;
+            Cx::Role   SenderRole{};
+            sf::String Recipient;
+            sf::String Content;
+        };
+
         explicit ChatWindow(SessionContext& session);
 
         sf::FloatRect GetGlobalBounds() const override;
@@ -39,8 +49,8 @@ namespace Cx
         void SetMaximumChatLength(unsigned int maxLength);
         void SetLineSpacing(float lineSpacing);
 
-        void PushMessage(const CharacterInfo& sender, const sf::String& chat);
-        void PushWhisper(const CharacterInfo& sender, const CharacterInfo& recepient, const sf::String& chat);
+        void PushMessage(const sf::String& sender, Role senderRole, const sf::String& chat);
+        void PushWhisper(const sf::String& sender, const sf::String& recepient, const sf::String& chat);
         void PushSystemMessage(const sf::String& chat);
 
     private:

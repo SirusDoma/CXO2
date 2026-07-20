@@ -15,7 +15,9 @@
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
+#include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/Contexts/GameContext.hpp>
+#include <CXO2/Models/Map.hpp>
 
 #include <CXO2/UI/Common/Marquee.hpp>
 #include <CXO2/UI/Common/ChatPanel.hpp>
@@ -62,13 +64,13 @@ namespace Cx
     using namespace StringTable::Identifiers;
 
     StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room,
-        GameContext& game, ChannelService& roomService, CharacterService& charService, ItemFactory& items) :
+        GameConfig& config, ChannelService& roomService, CharacterService& charService, ItemFactory& items) :
         m_mixer(mixer),
         m_charService(charService),
         m_service(roomService),
         m_session(session),
         m_room(room),
-        m_game(game),
+        m_config(config),
         m_items(items)
     {
     }
@@ -239,7 +241,7 @@ namespace Cx
         });
     }
 
-    void StateRoom::JoinRoom(const RoomInfo& room)
+    void StateRoom::JoinRoom(const Room& room)
     {
         if (room.Mode == GameMode::Single)
         {
@@ -260,30 +262,16 @@ namespace Cx
         }
 
         const auto& musicList = m_session.GetInstalledMusic();
-        if (room.MusicID <= std::numeric_limits<std::uint16_t>::max())
+        if (room.Random == static_cast<LevelCategory>(0))
         {
-            const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID = room.MusicID] (const auto& header)
+            const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID = room.Music.ID] (const auto& header)
             {
                 return header.ID == musicID;
             });
 
             if (it == musicList.end())
             {
-                ShowDialog(fmt::format(L"Please download the following tune. \n\n<< file : o2ma{} >>", room.MusicID), DialogStyle::Information);
-                return;
-            }
-        }
-        else
-        {
-            const std::uint8_t randomBit = static_cast<std::uint8_t>((room.MusicID >> 28) & 0xFF);
-            constexpr int randomMaxBit   = static_cast<int>(LevelCategory::Level1) |
-                                           static_cast<int>(LevelCategory::Level2) |
-                                           static_cast<int>(LevelCategory::Level3) |
-                                           static_cast<int>(LevelCategory::Level4);
-
-            if (randomBit == 0 || randomBit > randomMaxBit)
-            {
-                ShowDialog(fmt::format(L"Please download the following tune. \n\n<< file : o2ma{} >>", room.MusicID), DialogStyle::Information);
+                ShowDialog(fmt::format(L"Please download the following tune. \n\n<< file : o2ma{} >>", room.Music.ID), DialogStyle::Information);
                 return;
             }
         }
@@ -291,9 +279,11 @@ namespace Cx
         auto join = [=] (const std::string& password)
         {
             m_busy = true;
-            m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this, room] (const auto& ev)
+            m_room.Enter(room.ID);
+            m_room.SetLevelLimits(room.MinLevelLimit, room.MaxLevelLimit);
+            m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this] (const auto& ev)
             {
-                OnJoinRoomResponded(ev, room);
+                OnJoinRoomResponded(ev);
             });
         };
 
@@ -325,43 +315,18 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            auto charInfo = CharacterInfo
-            {
-                response.Name,
-                response.Gender,
-                response.Role,
-                response.Level,
-                response.Experience,
-                CharacterInfo::RankStatsInfo{
-                    0,
-                    response.Wins,
-                    response.Loses,
-                    response.Draws
-                },
-                CharacterInfo::WalletInfo{
-                    response.Gem,
-                    response.Point
-                },
-                response.EquippedItemIDs.GetContainer(),
-                {},
-                {}
-            };
-
-            for (const std::uint32_t id : response.Inventory.GetContainer())
-                charInfo.Inventory.push_back(id);
-
-            m_session.SetCharacterInfo(charInfo);
+            m_session.UpdateFrom(response);
 
             const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
-            nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", charInfo.Level, charInfo.Name));
+            nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
 
             const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
-            avatar->SetGender(charInfo.Gender);
+            avatar->SetGender(m_session.GetGender());
 
-            for (auto [_, item] : m_items.GetDefaultItems(charInfo.Gender))
+            for (auto [_, item] : m_items.GetDefaultItems(m_session.GetGender()))
                 avatar->SetDefaultItem(std::move(item));
 
-            for (const auto id : charInfo.EquippedItemIDs)
+            for (const auto id : m_session.GetEquippedItemIDs())
                 avatar->Equip(m_items.Create(id));
 
             avatar->SetVisible(true);
@@ -384,7 +349,7 @@ namespace Cx
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             roomList->Clear();
 
-            for (const RoomInfo& room : response.Rooms)
+            for (const auto& room : response.Rooms)
             {
                 if (room.State != RoomState::Unavailable)
                     roomList->Upsert(room);
@@ -413,15 +378,7 @@ namespace Cx
             userList->Clear();
 
             for (const auto& user : response.Users.GetContainer())
-            {
-                userList->AddUser(CharacterInfo
-                {
-                    user.Name,
-                    Gender::Any,
-                    Role::Normal,
-                    user.Level
-                });
-            }
+                userList->AddUser(user);
 
             userList->Invalidate();
         }
@@ -445,36 +402,20 @@ namespace Cx
                 return;
             }
 
-            const auto room = RoomInfo
-            {
-                /* .ID            = */ response.ID,
-                /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ request.Title,
-                /* .Locked        = */ !request.Password.empty(),
-                /* .MusicID       = */ music.ID,
-                /* .Difficulty    = */ Difficulty::EX,
-                /* .Mode          = */ request.GameMode,
-                /* .Speed         = */ Speed::X10,
-                /* .Capacity      = */ 8,
-                /* .UserCount     = */ 1,
-                /* .MinLevelLimit = */ static_cast<std::uint8_t>(request.MinLevelLimit),
-                /* .MaxLevelLimit = */ static_cast<std::uint8_t>(request.MaxLevelLimit)
-            };
-
-
-            m_room.UpdateFrom(room);
-            m_room.SetMapID(MapInfo::RandomID);
+            m_room.Enter(response.ID);
+            m_room.SetLevelLimits(request.MinLevelLimit, request.MaxLevelLimit);
+            m_room.SetState(RoomState::Waiting);
+            m_room.SetTitle(request.Title);
+            m_room.SetLocked(!request.Password.empty());
+            m_room.SetDifficulty(Difficulty::EX);
+            m_room.SetMode(request.GameMode);
+            m_room.SetSpeedID(Speed::X10);
+            m_room.SetSpeedMode(ToSpeedMode(Speed::X10));
+            m_room.SetMusicID(music.ID);
+            m_room.SetRandomLevel(static_cast<LevelCategory>(0));
+            m_room.SetMapID(Map::RandomID);
             m_room.SetRandomizedMapID(0);
-
-            auto& master = m_room.GetSlot(0);
-            master = RoomSlot
-            {
-                /* .Member   = */ m_session.GetCharacterInfo(),
-                /* .State    = */ RoomSlotState::Occupied,
-                /* .IsMaster = */ true,
-                /* .Ready    = */ true,
-                /* .Team     = */ RoomTeam::A
-            };
+            m_room.SetMasterSlot();
 
             GetDirector().Present<StateWaiting7K>();
         }
@@ -487,7 +428,7 @@ namespace Cx
         }
     }
 
-    void StateRoom::OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev, const RoomInfo& room)
+    void StateRoom::OnJoinRoomResponded(const MessageEnvelope<JoinRoomResponse>& ev)
     {
         try
         {
@@ -510,70 +451,40 @@ namespace Cx
                 return;
             }
 
-            std::uint32_t musicID = response.MusicID;
-            auto random = static_cast<LevelCategory>(0);
-            if (musicID >= std::numeric_limits<std::uint16_t>::max())
-            {
-                const std::uint8_t randomBit = static_cast<std::uint8_t>((room.MusicID >> 28) & 0xFF);
-                constexpr int randomMaxBit = static_cast<int>(LevelCategory::Level1) |
-                                             static_cast<int>(LevelCategory::Level2) |
-                                             static_cast<int>(LevelCategory::Level3) |
-                                             static_cast<int>(LevelCategory::Level4);
+            const auto music = MusicSelection{response.MusicID};
 
-                if (randomBit >= 1 && randomBit <= randomMaxBit)
+            m_room.SetState(RoomState::Waiting);
+            m_room.SetTitle(response.Title);
+            m_room.SetDifficulty(response.Difficulty);
+            m_room.SetMode(response.Mode);
+            m_room.SetSpeedID(response.Speed);
+            m_room.SetSpeedMode(ToSpeedMode(response.Speed));
+
+            if (music.ID > 0)
+                m_room.SetMusicID(music.ID);
+
+            const auto map = Map{response.Map};
+            m_room.SetMapID(map.GetMapID());
+            m_room.SetRandomizedMapID(map.GetRandomizedMap());
+            m_room.SetRandomLevel(music.Random);
+
+            for (const auto& source : response.Slots)
+            {
+                if (source.State == Room::SlotState::Unoccupied)
+                    m_room.Vacate(source.Index);
+                else if (source.State == Room::SlotState::Locked)
+                    m_room.Lock(source.Index);
+                else
                 {
-                    random  = static_cast<LevelCategory>(randomBit);
-                    musicID = response.MusicID & 0xFF;
+                    auto member = RoomContext::Member{};
+                    member.Name            = source.Member.Name;
+                    member.Gender          = source.Member.Gender;
+                    member.Level           = source.Member.Level;
+                    member.EquippedItemIDs = source.Member.EquippedItemIDs;
+                    member.MusicIDs        = source.Member.MusicIDs;
+
+                    m_room.Seat(source.Index, member, source.Member.Team, source.Member.Ready, source.Member.IsRoomMaster);
                 }
-            }
-
-            m_room.UpdateFrom(RoomInfo
-            {
-                /* .ID            = */ room.ID,
-                /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ response.Title,
-                /* .Locked        = */ room.Locked,
-                /* .MusicID       = */ musicID,
-                /* .Difficulty    = */ response.Difficulty,
-                /* .Mode          = */ response.Mode,
-                /* .Speed         = */ response.Speed,
-                /* .Capacity      = */ 8,
-                /* .UserCount     = */ 1,
-                /* .MinLevelLimit = */ room.MinLevelLimit,
-                /* .MaxLevelLimit = */ room.MaxLevelLimit
-            });
-
-            m_room.SetMapID(response.Map.GetMapID());
-            m_room.SetRandomizedMapID(response.Map.GetRandomizedMap());
-
-            m_room.SetRandomLevel(random);
-            for (const auto& source: response.Slots)
-            {
-                auto& slot = m_room.GetSlot(source.Index);
-                slot.State = source.State;
-
-                if (slot.State == RoomSlotState::Unoccupied || slot.State == RoomSlotState::Locked)
-                {
-                    slot.Member = std::nullopt;
-                    continue;
-                }
-
-                slot.IsMaster = source.Member.IsRoomMaster;
-                slot.Team = source.Member.Team;
-                slot.Ready = source.Member.IsRoomMaster || source.Member.Ready;
-                slot.Member = CharacterInfo
-                {
-                    /* .Name            = */ source.Member.Name,
-                    /* .Gender          = */ source.Member.Gender,
-                    /* .Role            = */ Role::Normal,
-                    /* .Level           = */ source.Member.Level,
-                    /* .Experience      = */ 0,
-                    /* .RankStats       = */ {},
-                    /* .Wallet          = */ {},
-                    /* .EquippedItemIDs = */ source.Member.EquippedItemIDs,
-                    /* .Inventory       = */ {},
-                    /* .MusicIDs        = */ source.Member.MusicIDs
-                };
             }
 
             GetDirector().Present<StateWaiting7K>();
@@ -593,22 +504,23 @@ namespace Cx
         {
             const auto& response = ev.Open();
 
+            auto room = Room{};
+            room.ID            = response.ID;
+            room.State         = RoomState::Waiting;
+            room.Title         = response.Title;
+            room.Locked        = response.Locked;
+            room.Music         = ChartMetadata{};
+            room.Difficulty    = Difficulty::EX;
+            room.Mode          = response.GameMode;
+            room.Speed         = ToSpeedValue(Speed::X15).value_or(1.5f);
+            room.SpeedMode     = ToSpeedMode(Speed::X15);
+            room.Capacity      = Room::MaxCapacity;
+            room.UserCount     = 1;
+            room.MinLevelLimit = response.MinLevelLimit;
+            room.MaxLevelLimit = response.MaxLevelLimit;
+
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-            roomList->Upsert(RoomInfo
-            {
-                /* .ID            = */ response.ID,
-                /* .State         = */ RoomState::Waiting,
-                /* .Title         = */ response.Title,
-                /* .Locked        = */ response.Locked,
-                /* .MusicID       = */ 0,
-                /* .Difficulty    = */ Difficulty::EX,
-                /* .Mode          = */ response.GameMode,
-                /* .Speed         = */ Speed::X15,
-                /* .Capacity      = */ 8,
-                /* .UserCount     = */ 1,
-                /* .MinLevelLimit = */ response.MinLevelLimit,
-                /* .MaxLevelLimit = */ response.MaxLevelLimit
-            });
+            roomList->Upsert(room);
 
             roomList->Invalidate();
         }
@@ -629,10 +541,13 @@ namespace Cx
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
+            const auto music = MusicSelection{response.MusicID};
 
-            room.MusicID    = response.MusicID;
+            room.Music      = ChartMetadata{music.ID};
+            room.Random     = music.Random;
             room.Difficulty = response.Difficulty;
-            room.Speed      = response.Speed;
+            room.Speed      = ToSpeedValue(response.Speed).value_or(1.0f);
+            room.SpeedMode  = ToSpeedMode(response.Speed);
             roomList->Invalidate();
         }
         catch (const Gx::Exception& ex)
@@ -727,7 +642,7 @@ namespace Cx
         }
     }
 
-    void StateRoom::OnRoomEntered(const RoomInfo& room)
+    void StateRoom::OnRoomEntered(const Room& room)
     {
         if (m_busy)
             return;
@@ -863,11 +778,18 @@ namespace Cx
 
     void StateRoom::OnTutorialButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        auto chart    = std::make_unique<Chart>();
-        chart->Source = "Tutorial.ojn";
+        auto game = GameContext{};
+        game.Chart = std::make_unique<Chart>();
+        game.Chart->Source = "Tutorial.ojn";
+
+        game.Mode       = GameMode::Tutorial;
+        game.Difficulty = Difficulty::EX;
+        game.Speed      = 1.0f;
+        game.MapID      = 1;
+        game.EffectID   = 1;
 
         auto& resources = GetResources(ResourceScope::Shared);
-        if (const auto metadata = O2JamChartMetadataLoader().LoadFromFile(chart->Source, Gx::ResourceContext::Default))
+        if (const auto metadata = O2JamChartMetadataLoader().LoadFromFile(game.Chart->Source, Gx::ResourceContext::Default))
         {
             if (auto image = O2JamChartLoader::LoadCoverArt(*metadata, Gx::ResourceContext::Default); image)
                 resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
@@ -875,16 +797,10 @@ namespace Cx
                 resources.Destroy<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER);
         }
 
-        m_game.GetConfig().KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];
-        m_game.SetChart(std::move(chart));
-        m_game.SetMode(GameMode::Tutorial);
-        m_game.SetDifficulty(Difficulty::EX);
-        m_game.SetSpeed(1.0);
-        m_game.SetMapID(1);
-        m_game.SetEffectID(1);
+        m_config.KeyBindings[KeyMode::Seven] = GameConfig().KeyBindings[KeyMode::Seven];
 
         auto& director = GetDirector();
-        director.Present<StateLoading>();
+        director.Present<StateLoading>(std::move(game));
     }
 
     void StateRoom::OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
