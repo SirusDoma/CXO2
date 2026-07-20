@@ -221,7 +221,7 @@ namespace Cx
         mapSelector->SetMapChangedCallback([this] (const unsigned int mapID) { OnMapSelectorStateChanged(mapID); });
         mapSelector->SetEffectChangedCallback([this] (const unsigned int effectID) { OnEffectSelectorStateChanged(effectID); });
 
-        mapSelector->SetMapID(m_room.GetMapID(), true);
+        mapSelector->SetMapID(m_room.GetMap().Random ? 0 : m_room.GetMap().ID, true);
         mapSelector->SetEffectID(m_room.GetEffectID());
         mapSelector->SetControlsEnabled(m_room.GetCurrentSlot().IsMaster);
 
@@ -276,7 +276,7 @@ namespace Cx
             OnSelectMusicDialogAccepted();
         }
 
-        if (m_room.GetCurrentSlot().IsMaster && (m_room.GetMapID() == Map::RandomID || m_room.GetMapID() == 0))
+        if (m_room.GetCurrentSlot().IsMaster && (m_room.GetMap().Random || m_room.GetMap().ID == 0))
             OnMapSelectorStateChanged(0);
 
         bgm->setLooping(true);
@@ -598,10 +598,10 @@ namespace Cx
         {
             const auto& response = ev.Open();
 
-            const auto music = MusicSelection{response.MusicID};
+            const auto music = MusicID::From(response.MusicID);
 
-            m_room.SetMusicID(music.ID);
-            m_room.SetRandomLevel(music.Random);
+            m_room.SetMusicID(music.Value);
+            m_room.SetRandomLevel(music.RandomLevel);
             m_room.SetDifficulty(response.Difficulty);
             m_room.SetSpeedID(response.Speed);
 
@@ -639,9 +639,7 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            const auto map = Map{response.Map};
-            m_room.SetMapID(map.GetMapID());
-            m_room.SetRandomizedMapID(map.GetRandomizedMap());
+            m_room.SetMap(Map::From(response.Map));
 
             InvalidateRoomInfo();
         }
@@ -839,11 +837,7 @@ namespace Cx
 
             const auto [diff, music] = pool[Gx::Randomizer::Randomize<std::size_t>(0, pool.size() - 1)];
 
-            auto selection = MusicSelection{};
-            selection.ID     = music.ID;
-            selection.Random = m_room.GetRandomLevel();
-
-            request.MusicID    = selection;
+            request.MusicID    = MusicID::Of(music.ID, m_room.GetRandomLevel());
             request.Difficulty = diff;
 
             m_room.SetMusic(music);
@@ -1001,12 +995,10 @@ namespace Cx
 
         const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
 
-        auto map = Map{};
-        map.Random = mapID == Map::RandomID || mapID == 0;
-        map.ID     = map.Random ? static_cast<std::uint8_t>(Gx::Randomizer::Randomize<int>(1, mapSelector->GetMapCount())) : static_cast<std::uint8_t>(mapID);
+        const auto random = mapID == Map::RandomID || mapID == 0;
+        const auto map    = Map::Of(random ? static_cast<std::uint8_t>(Gx::Randomizer::Randomize<int>(1, mapSelector->GetMapCount())) : static_cast<std::uint8_t>(mapID), random);
 
-        m_room.SetMapID(mapID);
-        m_room.SetRandomizedMapID(map.GetRandomizedMap());
+        m_room.SetMap(map);
         m_service.UpdateMap(UpdateMapRequest{ map });
     }
 
@@ -1318,7 +1310,7 @@ namespace Cx
         level->SetFrame(GetRoomLevelCode(m_room));
 
         const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
-        mapSelector->SetMapID(m_room.GetMapID(), true);
+        mapSelector->SetMapID(m_room.GetMap().Random ? 0 : m_room.GetMap().ID, true);
         mapSelector->SetControlsEnabled(isMaster);
 
         if (const auto cover = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))

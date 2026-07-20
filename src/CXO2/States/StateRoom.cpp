@@ -413,8 +413,7 @@ namespace Cx
             m_room.SetSpeedMode(ToSpeedMode(Speed::X10));
             m_room.SetMusicID(music.ID);
             m_room.SetRandomLevel(static_cast<LevelCategory>(0));
-            m_room.SetMapID(Map::RandomID);
-            m_room.SetRandomizedMapID(0);
+            m_room.SetMap(Map::Of(0, true));
             m_room.SetMasterSlot();
 
             GetDirector().Present<StateWaiting7K>();
@@ -451,7 +450,7 @@ namespace Cx
                 return;
             }
 
-            const auto music = MusicSelection{response.MusicID};
+            const auto music = MusicID::From(response.MusicID);
 
             m_room.SetState(RoomState::Waiting);
             m_room.SetTitle(response.Title);
@@ -460,13 +459,11 @@ namespace Cx
             m_room.SetSpeedID(response.Speed);
             m_room.SetSpeedMode(ToSpeedMode(response.Speed));
 
-            if (music.ID > 0)
-                m_room.SetMusicID(music.ID);
+            if (music.Value > 0)
+                m_room.SetMusicID(music.Value);
 
-            const auto map = Map{response.Map};
-            m_room.SetMapID(map.GetMapID());
-            m_room.SetRandomizedMapID(map.GetRandomizedMap());
-            m_room.SetRandomLevel(music.Random);
+            m_room.SetMap(Map::From(response.Map));
+            m_room.SetRandomLevel(music.RandomLevel);
 
             for (const auto& source : response.Slots)
             {
@@ -541,10 +538,10 @@ namespace Cx
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
-            const auto music = MusicSelection{response.MusicID};
+            const auto music = MusicID::From(response.MusicID);
 
-            room.Music      = ChartMetadata{music.ID};
-            room.Random     = music.Random;
+            room.Music      = ChartMetadata{music.Value};
+            room.Random     = music.RandomLevel;
             room.Difficulty = response.Difficulty;
             room.Speed      = ToSpeedValue(response.Speed).value_or(1.0f);
             room.SpeedMode  = ToSpeedMode(response.Speed);

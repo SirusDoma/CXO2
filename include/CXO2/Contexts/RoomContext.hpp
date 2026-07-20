@@ -3,6 +3,7 @@
 #include <CXO2/Metadata/Chart/O2JamChartMetadata.hpp>
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <CXO2/Models/Map.hpp>
 #include <CXO2/Models/Room.hpp>
 
 #include <SFML/Graphics/Color.hpp>
@@ -100,11 +101,8 @@ namespace Cx
         MusicSortOrder GetMusicSortOrder() const;
         void SetMusicSortOrder(MusicSortOrder order);
 
-        std::uint8_t GetMapID() const;
-        void SetMapID(std::uint8_t mapID);
-
-        std::uint8_t GetRandomizedMapID() const;
-        void SetRandomizedMapID(std::uint8_t randomizedMapID);
+        Map GetMap() const;
+        void SetMap(Map map);
 
         std::uint8_t GetEffectID() const;
         void SetEffectID(std::uint8_t effectID);

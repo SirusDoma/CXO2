@@ -36,15 +36,15 @@ namespace Cx
 
     inline RoomListResponse::Room::operator Cx::Room() const
     {
-        const auto music = MusicSelection{MusicID};
+        const auto id = Cx::MusicID::From(MusicID);
 
         auto room = Cx::Room{};
         room.ID            = ID;
         room.State         = State;
         room.Title         = Title;
         room.Locked        = Locked;
-        room.Music         = ChartMetadata{music.ID};
-        room.Random        = music.Random;
+        room.Music         = ChartMetadata{id.Value};
+        room.Random        = id.RandomLevel;
         room.Difficulty    = Difficulty;
         room.Mode          = Mode;
         room.Speed         = ToSpeedValue(Speed).value_or(1.0f);

@@ -8,26 +8,28 @@ namespace Cx
     {
         static constexpr std::uint8_t RandomID = 0x80;
 
-        Map() = default;
-        Map(const std::uint32_t value) :
-            ID(static_cast<std::uint8_t>(value & 0xFFFF)),
-            Random((value >> 24) == RandomID)
+        static Map From(const std::uint32_t value)
         {
+            auto map = Map{};
+            map.ID     = static_cast<std::uint8_t>(value & 0xFFFF);
+            map.Random = (value >> 24) == RandomID;
+
+            return map;
         }
 
+        static Map Of(const std::uint8_t id, const bool random = false)
+        {
+            auto map = Map{};
+            map.ID     = id;
+            map.Random = random;
+
+            return map;
+        }
+
+        // ReSharper disable once CppNonExplicitConversionOperator
         operator std::uint32_t() const
         {
             return Random ? (static_cast<std::uint32_t>(RandomID) << 24) | ID : ID;
-        }
-
-        std::uint8_t GetMapID() const
-        {
-            return Random ? 0 : ID;
-        }
-
-        std::uint8_t GetRandomizedMap() const
-        {
-            return Random ? ID : 0;
         }
 
         std::uint8_t ID{};

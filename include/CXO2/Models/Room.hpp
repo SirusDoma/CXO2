@@ -3,6 +3,7 @@
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
 #include <CXO2/Models/Character.hpp>
 #include <CXO2/Models/Game.hpp>
+#include <CXO2/Models/Map.hpp>
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/String.hpp>
@@ -89,8 +90,7 @@ namespace Cx
         float          Speed{1.0f};
         Cx::SpeedMode  SpeedMode{Cx::SpeedMode::HiSpeed};
         LevelCategory  Random{};
-        std::uint8_t   MapID{};
-        std::uint8_t   RandomizedMapID{};
+        Cx::Map        Map{};
         std::uint8_t   EffectID{1};
         std::uint8_t   MinLevelLimit{};
         std::uint8_t   MaxLevelLimit{};

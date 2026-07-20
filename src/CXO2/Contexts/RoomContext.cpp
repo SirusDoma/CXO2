@@ -214,24 +214,14 @@ namespace Cx
         m_order = order;
     }
 
-    std::uint8_t RoomContext::GetMapID() const
+    Map RoomContext::GetMap() const
     {
-        return m_state.MapID;
+        return m_state.Map;
     }
 
-    void RoomContext::SetMapID(const std::uint8_t mapID)
+    void RoomContext::SetMap(const Map map)
     {
-        m_state.MapID = mapID;
-    }
-
-    std::uint8_t RoomContext::GetRandomizedMapID() const
-    {
-        return m_state.RandomizedMapID;
-    }
-
-    void RoomContext::SetRandomizedMapID(const std::uint8_t randomizedMapID)
-    {
-        m_state.RandomizedMapID = randomizedMapID;
+        m_state.Map = map;
     }
 
     std::uint8_t RoomContext::GetEffectID() const
@@ -397,7 +387,7 @@ namespace Cx
         game.Mode       = m_state.Mode;
         game.Speed      = m_state.Speed;
         game.SpeedMode  = m_state.SpeedMode;
-        game.MapID      = m_state.MapID == Map::RandomID || m_state.MapID == 0 ? m_state.RandomizedMapID : m_state.MapID;
+        game.MapID      = m_state.Map.ID;
         game.EffectID   = m_state.EffectID;
 
         return game;

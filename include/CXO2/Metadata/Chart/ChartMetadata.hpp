@@ -19,14 +19,15 @@ namespace Cx
         Level4 = 1 << 3
     };
 
-    struct MusicSelection
+    struct MusicID
     {
-        MusicSelection() = default;
-        MusicSelection(const std::uint32_t value) :
-            ID(value)
+        static MusicID From(const std::uint32_t value)
         {
+            auto id = MusicID{};
+            id.Value = value;
+
             if (value <= std::numeric_limits<std::uint16_t>::max())
-                return;
+                return id;
 
             constexpr auto maxBit = static_cast<std::uint8_t>(
                 static_cast<int>(LevelCategory::Level1) |
@@ -37,18 +38,30 @@ namespace Cx
 
             if (const auto randomBit = static_cast<std::uint8_t>((value >> 28) & 0xFF); randomBit >= 1 && randomBit <= maxBit)
             {
-                ID     = value & 0xFF;
-                Random = static_cast<LevelCategory>(randomBit);
+                id.Value       = value & 0xFF;
+                id.RandomLevel = static_cast<LevelCategory>(randomBit);
             }
+
+            return id;
         }
 
+        static MusicID Of(const std::uint32_t value, const LevelCategory random = static_cast<LevelCategory>(0))
+        {
+            auto id = MusicID{};
+            id.Value  = value;
+            id.RandomLevel = random;
+
+            return id;
+        }
+
+        // ReSharper disable once CppNonExplicitConversionOperator
         operator std::uint32_t() const
         {
-            return ID | static_cast<std::uint32_t>(Random) << 28;
+            return Value | static_cast<std::uint32_t>(RandomLevel) << 28;
         }
 
-        std::uint32_t ID{};
-        LevelCategory Random{};
+        std::uint32_t Value{};
+        LevelCategory RandomLevel{};
     };
 
     struct ChartMetadata
