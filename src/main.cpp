@@ -51,6 +51,15 @@ int main(int argc , char** argv)
             return 0;
         }
 
+        if (Gx::GetCurrentPlatform() == Gx::Platform::Windows)
+        {
+            if ((sf::isGraphicsBackendAvailable(sf::GraphicsBackend::Direct3D11) && !sf::setGraphicsBackend(sf::GraphicsBackend::Direct3D11)) || !sf::setGraphicsBackend(sf::GraphicsBackend::OpenGL))
+            {
+                Cx::SystemMessageBox::ShowError("Failed to initialize the graphic renderer.", "Fatal Error");
+                return -1;
+            }
+        }
+
         auto cxo2 = Cx::O2("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);
         cxo2.GetModule<Gx::Context>().Provide<Cx::CommandLineContext>([ctx] (const auto&)
         {

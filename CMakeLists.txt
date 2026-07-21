@@ -188,6 +188,7 @@ set(SFML_USE_STATIC_STD_LIBS TRUE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 
 # -- Genode
+set(USE_CUSTOM_SFML ON CACHE BOOL "Use the SirusDoma SFML fork instead of upstream SFML" FORCE)
 add_subdirectory(modules/Genode)
 
 # -- Magic Enum
