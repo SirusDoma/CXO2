@@ -35,6 +35,8 @@ namespace Cx
         ChatWindow* GetChatWindow() const;
 
     private:
+        void ShowChatButtonToolTip(const Gx::Control& sender, const sf::String& message);
+
         void OnMessage(const sf::String& sender, Role senderRole, const sf::String& text);
 
         void OnWhisper(const MessageEnvelope<WhisperEventData>& ev);
@@ -43,15 +45,21 @@ namespace Cx
         void OnMainRoomUserMessage(const MessageEnvelope<MainRoomUserMessageResponse>& ev);
         void OnMainRoomAdminMessage(const MessageEnvelope<MainRoomAdminMessageResponse>& ev);
 
-        void OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const std::vector<std::string>& tokens, const sf::String& message);
-        void OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const sf::String& text);
+        void OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev);
 
         void OnChatScrollUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChatScrollDownButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
 
+        void OnChatAllFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChatAllCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev);
+
+        void OnChatFriendFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChatGuildFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChatFallbackCheckChanged(Gx::RadioButton& radio);
+
+        void OnChatWhisperFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
         void OnChatWhisperCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev);
+
         void OnWhisperDialogAccepted(Gx::InputField& nicknameInput, Gx::RadioButton& radio);
 
         void OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text);

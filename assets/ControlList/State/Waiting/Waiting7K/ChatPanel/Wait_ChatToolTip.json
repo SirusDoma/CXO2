@@ -1,0 +1,27 @@
+{
+  "type": "ToolTip",
+  "require": {
+    "font": "Interface/Common/Font.ttf",
+    "fallbackFonts": [
+      "Interface/Common/Fallback-Font1.ttf",
+      "Interface/Common/Fallback-Font2.ttf",
+      "Interface/Common/Fallback-Font3.ttf"
+    ]
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "delay": 500,
+    "fontSize": 12,
+    "color": {
+      "a": 255,
+      "r": 0,
+      "g": 0,
+      "b": 0
+    }
+  }
+}

@@ -3,6 +3,7 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Option.hpp>
+#include <CXO2/Constants/Messages/Option.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
@@ -264,12 +265,11 @@ namespace Cx
         const auto gameOption = FindChild<Gx::UiContainer>(Resource::Option::IDC_CONTAINER_GAME_OPTION);
         const auto keySelect  = gameOption->FindChild<Gx::Image>(Resource::Option::IDC_IMAGE_KEY_SELECT);
 
+        const auto keyTab   = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_KEY_TAB);
+        const auto soundTab = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_SOUND_TAB);
+
         if (!ValidateConfig())
-        {
-            toolTip->SetString("Invalid Keysetting.");
-            toolTip->Show(this);
             return;
-        }
 
         const auto& application = Gx::Application::Instance();
         m_appConfig.Apply(m_tempConfig);
@@ -290,8 +290,12 @@ namespace Cx
         auto& sfxGroup = m_mixer.GetSoundGroup(Sound::Channel::SFX);
         sfxGroup.SetVolume(m_tempConfig.EffectVolume);
 
-        toolTip->SetString("Setting has been saved.");
-        toolTip->Show(this);
+        if (keyTab->IsChecked())
+            toolTip->SetString(Constants::Messages::Option::KeySetting::SAVED);
+        else if (soundTab->IsChecked())
+            toolTip->SetString(Constants::Messages::Option::SoundSetting::SAVED);
+
+        toolTip->Show(*this);
         Invalidate();
     }
 
@@ -300,11 +304,18 @@ namespace Cx
         const auto btnSave = FindChild<Gx::Button>(Resource::Option::IDC_BUTTON_SAVE);
         const auto toolTip = FindChild<Gx::ToolTip>(Resource::Option::IDC_TOOLTIP_INFO);
 
+        const auto keyTab   = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_KEY_TAB);
+        const auto soundTab = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_SOUND_TAB);
+
         m_tempConfig.Reset();
         btnSave->PerformClick();
 
-        toolTip->SetString("Setting has reset to default.");
-        toolTip->Show(this);
+        if (keyTab->IsChecked())
+            toolTip->SetString(Constants::Messages::Option::KeySetting::RESET);
+        else if (soundTab->IsChecked())
+            toolTip->SetString(Constants::Messages::Option::SoundSetting::RESET);
+
+        toolTip->Show(*this);
     }
 
     void OptionDialog::OnKeyTabCheckChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
@@ -508,12 +519,26 @@ namespace Cx
 
     bool OptionDialog::ValidateConfig()
     {
+        const auto toolTip = FindChild<Gx::ToolTip>(Resource::Option::IDC_TOOLTIP_INFO);
         for (auto [channel, key] : m_tempConfig.KeyBindings[KeyMode::Seven])
         {
+            if (key == sf::Keyboard::Key::Unknown)
+            {
+                toolTip->SetString(Constants::Messages::Option::KeySetting::INCOMPLETE);
+                toolTip->Show(*this);
+
+                return false;
+            }
+
             for (auto [pairChannel, pairKey] : m_tempConfig.KeyBindings[KeyMode::Seven])
             {
                 if (channel != pairChannel && key == pairKey)
+                {
+                    toolTip->SetString(Constants::Messages::Option::KeySetting::DUPLICATED);
+                    toolTip->Show(*this);
+
                     return false;
+                }
             }
         }
 

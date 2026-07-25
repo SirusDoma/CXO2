@@ -66,6 +66,8 @@ namespace Cx
 
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
+        void ExitGame(const sf::String& prompt, sf::FloatRect bounds = {});
+
     private:
         void LoadCommonResources();
 

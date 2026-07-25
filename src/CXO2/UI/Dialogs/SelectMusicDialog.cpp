@@ -14,6 +14,7 @@
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/SelectMusic.hpp>
+#include <CXO2/Constants/Messages/SelectMusic.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
@@ -23,6 +24,7 @@
 #include <Genode/UI/ToggleButton.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/List.hpp>
+#include <Genode/UI/ToolTip.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 #include <cmath>
@@ -178,6 +180,7 @@ namespace Cx
                     continue;
 
                 m_randomLevelButtonValues[button] = level;
+                button->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnRandomLevelButtonFocusChanged(sender, ev); });
                 button->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnRandomLevelButtonCheckChanged(sender, ev); });
             }
         }
@@ -432,7 +435,7 @@ namespace Cx
         const auto pager = FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_PAGE);
         if (pager)
         {
-            pager->SetString(fmt::format("[{0:02}/{1:02}]", static_cast<int>(m_page) + 1, static_cast<int>(maxPage)));
+            pager->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::PAGE, static_cast<int>(m_page) + 1, static_cast<int>(maxPage)));
             pager->SetVisible(true);
         }
 
@@ -458,16 +461,16 @@ namespace Cx
     {
         struct LevelRange
         {
-            const char* Label;
+            const char32_t* Label;
             int Min;
             int Max;
         };
 
         static constexpr LevelRange ranges[] = {
-            { "LEVEL 1 - 5",     std::numeric_limits<int>::min(), 5 },
-            { "LEVEL 5 - 9",     6,  9 },
-            { "LEVEL 9 - 13",    10, 13 },
-            { "LEVEL 13 higher", 13, std::numeric_limits<int>::max() },
+            { Constants::Messages::SelectMusic::RandomRange::BEGINNER,     std::numeric_limits<int>::min(), 5 },
+            { Constants::Messages::SelectMusic::RandomRange::INTERMEDIATE, 6,  9 },
+            { Constants::Messages::SelectMusic::RandomRange::HIGH,         10, 13 },
+            { Constants::Messages::SelectMusic::RandomRange::MASTER,       13, std::numeric_limits<int>::max() },
         };
 
         const auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
@@ -501,9 +504,9 @@ namespace Cx
                         const auto& range = ranges[r - 1];
 
                         title->SetColor(sf::Color(200, 155, 55));
-                        title->SetString(range.Label);
+                        title->SetString(fmt::format(Constants::Messages::SelectMusic::RandomRange::RANDOM_ITEM, range.Label));
                         if (infoLabel)
-                            infoLabel->SetString(range.Label);
+                            infoLabel->SetString(fmt::format(Constants::Messages::SelectMusic::RandomRange::RANDOM_FIELD, range.Label));
 
                         m_randomMusicCount += CountRandomMusic(range.Min, range.Max, scanned);
                     }
@@ -536,7 +539,7 @@ namespace Cx
                 if (const auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
                     title->SetColor(sf::Color(200, 155, 55));
-                    title->SetString(fmt::format("'Random' is selected (Total: {0:02}/{1:02})",
+                    title->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::RANDOM_SELECTED,
                         static_cast<int>(m_randomMusicCount),
                         static_cast<int>(m_musicList.size())
                     ));
@@ -599,12 +602,12 @@ namespace Cx
                     {
                         if (m_genre.has_value())
                         {
-                            title->SetString(fmt::format("{} is not available yet.", magic_enum::enum_name(m_genre.value())));
+                            title->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::GENRE_UNAVAILABLE, sf::String(std::string(magic_enum::enum_name(m_genre.value())))));
                             title->SetColor(sf::Color(135, 200, 60));
                         }
                         else
                         {
-                            title->SetString("No installed music found.");
+                            title->SetString(Constants::Messages::SelectMusic::MusicList::NO_MUSIC_FOUND);
                             title->SetColor(sf::Color(135, 200, 60));
                         }
                     }
@@ -638,7 +641,7 @@ namespace Cx
                 title->Truncate(150);
 
                 if (title->GetString() != name)
-                    title->SetString(fmt::format(L"{}..", title->GetString()));
+                    title->SetString(fmt::format(U"{}..", title->GetString()));
             }
 
             if (const auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
@@ -654,7 +657,7 @@ namespace Cx
                 int remainder = static_cast<int>(seconds) % 60;
 
                 duration->SetColor(textColor);
-                duration->SetString(fmt::format("[{}:{:02}]", minute, remainder));
+                duration->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::DURATION, minute, remainder));
             }
 
             button->SetCheckedState(m_music.Source == m_filteredList[index].Source);
@@ -673,11 +676,11 @@ namespace Cx
         {
             const std::vector info =
             {
-                fmt::format(L"Title: {}", currentMetadata.Title),
-                fmt::format(L"Artist: {}", currentMetadata.Artist),
-                fmt::format(L"Note Designer: {}",  currentMetadata.NoteDesigner),
-                fmt::format(L"Total Notes: {}", currentMetadata.NoteCounts[m_difficulty]),
-                fmt::format(L"BPM: {:.2f}", m_music.BPM)
+                fmt::format(Constants::Messages::SelectMusic::Fields::TEXT_VALUE, Constants::Messages::SelectMusic::Fields::TITLE, currentMetadata.Title),
+                fmt::format(Constants::Messages::SelectMusic::Fields::TEXT_VALUE, Constants::Messages::SelectMusic::Fields::ARTIST, currentMetadata.Artist),
+                fmt::format(Constants::Messages::SelectMusic::Fields::TEXT_VALUE, Constants::Messages::SelectMusic::Fields::EDITOR, currentMetadata.NoteDesigner),
+                fmt::format(Constants::Messages::SelectMusic::Fields::INTEGER_VALUE, Constants::Messages::SelectMusic::Fields::NOTE, currentMetadata.NoteCounts[m_difficulty]),
+                fmt::format(Constants::Messages::SelectMusic::Fields::DECIMAL_VALUE, Constants::Messages::SelectMusic::Fields::BPM, m_music.BPM)
             };
 
             const auto children = infoList->GetChildren();
@@ -980,6 +983,37 @@ namespace Cx
             Sort(m_sort.value(), m_order.value());
         else
             InvalidateMusicList();
+    }
+
+    void SelectMusicDialog::OnRandomLevelButtonFocusChanged(Gx::Control& sender, const Gx::Control::Event& ev)
+    {
+        const auto button  = dynamic_cast<Gx::ToggleButton*>(&sender);
+        const auto tooltip = FindChild<Gx::ToolTip>(Resource::SelectMusic::IDC_TOOLTIP_INFO);
+
+        if (!button || !tooltip)
+            return;
+
+        if (!sender.IsFocused())
+        {
+            tooltip->Hide();
+            return;
+        }
+
+        switch (m_randomLevelButtonValues.at(button))
+        {
+            case LevelCategory::Level1: tooltip->SetString(Constants::Messages::SelectMusic::ToolTips::BEGINNER);     break;
+            case LevelCategory::Level2: tooltip->SetString(Constants::Messages::SelectMusic::ToolTips::INTERMEDIATE); break;
+            case LevelCategory::Level3: tooltip->SetString(Constants::Messages::SelectMusic::ToolTips::HIGH);         break;
+            case LevelCategory::Level4: tooltip->SetString(Constants::Messages::SelectMusic::ToolTips::MASTER);       break;
+            default: return;
+        }
+
+        const auto position = sf::Vector2f{
+            std::ceil((sender.GetPosition() / 2.f).x),
+            std::ceil(sender.GetPosition().y + (tooltip->GetLocalBounds().size.y + tooltip->GetPadding().y) * 2),
+        };
+
+        tooltip->Show(position, Gx::ToolTip::Alignment::Left);
     }
 
     void SelectMusicDialog::OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, const Gx::Control::Event& ev)

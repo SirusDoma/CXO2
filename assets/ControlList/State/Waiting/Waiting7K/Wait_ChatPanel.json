@@ -8,7 +8,8 @@
       "IDC_CHAT_WINDOW": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatWindow.json",
       "IDC_EDIT_CHAT": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatInput.json",
       "IDC_CONTAINER_CHAT_SCROLL_CONTROLS": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatScrollControls.json",
-      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatButtonList.json"
+      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatButtonList.json",
+      "IDC_TOOLTIP_INFO": "ControlList/State/Waiting/Waiting7K/ChatPanel/Wait_ChatToolTip.json"
     }
   }
 }

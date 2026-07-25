@@ -5,6 +5,7 @@
 #include <CXO2/Models/Game.hpp>
 
 #include <CXO2/Constants/Identifiers/Room.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
@@ -158,7 +159,7 @@ namespace Cx
         const auto noMusic        = FindChild<Image>(Resource::Room::Button::IDC_IMAGE_NOT_HAVE);
 
         title->SetString(m_room.Title);
-        capacity->SetString(fmt::format("({}/{})", m_room.UserCount, m_room.Capacity));
+        capacity->SetString(fmt::format(Constants::Messages::Room::USER_COUNT, m_room.UserCount, m_room.Capacity));
 
         number->SetValue(m_room.ID);
         number->SetDigitCount(3);
@@ -236,13 +237,12 @@ namespace Cx
             else if (m_randomEnd <= 13)
                 ohmLevel->SetFrame("High");
 
-            music->SetString(fmt::format(
-                "<< Random {} {} >>",
-                m_randomStart == 0 ? 13 : m_randomStart,
-                m_randomEnd == 0 ? "or higher" : fmt::format("- {}", m_randomEnd)
-            ));
-            music->SetOutlineColor(sf::Color(160, 24, 24));
+            if (m_randomStart != 0 && m_randomEnd != 0)
+                music->SetString(fmt::format(Constants::Messages::Room::Random::RANGE, m_randomStart, m_randomEnd));
+            else
+                music->SetString(fmt::format(Constants::Messages::Room::Random::ABOVE, m_randomStart == 0 ? 13 : m_randomStart));
 
+            music->SetOutlineColor(sf::Color(160, 24, 24));
             speedIndicator->SetFrame("RX" + speedStr);
 
             music->SetVisible(true);
@@ -255,7 +255,7 @@ namespace Cx
             levelLimit->SetVisible(true);
             levelRange->SetVisible(true);
 
-            levelRange->SetString(fmt::format("Lv.{} ~ Lv.{}", m_room.MinLevelLimit, m_room.MaxLevelLimit));
+            levelRange->SetString(fmt::format(Constants::Messages::Room::LEVEL_RANGE, m_room.MinLevelLimit, m_room.MaxLevelLimit));
         }
         else
         {

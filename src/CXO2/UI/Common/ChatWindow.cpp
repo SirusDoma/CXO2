@@ -1,5 +1,6 @@
 #include <CXO2/UI/Common/ChatWindow.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Constants/Messages/Chat.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <fmt/format.h>
@@ -7,6 +8,7 @@
 
 namespace Cx
 {
+
     ChatWindow::ChatWindow(SessionContext& session) :
         m_font(),
         m_textColor(sf::Color::White),
@@ -149,9 +151,9 @@ namespace Cx
         Invalidate();
     }
 
-    void ChatWindow::PushWhisper(const sf::String& sender, const sf::String& recepient, const sf::String& chat)
+    void ChatWindow::PushWhisper(const sf::String& sender, const sf::String& Recipient, const sf::String& chat)
     {
-        const auto chatData = ChatMessage{ sender, Role::Normal, recepient, chat };
+        const auto chatData = ChatMessage{ sender, Role::Normal, Recipient, chat };
         if (m_chats.size() >= m_maxChatLength && m_offset >= m_chats.size() - m_maxChatLength)
             m_offset++;
 
@@ -271,26 +273,15 @@ namespace Cx
 
             }
 
-            auto padSenderName = [] (sf::String& nickname)
-            {
-                if (constexpr size_t nickLength = 16; nickname.getSize() < nickLength)
-                {
-                    for (size_t j = 0; j < nickLength - nickname.getSize(); j++)
-                        nickname = fmt::format(L" {}", nickname);
-                }
-
-                return nickname;
-            };
-
             if (!chat.Sender.isEmpty() && !chat.Recipient.isEmpty())
             {
                 if (chat.Sender != m_session.GetName() && chat.Recipient == m_session.GetName())
-                    m_labels[index]->SetString(fmt::format(L"[{}] >> {}", padSenderName(chat.Recipient), chat.Content));
+                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_RECEIVED, chat.Recipient, chat.Content));
                 else
-                    m_labels[index]->SetString(fmt::format(L"[{}] << {}", padSenderName(chat.Recipient), chat.Content));
+                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_SENT, chat.Recipient, chat.Content));
             }
             else if (!chat.Sender.isEmpty())
-                m_labels[index]->SetString(fmt::format(L"[{}] {}", padSenderName(chat.Sender), chat.Content));
+                m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::MESSAGE, chat.Sender, chat.Content));
             else
                 m_labels[index]->SetString(chat.Content);
         }

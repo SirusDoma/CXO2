@@ -1,4 +1,6 @@
 #include <CXO2/O2.hpp>
+#include <CXO2/Constants/Messages/Application.hpp>
+#include <CXO2/Constants/Messages/Dialog.hpp>
 #include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Utilities/NamedMutex.hpp>
 #include <CXO2/Utilities/SystemMessageBox.hpp>
@@ -26,7 +28,11 @@ int main(int argc , char** argv)
             // Disabled when debugger is attached for developer & modder convenient
             if (!mutex.IsLocked())
             {
-                Cx::SystemMessageBox::ShowInformation("O2JAM is already running.", "[INFO]");
+                Cx::SystemMessageBox::ShowInformation(
+                    Cx::Constants::Messages::Dialog::Info::ALREADY_RUNNING,
+                    Cx::Constants::Messages::Dialog::Info::CAPTION
+                );
+
                 return 1;
             }
 
@@ -47,7 +53,11 @@ int main(int argc , char** argv)
              ctx.GetGame().empty() ||
              ctx.GetGatewayInfo().empty()))
         {
-            Cx::SystemMessageBox::ShowInformation("Please try to run O2jam.exe", "[INFO]");
+            Cx::SystemMessageBox::ShowInformation(
+                Cx::Constants::Messages::Dialog::Info::RUN_LAUNCHER,
+                Cx::Constants::Messages::Dialog::Info::CAPTION
+            );
+
             return 0;
         }
 
@@ -73,7 +83,7 @@ int main(int argc , char** argv)
             return -1;
         }
 
-        auto cxo2 = Cx::O2("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true, settings);
+        auto cxo2 = Cx::O2(Cx::Constants::Messages::Application::WINDOW_TITLE, sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true, settings);
         cxo2.GetModule<Gx::Context>().Provide<Cx::CommandLineContext>([ctx] (const auto&)
         {
             return std::make_unique<Cx::CommandLineContext>(ctx);

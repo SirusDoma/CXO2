@@ -51,6 +51,9 @@
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Room.hpp>
+#include <CXO2/Constants/Messages/Planet.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
+#include <CXO2/Constants/Messages/Waiting.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Graphics.hpp>
@@ -114,13 +117,13 @@ namespace Cx
         chatPanel->SetMaximumTextLength(50);
 
         const auto chatWindow = chatPanel->GetChatWindow();
-        chatWindow->PushSystemMessage("Welcome to O2Jam");
+        chatWindow->PushSystemMessage("Welcome to O2Jam!");
         chatWindow->PushSystemMessage("Alt+Enter     : Toggle windowed/fullscreen mode setting");
-        chatWindow->PushSystemMessage("/w Receiver  : Send message (whisper)");
-        chatWindow->PushSystemMessage("F7                 : Effect 2D/3D mode setting");
-        chatWindow->PushSystemMessage("F8                 : Cursor mode setting");
-        chatWindow->PushSystemMessage("F9                 : Toggle equalizer on/off");
-        chatWindow->PushSystemMessage("F10               : Toggle Vsync on/off");
+        chatWindow->PushSystemMessage(Constants::Messages::Room::Welcome::WHISPER);
+        chatWindow->PushSystemMessage(Constants::Messages::Room::Welcome::EFFECT_MODE);
+        chatWindow->PushSystemMessage(Constants::Messages::Room::Welcome::CURSOR_MODE);
+        chatWindow->PushSystemMessage("F9          : Toggle equalizer on/off");
+        chatWindow->PushSystemMessage("F10        : Toggle Vsync on/off");
 
         const auto createRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_CREATE_ROOM);
         createRoomButton->SetClickCallback(std::bind(&StateRoom::OnCreateRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
@@ -171,8 +174,18 @@ namespace Cx
 
         if (evType == RoomTransitionEventType::Kick)
         {
-            ShowDialog("You are forced out", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Waiting::Members::KICKED, DialogStyle::Information);
         }
+    }
+
+    void StateRoom::ShowChatHelp()
+    {
+        const auto chatPanel  = Instantiate<ChatPanel>(Resource::Room::IDC_CHAT_PANEL);
+        const auto chatWindow = chatPanel->GetChatWindow();
+
+        chatWindow->PushSystemMessage(Constants::Messages::Room::ChatHelp::WHISPER);
+        chatWindow->PushSystemMessage(Constants::Messages::Room::ChatHelp::EFFECT_MODE);
+        chatWindow->PushSystemMessage(Constants::Messages::Room::ChatHelp::CURSOR_MODE);
     }
 
     void StateRoom::SyncCharacterInfo()
@@ -216,7 +229,7 @@ namespace Cx
         const auto& musicList = m_session.GetInstalledMusic();
         if (musicList.empty())
         {
-            ShowDialog("You have no tune", DialogStyle::Information, false, [=] (bool)
+            ShowDialog(Constants::Messages::Room::NO_TUNE_OWNED, DialogStyle::Information, false, [=] (bool)
             {
                 m_busy = false;
             });
@@ -245,19 +258,25 @@ namespace Cx
     {
         if (room.Mode == GameMode::Single)
         {
-            ShowDialog("As it is a single room, any user cannot enter.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Room::JoinRequest::SINGLE_MODE_CLOSED, DialogStyle::Information);
             return;
         }
 
         if (room.State != RoomState::Waiting)
         {
-            ShowDialog("The game is in process.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Room::JoinRequest::GAME_IN_PROGRESS, DialogStyle::Information);
             return;
         }
 
         if (room.UserCount >= room.Capacity)
         {
-            ShowDialog("The room is filled.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Room::JoinRequest::ROOM_FILLED, DialogStyle::Information);
+            return;
+        }
+
+        if (room.MinLevelLimit > m_session.GetLevel() || room.MaxLevelLimit < m_session.GetLevel())
+        {
+            ShowDialog(Constants::Messages::Room::JoinRequest::LEVEL_OUT_OF_RANGE, DialogStyle::Information);
             return;
         }
 
@@ -271,7 +290,8 @@ namespace Cx
 
             if (it == musicList.end())
             {
-                ShowDialog(fmt::format(L"Please download the following tune. \n\n<< file : o2ma{} >>", room.Music.ID), DialogStyle::Information);
+                // ShowDialog(Constants::Messages::Room::JoinRequest::TUNE_UNREGISTERED, DialogStyle::Information);
+                ShowDialog(fmt::format(Constants::Messages::Room::JoinRequest::TUNE_REQUIRED, fmt::format(U"o2ma{}", room.Music.ID)), DialogStyle::Information);
                 return;
             }
         }
@@ -302,7 +322,7 @@ namespace Cx
 
             auto ctx = Gx::DialogPresentationContext();
             ctx.Bounds = sf::FloatRect{{0, 0}, GetView().getSize()};
-            ctx.Prompt = "Please input room password";
+            ctx.Prompt = Constants::Messages::Room::JoinRequest::PASSWORD_PROMPT;
 
             Present(*passwordDialog, ctx);
         }
@@ -318,7 +338,7 @@ namespace Cx
             m_session.UpdateFrom(response);
 
             const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
-            nicknameLabel->SetString(fmt::format(L"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
+            nicknameLabel->SetString(fmt::format(U"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
 
             const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
             avatar->SetGender(m_session.GetGender());
@@ -331,9 +351,9 @@ namespace Cx
 
             avatar->SetVisible(true);
         }
-        catch (const Gx::Exception& ex)
+        catch (const Gx::Exception&)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (bool)
+            ShowDialog(Constants::Messages::Room::SYNC_FAILED, DialogStyle::Information, false, [this] (bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -398,7 +418,7 @@ namespace Cx
             const auto& response = ev.Open();
             if (response.ResultCode != CreateRoomResult::Success)
             {
-                ShowDialog("Channel is full.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::Planet::CHANNEL_FULL, DialogStyle::Information);
                 return;
             }
 
@@ -435,16 +455,15 @@ namespace Cx
             if (response.Result != JoinResult::Success)
             {
                 if (response.Result == JoinResult::Full)
-                    ShowDialog("The room is filled.", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Room::JoinResponse::ROOM_FULL, DialogStyle::Information);
                 else if (response.Result == JoinResult::InvalidPassword)
-                    ShowDialog("Wrong password", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Room::JoinResponse::WRONG_PASSWORD, DialogStyle::Information);
                 else if (response.Result == JoinResult::InvalidMode)
-                    ShowDialog("The room is single playmode", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Room::JoinResponse::SINGLE_MODE, DialogStyle::Information);
                 else if (response.Result == JoinResult::InProgress)
-                    ShowDialog("The game already has started.", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Room::JoinResponse::GAME_STARTED, DialogStyle::Information);
                 else
-                    ShowDialog("[Fail] Please contact administrator when this message shows.",
-                               DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Room::JoinResponse::UNKNOWN, DialogStyle::Information);
 
                 m_busy = false;
                 return;
@@ -680,7 +699,7 @@ namespace Cx
         if (!room)
         {
             const auto tooltip = Instantiate<Gx::ToolTip>(Resource::Room::IDC_TOOLTIP_QUICK_JOIN);
-            tooltip->SetString("No available room.");
+            tooltip->SetString(Constants::Messages::Room::NO_ROOM_AVAILABLE);
             tooltip->Show();
 
             return;

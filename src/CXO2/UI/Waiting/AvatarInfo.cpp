@@ -1,8 +1,10 @@
 #include <CXO2/UI/Waiting/AvatarInfo.hpp>
 #include <CXO2/Avatar/Avatar.hpp>
+#include <CXO2/Utilities/StringFormatter.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
 #include <CXO2/Constants/Identifiers/Avatar.hpp>
-#include <CXO2/Utilities/StringFormatter.hpp>
+#include <CXO2/Constants/Messages/Waiting.hpp>
+#include <CXO2/Constants/Messages/Playing.hpp>
 
 #include <Genode/UI/Label.hpp>
 #include <Genode/UI/Gauge.hpp>
@@ -88,7 +90,7 @@ namespace Cx
 
         if (level)
         {
-            level->SetString(m_slot ? fmt::format("Lv.{}", m_slot->Level) : std::string());
+            level->SetString(m_slot ? sf::String(fmt::format(Constants::Messages::Playing::PLAYER_LEVEL, m_slot->Level)) : sf::String());
 
             if (name)
             {
@@ -104,7 +106,7 @@ namespace Cx
         else if (name)
         {
             if (m_slot)
-                name->SetString(fmt::format(L"Lv:{} {}", m_slot->Level, m_slot->Name));
+                name->SetString(fmt::format(Constants::Messages::Waiting::Members::ENTRY, m_slot->Level, m_slot->Name));
             else
                 name->SetString(std::string());
         }

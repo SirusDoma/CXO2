@@ -16,6 +16,8 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Messages/Network.hpp>
+#include <CXO2/Constants/Messages/Planet.hpp>
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
@@ -60,7 +62,7 @@ namespace Cx
         auto philix   = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_PREMIUM_01);
 
         const auto exitButton = Instantiate<Gx::Button>(Resource::Planet::IDC_BUTTON_EXIT);
-        exitButton->SetClickCallback([&] (auto&, auto&) { GetApplication().Close(); });
+        exitButton->SetClickCallback([&] (auto&, auto&) { ExitGame(Constants::Messages::Planet::EXIT_CONFIRM); });
 
         auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
         channelBoard->SetChannelEnterCallback([=] (auto hall, std::uint16_t serverID, std::uint16_t channelID)
@@ -119,35 +121,34 @@ namespace Cx
 
     void StatePlanet::OnAuthenticated(const AuthResult result)
     {
-
         if (result != AuthResult::Success)
         {
             auto message = std::string();
             switch (result)
             {
                 case AuthResult::DatabaseError:
-                    message = "(Please inquire of Administrator.) DB error";
+                    message = Constants::Messages::Planet::Authentication::DATABASE_ERROR;
                     break;
                 case AuthResult::Banned:
-                    message = "You have been banned!\nPlease enquire customer service for detail.";
+                    message = Constants::Messages::Planet::Authentication::BANNED;
                     break;
                 case AuthResult::DuplicateSessions:
-                    message = "User is now being connected to the Game.";
+                    message = Constants::Messages::Planet::Authentication::CONNECTING;
                     break;
                 case AuthResult::InvalidCredentials:
-                    message = "Either login name or password is incorrect.";
+                    message = Constants::Messages::Planet::Authentication::INVALID_CREDENTIALS;
                     break;
                 case AuthResult::IllegalUser:
-                    message = "You are illegal user.";
+                    message = Constants::Messages::Planet::Authentication::ILLEGAL_USER;
                     break;
                 case AuthResult::InsufficientBalance:
-                    message = "You have insufficient points to play. Please top up";
+                    message = Constants::Messages::Planet::Authentication::INSUFFICIENT_POINTS;
                     break;
                 case AuthResult::MultiGamesSession:
-                    message = "You have already connected another game.";
+                    message = Constants::Messages::Planet::Authentication::ALREADY_CONNECTED;
                     break;
                 default:
-                    message = "Network Error has occurred.";
+                    message = Constants::Messages::Planet::Authentication::NETWORK_ERROR;
                     break;
             }
 
@@ -170,7 +171,7 @@ namespace Cx
                 const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
                 container->SetEnabled(true);
 
-                ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::Network::CONNECT_FAILED, DialogStyle::Information);
             }
         });
     }
@@ -189,14 +190,14 @@ namespace Cx
     {
         if (response.Full)
         {
-            ShowDialog("Channel is full.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Planet::CHANNEL_FULL, DialogStyle::Information);
             return;
         }
 
         m_network.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
         {
             auto state = dynamic_cast<State*>(&Gx::Application::Instance().GetModule<Gx::SceneDirector>().GetPresentingScene());
-            state->ShowDialog("Network is not in a good condition.\nPlease try again a little while later.", DialogStyle::Information, false, [] (bool)
+            state->ShowDialog(Constants::Messages::Network::UNSTABLE, DialogStyle::Information, false, [] (bool)
             {
                 Gx::Application::Instance().GetModule<Gx::SceneDirector>().Present<StatePlanet>();
             });
@@ -226,7 +227,7 @@ namespace Cx
             catch (const Gx::NetworkException&)
             {
                 container->SetEnabled(true);
-                ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::Network::CONNECT_FAILED, DialogStyle::Information);
             }
         });
     }
@@ -251,7 +252,7 @@ namespace Cx
             }
             catch (const Gx::NetworkException&)
             {
-                ShowDialog("Failed in connecting to the server.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::Network::CONNECT_FAILED, DialogStyle::Information);
                 container->SetEnabled(true);
                 channelBoard->SetEnabled(true);
             }

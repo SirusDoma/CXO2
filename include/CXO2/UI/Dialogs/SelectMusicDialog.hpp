@@ -79,6 +79,7 @@ namespace Cx
         void OnSortLevelButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
         void OnSortDurationButtonClicked(Gx::Control& sender, const Gx::Control::Event& ev);
         void OnGenreButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
+        void OnRandomLevelButtonFocusChanged(Gx::Control& sender, const Gx::Control::Event& ev);
         void OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, const Gx::Control::Event& ev);
         void OnExButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);
         void OnNxButtonCheckChanged(Gx::RadioButton& sender, const Gx::Control::Event& ev);

@@ -1,5 +1,6 @@
 #include <CXO2/UI/Room/UserList.hpp>
 #include <CXO2/Constants/Identifiers/Room.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/List.hpp>
@@ -159,7 +160,7 @@ namespace Cx
         m_page = std::max(m_page, static_cast<unsigned int>(1));
 
         if (const auto userCountLabel = FindChild<Gx::Label>(Resource::Room::UserList::IDC_TEXT_USER_COUNT))
-            userCountLabel->SetString(fmt::format("Users: {} ({}/{})", m_users.size(), m_page, max));
+            userCountLabel->SetString(fmt::format(Constants::Messages::Room::USER_LIST_COUNT, m_users.size(), m_page, max));
 
         const auto children = list->GetChildren();
         for (size_t i = 0; i < children.size(); i++)
@@ -176,7 +177,7 @@ namespace Cx
                     continue;
 
                 auto user = m_users[index];
-                userNickLabel->SetString(fmt::format(L"Lv.{}: {}", user.Level, user.Name));
+                userNickLabel->SetString(fmt::format(Constants::Messages::Room::USER_LIST_ENTRY, user.Level, user.Name));
 
                 userButton->SetCheckedState(user.Name == m_selectedUser);
                 userButton->SetEnabled(true);

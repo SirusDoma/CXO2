@@ -50,7 +50,7 @@ namespace Cx
         void SetLineSpacing(float lineSpacing);
 
         void PushMessage(const sf::String& sender, Role senderRole, const sf::String& chat);
-        void PushWhisper(const sf::String& sender, const sf::String& recepient, const sf::String& chat);
+        void PushWhisper(const sf::String& sender, const sf::String& Recipient, const sf::String& chat);
         void PushSystemMessage(const sf::String& chat);
 
     private:

@@ -36,8 +36,10 @@ namespace Cx
         StateWaiting7K(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, WaitingService& service, ChatService& messaging, ItemFactory& items);
 
         void Initialize() override;
+        void ShowChatHelp();
 
         void OnMemberEmoticon(const sf::String& sender, const sf::String& chatData);
+        void ChangeRoomTitle(const sf::String& title);
 
     private:
         void InitializeAvatars();
@@ -60,7 +62,7 @@ namespace Cx
         void OnUpdateReadyStateResponded(Gx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev);
         void OnUpdateMusicResponded(const MessageEnvelope<UpdateRoomMusicRequest>& ev);
         void OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev);
-        void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, Room::Team team);
+        void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev);
         void OnExitRoomResponded(const MessageEnvelope<ExitWaitingResponse>& ev);
 
         void OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
@@ -90,7 +92,7 @@ namespace Cx
 
         void ExtendSlot(unsigned int slotID);
         void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
-        void SendEmoticon(const std::vector<std::uint8_t>& code, const std::string& emoticonID);
+        void SendEmoticon(const std::string& command, const std::string& emoticonID);
 
         void InvalidateRoomInfo();
         void InvalidateAvatarInfo();

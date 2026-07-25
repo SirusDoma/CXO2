@@ -8,13 +8,19 @@
 
 #include <CXO2/Utilities/StringFormatter.hpp>
 #include <CXO2/Constants/Identifiers/ChatPanel.hpp>
+#include <CXO2/Constants/Messages/Chat.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
+
+#include <cstring>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/InputField.hpp>
+#include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StateWaiting7K.hpp>
 #include <CXO2/States/StatePlaying7K.hpp>
 #include <CXO2/Models/Character.hpp>
+#include <Genode/UI/ToolTip.hpp>
 
 namespace Cx
 {
@@ -65,10 +71,16 @@ namespace Cx
             const auto btnChatWhisper = chatButtonList->FindChild<Gx::RadioButton>(Resource::ChatPanel::IDC_RADIO_CHAT_WHISPER);
 
             btnChatAll->SetCheckedState(true);
+            btnChatAll->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnChatAllFocusChanged(sender, ev); });
             btnChatAll->SetCheckStateChangeCallback([this] (auto& radio, auto& ev) { OnChatAllCheckChanged(radio, ev); });
 
+            btnChatFriend->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnChatFriendFocusChanged(sender, ev); });
             btnChatFriend->SetCheckStateChangeCallback([this] (auto& radio, auto&) { OnChatFallbackCheckChanged(radio); });
+
+            btnChatGuild->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnChatGuildFocusChanged(sender, ev); });
             btnChatGuild->SetCheckStateChangeCallback([this] (auto& radio, auto&) { OnChatFallbackCheckChanged(radio); });
+
+            btnChatWhisper->SetFocusChangedCallback([this] (auto& sender, auto& ev) { OnChatWhisperFocusChanged(sender, ev); });
             btnChatWhisper->SetCheckStateChangeCallback([this] (auto& radio, auto& ev) { OnChatWhisperCheckChanged(radio, ev); });
         }
 
@@ -152,42 +164,25 @@ namespace Cx
         }
     }
 
-    void ChatPanel::OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const std::vector<std::string>& tokens, const sf::String& message)
+    void ChatPanel::OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev)
     {
         const auto chatWindow = GetChatWindow();
 
         try
         {
-            if (!ev.Open().Invalid)
+            const auto& response = ev.Open();
+            if (!response.Invalid)
             {
-                chatWindow->PushWhisper(m_session.GetName(), m_recipient, message);
-                return;
+                chatWindow->PushWhisper(m_session.GetName(), response.Recipient, response.Content);
+            }
+            else
+            {
+                chatWindow->PushSystemMessage(fmt::format(Constants::Messages::Chat::WHISPER_NOT_DELIVERED, response.Recipient));
             }
         }
         catch (const Gx::Exception&)
         {
         }
-
-        chatWindow->PushSystemMessage(fmt::format("The message was not delivered to {}", tokens[1]));
-    }
-
-    void ChatPanel::OnSendWhisperResponded(const MessageEnvelope<WhisperMessageResponse>& ev, const sf::String& text)
-    {
-        const auto chatWindow = GetChatWindow();
-
-        try
-        {
-            if (!ev.Open().Invalid)
-            {
-                chatWindow->PushWhisper(m_session.GetName(), m_recipient, text);
-                return;
-            }
-        }
-        catch (const Gx::Exception&)
-        {
-        }
-
-        chatWindow->PushSystemMessage(sf::String(fmt::format(L"The message was not delivered to {}", m_recipient)));
     }
 
     void ChatPanel::OnChatScrollUpButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
@@ -206,10 +201,25 @@ namespace Cx
         scrollChat->Increase();
     }
 
+    void ChatPanel::OnChatAllFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ShowChatButtonToolTip(sender, Constants::Messages::Chat::Tooltips::ALL);
+    }
+
     void ChatPanel::OnChatAllCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev)
     {
         if (radio.IsChecked())
             m_recipient = {};
+    }
+
+    void ChatPanel::OnChatFriendFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ShowChatButtonToolTip(sender, Constants::Messages::Chat::Tooltips::FRIEND);
+    }
+
+    void ChatPanel::OnChatGuildFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ShowChatButtonToolTip(sender, Constants::Messages::Chat::Tooltips::GUILD);
     }
 
     void ChatPanel::OnChatFallbackCheckChanged(Gx::RadioButton& radio)
@@ -219,6 +229,11 @@ namespace Cx
 
         if (radio.IsChecked())
             btnChatAll->SetCheckedState(true);
+    }
+
+    void ChatPanel::OnChatWhisperFocusChanged(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        ShowChatButtonToolTip(sender, Constants::Messages::Chat::Tooltips::WHISPER);
     }
 
     void ChatPanel::OnChatWhisperCheckChanged(Gx::RadioButton& radio, Gx::Control::Event& ev)
@@ -250,7 +265,7 @@ namespace Cx
 
                     auto ctx   = Gx::DialogPresentationContext();
                     ctx.Bounds = {{}, parent->GetView().getSize()};
-                    ctx.Prompt = "Enter the nickname of person you wish to\nwhisper and then press the [OK] button.";
+                    ctx.Prompt = Constants::Messages::Chat::WHISPER_TARGET_PROMPT;
 
                     parent->Present(*dialog, ctx);
                 }
@@ -268,7 +283,35 @@ namespace Cx
 
     void ChatPanel::OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text)
     {
-        if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/w"))
+        const auto input = text.toAnsiString();
+
+        if (Gx::StringHelper::StartsWith(input, Constants::Messages::Chat::Commands::EMOTICON))
+        {
+            if (GetParent<StateWaiting7K>())
+                return;
+        }
+
+        if (Gx::StringHelper::StartsWith(input, Constants::Messages::Chat::Commands::ROOM_TITLE))
+        {
+            if (const auto waiting = GetParent<StateWaiting7K>())
+                waiting->ChangeRoomTitle(Gx::StringHelper::Trim(text.substring(std::strlen(Constants::Messages::Chat::Commands::ROOM_TITLE))));
+            else
+                GetChatWindow()->PushSystemMessage(Constants::Messages::Room::TITLE_CHANGE_FORBIDDEN);
+
+            return;
+        }
+
+        if (Gx::StringHelper::StartsWith(input, Constants::Messages::Chat::Commands::HELP_SHORT))
+        {
+            if (const auto waiting = GetParent<StateWaiting7K>())
+                waiting->ShowChatHelp();
+            else if (const auto room = GetParent<StateRoom>())
+                room->ShowChatHelp();
+
+            return;
+        }
+
+        if (Gx::StringHelper::StartsWith(text.toAnsiString(), Constants::Messages::Chat::Commands::WHISPER))
         {
             const auto tokens = Gx::StringHelper::Split(text.toAnsiString());
             if (tokens.size() < 3)
@@ -299,17 +342,17 @@ namespace Cx
             auto message = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
             m_service.SendWhisper(WhisperMessageRequest{tokens[1], message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
             {
-                OnSendWhisperResponded(ev, tokens, message);
+                OnSendWhisperResponded(ev);
             });
         }
         else if (!m_recipient.isEmpty())
         {
             m_service.SendWhisper(WhisperMessageRequest{m_recipient, text}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
             {
-                OnSendWhisperResponded(ev, text);
+                OnSendWhisperResponded(ev);
             });
         }
-        else if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/n") && m_session.GetRole() == Role::Administrator)
+        else if (Gx::StringHelper::StartsWith(text.toAnsiString(), Constants::Messages::Chat::Commands::ANNOUNCE) && m_session.GetRole() == Role::Administrator)
             m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
         else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
             m_service.SendWaitingMessage(WaitingMessageRequest{text});
@@ -320,6 +363,23 @@ namespace Cx
     ChatWindow* ChatPanel::GetChatWindow() const
     {
         return FindChild<ChatWindow>(Resource::ChatPanel::IDC_CHAT_WINDOW);
+    }
+
+    void ChatPanel::ShowChatButtonToolTip(const Gx::Control& sender, const sf::String& message)
+    {
+        if (const auto tooltip = FindChild<Gx::ToolTip>(Resource::ChatPanel::IDC_TOOLTIP_INFO))
+        {
+            tooltip->SetString(message);
+            const auto position = sf::Vector2f{
+                std::ceil(sender.GetParent()->GetPosition().x + (sender.GetPosition() / 2.f).x),
+                std::ceil(sender.GetParent()->GetPosition().y - sender.GetPosition().y - tooltip->GetLocalBounds().size.y - tooltip->GetPadding().y),
+            };
+
+            if (sender.IsFocused())
+                tooltip->Show(position, Gx::ToolTip::Alignment::Left);
+            else
+                tooltip->Hide();
+        }
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst

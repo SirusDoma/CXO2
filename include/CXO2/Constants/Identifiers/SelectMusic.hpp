@@ -21,6 +21,7 @@ namespace Cx::Constants::Identifiers::Resource::SelectMusic
     constexpr static auto IDC_TEXT_MUSIC_TIME               = "IDC_TEXT_MUSIC_TIME";
     constexpr static auto IDC_LIST_MUSIC_INFO               = "IDC_LIST_MUSIC_INFO";
     constexpr static auto IDC_IMAGE_MUSIC_THUMBNAIL         = "IDC_IMAGE_MUSIC_THUMBNAIL";
+    constexpr static auto IDC_TOOLTIP_INFO                  = "IDC_TOOLTIP_INFO";
 
     template<typename T>
     static std::string IDC_RADIO_SPEED(T&& speed)

@@ -6,6 +6,7 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Room.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Graphics/Animation.hpp>
@@ -125,8 +126,8 @@ namespace Cx
             jamAnimation->SetVisible(true);
         }
 
-        toolTip->SetString("JAM Mode is not available.");
-        toolTip->Show(this);
+        toolTip->SetString(Constants::Messages::Room::CreateRoom::JAM_MODE_UNAVAILABLE);
+        toolTip->Show(*this);
 
         jamModeButton->SetCheckedState(false);
         versusModeButton->SetCheckedState(true);
@@ -173,6 +174,13 @@ namespace Cx
             minLevelLimitInput->SetString("");
             maxLevelLimitInput->SetString("");
         }
+        else if (GetRoomMode() == GameMode::Single)
+        {
+            sender.SetCheckedState(false);
+            
+            const auto parent = dynamic_cast<Cx::State*>(GetPresentableParent());
+            parent->ShowDialog(Constants::Messages::Room::CreateRoom::LEVEL_LIMIT_IN_SINGLE, DialogStyle::Information);
+        }
     }
 
     void CreateRoomDialog::OnPresented(Parent& parent, const Gx::PresentationContext& context)
@@ -198,7 +206,7 @@ namespace Cx
 
         const auto toolTip = FindChild<Gx::ToolTip>(Resource::Room::CreateRoom::IDC_TOOLTIP_INFO);
 
-        titleInput->SetString(fmt::format(L"{}'s Room", m_session.GetName()));
+        titleInput->SetString(fmt::format(U"{}{}", m_session.GetName(), Constants::Messages::Room::CreateRoom::DEFAULT_TITLE_SUFFIX));
         titleInput->SelectAll();
         passwordInput->SetString("");
 
@@ -233,8 +241,8 @@ namespace Cx
 
         if (titleInput->GetString().isEmpty())
         {
-            toolTip->SetString("Please enter a room name.");
-            toolTip->Show(this);
+            toolTip->SetString(Constants::Messages::Room::CreateRoom::TITLE_REQUIRED);
+            toolTip->Show(*this);
             return;
         }
 
@@ -242,8 +250,8 @@ namespace Cx
         {
             if (minLevelLimitInput->GetString().isEmpty() || maxLevelLimitInput->GetString().isEmpty())
             {
-                toolTip->SetString("Please set level limit. Ex) 10 ~ 20");
-                toolTip->Show(this);
+                toolTip->SetString(Constants::Messages::Room::CreateRoom::LEVEL_LIMIT_REQUIRED);
+                toolTip->Show(*this);
 
                 return;
             }
@@ -253,13 +261,13 @@ namespace Cx
             const unsigned int max = std::stoi(maxLevelLimitInput->GetString().toAnsiString());
 
             if (min > 100 || max > 100)
-                toolTip->SetString("Wrong level selected. You can enter level range from 1 to 100");
+                toolTip->SetString(Constants::Messages::Room::CreateRoom::LEVEL_OUT_OF_RANGE);
             else if (min > max)
-                toolTip->SetString("You must enter higher numbers in HIGH LEVEL");
+                toolTip->SetString(Constants::Messages::Room::CreateRoom::HIGH_LEVEL_TOO_LOW);
 
             if (!toolTip->GetString().isEmpty())
             {
-                toolTip->Show(this);
+                toolTip->Show(*this);
                 return;
             }
         }

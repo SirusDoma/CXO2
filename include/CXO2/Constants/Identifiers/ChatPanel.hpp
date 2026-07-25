@@ -11,6 +11,7 @@ namespace Cx::Constants::Identifiers::Resource::ChatPanel
     constexpr static auto IDC_RADIO_CHAT_FRIEND              = "IDC_RADIO_CHAT_FRIEND";
     constexpr static auto IDC_RADIO_CHAT_GUILD               = "IDC_RADIO_CHAT_GUILD";
     constexpr static auto IDC_RADIO_CHAT_WHISPER             = "IDC_RADIO_CHAT_WHISPER";
+    constexpr static auto IDC_TOOLTIP_INFO                   = "IDC_TOOLTIP_INFO";
     constexpr static auto IDC_CONTAINER_CHAT_SCROLL_CONTROLS = "IDC_CONTAINER_CHAT_SCROLL_CONTROLS";
     constexpr static auto IDC_SCROLL_BAR_CHAT                = "IDC_SCROLL_BAR_CHAT";
     constexpr static auto IDC_BUTTON_SCROLL_UP               = "IDC_BUTTON_SCROLL_UP";

@@ -5,6 +5,7 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Map.hpp>
+#include <CXO2/Constants/Messages/Map.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
@@ -41,7 +42,7 @@ namespace Cx
         }
 
         const auto mapName = FindChild<Gx::Label>(Resource::Map::IDC_TEXT_MAP_NAME);
-        mapName->SetString("Random");
+        mapName->SetString(Constants::Messages::Map::RANDOM);
 
         const auto effectGroup1 = FindChild<UiContainer>(Resource::Map::IDC_CONTAINER_EFFECT_1);
         for (const auto effect : effectGroup1->GetChildren())
@@ -130,7 +131,7 @@ namespace Cx
                 randomMap->SetVisible(true);
                 map->SetVisible(false);
 
-                mapName->SetString("Random");
+                mapName->SetString(Constants::Messages::Map::RANDOM);
             }
             else
             {

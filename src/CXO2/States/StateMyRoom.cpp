@@ -18,6 +18,7 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/MyRoom.hpp>
+#include <CXO2/Constants/Messages/ItemShop.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Network/Exception.hpp>
@@ -190,7 +191,7 @@ namespace Cx
 
             if (!m_selectedItem)
             {
-                ShowDialog("No selected item.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::ItemShop::NOTHING_SELECTED, DialogStyle::Information);
                 return;
             }
 
@@ -211,7 +212,7 @@ namespace Cx
                 return;
             }
 
-            const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
+            const sf::String message = fmt::format(U"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
                 m_selectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
             ShowDialog(message, DialogStyle::OkCancel, false, [=] (auto accepted)

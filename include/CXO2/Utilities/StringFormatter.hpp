@@ -5,7 +5,7 @@
 #include <fmt/xchar.h>
 
 template <>
-struct fmt::formatter<sf::String, wchar_t>
+struct fmt::formatter<sf::String, char32_t>
 {
     template <typename ParseContext>
     constexpr auto parse(ParseContext &ctx) -> decltype(ctx.begin())
@@ -18,7 +18,7 @@ struct fmt::formatter<sf::String, wchar_t>
     {
         auto out = ctx.out();
         for (const auto& codepoint : string)
-            *out++ = static_cast<wchar_t>(codepoint);
+            *out++ = static_cast<char32_t>(codepoint);
 
         return out;
     }

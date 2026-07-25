@@ -8,7 +8,8 @@
       "IDC_CHAT_WINDOW": "ControlList/State/Room/ChatPanel/Room_ChatWindow.json",
       "IDC_EDIT_CHAT": "ControlList/State/Room/ChatPanel/Room_ChatInput.json",
       "IDC_CONTAINER_CHAT_SCROLL_CONTROLS": "ControlList/State/Room/ChatPanel/Room_ChatScrollControls.json",
-      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Room/ChatPanel/Room_ChatButtonList.json"
+      "IDC_LIST_CHAT_BUTTON": "ControlList/State/Room/ChatPanel/Room_ChatButtonList.json",
+      "IDC_TOOLTIP_INFO": "ControlList/State/Room/ChatPanel/Room_ChatToolTip.json"
     }
   }
 }

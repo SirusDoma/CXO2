@@ -23,6 +23,11 @@ namespace Cx
             else
                 metadata.Duration = sf::seconds(3.f);
 
+            if (auto delay = attributes.find("delay"); delay != attributes.end())
+                metadata.Delay = sf::milliseconds(delay->get<unsigned int>());
+            else
+                metadata.Delay = sf::Time::Zero;
+
             auto color = attributes.find("color");
             if (color != attributes.end())
             {
@@ -115,6 +120,7 @@ namespace Cx
     
         toolTip->SetName(metadata->Name);
         toolTip->SetDuration(metadata->Duration);
+        toolTip->SetDelay(metadata->Delay);
     
         toolTip->SetCharacterSize(metadata->FontSize);
         toolTip->SetColor(metadata->Color);

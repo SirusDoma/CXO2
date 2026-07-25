@@ -141,7 +141,8 @@
       "IDC_IMAGE_MUSIC_THUMBNAIL": "ControlList/Dialog/SelectMusic/SelectMusic_Thumbnail.json",
       "IDC_BUTTON_LEFT":  "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Left.json",
       "IDC_BUTTON_RIGHT":  "ControlList/Dialog/SelectMusic/SelectMusic_Btn_Right.json",
-      "IDC_TEXT_MUSIC_PAGE": "ControlList/Dialog/SelectMusic/SelectMusic_Page.json"
+      "IDC_TEXT_MUSIC_PAGE": "ControlList/Dialog/SelectMusic/SelectMusic_Page.json",
+      "IDC_TOOLTIP_INFO": "ControlList/Dialog/SelectMusic/SelectMusic_ToolTip.json"
     }
   }
 }

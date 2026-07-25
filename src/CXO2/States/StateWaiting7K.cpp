@@ -5,9 +5,6 @@
 #include <CXO2/States/StateLoading.hpp>
 #include <CXO2/States/StatePlaying7K.hpp>
 
-#include <CXO2/Metadata/Chart/O2JamChartMetadata.hpp>
-#include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
-
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
 
@@ -37,21 +34,22 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Waiting7K.hpp>
-#include <CXO2/Constants/Identifiers/Cache.hpp>
-#include <CXO2/Constants/Identifiers/Map.hpp>
+#include <CXO2/Constants/Messages/Chat.hpp>
+#include <CXO2/Constants/Messages/Room.hpp>
+#include <CXO2/Constants/Messages/Waiting.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
 #include <Genode/UI/Image.hpp>
-#include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 #include <fmt/format.h>
 
 #include <algorithm>
 #include <limits>
+#include <unordered_map>
 
 namespace Cx
 {
@@ -59,6 +57,29 @@ namespace Cx
 
     namespace
     {
+        const std::unordered_map<std::string, std::string> EmoticonMap = {
+            { Constants::Messages::Chat::Emoticons::EXCLAMATION_MARK,  Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK },
+            { Constants::Messages::Chat::Emoticons::QUESTION,          Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION },
+            { Constants::Messages::Chat::Emoticons::HEART,             Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART },
+            { Constants::Messages::Chat::Emoticons::COUNT,             Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT },
+            { Constants::Messages::Chat::Emoticons::NOTE,              Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE },
+            { Constants::Messages::Chat::Emoticons::EXCLAMATION_MARK2, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2 },
+            { Constants::Messages::Chat::Emoticons::BROKEN_HEART,      Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART },
+            { Constants::Messages::Chat::Emoticons::CLOVER,            Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER },
+            { Constants::Messages::Chat::Emoticons::FLOWER,            Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER },
+            { Constants::Messages::Chat::Emoticons::IDEA,              Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA },
+            { Constants::Messages::Chat::Emoticons::HI,                Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI },
+            { Constants::Messages::Chat::Emoticons::GO,                Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO },
+            { Constants::Messages::Chat::Emoticons::READY,             Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY },
+            { Constants::Messages::Chat::Emoticons::APPROVAL,          Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL },
+            { Constants::Messages::Chat::Emoticons::OBJECTION,         Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION },
+            { Constants::Messages::Chat::Emoticons::OHM_SMILE,         Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE },
+            { Constants::Messages::Chat::Emoticons::OHM_HAHA,          Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA },
+            { Constants::Messages::Chat::Emoticons::OHM_VICTORY,       Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY },
+            { Constants::Messages::Chat::Emoticons::OHM_LOSE,          Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE },
+            { Constants::Messages::Chat::Emoticons::BY_DEGREES,        Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES },
+        };
+
         std::string GetRoomLevelCode(const RoomContext& room, const bool useNormalMode = false)
         {
             const auto mode = room.GetSpeedMode();
@@ -249,6 +270,7 @@ namespace Cx
         const auto chatWindow = chatPanel->GetChatWindow();
         chatWindow->PushSystemMessage("Welcome to O2Jam!");
         chatWindow->PushSystemMessage("Let's play together~");
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::Welcome::CHANGE_TITLE);
 
         if (const auto cover = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))
             cover->SetVisible(!m_room.GetCurrentSlot().IsMaster);
@@ -369,7 +391,7 @@ namespace Cx
 
                     const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
                     const auto chatWindow = chatPanel->GetChatWindow();
-                    chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} forced out", name));
+                    chatWindow->PushSystemMessage(fmt::format(Constants::Messages::Waiting::Members::FORCED_OUT, name));
 
                     InvalidateMembers();
                     break;
@@ -423,7 +445,7 @@ namespace Cx
             const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
             const auto chatWindow = chatPanel->GetChatWindow();
 
-            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} just came in.", m_room.GetSlot(response.ID).Name));
+            chatWindow->PushSystemMessage(fmt::format(Constants::Messages::Waiting::Members::JOINED, m_room.GetSlot(response.ID).Name));
             InvalidateMembers();
 
             const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
@@ -461,7 +483,7 @@ namespace Cx
 
             const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
             const auto chatWindow = chatPanel->GetChatWindow();
-            chatWindow->PushSystemMessage(fmt::format(L"[INFO] {} has left", name));
+            chatWindow->PushSystemMessage(fmt::format(Constants::Messages::Waiting::Members::LEFT, name));
 
             InvalidateMembers();
             InvalidateRoomInfo();
@@ -520,53 +542,54 @@ namespace Cx
         }
     }
 
+    void StateWaiting7K::ShowChatHelp()
+    {
+        const auto chatPanel  = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+        const auto chatWindow = chatPanel->GetChatWindow();
+
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::ChatHelp::WHISPER);
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::ChatHelp::ROOM_TITLE);
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::ChatHelp::EFFECT_MODE);
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::ChatHelp::CURSOR_MODE);
+        chatWindow->PushSystemMessage(Constants::Messages::Waiting::ChatHelp::EMOTION);
+    }
+
+    void StateWaiting7K::ChangeRoomTitle(const sf::String& title)
+    {
+        if (!m_room.GetCurrentSlot().IsMaster)
+        {
+            const auto chatPanel = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+            chatPanel->GetChatWindow()->PushSystemMessage(Constants::Messages::Waiting::ChangeRoomTitle::TITLE_CHANGE_FORBIDDEN);
+
+            return;
+        }
+
+        if (title.isEmpty())
+            return;
+
+        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{title}, [=] (const auto& ev) { OnUpdateRoomTitleResponded(ev); });
+    }
+
     void StateWaiting7K::OnMemberEmoticon(const sf::String& sender, const sf::String& chatData)
     {
-        auto code = std::string();
-        auto text = chatData.toAnsiString();
-        auto data = std::vector<std::uint8_t>(text.begin(), text.end());
+        const auto prefix = std::string(Constants::Messages::Chat::Emoticons::PREFIX);
+        const auto text   = chatData.toAnsiString();
+        if (text.compare(0, prefix.size(), prefix) != 0)
+            return;
 
-        if (data == std::vector<std::uint8_t>{ 47, 33 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK;
-        else if (data == std::vector<std::uint8_t>{ 47, 63 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION;
-        else if (data == std::vector<std::uint8_t>{ 47, 187, 231, 182, 251, 199, 216 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART;
-        else if (data == std::vector<std::uint8_t>{ 47, 51, 50, 49 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT;
-        else if (data == std::vector<std::uint8_t>{ 47, 126 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE;
-        else if (data == std::vector<std::uint8_t>{ 47, 33, 33 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2;
-        else if (data == std::vector<std::uint8_t>{ 47, 185, 204, 191, 246 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART;
-        else if (data == std::vector<std::uint8_t>{ 47, 55 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER;
-        else if (data == std::vector<std::uint8_t>{ 47, 178, 201 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER;
-        else if (data == std::vector<std::uint8_t>{ 47, 185, 221, 194, 166 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA;
-        else if (data == std::vector<std::uint8_t>{ 47, 190, 200, 179, 231 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI;
-        else if (data == std::vector<std::uint8_t>{ 47, 176, 237 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO;
-        else if (data == std::vector<std::uint8_t>{ 47, 183, 185, 181, 240 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY;
-        else if (data == std::vector<std::uint8_t>{ 47, 193, 193, 190, 198 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL;
-        else if (data == std::vector<std::uint8_t>{ 47, 189, 200, 190, 238 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION;
-        else if (data == std::vector<std::uint8_t>{ 47, 200, 229, 200, 229 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE;
-        else if (data == std::vector<std::uint8_t>{ 47, 199, 207, 199, 207 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA;
-        else if (data == std::vector<std::uint8_t>{ 47, 197, 169, 197, 169 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY;
-        else if (data == std::vector<std::uint8_t>{ 47, 192, 185 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE;
-        else if (data == std::vector<std::uint8_t>{ 47, 46, 46, 46 })
-            code = Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES;
+        const auto emoticon = EmoticonMap.find(text.substr(prefix.size()));
+        if (emoticon == EmoticonMap.end())
+        {
+            if (sender == m_session.GetName())
+            {
+                const auto chatPanel = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
+                chatPanel->GetChatWindow()->PushSystemMessage(Constants::Messages::Chat::EMOTION_HINT);
+            }
 
+            return;
+        }
+
+        const auto code = emoticon->second;
         const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
         int memberID = 0;
@@ -668,17 +691,17 @@ namespace Cx
                 {
                     case StartGameResult::NotReady:
                     {
-                        message = "There are users not ready yet";
+                        message = Constants::Messages::Waiting::GameStart::PLAYERS_NOT_READY;
                         break;
                     }
                     case StartGameResult::InsufficientPlayers:
                     {
-                        message = "For VS mode, more than one player is required.";
+                        message = Constants::Messages::Waiting::GameStart::INSUFFICIENT_PLAYERS;
                         break;
                     }
                     case StartGameResult::TeamUnbalanced:
                     {
-                        message = "The team is not in harmony.";
+                        message = Constants::Messages::Waiting::GameStart::TEAMS_UNBALANCED;
                         break;
                     }
                     default: break;
@@ -751,7 +774,7 @@ namespace Cx
 
             if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
             {
-                ShowDialog("There are users who have not the right tune.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::Waiting::TUNE_MISSING_FOR_OTHERS, DialogStyle::Information);
                 sender.SetCheckedState(false);
 
                 return;
@@ -880,17 +903,18 @@ namespace Cx
 
         if (!m_room.GetCurrentSlot().IsMaster)
         {
-            ShowDialog("Only Room master can change the room title.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::Waiting::ChangeRoomTitle::TITLE_CHANGE_FORBIDDEN, DialogStyle::Information);
             return;
         }
 
         auto ctx   = Gx::DialogPresentationContext();
         ctx.Bounds = {{}, GetView().getSize()};
-        ctx.Prompt = "Please enter a room name.";
+        ctx.Prompt = Constants::Messages::Waiting::ChangeRoomTitle::TITLE_PROMPT;
 
         Present(*dialog, ctx);
         sender.SetFocus(false);
 
+        titleBox->SetMaximumTextLength(21);
         titleBox->SetString(m_room.GetTitle());
         titleBox->SetFocus(true);
         titleBox->SelectAll();
@@ -901,23 +925,24 @@ namespace Cx
         const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
         const auto titleBox = dialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
 
-        titleBox->SetMaximumTextLength(21);
+        if (titleBox->GetString().getSize() > titleBox->GetMaximumTextLength())
+        {
+            ShowDialog(Constants::Messages::Waiting::ChangeRoomTitle::TITLE_TOO_LONG, DialogStyle::Information);
+        }
+
         if (titleBox->GetString().isEmpty())
             return;
 
-        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{titleBox->GetString().toAnsiString()}, [=] (const auto& ev) { OnUpdateRoomTitleResponded(ev); });
+        m_service.UpdateRoomTitle(UpdateRoomTitleRequest{titleBox->GetString()}, [=] (const auto& ev) { OnUpdateRoomTitleResponded(ev); });
     }
 
     void StateWaiting7K::OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev)
     {
-        const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
-        const auto titleBox = dialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
-
         try
         {
-            const auto& _ = ev.Open();
+            const auto& response = ev.Open();
 
-            m_room.SetTitle(titleBox->GetString());
+            m_room.SetTitle(response.Title);
             InvalidateRoomInfo();
         }
         catch (const Gx::Exception& e)
@@ -935,19 +960,19 @@ namespace Cx
             return;
 
         const auto team = m_teamButtons.at(&sender);
-        m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev) { OnUpdateTeamResponded(ev, team); });
+        m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev) { OnUpdateTeamResponded(ev); });
     }
 
-    void StateWaiting7K::OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev, const Room::Team team)
+    void StateWaiting7K::OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev)
     {
         try
         {
-            const auto& _ = ev.Open();
+            const auto& response = ev.Open();
 
             const auto sfxTeam = Instantiate<sf::Sound>(Sound::Effects::EF_34);
             if (const auto index = m_room.GetCurrentSlotIndex(); index < RoomContext::MaxCapacity && m_avatarInfo->GetSlot())
             {
-                m_room.SetTeam(index, team);
+                m_room.SetTeam(index, response.Team);
                 m_room.SetTeamColor(index, m_avatarInfo->ResolveTeamColor());
             }
 
@@ -1107,52 +1132,52 @@ namespace Cx
                 {
                     case sf::Keyboard::Key::Num1:
                     {
-                        SendEmoticon({ 47, 190, 200, 179, 231 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::HI, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HI);
                         break;
                     }
                     case sf::Keyboard::Key::Num2:
                     {
-                        SendEmoticon({ 47, 176, 237 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::GO, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_GO);
                         break;
                     }
                     case sf::Keyboard::Key::Num3:
                     {
-                        SendEmoticon({ 47, 183, 185, 181, 240 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::READY, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_READY);
                         break;
                     }
                     case sf::Keyboard::Key::Num4:
                     {
-                        SendEmoticon({ 47, 193, 193, 190, 198 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::APPROVAL, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_APPROVAL);
                         break;
                     }
                     case sf::Keyboard::Key::Num5:
                     {
-                        SendEmoticon({ 47, 189, 200, 190, 238 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::OBJECTION, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OBJECTION);
                         break;
                     };
                     case sf::Keyboard::Key::Num6:
                     {
-                        SendEmoticon({ 47, 200, 229, 200, 229 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::OHM_SMILE, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_SMILE);
                         break;
                     };
                     case sf::Keyboard::Key::Num7:
                     {
-                        SendEmoticon({ 47, 199, 207, 199, 207 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::OHM_HAHA, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_HAHA);
                         break;
                     };
                     case sf::Keyboard::Key::Num8:
                     {
-                        SendEmoticon({ 47, 197, 169, 197, 169 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::OHM_VICTORY, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_VICTORY);
                         break;
                     };
                     case sf::Keyboard::Key::Num9:
                     {
-                        SendEmoticon({ 47, 192, 185 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::OHM_LOSE, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_OHM_LOSE);
                         break;
                     };
                     case sf::Keyboard::Key::Num0:
                     {
-                        SendEmoticon({ 47, 46, 46, 46 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::BY_DEGREES, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BY_DEGREES);
                         break;
                     };
                     default:
@@ -1165,52 +1190,52 @@ namespace Cx
                 {
                     case sf::Keyboard::Key::Num1:
                     {
-                        SendEmoticon({ 47, 33 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::EXCLAMATION_MARK, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK);
                         break;
                     }
                     case sf::Keyboard::Key::Num2:
                     {
-                        SendEmoticon({ 47, 63 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::QUESTION, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_QUESTION);
                         break;
                     }
                     case sf::Keyboard::Key::Num3:
                     {
-                        SendEmoticon({ 47, 187, 231, 182, 251, 199, 216 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::HEART, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_HEART);
                         break;
                     }
                     case sf::Keyboard::Key::Num4:
                     {
-                        SendEmoticon({ 47, 51, 50, 49 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::COUNT, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_COUNT);
                         break;
                     }
                     case sf::Keyboard::Key::Num5:
                     {
-                        SendEmoticon({ 47, 126 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::NOTE, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_NOTE);
                         break;
                     }
                     case sf::Keyboard::Key::Num6:
                     {
-                        SendEmoticon({ 47, 33, 33 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::EXCLAMATION_MARK2, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_EXCLAMATION_MARK2);
                         break;
                     }
                     case sf::Keyboard::Key::Num7:
                     {
-                        SendEmoticon({ 47, 185, 204, 191, 246 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::BROKEN_HEART, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_BROKEN_HEART);
                         break;
                     }
                     case sf::Keyboard::Key::Num8:
                     {
-                        SendEmoticon({ 47, 55 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::CLOVER, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_CLOVER);
                         break;
                     }
                     case sf::Keyboard::Key::Num9:
                     {
-                        SendEmoticon({ 47, 178, 201 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::FLOWER, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_FLOWER);
                         break;
                     }
                     case sf::Keyboard::Key::Num0:
                     {
-                        SendEmoticon({ 47, 185, 221, 194, 166 }, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);
+                        SendEmoticon(Constants::Messages::Chat::Emoticons::IDEA, Resource::Waiting7K::Emoticon::IDC_ANIMATION_EMOTICON_IDEA);
                         break;
                     }
                     default:
@@ -1233,7 +1258,7 @@ namespace Cx
             if (slot.Name == m_room.GetCurrentSlot().Name)
                 return;
 
-            ShowDialog("Would you like to kick out?", DialogStyle::YesNo, false, [=] (const bool confirm)
+            ShowDialog(Constants::Messages::Waiting::Members::KICK_CONFIRM, DialogStyle::YesNo, false, [=] (const bool confirm)
             {
                 if (confirm)
                     m_service.UpdateRoomSlot(UpdateRoomSlotRequest{static_cast<std::uint8_t>(slotID)});
@@ -1268,9 +1293,9 @@ namespace Cx
         emoticon->Reset();
     }
 
-    void StateWaiting7K::SendEmoticon(const std::vector<std::uint8_t>& code, const std::string& emoticonID)
+    void StateWaiting7K::SendEmoticon(const std::string& command, const std::string& emoticonID)
     {
-        m_messaging.SendWaitingMessage(WaitingMessageRequest{std::string(code.begin(), code.end())});
+        m_messaging.SendWaitingMessage(WaitingMessageRequest{Constants::Messages::Chat::Emoticons::PREFIX + command});
 
         ShowEmoticon(m_mainAvatar, emoticonID);
     }
@@ -1294,16 +1319,15 @@ namespace Cx
             const auto [start, end] = GetRandomLevelRange(m_room.GetRandomLevel());
 
             musicName->SetColor(sf::Color(2, 222, 225));
-            musicName->SetString(fmt::format(
-                "<< Random {} {} >>",
-                start == 0 ? 13 : start,
-                end == 0 ? "over" : fmt::format("- {}", end)
-            ));
+            if (start != 0 && end != 0)
+                musicName->SetString(fmt::format(Constants::Messages::Room::Random::RANGE, start, end));
+            else
+                musicName->SetString(fmt::format(Constants::Messages::Waiting::Music::RANDOM_OVER, start == 0 ? 13 : start));
         }
         else
         {
             musicName->SetColor(sf::Color::White);
-            musicName->SetString(sf::String(fmt::format(L"{} [BPM: {:.2f}]", m_room.GetMusic().Title, m_room.GetMusic().BPM)));
+            musicName->SetString(sf::String(fmt::format(U"{} [BPM: {:.2f}]", m_room.GetMusic().Title, m_room.GetMusic().BPM)));
         }
 
         const auto level = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_ROOM_LEVEL);

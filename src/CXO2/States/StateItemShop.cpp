@@ -19,6 +19,7 @@
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/ItemShop.hpp>
+#include <CXO2/Constants/Messages/ItemShop.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Network/Exception.hpp>
@@ -78,7 +79,7 @@ namespace Cx
             avatar->Equip(m_items.Create(id));
 
         const auto nicknameText = Instantiate<Gx::Label>(Resource::ItemShop::IDC_TEXT_NICKNAME);
-        nicknameText->SetString(fmt::format(L"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
+        nicknameText->SetString(fmt::format(Constants::Messages::ItemShop::NICKNAME, m_session.GetLevel(), m_session.GetName()));
 
         const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::ItemShop::IDC_NUMBER_GEM);
         currentGem->SetValue(m_session.GetWallet().Gem);
@@ -364,9 +365,9 @@ namespace Cx
             if (response.ResultCode != PurchaseItemResult::Success)
             {
                 if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
-                    ShowDialog("You need more money.", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::ItemShop::PurchaseResponse::NOT_ENOUGH_MONEY, DialogStyle::Information);
                 else if (response.ResultCode == PurchaseItemResult::InventoryFull)
-                    ShowDialog("No more room in your Bag.", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::ItemShop::PurchaseResponse::NO_VACANT_SLOT, DialogStyle::Information);
 
                 return;
             }
@@ -407,7 +408,7 @@ namespace Cx
             const auto& response = ev.Open();
             if (response.Result == SellItemResult::Failed)
             {
-                ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::ItemShop::STANDARD_FACE_LOCKED, DialogStyle::Information);
                 return;
             }
 
@@ -555,7 +556,7 @@ namespace Cx
     {
         if (!m_myBagSelectedItem)
         {
-            ShowDialog("No selected item.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::ItemShop::NOTHING_SELECTED, DialogStyle::Information);
             return;
         }
 
@@ -572,14 +573,15 @@ namespace Cx
 
         if (price <= 0)
         {
-            ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+            ShowDialog(Constants::Messages::ItemShop::STANDARD_FACE_LOCKED, DialogStyle::Information);
             return;
         }
 
-        const sf::String message = fmt::format(L"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
-            m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
+        // v3.50 and later:
+        // const sf::String message = fmt::format(U"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
+        //     m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-        ShowDialog(message, DialogStyle::OkCancel, false, [this] (auto accepted) { OnSellItemConfirmed(accepted); });
+        ShowDialog(Constants::Messages::ItemShop::SELL_CONFIRM, DialogStyle::OkCancel, false, [this] (auto accepted) { OnSellItemConfirmed(accepted); });
     }
 
     void StateItemShop::OnSellItemConfirmed(const bool accepted)
@@ -1045,6 +1047,21 @@ namespace Cx
         const auto& metadata = m_shopItemAddButtons.at(&sender);
         if (O2::InInteropMode(InteropMode::Interface))
         {
+            // Note: Removed client validation, let this validation runs on server side
+            // if (m_session.GetInventory().size() >= 30)
+            // {
+            //     const auto it = std::find_if(m_session.GetInventory().begin(), m_session.GetInventory().end(), [itemID = metadata.ID] (auto id)
+            //     {
+            //         return id == 0;
+            //     });
+            //
+            //     if (it == m_session.GetInventory().end())
+            //     {
+            //         ShowDialog(Constants::Messages::ItemShop::VACANT_SLOT_REQUIRED, DialogStyle::Information);
+            //         return;
+            //     }
+            // }
+
             const auto it = std::find_if(m_session.GetInventory().begin(), m_session.GetInventory().end(), [itemID = metadata.ID] (auto id)
             {
                 return id == itemID;
@@ -1069,7 +1086,7 @@ namespace Cx
 
             if (!purchasable)
             {
-                ShowDialog("Not enough money to buy.", DialogStyle::Information);
+                ShowDialog(Constants::Messages::ItemShop::NOT_ENOUGH_MONEY, DialogStyle::Information);
                 return;
             }
 
@@ -1101,7 +1118,6 @@ namespace Cx
         }
 
         cartButton->PerformClick();
-
     }
 
     void StateItemShop::OnShopItemPreviewButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
@@ -1110,7 +1126,7 @@ namespace Cx
         const auto& [metadata, id] = m_shopItemPreviewButtons.at(&sender);
         if (metadata.Gender != Gender::Any && m_session.GetGender() != metadata.Gender)
         {
-            ShowDialog("You cannot equip items meant for the other\ngender", DialogStyle::Information);
+            ShowDialog(Constants::Messages::ItemShop::WRONG_GENDER, DialogStyle::Information);
             return;
         }
 
@@ -1136,7 +1152,7 @@ namespace Cx
         const auto& [metadata, id] = m_shopSetItemPreviewButtons.at(&sender);
         if (metadata.Gender != Gender::Any && m_session.GetGender() != metadata.Gender)
         {
-            ShowDialog("You cannot wear set items of different\ngender", DialogStyle::Information);
+            ShowDialog(Constants::Messages::ItemShop::WRONG_GENDER, DialogStyle::Information);
             return;
         }
 
@@ -1800,7 +1816,7 @@ namespace Cx
                 pieceName->SetVisible(true);
                 pieceName->SetString(std::to_string(p + 1));
                 if (p < itemSetList.size())
-                    pieceName->SetString(fmt::format(L"{} {}", p + 1, itemSetList[p].Name));
+                    pieceName->SetString(fmt::format(U"{} {}", p + 1, itemSetList[p].Name));
             }
 
             thumbnail->SetVisible(false);

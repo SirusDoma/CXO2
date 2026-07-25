@@ -7,6 +7,7 @@
 #include <CXO2/Config/GameConfig.hpp>
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Messages/Application.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 
@@ -175,7 +176,7 @@ namespace Cx
             {
                 if (!config.UseWindowCursor)
                 {
-                    ShowDialog("Would you like to change to window\ncursor?\nIf you cannot see the cursor press\nF8 again", DialogStyle::OkCancel, false, [&] (const bool response)
+                    ShowDialog(Constants::Messages::Application::Display::WINDOW_CURSOR_CONFIRM, DialogStyle::OkCancel, false, [&] (const bool response)
                     {
                         if (response)
                         {
@@ -199,7 +200,32 @@ namespace Cx
                         GetApplication().InvalidateCursor();
                     }
 
-                    ShowDialog("Changed to image cursor.\nTo change back to window cursor press F8\nagain", DialogStyle::Information);
+                    ShowDialog(Constants::Messages::Application::Display::IMAGE_CURSOR_ENABLED, DialogStyle::Information);
+                }
+            }
+            else if (ev.code == sf::Keyboard::Key::F7)
+            {
+                if (config.UseFx)
+                {
+                    ShowDialog(Constants::Messages::Application::Display::ENABLE_3D_CONFIRM, DialogStyle::YesNo, false, [&config] (const bool confirm)
+                    {
+                        if (confirm)
+                        {
+                            config.UseFx = true;
+                            config.Save();
+                        }
+                    });
+                }
+                else
+                {
+                    ShowDialog(Constants::Messages::Application::Display::DISABLE_3D_CONFIRM, DialogStyle::YesNo, false, [&config] (const bool confirm)
+                    {
+                        if (confirm)
+                        {
+                            config.UseFx = false;
+                            config.Save();
+                        }
+                    });
                 }
             }
             else if (ev.code == sf::Keyboard::Key::F9)
@@ -227,6 +253,35 @@ namespace Cx
         }
     }
 
+    void State::ExitGame(const sf::String& prompt, sf::FloatRect bounds)
+    {
+        if (m_popupSound)
+        {
+            auto& mixer = Require<Gx::AudioMixer>();
+            mixer.Play(*m_popupSound, Sound::Channel::SFX);
+        }
+
+        m_exitDialog->SetAcceptCallback([&]
+        {
+            m_exitPrompted = true;
+            Gx::Application::Instance().Close();
+        });
+
+        m_exitDialog->SetCancelCallback([&]
+        {
+            auto& mixer = Gx::Application::Instance().GetModule<Gx::Context>().Require<Gx::AudioMixer>();
+
+            mixer.Play(*m_cancelSound, Sound::Channel::SFX);
+            m_exitPrompted = false;
+        });
+
+        auto ctx        = Gx::DialogPresentationContext();
+        ctx.Bounds      = bounds.size == sf::Vector2f{} ? sf::FloatRect{{0, 0}, GetDefaultView().getSize() } : bounds;
+        ctx.Prompt      = prompt;
+        ctx.UseBackdrop = true;
+        Present(*m_exitDialog, ctx);
+    }
+
     Gx::RenderStates State::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
     {
         auto result = Scene::Render(surface, states);
@@ -250,32 +305,7 @@ namespace Cx
     {
         if (!m_exitPrompted)
         {
-            if (m_popupSound)
-            {
-                auto& mixer = Require<Gx::AudioMixer>();
-                mixer.Play(*m_popupSound, Sound::Channel::SFX);
-            }
-
-            m_exitDialog->SetAcceptCallback([&]
-            {
-                m_exitPrompted = true;
-                Gx::Application::Instance().Close();
-            });
-
-            m_exitDialog->SetCancelCallback([&]
-            {
-                auto& mixer = Gx::Application::Instance().GetModule<Gx::Context>().Require<Gx::AudioMixer>();
-
-                mixer.Play(*m_cancelSound, Sound::Channel::SFX);
-                m_exitPrompted = false;
-            });
-
-            auto ctx        = Gx::DialogPresentationContext();
-            ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
-            ctx.Prompt      = "Do you really want to exit?";
-            ctx.UseBackdrop = true;
-            Present(*m_exitDialog, ctx);
-
+            ExitGame(Constants::Messages::Application::Exit::CONFIRM);
             return false;
         }
 

@@ -39,6 +39,7 @@ namespace Cx
 
         void Initialize() override;
         void Initialize(RoomTransitionEventType evType);
+        void ShowChatHelp();
 
     private:
         void SyncCharacterInfo();
