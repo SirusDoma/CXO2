@@ -51,16 +51,29 @@ int main(int argc , char** argv)
             return 0;
         }
 
-        if (Gx::GetCurrentPlatform() == Gx::Platform::Windows)
+        sf::ContextSettings settings{};
+        settings.presentation = sf::ContextSettings::Presentation::Auto;
+
+        auto renderer = sf::Renderer::OpenGL;
+        if (sf::isRendererAvailable(sf::Renderer::Direct3D11))
         {
-            if ((sf::isGraphicsBackendAvailable(sf::GraphicsBackend::Direct3D11) && !sf::setGraphicsBackend(sf::GraphicsBackend::Direct3D11)) || !sf::setGraphicsBackend(sf::GraphicsBackend::OpenGL))
-            {
-                Cx::SystemMessageBox::ShowError("Failed to initialize the graphic renderer.", "Fatal Error");
-                return -1;
-            }
+            renderer = sf::Renderer::Direct3D11;
+            settings.presentation = sf::ContextSettings::Presentation::LowLatency;
+        }
+        else if (sf::isRendererAvailable(sf::Renderer::Metal))
+        {
+            renderer = sf::Renderer::Metal;
+            settings.presentation = sf::ContextSettings::Presentation::LowLatency;
         }
 
-        auto cxo2 = Cx::O2("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true);
+        sf::setRenderer(renderer);
+        if (sf::getRenderer() != renderer)
+        {
+            Cx::SystemMessageBox::ShowError("Failed to initialize the graphic renderer.", "Fatal Error");
+            return -1;
+        }
+
+        auto cxo2 = Cx::O2("O2-JAM", sf::VideoMode({800, 600}), sf::View({400, 300}, {800, 600}), true, settings);
         cxo2.GetModule<Gx::Context>().Provide<Cx::CommandLineContext>([ctx] (const auto&)
         {
             return std::make_unique<Cx::CommandLineContext>(ctx);
