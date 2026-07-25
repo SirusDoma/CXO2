@@ -6,7 +6,7 @@
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
 
 #include <CXO2/UI/Dialogs/OptionDialog.hpp>
 #include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
@@ -23,7 +23,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     void DialogLoader::OnRegistered(const std::string& id, const Builder& builder)
     {

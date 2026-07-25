@@ -6,13 +6,13 @@
 
 #include <CXO2/Metadata/UI/Components/Planet/ChannelBoardMetadata.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
-#include <CXO2/StringTable/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Identifiers/Planet.hpp>
 
 #include <fmt/format.h>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     Gx::ResourcePtr<ChannelBoard> ChannelBoardLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {

@@ -4,13 +4,13 @@
 #include <CXO2/Core/LongNote.hpp>
 #include <CXO2/Core/NoteGuideLine.hpp>
 
-#include <CXO2/StringTable/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
 
 #include <fmt/format.h>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     // TODO: Pass State instead
     NoteFactory::NoteFactory(Gx::ResourceManager& resources, const ChannelSet& instantiables) :

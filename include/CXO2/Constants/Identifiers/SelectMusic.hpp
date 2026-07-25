@@ -2,7 +2,7 @@
 
 #include <fmt/format.h>
 
-namespace Cx::StringTable::Identifiers::Resource::SelectMusic
+namespace Cx::Constants::Identifiers::Resource::SelectMusic
 {
     constexpr static auto IDC_DIALOG_SELECT_MUSIC           = "*/IDC_DIALOG_SELECT_MUSIC";
     constexpr static auto IDC_LIST_MUSIC_SELECTOR           = "IDC_LIST_MUSIC_SELECTOR";

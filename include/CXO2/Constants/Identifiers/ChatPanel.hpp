@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::ChatPanel
+namespace Cx::Constants::Identifiers::Resource::ChatPanel
 {
     constexpr static auto IDC_CHAT_PANEL                     = "*/IDC_CHAT_PANEL";
     constexpr static auto IDC_CHAT_WINDOW                    = "IDC_CHAT_WINDOW";

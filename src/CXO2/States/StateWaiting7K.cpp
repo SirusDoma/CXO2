@@ -35,10 +35,10 @@
 #include <CXO2/UI/Waiting/InstrumentSelector.hpp>
 #include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Waiting7K.hpp>
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Map.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Waiting7K.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Map.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Button.hpp>
@@ -55,7 +55,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     namespace
     {

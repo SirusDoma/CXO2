@@ -2,7 +2,7 @@
 
 #include <fmt/format.h>
 
-namespace Cx::StringTable::Identifiers::Resource::Game
+namespace Cx::Constants::Identifiers::Resource::Game
 {
     namespace Renderer
     {

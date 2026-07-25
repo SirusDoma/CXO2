@@ -14,15 +14,15 @@
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/UI/Planet/ChannelBoard.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Planet.hpp>
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Fade.hpp>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     class AuthService;
     class PlanetService;

@@ -1,7 +1,7 @@
 #include <CXO2/UI/Room/RoomList.hpp>
 
 #include <CXO2/Models/Room.hpp>
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/IO/ResourceManager.hpp>
@@ -11,7 +11,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     RoomList::RoomList(Gx::AudioMixer& mixer, Gx::ResourceManager& resources) :
         m_mixer(mixer),

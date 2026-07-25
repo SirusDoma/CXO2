@@ -4,8 +4,8 @@
 
 #include <CXO2/Models/Game.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Graphics/Animation.hpp>
@@ -18,7 +18,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     CreateRoomDialog::CreateRoomDialog(SessionContext& session, Gx::AudioMixer& mixer) :
         m_session(session),

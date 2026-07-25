@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Loading
+namespace Cx::Constants::Identifiers::Resource::Loading
 {
     constexpr static auto IDC_LIST_LOADING_SIGN   = "STATE_LOADING/IDC_LIST_LOADING_SIGN";
     constexpr static auto IDC_IMAGE_STATE_LOADING = "STATE_LOADING/IDC_IMAGE_STATE_LOADING";

@@ -1,0 +1,21 @@
+#pragma once
+
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Avatar.hpp>
+#include <CXO2/Constants/Identifiers/ChatPanel.hpp>
+#include <CXO2/Constants/Identifiers/Map.hpp>
+#include <CXO2/Constants/Identifiers/Instrument.hpp>
+#include <CXO2/Constants/Identifiers/Option.hpp>
+#include <CXO2/Constants/Identifiers/SelectMusic.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Bulletin.hpp>
+#include <CXO2/Constants/Identifiers/MyRoom.hpp>
+#include <CXO2/Constants/Identifiers/ItemShop.hpp>
+#include <CXO2/Constants/Identifiers/Payment.hpp>
+#include <CXO2/Constants/Identifiers/MusicShop.hpp>
+#include <CXO2/Constants/Identifiers/Waiting7K.hpp>
+#include <CXO2/Constants/Identifiers/Playing7K.hpp>
+#include <CXO2/Constants/Identifiers/Result.hpp>

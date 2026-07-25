@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace Cx::StringTable::Identifiers::Resource::Playing7K
+namespace Cx::Constants::Identifiers::Resource::Playing7K
 {
     constexpr static auto IDC_CHART_RENDERER           = "STATE_PLAYING_7K/IDC_CHART_RENDERER";
     constexpr static auto IDC_CHAT_PANEL               = "STATE_PLAYING_7K/IDC_CHAT_PANEL";

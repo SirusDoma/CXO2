@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Waiting7K
+namespace Cx::Constants::Identifiers::Resource::Waiting7K
 {
     constexpr static auto IDC_IMAGE_CHANNEL_CATEGORY        = "STATE_WAITING_7K/IDC_IMAGE_CHANNEL_CATEGORY";
     constexpr static auto IDC_NUMBER_CHANNEL_ID             = "STATE_WAITING_7K/IDC_NUMBER_CHANNEL_ID";

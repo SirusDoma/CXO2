@@ -3,8 +3,8 @@
 
 #include <CXO2/Services/WaitingService.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Map.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Map.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
@@ -16,7 +16,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     MapSelector::MapSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, const unsigned int mapId, const unsigned int effectId) :
         m_mixer(mixer),

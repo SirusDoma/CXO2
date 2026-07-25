@@ -3,7 +3,7 @@
 #include<fmt/format.h>
 #include <string>
 
-namespace Cx::StringTable::Identifiers::Resource::Map
+namespace Cx::Constants::Identifiers::Resource::Map
 {
     constexpr static auto IDC_CONTAINER_MAP_SELECTOR  = "*/IDC_CONTAINER_MAP_SELECTOR";
 

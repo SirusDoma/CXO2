@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Instrument
+namespace Cx::Constants::Identifiers::Resource::Instrument
 {
     constexpr static auto IDC_CONTAINER_INSTRUMENT_SELECTOR = "*/IDC_CONTAINER_INSTRUMENT_SELECTOR";
 

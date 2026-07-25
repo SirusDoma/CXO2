@@ -4,8 +4,8 @@
 #include <CXO2/States/State.hpp>
 #include <CXO2/Services/PlanetService.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Planet.hpp>
 
 #include <Genode/UI/List.hpp>
 #include <Genode/Tasks.hpp>
@@ -15,7 +15,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     ChannelBoard::ChannelBoard(Gx::AudioMixer& mixer, Gx::ResourceManager& resources) :
         m_mixer(mixer),

@@ -7,13 +7,13 @@
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
 
 #include <Genode/IO/FileSystem.hpp>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     RoomContext::RoomContext(SessionContext& session, Gx::ResourceManager& resources) :
         m_session(session),

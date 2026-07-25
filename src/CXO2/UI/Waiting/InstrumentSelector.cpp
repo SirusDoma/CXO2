@@ -1,8 +1,8 @@
 #include <CXO2/UI/Waiting/InstrumentSelector.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Instrument.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Instrument.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Button.hpp>
@@ -12,7 +12,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     InstrumentSelector::InstrumentSelector(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, ItemFactory& items) :
         m_mixer(mixer),

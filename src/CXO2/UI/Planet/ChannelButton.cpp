@@ -1,11 +1,11 @@
 #include <CXO2/UI/Planet/ChannelButton.hpp>
 #include <CXO2/States/State.hpp>
 
-#include <CXO2/StringTable/Identifiers/Planet.hpp>
+#include <CXO2/Constants/Identifiers/Planet.hpp>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     ChannelButton::ChannelButton() :
         RadioButton(),

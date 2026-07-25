@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::MyRoom
+namespace Cx::Constants::Identifiers::Resource::MyRoom
 {
     constexpr static auto IDC_AVATAR                        = "STATE_MY_ROOM/IDC_AVATAR";
     constexpr static auto IDC_IMAGE_MYBAG_SELECT            = "STATE_MY_ROOM/IDC_IMAGE_MYBAG_SELECT";

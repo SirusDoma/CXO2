@@ -11,9 +11,9 @@
 #include <CXO2/Contexts/RoomContext.hpp>
 
 #include <CXO2/Utilities/StringFormatter.hpp>
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/SelectMusic.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/SelectMusic.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/SceneGraph/Scene.hpp>
@@ -32,7 +32,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room) :
         m_coverID(0),

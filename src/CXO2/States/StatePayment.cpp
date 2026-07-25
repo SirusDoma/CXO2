@@ -3,8 +3,8 @@
 #include <CXO2/Avatar/ItemFactory.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Payment.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Payment.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
@@ -13,7 +13,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StatePayment::StatePayment(Gx::AudioMixer& mixer, SessionContext& session, ItemFactory& items, CartContext& cart) :
         m_mixer(mixer),

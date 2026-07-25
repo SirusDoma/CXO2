@@ -6,7 +6,7 @@
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
 
 #include <Genode/IO/ResourceManager.hpp>
 
@@ -18,7 +18,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     State::State() :
         State(typeid(this).name())

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Sound
+namespace Cx::Constants::Identifiers::Sound
 {
     namespace Channel
     {

@@ -7,7 +7,7 @@
 #include <CXO2/Services/ChatService.hpp>
 
 #include <CXO2/Utilities/StringFormatter.hpp>
-#include <CXO2/StringTable/Identifiers/ChatPanel.hpp>
+#include <CXO2/Constants/Identifiers/ChatPanel.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/RadioButton.hpp>
@@ -18,7 +18,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     ChatPanel::ChatPanel(SessionContext& session, ChatService& service) :
         m_session(session),

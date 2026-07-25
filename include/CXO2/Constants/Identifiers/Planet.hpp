@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Planet
+namespace Cx::Constants::Identifiers::Resource::Planet
 {
     constexpr static auto IDC_CONTAINER_MUSIC_HALL  = "STATE_PLANET/IDC_CONTAINER_MUSIC_HALL";
     constexpr static auto IDC_RADIO_BEGINNER_01     = "STATE_PLANET/IDC_CONTAINER_MUSIC_HALL/IDC_RADIO_BEGINNER_01";

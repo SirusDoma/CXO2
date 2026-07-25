@@ -1,8 +1,8 @@
 #include <CXO2/UI/Dialogs/OptionDialog.hpp>
 #include <CXO2/States/State.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Option.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Option.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Audio/SoundGroup.hpp>
@@ -19,7 +19,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     OptionDialog::OptionDialog(Gx::AudioMixer& mixer, GameConfig& config) :
         m_parent(),

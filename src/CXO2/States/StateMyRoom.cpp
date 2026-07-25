@@ -16,8 +16,8 @@
 #include <CXO2/Network/Responses/EquipItemResponse.hpp>
 #include <CXO2/Network/Responses/SellItemResponse.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/MyRoom.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/MyRoom.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Network/Exception.hpp>
@@ -33,7 +33,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     namespace
     {

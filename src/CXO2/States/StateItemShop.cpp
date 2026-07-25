@@ -17,8 +17,8 @@
 #include <CXO2/Network/Responses/PurchaseItemResponse.hpp>
 #include <CXO2/Network/Responses/SellItemResponse.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/ItemShop.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/ItemShop.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Network/Exception.hpp>
@@ -34,7 +34,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateItemShop::StateItemShop(Gx::AudioMixer& mixer, ItemShopService& service, SessionContext& session, CartContext& cart, ItemFactory& items) :
         m_mixer(mixer),

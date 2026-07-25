@@ -14,10 +14,10 @@
 
 #include <unordered_map>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     using NotePrefabMap = std::unordered_map<NoteShape, Gx::Sprite*>;
 

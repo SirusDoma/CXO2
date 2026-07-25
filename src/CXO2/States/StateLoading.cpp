@@ -12,8 +12,8 @@
 
 #include <CXO2/IO/PlayingResourceContext.hpp>
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Loading.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Loading.hpp>
 
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
@@ -31,7 +31,7 @@ namespace Gx
 namespace Cx
 {
 
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateLoading::StateLoading(GameConfig& config, SessionContext& session, RoomContext& room, PlayingService& service) :
         m_texture(),

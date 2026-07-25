@@ -1,7 +1,7 @@
 #include <CXO2/UI/Waiting/AvatarInfo.hpp>
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
-#include <CXO2/StringTable/Identifiers/Avatar.hpp>
+#include <CXO2/Constants/Identifiers/Avatar.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Label.hpp>
@@ -12,7 +12,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     void AvatarInfo::Initialize()
     {

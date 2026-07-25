@@ -1,5 +1,5 @@
 #include <CXO2/UI/Playing/Equalizer.hpp>
-#include <CXO2/StringTable/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
 
 #include <Genode/UI/List.hpp>
 
@@ -10,7 +10,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     Equalizer::Equalizer(const unsigned int sampleBufferCount) :
         m_bufferSampleCount(sampleBufferCount),

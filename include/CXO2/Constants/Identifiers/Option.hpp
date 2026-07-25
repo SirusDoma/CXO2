@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 
-namespace Cx::StringTable::Identifiers::Resource::Option
+namespace Cx::Constants::Identifiers::Resource::Option
 {
     constexpr static auto IDC_DIALOG_OPTION             = "*/IDC_DIALOG_OPTION";
     constexpr static auto IDC_IMAGE_DIALOG_OPTION_KEY   = "IDC_IMAGE_DIALOG_OPTION_KEY";

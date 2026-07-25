@@ -48,9 +48,9 @@
 #include <CXO2/Models/Game.hpp>
 #include <CXO2/Models/Room.hpp>
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Graphics.hpp>
@@ -61,7 +61,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateRoom::StateRoom(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room,
         GameConfig& config, ChannelService& roomService, CharacterService& charService, ItemFactory& items) :

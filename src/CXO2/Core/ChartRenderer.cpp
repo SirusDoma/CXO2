@@ -6,7 +6,7 @@
 #include <CXO2/Core/NoteFactory.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/UI/Playing/Equalizer.hpp>
-#include <CXO2/StringTable/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
 
 #include <Genode/Tween/Fade.hpp>
 #include <Genode/UI/List.hpp>
@@ -14,7 +14,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     ChartRenderer::ChartRenderer(JudgementStrategy& judgement, LifeSystem& life, ScoreTracker& scores, Gx::AudioMixer& mixer, Gx::ResourceManager& prefabResources, const ChannelSet& instantiables) :
         m_judgement(judgement),

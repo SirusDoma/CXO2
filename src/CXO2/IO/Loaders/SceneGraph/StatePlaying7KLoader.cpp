@@ -5,7 +5,7 @@
 #include <CXO2/IO/PlayingResourceContext.hpp>
 
 #include <CXO2/Avatar/Avatar.hpp>
-#include <CXO2/StringTable/Identifiers/Playing7K.hpp>
+#include <CXO2/Constants/Identifiers/Playing7K.hpp>
 
 #include <Genode/UI/List.hpp>
 
@@ -13,7 +13,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StatePlaying7KLoader::StatePlaying7KLoader(Gx::ResourceManager& resources) :
         m_resources(resources)

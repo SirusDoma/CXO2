@@ -4,7 +4,7 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Models/Game.hpp>
 
-#include <CXO2/StringTable/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/SceneGraph/Scene.hpp>
@@ -16,7 +16,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     RoomButton::RoomButton(const SessionContext& session) :
         m_room(),

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::MusicShop
+namespace Cx::Constants::Identifiers::Resource::MusicShop
 {
     constexpr static auto IDC_NUMBER_GEM          = "STATE_MUSIC_SHOP/IDC_NUMBER_GEM";
     constexpr static auto IDC_NUMBER_CASH         = "STATE_MUSIC_SHOP/IDC_NUMBER_CASH";

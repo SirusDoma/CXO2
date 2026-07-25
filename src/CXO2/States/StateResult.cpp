@@ -12,9 +12,9 @@
 #include <CXO2/Services/PlayingService.hpp>
 
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Result.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Result.hpp>
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Move.hpp>
@@ -26,7 +26,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service) :
         m_mixer(mixer),

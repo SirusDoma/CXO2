@@ -1,7 +1,7 @@
 #include <CXO2/States/StateAvi.hpp>
 #include <CXO2/States/StatePlanet.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
 
 #include <Genode/Tasks/Action.hpp>
 #include <Genode/Tasks/Delay.hpp>
@@ -13,7 +13,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateAvi::StateAvi(Gx::AudioMixer& mixer) :
         m_mixer(mixer)

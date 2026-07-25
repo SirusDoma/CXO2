@@ -6,8 +6,8 @@
 #include <CXO2/Contexts/CartContext.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/MusicShop.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/MusicShop.hpp>
 
 #include <Genode/UI/Button.hpp>
 #include <Genode/UI/Gauge.hpp>
@@ -23,7 +23,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateMusicShop::StateMusicShop(Gx::AudioMixer& mixer, SessionContext& session, CartContext& cart, ItemFactory& items) :
         m_mixer(mixer),

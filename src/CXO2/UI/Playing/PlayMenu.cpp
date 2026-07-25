@@ -3,7 +3,7 @@
 #include <CXO2/Core/ChartRenderer.hpp>
 #include <CXO2/States/State.hpp>
 
-#include <CXO2/StringTable/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
 
 #include <Genode/UI/List.hpp>
 #include <Genode/UI/BitmapNumber.hpp>
@@ -14,7 +14,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     PlayMenu::PlayMenu(const GameConfig& config) :
         m_config(config),

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Avatar
+namespace Cx::Constants::Identifiers::Resource::Avatar
 {
     constexpr static auto IDC_AVATAR_INFO          = "IDC_AVATAR_INFO";
     constexpr static auto IDC_ANIMATION_OHM        = "IDC_ANIMATION_OHM";

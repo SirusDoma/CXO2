@@ -8,7 +8,7 @@
 #include <CXO2/UI/Waiting/MapSelector.hpp>
 #include <CXO2/UI/Waiting/InstrumentSelector.hpp>
 
-#include <CXO2/StringTable/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Services/ChatService.hpp>
@@ -21,7 +21,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     void UiContainerLoader::OnRegistered(const std::string& id, const Builder& builder)
     {

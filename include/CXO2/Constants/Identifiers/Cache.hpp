@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Cache
+namespace Cx::Constants::Identifiers::Resource::Cache
 {
     constexpr static auto IDC_IMAGE_STATE_LOADING_COVER = "IDC_IMAGE_STATE_LOADING_COVER";
     constexpr static auto IDC_TEXTURE_STATE_PLAYING     = "IDC_TEXTURE_STATE_PLAYING";

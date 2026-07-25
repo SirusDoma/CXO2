@@ -1,8 +1,8 @@
 #include <CXO2/States/StateBulletin.hpp>
 #include <CXO2/States/StateRoom.hpp>
 
-#include <CXO2/StringTable/Identifiers/Sound.hpp>
-#include <CXO2/StringTable/Identifiers/Bulletin.hpp>
+#include <CXO2/Constants/Identifiers/Sound.hpp>
+#include <CXO2/Constants/Identifiers/Bulletin.hpp>
 
 #include <Genode/UI/Button.hpp>
 
@@ -10,7 +10,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StateBulletin::StateBulletin(Gx::AudioMixer& mixer) :
         m_mixer(mixer)

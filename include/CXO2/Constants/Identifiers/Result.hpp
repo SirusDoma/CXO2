@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Cx::StringTable::Identifiers::Resource::Result
+namespace Cx::Constants::Identifiers::Resource::Result
 {
     constexpr static auto IDC_CONTAINER_BACKGROUND       = "STATE_RESULT/IDC_CONTAINER_BACKGROUND";
     constexpr static auto IDC_IMAGE_STATE_RESULT         = "STATE_RESULT/IDC_IMAGE_STATE_RESULT";

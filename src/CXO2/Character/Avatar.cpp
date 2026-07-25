@@ -1,13 +1,13 @@
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Models/Equipment.hpp>
 
-#include <CXO2/StringTable/Identifiers/Avatar.hpp>
+#include <CXO2/Constants/Identifiers/Avatar.hpp>
 
 #include <utility>
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     static constexpr std::array<std::pair<EquipmentType, RenderPart>, 100> RenderLayerOrder =
     {

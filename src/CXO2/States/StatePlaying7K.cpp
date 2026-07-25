@@ -27,9 +27,9 @@
 #include <CXO2/UI/Playing/PlayMenu.hpp>
 #include <CXO2/UI/Playing/Equalizer.hpp>
 
-#include <CXO2/StringTable/Identifiers/Cache.hpp>
-#include <CXO2/StringTable/Identifiers/Game.hpp>
-#include <CXO2/StringTable/Identifiers/Playing7K.hpp>
+#include <CXO2/Constants/Identifiers/Cache.hpp>
+#include <CXO2/Constants/Identifiers/Game.hpp>
+#include <CXO2/Constants/Identifiers/Playing7K.hpp>
 
 #include <Genode/Tasks/Scheduler.hpp>
 #include <Genode/UI/Button.hpp>
@@ -47,7 +47,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     StatePlaying7K::StatePlaying7K(
         Gx::AudioMixer& mixer,

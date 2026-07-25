@@ -1,5 +1,5 @@
 #include <CXO2/UI/Room/UserList.hpp>
-#include <CXO2/StringTable/Identifiers/Room.hpp>
+#include <CXO2/Constants/Identifiers/Room.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/List.hpp>
@@ -15,7 +15,7 @@
 
 namespace Cx
 {
-    using namespace StringTable::Identifiers;
+    using namespace Constants::Identifiers;
 
     UserList::UserList(ChannelService& service) :
         m_service(service),
