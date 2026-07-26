@@ -59,7 +59,8 @@ namespace Cx
             std::uint8_t  OriginFlag;
             std::uint8_t  GenderFlag;
             std::uint8_t  Discounted;
-            std::uint16_t ItemCount;
+            std::uint8_t  ItemCount;
+            std::uint8_t  Currency;
             std::uint32_t ItemIDs[5];
             std::uint32_t Prices[5];
             std::uint32_t Discounts[5];
@@ -74,8 +75,8 @@ namespace Cx
             auto set   = SetInfoMetadata();
             set.ID     = info.ID;
             set.Type   = ResourceMetadata::ResourceType::SetInfo;
-            set.IsNew  = (info.OriginFlag & 0x7F) != 0;
-            set.Origin = static_cast<Planet>(info.OriginFlag >> 7 & 1);
+            set.IsNew  = (info.OriginFlag >> 7 & 1) != 0;
+            set.Origin = static_cast<Planet>(info.OriginFlag & 0x7F);
 
             switch (info.GenderFlag >> 6)
             {
@@ -87,12 +88,12 @@ namespace Cx
             set.Name        = ReadString(stream, ctx);
             set.Description = ReadString(stream, ctx);
 
+            const auto currency = info.Currency != 0 ? Currency::Gem : Currency::Cash;
             for (std::size_t slot = 0; slot < std::min<std::size_t>(info.ItemCount, 5); slot++)
             {
-                // Assume all sets are using cash
                 set.ItemsIDs.insert(info.ItemIDs[slot]);
                 if (info.Discounted != 0 && info.Prices[slot] > info.Discounts[slot])
-                    set.Discounts[info.ItemIDs[slot]][Currency::Cash] = info.Prices[slot] - info.Discounts[slot];
+                    set.Discounts[info.ItemIDs[slot]][currency] = info.Prices[slot] - info.Discounts[slot];
             }
 
             if (set.ID == 0 || set.ItemsIDs.empty())
