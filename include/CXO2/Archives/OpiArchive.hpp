@@ -16,12 +16,12 @@ namespace Cx
     {
         char          Name[128];
         std::uint32_t Reference;
-        std::uint32_t Size1;
-        std::uint32_t Size2;
+        std::uint32_t FileSize;
+        std::uint32_t ReservedSize;
         std::uint32_t Unused1;
         std::uint32_t Unused2;
 
-        std::uint32_t GetSize() const { return std::max(Size1, Size2); }
+        std::uint32_t GetSize() const { return FileSize; }
     };
 
     class OpiArchive final : public virtual Gx::Archive
