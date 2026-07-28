@@ -34,7 +34,8 @@ The game is a drop-in replacement of original `OTwo.exe`, which mean it can read
 
 This mean modded `Interface(1).opi`, `Playing(1).opi` and/or `Avatar.opa` may work in this client, **as long as the files are compatible with the `Client Version` specified in the top of the [README](../README.md)**.
 
-The client also extend the interface/avatar asset pipeline further by utilizing json format and extremely extendible for this front, you can use this to mod or even build the scene composition from the scratch.
+The client also extend the interface/avatar asset pipeline further by utilizing json format and extremely extendible in this front, you can use this to mod or even build the scene composition from the scratch.
+Further details can be found in the [Asset customization documentation](./modding/Asset.md).
 
 Further modding (such as extending game via library (.dll)) is still under planning phase. Please note that any dll injection that you use with original `OTwo.exe` **will not** work.
 

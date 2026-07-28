@@ -105,5 +105,8 @@ $ cmake --build build/cmake-build-debug --target CXO2
 ## File Format ##
 The file formats used by the client are documented in [docs/file-format/FileFormat.md](docs/file-format/FileFormat.md).
 
+## Modding ##
+The asset customizations are documented in [docs/modding/Asset.md](docs/modding/Asset.md).
+
 ## FAQ ##
 Refer to [docs/FAQ.md](docs/FAQ.md) for frequently asked questions.
