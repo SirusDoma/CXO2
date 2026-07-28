@@ -1,7 +1,7 @@
 {
   "type": "Image",
   "require": {
-    "sheet": "Buffer.ojs",
+    "sprite": "Buffer.ojs",
     "bndID": "0X1B000005"
   },
   "attributes": {

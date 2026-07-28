@@ -1,7 +1,7 @@
 {
   "type": "Image",
   "require": {
-    "sheet": "StateResult_Top.ojs"
+    "sprite": "StateResult_Top.ojs"
   },
   "attributes": {
     "objects": {

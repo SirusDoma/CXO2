@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Wait_Effect8_1.ojs",
+    "sprite": "Wait_Effect8_1.ojs",
     "bndID": "0X16500045"
   },
   "attributes": {

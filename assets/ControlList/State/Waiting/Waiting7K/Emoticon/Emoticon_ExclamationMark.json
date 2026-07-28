@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Emoticon_ExclamationMark.ojs"
+    "sprite": "Emoticon_ExclamationMark.ojs"
   },
   "attributes": {
     "transform": {

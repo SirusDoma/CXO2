@@ -1,7 +1,7 @@
 {
   "type": "Gauge",
   "require": {
-    "sheet": "equalizer_ani.ojs"
+    "sprite": "equalizer_ani.ojs"
   },
   "attributes": {
     "orientation": "Vertical",

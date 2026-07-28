@@ -1,7 +1,7 @@
 {
   "type": "Dialog",
   "require": {
-    "sheet": "Notice_Base.ojs"
+    "sprite": "Notice_Base.ojs"
   },
   "attributes": {
     "label": {

@@ -1,7 +1,7 @@
 {
   "type": "RadioButton",
   "require": {
-    "sheet": "Room_UserList_Over.ojs"
+    "sprite": "Room_UserList_Over.ojs"
   },
   "attributes": {
     "objects": {
@@ -9,7 +9,7 @@
       "IDC_IMAGE_HOVER": {
         "type": "Image",
         "require": {
-          "sheet": "Room_UserList_Over.ojs"
+          "sprite": "Room_UserList_Over.ojs"
         }
       }
     }

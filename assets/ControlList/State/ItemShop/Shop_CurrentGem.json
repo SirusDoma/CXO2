@@ -1,7 +1,7 @@
 {
   "type": "BitmapNumber",
   "require": {
-    "sheet": "Shop_GemFont.ojs",
+    "sprite": "Shop_GemFont.ojs",
     "bndID": "0X14400024"
   },
   "attributes": {

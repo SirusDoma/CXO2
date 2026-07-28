@@ -1,6 +1,6 @@
 ﻿{
   "type": "Image",
   "require": {
-    "sheet": "MusicLoading10.ojs"
+    "sprite": "MusicLoading10.ojs"
   }
 }

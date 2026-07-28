@@ -1,7 +1,7 @@
 ﻿{
   "type": "Image",
   "require": {
-    "sheet": "Room_MOver.ojs"
+    "sprite": "Room_MOver.ojs"
   },
   "attributes": {
     "transform": {

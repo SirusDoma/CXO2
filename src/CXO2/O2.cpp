@@ -317,61 +317,6 @@ namespace Cx
         auto& avatar    = resources.Create<OpiArchive>("Avatar");
         auto& embedded  = resources.Create<EmbeddedArchive>("Internal");
 
-        // Reroute font to embedded resource
-        auto& fontManager = context.Require<Gx::FontManager>();
-        if (auto unicode = fontManager.GetData("Arial Unicode MS"))
-            embedded.WriteFile("Interface/Common/Font.ttf", unicode->first, unicode->second);
-        else
-        {
-            if (auto arial = fontManager.GetData("Arial"))
-                embedded.WriteFile("Interface/Common/Font.ttf", arial->first, arial->second);
-            else if (auto defaultData = fontManager.GetDefaultData())
-                embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
-
-            // Korea
-            if (auto ff1_1 = fontManager.GetData("Malgun Gothic"))
-                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_1->first, ff1_1->second);
-            else if (auto ff1_2 = fontManager.GetData("Apple SD Gothic Neo"))
-                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_2->first, ff1_2->second);
-            else if (auto ff1_3 = fontManager.GetData("Baekmuk Dotum"))
-                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_3->first, ff1_3->second);
-
-            // Chinese
-            if (auto ff2_1 = fontManager.GetData("Microsoft YaHei UI"))
-                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_1->first, ff2_1->second);
-            else if (auto ff2_2 = fontManager.GetData("PingFang SC"))
-                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_2->first, ff2_2->second);
-            else if (auto ff2_3 = fontManager.GetData("AR PL UMing CN"))
-                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_3->first, ff2_3->second);
-
-            // Japan
-            if (auto ff3_1 = fontManager.GetData("Yu Gothic UI"))
-                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_1->first, ff3_1->second);
-            else if (auto ff3_2 = fontManager.GetData("Hiragino Sans"))
-                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_2->first, ff3_2->second);
-            else if (auto ff3_3 = fontManager.GetData("Kochi Gothic"))
-                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_3->first, ff3_3->second);
-        }
-
-        // Reroute bold font to embedded resource
-        if (auto arialBlack = fontManager.GetData("Arial Black"))
-            embedded.WriteFile("Interface/Common/Font.Bold.ttf", arialBlack->first, arialBlack->second);
-        else if (auto defaultData = fontManager.GetDefaultData())
-            embedded.WriteFile("Interface/Common/Font.Bold.ttf", defaultData->first, defaultData->second);
-
-        // Embedded resources
-        for (const auto& [name, resource] : Cx::Resources)
-            embedded.WriteFile(std::string(name), resource.data, resource.size);
-
-        Gx::FileSystem::Mount(embedded);
-
-        // App Icon
-        if (const auto stream = embedded.Open("Icon.png"))
-        {
-            m_icon = sf::Image(*stream);
-            window.setIcon(*m_icon);
-        }
-
         // Mount patch packages instead of applying them to the master archive.
         // This will keep master archive pristine while still accounting patches that are not applied by the game.
 
@@ -380,7 +325,7 @@ namespace Cx
             auto patches = std::vector<std::pair<unsigned long, std::string>>();
             for (const auto& extension : { ".opi", ".opa" })
             {
-                for (const auto& file : Gx::FileSystem::Scan(target + "*" + extension))
+                for (const auto& file : Gx::FileSystem::Scan(fmt::format("{}*{}", target , extension)))
                 {
                     const auto fileName = file->GetName();
                     const auto suffix   = std::filesystem::path(fileName).stem().string().substr(target.size());
@@ -466,6 +411,61 @@ namespace Cx
         if (Gx::FileSystem::Contains("O2PlanetNPC.ojm") && npc.LoadFromFile("O2PlanetNPC.ojm"))
             Gx::FileSystem::Mount(npc);
 
+        // Reroute font to embedded resource
+        auto& fontManager = context.Require<Gx::FontManager>();
+        if (auto unicode = fontManager.GetData("Arial Unicode MS"))
+            embedded.WriteFile("Interface/Common/Font.ttf", unicode->first, unicode->second);
+        else
+        {
+            if (auto arial = fontManager.GetData("Arial"))
+                embedded.WriteFile("Interface/Common/Font.ttf", arial->first, arial->second);
+            else if (auto defaultData = fontManager.GetDefaultData())
+                embedded.WriteFile("Interface/Common/Font.ttf", defaultData->first, defaultData->second);
+
+            // Korea
+            if (auto ff1_1 = fontManager.GetData("Malgun Gothic"))
+                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_1->first, ff1_1->second);
+            else if (auto ff1_2 = fontManager.GetData("Apple SD Gothic Neo"))
+                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_2->first, ff1_2->second);
+            else if (auto ff1_3 = fontManager.GetData("Baekmuk Dotum"))
+                embedded.WriteFile("Interface/Common/Fallback-Font1.ttf", ff1_3->first, ff1_3->second);
+
+            // Chinese
+            if (auto ff2_1 = fontManager.GetData("Microsoft YaHei UI"))
+                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_1->first, ff2_1->second);
+            else if (auto ff2_2 = fontManager.GetData("PingFang SC"))
+                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_2->first, ff2_2->second);
+            else if (auto ff2_3 = fontManager.GetData("AR PL UMing CN"))
+                embedded.WriteFile("Interface/Common/Fallback-Font2.ttf", ff2_3->first, ff2_3->second);
+
+            // Japan
+            if (auto ff3_1 = fontManager.GetData("Yu Gothic UI"))
+                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_1->first, ff3_1->second);
+            else if (auto ff3_2 = fontManager.GetData("Hiragino Sans"))
+                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_2->first, ff3_2->second);
+            else if (auto ff3_3 = fontManager.GetData("Kochi Gothic"))
+                embedded.WriteFile("Interface/Common/Fallback-Font3.ttf", ff3_3->first, ff3_3->second);
+        }
+
+        // Reroute bold font to embedded resource
+        if (auto arialBlack = fontManager.GetData("Arial Black"))
+            embedded.WriteFile("Interface/Common/Font.Bold.ttf", arialBlack->first, arialBlack->second);
+        else if (auto defaultData = fontManager.GetDefaultData())
+            embedded.WriteFile("Interface/Common/Font.Bold.ttf", defaultData->first, defaultData->second);
+
+        // Embedded resources
+        for (const auto& [name, resource] : Cx::Resources)
+            embedded.WriteFile(std::string(name), resource.data, resource.size);
+
+        // App Icon
+        if (const auto stream = embedded.Open("Icon.png"))
+        {
+            m_icon = sf::Image(*stream);
+            window.setIcon(*m_icon);
+        }
+
+        Gx::FileSystem::Mount(embedded);
+
         // Cache item textures
         if (InInteropMode(InteropMode::Avatar))
         {
@@ -481,20 +481,23 @@ namespace Cx
                 // Scan for ItemData.dat
                 std::string itemDataFileName = []
                 {
+                    if (Gx::FileSystem::Contains("Avatar/ItemData.json"))
+                        return std::string("Avatar/ItemData.json");
+
                     if (const auto files = Gx::FileSystem::Scan("itemdata*.dat"); !files.empty())
                         return files.front()->GetName();
 
-                    return std::string("Avatar/ItemData.json");
+                    return std::string();
                 }();
 
                 // Scan for SetInfoData.ojs (optional)
                 std::string setInfoDataFileName = []
                 {
-                    if (const auto files = Gx::FileSystem::Scan("setinfodata.*"); !files.empty())
-                        return files.front()->GetName();
-
                     if (Gx::FileSystem::Contains("Avatar/SetInfoData.json"))
                         return std::string("Avatar/SetInfoData.json");
+
+                    if (const auto files = Gx::FileSystem::Scan("setinfodata.*"); !files.empty())
+                        return files.front()->GetName();
 
                     return std::string();
                 }();

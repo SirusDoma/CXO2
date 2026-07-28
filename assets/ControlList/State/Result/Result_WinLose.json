@@ -1,7 +1,7 @@
 {
   "type": "Image",
   "require": {
-    "sheet": "Result_WinLose.ojs"
+    "sprite": "Result_WinLose.ojs"
   },
   "attributes": {
     "frames": {

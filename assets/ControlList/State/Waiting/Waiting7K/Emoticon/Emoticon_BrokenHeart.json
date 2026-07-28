@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Emoticon_BrokenHeart.ojs"
+    "sprite": "Emoticon_BrokenHeart.ojs"
   },
   "attributes": {
     "transform": {

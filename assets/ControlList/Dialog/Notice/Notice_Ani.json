@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Notice_Ani.ojs"
+    "sprite": "Notice_Ani.ojs"
   },
   "attributes": {
     "isLoop": true

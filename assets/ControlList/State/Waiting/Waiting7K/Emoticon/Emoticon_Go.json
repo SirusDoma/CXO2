@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Emoticon_Go.ojs"
+    "sprite": "Emoticon_Go.ojs"
   },
   "attributes": {
     "transform": {

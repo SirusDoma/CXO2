@@ -95,7 +95,7 @@
       "IDC_IMAGE_MUSIC_HIGHLIGHT": {
         "type": "Image",
         "require": {
-          "sheet": "Dialog_SelectMusicMM.ojs"
+          "sprite": "Dialog_SelectMusicMM.ojs"
         }
       }
     }

@@ -59,10 +59,10 @@ namespace Cx
 
             auto json = Gx::Json();
             json["type"]    = type;
-            json["require"] = { { "sheet", ref } };
+            json["require"] = { { "sprite", ref } };
 
             if (type == Gx::StringHelper::GetTypeName<Gx::Animation>(false))
-                json["attributes"] = { { "inherit", true } };
+                json["attributes"] = { { "infer", true } };
 
             return json;
         }

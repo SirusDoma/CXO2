@@ -1,7 +1,7 @@
 {
   "type": "Cursor",
   "require": {
-    "sheet": "Window_Cursor.ojs-backup"
+    "sprite": "Window_Cursor.ojs-backup"
   },
   "attributes": {
     "states": {

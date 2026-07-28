@@ -20,7 +20,6 @@ namespace Cx
         void SetCoverLoadCallback(const std::function<void(const sf::Image *)> &onCoverLoaded);
         void SetThumbnailLoadCallback(const std::function<void(const sf::Image *)> &onThumbnailLoaded);
 
-
         [[nodiscard]] static Gx::ResourcePtr<sf::Image> LoadThumbnail(const std::string& source, const Gx::ResourceContext& ctx);
         [[nodiscard]] static Gx::ResourcePtr<sf::Image> LoadCoverArt(const std::string& source, const Gx::ResourceContext& ctx);
         [[nodiscard]] static Gx::ResourcePtr<sf::Image> LoadThumbnail(const O2JamChartMetadata& metadata, const Gx::ResourceContext& ctx);
@@ -30,19 +29,23 @@ namespace Cx
         [[nodiscard]] static Gx::ResourcePtr<sf::InputStream> Decrypt(Gx::ResourcePtr<sf::InputStream> stream);
 
     private:
+        #pragma pack(push, 1)
         struct NoteBlockHeader
         {
             std::uint32_t Measure;
             std::uint16_t Channel;
             std::uint16_t EventCount;
         };
+        #pragma pack(pop)
 
+        #pragma pack(push, 1)
         struct NoteEventHeader
         {
             std::uint16_t ID;
             std::int8_t   Audio;
             std::int8_t   Type;
         };
+        #pragma pack(pop)
 
         std::function<void(const sf::Image*)> m_onCoverLoaded;
         std::function<void(const sf::Image*)> m_onThumbnailLoaded;

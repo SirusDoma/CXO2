@@ -33,12 +33,11 @@ namespace Cx
             throw Gx::ResourceLoadException(ctx.GetID(), fileName.string());
 
         auto& inputStream = *stream.get();
-        auto chart        = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
+        auto chart = LoadFromStream(inputStream, Gx::ResourceContext::Rebind(ctx, fileName.string()));
         if (!chart)
             return nullptr;
 
-        chart->Source     = fileName.string();
-
+        chart->Source = fileName.string();
         return chart;
     }
 

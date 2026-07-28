@@ -26,8 +26,8 @@ namespace Cx
                     metadata.Align = parsed.value();
             }
 
-            if (const auto inherit = attributes.find("inherit"); inherit != attributes.end())
-                metadata.Inherit = inherit->get<bool>();
+            if (const auto infer = attributes.find("infer"); infer != attributes.end())
+                metadata.Infer = infer->get<bool>();
 
             if (const auto frames = attributes.find("frames"); frames != attributes.end())
             {
@@ -193,7 +193,7 @@ namespace Cx
                         animation->AddFrame(frame);
                     }
                 }
-                else if (metadata->Inherit)
+                else if (metadata->Infer)
                 {
                     for (std::size_t i = 0; i < sheet->Frames.size(); i++)
                     {

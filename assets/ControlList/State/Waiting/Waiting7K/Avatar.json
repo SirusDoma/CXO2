@@ -16,7 +16,7 @@
             "IDC_IMAGE_COVER_AVATAR": {
               "type": "Sprite",
               "require": {
-                "sheet": "Wait_Cover_Avatar.ojs"
+                "sprite": "Wait_Cover_Avatar.ojs"
               },
               "attributes": {
                 "transform": {

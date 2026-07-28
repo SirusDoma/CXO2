@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Emoticon_Ohm_HH.ojs"
+    "sprite": "Emoticon_Ohm_HH.ojs"
   },
   "attributes": {
     "transform": {

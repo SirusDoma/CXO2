@@ -23,7 +23,7 @@ namespace Cx
         };
 
         bool         IsLoop       = false;
-        bool         Inherit      = false;
+        bool         Infer        = false;
         sf::Time     Duration     = sf::Time::Zero;
         float        Speed        = 1.f;
         unsigned int RepeatCount  = 0;

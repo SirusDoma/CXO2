@@ -72,7 +72,7 @@ namespace Cx
         }
         else if constexpr (std::is_base_of_v<R, SpriteSheet>)
         {
-            if (const auto resource = require.find("sheet"); resource != require.end())
+            if (const auto resource = require.find("sprite"); resource != require.end())
             {
                 id = resolve(resource->second);
             }

@@ -1,7 +1,7 @@
 {
   "type": "Animation",
   "require": {
-    "sheet": "Emoticon_Question.ojs"
+    "sprite": "Emoticon_Question.ojs"
   },
   "attributes": {
     "transform": {

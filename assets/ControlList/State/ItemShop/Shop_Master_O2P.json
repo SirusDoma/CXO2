@@ -5,13 +5,13 @@
       "IDC_IMAGE_MAIN": {
         "type": "Image",
         "require": {
-          "sheet": "Shop_Master_o2p_main.ojs"
+          "sprite": "Shop_Master_o2p_main.ojs"
         }
       },
       "IDC_ANIMATION_EYES": {
         "type": "Animation",
         "require": {
-          "sheet": "Shop_Master_o2p_CloseEye.ojs"
+          "sprite": "Shop_Master_o2p_CloseEye.ojs"
         },
         "attributes": {
           "duration": 3000,
@@ -119,7 +119,7 @@
       "IDC_ANIMATION_SPEECH": {
         "type": "Animation",
         "require": {
-          "sheet": "Shop_master_o2p_Say.ojs"
+          "sprite": "Shop_master_o2p_Say.ojs"
         },
         "attributes": {
           "duration": 300,

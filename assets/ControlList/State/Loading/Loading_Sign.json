@@ -1,7 +1,7 @@
 {
   "type": "Image",
   "require": {
-    "sheet": "Loading_Sign.ojs"
+    "sprite": "Loading_Sign.ojs"
   },
   "attributes": {
     "transform": {

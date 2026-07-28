@@ -1,7 +1,7 @@
 {
   "type": "BitmapNumber",
   "require": {
-    "sheet": "PlayTimeNum.ojs"
+    "sprite": "PlayTimeNum.ojs"
   },
   "attributes": {
     "transform": {

@@ -1,7 +1,7 @@
 {
   "type": "BitmapNumber",
   "require": {
-    "sheet": "NotePointNum.ojs"
+    "sprite": "NotePointNum.ojs"
   },
   "attributes": {
     "alignment": "Right",

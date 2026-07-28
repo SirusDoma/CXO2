@@ -1,7 +1,7 @@
 {
   "type": "Gauge",
   "require": {
-    "sheet": "equalizer_ani.ojs",
+    "sprite": "equalizer_ani.ojs",
     "bndID": "0X1B00001F"
   },
   "attributes": {
