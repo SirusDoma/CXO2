@@ -49,6 +49,7 @@
 #include <CXO2/IO/Loaders/UI/Components/Playing/EqualizerLoader.hpp>
 
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
+#include <CXO2/IO/Loaders/Chart/O2JamMusicListLoader.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartLoader.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/StateLoader.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/StatePlaying7KLoader.hpp>
@@ -305,6 +306,7 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();
         // O2Jam Core Resources
         Gx::ResourceLoaderFactory::Register<O2JamChartMetadata, O2JamChartMetadataLoader>();
+        Gx::ResourceLoaderFactory::Register<O2JamMusicList, O2JamMusicListLoader>();
         Gx::ResourceLoaderFactory::Register<Chart, O2JamChartLoader>();
         // SceneGraph
         Gx::ResourceLoaderFactory::Register<State, StateLoader>();
@@ -514,7 +516,10 @@ namespace Cx
             }
         }, Gx::Context::Scope::Singleton);
 
-        auto _ = context.Require<SessionContext>().GetInstalledMusic();
+        auto& session = context.Require<SessionContext>();
+        session.SetMusicListMode(MusicListMode::Mixed);
+
+        auto _ = session.GetMusicList();
         for (auto gender : {Gender::Male, Gender::Female})
             auto __ = context.Require<ItemFactory>().GetDefaultItems(gender);
 

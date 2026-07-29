@@ -58,7 +58,7 @@ namespace Cx
         }
 
         m_page = 0;
-        m_musicList = m_session.GetInstalledMusic();
+        m_musicList = m_session.GetMusicList();
         FilterMusic();
 
         m_random     = m_room.GetRandomLevel();
@@ -71,7 +71,16 @@ namespace Cx
             if (m_room.GetMusic().ID != 0)
                 m_music = m_room.GetMusic();
             else
-                m_music = m_filteredList[m_filteredList.size() - 1];
+            {
+                for (auto it = m_filteredList.rbegin(); it != m_filteredList.rend(); ++it)
+                {
+                    if (it->Status == MusicStatus::Playable)
+                    {
+                        m_music = *it;
+                        break;
+                    }
+                }
+            }
         }
 
         if (auto leftButton = FindChild<Gx::Button>(Resource::SelectMusic::IDC_BUTTON_LEFT))
@@ -339,6 +348,9 @@ namespace Cx
     {
         return std::count_if(m_musicList.begin(), m_musicList.end(), [&scanned, min, max] (ChartMetadata& m)
         {
+            if (m.Status != MusicStatus::Playable)
+                return false;
+
             const auto diffs = {Difficulty::EX, Difficulty::NX, Difficulty::HX};
             const bool result = std::any_of(diffs.begin(), diffs.end(), [&m, min, max] (auto diff)
             {
@@ -622,14 +634,17 @@ namespace Cx
                 continue;
             }
 
-            if (i == 0 && m_music.Source.empty())
+            const bool grayed = m_filteredList[index].Status != MusicStatus::Playable;
+            if (i == 0 && m_music.Source.empty() && !grayed)
                 m_music = m_filteredList[index];
 
             const auto& availableMusicIDs = m_room.GetAvailableMusicIDs();
             auto textColor = m_titleColor;
             if (const auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
             {
-                if (availableMusicIDs.find(static_cast<std::uint32_t>(m_filteredList[index].ID)) == availableMusicIDs.end())
+                if (grayed)
+                    title->SetColor(sf::Color(147, 207, 226));
+                else if (availableMusicIDs.find(static_cast<std::uint32_t>(m_filteredList[index].ID)) == availableMusicIDs.end())
                     title->SetColor(sf::Color(241, 195, 10));
                 else
                     title->SetColor(m_titleColor);
@@ -660,11 +675,11 @@ namespace Cx
                 duration->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::DURATION, minute, remainder));
             }
 
-            button->SetCheckedState(m_music.Source == m_filteredList[index].Source);
-            button->SetEnabled(true);
+            button->SetCheckedState(!grayed && m_music.Source == m_filteredList[index].Source);
+            button->SetEnabled(!grayed);
             button->SetVisible(true);
 
-            if (const auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter && m_music.Source == m_filteredList[index].Source)
+            if (const auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter && !grayed && m_music.Source == m_filteredList[index].Source)
                 activeHighlighter->SetVisible(true);
         }
     }
@@ -738,44 +753,26 @@ namespace Cx
         {
             if (const auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
             {
-                const auto children = list->GetChildren();
-                Gx::RadioButton* previous = nullptr;
-                for (std::size_t i = 0; i < children.size(); i++)
+                const unsigned int itemListCount = list->GetChildrenCount();
+                for (const auto child : list->GetChildren())
                 {
-                    const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
-                    if (!button)
+                    const auto button = dynamic_cast<Gx::RadioButton*>(child);
+                    if (!button || !button->IsChecked())
                         continue;
 
-                    if (button->IsChecked())
+                    const auto current = static_cast<int>(m_musicButtonIndices.at(button) + m_page * itemListCount);
+                    for (int i = current - 1; i >= 0; i--)
                     {
-                        if (!previous && m_page != 0)
-                        {
-                            m_page--;
-                            m_music = ChartMetadata{};
-                            for (std::size_t j = children.size() - 1; j > 0; j--)
-                            {
-                                if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
-                                {
-                                    if (next->IsVisible() && next->IsEnabled())
-                                        next->SetCheckedState(true);
+                        if (m_filteredList[i].Status != MusicStatus::Playable)
+                            continue;
 
-                                    break;
-                                }
-                            }
-
-                            InvalidateMusicList();
-                            return;
-                        }
-                        else if (i > 0)
-                        {
-                            if (previous)
-                                previous->SetCheckedState(true);
-
-                            return;
-                        }
+                        m_page  = static_cast<unsigned int>(i) / itemListCount;
+                        m_music = m_filteredList[i];
+                        InvalidateMusicList();
+                        break;
                     }
 
-                    previous = button;
+                    return;
                 }
             }
         }
@@ -783,36 +780,26 @@ namespace Cx
         {
             if (const auto list = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR); list)
             {
-                const auto children = list->GetChildren();
-                for (std::size_t i = 0; i < children.size(); i++)
+                const unsigned int itemListCount = list->GetChildrenCount();
+                for (const auto child : list->GetChildren())
                 {
-                    const auto button = dynamic_cast<Gx::RadioButton*>(children[i]);
-                    if (!button)
+                    const auto button = dynamic_cast<Gx::RadioButton*>(child);
+                    if (!button || !button->IsChecked())
                         continue;
 
-                    if (button->IsChecked())
+                    const auto current = m_musicButtonIndices.at(button) + m_page * itemListCount;
+                    for (auto i = current + 1; i < m_filteredList.size(); i++)
                     {
-                        if (i == children.size() - 1 && m_page < GetMaxPage() - 1)
-                        {
-                            SetPage(m_page + 1);
-                            return;
-                        }
-                        else if (i < children.size())
-                        {
-                            for (std::size_t j = i + 1; j < children.size(); j++)
-                            {
-                                if (const auto next = dynamic_cast<Gx::RadioButton*>(children[j]); next)
-                                {
-                                    if (next->IsVisible() && next->IsEnabled())
-                                        next->SetCheckedState(true);
+                        if (m_filteredList[i].Status != MusicStatus::Playable)
+                            continue;
 
-                                    break;
-                                }
-                            }
-
-                            return;
-                        }
+                        m_page  = static_cast<unsigned int>(i / itemListCount);
+                        m_music = m_filteredList[i];
+                        InvalidateMusicList();
+                        break;
                     }
+
+                    return;
                 }
             }
         }
@@ -835,13 +822,22 @@ namespace Cx
 
         Initialize();
 
-        m_musicList = m_session.GetInstalledMusic(rescan);
+        m_musicList = m_session.GetMusicList(rescan);
         FilterMusic();
 
         if (!m_room.GetMusic().Source.empty())
             m_music = m_room.GetMusic();
         else
-            m_music = m_musicList[m_musicList.size() - 1];
+        {
+            for (auto it = m_musicList.rbegin(); it != m_musicList.rend(); ++it)
+            {
+                if (it->Status == MusicStatus::Playable)
+                {
+                    m_music = *it;
+                    break;
+                }
+            }
+        }
 
         m_random = m_room.GetRandomLevel();
         m_difficulty = m_room.GetDifficulty();
@@ -862,7 +858,7 @@ namespace Cx
     void SelectMusicDialog::OnAccepted()
     {
         // Edge case: No music in selected genre
-        if (m_music.Source.empty() && !IsRandomActive())
+        if ((m_music.Source.empty() || m_music.Status != MusicStatus::Playable) && !IsRandomActive())
             return;
 
         // Edge case: No music match with random categories

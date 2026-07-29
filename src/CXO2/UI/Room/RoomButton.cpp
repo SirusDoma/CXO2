@@ -22,7 +22,7 @@ namespace Cx
     RoomButton::RoomButton(const SessionContext& session) :
         m_room(),
         m_music(),
-        m_musicList(session.GetInstalledMusic()),
+        m_musicList(session.GetMusicList()),
         m_hover(nullptr),
         m_active(false)
     {
@@ -101,12 +101,13 @@ namespace Cx
                return m.ID == id;
             });
 
+            m_music.Status = MusicStatus::Missing;
             if (it != m_musicList.end())
                 m_music = *it;
 
             m_randomStart = 0;
             m_randomEnd = 0;
-            m_active = m_music.ID != 0;
+            m_active = true;// m_music.ID != 0;
         }
 
         Invalidate();
@@ -270,6 +271,6 @@ namespace Cx
         else
             stateIndicator->SetFrame("Waiting");
 
-        noMusic->SetVisible(false);
+        noMusic->SetVisible(m_music.Status != MusicStatus::Playable);
     }
 }

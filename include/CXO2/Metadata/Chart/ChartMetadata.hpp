@@ -1,12 +1,14 @@
 #pragma once
 
 #include <CXO2/Models/Game.hpp>
+#include <CXO2/Models/Shop.hpp>
 
 #include <SFML/System/String.hpp>
 #include <SFML/System/Time.hpp>
 
 #include <cstdint>
 #include <limits>
+#include <map>
 #include <unordered_map>
 
 namespace Cx
@@ -64,6 +66,15 @@ namespace Cx
         LevelCategory RandomLevel{};
     };
 
+    enum class MusicStatus
+    {
+        Playable,
+        Missing,
+        Corrupted,
+        InvalidFormat,
+        Unacquired
+    };
+
     struct ChartMetadata
     {
         std::uint32_t ID{};
@@ -77,7 +88,9 @@ namespace Cx
         std::unordered_map<Difficulty, unsigned int>  Levels{};
         std::unordered_map<Difficulty, unsigned int>  NoteCounts{};
         std::unordered_map<Difficulty, sf::Time>      Durations{};
+        std::unordered_map<Currency, unsigned int>    Prices{};
 
         std::string Source;
+        MusicStatus Status{};
     };
 }

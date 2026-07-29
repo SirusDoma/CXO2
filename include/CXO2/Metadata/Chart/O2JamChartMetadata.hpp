@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CXO2/Models/Game.hpp>
+#include <CXO2/Models/Shop.hpp>
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
 #include <CXO2/Utilities/StringTranscoder.hpp>
 
@@ -9,6 +10,7 @@
 #include <SFML/System/Time.hpp>
 
 #include <bitset>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -807,6 +809,8 @@ namespace Cx
     struct O2JamChartMetadata : O2JamChartHeader
     {
         std::string Source;
+        bool IsNew{};
+        std::unordered_map<Currency, unsigned int> Prices;
 
         unsigned int GetLevel(const Difficulty difficulty) const
         {
@@ -889,7 +893,7 @@ namespace Cx
 
             return ChartMetadata{
                 /* .ID           = */ ID,
-                /* .New          = */ false,
+                /* .New          = */ IsNew,
                 /* .Title        = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Title[0], 64, encoding)),
                 /* .Artist       = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&Artist[0], 32, encoding)),
                 /* .NoteDesigner = */ Gx::StringHelper::Trim(StringTranscoder::Transcode(&NoteArranger[0], 32, encoding)),
@@ -913,6 +917,7 @@ namespace Cx
                                          {Difficulty::NX, sf::seconds(static_cast<float>(DurationNx))},
                                          {Difficulty::HX, sf::seconds(static_cast<float>(DurationHx))},
                                       },
+                /* .Prices       = */ Prices,
                 /* .Source       = */ Source
             };
         }

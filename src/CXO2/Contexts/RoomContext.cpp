@@ -100,7 +100,7 @@ namespace Cx
 
     void RoomContext::SetMusicID(const std::uint32_t musicID)
     {
-        const auto& musicList = m_session.GetInstalledMusic();
+        const auto& musicList = m_session.GetMusicList();
         const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID] (const auto& m)
         {
             return m.ID == musicID;

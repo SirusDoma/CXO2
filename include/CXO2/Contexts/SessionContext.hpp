@@ -4,12 +4,25 @@
 #include <CXO2/Models/Character.hpp>
 #include <CXO2/Models/Room.hpp>
 #include <CXO2/Metadata/Chart/O2JamChartMetadata.hpp>
+#include <CXO2/Metadata/Chart/O2JamMusicList.hpp>
+
+#include <Genode/IO/Resource.hpp>
 
 #include <SFML/System/String.hpp>
+
+#include <optional>
+#include <unordered_set>
 
 namespace Cx
 {
     struct CharacterInfoResponse;
+
+    enum class MusicListMode
+    {
+        Legacy,
+        Mixed,
+        Free
+    };
 
     class SessionContext
     {
@@ -80,7 +93,13 @@ namespace Cx
         const EquipmentSet& GetEquippedItemIDs() const;
         const ItemList& GetInventory() const;
         const MusicList& GetMusicIDs() const;
+
+        void SetMusicListMode(MusicListMode mode);
+        void SetAcquiredMusicIDs(std::unordered_set<std::uint32_t> musicIDs);
+
+        const std::vector<ChartMetadata>& GetMusicList(bool rescan = false) const;
         const std::vector<ChartMetadata>& GetInstalledMusic(bool rescan = false) const;
+        const std::vector<ChartMetadata>& GetNonPlayableMusicList() const;
 
         void Equip(std::uint32_t itemID);
         void Unequip(std::uint32_t itemID);
@@ -94,6 +113,8 @@ namespace Cx
         void Save() const;
 
     private:
+        void ScanMusic() const;
+
         std::string m_token;
 
         sf::String   m_name;
@@ -112,6 +133,14 @@ namespace Cx
         MusicHall m_server;
         unsigned int m_channelID;
 
+        MusicListMode m_musicListMode{};
+        std::optional<std::unordered_set<std::uint32_t>> m_acquiredMusicIDs;
+
+        mutable Gx::ResourcePtr<O2JamMusicList> m_musicList;
         mutable std::vector<ChartMetadata> m_installedMusicList;
+        mutable std::vector<ChartMetadata> m_displayMusicList;
+        mutable std::vector<ChartMetadata> m_nonPlayableMusicList;
+        mutable bool m_musicScanned{};
+        mutable bool m_musicListLoaded{};
     };
 }

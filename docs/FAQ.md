@@ -14,13 +14,11 @@ To see other client version, check the other branches/tags.
 O2Jam v3.10 does not have ring/modifier among other things. The next iteration will bring these features.
 
 ## Can I use custom music?
-Absolutely, you can!
+Absolutely, you can! The game respect the OJNList.dat while still allows you to drop custom music without synchronizing with it.
 
 ### Special notes for Pre-NX client
-client and server will perform no validation to your music list.
-~~This is because client v3.10 does not have OJNList.dat implemented.~~ (This is not true: the OJNList.dat exist in `Playing(1).opi` for v3.10)
-
-It is easy to spoof, the music. If you are playing in public space, please be mindful when playing with others.
+The client has minimum validation against OJNList.dat (from Playing(1).opi) and server will perform no validation to your music list.
+If you are playing in public space, please be mindful when playing with others as it is easy to spoof the music.
 
 ## The music title in music selection is incorrect or gibberish, it supposed to be displayed in (Chinese/Japanese/Korea/etc). Can you fix it?
 Currently, the game implemented support for legacy Unicode encodings.
@@ -30,7 +28,7 @@ You may not notice it, but this issue also appear in the original client. Each O
 For example, using chinese title in O2Jam client v1.8 (9you) will likely work and reliable, but the game will likely fail to display the titile for any song with Korean title. The opposite also happening with O2Jam Korea client.
 
 ## How about mods? What are the file formats the client use?
-The game is a drop-in replacement of original `OTwo.exe`, which mean it can read all files that original O2Jam client can read, including `.opi`/`.opa` and `.ojn`/`.ojm` (and in the future, `OJNList.dat`).
+The game is a drop-in replacement of original `OTwo.exe`, which mean it can read all files that original O2Jam client can read, including `.opi`/`.opa`, `.ojn`/`.ojm` and `OJNList.dat`.
 
 This mean modded `Interface(1).opi`, `Playing(1).opi` and/or `Avatar.opa` may work in this client, **as long as the files are compatible with the `Client Version` specified in the top of the [README](../README.md)**.
 

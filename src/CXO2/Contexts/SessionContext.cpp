@@ -1,11 +1,19 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/IO/Loaders/Chart/O2JamChartMetadataLoader.hpp>
+#include <CXO2/IO/Loaders/Chart/O2JamMusicListLoader.hpp>
 
 #include <CXO2/Network/Responses/CharacterInfoResponse.hpp>
 
 #include <Genode/IO/LocalFileSystem.hpp>
 
 #include <magic_enum/magic_enum.hpp>
+
+#include <algorithm>
+#include <charconv>
+#include <filesystem>
+#include <future>
+#include <thread>
+#include <unordered_map>
 
 namespace Cx
 {
@@ -186,26 +194,217 @@ namespace Cx
         m_channelID = channelId;
     }
 
+    void SessionContext::SetMusicListMode(const MusicListMode mode)
+    {
+        if (m_musicListMode == mode)
+            return;
+
+        m_musicListMode = mode;
+        m_musicScanned  = false;
+    }
+
+    void SessionContext::SetAcquiredMusicIDs(std::unordered_set<std::uint32_t> musicIDs)
+    {
+        m_acquiredMusicIDs = std::move(musicIDs);
+        m_musicScanned     = false;
+    }
+
+    const std::vector<ChartMetadata>& SessionContext::GetMusicList(const bool rescan) const
+    {
+        if (rescan || !m_musicScanned)
+            ScanMusic();
+
+        return m_displayMusicList;
+    }
+
     const std::vector<ChartMetadata>& SessionContext::GetInstalledMusic(const bool rescan) const
     {
-        if (rescan || m_installedMusicList.empty())
-        {
-            m_installedMusicList.clear();
-            const auto metaLoader = O2JamChartMetadataLoader();
-
-            for (const auto& file : Gx::FileSystem::Scan("o2ma*.ojn"))
-            {
-                if (const auto meta = metaLoader.LoadFromFile(file->GetName(), Gx::ResourceContext::Default))
-                    m_installedMusicList.push_back(meta->ToChartMetadata());
-            }
-
-            std::sort(m_installedMusicList.begin(), m_installedMusicList.end(), [this] (ChartMetadata& a, ChartMetadata& b)
-            {
-                return a.Levels[Difficulty::EX] < b.Levels[Difficulty::EX];
-            });
-        }
+        if (rescan || !m_musicScanned)
+            ScanMusic();
 
         return m_installedMusicList;
+    }
+
+    const std::vector<ChartMetadata>& SessionContext::GetNonPlayableMusicList() const
+    {
+        if (!m_musicScanned)
+            ScanMusic();
+
+        return m_nonPlayableMusicList;
+    }
+
+    void SessionContext::ScanMusic() const
+    {
+        const auto metaLoader = O2JamChartMetadataLoader();
+        const auto musicListLoader = O2JamMusicListLoader();
+
+        auto scanned  = std::vector<Gx::ResourcePtr<O2JamChartMetadata>>();
+        auto failures = std::vector<ChartMetadata>();
+        auto indices  = std::unordered_map<std::uint32_t, std::size_t>();
+
+        struct ScanBatch
+        {
+            std::vector<Gx::ResourcePtr<O2JamChartMetadata>> Loaded;
+            std::vector<ChartMetadata> Failures;
+        };
+
+        const auto files = Gx::FileSystem::Scan("o2ma*.ojn");
+        const auto workerCount = std::clamp<std::size_t>(std::thread::hardware_concurrency(), 1, std::max<std::size_t>(files.size(), 1));
+        const auto chunkSize   = (files.size() + workerCount - 1) / workerCount;
+
+        auto workers = std::vector<std::future<ScanBatch>>();
+        for (std::size_t w = 0; w < workerCount; w++)
+        {
+            workers.push_back(std::async(std::launch::async, [&files, &metaLoader, w, chunkSize]
+            {
+                auto batch = ScanBatch();
+                for (std::size_t i = w * chunkSize; i < std::min(files.size(), (w + 1) * chunkSize); i++)
+                {
+                    if (auto meta = metaLoader.LoadFromFile(files[i]->GetName(), Gx::ResourceContext::Default))
+                    {
+                        batch.Loaded.push_back(std::move(meta));
+                    }
+                    else
+                    {
+                        auto failure   = ChartMetadata();
+                        failure.Source = files[i]->GetName();
+                        failure.Status = MusicStatus::InvalidFormat;
+
+                        if (const auto stem = std::filesystem::path(files[i]->GetName()).stem().string(); stem.size() > 4)
+                            std::from_chars(stem.data() + 4, stem.data() + stem.size(), failure.ID);
+
+                        batch.Failures.push_back(std::move(failure));
+                    }
+                }
+
+                return batch;
+            }));
+        }
+
+        for (auto& worker : workers)
+        {
+            auto batch = worker.get();
+            for (auto& meta : batch.Loaded)
+            {
+                indices[meta->ID] = scanned.size();
+                scanned.push_back(std::move(meta));
+            }
+
+            for (auto& failure : batch.Failures)
+                failures.push_back(std::move(failure));
+        }
+
+        if (m_musicListMode != MusicListMode::Free && !m_musicListLoaded)
+        {
+            m_musicListLoaded = true;
+            if (Gx::FileSystem::Contains("OJNList.dat"))
+                m_musicList = musicListLoader.LoadFromFile("OJNList.dat", Gx::ResourceContext::Default);
+        }
+
+        m_installedMusicList.clear();
+        m_displayMusicList.clear();
+        m_nonPlayableMusicList.clear();
+
+        if (m_musicListMode == MusicListMode::Free || !m_musicList)
+        {
+            for (const auto& meta : scanned)
+                m_installedMusicList.push_back(meta->ToChartMetadata());
+
+            m_displayMusicList     = m_installedMusicList;
+            m_nonPlayableMusicList = std::move(failures);
+        }
+        else
+        {
+            auto listed = std::unordered_set<std::uint32_t>();
+            auto failureIndices = std::unordered_map<std::uint32_t, std::size_t>();
+            for (std::size_t i = 0; i < failures.size(); i++)
+                failureIndices[failures[i].ID] = i;
+
+            for (const auto& chart : m_musicList->Charts)
+            {
+                listed.insert(chart.ID);
+
+                auto merged = chart.ToChartMetadata();
+                if (const auto it = indices.find(chart.ID); it != indices.end())
+                {
+                    const auto& local = *scanned[it->second];
+                    if (chart.NoteCountEx == local.NoteCountEx && chart.NoteCountNx == local.NoteCountNx && chart.NoteCountHx == local.NoteCountHx)
+                    {
+                        merged.Source = local.Source;
+                        merged.Status = MusicStatus::Playable;
+                    }
+                    else
+                        merged.Status = MusicStatus::Corrupted;
+                }
+                else if (const auto failed = failureIndices.find(chart.ID); failed != failureIndices.end())
+                {
+                    merged.Source = failures[failed->second].Source;
+                    merged.Status = MusicStatus::InvalidFormat;
+                }
+                else
+                    merged.Status = MusicStatus::Missing;
+
+                if (merged.Status == MusicStatus::Playable)
+                    m_installedMusicList.push_back(merged);
+                else
+                    m_nonPlayableMusicList.push_back(merged);
+
+                m_displayMusicList.push_back(std::move(merged));
+            }
+
+            if (m_musicListMode == MusicListMode::Mixed)
+            {
+                for (const auto& meta : scanned)
+                {
+                    if (listed.find(meta->ID) != listed.end())
+                        continue;
+
+                    auto entry = meta->ToChartMetadata();
+                    m_installedMusicList.push_back(entry);
+                    m_displayMusicList.push_back(std::move(entry));
+                }
+
+                for (auto& failure : failures)
+                {
+                    if (listed.find(failure.ID) == listed.end())
+                        m_nonPlayableMusicList.push_back(std::move(failure));
+                }
+            }
+        }
+
+        if (m_acquiredMusicIDs.has_value())
+        {
+            const auto& acquired = m_acquiredMusicIDs.value();
+
+            auto playable = std::vector<ChartMetadata>();
+            for (auto& entry : m_installedMusicList)
+            {
+                if (acquired.find(entry.ID) == acquired.end())
+                {
+                    entry.Status = MusicStatus::Unacquired;
+                    m_nonPlayableMusicList.push_back(std::move(entry));
+                }
+                else
+                    playable.push_back(std::move(entry));
+            }
+
+            m_installedMusicList = std::move(playable);
+            for (auto& entry : m_displayMusicList)
+            {
+                if (entry.Status == MusicStatus::Playable && acquired.find(entry.ID) == acquired.end())
+                    entry.Status = MusicStatus::Unacquired;
+            }
+        }
+
+        const auto comparer = [] (ChartMetadata& a, ChartMetadata& b)
+        {
+            return a.Levels[Difficulty::EX] < b.Levels[Difficulty::EX];
+        };
+
+        std::sort(m_installedMusicList.begin(), m_installedMusicList.end(), comparer);
+        std::sort(m_displayMusicList.begin(), m_displayMusicList.end(), comparer);
+
+        m_musicScanned = true;
     }
 
     void SessionContext::Load()

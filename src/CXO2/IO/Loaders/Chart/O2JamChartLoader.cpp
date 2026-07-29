@@ -327,7 +327,6 @@ namespace Cx
 
         auto& input = *stream.get();
 
-        // Read entire stream into memory
         const auto totalSizeOpt = input.getSize();
         if (!totalSizeOpt.has_value())
         {
@@ -348,16 +347,18 @@ namespace Cx
             return stream;
         }
 
-        auto data = std::vector<std::uint8_t>(totalSize);
-        if (input.read(data.data(), static_cast<std::int64_t>(totalSize)) != totalSize)
+        // Validate signature "new"
+        std::uint8_t signature[3]{};
+        if (input.read(signature, sizeof(signature)) != sizeof(signature) ||
+            std::string(reinterpret_cast<const char*>(signature), sizeof(signature)) != "new")
         {
             auto _ = stream->seek(0);
             return stream;
         }
 
-        // Validate signature "new"
-        const std::string signature(reinterpret_cast<const char*>(data.data()), 3);
-        if (signature != "new")
+        // Read the rest of the stream into memory
+        auto data = std::vector<std::uint8_t>(totalSize);
+        if (input.read(data.data() + sizeof(signature), static_cast<std::int64_t>(totalSize - sizeof(signature))) != totalSize - sizeof(signature))
         {
             auto _ = stream->seek(0);
             return stream;

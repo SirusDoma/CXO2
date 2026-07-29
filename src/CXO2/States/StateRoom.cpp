@@ -280,7 +280,7 @@ namespace Cx
             return;
         }
 
-        const auto& musicList = m_session.GetInstalledMusic();
+        const auto& musicList = m_session.GetMusicList();
         if (room.Random == static_cast<LevelCategory>(0))
         {
             const auto it = std::find_if(musicList.begin(), musicList.end(), [musicID = room.Music.ID] (const auto& header)
@@ -290,9 +290,24 @@ namespace Cx
 
             if (it == musicList.end())
             {
-                // ShowDialog(Constants::Messages::Room::JoinRequest::TUNE_UNREGISTERED, DialogStyle::Information);
-                ShowDialog(fmt::format(Constants::Messages::Room::JoinRequest::TUNE_REQUIRED, fmt::format(U"o2ma{}", room.Music.ID)), DialogStyle::Information);
+                ShowDialog(Constants::Messages::Room::JoinRequest::TUNE_UNREGISTERED, DialogStyle::Information);
                 return;
+            }
+
+            switch (it->Status)
+            {
+                case MusicStatus::Missing:
+                    ShowDialog(fmt::format(Constants::Messages::Room::JoinRequest::TUNE_REQUIRED, it->Title), DialogStyle::Information);
+                    return;
+                case MusicStatus::Corrupted:
+                    ShowDialog(Constants::Messages::Room::JoinRequest::TUNE_CORRUPTED, DialogStyle::Information);
+                    return;
+                case MusicStatus::InvalidFormat:
+                    ShowDialog(fmt::format(Constants::Messages::Room::JoinRequest::TUNE_INVALID_FORMAT, fmt::format(U"o2ma{}.ojn", room.Music.ID)), DialogStyle::Information);
+                    return;
+                case MusicStatus::Playable:
+                case MusicStatus::Unacquired:
+                    break;
             }
         }
 

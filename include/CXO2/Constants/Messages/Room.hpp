@@ -20,17 +20,16 @@ namespace Cx::Constants::Messages::Room
 
     namespace JoinRequest
     {
-        constexpr static auto TUNE_UNREGISTERED   = "This is the room with unregistered tune."; // Unused
         constexpr static auto SINGLE_MODE_CLOSED  = "As it is a single room, any user cannot enter.";
         constexpr static auto PASSWORD_PROMPT     = "Please input room password";
         constexpr static auto LEVEL_OUT_OF_RANGE  = U"[INFO]Wrong level is selected.\nYou can enter the level range from \n{} - {}";
-        constexpr static auto TUNE_REQUIRED       = U"Please download the following tune. \n\n<< title : {} >>";
         constexpr static auto ROOM_FILLED         = "The room is filled.";
         constexpr static auto GAME_IN_PROGRESS    = "The game is in process.";
 
-        constexpr static auto MUSIC_CORRUPTED      = "There may be a damage caused to the file. The tune is not registered."; // Unmapped
-        constexpr static auto MUSIC_FORMAT_INVALID = U"File format wrong.\n{} Please delete files and download again"; // Unmapped
-        constexpr static auto MUSIC_NOT_FOUND      = U"{} cannot find file"; // Unmapped
+        constexpr static auto TUNE_UNREGISTERED   = "This is the room with unregistered tune.";
+        constexpr static auto TUNE_REQUIRED       = U"Please download the following tune. \n\n<< title : {} >>";
+        constexpr static auto TUNE_CORRUPTED      = "There may be a damage caused to the file.\nThe tune is not registered.";
+        constexpr static auto TUNE_INVALID_FORMAT = U"File format wrong.\n{} Please delete files and download again";
     }
 
     namespace JoinResponse
