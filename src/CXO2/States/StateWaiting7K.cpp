@@ -766,6 +766,31 @@ namespace Cx
         const auto sfxStart = Instantiate<sf::Sound>(Sound::Effects::EF_33);
         m_mixer.Play(*sfxStart, Sound::Channel::SFX);
 
+        if (m_room.GetMusic().ID == 0)
+        {
+            ShowDialog(Constants::Messages::Waiting::TUNE_NOT_SELECTED, DialogStyle::Information);
+            sender.SetCheckedState(false);
+
+            return;
+        }
+
+        for (const auto& meta : m_session.GetNonPlayableMusicList())
+        {
+            if (meta.ID == m_room.GetMusic().ID)
+            {
+                auto prompt = sf::String();
+                if (meta.Status == MusicStatus::Unacquired)
+                    prompt = Constants::Messages::Waiting::TUNE_NOT_PURCHASED;
+                else
+                    prompt = Constants::Messages::Waiting::TUNE_NOT_FOUND;
+
+                ShowDialog(prompt, DialogStyle::Information);
+                sender.SetCheckedState(false);
+
+                return;
+            }
+        }
+
         for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
         {
             const auto& slot = m_room.GetSlot(i);

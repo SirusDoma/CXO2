@@ -50,7 +50,7 @@ int main(int argc , char** argv)
             (ctx.GetArgumentCount() < 6 ||
              ctx.GetAuthToken().empty() ||
              ctx.GetFtpUrl().empty() ||
-             ctx.GetGame().empty() ||
+             ctx.GetFtpPath().empty() ||
              ctx.GetGatewayInfo().empty()))
         {
             Cx::SystemMessageBox::ShowInformation(

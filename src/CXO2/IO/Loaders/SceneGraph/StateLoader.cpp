@@ -19,6 +19,7 @@
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
+#include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Services/PlanetService.hpp>

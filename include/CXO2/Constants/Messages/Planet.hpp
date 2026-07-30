@@ -4,7 +4,7 @@ namespace Cx::Constants::Messages::Planet
 {
     constexpr static auto CHANNEL_FULL                   = "Exceeding the channel (server) capacity, please enter another channel (server)";
     constexpr static auto EXIT_CONFIRM                   = "Do you end the game?";
-    constexpr static auto EXIT_CONFIRM_WHILE_DOWNLOADING = "A tune is now being downloaded. Do you want to cancel it and end the game?"; // Unmapped
+    constexpr static auto EXIT_CONFIRM_WHILE_DOWNLOADING = "A tune is now being downloaded. Do you want to cancel it and end the game?";
 
     namespace Authentication
     {

@@ -70,9 +70,10 @@ For example: `Playing1_300.opi`
 
 #### Music Patch
 
-Unlike image patches, music patches are downloaded by the main client (`OTwo.exe`) rather than the game patcher. The `TEMP/` folder holds in-progress download files for both [OJN](#o2jam-note) and [OJM](#o2jam-music) files, typically via Music Shop. Once a download completes, the files are moved out of `TEMP/`.
+Unlike image patches, music patches are downloaded by the main client (`OTwo.exe`) rather than the game patcher. The `TEMP/` folder holds in-progress download files for both [OJN](#o2jam-note) and [OJM](#o2jam-music) files, typically via Music Shop. 
+While inside `TEMP/`, download files carry a trailing underscore (e.g., `o2ma100.ojn_`). Once every file of the request completes, the files are moved out of `TEMP/` with the underscore stripped; if the destination file already exists in `Music/`, the temporary copy is discarded instead.
 
-In addition to the [game music files](#music), the client persists download state via [INI file](https://en.wikipedia.org/wiki/INI_file) until the requested files are fully downloaded (or the download fails). The filename follows the pattern `o2ma<music_id>.ini`:
+In addition to the [game music files](#music), the client persists download state via [INI file](https://en.wikipedia.org/wiki/INI_file) until the requested files are fully downloaded (or the download fails). The filename follows the pattern `o2ma<music_id>.ini`, or `o2ma<music_id>_<version>.ini` when a chart revision is requested. The same `_<version>` suffix applies to the OJN filename, while the OJM filename never carries it:
 
 ```ini
 [FileInfo]
@@ -82,6 +83,10 @@ FileStatus1=0
 FileName2=o2ma100.ojm
 FileStatus2=0
 ```
+
+`FileStatus` tracks the download state of each file: `0` while pending or in progress, `4` once completed. When every entry reaches `4`, the files are moved out of `TEMP/` and the INI file is deleted.
+
+Once a music download completes, the client also reports the downloaded music ID to the server via packet `5012`, unless the download was initiated from the Music Shop screen, where completion is handled locally instead.
 
 ---
 

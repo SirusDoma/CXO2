@@ -10,7 +10,6 @@
     "bndID": "0X1A40001A"
   },
   "attributes": {
-    "fontSize": 10,
-    "string": "[1/12]"
+    "fontSize": 10
   }
 }

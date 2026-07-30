@@ -18,8 +18,7 @@
           "localBndID": "0X1A400048"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "Etc."
+          "fontSize": 10
         }
       },
       "IDC_TEXT_TITLE": {
@@ -34,8 +33,7 @@
           "localBndID": "0X1A400049"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "Music Title Sample"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_LEVEL": {
@@ -50,8 +48,7 @@
           "localBndID": "0X1A40004A"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "16/24/38"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_TIME": {
@@ -66,8 +63,7 @@
           "localBndID": "0X1A40004B"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "02:35"
+          "fontSize": 10
         }
       },
       "IDC_IMAGE_STATUS": "ControlList/State/MusicShop/MusicShop_MusicItemStatus.json",

@@ -1,11 +1,19 @@
 #include <CXO2/States/State.hpp>
 #include <CXO2/States/StateAvi.hpp>
+#include <CXO2/States/StatePlanet.hpp>
+#include <CXO2/States/StateMusicShop.hpp>
 #include <CXO2/States/StateBulletin.hpp>
 #include <CXO2/States/StatePayment.hpp>
 #include <CXO2/States/StatePlaying7K.hpp>
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 
+#include <CXO2/Network/Requests/SyncMusicDownloadRequest.hpp>
+#include <CXO2/Services/MusicDownloaderService.hpp>
+#include <CXO2/Services/NetworkService.hpp>
+
+#include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/CommandLineContext.hpp>
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Messages/Application.hpp>
 
@@ -43,20 +51,36 @@ namespace Cx
         LoadCommonResources();
     }
 
+    void State::Initialize()
+    {
+        Require<MusicDownloaderService>().SetDownloadCompletedCallback([this] (const std::uint16_t musicID)
+        {
+            if (const auto shop = dynamic_cast<StateMusicShop*>(this))
+            {
+                shop->OnDownloadCompleted(musicID);
+                return;
+            }
+
+            if (dynamic_cast<StateAvi*>(this) || dynamic_cast<StatePlanet*>(this))
+                return;
+
+            Require<NetworkService>().Dispatch(SyncMusicDownloadRequest{musicID},nullptr);
+        });
+
+        Gx::Scene::Initialize();
+        m_tempResources->Clear();
+    }
+
     void State::Finalize()
     {
+        Require<MusicDownloaderService>().SetDownloadCompletedCallback(nullptr);
+
         Scene::Finalize();
 
         Require<Gx::AudioMixer>().Reset(true);
 
         m_exitPrompted = false;
         m_exitDialog->Dismiss();
-    }
-
-    void State::Initialize()
-    {
-        Gx::Scene::Initialize();
-        m_tempResources->Clear();
     }
 
     void State::LoadCommonResources()
@@ -305,7 +329,11 @@ namespace Cx
     {
         if (!m_exitPrompted)
         {
-            ExitGame(Constants::Messages::Application::Exit::CONFIRM);
+            if (Require<MusicDownloaderService>().IsDownloading())
+                ExitGame(Constants::Messages::Application::Exit::CONFIRM_WHILE_DOWNLOADING);
+            else
+                ExitGame(Constants::Messages::Application::Exit::CONFIRM);
+
             return false;
         }
 

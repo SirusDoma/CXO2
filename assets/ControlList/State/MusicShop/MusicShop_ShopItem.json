@@ -25,8 +25,7 @@
           "bndID": "0X1A400031"
         },
         "attributes": {
-          "fontSize": 13,
-          "string": "Music Sample Title"
+          "fontSize": 13
         }
       },
       "IDC_TEXT_ARTIST": {
@@ -41,8 +40,7 @@
           "bndID": "0X1A400032"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "Unknown"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_EDITOR": {
@@ -57,8 +55,7 @@
           "bndID": "0X1A400033"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "Unknown"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_GENRE": {
@@ -73,8 +70,7 @@
           "bndID": "0X1A400034"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "Etc."
+          "fontSize": 10
         }
       },
       "IDC_TEXT_BPM": {
@@ -89,8 +85,7 @@
           "bndID": "0X1A400035"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "120"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_TIME": {
@@ -105,8 +100,7 @@
           "bndID": "0X1A400036"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "01:35"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_LEVEL": {
@@ -121,8 +115,7 @@
           "bndID": "0X1A500037"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "05 / 21 / 36"
+          "fontSize": 10
         }
       },
       "IDC_TEXT_GEM_PRICE": {
@@ -137,8 +130,7 @@
           "bndID": "0X1A400038"
         },
         "attributes": {
-          "fontSize": 10,
-          "string": "15000"
+          "fontSize": 10
         }
       },
       "IDC_BUTTON_BUY": "ControlList/State/MusicShop/MusicShop_Btn_ShopItemBuy.json"

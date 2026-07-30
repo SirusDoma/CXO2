@@ -58,7 +58,7 @@ namespace Cx
         return m_arguments[1];
     }
 
-    std::string CommandLineContext::GetGame() const
+    std::string CommandLineContext::GetFtpPath() const
     {
         if (GetArgumentCount() < 3)
             return std::string();

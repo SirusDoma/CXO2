@@ -16,6 +16,6 @@ namespace Cx::Constants::Messages::Application
     namespace Exit
     {
         constexpr static auto CONFIRM                   = "Would you like to finish the game?";
-        constexpr static auto CONFIRM_WHILE_DOWNLOADING = "Would you like to stop download music files and then finish the game?"; // Unmapped
+        constexpr static auto CONFIRM_WHILE_DOWNLOADING = "Would you like to stop download music files and then finish the game?";
     }
 }

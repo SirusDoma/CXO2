@@ -3,10 +3,10 @@
 namespace Cx::Constants::Messages::Waiting
 {
 
-    constexpr static auto TUNE_NOT_SELECTED       = "No tune to play. Please select a tune again."; // Unmapped
-    constexpr static auto TUNE_NOT_FOUND          = "Failed in finding the tune. Please download it."; // Unmapped
+    constexpr static auto TUNE_NOT_SELECTED       = "No tune to play. Please select a tune again.";
+    constexpr static auto TUNE_NOT_FOUND          = "Failed in finding the tune. Please download it.";
     constexpr static auto TUNE_MISSING_FOR_OTHERS = "There are users who have not the right tune.";
-    constexpr static auto TUNE_NOT_PURCHASED      = "You have a music file but did not purchase any. Please purchase some in the music shop."; // Unmapped
+    constexpr static auto TUNE_NOT_PURCHASED      = "You have a music file but did not purchase any. Please purchase some in the music shop.";
 
     namespace Music
     {

@@ -3,6 +3,7 @@
 
 #include <CXO2/O2.hpp>
 #include <CXO2/Contexts/SessionContext.hpp>
+#include <CXO2/Contexts/CommandLineContext.hpp>
 
 #include <CXO2/Services/AuthService.hpp>
 #include <CXO2/Network/Requests/AuthRequest.hpp>
@@ -12,6 +13,7 @@
 
 #include <CXO2/Models/Planet.hpp>
 #include <CXO2/Services/NetworkService.hpp>
+#include <CXO2/Services/MusicDownloaderService.hpp>
 #include <CXO2/UI/Planet/ChannelBoard.hpp>
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
@@ -62,7 +64,13 @@ namespace Cx
         auto philix   = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_PREMIUM_01);
 
         const auto exitButton = Instantiate<Gx::Button>(Resource::Planet::IDC_BUTTON_EXIT);
-        exitButton->SetClickCallback([&] (auto&, auto&) { ExitGame(Constants::Messages::Planet::EXIT_CONFIRM); });
+        exitButton->SetClickCallback([&] (auto&, auto&)
+        {
+            if (Require<MusicDownloaderService>().IsDownloading())
+                ExitGame(Constants::Messages::Planet::EXIT_CONFIRM_WHILE_DOWNLOADING);
+            else
+                ExitGame(Constants::Messages::Planet::EXIT_CONFIRM);
+        });
 
         auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
         channelBoard->SetChannelEnterCallback([=] (auto hall, std::uint16_t serverID, std::uint16_t channelID)

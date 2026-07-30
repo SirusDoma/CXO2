@@ -24,7 +24,7 @@ namespace Cx
 
         std::string GetAuthToken() const;
         std::string GetFtpUrl() const;
-        std::string GetGame() const;
+        std::string GetFtpPath() const;
         std::vector<Gateway> GetGatewayInfo() const;
 
     private:
