@@ -4,6 +4,7 @@
 #include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <fmt/format.h>
+// #include <fmt/xchar.h>
 #include <utility>
 
 namespace Cx
@@ -276,12 +277,12 @@ namespace Cx
             if (!chat.Sender.isEmpty() && !chat.Recipient.isEmpty())
             {
                 if (chat.Sender != m_session.GetName() && chat.Recipient == m_session.GetName())
-                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_RECEIVED, chat.Recipient, chat.Content));
+                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_RECEIVED, chat.Recipient.toUtf32(), chat.Content.toUtf32()));
                 else
-                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_SENT, chat.Recipient, chat.Content));
+                    m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::WHISPER_SENT, chat.Recipient.toUtf32(), chat.Content.toUtf32()));
             }
             else if (!chat.Sender.isEmpty())
-                m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::MESSAGE, chat.Sender, chat.Content));
+                m_labels[index]->SetString(fmt::format(Constants::Messages::Chat::Lines::MESSAGE, chat.Sender.toUtf32(), chat.Content.toUtf32()));
             else
                 m_labels[index]->SetString(chat.Content);
         }
