@@ -6,7 +6,6 @@
 
 namespace Cx
 {
-    class ScoreTracker;
     class RoomContext;
     class SessionContext;
     class WaitingService;
@@ -14,7 +13,7 @@ namespace Cx
     class StateResult : public State
     {
     public:
-        StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service);
+        StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, WaitingService& waiting, PlayingService& service);
 
         void Initialize() override;
         void Initialize(GameContext game);
@@ -30,6 +29,5 @@ namespace Cx
         GameContext m_context;
         WaitingService& m_waiting;
         PlayingService& m_service;
-        const ScoreTracker& m_scoreTracker;
     };
 }

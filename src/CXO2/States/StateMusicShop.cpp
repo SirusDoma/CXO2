@@ -865,7 +865,7 @@ namespace Cx
         if (!m_downloader.IsDownloading())
             return;
 
-        ShowDialog(Constants::Messages::MusicShop::DOWNLOAD_CANCEL_CONFIRM, DialogStyle::YesNo, false, [this] (const bool answer)
+        ShowDialog(Constants::Messages::MusicShop::DOWNLOAD_CANCEL_CONFIRM, DialogStyle::YesNo, [this] (const bool answer)
         {
             OnCancelDialogAnswered(answer);
         });
@@ -950,7 +950,7 @@ namespace Cx
                 Constants::Messages::MusicShop::Purchase::CONFIRM
             );
 
-            ShowDialog(prompt, DialogStyle::YesNo, false, [this] (const bool)
+            ShowDialog(prompt, DialogStyle::YesNo, [this] (const bool)
             {
                 ShowDialog("Music shop purchase is currently not available.", DialogStyle::Information);
             });
@@ -965,7 +965,7 @@ namespace Cx
             return;
         }
 
-        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, false, [=] (const bool answer)
+        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, [=] (const bool answer)
         {
             OnCartBuyDialogAnswered(answer);
         });

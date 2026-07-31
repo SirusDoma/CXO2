@@ -56,7 +56,8 @@ namespace Cx
         explicit RoomContext(SessionContext& session, Gx::ResourceManager& resources);
         ~RoomContext();
 
-        void Enter(std::uint32_t id);
+        void Create(std::uint32_t id);
+        void Join(std::uint32_t id);
         void Leave();
 
         std::uint32_t GetID() const;
@@ -116,11 +117,11 @@ namespace Cx
         void Lock(std::size_t index);
         void Unlock(std::size_t index);
         void PromoteMaster(std::size_t index);
-        void SetReady(std::size_t index, bool ready);
-        void SetTeam(std::size_t index, Room::Team team);
-        void SetTeamColor(std::size_t index, const sf::Color& color);
-        void SetEquipment(std::size_t index, const EquipmentSet& equippedItemIDs);
-        void SetMasterSlot();
+        void SetMemberReady(std::size_t index, bool ready);
+        void SetMemberTeam(std::size_t index, Room::Team team);
+        void SetMemberTeamColor(std::size_t index, const sf::Color& color);
+        void SetMemberLevel(std::size_t index, std::int32_t level);
+        void SetMemberEquipment(std::size_t index, const EquipmentSet& equippedItemIDs);
 
         const Room::Slot& GetMaster() const;
         const Room::Slot& GetCurrentSlot() const;

@@ -27,7 +27,22 @@ namespace Cx
     {
     }
 
-    void RoomContext::Enter(const std::uint32_t id)
+    void RoomContext::Create(const std::uint32_t id)
+    {
+        m_state = Room{};
+        m_state.ID = id;
+
+        auto member = Member{};
+        member.Name            = m_session.GetName();
+        member.Gender          = m_session.GetGender();
+        member.Level           = m_session.GetLevel();
+        member.EquippedItemIDs = m_session.GetEquippedItemIDs();
+        member.MusicIDs        = m_session.GetMusicIDs();
+
+        Seat(0, member, Room::Team::A, true, true);
+    }
+
+    void RoomContext::Join(const std::uint32_t id)
     {
         m_state = Room{};
         m_state.ID = id;
@@ -252,17 +267,16 @@ namespace Cx
 
     void RoomContext::Seat(const std::size_t index, const Member& member, const Room::Team team, const bool ready, const bool isMaster)
     {
-        auto& slot = m_state.Slots[index];
-        slot.State    = Room::SlotState::Occupied;
-        slot.IsMaster = isMaster;
-        slot.Ready    = isMaster || ready;
-        slot.Team     = team;
-
+        auto& slot           = m_state.Slots[index];
         slot.Name            = member.Name;
         slot.Gender          = member.Gender;
         slot.Level           = member.Level;
         slot.EquippedItemIDs = member.EquippedItemIDs;
         slot.MusicIDs        = member.MusicIDs;
+        slot.State           = Room::SlotState::Occupied;
+        slot.IsMaster        = isMaster;
+        slot.Ready           = isMaster || ready;
+        slot.Team            = team;
     }
 
     void RoomContext::Vacate(const std::size_t index)
@@ -274,52 +288,73 @@ namespace Cx
     void RoomContext::Lock(const std::size_t index)
     {
         auto& slot = m_state.Slots[index];
+        if (slot.State == Room::SlotState::Occupied)
+            throw Gx::InvalidOperationException();
+
         slot = Room::Slot{};
         slot.State = Room::SlotState::Locked;
     }
 
     void RoomContext::Unlock(const std::size_t index)
     {
-        Vacate(index);
+        auto& slot = m_state.Slots[index];
+        if (slot.State == Room::SlotState::Occupied)
+            throw Gx::InvalidOperationException();
+
+        slot = Room::Slot{};
     }
 
     void RoomContext::PromoteMaster(const std::size_t index)
     {
-        auto& slot = m_state.Slots[index];
-        slot.IsMaster = true;
-        slot.Ready    = true;
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
+
+        for (std::size_t i = 0; i < m_state.Slots.size(); i++)
+        {
+            auto& slot    = m_state.Slots[i];
+            slot.IsMaster = index == i;
+            slot.Ready    = slot.IsMaster || slot.Ready;
+        }
     }
 
-    void RoomContext::SetReady(const std::size_t index, const bool ready)
+    void RoomContext::SetMemberReady(const std::size_t index, const bool ready)
     {
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
+
         m_state.Slots[index].Ready = ready;
     }
 
-    void RoomContext::SetTeam(const std::size_t index, const Room::Team team)
+    void RoomContext::SetMemberTeam(const std::size_t index, const Room::Team team)
     {
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
+
         m_state.Slots[index].Team = team;
     }
 
-    void RoomContext::SetTeamColor(const std::size_t index, const sf::Color& color)
+    void RoomContext::SetMemberTeamColor(const std::size_t index, const sf::Color& color)
     {
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
+
         m_state.Slots[index].TeamColor = color;
     }
 
-    void RoomContext::SetEquipment(const std::size_t index, const EquipmentSet& equippedItemIDs)
+    void RoomContext::SetMemberLevel(const std::size_t index, const std::int32_t level)
     {
-        m_state.Slots[index].EquippedItemIDs = equippedItemIDs;
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
+
+        m_state.Slots[index].Level = level;
     }
 
-    void RoomContext::SetMasterSlot()
+    void RoomContext::SetMemberEquipment(const std::size_t index, const EquipmentSet& equippedItemIDs)
     {
-        auto member = Member{};
-        member.Name            = m_session.GetName();
-        member.Gender          = m_session.GetGender();
-        member.Level           = m_session.GetLevel();
-        member.EquippedItemIDs = m_session.GetEquippedItemIDs();
-        member.MusicIDs        = m_session.GetMusicIDs();
+        if (index >= m_state.Slots.size())
+            throw Gx::ArgumentOutOfRangeException();
 
-        Seat(0, member, Room::Team::A, true, true);
+        m_state.Slots[index].EquippedItemIDs = equippedItemIDs;
     }
 
     const Room::Slot& RoomContext::GetMaster() const
@@ -379,16 +414,19 @@ namespace Cx
 
     GameContext RoomContext::CreateGameContext() const
     {
-        auto game = GameContext{};
-        game.Chart = std::make_unique<Chart>();
-        game.Chart->Source = m_state.Music.Source;
+        auto chart = std::make_unique<Chart>();
+        chart->Source = m_state.Music.Source;
+        chart->SetMetadata(m_state.Music);
 
-        game.Difficulty = m_state.Difficulty;
-        game.Mode       = m_state.Mode;
-        game.Speed      = m_state.Speed;
-        game.SpeedMode  = m_state.SpeedMode;
-        game.MapID      = m_state.Map.ID;
-        game.EffectID   = m_state.EffectID;
+        auto game = GameContext{m_session};
+        game.SetChart(std::move(chart));
+
+        game.SetDifficulty(m_state.Difficulty);
+        game.SetMode(m_state.Mode);
+        game.SetSpeed(m_state.Speed);
+        game.SetSpeedMode(m_state.SpeedMode);
+        game.SetMapID(m_state.Map.ID);
+        game.SetEffectID(m_state.EffectID);
 
         return game;
     }

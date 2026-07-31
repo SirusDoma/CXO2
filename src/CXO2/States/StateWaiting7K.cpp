@@ -400,7 +400,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -418,7 +418,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -453,7 +453,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -493,7 +493,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -508,13 +508,13 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            m_room.SetTeam(response.ID, response.Team);
+            m_room.SetMemberTeam(response.ID, response.Team);
 
             InvalidateAvatarInfo();
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -529,13 +529,13 @@ namespace Cx
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
-            m_room.SetReady(response.ID, response.Ready);
+            m_room.SetMemberReady(response.ID, response.Ready);
 
             InvalidateAvatarInfo();
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -633,7 +633,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -650,7 +650,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -668,7 +668,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -719,7 +719,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -751,7 +751,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -821,7 +821,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -914,7 +914,7 @@ namespace Cx
         catch (const Gx::Exception& e)
         {
             selectMusicButton->SetEnabled(true);
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -972,7 +972,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -997,8 +997,8 @@ namespace Cx
             const auto sfxTeam = Instantiate<sf::Sound>(Sound::Effects::EF_34);
             if (const auto index = m_room.GetCurrentSlotIndex(); index < RoomContext::MaxCapacity && m_avatarInfo->GetSlot())
             {
-                m_room.SetTeam(index, response.Team);
-                m_room.SetTeamColor(index, m_avatarInfo->ResolveTeamColor());
+                m_room.SetMemberTeam(index, response.Team);
+                m_room.SetMemberTeamColor(index, m_avatarInfo->ResolveTeamColor());
             }
 
             m_avatarInfo->Invalidate();
@@ -1006,7 +1006,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -1035,7 +1035,7 @@ namespace Cx
         for (auto [_, equipedItem] : m_mainAvatar->GetEquipedItems())
             equipment.insert(equipedItem->GetID());
 
-        m_room.SetEquipment(m_room.GetCurrentSlotIndex(), equipment);
+        m_room.SetMemberEquipment(m_room.GetCurrentSlotIndex(), equipment);
     }
 
     void StateWaiting7K::OnMapSelectorStateChanged(const unsigned int mapID)
@@ -1122,7 +1122,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [this] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [this] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -1283,7 +1283,7 @@ namespace Cx
             if (slot.Name == m_room.GetCurrentSlot().Name)
                 return;
 
-            ShowDialog(Constants::Messages::Waiting::Members::KICK_CONFIRM, DialogStyle::YesNo, false, [=] (const bool confirm)
+            ShowDialog(Constants::Messages::Waiting::Members::KICK_CONFIRM, DialogStyle::YesNo, [=] (const bool confirm)
             {
                 if (confirm)
                     m_service.UpdateRoomSlot(UpdateRoomSlotRequest{static_cast<std::uint8_t>(slotID)});
@@ -1401,7 +1401,7 @@ namespace Cx
             if (slot.State != Room::SlotState::Occupied)
                 continue;
 
-            m_room.SetTeamColor(index, avatarInfo->ResolveTeamColor());
+            m_room.SetMemberTeamColor(index, avatarInfo->ResolveTeamColor());
 
             const auto bossMark = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_BOSS_MARK);
             const auto noMusic  = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_NO_MUSIC);
@@ -1474,7 +1474,7 @@ namespace Cx
 
             avatar->SetGender(slot.Gender);
             avatarInfo->SetSlot(slot);
-            m_room.SetTeamColor(memberIndex, avatarInfo->ResolveTeamColor());
+            m_room.SetMemberTeamColor(memberIndex, avatarInfo->ResolveTeamColor());
 
             for (auto [_, item]: m_items.GetDefaultItems(slot.Gender))
                 avatar->SetDefaultItem(std::move(item));

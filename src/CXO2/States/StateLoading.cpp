@@ -14,6 +14,9 @@
 
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Loading.hpp>
+#include <CXO2/Constants/Messages/Loading.hpp>
+#include <CXO2/Constants/Messages/Result.hpp>
+#include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/UI/Image.hpp>
 #include <Genode/UI/Label.hpp>
@@ -21,6 +24,7 @@
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
+#include <fmt/format.h>
 #include <thread>
 
 namespace Gx
@@ -36,6 +40,7 @@ namespace Cx
     StateLoading::StateLoading(GameConfig& config, SessionContext& session, RoomContext& room, PlayingService& service) :
         m_texture(),
         m_config(config),
+        m_context(session),
         m_session(session),
         m_room(room),
         m_service(service),
@@ -77,9 +82,9 @@ namespace Cx
         if (!randomized && !imageSet.empty())
             imageSet[0]->SetVisible(true);
 
-        const auto chart      = m_context.Chart.get();
+        const auto chart      = m_context.GetChart();
         const auto& resources = GetResources(ResourceScope::Shared);
-        auto loader           = O2JamChartLoader(m_context.Mode, m_context.Difficulty);
+        auto loader           = O2JamChartLoader(m_context.GetMode(), m_context.GetDifficulty());
 
         const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
         for (std::size_t i = 0; i < list->GetChildrenCount(); i++)
@@ -111,6 +116,38 @@ namespace Cx
                 sign->SetFrame("Loading");
         }
 
+        const auto missionHeader      = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_HEADER);
+        const auto missionRequirement = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_REQUIREMENT);
+        const auto missionNotice      = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_NOTICE);
+
+        missionHeader->SetVisible(false);
+        missionRequirement->SetVisible(false);
+        missionNotice->SetVisible(false);
+
+        const auto missionID = m_context.GetMissionID();
+        if (m_context.GetMode() != GameMode::Tutorial && missionID >= 0)
+        {
+            const auto level = m_session.GetLevel();
+            m_context.SetActiveMissionID(missionID);
+
+            missionHeader->SetVisible(true);
+            missionHeader->SetString(fmt::format(Constants::Messages::Loading::MISSION_HEADER, sf::String(std::to_string(level + 1))));
+
+            missionRequirement->SetVisible(true);
+            missionRequirement->SetString(Constants::Messages::Result::Mission::REQUIREMENTS[m_context.GetMissionID()]);
+
+            if (m_context.GetMode() == GameMode::Single)
+            {
+                missionNotice->SetVisible(true);
+                missionNotice->SetString(Constants::Messages::Loading::MISSION_NEEDS_MULTIPLAY);
+            }
+            else if (!m_context.IsMissionEligible())
+            {
+                missionNotice->SetVisible(true);
+                missionNotice->SetString(Constants::Messages::Loading::MISSION_NEEDS_OTHER_TUNE);
+            }
+        }
+
         if (const auto image = resources.Find<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER))
         {
             OnCoverLoaded(image);
@@ -129,8 +166,8 @@ namespace Cx
 
         auto thread = std::thread([=] ()
         {
-            m_context.Chart = loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default);
-            Invoke([this] { OnChartLoaded(m_context.Chart.get()); });
+            m_context.SetChart(loader.LoadFromFile(chart->Source, Gx::ResourceContext::Default));
+            Invoke([this] { OnChartLoaded(m_context.GetChart()); });
         });
 
         thread.detach();
@@ -164,7 +201,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -240,9 +277,9 @@ namespace Cx
 
                     auto ctx = PlayingResourceContext();
                     ctx.SetFxEnabled(m_config.UseFx);
-                    ctx.SetMapID(m_context.MapID);
-                    ctx.SetEffectID(m_context.EffectID);
-                    ctx.SetMode(m_context.Mode);
+                    ctx.SetMapID(m_context.GetMapID());
+                    ctx.SetEffectID(m_context.GetEffectID());
+                    ctx.SetMode(m_context.GetMode());
 
                     GetDirector().Present<StatePlaying7K>(ctx, std::move(m_context));
                 });

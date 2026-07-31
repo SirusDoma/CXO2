@@ -57,21 +57,20 @@ namespace Cx
         RoomContext& room,
         GameConfig& config,
         JudgementStrategy& judgementStrategy,
-        ScoreTracker& scoreTracker,
         LifeSystem& lifeSystem,
         ItemFactory& items
     ) :
         m_service(service),
         m_session(session),
         m_room(room),
+        m_context(session),
         m_config(config),
-        m_scoreTracker(scoreTracker),
         m_lifeSystem(lifeSystem),
         m_items(items),
         m_renderer(
             judgementStrategy,
             lifeSystem,
-            scoreTracker,
+            m_context.GetScoreTracker(),
             mixer,
             GetResources(),
             ChannelSet{
@@ -108,27 +107,27 @@ namespace Cx
         m_service.SetGameCompletedEventCallback([this] (const auto& ev) { OnGameCompleted(ev); });
 
         // Setup providers
-        m_scoreTracker.Initialize(m_context.Difficulty);
-        m_lifeSystem.Initialize(m_context.Difficulty);
+        m_context.GetScoreTracker().Initialize(m_context.GetDifficulty());
+        m_lifeSystem.Initialize(m_context.GetDifficulty());
 
         // Add chart renderer
         m_renderer.SetName(Resource::Playing7K::IDC_CHART_RENDERER);
         m_renderer.SetRenderCompleteCallback([this] { OnChartRenderCompleted(); });
         AddChild(m_renderer);
 
-        m_renderer.Initialize(*m_context.Chart, ChartRenderer::RenderSettings{
+        m_renderer.Initialize(*m_context.GetChart(), ChartRenderer::RenderSettings{
             false,
             m_config,
             GetViewport(),
-            m_context.Speed,
-            m_context.SpeedMode,
-            m_context.Difficulty
+            m_context.GetSpeed(),
+            m_context.GetSpeedMode(),
+            m_context.GetDifficulty()
         });
 
         // Setup chat panel
         const auto chatPanel = Instantiate<ChatPanel>(Resource::Playing7K::IDC_CHAT_PANEL);
         m_chatBox = chatPanel->FindChild<Gx::InputField>(Resource::Playing7K::IDC_EDIT_CHAT);
-        if (m_context.Mode != GameMode::Tutorial)
+        if (m_context.GetMode() != GameMode::Tutorial)
         {
             chatPanel->SetMaximumTextLength(50);
             m_chatBox->SetPermanentFocusEnabled(true);
@@ -142,13 +141,13 @@ namespace Cx
 
         // Setup Guide
         if (const auto instructor = Instantiate<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_INSTRUCTOR))
-            instructor->SetVisible(m_context.Mode == GameMode::Tutorial);
+            instructor->SetVisible(m_context.GetMode() == GameMode::Tutorial);
 
         if (const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
             instruction->SetVisible(false);
 
         // Map user states
-        if (m_context.Mode != GameMode::Tutorial)
+        if (m_context.GetMode() != GameMode::Tutorial)
         {
             for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
             {
@@ -177,7 +176,7 @@ namespace Cx
                 continue;
 
             const auto avatar = container->FindChild<Avatar>(Resource::Playing7K::Avatar::IDC_AVATAR);
-            if (m_context.Mode == GameMode::Tutorial)
+            if (m_context.GetMode() == GameMode::Tutorial)
             {
                 container->SetVisible(i == 4);
                 if (!container->IsVisible())
@@ -212,7 +211,7 @@ namespace Cx
                 if (!container->IsVisible())
                     continue;
 
-                m_room.SetReady(i, slot.IsMaster);
+                m_room.SetMemberReady(i, slot.IsMaster);
 
                 EquipAvatar(avatar, slot.Gender, slot.EquippedItemIDs);
 
@@ -287,7 +286,7 @@ namespace Cx
             keyEffect->SetFrame(id);
             keyEffect->SetVisible(false);
 
-            if (m_context.Mode == GameMode::Tutorial)
+            if (m_context.GetMode() == GameMode::Tutorial)
             {
                 const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
                 guideKeyEffect->SetVisible(false);
@@ -300,8 +299,8 @@ namespace Cx
 
         // Setup Play Menu
         const auto playMenu = Instantiate<PlayMenu>(Resource::Playing7K::IDC_PLAY_MENU);
-        playMenu->SetMetadata(m_context.Chart->GetMetadata(), m_context.Difficulty, m_context.Speed, m_context.SpeedMode);
-        playMenu->SetScoreTracker(m_scoreTracker);
+        playMenu->SetMetadata(m_context.GetChart()->GetMetadata(), m_context.GetDifficulty(), m_context.GetSpeed(), m_context.GetSpeedMode());
+        playMenu->SetScoreTracker(m_context.GetScoreTracker());
 
         // Setup Score Counter
         const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
@@ -408,13 +407,13 @@ namespace Cx
         m_renderer.SetInputCallback([=] (auto channel, bool state) { OnChartInput(channel, state); });
 
         // Setup Score changes
-        m_scoreTracker.AddIncrementListener([this] (auto& ev, auto acc, auto count)
+        m_context.GetScoreTracker().AddIncrementListener([this] (auto& ev, auto acc, auto count)
         {
             OnScoreIncremented(ev, acc, count);
         });
 
         // Setup jam combo effect
-        m_scoreTracker.AddJamComboListener([=] (auto& ev, auto acc, auto jamCombo)
+        m_context.GetScoreTracker().AddJamComboListener([=] (auto& ev, auto acc, auto jamCombo)
         {
             OnJamComboIncremented(ev, acc, jamCombo);
         });
@@ -448,7 +447,7 @@ namespace Cx
 
     void StatePlaying7K::OnRenderComplete()
     {
-        if (m_context.Mode == GameMode::Tutorial)
+        if (m_context.GetMode() == GameMode::Tutorial)
         {
             GetDirector().Dismiss();
             return;
@@ -456,6 +455,8 @@ namespace Cx
 
         if (m_states.size() == 0)
         {
+            const auto& scoreTracker = m_context.GetScoreTracker();
+
             auto items = std::array<GameCompletedEventData::ScoreEntry, 8>();
             for (std::size_t i = 0; i < items.size(); i++)
             {
@@ -466,19 +467,18 @@ namespace Cx
                     {
                         /* .ID          = */ static_cast<std::uint8_t>(i),
                         /* .Active      = */ true,
-                        /* .Cool        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Cool)),
-                        /* .Good        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Good)),
-                        /* .Bad         = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Bad)),
-                        /* .Miss        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Miss)),
-                        /* .MaxCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxCombo()),
-                        /* .MaxJamCombo = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxJamCombo()),
-                        /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
+                        /* .Cool        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Cool)),
+                        /* .Good        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Good)),
+                        /* .Bad         = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Bad)),
+                        /* .Miss        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Miss)),
+                        /* .MaxCombo    = */ static_cast<std::uint16_t>(scoreTracker.GetMaxCombo()),
+                        /* .MaxJamCombo = */ static_cast<std::uint16_t>(scoreTracker.GetMaxJamCombo()),
+                        /* .Score       = */ static_cast<std::uint32_t>(scoreTracker.GetScorePoint()),
                         /* .Reward      = */ 0,
                         /* .Level       = */ m_session.GetLevel(),
                         /* .Experience  = */ m_session.GetExperience(),
-                        /* .Winning     = */ true,
-                        /* .Reserved    = */ {},
-
+                        /* .Result      = */ GameCompletedEventData::MatchResult::Win,
+                        /* .Mission     = */ GameCompletedEventData::MissionResult::None,
                     };
                 }
                 else
@@ -539,7 +539,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -560,7 +560,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -574,22 +574,29 @@ namespace Cx
             const auto& response = ev.Open();
             if (const auto it = m_states.find(response.ID); it != m_states.end())
             {
-                it->second.Completed = true;
-                it->second.Valid = false;
+                if (it->second.Completed)
+                {
+                    // TODO: Update member levels
+                }
+                else
+                {
+                    it->second.Completed = true;
+                    it->second.Valid = false;
 
-                if (it->second.Avatar)
-                    it->second.Avatar->SetVisible(false);
+                    if (it->second.Avatar)
+                        it->second.Avatar->SetVisible(false);
 
-                if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
-                    return;
+                    if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
+                        return;
 
-                auto name = m_room.GetSlot(response.ID).Name;
-                m_room.Vacate(response.ID);
+                    auto name = m_room.GetSlot(response.ID).Name;
+                    m_room.Vacate(response.ID);
+                }
             }
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -615,7 +622,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -630,7 +637,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false);
+            ShowDialog(std::string(e.what()), DialogStyle::Information);
             GetDirector().Dismiss<StatePlanet>();
         }
     }
@@ -643,7 +650,7 @@ namespace Cx
         }
         catch (const Gx::Exception& e)
         {
-            ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(e.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Dismiss<StatePlanet>();
             });
@@ -661,7 +668,7 @@ namespace Cx
             return;
         }
 
-        if (m_context.Mode != GameMode::Single)
+        if (m_context.GetMode() != GameMode::Single)
         {
             m_room.Leave();
             GetDirector().Dismiss<StateRoom>();
@@ -706,11 +713,12 @@ namespace Cx
         const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
         const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
 
-        if (!m_scoreTracker.IsEnabled() && m_context.Difficulty != Difficulty::EX)
+        auto& scoreTracker = m_context.GetScoreTracker();
+        if (!scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
             return;
 
         // Life System
-        if (m_scoreTracker.IsEnabled())
+        if (scoreTracker.IsEnabled())
         {
             const auto lastLife = m_lifeSystem.GetCurrentLifePoint();
             m_lifeSystem.Update(acc, count);
@@ -729,11 +737,11 @@ namespace Cx
 
             if (m_lifeSystem.GetCurrentLifePoint() == 0)
             {
-                m_scoreTracker.SetEnabled(false);
+                scoreTracker.SetEnabled(false);
                 m_self->Die();
 
                 SubmitScore();
-                if (m_context.Difficulty != Difficulty::EX && m_states.size() == 0)
+                if (m_context.GetDifficulty() != Difficulty::EX && m_states.size() == 0)
                 {
                     Run<Gx::Delay>(sf::milliseconds(2000), [this]
                     {
@@ -761,21 +769,21 @@ namespace Cx
         }
 
         // Combo
-        m_comboCounter->SetCombo(m_scoreTracker.GetCombo());
+        m_comboCounter->SetCombo(scoreTracker.GetCombo());
         if (m_lifeSystem.GetCurrentLifePoint() > 0 || acc != Accuracy::Miss)
             m_judgementIndicator->Play(acc);
         else
             m_judgementIndicator->Play(Accuracy::None);
 
         // Score and Jam Combo
-        scoreNumber->SetValue(m_scoreTracker.GetScorePoint());
-        jamGauge->SetValue(m_scoreTracker.GetJamProgress());
+        scoreNumber->SetValue(scoreTracker.GetScorePoint());
+        jamGauge->SetValue(scoreTracker.GetJamProgress());
 
         // Buffer
         for (std::size_t i = 0; i < m_buffers.size(); i++)
         {
             const auto renderable = dynamic_cast<Gx::Renderable*>(m_buffers[i]);
-            renderable->SetVisible(i < m_scoreTracker.GetBufferCount());
+            renderable->SetVisible(i < scoreTracker.GetBufferCount());
         }
     }
 
@@ -799,7 +807,7 @@ namespace Cx
 
     void StatePlaying7K::OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        m_service.ExitPlaying(m_context.Mode, [=] (const auto& ev)
+        m_service.ExitPlaying(m_context.GetMode(), [=] (const auto& ev)
         {
             OnExitPlayingResponded(ev);
         });
@@ -809,7 +817,7 @@ namespace Cx
     {
         State::Update(delta);
 
-        if (m_context.Mode == GameMode::Tutorial)
+        if (m_context.GetMode() == GameMode::Tutorial)
         {
             const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
             const auto frontBuffers = m_renderer.GetFrontBuffers();
@@ -923,23 +931,23 @@ namespace Cx
 
     void StatePlaying7K::SetScores(const std::array<GameCompletedEventData::ScoreEntry, 8>& entries)
     {
-        m_context.Scores = entries;
-        std::sort(m_context.Scores.begin(), m_context.Scores.end(), [] (auto& a, auto& b) { return a.Score > b.Score; });
+        m_context.SetScores(entries);
     }
 
     void StatePlaying7K::SubmitScore()
     {
+        const auto& scoreTracker = m_context.GetScoreTracker();
         m_service.SubmitScore(SubmitScoreRequest
         {
-            /* .Cool        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Cool)),
-            /* .Good        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Good)),
-            /* .Bad         = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Bad)),
-            /* .Miss        = */ static_cast<std::uint16_t>(m_scoreTracker.GetPoint(Accuracy::Miss)),
-            /* .MaxCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxCombo()),
-            /* .JamCombo    = */ static_cast<std::uint16_t>(m_scoreTracker.GetJamCombo()),
-            /* .MaxJamCombo = */ static_cast<std::uint16_t>(m_scoreTracker.GetMaxJamCombo()),
-            /* .Score       = */ static_cast<std::uint32_t>(m_scoreTracker.GetScorePoint()),
-            /* .Life        = */ static_cast<std::uint8_t>(m_lifeSystem.GetCurrentLifePoint() / m_lifeSystem.GetMaxLifePoint() * 100),
+            /* .Cool        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Cool)),
+            /* .Good        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Good)),
+            /* .Bad         = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Bad)),
+            /* .Miss        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Miss)),
+            /* .MaxCombo    = */ static_cast<std::uint16_t>(scoreTracker.GetMaxCombo()),
+            /* .JamCombo    = */ static_cast<std::uint16_t>(scoreTracker.GetJamCombo()),
+            /* .MaxJamCombo = */ static_cast<std::uint16_t>(scoreTracker.GetMaxJamCombo()),
+            /* .Score       = */ static_cast<std::uint32_t>(scoreTracker.GetScorePoint()),
+            /* .Life        = */ static_cast<std::uint8_t>((static_cast<float>(m_lifeSystem.GetCurrentLifePoint()) / static_cast<float>(m_lifeSystem.GetMaxLifePoint())) * 100.f),
         },
         [=] (const auto& ev)
         {

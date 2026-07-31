@@ -11,6 +11,20 @@ namespace Cx
     {
         static constexpr Cx::Command Command = EventCommand::GameCompleted;
 
+        enum class MatchResult : std::uint8_t
+        {
+            // Draw = 0,
+            Lose = 0,
+            Win  = 1,
+        };
+
+        enum class MissionResult : std::uint8_t
+        {
+            None      = 0,
+            Failed    = 1,
+            Completed = 2
+        };
+
         struct ScoreEntry
         {
             std::uint8_t  ID{};
@@ -25,8 +39,8 @@ namespace Cx
             std::uint16_t Reward{};
             std::int32_t  Level{};
             std::int32_t  Experience{};
-            bool          IsWinning{};
-            std::uint8_t  Reserved{};
+            MatchResult   Result{};
+            MissionResult Mission{};
         };
 
         CollectionEnvelope<std::vector<ScoreEntry>, std::uint32_t> Entries{};

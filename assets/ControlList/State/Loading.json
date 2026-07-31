@@ -14,7 +14,10 @@
       "IDC_IMAGE_STATE_LOADING8": "ControlList/State/Loading/MusicLoading8.json",
       "IDC_IMAGE_STATE_LOADING9": "ControlList/State/Loading/MusicLoading9.json",
       "IDC_IMAGE_STATE_LOADING10": "ControlList/State/Loading/MusicLoading10.json",
-      "IDC_LIST_LOADING_SIGN": "ControlList/State/Loading/Loading_List.json"
+      "IDC_LIST_LOADING_SIGN": "ControlList/State/Loading/Loading_List.json",
+      "IDC_TEXT_MISSION_HEADER": "ControlList/State/Loading/Loading_MissionHeader.json",
+      "IDC_TEXT_MISSION_REQUIREMENT": "ControlList/State/Loading/Loading_MissionRequirement.json",
+      "IDC_TEXT_MISSION_NOTICE": "ControlList/State/Loading/Loading_MissionNotice.json"
     }
   }
 }

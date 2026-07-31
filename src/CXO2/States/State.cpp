@@ -53,6 +53,18 @@ namespace Cx
 
     void State::Initialize()
     {
+        if (m_persistentDialog)
+        {
+            Invoke([this]
+            {
+                if (!m_persistentDialog)
+                    return;
+
+                const auto pending = *m_persistentDialog;
+                ShowDialog(pending.Content, pending.Style, true, pending.Backdrop, pending.Callback);
+            });
+        }
+
         Require<MusicDownloaderService>().SetDownloadCompletedCallback([this] (const std::uint16_t musicID)
         {
             if (const auto shop = dynamic_cast<StateMusicShop*>(this))
@@ -67,6 +79,13 @@ namespace Cx
             Require<NetworkService>().Dispatch(SyncMusicDownloadRequest{musicID},nullptr);
         });
 
+        auto ev = StateEventData{*this};
+        auto& dispatcher = Require<Gx::Events::EventDispatcher>();
+        dispatcher.Dispatch(StateEvents::OnInitialize, ev);
+
+        if (ev.Cancelled)
+            return;
+
         Gx::Scene::Initialize();
         m_tempResources->Clear();
     }
@@ -74,6 +93,19 @@ namespace Cx
     void State::Finalize()
     {
         Require<MusicDownloaderService>().SetDownloadCompletedCallback(nullptr);
+
+        for (const auto dialog : {m_dialogInfo, m_dialog1, m_dialog2})
+        {
+            if (dialog->IsShown())
+                dialog->Dismiss();
+        }
+
+        auto ev = StateEventData{*this};
+        auto& dispatcher = Require<Gx::Events::EventDispatcher>();
+        dispatcher.Dispatch(StateEvents::OnFinalize, ev);
+
+        if (ev.Cancelled)
+            return;
 
         Scene::Finalize();
 
@@ -122,22 +154,51 @@ namespace Cx
         loaded = true;
     }
 
-    void State::ShowDialog(const sf::String& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
+    Gx::Dialog* State::GetDialog(const DialogStyle style)
     {
-        auto dialog = m_dialogInfo;
         if (style == DialogStyle::OkCancel)
-            dialog = m_dialog1;
-        else if (style == DialogStyle::YesNo)
-            dialog = m_dialog2;
+            return m_dialog1;
 
-        const auto label = dialog->GetLabel();
+        if (style == DialogStyle::YesNo)
+            return m_dialog2;
+
+        return m_dialogInfo;
+    }
+
+    void State::ShowDialog(const sf::String& content, const DialogStyle style, std::function<void(bool)> callback)
+    {
+        ShowDialog(content, style, true, false, std::move(callback));
+    }
+
+    void State::ShowDialog(const sf::String& content, const DialogStyle style, const bool persist, const bool backdrop, std::function<void(bool)> callback)
+    {
+        const auto dialog = GetDialog(style);
+        const auto label  = dialog->GetLabel();
         label->SetVisible(true);
 
         if (!callback)
             callback = [] (bool) {};
 
-        dialog->SetAcceptCallback([=] () { callback(true); });
-        dialog->SetCancelCallback([=] () { callback(false); });
+        if (persist)
+            m_persistentDialog = PersistentDialog{content, style, backdrop, callback};
+        else if (m_persistentDialog && m_persistentDialog->Style == style)
+            m_persistentDialog.reset();
+
+        dialog->SetAcceptCallback([=] ()
+        {
+            if (m_persistentDialog && m_persistentDialog->Style == style)
+                m_persistentDialog.reset();
+
+            callback(true);
+        });
+
+        dialog->SetCancelCallback([=] ()
+        {
+            if (m_persistentDialog && m_persistentDialog->Style == style)
+                m_persistentDialog.reset();
+
+            callback(false);
+        });
 
         auto ctx        = Gx::DialogPresentationContext();
         ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
@@ -149,11 +210,9 @@ namespace Cx
 
     void State::ShowDialog(Gx::Node& content, const DialogStyle style, const bool backdrop, std::function<void(bool)> callback)
     {
-        auto dialog = m_dialogInfo;
-        if (style == DialogStyle::OkCancel)
-            dialog = m_dialog1;
-        else if (style == DialogStyle::YesNo)
-            dialog = m_dialog2;
+        const auto dialog = GetDialog(style);
+        if (m_persistentDialog && m_persistentDialog->Style == style)
+            m_persistentDialog.reset();
 
         const auto label        = dialog->GetLabel();
         const auto acceptButton = dialog->GetAcceptButton();
@@ -200,7 +259,7 @@ namespace Cx
             {
                 if (!config.UseWindowCursor)
                 {
-                    ShowDialog(Constants::Messages::Application::Display::WINDOW_CURSOR_CONFIRM, DialogStyle::OkCancel, false, [&] (const bool response)
+                    ShowDialog(Constants::Messages::Application::Display::WINDOW_CURSOR_CONFIRM, DialogStyle::OkCancel, [&] (const bool response)
                     {
                         if (response)
                         {
@@ -231,7 +290,7 @@ namespace Cx
             {
                 if (config.UseFx)
                 {
-                    ShowDialog(Constants::Messages::Application::Display::ENABLE_3D_CONFIRM, DialogStyle::YesNo, false, [&config] (const bool confirm)
+                    ShowDialog(Constants::Messages::Application::Display::ENABLE_3D_CONFIRM, DialogStyle::YesNo, [&config] (const bool confirm)
                     {
                         if (confirm)
                         {
@@ -242,7 +301,7 @@ namespace Cx
                 }
                 else
                 {
-                    ShowDialog(Constants::Messages::Application::Display::DISABLE_3D_CONFIRM, DialogStyle::YesNo, false, [&config] (const bool confirm)
+                    ShowDialog(Constants::Messages::Application::Display::DISABLE_3D_CONFIRM, DialogStyle::YesNo, [&config] (const bool confirm)
                     {
                         if (confirm)
                         {

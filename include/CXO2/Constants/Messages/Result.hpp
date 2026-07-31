@@ -4,23 +4,23 @@
 
 namespace Cx::Constants::Messages::Result
 {
-    constexpr static auto LEVEL      = "Level"; // Unmapped
-    constexpr static auto UPGRADE_TO = "Upgrade to"; // Unmapped
+    constexpr static auto LEVEL      = "Level";
+    constexpr static auto UPGRADE_TO = "Upgrade to";
 
     namespace Mission
     {
-        constexpr static auto LABEL              = "Mission"; // Unmapped
-        constexpr static auto SUCCEEDED          = "Mission succeeded!"; // Unmapped
-        constexpr static auto FAILED             = "Mission failed"; // Unmapped
-        constexpr static auto CONGRATULATIONS    = "Congratulations"; // Unmapped
-        constexpr static auto LEVEL_ACHIEVED     = "Achieved the mission level"; // Unmapped
-        constexpr static auto FAILED_NOTICE      = "Unless accomplished the mission presented, neither experience value nor level can be upgraeded"; // Unmapped
-        constexpr static auto PENDING_NOTICE     = "Unless accomplishing the mission presented, neither experience value nor level can be upgraded"; // Unmapped
-        constexpr static auto SUMMARY            = U"{:>18}LEVEL {} MISSION\n{}\n{}\n{}"; // Unmapped
-        constexpr static auto SUMMARY_UPGRADED   = U"{:>18}LEVEL {} MISSION\n{}\n{}\n{} {}{}{}"; // Unmapped
-        constexpr static auto PROGRESS           = U"{:>28}MISSION\n{}\n{} {} {} : {}\n{} "; // Unmapped
+        constexpr static auto LABEL              = "Mission";
+        constexpr static auto SUCCEEDED          = "Mission succeeded!";
+        constexpr static auto FAILED             = "Mission failed";
+        constexpr static auto CONGRATULATIONS    = "Congratulations";
+        constexpr static auto LEVEL_ACHIEVED     = "Achieved the mission level";
+        constexpr static auto FAILED_NOTICE      = "Unless accomplished the mission presented, neither experience value nor level can be upgraeded";
+        constexpr static auto PENDING_NOTICE     = "Unless accomplishing the mission presented, neither experience value nor level can be upgraded";
+        constexpr static auto SUMMARY_FAILED     = U"{:>18}LEVEL {} MISSION\n{}\n{}\n{}";
+        constexpr static auto SUMMARY_UPGRADED   = U"{:>18}LEVEL {} MISSION\n{}\n{}\n{} {}{}{}";
+        constexpr static auto SUMMARY_UNLOCK     = U"{:>28}MISSION\n{}\n{} {} {} : {}\n{} ";
 
-        constexpr static std::array REQUIREMENTS = { // Unmapped
+        constexpr static std::array REQUIREMENTS = {
             "To clear 50 combos or more of a tune at the minimum level 4",
             "To clear a tune with the minimum level 5 at half-speed",
             "To clear a tune with the minimum level 7 at a LIFE 100%",

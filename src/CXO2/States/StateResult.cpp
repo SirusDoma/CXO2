@@ -15,6 +15,8 @@
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Result.hpp>
+#include <CXO2/Constants/Messages/Result.hpp>
+#include <CXO2/Utilities/StringFormatter.hpp>
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Move.hpp>
@@ -28,13 +30,13 @@ namespace Cx
 {
     using namespace Constants::Identifiers;
 
-    StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, const ScoreTracker& scoreTracker, WaitingService& waiting, PlayingService& service) :
+    StateResult::StateResult(Gx::AudioMixer& mixer, SessionContext& session, RoomContext& room, WaitingService& waiting, PlayingService& service) :
         m_mixer(mixer),
         m_session(session),
         m_room(room),
+        m_context(session),
         m_waiting(waiting),
-        m_service(service),
-        m_scoreTracker(scoreTracker)
+        m_service(service)
     {
     }
 
@@ -74,29 +76,30 @@ namespace Cx
         top->SetPosition(0.f, -height + -top->GetLocalBounds().size.y);
         bottom->SetPosition(0.f, view.getSize().y + height);
 
+        const auto& scoreTracker = m_context.GetScoreTracker();
         if (const auto container = top->FindChild<Gx::UiContainer>(Resource::Result::Top::IDC_CONTAINER_PLAYER_SCORE); container)
         {
             if (const auto cool = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_COOL); cool)
-                cool->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Cool)));
+                cool->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Cool)));
 
             if (const auto good = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_GOOD); good)
-                good->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Good)));
+                good->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Good)));
 
             if (const auto bad = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_BAD); bad)
-                bad->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Bad)));
+                bad->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Bad)));
 
             if (const auto miss = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MISS); miss)
-                miss->SetString(std::to_string(m_scoreTracker.GetPoint(Accuracy::Miss)));
+                miss->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Miss)));
 
             if (const auto maxCombo = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_COMBO); maxCombo)
-                maxCombo->SetString(std::to_string(m_scoreTracker.GetMaxCombo()));
+                maxCombo->SetString(std::to_string(scoreTracker.GetMaxCombo()));
 
             if (const auto maxJamCombo = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_JAM_COMBO); maxJamCombo)
-                maxJamCombo->SetString(std::to_string(m_scoreTracker.GetMaxJamCombo()));
+                maxJamCombo->SetString(std::to_string(scoreTracker.GetMaxJamCombo()));
         }
 
         if (const auto point = top->FindChild<Gx::BitmapNumber>(Resource::Result::Top::IDC_NUMBER_POINT); point)
-            point->SetValue(m_scoreTracker.GetScorePoint());
+            point->SetValue(scoreTracker.GetScorePoint());
 
         if (const auto gem = top->FindChild<Gx::Label>(Resource::Result::Top::IDC_TEXT_GEM); gem)
             gem->SetString(std::to_string(100));
@@ -104,7 +107,7 @@ namespace Cx
         if (const auto list = bottom->FindChild<Gx::List>(Resource::Result::Bottom::IDC_LIST_RANK_SCORE); list)
         {
             const auto listItems  = list->GetChildren();
-            const auto& scoreItems = m_context.Scores;
+            const auto& scoreItems = m_context.GetScores();
             for (std::size_t i = 0; i < listItems.size(); i++)
             {
                 const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
@@ -127,7 +130,7 @@ namespace Cx
                 if (member.Name.isEmpty())
                     continue;
 
-                // TODO: Make this adjustable?
+                m_room.SetMemberLevel(entry.ID, entry.Level);
                 item->SetVisible(true);
 
                 auto primaryTeamColor = std::unordered_map<Room::Team, sf::Color>
@@ -206,9 +209,9 @@ namespace Cx
 
             const auto showError = [this] (const Gx::Exception& e)
             {
-                ShowDialog(std::string(e.what()), DialogStyle::Information, false, [this] (bool)
+                ShowDialog(std::string(e.what()), DialogStyle::Information, [&director = GetDirector()] (bool)
                 {
-                    GetDirector().Dismiss<StatePlanet>();
+                    director.Dismiss<StatePlanet>();
                 });
             };
 
@@ -263,13 +266,76 @@ namespace Cx
                 catch (const Gx::Exception& e)
                 {
                     StopAll();
-                    ShowDialog(std::string(e.what()), DialogStyle::Information, false, [=] (bool)
+                    ShowDialog(std::string(e.what()), DialogStyle::Information, [&director = GetDirector()] (bool)
                     {
-                        GetDirector().Dismiss<StatePlanet>();
+                        director.Dismiss<StatePlanet>();
                     });
                 }
             });
         });
+
+        auto self = GameCompletedEventData::ScoreEntry{};
+        for (const auto& entry : m_context.GetScores())
+        {
+            if (!entry.Active || entry.ID >= RoomContext::MaxCapacity)
+                continue;
+
+            if (m_room.GetSlot(entry.ID).Name == m_session.GetName())
+                self = entry;
+        }
+
+        const auto prevExp = m_session.GetExperience();
+        if (self.Active)
+        {
+            m_session.SetLevel(self.Level);
+            m_session.SetExperience(self.Experience);
+        }
+
+        const auto activeMissionID = m_context.GetActiveMissionID();
+        const auto missionRequired = self.Active && prevExp < self.Experience && m_context.GetMissionID() >= 0;
+        m_context.SetActiveMissionID(-1);
+
+        if (self.Mission == GameCompletedEventData::MissionResult::None && missionRequired)
+        {
+            ShowDialog(fmt::format(
+                Constants::Messages::Result::Mission::SUMMARY_UNLOCK,
+                U" ",
+                sf::String(Constants::Messages::Result::Mission::LEVEL_ACHIEVED),
+                sf::String(Constants::Messages::Result::LEVEL),
+                sf::String(std::to_string(self.Level + 1)),
+                sf::String(Constants::Messages::Result::Mission::LABEL),
+                sf::String(Constants::Messages::Result::Mission::REQUIREMENTS[m_context.GetMissionID()]),
+                sf::String(Constants::Messages::Result::Mission::PENDING_NOTICE)
+            ), DialogStyle::Information);
+        }
+        else if (activeMissionID >= 0 && activeMissionID < GameContext::MissionCount)
+        {
+            if (self.Mission == GameCompletedEventData::MissionResult::Failed)
+            {
+                ShowDialog(fmt::format(
+                    Constants::Messages::Result::Mission::SUMMARY_FAILED,
+                    U" ",
+                    sf::String(std::to_string(self.Level + 1)),
+                    sf::String(Constants::Messages::Result::Mission::REQUIREMENTS[activeMissionID]),
+                    sf::String(Constants::Messages::Result::Mission::FAILED),
+                    sf::String(Constants::Messages::Result::Mission::FAILED_NOTICE)
+                ), DialogStyle::Information);
+            }
+            else if (self.Mission == GameCompletedEventData::MissionResult::Completed)
+            {
+                ShowDialog(fmt::format(
+                    Constants::Messages::Result::Mission::SUMMARY_UPGRADED,
+                    U" ",
+                    sf::String(std::to_string(self.Level)),
+                    sf::String(Constants::Messages::Result::Mission::REQUIREMENTS[activeMissionID]),
+                    sf::String(Constants::Messages::Result::Mission::SUCCEEDED),
+                    sf::String(Constants::Messages::Result::Mission::CONGRATULATIONS),
+                    sf::String(Constants::Messages::Result::LEVEL),
+                    sf::String(std::to_string(self.Level)),
+                    sf::String(Constants::Messages::Result::UPGRADE_TO)
+                ), DialogStyle::Information);
+            }
+        }
 
         auto topFx    = Run<Gx::Move>(*top, sf::Vector2f(0, 0), sf::seconds(2.f));
         auto bottomFx = Run<Gx::Sequence>([=]

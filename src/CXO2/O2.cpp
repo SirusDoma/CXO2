@@ -99,7 +99,6 @@
 #include <CXO2/Core/JudgementStrategy.hpp>
 #include <CXO2/Core/Judgements/RenderPositionJudgementStrategy.hpp>
 #include <CXO2/Core/Judgements/TimeJudgementStrategy.hpp>
-#include <CXO2/Core/ScoreTracker.hpp>
 
 #include <CXO2/States/StateAvi.hpp>
 #include <CXO2/States/StatePlanet.hpp>
@@ -219,7 +218,6 @@ namespace Cx
 
         context.Provide<RoomContext>(Gx::Context::Scope::Singleton);
         context.Provide<CartContext>(Gx::Context::Scope::Singleton);
-        context.Provide<ScoreTracker>(Gx::Context::Scope::Singleton);
 
         // Initialize local providers
         context.Provide<JudgementStrategy>([] (auto&)

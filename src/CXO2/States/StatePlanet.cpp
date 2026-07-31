@@ -205,7 +205,7 @@ namespace Cx
         m_network.StartHeartbeat<PingRequest, PingResponse>(sf::seconds(10), [] (const auto&)
         {
             auto state = dynamic_cast<State*>(&Gx::Application::Instance().GetModule<Gx::SceneDirector>().GetPresentingScene());
-            state->ShowDialog(Constants::Messages::Network::UNSTABLE, DialogStyle::Information, false, [] (bool)
+            state->ShowDialog(Constants::Messages::Network::UNSTABLE, DialogStyle::Information, [] (bool)
             {
                 Gx::Application::Instance().GetModule<Gx::SceneDirector>().Present<StatePlanet>();
             });

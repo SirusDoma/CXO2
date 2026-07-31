@@ -229,7 +229,7 @@ namespace Cx
         const auto& musicList = m_session.GetInstalledMusic();
         if (musicList.empty())
         {
-            ShowDialog(Constants::Messages::Room::NO_TUNE_OWNED, DialogStyle::Information, false, [=] (bool)
+            ShowDialog(Constants::Messages::Room::NO_TUNE_OWNED, DialogStyle::Information, [=] (bool)
             {
                 m_busy = false;
             });
@@ -314,7 +314,7 @@ namespace Cx
         auto join = [=] (const std::string& password)
         {
             m_busy = true;
-            m_room.Enter(room.ID);
+            m_room.Join(room.ID);
             m_room.SetLevelLimits(room.MinLevelLimit, room.MaxLevelLimit);
             m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this] (const auto& ev)
             {
@@ -368,7 +368,7 @@ namespace Cx
         }
         catch (const Gx::Exception&)
         {
-            ShowDialog(Constants::Messages::Room::SYNC_FAILED, DialogStyle::Information, false, [this] (bool)
+            ShowDialog(Constants::Messages::Room::SYNC_FAILED, DialogStyle::Information, [this] (bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -394,7 +394,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -419,7 +419,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -437,8 +437,7 @@ namespace Cx
                 return;
             }
 
-            m_room.Enter(response.ID);
-            m_room.SetLevelLimits(request.MinLevelLimit, request.MaxLevelLimit);
+            m_room.Create(response.ID);
             m_room.SetState(RoomState::Waiting);
             m_room.SetTitle(request.Title);
             m_room.SetLocked(!request.Password.empty());
@@ -449,13 +448,13 @@ namespace Cx
             m_room.SetMusicID(music.ID);
             m_room.SetRandomLevel(static_cast<LevelCategory>(0));
             m_room.SetMap(Map::Of(0, true));
-            m_room.SetMasterSlot();
+            m_room.SetLevelLimits(request.MinLevelLimit, request.MaxLevelLimit);
 
             GetDirector().Present<StateWaiting7K>();
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -522,7 +521,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -557,7 +556,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -583,7 +582,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -604,7 +603,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -625,7 +624,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -648,7 +647,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -666,7 +665,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [this] (const bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [this] (const bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -809,18 +808,20 @@ namespace Cx
 
     void StateRoom::OnTutorialButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        auto game = GameContext{};
-        game.Chart = std::make_unique<Chart>();
-        game.Chart->Source = "Tutorial.ojn";
+        auto chart = std::make_unique<Chart>();
+        chart->Source = "Tutorial.ojn";
 
-        game.Mode       = GameMode::Tutorial;
-        game.Difficulty = Difficulty::EX;
-        game.Speed      = 1.0f;
-        game.MapID      = 1;
-        game.EffectID   = 1;
+        auto game = GameContext{m_session};
+        game.SetChart(std::move(chart));
+
+        game.SetMode(GameMode::Tutorial);
+        game.SetDifficulty(Difficulty::EX);
+        game.SetSpeed(1.0f);
+        game.SetMapID(1);
+        game.SetEffectID(1);
 
         auto& resources = GetResources(ResourceScope::Shared);
-        if (const auto metadata = O2JamChartMetadataLoader().LoadFromFile(game.Chart->Source, Gx::ResourceContext::Default))
+        if (const auto metadata = O2JamChartMetadataLoader().LoadFromFile(game.GetChart()->Source, Gx::ResourceContext::Default))
         {
             if (auto image = O2JamChartLoader::LoadCoverArt(*metadata, Gx::ResourceContext::Default); image)
                 resources.Store<sf::Image>(Resource::Cache::IDC_IMAGE_STATE_LOADING_COVER, std::move(image), Gx::CacheMode::Update);
@@ -855,7 +856,7 @@ namespace Cx
             }
             catch (const Gx::Exception& ex)
             {
-                ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
                 {
                     GetDirector().Dismiss<StatePlanet>();
                 });

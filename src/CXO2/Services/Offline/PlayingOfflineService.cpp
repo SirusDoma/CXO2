@@ -35,7 +35,8 @@ namespace Cx
         entry.Score       = request.Score;
         entry.Level       = m_session.GetLevel();
         entry.Experience  = m_session.GetExperience();
-        entry.IsWinning   = true;
+        entry.Result      = GameCompletedEventData::MatchResult::Win;
+        entry.Mission     = GameCompletedEventData::MissionResult::None;
 
         if (m_scoreCallback)
             m_scoreCallback(MessageEnvelope<PlayingMemberScoreSubmissionEventData>(PlayingMemberScoreSubmissionEventData{ 0 }));

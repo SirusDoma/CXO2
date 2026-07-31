@@ -36,7 +36,6 @@ namespace Cx
             RoomContext& room,
             GameConfig& config,
             JudgementStrategy& judgementStrategy,
-            ScoreTracker& scoreTracker,
             LifeSystem& lifeSystem,
             ItemFactory& items
         );
@@ -100,7 +99,6 @@ namespace Cx
         RoomContext& m_room;
         GameContext m_context;
         GameConfig& m_config;
-        ScoreTracker& m_scoreTracker;
         LifeSystem& m_lifeSystem;
         ItemFactory& m_items;
 

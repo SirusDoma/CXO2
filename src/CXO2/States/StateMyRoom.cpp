@@ -177,7 +177,7 @@ namespace Cx
         const auto albumButton = statusPanel->FindChild<Gx::Button>(Resource::MyRoom::Status::IDC_BUTTON_MY_ALBUM);
         albumButton->SetClickCallback([=] (auto&, auto&)
         {
-            ShowDialog("Album mode is currently not available", DialogStyle::Information, false, [=] (auto)
+            ShowDialog("Album mode is currently not available", DialogStyle::Information, [=] (auto)
             {
                 m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
             });
@@ -215,7 +215,7 @@ namespace Cx
             const sf::String message = fmt::format(U"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
                 m_selectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-            ShowDialog(message, DialogStyle::OkCancel, false, [=] (auto accepted)
+            ShowDialog(message, DialogStyle::OkCancel, [=] (auto accepted)
             {
                 if (!accepted)
                 {
@@ -467,7 +467,7 @@ namespace Cx
                     }
                     catch (const Gx::Exception& ex)
                     {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
                         {
                             GetDirector().Dismiss<StatePlanet>();
                         });
@@ -599,7 +599,7 @@ namespace Cx
                     }
                     catch (const Gx::Exception& ex)
                     {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+                        ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
                         {
                             GetDirector().Dismiss<StatePlanet>();
                         });

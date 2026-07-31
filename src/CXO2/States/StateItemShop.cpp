@@ -392,7 +392,7 @@ namespace Cx
         }
         catch (const Gx::Exception& ex)
         {
-            ShowDialog(std::string(ex.what()), DialogStyle::Information, false, [=] (bool)
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
             {
                 GetDirector().Present<StatePlanet>();
             });
@@ -528,7 +528,7 @@ namespace Cx
             return;
         }
 
-        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, false, [=] (const bool answer)
+        ShowDialog("Would you like to move\nto the transaction window?", DialogStyle::YesNo, [=] (const bool answer)
         {
             if (answer)
             {
@@ -581,7 +581,7 @@ namespace Cx
         // const sf::String message = fmt::format(U"Item: {}\nPrice: {} {}\n\nAre you sure about selling the item?",
         //     m_myBagSelectedItem->GetName(), price, sf::String(std::string(magic_enum::enum_name(currency))));
 
-        ShowDialog(Constants::Messages::ItemShop::SELL_CONFIRM, DialogStyle::OkCancel, false, [this] (auto accepted) { OnSellItemConfirmed(accepted); });
+        ShowDialog(Constants::Messages::ItemShop::SELL_CONFIRM, DialogStyle::OkCancel, [this] (auto accepted) { OnSellItemConfirmed(accepted); });
     }
 
     void StateItemShop::OnSellItemConfirmed(const bool accepted)

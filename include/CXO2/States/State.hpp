@@ -53,7 +53,8 @@ namespace Cx
         Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local);
         bool OnAppClose() override;
 
-        void ShowDialog(const sf::String& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
+        void ShowDialog(const sf::String& content, DialogStyle style, std::function<void(bool)> callback = nullptr);
+        void ShowDialog(const sf::String& content, DialogStyle style, bool persist, bool backdrop, std::function<void(bool)> callback = nullptr);
         void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
 
         static void Announce(const sf::String& content);
@@ -69,7 +70,17 @@ namespace Cx
         void ExitGame(const sf::String& prompt, sf::FloatRect bounds = {});
 
     private:
+        struct PersistentDialog
+        {
+            sf::String                Content;
+            DialogStyle               Style{};
+            bool                      Backdrop{};
+            std::function<void(bool)> Callback;
+        };
+
         void LoadCommonResources();
+
+        static Gx::Dialog* GetDialog(DialogStyle style);
 
         template<typename R>
         R* Locate(Gx::ResourceManager& resources, const std::string& id);
@@ -81,6 +92,7 @@ namespace Cx
         inline static sf::Sound* m_popupSound, *m_cancelSound;
         inline static bool m_exitPrompted = false;
         inline static sf::Clock m_noticeTimer{};
+        inline static std::optional<PersistentDialog> m_persistentDialog{};
     };
 
 }

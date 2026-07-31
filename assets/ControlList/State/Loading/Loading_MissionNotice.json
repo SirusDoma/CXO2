@@ -1,0 +1,35 @@
+{
+  "type": "Label",
+  "require": {
+    "font": "Interface/Common/Font.ttf",
+    "fallbackFonts": [
+      "Interface/Common/Fallback-Font1.ttf",
+      "Interface/Common/Fallback-Font2.ttf",
+      "Interface/Common/Fallback-Font3.ttf"
+    ]
+  },
+  "attributes": {
+    "transform": {
+      "position": {
+        "x": 490,
+        "y": 550
+      }
+    },
+    "fontSize": 9,
+    "color": {
+      "a": 255,
+      "r": 255,
+      "g": 25,
+      "b": 25
+    },
+    "outline": {
+      "thickness": 1,
+      "color": {
+        "a": 255,
+        "r": 25,
+        "g": 25,
+        "b": 25
+      }
+    }
+  }
+}
