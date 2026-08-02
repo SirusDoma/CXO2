@@ -2,9 +2,8 @@
 
 #include <Genode/UI/Control.hpp>
 #include <Genode/UI/Label.hpp>
-#include <Genode/Graphics/Sprite.hpp>
 
-#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 
 namespace Cx
 {
@@ -26,12 +25,13 @@ namespace Cx
         void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
-        void Invalidate() override;
+        void OnGeometryUpdated() const override;
 
         sf::FloatRect m_bounds;
-        Gx::Sprite m_sprite;
         double m_speed;
 
-        mutable std::unique_ptr<sf::RenderTexture> m_renderTexture;
+        mutable sf::VertexArray m_unclippedVertices;
+        mutable sf::VertexArray m_unclippedOutlineVertices;
+        mutable bool m_unclippedStale{true};
     };
 }

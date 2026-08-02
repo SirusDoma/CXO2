@@ -18,6 +18,7 @@
         },
         "attributes": {
           "fontSize": 10,
+          "ellipsis": "..",
           "outline": {
             "thickness": 1.25,
             "color": {

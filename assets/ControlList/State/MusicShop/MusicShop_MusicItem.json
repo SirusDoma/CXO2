@@ -33,7 +33,8 @@
           "localBndID": "0X1A400049"
         },
         "attributes": {
-          "fontSize": 10
+          "fontSize": 10,
+          "ellipsis": ".."
         }
       },
       "IDC_TEXT_LEVEL": {

@@ -146,7 +146,6 @@ namespace Cx
         m_dialogNotice->SetVisible(false);
         m_dialogNotice->SetOrigin(0.f, 0.f);
         m_dialogNotice->SetPosition(x, y);
-        m_dialogNotice->GetLabel()->SetLocalBounds(sf::FloatRect{{}, {152, 300}});
 
         m_cancelSound = Instantiate<sf::Sound>(Sound::Effects::EF_03, ResourceScope::Shared);
         m_popupSound  = Instantiate<sf::Sound>(Sound::Effects::EF_06, ResourceScope::Shared);
@@ -184,7 +183,7 @@ namespace Cx
         else if (m_persistentDialog && m_persistentDialog->Style == style)
             m_persistentDialog.reset();
 
-        dialog->SetAcceptCallback([=] ()
+        dialog->SetAcceptCallback([=] (auto&, auto&)
         {
             if (m_persistentDialog && m_persistentDialog->Style == style)
                 m_persistentDialog.reset();
@@ -192,7 +191,7 @@ namespace Cx
             callback(true);
         });
 
-        dialog->SetCancelCallback([=] ()
+        dialog->SetCancelCallback([=] (auto&, auto&)
         {
             if (m_persistentDialog && m_persistentDialog->Style == style)
                 m_persistentDialog.reset();
@@ -225,8 +224,8 @@ namespace Cx
         if (!callback)
             callback = [] (bool) {};
 
-        dialog->SetAcceptCallback([=] () { callback(true); });
-        dialog->SetCancelCallback([=] () { callback(false); });
+        dialog->SetAcceptCallback([=] (auto&, auto&) { callback(true); });
+        dialog->SetCancelCallback([=] (auto&, auto&) { callback(false); });
 
         auto ctx        = Gx::DialogPresentationContext();
         ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
@@ -344,13 +343,13 @@ namespace Cx
             mixer.Play(*m_popupSound, Sound::Channel::SFX);
         }
 
-        m_exitDialog->SetAcceptCallback([&]
+        m_exitDialog->SetAcceptCallback([&] (auto&, auto&)
         {
             m_exitPrompted = true;
             Gx::Application::Instance().Close();
         });
 
-        m_exitDialog->SetCancelCallback([&]
+        m_exitDialog->SetCancelCallback([&] (auto&, auto&)
         {
             auto& mixer = Gx::Application::Instance().GetModule<Gx::Context>().Require<Gx::AudioMixer>();
 

@@ -6,15 +6,10 @@
       "Interface/Common/Fallback-Font1.ttf",
       "Interface/Common/Fallback-Font2.ttf",
       "Interface/Common/Fallback-Font3.ttf"
-    ]
+    ],
+    "bndID": "0X1B000009"
   },
   "attributes": {
-    "transform": {
-      "position": {
-        "x": 442,
-        "y": 538
-      }
-    },
     "fontSize": 12
   }
 }

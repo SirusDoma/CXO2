@@ -25,7 +25,8 @@
           "bndID": "0X1A400031"
         },
         "attributes": {
-          "fontSize": 13
+          "fontSize": 12,
+          "ellipsis": ".."
         }
       },
       "IDC_TEXT_ARTIST": {
@@ -40,7 +41,8 @@
           "bndID": "0X1A400032"
         },
         "attributes": {
-          "fontSize": 10
+          "fontSize": 10,
+          "ellipsis": ".."
         }
       },
       "IDC_TEXT_EDITOR": {
@@ -55,7 +57,8 @@
           "bndID": "0X1A400033"
         },
         "attributes": {
-          "fontSize": 10
+          "fontSize": 10,
+          "ellipsis": ".."
         }
       },
       "IDC_TEXT_GENRE": {

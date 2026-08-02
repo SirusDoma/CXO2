@@ -330,7 +330,7 @@ namespace Cx
             field->SetMasked(true);
             field->SetString(std::string());
 
-            passwordDialog->SetAcceptCallback([=]
+            passwordDialog->SetAcceptCallback([=] (auto&, auto&)
             {
                 join(field->GetString().toAnsiString());
             });
@@ -690,7 +690,7 @@ namespace Cx
         m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
 
         Present(*createRoomDialog, Gx::PresentationContext::Default);
-        createRoomDialog->SetAcceptCallback([=]
+        createRoomDialog->SetAcceptCallback([=] (auto&, auto&)
         {
             CreateRoom(
                 createRoomDialog->GetRoomName(),

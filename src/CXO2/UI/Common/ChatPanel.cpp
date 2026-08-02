@@ -86,7 +86,7 @@ namespace Cx
 
         const auto chatInput = FindChild<Gx::InputField>(Resource::ChatPanel::IDC_EDIT_CHAT);
         chatInput->SetPermanentFocusEnabled(true);
-        chatInput->SetTextEnteredCallback([this] (auto& sender, const sf::String& text) { OnChatInputTextEntered(sender, text); });
+        chatInput->SetTextEnteredCallback([this] (auto& sender, auto& ev) { OnChatInputTextEntered(sender, ev); });
     }
 
     void ChatPanel::OnMessage(const sf::String& sender, const Role senderRole, const sf::String& text)
@@ -253,12 +253,12 @@ namespace Cx
                     nicknameInput->SetFocus(true);
                     nicknameInput->SelectAll();
 
-                    dialog->SetAcceptCallback([=, &radio]
+                    dialog->SetAcceptCallback([=, &radio] (auto&, auto&)
                     {
                         OnWhisperDialogAccepted(*nicknameInput, radio);
                     });
 
-                    dialog->SetCancelCallback([=, &radio]
+                    dialog->SetCancelCallback([=, &radio] (auto&, auto&)
                     {
                         OnChatFallbackCheckChanged(radio);
                     });
@@ -281,8 +281,9 @@ namespace Cx
         m_recipient = nicknameInput.GetString();
     }
 
-    void ChatPanel::OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text)
+    void ChatPanel::OnChatInputTextEntered(Gx::InputField& sender, Gx::InputField::TextEnteredEvent& ev)
     {
+        const auto& text = ev.Text;
         const auto input = text.toAnsiString();
 
         if (Gx::StringHelper::StartsWith(input, Constants::Messages::Chat::Commands::EMOTICON))

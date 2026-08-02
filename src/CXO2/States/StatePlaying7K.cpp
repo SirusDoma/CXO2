@@ -249,7 +249,7 @@ namespace Cx
                 if (numEffect)
                 {
                     numEffect->SetName(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
-                    numEffect->SetAnimationCallback([=] (auto& _) {
+                    numEffect->SetAnimationCallback([=] (auto& _, auto&) {
                         numEffect->SetVisible(
                             numEffect->GetAnimationState() == Gx::Animation::AnimationState::Playing ||
                             numEffect->GetAnimationState() == Gx::Animation::AnimationState::Initial

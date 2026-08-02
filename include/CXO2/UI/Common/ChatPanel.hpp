@@ -62,7 +62,7 @@ namespace Cx
 
         void OnWhisperDialogAccepted(Gx::InputField& nicknameInput, Gx::RadioButton& radio);
 
-        void OnChatInputTextEntered(Gx::InputField& sender, const sf::String& text);
+        void OnChatInputTextEntered(Gx::InputField& sender, Gx::InputField::TextEnteredEvent& ev);
 
         sf::String m_recipient{};
         SessionContext& m_session;

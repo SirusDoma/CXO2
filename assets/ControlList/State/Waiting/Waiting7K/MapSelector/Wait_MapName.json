@@ -11,6 +11,7 @@
   },
   "attributes": {
     "fontSize": 12,
+    "allowOverflow": true,
     "outline": {
       "thickness": 1,
       "color": {

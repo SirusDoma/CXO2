@@ -31,6 +31,7 @@
 #include <CXO2/IO/Loaders/UI/GaugeLoader.hpp>
 #include <CXO2/IO/Loaders/UI/ListLoader.hpp>
 #include <CXO2/IO/Loaders/UI/DialogLoader.hpp>
+#include <CXO2/IO/Loaders/UI/SelectMusicDialogLoader.hpp>
 #include <CXO2/IO/Loaders/UI/InputFieldLoader.hpp>
 #include <CXO2/IO/Loaders/UI/ScrollBarLoader.hpp>
 #include <CXO2/IO/Loaders/UI/UiContainerLoader.hpp>
@@ -72,6 +73,7 @@
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
 #include <CXO2/Services/NetworkService.hpp>
+#include <CXO2/Services/MusicDownloaderService.hpp>
 
 #include <CXO2/Services/Online/AuthOnlineService.hpp>
 #include <CXO2/Services/Online/PlanetOnlineService.hpp>
@@ -225,6 +227,9 @@ namespace Cx
             return std::make_unique<RenderPositionJudgementStrategy>();
         });
 
+        Install<Gx::Events::EventDispatcher>();
+        Install<MusicDownloaderService>();
+
         // Register services
         // Offline services take over when the game is launched without a command line
         if (context.Require<CommandLineContext>().GetArgumentCount() > 0)
@@ -299,6 +304,7 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<ChatWindow, ChatWindowLoader>();
         Gx::ResourceLoaderFactory::Register<ChannelButton, ChannelButtonLoader>();
         Gx::ResourceLoaderFactory::Register<ChannelBoard, ChannelBoardLoader>();
+        Gx::ResourceLoaderFactory::Register<SelectMusicDialog, SelectMusicDialogLoader>();
         Gx::ResourceLoaderFactory::Register<AvatarInfo, AvatarInfoLoader>();
         Gx::ResourceLoaderFactory::Register<SpeedButton, SpeedButtonLoader>();
         Gx::ResourceLoaderFactory::Register<Equalizer, EqualizerLoader>();

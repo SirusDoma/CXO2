@@ -12,17 +12,11 @@
           "Interface/Common/Fallback-Font1.ttf",
           "Interface/Common/Fallback-Font2.ttf",
           "Interface/Common/Fallback-Font3.ttf"
-        ]
+        ],
+        "bndID": "0X21400003"
       },
       "attributes": {
-        "fontSize": 10,
-        "alignment": "Center",
-        "transform": {
-          "position": {
-            "x": 160,
-            "y": 80
-          }
-        }
+        "fontSize": 10
       }
     },
     "buttons": {

@@ -10,12 +10,6 @@
     "bndID": "0X1640001C"
   },
   "attributes": {
-    "transform": {
-      "origin": {
-        "x": -3,
-        "y": -5
-      }
-    },
     "fontSize": 12,
     "kerning": 1,
     "outline": {

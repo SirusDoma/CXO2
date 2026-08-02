@@ -277,10 +277,6 @@ namespace Cx
             if (const auto title = slot->FindChild<Gx::Label>(Resource::MusicShop::MusicItem::IDC_TEXT_TITLE))
             {
                 title->SetString(entry.Title);
-                title->Truncate(135);
-
-                if (title->GetString() != entry.Title)
-                    title->SetString(fmt::format(U"{}..", title->GetString()));
             }
 
             if (const auto level = slot->FindChild<Gx::Label>(Resource::MusicShop::MusicItem::IDC_TEXT_LEVEL))
@@ -362,28 +358,16 @@ namespace Cx
             if (const auto title = slot->FindChild<Gx::Label>(Resource::MusicShop::Shop::Item::IDC_TEXT_TITLE))
             {
                 title->SetString(entry.Title);
-                title->Truncate(245);
-
-                if (title->GetString() != entry.Title)
-                    title->SetString(fmt::format(U"{}..", title->GetString()));
             }
 
             if (const auto artist = slot->FindChild<Gx::Label>(Resource::MusicShop::Shop::Item::IDC_TEXT_ARTIST))
             {
                 artist->SetString(entry.Artist);
-                artist->Truncate(100);
-
-                if (artist->GetString() != entry.Artist)
-                    artist->SetString(fmt::format(U"{}..", artist->GetString()));
             }
 
             if (const auto editor = slot->FindChild<Gx::Label>(Resource::MusicShop::Shop::Item::IDC_TEXT_EDITOR))
             {
                 editor->SetString(entry.NoteDesigner);
-                editor->Truncate(80);
-
-                if (editor->GetString() != entry.NoteDesigner)
-                    editor->SetString(fmt::format(U"{}..", editor->GetString()));
             }
 
             if (const auto genre = slot->FindChild<Gx::Label>(Resource::MusicShop::Shop::Item::IDC_TEXT_GENRE))

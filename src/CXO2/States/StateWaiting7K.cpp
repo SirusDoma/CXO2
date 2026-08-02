@@ -232,7 +232,7 @@ namespace Cx
         const auto changeTitleDialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
         const auto changeTitleBox = changeTitleDialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
         changeTitleBox->SetMaximumTextLength(21);
-        changeTitleDialog->SetAcceptCallback([this] { OnChangeTitleDialogAccepted(); });
+        changeTitleDialog->SetAcceptCallback([this] (auto&, auto&) { OnChangeTitleDialogAccepted(); });
 
         const auto changeTitleButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_CHANGE_TITLE);
         changeTitleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnChangeTitleButtonClicked(sender, ev); });
@@ -258,7 +258,7 @@ namespace Cx
 
         // Select music dialog
         const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
-        selectMusicDialog->SetAcceptCallback([this] { OnSelectMusicDialogAccepted(); });
+        selectMusicDialog->SetAcceptCallback([this] (auto&, auto&) { OnSelectMusicDialogAccepted(); });
 
         const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
         selectMusicButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSelectMusicButtonClicked(sender, ev); });

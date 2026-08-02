@@ -1159,7 +1159,7 @@ Represents an editable text field.
 | `maximumLength`      | number | `0`     | The maximum number of characters. `0` is unlimited.                       |
 | `highlightTextColor` | color  | Black   | The selected text colour.                                                 |
 | `highlightBackColor` | color  | White   | The selection background colour.                                          |
-| Label attributes     |        |         | All attributes of [Label](#label) apply.                                  |
+| Label attributes     |        |         | All attributes of [Label](#label) apply, except the bound layout ones (`verticalAlignment`, `ellipsis`, `allowOverflow`). |
 
 <table>
 <tr><th>Interop Reference</th><th>Custom Reference</th></tr>
@@ -1227,19 +1227,29 @@ Represents text rendered with a font.
 - `fallbackFonts`
 - `bndID` / `globalBndID` / `localBndID`
 
-| Attribute    | Type   | Default   | Description                                                      |
-|--------------|--------|-----------|------------------------------------------------------------------|
-| `string`     | string | Empty     | The text content, UTF-8.                                         |
-| `fontSize`   | number | `30`      | The character size.                                              |
-| `fontWidth`  | number | `0`       | The forced character width. `0` keeps the font's own metrics.    |
-| `color`      | color  | White     | The text colour.                                                 |
-| `bold`       | bool   | `false`   | Whether the text is bold.                                        |
-| `italic`     | bool   | `false`   | Whether the text is italic.                                      |
-| `underlined` | bool   | `false`   | Whether the text is underlined.                                  |
-| `kerning`    | number | `0`       | The extra letter spacing. It applies only when greater than `0`. |
-| `outline`    | object | —         | The outline `thickness` (number) and `color`.                    |
-| `alignment`  | string | `Default` | `Default`, `Left`, `Center` or `Right`.                          |
-| `transform`  | object | —         | See [Transform](#transform).                                     |
+| Attribute           | Type           | Default   | Description                                                                          |
+|---------------------|----------------|-----------|--------------------------------------------------------------------------------------|
+| `string`            | string         | Empty     | The text content, UTF-8.                                                             |
+| `fontSize`          | number         | `30`      | The character size.                                                                  |
+| `fontWidth`         | number         | `0`       | The forced character width. `0` keeps the font's own metrics.                        |
+| `color`             | color          | White     | The text colour.                                                                     |
+| `bold`              | bool           | `false`   | Whether the text is bold.                                                            |
+| `italic`            | bool           | `false`   | Whether the text is italic.                                                          |
+| `underlined`        | bool           | `false`   | Whether the text is underlined.                                                      |
+| `kerning`           | number         | `0`       | The extra letter spacing. It applies only when greater than `0`.                     |
+| `outline`           | object         | —         | The outline `thickness` (number) and `color`.                                        |
+| `alignment`         | string         | `Default` | `Default`, `Left`, `Center` or `Right`.                                              |
+| `verticalAlignment` | string         | `Center`  | `Top`, `Center` or `Bottom`. It applies only when the label has a bound.             |
+| `ellipsis`          | string         | Empty     | The text that replaces the trailing characters when the content is cut by the bound, e.g. `".."`. |
+| `allowOverflow`     | bool           | `false`   | Whether to ignore the bound's size, leaving the text unclipped. The bound then only positions the label. |
+| `bounds`            | rect \| string | —         | The local bound as a rectangle, or a bound ID whose size is used. It falls back to the bound from `bndID`. |
+| `transform`         | object         | —         | See [Transform](#transform).                                                         |
+
+A label with a bound lays its text out inside that rectangle the way the original client does: lines wrap at word boundaries while vertical space remains, 
+and anything that still overflows the rectangle is clipped visually at the bound's edges, like a scissor. 
+When `ellipsis` is set, the overflowing trailing characters are instead removed so the ellipsis still renders inside the bound. 
+`alignment` places each line horizontally within the bound and `verticalAlignment` places the text block vertically within it. 
+A label without a bound keeps the plain single-block behaviour.
 
 <table>
 <tr><th>Interop Reference</th><th>Custom Reference</th></tr>
@@ -1596,7 +1606,7 @@ Represents a label inside a floating container.
 | `delay`          | time   | `0`     | The delay before it appears.                                                                                                                            |
 | `color`          | color  | Black   | The text colour.                                                                                                                                        |
 | `container`      | object | —       | The container styling: `padding` (vector, defaults to 10% of the font size), `color` (white), and `outline` with `thickness` (`1`) and `color` (black). |
-| Label attributes |        |         | All attributes of [Label](#label) apply.                                                                                                                |
+| Label attributes |        |         | All attributes of [Label](#label) apply, except the bound layout ones (`verticalAlignment`, `ellipsis`, `allowOverflow`).                               |
 
 <table>
 <tr><th>Interop Reference</th><th>Custom Reference</th></tr>
@@ -1744,7 +1754,7 @@ Custom UI types are game-specific types built on the common UI types. Each is re
 | `PlayMenu`           | `Image`       | None                            |
 | `RoomButton`         | `Image`       | None                            |
 | `RoomList`           | `List`        | None                            |
-| `SelectMusicDialog`  | `Dialog`      | None                            |
+| `SelectMusicDialog`  | `Dialog`      | [SelectMusicDialog](#selectmusicdialog) |
 | `SpeedButton`        | `RadioButton` | [SpeedButton](#speedbutton)     |
 | `UserList`           | `UiContainer` | None                            |
 
@@ -2144,7 +2154,7 @@ Represents scrolling text clipped to a bound.
 |------------------|--------|---------|----------------------------------------------------------|
 | `speed`          | number | `30`    | The scroll speed.                                        |
 | `bounds`         | rect   | —       | The clip bound. It falls back to the bound from `bndID`. |
-| Label attributes |        |         | All attributes of [Label](#label) apply.                 |
+| Label attributes |        |         | All attributes of [Label](#label) apply, except the bound layout ones (`verticalAlignment`, `ellipsis`, `allowOverflow`). |
 
 <table>
 <tr><th>Interop Reference</th><th>Custom Reference</th></tr>
@@ -2196,6 +2206,44 @@ Represents scrolling text clipped to a bound.
 </td>
 </tr>
 </table>
+
+### SelectMusicDialog
+
+Represents the music selection dialog. It takes every field of [Dialog](#dialog), plus a `colors` object holding the colours of the music list entries.
+
+| Key        | Type  | Default                | Description                                                           |
+|------------|-------|------------------------|-----------------------------------------------------------------------|
+| `random`   | color | `{255, 200, 155, 55}`  | The colour of the random category entries and the random summary.     |
+| `notice`   | color | `{255, 135, 200, 60}`  | The colour of the empty-list notices, e.g. when a genre has no music. |
+| `disabled` | color | `{255, 147, 207, 226}` | The colour of entries that cannot be played, e.g. not owned.          |
+| `warning`  | color | `{255, 241, 195, 10}`  | The colour of entries that are not available to everyone in the room. |
+
+The colour of a regular entry comes from the music title label's own `color`.
+
+```json
+{
+  "type": "SelectMusicDialog",
+  "require": {
+    "refID": "0X29100001"
+  },
+  "attributes": {
+    "colors": {
+      "random": {
+        "a": 255,
+        "r": 200,
+        "g": 155,
+        "b": 55
+      },
+      "disabled": {
+        "a": 255,
+        "r": 147,
+        "g": 207,
+        "b": 226
+      }
+    }
+  }
+}
+```
 
 ### SpeedButton
 

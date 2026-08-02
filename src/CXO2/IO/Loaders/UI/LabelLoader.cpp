@@ -50,16 +50,34 @@ namespace Cx
             }
         }
 
+        if (metadata->Bounds != sf::FloatRect() && !metadata->AllowOverflow)
+            label->SetLocalBounds(metadata->Bounds);
+
         if (metadata->Position.has_value())
         {
             label->SetPosition(*metadata->Position);
         }
-        else if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
+
+        if (const auto bound = ctx.Require<sf::IntRect>(*metadata))
         {
-            label->SetPosition(sf::Vector2f(
-                static_cast<float>(bound->position.x),
-                static_cast<float>(bound->position.y)
-            ));
+            if (metadata->Bounds == sf::FloatRect() && bound->size != sf::Vector2i() && !metadata->AllowOverflow)
+            {
+                label->SetLocalBounds({
+                    {},
+                    {
+                        static_cast<float>(bound->size.x),
+                        static_cast<float>(bound->size.y),
+                    }
+                });
+            }
+
+            if (!metadata->Position.has_value())
+            {
+                label->SetPosition(sf::Vector2f(
+                    static_cast<float>(bound->position.x),
+                    static_cast<float>(bound->position.y)
+                ));
+            }
         }
 
         std::uint32_t style = 0;
@@ -85,6 +103,8 @@ namespace Cx
         label->SetScale(metadata->Scale);
         label->SetRotation(metadata->Rotation);
         label->SetLineAlignment(metadata->Alignment);
+        label->SetVerticalAlignment(metadata->VerticalAlignment);
+        label->SetEllipsis(sf::String::fromUtf8(metadata->Ellipsis.begin(), metadata->Ellipsis.end()));
 
         if (metadata->Kerning > 0)
             label->SetLetterSpacing(metadata->Kerning);
@@ -173,6 +193,45 @@ namespace Cx
         {
             if (auto parsed = magic_enum::enum_cast<Gx::Text::LineAlignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                 metadata.Alignment = parsed.value();
+        }
+
+        metadata.VerticalAlignment = Gx::Label::VerticalAlignment::Center;
+        if (auto alignment = attributes.find("verticalAlignment"); alignment != attributes.end())
+        {
+            if (auto parsed = magic_enum::enum_cast<Gx::Label::VerticalAlignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+                metadata.VerticalAlignment = parsed.value();
+        }
+
+        if (auto ellipsis = attributes.find("ellipsis"); ellipsis != attributes.end())
+            metadata.Ellipsis = ellipsis->get<std::string>();
+
+        metadata.AllowOverflow = false;
+        if (auto allowOverflow = attributes.find("allowOverflow"); allowOverflow != attributes.end())
+            metadata.AllowOverflow = allowOverflow->get<bool>();
+
+        if (const auto bounds = attributes.find("bounds"); bounds != attributes.end())
+        {
+            if (bounds->type() == Gx::Json::value_t::object)
+            {
+                float x, y, w, h;
+                bounds->at("x").get_to(x);
+                bounds->at("y").get_to(y);
+                bounds->at("width").get_to(w);
+                bounds->at("height").get_to(h);
+
+                metadata.Bounds = sf::FloatRect{ {x, y}, {w, h} };
+            }
+            else if (bounds->type() == Gx::Json::value_t::string)
+            {
+                const auto& bound = context.Acquire<sf::IntRect>(bounds.value().get<std::string>());
+                metadata.Bounds = {
+                    {},
+                    {
+                        static_cast<float>(bound.size.x),
+                        static_cast<float>(bound.size.y),
+                    }
+                };
+            }
         }
 
         return true;

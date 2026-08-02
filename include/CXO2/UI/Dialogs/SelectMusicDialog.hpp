@@ -44,6 +44,11 @@ namespace Cx
 
         void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
 
+        void SetRandomColor(const sf::Color& color);
+        void SetNoticeColor(const sf::Color& color);
+        void SetDisabledColor(const sf::Color& color);
+        void SetWarningColor(const sf::Color& color);
+
     protected:
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
@@ -108,7 +113,11 @@ namespace Cx
         Gx::ResourcePtr<sf::Texture> m_thumbnail;
         std::vector<ChartMetadata>   m_musicList;
         std::vector<ChartMetadata>   m_filteredList;
-        sf::Color                    m_titleColor = sf::Color(25, 25, 25);
+        sf::Color                    m_titleColor       = sf::Color();
+        sf::Color                    m_randomColor      = sf::Color();
+        sf::Color                    m_noticeColor      = sf::Color();
+        sf::Color                    m_disabledColor    = sf::Color();
+        sf::Color                    m_warningColor     = sf::Color();
 
         std::vector<SpeedButton*> m_speedButtons;
 

@@ -275,6 +275,26 @@ namespace Cx
         return m_speedMode;
     }
 
+    void SelectMusicDialog::SetRandomColor(const sf::Color& color)
+    {
+        m_randomColor = color;
+    }
+
+    void SelectMusicDialog::SetNoticeColor(const sf::Color& color)
+    {
+        m_noticeColor = color;
+    }
+
+    void SelectMusicDialog::SetDisabledColor(const sf::Color& color)
+    {
+        m_disabledColor = color;
+    }
+
+    void SelectMusicDialog::SetWarningColor(const sf::Color& color)
+    {
+        m_warningColor = color;
+    }
+
     void SelectMusicDialog::Sort(const MusicSortMode sort, const MusicSortOrder order)
     {
         m_sort  = sort;
@@ -515,7 +535,7 @@ namespace Cx
                     {
                         const auto& range = ranges[r - 1];
 
-                        title->SetColor(sf::Color(200, 155, 55));
+                        title->SetColor(m_randomColor);
                         title->SetString(fmt::format(Constants::Messages::SelectMusic::RandomRange::RANDOM_ITEM, range.Label));
                         if (infoLabel)
                             infoLabel->SetString(fmt::format(Constants::Messages::SelectMusic::RandomRange::RANDOM_FIELD, range.Label));
@@ -550,7 +570,7 @@ namespace Cx
                 button->SetVisible(true);
                 if (const auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
                 {
-                    title->SetColor(sf::Color(200, 155, 55));
+                    title->SetColor(m_randomColor);
                     title->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::RANDOM_SELECTED,
                         static_cast<int>(m_randomMusicCount),
                         static_cast<int>(m_musicList.size())
@@ -615,12 +635,12 @@ namespace Cx
                         if (m_genre.has_value())
                         {
                             title->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::GENRE_UNAVAILABLE, sf::String(std::string(magic_enum::enum_name(m_genre.value())))));
-                            title->SetColor(sf::Color(135, 200, 60));
+                            title->SetColor(m_noticeColor);
                         }
                         else
                         {
                             title->SetString(Constants::Messages::SelectMusic::MusicList::NO_MUSIC_FOUND);
-                            title->SetColor(sf::Color(135, 200, 60));
+                            title->SetColor(m_noticeColor);
                         }
                     }
 
@@ -634,29 +654,24 @@ namespace Cx
                 continue;
             }
 
-            const bool grayed = m_filteredList[index].Status != MusicStatus::Playable;
-            if (i == 0 && m_music.Source.empty() && !grayed)
+            const bool disabled = m_filteredList[index].Status != MusicStatus::Playable;
+            if (i == 0 && m_music.Source.empty() && !disabled)
                 m_music = m_filteredList[index];
 
             const auto& availableMusicIDs = m_room.GetAvailableMusicIDs();
             auto textColor = m_titleColor;
             if (const auto title = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_TITLE); title)
             {
-                if (grayed)
-                    title->SetColor(sf::Color(147, 207, 226));
+                if (disabled)
+                    title->SetColor(m_disabledColor);
                 else if (availableMusicIDs.find(static_cast<std::uint32_t>(m_filteredList[index].ID)) == availableMusicIDs.end())
-                    title->SetColor(sf::Color(241, 195, 10));
+                    title->SetColor(m_warningColor);
                 else
                     title->SetColor(m_titleColor);
 
                 textColor = title->GetColor();
 
-                auto name = m_filteredList[index].Title;
-                title->SetString(name);
-                title->Truncate(150);
-
-                if (title->GetString() != name)
-                    title->SetString(fmt::format(U"{}..", title->GetString()));
+                title->SetString(m_filteredList[index].Title);
             }
 
             if (const auto level = button->FindChild<Gx::Label>(Resource::SelectMusic::IDC_TEXT_MUSIC_LEVEL); level)
@@ -675,11 +690,11 @@ namespace Cx
                 duration->SetString(fmt::format(Constants::Messages::SelectMusic::MusicList::DURATION, minute, remainder));
             }
 
-            button->SetCheckedState(!grayed && m_music.Source == m_filteredList[index].Source);
-            button->SetEnabled(!grayed);
+            button->SetCheckedState(!disabled && m_music.Source == m_filteredList[index].Source);
+            button->SetEnabled(!disabled);
             button->SetVisible(true);
 
-            if (const auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter && !grayed && m_music.Source == m_filteredList[index].Source)
+            if (const auto activeHighlighter = button->FindChild<Gx::Shape>(Resource::SelectMusic::IDC_IMAGE_MUSIC_ACTIVE); activeHighlighter && !disabled && m_music.Source == m_filteredList[index].Source)
                 activeHighlighter->SetVisible(true);
         }
     }
