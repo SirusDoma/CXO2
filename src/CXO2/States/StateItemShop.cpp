@@ -1,4 +1,7 @@
 #include <CXO2/States/StateItemShop.hpp>
+
+#include <CXO2/Events/ItemShopEvents.hpp>
+
 #include <CXO2/States/StatePlanet.hpp>
 #include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StateMyRoom.hpp>
@@ -51,7 +54,8 @@ namespace Cx
 
     void StateItemShop::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         const auto bgm        = Instantiate<sf::Music>(Sound::BGM::BG_ITEM_SHOP);
         const auto sfxWelcome = Instantiate<sf::Sound>(Sound::Speech::NPC_1);
@@ -362,6 +366,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(ItemShopEvents::OnPurchaseItemResponded, ItemShopPurchaseResponseEventArgs{response, metadata}))
+                return;
+
             if (response.ResultCode != PurchaseItemResult::Success)
             {
                 if (response.ResultCode == PurchaseItemResult::InsufficientMoney)
@@ -406,6 +413,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(ItemShopEvents::OnSellItemResponded, ItemShopSellResponseEventArgs{response}))
+                return;
+
             if (response.Result == SellItemResult::Failed)
             {
                 ShowDialog(Constants::Messages::ItemShop::STANDARD_FACE_LOCKED, DialogStyle::Information);
@@ -607,6 +617,9 @@ namespace Cx
         if (slotID >= m_session.GetInventory().size())
             return;
 
+        if (Dispatch(ItemShopEvents::OnItemSell, ItemShopSellEventArgs{*m_myBagSelectedItem, slotID}))
+            return;
+
         m_service.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [this] (const auto& ev)
         {
             OnSellItemResponded(ev);
@@ -647,8 +660,11 @@ namespace Cx
         if (!sender.IsChecked())
             return;
 
-        const auto sfxMenu  = Instantiate<sf::Sound>(Sound::Effects::EF_11);
-        const auto category = m_shopCategoryButtons.at(&sender);
+        const auto sfxMenu = Instantiate<sf::Sound>(Sound::Effects::EF_11);
+        auto category      = m_shopCategoryButtons.at(&sender);
+
+        if (Dispatch(ItemShopEvents::OnMainCategoryChange, ItemShopMainCategoryEventArgs{category}))
+            return;
 
         m_shopCategory = category;
         m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
@@ -687,7 +703,11 @@ namespace Cx
         const auto sfxMenu        = Instantiate<sf::Sound>(Sound::Effects::EF_11);
         const auto& [category, i] = m_itemCategoryButtons.at(&sender);
 
-        m_itemCategory = m_itemCategoryMap.at(category).at(i);
+        auto type = m_itemCategoryMap.at(category).at(i);
+        if (Dispatch(ItemShopEvents::OnSubCategoryChange, ItemShopSubCategoryEventArgs{type}))
+            return;
+
+        m_itemCategory = type;
         m_mixer.Play(*sfxMenu, Sound::Channel::SFX);
 
         InvalidateShopItemList(true);
@@ -697,25 +717,30 @@ namespace Cx
     {
         const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
         const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
-        if (m_shopPlanetCategory == Planet::Unknown)
+        auto category = m_shopPlanetCategory;
+        if (category == Planet::Unknown)
         {
-            m_shopPlanetCategory = Planet::Event;
+            category = Planet::Event;
         }
         else if (planet->GetFrameCount() >= 12)
         {
-            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) - 1);
+            category = static_cast<Planet>(static_cast<std::uint8_t>(category) - 1);
         }
         else
         {
             auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
-            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
-                return m_shopPlanetCategory == p;
+            auto it = std::find_if(categories.begin(), categories.end(), [category] (const auto p) {
+                return category == p;
             });
 
             if (it && it != categories.end())
-                m_shopPlanetCategory = *(--it);
+                category = *(--it);
         }
 
+        if (Dispatch(ItemShopEvents::OnPlanetFilterChange, ItemShopPlanetEventArgs{category}))
+            return;
+
+        m_shopPlanetCategory = category;
         m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
@@ -725,25 +750,30 @@ namespace Cx
     {
         const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
         const auto planet = Instantiate<Gx::Image>(Resource::ItemShop::IDC_IMAGE_PLANET);
-        if (m_shopPlanetCategory == Planet::Event)
+        auto category = m_shopPlanetCategory;
+        if (category == Planet::Event)
         {
-            m_shopPlanetCategory = Planet::Unknown;
+            category = Planet::Unknown;
         }
         else if (planet->GetFrameCount() >= 12)
         {
-            m_shopPlanetCategory = static_cast<Planet>(static_cast<std::uint8_t>(m_shopPlanetCategory) + 1);
+            category = static_cast<Planet>(static_cast<std::uint8_t>(category) + 1);
         }
         else
         {
             auto categories = { Planet::Unknown, Planet::O2Planet, Planet::Aqua, Planet::Event };
-            auto it = std::find_if(categories.begin(), categories.end(), [this] (const auto p) {
-                return m_shopPlanetCategory == p;
+            auto it = std::find_if(categories.begin(), categories.end(), [category] (const auto p) {
+                return category == p;
             });
 
             if (it && it != categories.end())
-                m_shopPlanetCategory = *(++it);
+                category = *(++it);
         }
 
+        if (Dispatch(ItemShopEvents::OnPlanetFilterChange, ItemShopPlanetEventArgs{category}))
+            return;
+
+        m_shopPlanetCategory = category;
         m_mixer.Play(*sfxPlanet, Sound::Channel::SFX);
         InvalidateShopMaster(true);
         InvalidateShopItemList(true);
@@ -752,9 +782,12 @@ namespace Cx
     void StateItemShop::OnPlanetExtensionButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         const auto sfxPlanet = Instantiate<sf::Sound>(Sound::Effects::EF_24_);
-        const auto p         = m_planetExtensionButtons.at(&sender);
+        auto p               = m_planetExtensionButtons.at(&sender);
 
         if (m_shopPlanetCategory == p)
+            return;
+
+        if (Dispatch(ItemShopEvents::OnPlanetFilterChange, ItemShopPlanetEventArgs{p}))
             return;
 
         m_shopPlanetCategory = p;
@@ -773,8 +806,11 @@ namespace Cx
         SelectGender(Gender::Male);
     }
 
-    void StateItemShop::SelectGender(const Gender gender)
+    void StateItemShop::SelectGender(Gender gender)
     {
+        if (Dispatch(ItemShopEvents::OnGenderFilterChange, ItemShopGenderEventArgs{gender}))
+            return;
+
         const auto sfxGender      = Instantiate<sf::Sound>(Sound::Effects::EF_15);
         const auto maleButton     = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_MALE);
         const auto femaleButton   = Instantiate<Gx::Button>(Resource::ItemShop::IDC_BUTTON_FEMALE);
@@ -1044,7 +1080,7 @@ namespace Cx
 
     void StateItemShop::OnShopItemAddButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
-        const auto& metadata = m_shopItemAddButtons.at(&sender);
+        auto metadata = m_shopItemAddButtons.at(&sender);
         if (O2::InInteropMode(InteropMode::Interface))
         {
             // Note: Removed client validation, let this validation runs on server side
@@ -1089,6 +1125,9 @@ namespace Cx
                 ShowDialog(Constants::Messages::ItemShop::NOT_ENOUGH_MONEY, DialogStyle::Information);
                 return;
             }
+
+            if (Dispatch(ItemShopEvents::OnItemPurchase, ItemShopPurchaseEventArgs{metadata}))
+                return;
 
             m_service.PurchaseItem(PurchaseItemRequest{metadata.ID}, [=] (const auto& envelope)
             {

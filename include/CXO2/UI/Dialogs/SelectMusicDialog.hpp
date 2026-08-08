@@ -5,6 +5,8 @@
 #include <CXO2/Metadata/Chart/O2JamChartMetadata.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
 
+#include <CXO2/Entities/Dispatchable.hpp>
+
 #include <Genode/IO/Resource.hpp>
 #include <Genode/UI/Dialog.hpp>
 
@@ -26,10 +28,10 @@ namespace Cx
 
     class SessionContext;
     class SpeedButton;
-    class SelectMusicDialog : public Gx::Dialog
+    class SelectMusicDialog : public Gx::Dialog, protected Dispatchable
     {
     public:
-        SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room);
+        SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room, Gx::EventDispatcher& events);
 
         void Initialize() override;
 
@@ -43,6 +45,10 @@ namespace Cx
         SpeedMode GetSelectedSpeedMode() const;
 
         void Sort(MusicSortMode sort, MusicSortOrder order = static_cast<MusicSortOrder>(0));
+
+        virtual const std::vector<ChartMetadata>& GetMusicList() const;
+        virtual const std::vector<ChartMetadata>& GetFilteredList() const;
+        virtual void SetFilteredList(const std::vector<ChartMetadata>& list);
 
         void SetRandomColor(const sf::Color& color);
         void SetNoticeColor(const sf::Color& color);

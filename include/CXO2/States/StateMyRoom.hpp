@@ -5,8 +5,20 @@
 #include <CXO2/Avatar/Item.hpp>
 #include <CXO2/Models/Room.hpp>
 
+#include <CXO2/Network/MessageEnvelope.hpp>
+#include <CXO2/Network/Responses/EquipItemResponse.hpp>
+#include <CXO2/Network/Responses/SellItemResponse.hpp>
+
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/UI/Image.hpp>
+
+#include <cstddef>
+#include <unordered_map>
+
+namespace Gx
+{
+    class Control;
+}
 
 namespace Cx
 {
@@ -25,6 +37,14 @@ namespace Cx
         void Invalidate();
         void InvalidateSlot(Gx::Image* slot, EquipmentType type, RenderPart thumbnail = RenderPart::LargeThumbnail);
 
+        void OnBagSlotClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBagSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnEquippedSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+
+        void OnEquipItemResponded(const MessageEnvelope<EquipItemResponse>& ev);
+        void OnUnequipItemResponded(const MessageEnvelope<EquipItemResponse>& ev, const Item& item);
+        void OnSellItemResponded(const MessageEnvelope<SellItemResponse>& ev);
+
         Gx::AudioMixer& m_mixer;
         SessionContext& m_session;
         CharacterService& m_service;
@@ -38,5 +58,10 @@ namespace Cx
         Item* m_selectedItem;
         Gx::Image* m_bagSelectIndicator;
         std::vector<Item> m_inventory;
+
+        std::unordered_map<Gx::Control*, Item*> m_bagSlotItems;
+        std::unordered_map<Gx::Control*, unsigned int> m_bagSlotQuantities;
+        std::unordered_map<Gx::Control*, std::size_t> m_bagSlotTargets;
+        std::unordered_map<Gx::Control*, const Item*> m_equippedSlotItems;
     };
 }

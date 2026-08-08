@@ -15,12 +15,12 @@ namespace Cx
         class TMessage,
         typename = std::enable_if_t<IsMessage<TMessage>::value>
     >
-    using MessageSubscriber = Gx::Events::Subscriber<std::uint16_t, MessageEnvelope<TMessage>>;
+    using MessageSubscriber = Gx::Subscriber<std::uint16_t, MessageEnvelope<TMessage>>;
 
     class NetworkService : public MessageDispatcher, public Gx::Module
     {
     public:
-        NetworkService(Gx::TcpNetworkClient& client, Gx::Events::EventDispatcher& events);
+        NetworkService(Gx::TcpNetworkClient& client, Gx::EventDispatcher& events);
 
         void Connect(
             const sf::IpAddress& ipAddress,
@@ -97,7 +97,7 @@ namespace Cx
         };
 
         Gx::TcpNetworkClient&                           m_client;
-        Gx::Events::EventDispatcher&                    m_events;
+        Gx::EventDispatcher&                            m_events;
         std::unordered_map<std::uint16_t, Subscription> m_subscriptions{};
         Heartbeat                                       m_heartbeat{};
         std::function<void()>                           m_connectedCallback{};

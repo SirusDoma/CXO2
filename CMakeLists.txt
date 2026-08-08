@@ -68,7 +68,7 @@ if(WIN32)
     # Windows (Visual Studio) Compiler Output Directories and Flags
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Force static link" FORCE)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>" CACHE STRING "Static runtime in Release, shared debug runtime in Debug" FORCE)
     set_target_properties(${TARGET} PROPERTIES
         WIN32_EXECUTABLE                        TRUE
         MSVC_RUNTIME_LIBRARY                    ${CMAKE_MSVC_RUNTIME_LIBRARY}
@@ -184,7 +184,7 @@ endif()
 set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
 
 # External Libs Sources and Flags
-set(SFML_USE_STATIC_STD_LIBS TRUE)
+set(SFML_USE_STATIC_STD_LIBS FALSE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
 
 # -- Genode
@@ -215,6 +215,22 @@ add_library(ced STATIC
 )
 target_include_directories(ced PUBLIC ${ced_SOURCE_DIR})
 
+# -- dlfcn-win32
+if(WIN32)
+    FetchContent_Declare(
+        dlfcn-win32
+        GIT_REPOSITORY https://github.com/dlfcn-win32/dlfcn-win32.git
+        GIT_TAG        v1.4.2
+    )
+    FetchContent_MakeAvailable(dlfcn-win32)
+
+    if(NOT TARGET dlfcn-win32::dl)
+        add_library(dlfcn-win32::dl ALIAS dl)
+    endif()
+
+    set(CMAKE_DL_LIBS dlfcn-win32::dl)
+endif()
+
 message("-- Output Directory: " ${OUTPUT_DIR})
 
 # Application includes
@@ -234,6 +250,9 @@ target_link_libraries(${TARGET} PRIVATE magic_enum::magic_enum)
 
 # Link Compact Encoding Detector
 target_link_libraries(${TARGET} PRIVATE ced)
+
+# Link Dynamic Library Loader
+target_link_libraries(${TARGET} PRIVATE ${CMAKE_DL_LIBS})
 
 # Link Boost PFR
 target_link_libraries(${TARGET} PRIVATE Boost::pfr)
@@ -270,3 +289,8 @@ set_target_properties(ResourceCompiler PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${COMPILER_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${COMPILER_OUTPUT_DIR}
 )
+
+# Samples (untracked, built only when present)
+if(EXISTS ${CMAKE_SOURCE_DIR}/samples/O2CX/CMakeLists.txt)
+    add_subdirectory(samples/O2CX)
+endif()

@@ -1,5 +1,6 @@
 #pragma once
 #include <CXO2/Services/Service.hpp>
+#include <CXO2/Models/Shop.hpp>
 
 #include <Genode/Entities/Updatable.hpp>
 #include <Genode/System/Module.hpp>
@@ -24,53 +25,6 @@ namespace Cx
     class MusicDownloaderService : public virtual Service, public Gx::Module, public Gx::Updatable
     {
     public:
-        enum class DownloadStatus
-        {
-            Idle,
-            Connecting,
-            Downloading,
-            Completed,
-            Failed
-        };
-
-        enum class DownloadError
-        {
-            None,
-            ConnectionFailed,
-            DownloadFailed,
-            InsufficientDiskSpace,
-            Cancelled
-        };
-
-        struct DownloadProgress
-        {
-            DownloadStatus Status = DownloadStatus::Idle;
-            DownloadError Error   = DownloadError::None;
-
-            std::uint16_t MusicID = 0;
-            sf::String  MusicTitle;
-            std::string FileName;
-
-            std::size_t QueueIndex = 0;
-            std::size_t QueueCount = 0;
-
-            std::uint64_t FileBytesRead  = 0;
-            std::uint64_t FileSize       = 0;
-            std::uint64_t TotalBytesRead = 0;
-            std::uint64_t TotalSize      = 0;
-            std::uint64_t BytesPerSecond = 0;
-
-            float GetFilePercent() const
-            {
-                return FileSize > 0 ? static_cast<float>(FileBytesRead) / static_cast<float>(FileSize) * 100.f : 0.f;
-            }
-
-            float GetTotalPercent() const
-            {
-                return TotalSize > 0 ? static_cast<float>(TotalBytesRead) / static_cast<float>(TotalSize) * 100.f : 0.f;
-            }
-        };
-
         MusicDownloaderService(CommandLineContext& args, SessionContext& session);
         ~MusicDownloaderService() override;
 
@@ -84,13 +38,14 @@ namespace Cx
         void Cancel();
         bool IsDownloading() const;
 
-        DownloadProgress GetProgress() const;
+        MusicDownloadProgress GetProgress() const;
 
         void SetDownloadStartedCallback(const std::function<void(std::uint16_t)>& callback);
         void SetRenamingCallback(const std::function<void(std::uint16_t)>& callback);
         void SetDownloadCompletedCallback(const std::function<void(std::uint16_t)>& callback);
         void SetQueueCompletedCallback(const std::function<void()>& callback);
-        void SetErrorCallback(const std::function<void(DownloadError)>& callback);
+        void SetErrorCallback(const std::function<void(MusicDownloadError)>& callback);
+        void SetProgressCallback(const std::function<void(const MusicDownloadProgress&)>& callback);
 
         void Update(const sf::Time& delta) override;
 
@@ -122,24 +77,26 @@ namespace Cx
 
             Type Kind;
             std::uint16_t MusicID;
-            DownloadError Error;
+            MusicDownloadError Error;
         };
 
         void DownloadProc();
-        void Fail(DownloadError error);
+        void Fail(MusicDownloadError error);
 
         CommandLineContext& m_args;
         SessionContext& m_session;
 
         std::vector<DownloadItem> m_queue;
         std::vector<Notification> m_notifications;
-        DownloadProgress m_progress;
+        MusicDownloadProgress m_progress;
+        MusicDownloadProgress m_lastProgress;
 
         std::function<void(std::uint16_t)> m_downloadStartedCallback;
         std::function<void(std::uint16_t)> m_renamingCallback;
         std::function<void(std::uint16_t)> m_downloadCompletedCallback;
         std::function<void()> m_queueCompletedCallback;
-        std::function<void(DownloadError)> m_errorCallback;
+        std::function<void(MusicDownloadError)> m_errorCallback;
+        std::function<void(const MusicDownloadProgress&)> m_progressCallback;
 
         std::thread m_thread;
         mutable std::mutex m_mutex;

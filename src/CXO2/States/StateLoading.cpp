@@ -1,4 +1,7 @@
 #include <CXO2/States/StateLoading.hpp>
+
+#include <CXO2/Events/LoadingEvents.hpp>
+
 #include <CXO2/States/StatePlanet.hpp>
 
 #include <CXO2/States/StatePlaying7K.hpp>
@@ -58,7 +61,8 @@ namespace Cx
 
     void StateLoading::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
+            return;
 
         m_service.SetMemberMusicLoadedEventCallback([this] (const auto& ev) { OnMemberConfirmMusicLoaded(ev); });
 
@@ -115,6 +119,16 @@ namespace Cx
             if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
                 sign->SetFrame("Loading");
         }
+
+        const auto& metadata = chart->GetMetadata();
+        const auto noteIt    = metadata.NoteCounts.find(m_context.GetDifficulty());
+        const auto noteCount = noteIt != metadata.NoteCounts.end() ? noteIt->second : 0u;
+
+        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_TITLE)->SetString(metadata.Title);
+        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_ARTIST)->SetString(metadata.Artist);
+        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_COUNT)->SetString(std::to_string(noteCount));
+        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_DESIGNER)->SetString(metadata.NoteDesigner);
+        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_SPEED)->SetString(fmt::format(Constants::Messages::Loading::SPEED, m_context.GetSpeed()));
 
         const auto missionHeader      = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_HEADER);
         const auto missionRequirement = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_REQUIREMENT);
@@ -183,6 +197,8 @@ namespace Cx
         try
         {
             const auto& ev = envelope.Open();
+            if (Dispatch(LoadingEvents::OnMemberMusicLoaded, LoadingMemberMusicLoadedEventArgs{ev}))
+                return;
 
             auto lock = std::lock_guard(m_mutex);
 
@@ -210,6 +226,9 @@ namespace Cx
 
     void StateLoading::OnMemberLeft(const WaitingMemberLeftEventData& ev)
     {
+        if (Dispatch(LoadingEvents::OnMemberLeft, LoadingMemberLeftEventArgs{ev}))
+            return;
+
         auto lock = std::lock_guard(m_mutex);
 
         m_loadedUsers.erase(ev.ID);
@@ -240,6 +259,9 @@ namespace Cx
 
     void StateLoading::OnChartLoaded(const Chart* chart)
     {
+        if (Dispatch(LoadingEvents::OnMusicLoaded, LoadingMusicEventArgs{*chart}))
+            return;
+
         m_service.ConfirmMusicLoaded([this] (const auto& ev)
         {
             try

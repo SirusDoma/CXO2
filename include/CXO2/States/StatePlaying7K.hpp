@@ -46,6 +46,8 @@ namespace Cx
         unsigned int GetViewport() const;
         void SetViewport(unsigned int viewport);
 
+        ChartRenderer& GetChartRenderer();
+
         void OnMemberStatsUpdate(const MessageEnvelope<PlayingMemberStatsUpdateEventData>& ev);
         void OnMemberScoreSubmitted(const MessageEnvelope<PlayingMemberScoreSubmissionEventData>& ev);
         void OnMemberLeft(const MessageEnvelope<PlayingMemberLeftEventData>& ev);

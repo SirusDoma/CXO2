@@ -1,4 +1,7 @@
 #include <CXO2/States/StateMusicShop.hpp>
+
+#include <CXO2/Events/MusicShopEvents.hpp>
+
 #include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StatePayment.hpp>
 
@@ -48,7 +51,8 @@ namespace Cx
 
     void StateMusicShop::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MUSIC_SHOP);
 
@@ -150,6 +154,7 @@ namespace Cx
         m_downloader.SetRenamingCallback([this] (const auto musicID) { OnDownloadRenaming(musicID); });
         m_downloader.SetQueueCompletedCallback([this] { OnQueueCompleted(); });
         m_downloader.SetErrorCallback([this] (const auto error) { OnDownloadFailed(error); });
+        m_downloader.SetProgressCallback([this] (const auto& progress) { OnDownloadProgressed(progress); });
 
         const auto buyButton = cartContainer->FindChild<Gx::Button>(Resource::MusicShop::Cart::IDC_BUTTON_BUY);
         buyButton->SetClickCallback([this] (auto& sender, auto& ev) { OnCartBuyButtonClicked(sender, ev); });
@@ -182,21 +187,13 @@ namespace Cx
     void StateMusicShop::Finalize()
     {
         m_downloader.SetDownloadStartedCallback(nullptr);
+        m_downloader.SetDownloadCompletedCallback(nullptr);
         m_downloader.SetRenamingCallback(nullptr);
         m_downloader.SetQueueCompletedCallback(nullptr);
         m_downloader.SetErrorCallback(nullptr);
+        m_downloader.SetProgressCallback(nullptr);
 
         State::Finalize();
-    }
-
-    void StateMusicShop::Update(const sf::Time& delta)
-    {
-        State::Update(delta);
-
-        if (m_downloader.GetProgress().Status == MusicDownloaderService::DownloadStatus::Connecting)
-            SetDownloadStatus(Constants::Messages::MusicShop::Download::CONNECTING);
-
-        InvalidateDownloadPanel();
     }
 
     void StateMusicShop::SelectMusicFilter(const bool showAll)
@@ -233,6 +230,9 @@ namespace Cx
 
     void StateMusicShop::InvalidateMusicList()
     {
+        if (Dispatch(MusicShopEvents::OnAcquiredMusicListInvalidate, MusicShopEventArgs{}))
+            return;
+
         const auto container = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_MUSIC);
         const auto musicList = container->FindChild<Gx::List>(Resource::MusicShop::IDC_LIST_MUSIC);
         const auto slots     = musicList->GetChildren();
@@ -321,6 +321,9 @@ namespace Cx
 
     void StateMusicShop::InvalidateShopList()
     {
+        if (Dispatch(MusicShopEvents::OnMusicShopListInvalidate, MusicShopEventArgs{}))
+            return;
+
         const auto container = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_SHOP);
         const auto shopList  = container->FindChild<Gx::List>(Resource::MusicShop::Shop::IDC_LIST_SHOP);
         const auto slots     = shopList->GetChildren();
@@ -441,6 +444,9 @@ namespace Cx
 
     void StateMusicShop::InvalidateDownloadPanel()
     {
+        if (Dispatch(MusicShopEvents::OnDownloadPanelInvalidate, MusicShopEventArgs{}))
+            return;
+
         const auto container  = Instantiate<Gx::UiContainer>(Resource::MusicShop::IDC_CONTAINER_DOWNLOAD);
         const auto music      = container->FindChild<Gx::Label>(Resource::MusicShop::Download::IDC_TEXT_DOWNLOAD_MUSIC);
         const auto speed      = container->FindChild<Gx::Label>(Resource::MusicShop::Download::IDC_TEXT_DOWNLOAD_SPEED);
@@ -814,8 +820,13 @@ namespace Cx
         if (key == m_sortKeys.end())
             return;
 
-        m_shopSortAscending = m_shopSortKey == key->second ? !m_shopSortAscending : true;
-        m_shopSortKey       = key->second;
+        auto sortKey   = key->second;
+        auto ascending = m_shopSortKey == sortKey ? !m_shopSortAscending : true;
+        if (Dispatch(MusicShopEvents::OnMusicShopListSort, MusicShopSortEventArgs{sortKey, ascending}))
+            return;
+
+        m_shopSortAscending = ascending;
+        m_shopSortKey       = sortKey;
 
         InvalidateShopList();
     }
@@ -826,8 +837,13 @@ namespace Cx
         if (key == m_sortKeys.end())
             return;
 
-        m_musicSortAscending = m_musicSortKey == key->second ? !m_musicSortAscending : true;
-        m_musicSortKey       = key->second;
+        auto sortKey   = key->second;
+        auto ascending = m_musicSortKey == sortKey ? !m_musicSortAscending : true;
+        if (Dispatch(MusicShopEvents::OnAcquiredMusicListSort, MusicShopSortEventArgs{sortKey, ascending}))
+            return;
+
+        m_musicSortAscending = ascending;
+        m_musicSortKey       = sortKey;
 
         InvalidateMusicList();
     }
@@ -835,6 +851,9 @@ namespace Cx
     void StateMusicShop::OnDownloadButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
         if (m_downloader.IsDownloading() || m_downloader.GetQueueCount() == 0)
+            return;
+
+        if (Dispatch(MusicShopEvents::OnDownloadInitializing, MusicShopEventArgs{}))
             return;
 
         SetDownloadStatus(Constants::Messages::MusicShop::Download::INITIALIZING);
@@ -857,23 +876,48 @@ namespace Cx
 
     void StateMusicShop::OnCancelDialogAnswered(const bool answer)
     {
-        if (answer)
-            m_downloader.Cancel();
+        if (!answer)
+            return;
+
+        if (Dispatch(MusicShopEvents::OnDownloadCancel, MusicShopEventArgs{}))
+            return;
+
+        m_downloader.Cancel();
     }
 
     void StateMusicShop::OnDownloadStarted(std::uint16_t musicID)
     {
+        if (Dispatch(MusicShopEvents::OnDownloadStarted, MusicShopDownloadEventArgs{musicID}))
+            return;
+
         SetDownloadStatus(Constants::Messages::MusicShop::Download::DOWNLOADING);
         InvalidateMusicList();
     }
 
     void StateMusicShop::OnDownloadRenaming(std::uint16_t musicID)
     {
+        if (Dispatch(MusicShopEvents::OnDownloadRenaming, MusicShopDownloadEventArgs{musicID}))
+            return;
+
         SetDownloadStatus(Constants::Messages::MusicShop::Download::RENAMING);
+    }
+
+    void StateMusicShop::OnDownloadProgressed(const MusicDownloadProgress& progress)
+    {
+        if (Dispatch(MusicShopEvents::OnDownloadProgress, MusicShopDownloadProgressEventArgs{progress}))
+            return;
+
+        if (progress.Status == MusicDownloadStatus::Connecting)
+            SetDownloadStatus(Constants::Messages::MusicShop::Download::CONNECTING);
+
+        InvalidateDownloadPanel();
     }
 
     void StateMusicShop::OnDownloadCompleted(std::uint16_t musicID)
     {
+        if (Dispatch(MusicShopEvents::OnDownloadCompleted, MusicShopDownloadEventArgs{musicID}))
+            return;
+
         SetDownloadStatus(Constants::Messages::MusicShop::Download::COMPLETED);
         auto _ = m_session.GetMusicList(true);
 
@@ -882,26 +926,32 @@ namespace Cx
 
     void StateMusicShop::OnQueueCompleted()
     {
+        if (Dispatch(MusicShopEvents::OnQueueCompleted, MusicShopEventArgs{}))
+            return;
+
         auto _ = m_session.GetMusicList(true);
 
         InvalidateMusicList();
     }
 
-    void StateMusicShop::OnDownloadFailed(const MusicDownloaderService::DownloadError error)
+    void StateMusicShop::OnDownloadFailed(const MusicDownloadError error)
     {
+        if (Dispatch(MusicShopEvents::OnDownloadFailed, MusicShopDownloadErrorEventArgs{error}))
+            return;
+
         switch (error)
         {
-            case MusicDownloaderService::DownloadError::ConnectionFailed:
+            case MusicDownloadError::ConnectionFailed:
                 SetDownloadStatus(Constants::Messages::MusicShop::Download::CONNECT_FAILED);
                 ShowDialog(Constants::Messages::MusicShop::Download::CONNECT_FAILED_NOTICE, DialogStyle::Information);
                 break;
 
-            case MusicDownloaderService::DownloadError::InsufficientDiskSpace:
+            case MusicDownloadError::InsufficientDiskSpace:
                 SetDownloadStatus(Constants::Messages::MusicShop::Download::DISK_FULL);
                 ShowDialog(Constants::Messages::MusicShop::Download::DISK_FULL_NOTICE, DialogStyle::Information);
                 break;
 
-            case MusicDownloaderService::DownloadError::DownloadFailed:
+            case MusicDownloadError::DownloadFailed:
                 SetDownloadStatus(Constants::Messages::MusicShop::Download::FILE_NOT_FOUND);
                 ShowDialog(Constants::Messages::MusicShop::Download::FAILED_NOTICE, DialogStyle::Information);
                 break;
@@ -911,25 +961,29 @@ namespace Cx
                 break;
         }
 
-        m_session.GetMusicList(true);
+        const auto _ = m_session.GetMusicList(true);
         InvalidateMusicList();
     }
 
     void StateMusicShop::OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev, const ChartMetadata& entry)
     {
-        if (entry.Prices.empty())
+        auto music = entry;
+        if (Dispatch(MusicShopEvents::OnMusicPurchase, MusicShopPurchaseEventArgs{music}))
+            return;
+
+        if (music.Prices.empty())
         {
             ShowDialog(Constants::Messages::MusicShop::ALREADY_FREE, DialogStyle::Information);
         }
         else
         {
-            const auto gem = entry.Prices.find(Currency::Gem);
+            const auto gem = music.Prices.find(Currency::Gem);
             const auto prompt = fmt::format(
                 Constants::Messages::MusicShop::Purchase::PROMPT,
                 Constants::Messages::MusicShop::Purchase::TITLE,
-                entry.Title,
+                music.Title,
                 Constants::Messages::MusicShop::Purchase::PRICE,
-                sf::String(std::to_string(gem != entry.Prices.end() ? gem->second : 0)),
+                sf::String(std::to_string(gem != music.Prices.end() ? gem->second : 0)),
                 Constants::Messages::MusicShop::Purchase::CURRENCY,
                 Constants::Messages::MusicShop::Purchase::CONFIRM
             );

@@ -1,4 +1,7 @@
 #include <CXO2/States/StateMyRoom.hpp>
+
+#include <CXO2/Events/MyRoomEvents.hpp>
+
 #include <CXO2/States/StateItemShop.hpp>
 #include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StatePlanet.hpp>
@@ -75,7 +78,8 @@ namespace Cx
 
     void StateMyRoom::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
     
         const auto bgm       = Instantiate<sf::Music>(Sound::BGM::BG_MY_ROOM);
         const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
@@ -236,32 +240,12 @@ namespace Cx
                 if (slotID >= m_session.GetInventory().size())
                     return;
 
-                m_shopService.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=] (const MessageEnvelope<SellItemResponse>& ev)
+                if (Dispatch(MyRoomEvents::OnItemSell, MyRoomSellEventArgs{*m_selectedItem, slotID}))
+                    return;
+
+                m_shopService.SellItem(SellItemRequest{static_cast<std::uint32_t>(slotID)}, [=] (const auto& ev)
                 {
-                    try
-                    {
-                        const auto& response = ev.Open();
-                        if (response.Result == SellItemResult::Failed)
-                        {
-                            ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
-                            return;
-                        }
-
-                        m_session.SetInventoryItem(response.SlotID, 0);
-                        m_inventory[response.SlotID] = Item{};
-
-                        m_session.SetWallet({ response.Gem, response.Cash });
-
-                        m_selectedItem = nullptr;
-                        m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
-
-                        // m_session.Save();
-                        Invalidate();
-                    }
-                    catch (const Gx::Exception& ex)
-                    {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information);
-                    }
+                    OnSellItemResponded(ev);
                 });
             });
         });
@@ -301,7 +285,11 @@ namespace Cx
     {
         const auto avatar    = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
         const auto container = Instantiate<Gx::UiContainer>(Resource::MyRoom::IDC_CONTAINER_EQUIPMENTS);
-        const auto sfxClick  = Instantiate<sf::Sound>(Sound::Effects::EF_25);
+
+        m_bagSlotItems.clear();
+        m_bagSlotQuantities.clear();
+        m_bagSlotTargets.clear();
+        m_equippedSlotItems.clear();
 
         const auto bagList  = Instantiate<Gx::List>(Resource::MyRoom::IDC_LIST_BAG);
         const auto bagSlots = bagList->GetChildren();
@@ -353,127 +341,13 @@ namespace Cx
                     quantityLabel->SetString(std::string());
             }
 
+            m_bagSlotItems[slot]      = item;
+            m_bagSlotQuantities[slot] = quantity;
+            m_bagSlotTargets[slot]    = target;
+
             slot->SetVisible(true);
-            slot->SetClickCallback([=] (auto&, auto&)
-            {
-                m_mixer.Play(*sfxClick, Sound::Channel::SFX);
-                if (m_selectedItem == item || item->GetID() == 0)
-                    return;
-
-                m_selectedItem = item;
-                m_bagSelectIndicator->SetVisible(true);
-
-                slot->AddChild(*m_bagSelectIndicator);
-            });
-
-            slot->SetDoubleClickCallback([=] (auto&, auto&)
-            {
-                if (!item || item->GetID() == 0)
-                    return;
-
-                if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
-                {
-                    if (const auto dialog = Instantiate<Gx::Dialog>(Resource::MyRoom::IDC_DIALOG_SKILL_INFO); dialog)
-                    {
-                        const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_NAME);
-                        const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
-                        const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_SKILL);
-                        const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
-                        const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::MyRoom::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
-
-                        nameLabel->SetString(item->GetName());
-                        quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-"); // L"\u221E"
-                        skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
-                        descriptionLabel->SetString(item->GetDescription());
-
-                        constexpr unsigned int bounds = 160;
-                        auto string = item->GetDescription();
-
-                        bool wrapped = true;
-                        while (wrapped)
-                        {
-                            wrapped = false;
-
-                            std::size_t checkpoint = 0;
-                            for (const auto& glyph : descriptionLabel->GetShapedGlyphs())
-                            {
-                                const auto c = static_cast<std::size_t>(glyph.cluster);
-                                if (c >= string.getSize() || string[c] == '\n')
-                                    continue;
-
-                                if (string[c] == ' ')
-                                {
-                                    checkpoint = c;
-                                    continue;
-                                }
-
-                                const auto position = descriptionLabel->GetTransform().transformPoint(glyph.position);
-                                if (position.x > descriptionLabel->GetPosition().x + bounds)
-                                {
-                                    if (string[checkpoint] == '\n')
-                                    {
-                                        checkpoint = 0;
-                                        continue;
-                                    }
-
-                                    string.replace(checkpoint, 1, "\n");
-                                    descriptionLabel->SetString(string);
-
-                                    wrapped = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (const auto texture = item->GetLargeThumbnail().GetTexture())
-                            skillThumbnail->SetTexture(*texture, true);
-
-                        Present(*dialog, Gx::PresentationContext::Default);
-                    }
-
-                    return;
-                }
-
-                if (m_busy)
-                    return;
-
-                m_busy = true;
-                const auto request = EquipItemRequest{
-                    GetItemEquipSlotType(item->GetType()),
-                    static_cast<std::uint32_t>(target)
-                };
-
-                m_service.Equip(request, [=] (const auto& ev)
-                {
-                    m_busy = false;
-
-                    try
-                    {
-                        const auto& response = ev.Open();
-                        if (response.Invalid)
-                            return;
-
-                        avatar->Equip(m_inventory[response.SlotID]);
-
-                        m_session.Equip(response.NewEquippedItemId);
-                        m_session.Unequip(response.PreviousEquippedItemId);
-                        m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
-                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
-
-                        m_selectedItem = nullptr;
-                        // m_session.Save();
-
-                        Invalidate();
-                    }
-                    catch (const Gx::Exception& ex)
-                    {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
-                        {
-                            GetDirector().Dismiss<StatePlanet>();
-                        });
-                    }
-                });
-            });
+            slot->SetClickCallback([this] (auto& sender, auto& ev) { OnBagSlotClicked(sender, ev); });
+            slot->SetDoubleClickCallback([this] (auto& sender, auto& ev) { OnBagSlotDoubleClicked(sender, ev); });
         }
 
         if (!currentSlot)
@@ -533,6 +407,108 @@ namespace Cx
         currentCash->SetValue(m_session.GetWallet().Cash);
     }
 
+    void StateMyRoom::OnEquipItemResponded(const MessageEnvelope<EquipItemResponse>& ev)
+    {
+        m_busy = false;
+
+        const auto avatar = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
+        try
+        {
+            const auto& response = ev.Open();
+            if (Dispatch(MyRoomEvents::OnEquipItemResponded, MyRoomEquipResponseEventArgs{response}))
+                return;
+
+            if (response.Invalid)
+                return;
+
+            avatar->Equip(m_inventory[response.SlotID]);
+
+            m_session.Equip(response.NewEquippedItemId);
+            m_session.Unequip(response.PreviousEquippedItemId);
+            m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
+            m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
+
+            m_selectedItem = nullptr;
+            // m_session.Save();
+
+            Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
+            {
+                GetDirector().Dismiss<StatePlanet>();
+            });
+        }
+    }
+
+    void StateMyRoom::OnUnequipItemResponded(const MessageEnvelope<EquipItemResponse>& ev, const Item& item)
+    {
+        const auto avatar = Instantiate<Avatar>(Resource::MyRoom::IDC_AVATAR);
+        try
+        {
+            m_busy = false;
+            const auto& response = ev.Open();
+            if (Dispatch(MyRoomEvents::OnUnequipItemResponded, MyRoomUnequipResponseEventArgs{response}))
+                return;
+
+            if (response.Invalid)
+                return;
+
+            const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
+            m_mixer.Play(*sfxDress, Sound::Channel::SFX);
+
+            avatar->Unequip(item.GetType());
+
+            m_session.Unequip(response.PreviousEquippedItemId);
+            m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
+            m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
+
+            // m_session.Save();
+            Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
+            {
+                GetDirector().Dismiss<StatePlanet>();
+            });
+        }
+    }
+
+    void StateMyRoom::OnSellItemResponded(const MessageEnvelope<SellItemResponse>& ev)
+    {
+        const auto sfxAccept = Instantiate<sf::Sound>(Sound::Effects::EF_02);
+
+        try
+        {
+            const auto& response = ev.Open();
+            if (Dispatch(MyRoomEvents::OnSellItemResponded, MyRoomSellResponseEventArgs{response}))
+                return;
+
+            if (response.Result == SellItemResult::Failed)
+            {
+                ShowDialog("Selected item cannot be sold.", DialogStyle::Information);
+                return;
+            }
+
+            m_session.SetInventoryItem(response.SlotID, 0);
+            m_inventory[response.SlotID] = Item{};
+
+            m_session.SetWallet({ response.Gem, response.Cash });
+
+            m_selectedItem = nullptr;
+            m_mixer.Play(*sfxAccept, Sound::Channel::SFX);
+
+            // m_session.Save();
+            Invalidate();
+        }
+        catch (const Gx::Exception& ex)
+        {
+            ShowDialog(std::string(ex.what()), DialogStyle::Information);
+        }
+    }
+
     void StateMyRoom::InvalidateSlot(Gx::Image* slot, const EquipmentType type, RenderPart thumbnailType)
     {
         if (!slot)
@@ -557,55 +533,141 @@ namespace Cx
             else
                 slot->SetTexture(*it->second->GetSmallThumbnail().GetTexture(), true);
 
-            slot->SetDoubleClickCallback([=] (auto&, auto&)
-            {
-                if (m_busy)
-                    return;
-
-                m_busy = true;
-
-                const auto& inventory = m_session.GetInventory();
-                auto slotIt = std::find_if(inventory.begin(), inventory.end(), [id = item->GetID()] (const auto& i) {
-                    return i.ID == 0;
-                });
-
-                const size_t target = slotIt != inventory.end() ? static_cast<size_t>(std::distance(inventory.begin(), slotIt)) : inventory.size();
-                const auto request  = EquipItemRequest{
-                    GetItemEquipSlotType(item->GetType()),
-                    static_cast<std::uint32_t>(target)
-                };
-
-                m_service.Equip(request, [=] (const auto& ev)
-                {
-                    try
-                    {
-                        m_busy = false;
-                        const auto& response = ev.Open();
-
-                        if (response.Invalid)
-                            return;
-
-                        const auto sfxDress = Instantiate<sf::Sound>(Sound::Effects::EF_27_dress);
-                        m_mixer.Play(*sfxDress, Sound::Channel::SFX);
-
-                        avatar->Unequip(item->GetType());
-
-                        m_session.Unequip(response.PreviousEquippedItemId);
-                        m_session.SetInventoryItem(response.SlotID, SessionContext::Item{response.PreviousEquippedItemId});
-                        m_inventory[response.SlotID] = m_items.Create(response.PreviousEquippedItemId);
-
-                        // m_session.Save();
-                        Invalidate();
-                    }
-                    catch (const Gx::Exception& ex)
-                    {
-                        ShowDialog(std::string(ex.what()), DialogStyle::Information, [=] (bool)
-                        {
-                            GetDirector().Dismiss<StatePlanet>();
-                        });
-                    }
-                });
-            });
+            m_equippedSlotItems[slot] = item;
+            slot->SetDoubleClickCallback([this] (auto& sender, auto& ev) { OnEquippedSlotDoubleClicked(sender, ev); });
         }
+    }
+
+    void StateMyRoom::OnBagSlotClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto sfxClick = Instantiate<sf::Sound>(Sound::Effects::EF_25);
+        const auto item     = m_bagSlotItems.at(&sender);
+
+        m_mixer.Play(*sfxClick, Sound::Channel::SFX);
+        if (m_selectedItem == item || item->GetID() == 0)
+            return;
+
+        m_selectedItem = item;
+        m_bagSelectIndicator->SetVisible(true);
+
+        sender.AddChild(*m_bagSelectIndicator);
+    }
+
+    void StateMyRoom::OnBagSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto item     = m_bagSlotItems.at(&sender);
+        const auto quantity = m_bagSlotQuantities.at(&sender);
+
+        if (!item || item->GetID() == 0)
+            return;
+
+        if (item->GetType() == EquipmentType::AttributiveItem || quantity > 1)
+        {
+            if (const auto dialog = Instantiate<Gx::Dialog>(Resource::MyRoom::IDC_DIALOG_SKILL_INFO); dialog)
+            {
+                const auto nameLabel        = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_NAME);
+                const auto quantityLabel    = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_QUANTITY);
+                const auto skillLabel       = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_SKILL);
+                const auto descriptionLabel = dialog->FindChild<Gx::Label>(Resource::MyRoom::SkillInfo::IDC_TEXT_ITEM_DESCRIPTION);
+                const auto skillThumbnail   = dialog->FindChild<Gx::Image>(Resource::MyRoom::SkillInfo::IDC_IMAGE_ITEM_THUMBNAIL);
+
+                nameLabel->SetString(item->GetName());
+                quantityLabel->SetString(quantity > 0 ? std::to_string(quantity) : "-"); // L"∞"
+                skillLabel->SetString(item->GetName().substring(0, item->GetName().find(' ')));
+                descriptionLabel->SetString(item->GetDescription());
+
+                constexpr unsigned int bounds = 160;
+                auto string = item->GetDescription();
+
+                bool wrapped = true;
+                while (wrapped)
+                {
+                    wrapped = false;
+
+                    std::size_t checkpoint = 0;
+                    for (const auto& glyph : descriptionLabel->GetShapedGlyphs())
+                    {
+                        const auto c = static_cast<std::size_t>(glyph.cluster);
+                        if (c >= string.getSize() || string[c] == '\n')
+                            continue;
+
+                        if (string[c] == ' ')
+                        {
+                            checkpoint = c;
+                            continue;
+                        }
+
+                        const auto position = descriptionLabel->GetTransform().transformPoint(glyph.position);
+                        if (position.x > descriptionLabel->GetPosition().x + bounds)
+                        {
+                            if (string[checkpoint] == '\n')
+                            {
+                                checkpoint = 0;
+                                continue;
+                            }
+
+                            string.replace(checkpoint, 1, "\n");
+                            descriptionLabel->SetString(string);
+
+                            wrapped = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (const auto texture = item->GetLargeThumbnail().GetTexture())
+                    skillThumbnail->SetTexture(*texture, true);
+
+                Present(*dialog, Gx::PresentationContext::Default);
+            }
+
+            return;
+        }
+
+        if (m_busy)
+            return;
+
+        auto slotID = m_bagSlotTargets.at(&sender);
+        if (Dispatch(MyRoomEvents::OnItemEquip, MyRoomEquipEventArgs{*item, slotID}))
+            return;
+
+        m_busy = true;
+        const auto request = EquipItemRequest{
+            GetItemEquipSlotType(item->GetType()),
+            static_cast<std::uint32_t>(slotID)
+        };
+
+        m_service.Equip(request, [=] (const auto& ev)
+        {
+            OnEquipItemResponded(ev);
+        });
+    }
+
+    void StateMyRoom::OnEquippedSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    {
+        const auto item = m_equippedSlotItems.at(&sender);
+
+        if (m_busy)
+            return;
+
+        const auto& inventory = m_session.GetInventory();
+        const auto slotIt = std::find_if(inventory.begin(), inventory.end(), [id = item->GetID()] (const auto& i) {
+            return i.ID == 0;
+        });
+
+        size_t target = slotIt != inventory.end() ? static_cast<size_t>(std::distance(inventory.begin(), slotIt)) : inventory.size();
+        if (Dispatch(MyRoomEvents::OnItemUnequip, MyRoomUnequipEventArgs{*item, target}))
+            return;
+
+        m_busy = true;
+        const auto request  = EquipItemRequest{
+            GetItemEquipSlotType(item->GetType()),
+            static_cast<std::uint32_t>(target)
+        };
+
+        m_service.Equip(request, [=] (const auto& ev)
+        {
+            OnUnequipItemResponded(ev, *item);
+        });
     }
 }

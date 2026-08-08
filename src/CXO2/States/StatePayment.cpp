@@ -25,7 +25,8 @@ namespace Cx
 
     void StatePayment::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         const auto& itemData    = m_items.GetItemData();
         const auto& setInfoData = m_items.GetSetInfoData();

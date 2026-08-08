@@ -1,6 +1,8 @@
 #pragma once
 
 #include <CXO2/Network/Commands.hpp>
+#include <Genode/System/Exception.hpp>
+
 #include <variant>
 
 namespace Cx
@@ -24,6 +26,9 @@ namespace Cx
                     },
                     [] (const std::exception_ptr& eptr) -> const TMessage&
                     {
+                        if (!eptr)
+                            throw Gx::Exception("Message envelope holds a null exception pointer");
+
                         std::rethrow_exception(eptr);
                     }
                 },
@@ -40,6 +45,9 @@ namespace Cx
                     },
                     [] (const std::exception_ptr& eptr) -> TMessage&
                     {
+                        if (!eptr)
+                            throw Gx::Exception("Message envelope holds a null exception pointer");
+
                         std::rethrow_exception(eptr);
                     }
                 },

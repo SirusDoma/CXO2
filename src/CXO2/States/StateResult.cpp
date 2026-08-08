@@ -48,7 +48,8 @@ namespace Cx
 
     void StateResult::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
+            return;
         if (const auto container = Instantiate<Gx::UiContainer>(Resource::Result::IDC_CONTAINER_BACKGROUND); container)
         {
             const auto& resources = GetResources(ResourceScope::Shared);

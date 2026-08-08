@@ -71,7 +71,6 @@ namespace Cx
         void StartRender();
         bool IsRendering() const;
 
-        Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
         void Input(Chart::Channel channel, bool pressed) const;
 
         const RenderSettings& GetRenderSettings() const;
@@ -89,6 +88,10 @@ namespace Cx
         void SetInputCallback(const std::function<void(Chart::Channel, bool)> &inputCallback);
 
         int MapRenderPositionToPixels(Chart::Channel channel, double position, bool absolute = false) const;
+
+    protected:
+        void Update(const sf::Time& delta) override;
+        Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
 
     private:
         // Measure interval per millisecond @ 60bpm in 1/4 note
@@ -116,23 +119,22 @@ namespace Cx
         const Chart* m_chart;
         mutable Gx::ResourceManager m_resources;
         std::unique_ptr<RenderSettings> m_settings;
-        mutable std::unordered_map<Chart::Channel, Gx::Delay> m_autoDelays;
+        std::unordered_map<Chart::Channel, Gx::Delay> m_autoDelays;
 
         SpeedMap m_speeds;
         sf::Clock m_timer;
         mutable Equalizer* m_equalizer;
-        mutable EventStateList m_events;
+        EventStateList m_events;
         mutable FrontBufferMap m_frontBuffers;
         mutable InputStateMap m_inputs;
         mutable SoundMap m_sounds;
-        mutable double m_currentTime;
-        mutable double m_refTime;
-        mutable double m_refPosition;
-        mutable double m_bpm;
-        mutable double m_inputTime;
-        mutable unsigned int m_frameID;
-        mutable unsigned int m_lastEventID;
-        mutable bool m_completed;
+        double m_currentTime;
+        double m_refTime;
+        double m_refPosition;
+        double m_bpm;
+        double m_inputTime;
+        unsigned int m_lastEventID;
+        bool m_completed;
 
         std::function<void()> m_completeCallback;
         std::function<void(Chart::Channel, bool)> m_inputCallback;

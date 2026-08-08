@@ -1,6 +1,8 @@
 #include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
 #include <CXO2/UI/Waiting/SpeedButton.hpp>
 
+#include <CXO2/Events/SelectMusicEvents.hpp>
+
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Game.hpp>
 
@@ -36,7 +38,8 @@ namespace Cx
 {
     using namespace Constants::Identifiers;
 
-    SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room) :
+    SelectMusicDialog::SelectMusicDialog(Gx::AudioMixer& mixer, Gx::ResourceManager& resources, SessionContext& session, RoomContext& room, Gx::EventDispatcher& events) :
+        Dispatchable(events),
         m_coverID(0),
         m_speed(0),
         m_mixer(mixer),
@@ -56,6 +59,9 @@ namespace Cx
             InvalidateMusicList();
             return;
         }
+
+        if (Dispatch(SelectMusicEvents::OnInitialize, SelectMusicEventArgs{}))
+            return;
 
         m_page = 0;
         m_musicList = m_session.GetMusicList();
@@ -245,6 +251,23 @@ namespace Cx
         return m_music;
     }
 
+    const std::vector<ChartMetadata>& SelectMusicDialog::GetMusicList() const
+    {
+        return m_musicList;
+    }
+
+    const std::vector<ChartMetadata>& SelectMusicDialog::GetFilteredList() const
+    {
+        return m_filteredList;
+    }
+
+    void SelectMusicDialog::SetFilteredList(const std::vector<ChartMetadata>& list)
+    {
+        m_filteredList = list;
+        m_page = 0;
+        InvalidateMusicList();
+    }
+
     Difficulty SelectMusicDialog::GetSelectedDifficulty() const
     {
         return m_difficulty;
@@ -402,7 +425,7 @@ namespace Cx
         return m_page;
     }
 
-    void SelectMusicDialog::SetPage(const unsigned int page)
+    void SelectMusicDialog::SetPage(unsigned int page)
     {
         if (IsRandomActive())
             return;
@@ -410,13 +433,19 @@ namespace Cx
         if (page >= GetMaxPage())
             return;
 
+        if (Dispatch(SelectMusicEvents::OnChangePage, SelectMusicPageEventArgs{page}))
+            return;
+
         m_page  = page;
         m_music = ChartMetadata{};
         InvalidateMusicList();
     }
 
-    void SelectMusicDialog::ToggleSort(const MusicSortMode mode)
+    void SelectMusicDialog::ToggleSort(MusicSortMode mode)
     {
+        if (Dispatch(SelectMusicEvents::OnSort, SelectMusicSortEventArgs{mode}))
+            return;
+
         Sort(mode, m_sort != mode || m_order != MusicSortOrder::Ascending ? MusicSortOrder::Ascending : MusicSortOrder::Descending);
     }
 
@@ -440,6 +469,9 @@ namespace Cx
 
     void SelectMusicDialog::InvalidateMusicList()
     {
+        if (Dispatch(SelectMusicEvents::OnInvalidate, SelectMusicEventArgs{}))
+            return;
+
         Invalidate();
 
         const auto musicSelector = FindChild<Gx::List>(Resource::SelectMusic::IDC_LIST_MUSIC_SELECTOR);
@@ -832,6 +864,9 @@ namespace Cx
     {
         Dialog::OnPresented(parent, context);
 
+        if (Dispatch(SelectMusicEvents::OnPresent, SelectMusicEventArgs{}))
+            return;
+
         // TODO: Do not rescan, use fs to watch music folder
         const bool rescan = false; // !m_initialized;
 
@@ -880,6 +915,9 @@ namespace Cx
         if (m_randomMusicCount == 0 && IsRandomActive())
             return;
 
+        if (Dispatch(SelectMusicEvents::OnDismiss, SelectMusicDismissEventArgs{true}))
+            return;
+
         Dialog::OnAccepted();
 
         m_room.SetMusic(m_music);
@@ -896,6 +934,9 @@ namespace Cx
 
     void SelectMusicDialog::OnCancelled()
     {
+        if (Dispatch(SelectMusicEvents::OnDismiss, SelectMusicDismissEventArgs{false}))
+            return;
+
         Dialog::OnCancelled();
 
         auto& sfx = m_resources.AddFromFile<sf::Sound>(Sound::Effects::EF_03);
@@ -1029,7 +1070,11 @@ namespace Cx
 
     void SelectMusicDialog::OnRandomLevelButtonCheckChanged(Gx::ToggleButton& sender, const Gx::Control::Event& ev)
     {
-        const auto lv = m_randomLevelButtonValues.at(&sender);
+        auto lv = m_randomLevelButtonValues.at(&sender);
+
+        if (Dispatch(SelectMusicEvents::OnRandomToggle, SelectMusicRandomEventArgs{lv, sender.IsChecked()}))
+            return;
+
         if (sender.IsChecked())
             m_random = static_cast<LevelCategory>(static_cast<int>(m_random) | static_cast<int>(lv));
         else

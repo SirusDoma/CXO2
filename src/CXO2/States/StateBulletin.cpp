@@ -19,7 +19,8 @@ namespace Cx
 
     void StateBulletin::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         const auto backButton = Instantiate<Gx::Button>(Resource::Bulletin::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto&, auto&)

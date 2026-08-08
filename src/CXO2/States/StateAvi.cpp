@@ -22,7 +22,8 @@ namespace Cx
 
     void StateAvi::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         auto& director = GetDirector();
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_LOGO);

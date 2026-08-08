@@ -3,6 +3,7 @@
 #include <CXO2/Core/Chart.hpp>
 #include <CXO2/Config/GameConfig.hpp>
 #include <CXO2/States/State.hpp>
+#include <CXO2/Entities/Dispatchable.hpp>
 
 #include <Genode/UI/Dialog.hpp>
 #include <Genode/UI/Image.hpp>
@@ -18,10 +19,10 @@ namespace Gx
 
 namespace Cx
 {
-    class OptionDialog : public Gx::Dialog
+    class OptionDialog : public Gx::Dialog, protected Dispatchable
     {
     public:
-        OptionDialog(Gx::AudioMixer& mixer, GameConfig& config);
+        OptionDialog(Gx::AudioMixer& mixer, GameConfig& config, Gx::EventDispatcher& events);
         void Initialize() override;
 
     private:

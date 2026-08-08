@@ -1,4 +1,7 @@
 #include <CXO2/States/StatePlaying7K.hpp>
+
+#include <CXO2/Events/PlayingEvents.hpp>
+
 #include <CXO2/States/StateWaiting7K.hpp>
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/States/StatePlanet.hpp>
@@ -99,7 +102,8 @@ namespace Cx
 
     void StatePlaying7K::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
+            return;
 
         m_service.SetMemberStatsUpdateEventCallback([this] (const auto& ev) { OnMemberStatsUpdate(ev); });
         m_service.SetMemberScoreSubmittedEventCallback([this] (const auto& ev) { OnMemberScoreSubmitted(ev); });
@@ -447,6 +451,9 @@ namespace Cx
 
     void StatePlaying7K::OnRenderComplete()
     {
+        if (Dispatch(PlayingEvents::OnComplete, PlayingEventArgs{}))
+            return;
+
         if (m_context.GetMode() == GameMode::Tutorial)
         {
             GetDirector().Dismiss();
@@ -502,11 +509,19 @@ namespace Cx
         m_viewport = viewport;
     }
 
+    ChartRenderer& StatePlaying7K::GetChartRenderer()
+    {
+        return m_renderer;
+    }
+
     void StatePlaying7K::OnMemberStatsUpdate(const MessageEnvelope<PlayingMemberStatsUpdateEventData>& ev)
     {
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(PlayingEvents::OnMemberStatsUpdate, PlayingMemberStatsEventArgs{response}))
+                return;
+
             if (response.Type == UpdateStatsType::Life)
             {
                 const auto it = m_states.find(response.ID);
@@ -551,6 +566,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(PlayingEvents::OnMemberScoreSubmitted, PlayingMemberScoreEventArgs{response}))
+                return;
 
             const auto it = m_states.find(response.ID);
             if (it == m_states.end() || !it->second.Valid)
@@ -572,6 +589,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(PlayingEvents::OnMemberLeft, PlayingMemberLeftEventArgs{response}))
+                return;
+
             if (const auto it = m_states.find(response.ID); it != m_states.end())
             {
                 if (it->second.Completed)
@@ -608,6 +628,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(PlayingEvents::OnGameCompleted, PlayingGameCompletedEventArgs{response}))
+                return;
 
             auto entries = std::array<GameCompletedEventData::ScoreEntry, 8>();
             const auto& container = response.Entries.GetContainer();
@@ -690,6 +712,9 @@ namespace Cx
 
     void StatePlaying7K::OnChartInput(const Chart::Channel channel, const bool state)
     {
+        if (Dispatch(PlayingEvents::OnInput, PlayingInputEventArgs{m_renderer.GetRenderPosition(), channel, state}))
+            return;
+
         m_inputStates[channel] = state;
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
             keyEffect->second->SetVisible(state);
@@ -709,6 +734,9 @@ namespace Cx
 
     void StatePlaying7K::OnScoreIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long count)
     {
+        if (Dispatch(PlayingEvents::OnJudgement, PlayingJudgementEventArgs{m_renderer.GetRenderPosition(), ev, acc, count}))
+            return;
+
         const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
         const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
         const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
@@ -789,6 +817,9 @@ namespace Cx
 
     void StatePlaying7K::OnJamComboIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long jamCombo)
     {
+        if (Dispatch(PlayingEvents::OnJamCombo, PlayingJamComboEventArgs{m_renderer.GetRenderPosition(), ev, acc, jamCombo}))
+            return;
+
         const auto jamContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
         const auto jamAnimation = jamContainer->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_JAM);
         const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
@@ -807,6 +838,9 @@ namespace Cx
 
     void StatePlaying7K::OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
     {
+        if (Dispatch(PlayingEvents::OnExit, PlayingEventArgs{}))
+            return;
+
         m_service.ExitPlaying(m_context.GetMode(), [=] (const auto& ev)
         {
             OnExitPlayingResponded(ev);
@@ -937,7 +971,7 @@ namespace Cx
     void StatePlaying7K::SubmitScore()
     {
         const auto& scoreTracker = m_context.GetScoreTracker();
-        m_service.SubmitScore(SubmitScoreRequest
+        auto request = SubmitScoreRequest
         {
             /* .Cool        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Cool)),
             /* .Good        = */ static_cast<std::uint16_t>(scoreTracker.GetPoint(Accuracy::Good)),
@@ -948,8 +982,12 @@ namespace Cx
             /* .MaxJamCombo = */ static_cast<std::uint16_t>(scoreTracker.GetMaxJamCombo()),
             /* .Score       = */ static_cast<std::uint32_t>(scoreTracker.GetScorePoint()),
             /* .Life        = */ static_cast<std::uint8_t>((static_cast<float>(m_lifeSystem.GetCurrentLifePoint()) / static_cast<float>(m_lifeSystem.GetMaxLifePoint())) * 100.f),
-        },
-        [=] (const auto& ev)
+        };
+
+        if (Dispatch(PlayingEvents::OnSubmitScore, PlayingSubmitScoreEventArgs{request}))
+            return;
+
+        m_service.SubmitScore(request, [=] (const auto& ev)
         {
             OnSubmitScoreResponded(ev);
         });

@@ -2,6 +2,7 @@
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Metadata/Chart/ChartMetadata.hpp>
+#include <CXO2/Models/Shop.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
@@ -26,21 +27,8 @@ namespace Cx
 
     protected:
         void Finalize() override;
-        void Update(const sf::Time& delta) override;
 
     private:
-        enum class MusicSortKey
-        {
-            New,
-            Genre,
-            Title,
-            Level,
-            Bpm,
-            Price,
-            Time,
-            Status
-        };
-
         void SelectMusicFilter(bool showAll);
         void SelectShopTab(bool download);
         void InvalidateCart();
@@ -78,8 +66,9 @@ namespace Cx
 
         void OnDownloadStarted(std::uint16_t musicID);
         void OnDownloadRenaming(std::uint16_t musicID);
+        void OnDownloadProgressed(const MusicDownloadProgress& progress);
         void OnQueueCompleted();
-        void OnDownloadFailed(MusicDownloaderService::DownloadError error);
+        void OnDownloadFailed(MusicDownloadError error);
 
         void OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev, const ChartMetadata& entry);
         void OnCartBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);

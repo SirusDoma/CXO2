@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CXO2/UI/Common/ChatWindow.hpp>
+#include <CXO2/Entities/Dispatchable.hpp>
 
 #include <Genode/UI/UiContainer.hpp>
 #include <Genode/UI/InputField.hpp>
@@ -22,10 +23,10 @@ namespace Cx
 {
     class SessionContext;
     class ChatService;
-    class ChatPanel : public Gx::UiContainer
+    class ChatPanel : public Gx::UiContainer, protected Dispatchable
     {
     public:
-        ChatPanel(SessionContext& session, ChatService& service);
+        ChatPanel(SessionContext& session, ChatService& service, Gx::EventDispatcher& events);
 
         void Initialize() override;
 

@@ -74,6 +74,7 @@
 
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
+#include <CXO2/Services/PluginService.hpp>
 
 #include <CXO2/Services/Online/AuthOnlineService.hpp>
 #include <CXO2/Services/Online/PlanetOnlineService.hpp>
@@ -220,6 +221,14 @@ namespace Cx
 
         context.Provide<RoomContext>(Gx::Context::Scope::Singleton);
         context.Provide<CartContext>(Gx::Context::Scope::Singleton);
+        context.Provide<PluginService>([&context] (auto& ctx)
+        {
+            return std::make_unique<PluginService>(
+                ctx.template Require<CommandLineContext>(),
+                context,
+                ctx.template Require<Gx::EventDispatcher>()
+            );
+        }, Gx::Context::Scope::Singleton);
 
         // Initialize local providers
         context.Provide<JudgementStrategy>([] (auto&)
@@ -227,7 +236,7 @@ namespace Cx
             return std::make_unique<RenderPositionJudgementStrategy>();
         });
 
-        Install<Gx::Events::EventDispatcher>();
+        Install<Gx::EventDispatcher>();
         Install<MusicDownloaderService>();
 
         // Register services
@@ -595,6 +604,8 @@ namespace Cx
         director.Register<StateBulletin>("Interface/State/Bulletin.json");
         director.Register<StatePayment>("Interface/State/Payment.json");
 
+        context.Require<PluginService>().Load();
+
         director.Present<StateAvi>();
     }
 
@@ -659,6 +670,8 @@ namespace Cx
 
     int O2::Shutdown()
     {
+        GetModule<Gx::Context>().Require<PluginService>().ShutDown();
+
         auto& director  = GetModule<Gx::SceneDirector>();
         auto& mixer     = GetModule<Gx::Context>().Require<Gx::AudioMixer>();
         auto& resources = GetModule<Gx::Context>().Require<Gx::ResourceManager>();

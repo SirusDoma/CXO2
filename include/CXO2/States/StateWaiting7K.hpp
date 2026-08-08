@@ -92,7 +92,7 @@ namespace Cx
 
         void ExtendSlot(unsigned int slotID);
         void ShowEmoticon(const Avatar* avatar, const std::string& emoticonID);
-        void SendEmoticon(const std::string& command, const std::string& emoticonID);
+        void SendEmoticon(std::string command, const std::string& emoticonID);
 
         void InvalidateRoomInfo();
         void InvalidateAvatarInfo();

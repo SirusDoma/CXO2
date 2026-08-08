@@ -47,9 +47,9 @@ namespace Cx
         void RegisterMessageEvents();
 
         void CreateRoom(
-            const sf::String& title,
+            sf::String title,
             GameMode mode,
-            const std::string& password,
+            std::string password,
             unsigned int minLevelLimit,
             unsigned int maxLevelLimit
         );

@@ -31,9 +31,6 @@ cmake-*/
 .vscode/
 .idea/
 
-# Live++ binaries
-extlibs/libs/internal/livepp/*
-
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*

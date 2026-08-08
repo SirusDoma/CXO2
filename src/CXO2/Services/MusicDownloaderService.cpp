@@ -139,7 +139,7 @@ namespace Cx
         return m_running;
     }
 
-    MusicDownloaderService::DownloadProgress MusicDownloaderService::GetProgress() const
+    MusicDownloadProgress MusicDownloaderService::GetProgress() const
     {
         auto lock = std::lock_guard(m_mutex);
         return m_progress;
@@ -165,17 +165,24 @@ namespace Cx
         m_queueCompletedCallback = callback;
     }
 
-    void MusicDownloaderService::SetErrorCallback(const std::function<void(DownloadError)>& callback)
+    void MusicDownloaderService::SetErrorCallback(const std::function<void(MusicDownloadError)>& callback)
     {
         m_errorCallback = callback;
+    }
+
+    void MusicDownloaderService::SetProgressCallback(const std::function<void(const MusicDownloadProgress&)>& callback)
+    {
+        m_progressCallback = callback;
     }
 
     void MusicDownloaderService::Update(const sf::Time& delta)
     {
         auto notifications = std::vector<Notification>();
+        auto progress      = MusicDownloadProgress();
         {
             auto lock = std::lock_guard(m_mutex);
             notifications.swap(m_notifications);
+            progress = m_progress;
         }
 
         for (const auto& notification : notifications)
@@ -208,17 +215,31 @@ namespace Cx
                     break;
             }
         }
+
+        if (m_progressCallback &&
+            (progress.Status != m_lastProgress.Status ||
+             progress.Error != m_lastProgress.Error ||
+             progress.MusicID != m_lastProgress.MusicID ||
+             progress.QueueIndex != m_lastProgress.QueueIndex ||
+             progress.FileBytesRead != m_lastProgress.FileBytesRead ||
+             progress.FileSize != m_lastProgress.FileSize ||
+             progress.TotalBytesRead != m_lastProgress.TotalBytesRead ||
+             progress.BytesPerSecond != m_lastProgress.BytesPerSecond))
+        {
+            m_lastProgress = progress;
+            m_progressCallback(progress);
+        }
     }
 
-    void MusicDownloaderService::Fail(const DownloadError error)
+    void MusicDownloaderService::Fail(const MusicDownloadError error)
     {
         auto lock = std::lock_guard(m_mutex);
-        if (error == DownloadError::DownloadFailed || error == DownloadError::Cancelled)
+        if (error == MusicDownloadError::DownloadFailed || error == MusicDownloadError::Cancelled)
             m_queue.clear();
 
-        m_progress = DownloadProgress();
-        m_progress.Status = error == DownloadError::Cancelled ? DownloadStatus::Idle : DownloadStatus::Failed;
-        m_progress.Error  = error == DownloadError::Cancelled ? DownloadError::None : error;
+        m_progress = MusicDownloadProgress();
+        m_progress.Status = error == MusicDownloadError::Cancelled ? MusicDownloadStatus::Idle : MusicDownloadStatus::Failed;
+        m_progress.Error  = error == MusicDownloadError::Cancelled ? MusicDownloadError::None : error;
         m_notifications.push_back({Notification::Type::Error, 0, error});
 
         m_cancelled = false;
@@ -231,16 +252,16 @@ namespace Cx
         {
             auto lock = std::lock_guard(m_mutex);
             items = m_queue;
-            m_progress = DownloadProgress();
-            m_progress.Status = DownloadStatus::Connecting;
+            m_progress = MusicDownloadProgress();
+            m_progress.Status = MusicDownloadStatus::Connecting;
             m_progress.QueueCount = items.size();
         }
 
         if (items.empty())
         {
             auto lock = std::lock_guard(m_mutex);
-            m_progress.Status = DownloadStatus::Completed;
-            m_notifications.push_back({Notification::Type::QueueCompleted, 0, DownloadError::None});
+            m_progress.Status = MusicDownloadStatus::Completed;
+            m_notifications.push_back({Notification::Type::QueueCompleted, 0, MusicDownloadError::None});
             m_running = false;
             return;
         }
@@ -258,7 +279,7 @@ namespace Cx
             }
             catch (...)
             {
-                Fail(DownloadError::ConnectionFailed);
+                Fail(MusicDownloadError::ConnectionFailed);
                 return;
             }
 
@@ -281,7 +302,7 @@ namespace Cx
 
         if (!address.has_value())
         {
-            Fail(DownloadError::ConnectionFailed);
+            Fail(MusicDownloadError::ConnectionFailed);
             return;
         }
 
@@ -330,7 +351,7 @@ namespace Cx
 
         if (!sftp.has_value() && !ftp.has_value())
         {
-            Fail(m_cancelled ? DownloadError::Cancelled : DownloadError::ConnectionFailed);
+            Fail(m_cancelled ? MusicDownloadError::Cancelled : MusicDownloadError::ConnectionFailed);
             return;
         }
 
@@ -371,7 +392,7 @@ namespace Cx
             const auto ojmSize = getRemoteSize(ojm);
             if (!ojnSize.has_value() || !ojmSize.has_value())
             {
-                Fail(DownloadError::ConnectionFailed);
+                Fail(MusicDownloadError::ConnectionFailed);
                 return;
             }
 
@@ -382,13 +403,13 @@ namespace Cx
         auto error = std::error_code();
         if (const auto space = std::filesystem::space(".", error); !error && space.available < totalSize)
         {
-            Fail(DownloadError::InsufficientDiskSpace);
+            Fail(MusicDownloadError::InsufficientDiskSpace);
             return;
         }
 
         {
             auto lock = std::lock_guard(m_mutex);
-            m_progress.Status = DownloadStatus::Downloading;
+            m_progress.Status = MusicDownloadStatus::Downloading;
             m_progress.TotalSize = totalSize;
         }
 
@@ -409,12 +430,12 @@ namespace Cx
                 m_progress.QueueIndex = index;
                 m_progress.MusicID    = item.MusicID;
                 m_progress.MusicTitle = item.Title;
-                m_notifications.push_back({Notification::Type::DownloadStarted, item.MusicID, DownloadError::None});
+                m_notifications.push_back({Notification::Type::DownloadStarted, item.MusicID, MusicDownloadError::None});
             }
 
             WriteFileInfo(iniPath, entries);
 
-            auto failure = std::optional<DownloadError>();
+            auto failure = std::optional<MusicDownloadError>();
             for (std::size_t fileIndex = 0; fileIndex < entries.size(); fileIndex++)
             {
                 auto& entry = entries[fileIndex];
@@ -430,7 +451,7 @@ namespace Cx
 
                 if (m_cancelled)
                 {
-                    failure = DownloadError::Cancelled;
+                    failure = MusicDownloadError::Cancelled;
                     break;
                 }
 
@@ -514,7 +535,7 @@ namespace Cx
 
                 if (!success)
                 {
-                    failure = m_cancelled ? DownloadError::Cancelled : DownloadError::DownloadFailed;
+                    failure = m_cancelled ? MusicDownloadError::Cancelled : MusicDownloadError::DownloadFailed;
                     break;
                 }
 
@@ -540,7 +561,7 @@ namespace Cx
 
             {
                 auto lock = std::lock_guard(m_mutex);
-                m_notifications.push_back({Notification::Type::Renaming, item.MusicID, DownloadError::None});
+                m_notifications.push_back({Notification::Type::Renaming, item.MusicID, MusicDownloadError::None});
             }
 
             for (const auto& entry : entries)
@@ -559,7 +580,7 @@ namespace Cx
 
             {
                 auto lock = std::lock_guard(m_mutex);
-                m_notifications.push_back({Notification::Type::DownloadCompleted, item.MusicID, DownloadError::None});
+                m_notifications.push_back({Notification::Type::DownloadCompleted, item.MusicID, MusicDownloadError::None});
             }
         }
 
@@ -568,9 +589,9 @@ namespace Cx
         {
             auto lock = std::lock_guard(m_mutex);
             m_queue.clear();
-            m_progress = DownloadProgress();
-            m_progress.Status = DownloadStatus::Completed;
-            m_notifications.push_back({Notification::Type::QueueCompleted, 0, DownloadError::None});
+            m_progress = MusicDownloadProgress();
+            m_progress.Status = MusicDownloadStatus::Completed;
+            m_notifications.push_back({Notification::Type::QueueCompleted, 0, MusicDownloadError::None});
         }
 
         m_cancelled = false;

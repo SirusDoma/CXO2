@@ -2,6 +2,7 @@
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Planet.hpp>
+#include <CXO2/UI/Planet/ChannelBoard.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 
@@ -36,6 +37,7 @@ namespace Cx
     private:
         void OnMusicHallSelected(MusicHall hall);
         void OnChannelEnterButtonClicked(MusicHall hall, std::uint16_t serverID, std::uint16_t channelID);
+        void OnChannelBoardTabChanged(ChannelBoard& sender, ChannelBoard::TabChangedEvent& ev);
 
         Gx::AudioMixer& m_mixer;
         NetworkService& m_network;

@@ -1,6 +1,7 @@
 #include <CXO2/UI/Common/ChatPanel.hpp>
 #include <CXO2/UI/Common/ChatWindow.hpp>
 
+#include <CXO2/Events/ChatEvents.hpp>
 #include <CXO2/States/State.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
@@ -26,7 +27,8 @@ namespace Cx
 {
     using namespace Constants::Identifiers;
 
-    ChatPanel::ChatPanel(SessionContext& session, ChatService& service) :
+    ChatPanel::ChatPanel(SessionContext& session, ChatService& service, Gx::EventDispatcher& events) :
+        Dispatchable(events),
         m_session(session),
         m_service(service)
     {
@@ -35,6 +37,9 @@ namespace Cx
     void ChatPanel::Initialize()
     {
         UiContainer::Initialize();
+
+        if (Dispatch(ChatEvents::OnInitialize, ChatEventArgs{}))
+            return;
 
         const auto chatWindow = GetChatWindow();
 
@@ -91,15 +96,19 @@ namespace Cx
 
     void ChatPanel::OnMessage(const sf::String& sender, const Role senderRole, const sf::String& text)
     {
+        auto args = ChatMessageEventArgs{senderRole, sender, text};
+        if (Dispatch(ChatEvents::OnMessage, args))
+            return;
+
         const auto chatWindow = GetChatWindow();
 
-        if (Gx::StringHelper::StartsWith(text.toAnsiString(), "/"))
+        if (Gx::StringHelper::StartsWith(args.Message.toAnsiString(), "/"))
         {
             if (const auto waiting = GetParent<StateWaiting7K>())
-                waiting->OnMemberEmoticon(sender, text);
+                waiting->OnMemberEmoticon(args.Sender, args.Message);
         }
         else
-            chatWindow->PushMessage(sender, senderRole, text);
+            chatWindow->PushMessage(args.Sender, senderRole, args.Message);
     }
 
     void ChatPanel::OnWhisper(const MessageEnvelope<WhisperEventData>& ev)
@@ -108,8 +117,12 @@ namespace Cx
         {
             const auto& response = ev.Open();
 
+            auto args = ChatWhisperEventArgs{response.Sender, response.Content};
+            if (Dispatch(ChatEvents::OnWhisper, args))
+                return;
+
             const auto chatWindow = GetChatWindow();
-            chatWindow->PushWhisper(response.Sender, m_session.GetName(), response.Content);
+            chatWindow->PushWhisper(args.Sender, m_session.GetName(), args.Message);
         }
         catch (const Gx::Exception&)
         {
@@ -340,25 +353,55 @@ namespace Cx
             }
 
 
-            auto message = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
-            m_service.SendWhisper(WhisperMessageRequest{tokens[1], message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+            auto message   = Gx::StringHelper::Trim(text.substring(3 + tokens[1].size()));
+            auto recipient = sf::String(tokens[1]);
+
+            auto args = ChatSendEventArgs{ChatSendType::Whisper, message, recipient};
+            if (Dispatch(ChatEvents::OnSend, args))
+                return;
+
+            m_service.SendWhisper(WhisperMessageRequest{args.Recipient, args.Message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
             {
                 OnSendWhisperResponded(ev);
             });
         }
         else if (!m_recipient.isEmpty())
         {
-            m_service.SendWhisper(WhisperMessageRequest{m_recipient, text}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
+            auto args = ChatSendEventArgs{ChatSendType::Whisper, text, m_recipient};
+            if (Dispatch(ChatEvents::OnSend, args))
+                return;
+
+            m_service.SendWhisper(WhisperMessageRequest{args.Recipient, args.Message}, [=] (const MessageEnvelope<WhisperMessageResponse>& ev)
             {
                 OnSendWhisperResponded(ev);
             });
         }
         else if (Gx::StringHelper::StartsWith(text.toAnsiString(), Constants::Messages::Chat::Commands::ANNOUNCE) && m_session.GetRole() == Role::Administrator)
-            m_service.SendAnnouncement(AnnouncementRequest{Gx::StringHelper::Trim(text.substring(2))});
+        {
+            auto message = Gx::StringHelper::Trim(text.substring(2));
+
+            auto args = ChatSendEventArgs{ChatSendType::Announcement, message, sf::String()};
+            if (Dispatch(ChatEvents::OnSend, args))
+                return;
+
+            m_service.SendAnnouncement(AnnouncementRequest{args.Message});
+        }
         else if (GetParent<StateWaiting7K>() || GetParent<StatePlaying7K>())
-            m_service.SendWaitingMessage(WaitingMessageRequest{text});
+        {
+            auto args = ChatSendEventArgs{ChatSendType::Waiting, text, sf::String()};
+            if (Dispatch(ChatEvents::OnSend, args))
+                return;
+
+            m_service.SendWaitingMessage(WaitingMessageRequest{args.Message});
+        }
         else
-            m_service.SendMainRoomMessage(MainRoomMessageRequest{text});
+        {
+            auto args = ChatSendEventArgs{ChatSendType::MainRoom, text, sf::String()};
+            if (Dispatch(ChatEvents::OnSend, args))
+                return;
+
+            m_service.SendMainRoomMessage(MainRoomMessageRequest{args.Message});
+        }
     }
 
     ChatWindow* ChatPanel::GetChatWindow() const

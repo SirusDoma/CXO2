@@ -3,6 +3,7 @@
 #include <CXO2/States/State.hpp>
 #include <CXO2/Avatar/Item.hpp>
 #include <CXO2/Models/Equipment.hpp>
+#include <CXO2/Models/Shop.hpp>
 #include <CXO2/Metadata/Avatar/ItemMetadata.hpp>
 #include <CXO2/Metadata/Avatar/SetInfoMetadata.hpp>
 #include <CXO2/Contexts/CartContext.hpp>
@@ -37,15 +38,6 @@ namespace Cx
         void Initialize() override;
 
     private:
-        enum class ShopCategory
-        {
-            Special,
-            Fashion,
-            Accessory,
-            Beauty,
-            Instrument
-        };
-
         void InitializeShopMaster(Gx::UiContainer* shopMaster, bool useSpeech = false);
         void SelectGender(Gender gender);
 

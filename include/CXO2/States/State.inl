@@ -9,6 +9,27 @@
 
 namespace Cx
 {
+    template <typename TKey, typename TSender, typename... TArgs, typename... UArgs>
+    bool State::Dispatch(const Gx::Event<TKey, TSender, TArgs...>& event, UArgs&&... args)
+    {
+        Require<Gx::EventDispatcher>().Dispatch(event, static_cast<TSender&>(*this), args...);
+        return (false || ... || args.Handled);
+    }
+
+    template <typename TKey, typename TSender, typename... TArgs, typename... UArgs>
+    bool State::Dispatch(const Gx::Event<TKey, TSender, TArgs...>& event, UArgs&&... args) const
+    {
+        GetApplication().GetModule<Gx::EventDispatcher>().Dispatch(event, static_cast<TSender&>(const_cast<State&>(*this)), args...);
+        return (false || ... || args.Handled);
+    }
+
+    template<typename T, typename... Args, std::enable_if_t<std::is_base_of_v<StateExtension, T>, int>>
+    T& State::AddExtension(Args&&... args)
+    {
+        auto extension = StateExtensionPtr(new T(std::forward<Args>(args)...), [] (StateExtension* ptr) { delete static_cast<T*>(ptr); });
+        return static_cast<T&>(Attach(std::move(extension)));
+    }
+
     template<typename R>
     R* State::Locate(Gx::ResourceManager& resources, const std::string& id)
     {

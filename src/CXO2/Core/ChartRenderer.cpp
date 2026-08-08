@@ -40,7 +40,6 @@ namespace Cx
         m_refPosition(0),
         m_bpm(0),
         m_inputTime(0),
-        m_frameID(0),
         m_lastEventID(0),
         m_completed(false),
         m_completeCallback(),
@@ -107,7 +106,6 @@ namespace Cx
         m_currentTime = 0;
         m_refPosition = 0;
         m_refTime     = 0;
-        m_frameID     = 0;
         m_lastEventID = 0;
         m_bpm         = m_chart->GetMetadata().BPM;
         m_endPosition = std::ceil(m_chart->GetLastEventPosition(m_settings->Difficulty)) + 1.f;
@@ -119,40 +117,36 @@ namespace Cx
         return m_rendering;
     }
 
-    Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
+    void ChartRenderer::Update(const sf::Time& delta)
     {
+        UpdatableContainer::Update(delta);
+
         if (!m_chart || !m_rendering)
         {
             if (m_instantiables.empty())
-                return states;
+                return;
 
             // Still send key press event with empty front buffers for fun
             const auto keyMode = static_cast<KeyMode>(m_instantiables.size());
             for (auto [channel, key] :  m_settings->Config.KeyBindings.at(keyMode))
                 Input(channel, isKeyPressed(key));
 
-            return states;
+            return;
         }
 
         if (GetRenderPosition() > m_endPosition)
         {
-            states = RenderableContainer::Render(surface, states);
-            if (m_completeCallback && !m_completed)
+            if (!m_completed)
             {
                 m_completed = true;
-                m_completeCallback();
+                if (m_completeCallback)
+                    m_completeCallback();
             }
 
-            return states;
+            return;
         }
 
-        // Skip multiple render calls
-        if (states.FrameID == m_frameID)
-            return RenderableContainer::Render(surface, states);
-
-        // Save the current frame time so the generated render position is always consistent across multiple calls in the same frame
         m_currentTime = m_timer.getElapsedTime().asMilliseconds();
-        m_frameID = states.FrameID;
 
         // Update input states
         if (!m_settings->Autoplay)
@@ -167,7 +161,7 @@ namespace Cx
         {
             for (auto& [channel, state] : m_frontBuffers)
             {
-                static_cast<Gx::Updatable*>(&m_autoDelays[channel])->Update(states.Delta);
+                static_cast<Gx::Updatable*>(&m_autoDelays[channel])->Update(delta);
                 if (!state || state->IsRegistered())
                 {
                     Input(channel, false);
@@ -272,7 +266,7 @@ namespace Cx
                     });
                 }
 
-                m_container->UpdateGeometry(note, states.Delta);
+                m_container->UpdateGeometry(note, delta);
             }
             else
             {
@@ -300,7 +294,13 @@ namespace Cx
         }
 
         if (m_equalizer)
-            m_equalizer->Update(states.Delta);
+            m_equalizer->Update(delta);
+    }
+
+    Gx::RenderStates ChartRenderer::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
+    {
+        if (!m_chart || !m_rendering)
+            return states;
 
         return RenderableContainer::Render(surface, states);
     }

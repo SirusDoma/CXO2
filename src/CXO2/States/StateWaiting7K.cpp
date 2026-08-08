@@ -1,5 +1,7 @@
 #include <CXO2/States/StateWaiting7K.hpp>
 
+#include <CXO2/Events/WaitingEvents.hpp>
+
 #include <CXO2/States/StatePlanet.hpp>
 #include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StateLoading.hpp>
@@ -163,7 +165,8 @@ namespace Cx
 
     void StateWaiting7K::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         RegisterMessageEvents();
 
@@ -361,6 +364,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnSlotChanged, WaitingSlotChangedEventArgs{response}))
+                return;
+
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
@@ -411,7 +417,9 @@ namespace Cx
     {
         try
         {
-            const auto& _ = ev.Open();
+            const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnKicked, WaitingKickedEventArgs{response}))
+                return;
 
             m_room.Leave();
             GetDirector().Dismiss<StateRoom>(RoomTransitionEventType::Kick);
@@ -430,6 +438,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMemberJoined, WaitingMemberJoinedEventArgs{response}))
+                return;
+
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
@@ -465,6 +476,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMemberLeft, WaitingMemberLeftEventArgs{response}))
+                return;
+
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
@@ -505,6 +519,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMemberTeamChanged, WaitingMemberTeamChangedEventArgs{response}))
+                return;
+
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
@@ -526,6 +543,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMemberReadyStateChanged, WaitingMemberReadyStateChangedEventArgs{response}))
+                return;
+
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
 
@@ -620,6 +640,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMusicChanged, WaitingMusicChangedEventArgs{response}))
+                return;
 
             const auto music = MusicID::From(response.MusicID);
 
@@ -645,6 +667,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnTitleChanged, WaitingTitleChangedEventArgs{response}))
+                return;
+
             m_room.SetTitle(response.Title);
             InvalidateRoomInfo();
         }
@@ -662,6 +687,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnMapChanged, WaitingMapChangedEventArgs{response}))
+                return;
+
             m_room.SetMap(Map::From(response.Map));
 
             InvalidateRoomInfo();
@@ -680,6 +708,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnStartGame, WaitingGameStartedEventArgs{response}))
+                return;
 
             const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
             const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
@@ -728,6 +758,9 @@ namespace Cx
 
     void StateWaiting7K::OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
     {
+        if (Dispatch(WaitingEvents::OnReady, WaitingReadyEventArgs{sender.IsChecked()}))
+            return;
+
         const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
         const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
 
@@ -763,46 +796,55 @@ namespace Cx
          if (!sender.IsChecked())
             return;
 
-        const auto sfxStart = Instantiate<sf::Sound>(Sound::Effects::EF_33);
-        m_mixer.Play(*sfxStart, Sound::Channel::SFX);
-
-        if (m_room.GetMusic().ID == 0)
+        auto args = WaitingStartGameEventArgs{};
+        if (Dispatch(WaitingEvents::OnStartGameCheck, args))
         {
-            ShowDialog(Constants::Messages::Waiting::TUNE_NOT_SELECTED, DialogStyle::Information);
-            sender.SetCheckedState(false);
-
-            return;
+            if (!args.Authorized)
+                return;
         }
-
-        for (const auto& meta : m_session.GetNonPlayableMusicList())
+        else
         {
-            if (meta.ID == m_room.GetMusic().ID)
-            {
-                auto prompt = sf::String();
-                if (meta.Status == MusicStatus::Unacquired)
-                    prompt = Constants::Messages::Waiting::TUNE_NOT_PURCHASED;
-                else
-                    prompt = Constants::Messages::Waiting::TUNE_NOT_FOUND;
+            const auto sfxStart = Instantiate<sf::Sound>(Sound::Effects::EF_33);
+            m_mixer.Play(*sfxStart, Sound::Channel::SFX);
 
-                ShowDialog(prompt, DialogStyle::Information);
+            if (m_room.GetMusic().ID == 0)
+            {
+                ShowDialog(Constants::Messages::Waiting::TUNE_NOT_SELECTED, DialogStyle::Information);
                 sender.SetCheckedState(false);
 
                 return;
             }
-        }
 
-        for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
-        {
-            const auto& slot = m_room.GetSlot(i);
-            if (slot.State != Room::SlotState::Occupied || slot.IsMaster)
-                continue;
-
-            if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
+            for (const auto& meta : m_session.GetNonPlayableMusicList())
             {
-                ShowDialog(Constants::Messages::Waiting::TUNE_MISSING_FOR_OTHERS, DialogStyle::Information);
-                sender.SetCheckedState(false);
+                if (meta.ID == m_room.GetMusic().ID)
+                {
+                    auto prompt = sf::String();
+                    if (meta.Status == MusicStatus::Unacquired)
+                        prompt = Constants::Messages::Waiting::TUNE_NOT_PURCHASED;
+                    else
+                        prompt = Constants::Messages::Waiting::TUNE_NOT_FOUND;
 
-                return;
+                    ShowDialog(prompt, DialogStyle::Information);
+                    sender.SetCheckedState(false);
+
+                    return;
+                }
+            }
+
+            for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
+            {
+                const auto& slot = m_room.GetSlot(i);
+                if (slot.State != Room::SlotState::Occupied || slot.IsMaster)
+                    continue;
+
+                if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
+                {
+                    ShowDialog(Constants::Messages::Waiting::TUNE_MISSING_FOR_OTHERS, DialogStyle::Information);
+                    sender.SetCheckedState(false);
+
+                    return;
+                }
             }
         }
 
@@ -984,7 +1026,11 @@ namespace Cx
         if (!sender.IsChecked() || !m_avatarInfo)
             return;
 
-        const auto team = m_teamButtons.at(&sender);
+        auto team = m_teamButtons.at(&sender);
+
+        if (Dispatch(WaitingEvents::OnTeamChange, WaitingTeamEventArgs{team}))
+            return;
+
         m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev) { OnUpdateTeamResponded(ev); });
     }
 
@@ -1111,7 +1157,9 @@ namespace Cx
     {
         try
         {
-            const auto& _ = ev.Open();
+            const auto& response = ev.Open();
+            if (Dispatch(WaitingEvents::OnExitRoomResponded, WaitingExitRoomEventArgs{response}))
+                return;
 
             m_room.Leave();
 
@@ -1275,14 +1323,18 @@ namespace Cx
         State::OnKeyReleased(ev);
     }
 
-    void StateWaiting7K::ExtendSlot(const unsigned int slotID)
+    void StateWaiting7K::ExtendSlot(unsigned int slotID)
     {
         const auto& slot = m_room.GetSlot(slotID);
-        if (slot.State == Room::SlotState::Occupied && !slot.Name.isEmpty())
-        {
-            if (slot.Name == m_room.GetCurrentSlot().Name)
-                return;
+        const bool kick  = slot.State == Room::SlotState::Occupied && !slot.Name.isEmpty();
+        if (kick && slot.Name == m_room.GetCurrentSlot().Name)
+            return;
 
+        if (Dispatch(WaitingEvents::OnSlotChange, WaitingSlotEventArgs{slotID, kick}))
+            return;
+
+        if (kick)
+        {
             ShowDialog(Constants::Messages::Waiting::Members::KICK_CONFIRM, DialogStyle::YesNo, [=] (const bool confirm)
             {
                 if (confirm)
@@ -1318,8 +1370,11 @@ namespace Cx
         emoticon->Reset();
     }
 
-    void StateWaiting7K::SendEmoticon(const std::string& command, const std::string& emoticonID)
+    void StateWaiting7K::SendEmoticon(std::string command, const std::string& emoticonID)
     {
+        if (Dispatch(WaitingEvents::OnEmoticon, WaitingEmoticonEventArgs{command}))
+            return;
+
         m_messaging.SendWaitingMessage(WaitingMessageRequest{Constants::Messages::Chat::Emoticons::PREFIX + command});
 
         ShowEmoticon(m_mainAvatar, emoticonID);

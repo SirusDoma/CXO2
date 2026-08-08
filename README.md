@@ -73,6 +73,7 @@ List of dependencies:
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [magic_enum](https://github.com/Neargye/magic_enum)
 - [dj_fft](https://github.com/jdupuy/dj_fft)
+- [dlfcn-win32](https://github.com/dlfcn-win32/dlfcn-win32)
 - [libiconv](https://www.gnu.org/software/libiconv/) (Linux and macOS)
 - [Fontconfig](https://www.freedesktop.org/wiki/Software/fontconfig/) (Linux, optional)
 - [compact_enc_det](https://github.com/google/compact_enc_det)

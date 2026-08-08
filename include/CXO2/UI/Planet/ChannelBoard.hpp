@@ -33,6 +33,11 @@ namespace Cx
             ChannelList
         };
 
+        struct TabChangedEvent : Gx::Control::Event
+        {
+            ChannelBoard::Tab Tab;
+        };
+
         ChannelBoard(Gx::AudioMixer& mixer, Gx::ResourceManager& resources);
 
         void Initialize() override;
@@ -50,6 +55,7 @@ namespace Cx
         void SetAnimationEnabled(bool animationEnabled);
 
         void SetChannelEnterCallback(std::function<void(MusicHall, std::uint16_t, std::uint16_t)> callback);
+        void SetTabChangedCallback(std::function<void(ChannelBoard&, TabChangedEvent&)> callback);
 
         unsigned int GetChannelsPerPage() const;
         void SetChannelsPerPage(unsigned int channelsPerPage);
@@ -88,6 +94,7 @@ namespace Cx
 
         std::vector<ChannelListResponse::ChannelState> m_channels;
         std::function<void(MusicHall, std::uint16_t, std::uint16_t)> m_callback;
+        std::function<void(ChannelBoard&, TabChangedEvent&)> m_tabChangedCallback;
         std::unordered_map<Gx::Control*, int> m_channelButtonIndices;
 
         bool m_transitioning, m_animationEnabled;

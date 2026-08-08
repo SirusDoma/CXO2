@@ -38,6 +38,8 @@
 #include <CXO2/Network/Responses/CreateRoomResponse.hpp>
 #include <CXO2/Network/Responses/JoinRoomResponse.hpp>
 
+#include <CXO2/Events/RoomEvents.hpp>
+
 #include <CXO2/Network/Events/RoomCreatedEventData.hpp>
 #include <CXO2/Network/Events/RoomMusicChangedEventData.hpp>
 #include <CXO2/Network/Events/RoomStateChangedEventData.hpp>
@@ -83,9 +85,10 @@ namespace Cx
         Initialize(RoomTransitionEventType::Normal);
     }
 
-    void StateRoom::Initialize(const RoomTransitionEventType evType)
+    void StateRoom::Initialize(RoomTransitionEventType evType)
     {
-        State::Initialize();
+        if (!State::Initialize(StateRoomEventArgs{GetName(), evType}))
+            return;
 
         SyncCharacterInfo();
         SyncChannelInfo();
@@ -217,13 +220,16 @@ namespace Cx
     }
 
     void StateRoom::CreateRoom(
-        const sf::String& title,
-        const GameMode mode,
-        const std::string& password,
-        const unsigned int minLevelLimit,
-        const unsigned int maxLevelLimit
+        sf::String title,
+        GameMode mode,
+        std::string password,
+        unsigned int minLevelLimit,
+        unsigned int maxLevelLimit
     )
     {
+        if (Dispatch(RoomEvents::OnCreateRoom, RoomCreateEventArgs{title, mode, password, minLevelLimit, maxLevelLimit}))
+            return;
+
         m_busy = true;
 
         const auto& musicList = m_session.GetInstalledMusic();
@@ -274,9 +280,9 @@ namespace Cx
             return;
         }
 
-        if (room.MinLevelLimit > m_session.GetLevel() || room.MaxLevelLimit < m_session.GetLevel())
+        if (room.MinLevelLimit != 0 && room.MaxLevelLimit != 0 && (room.MinLevelLimit > m_session.GetLevel() || room.MaxLevelLimit < m_session.GetLevel()))
         {
-            ShowDialog(Constants::Messages::Room::JoinRequest::LEVEL_OUT_OF_RANGE, DialogStyle::Information);
+            ShowDialog(fmt::format(Constants::Messages::Room::JoinRequest::LEVEL_OUT_OF_RANGE, room.MinLevelLimit, room.MaxLevelLimit), DialogStyle::Information);
             return;
         }
 
@@ -313,10 +319,16 @@ namespace Cx
 
         auto join = [=] (const std::string& password)
         {
+            auto roomID = room.ID;
+            auto pass   = password;
+
+            if (Dispatch(RoomEvents::OnJoinRoom, RoomJoinEventArgs{room, roomID, pass}))
+                return;
+
             m_busy = true;
-            m_room.Join(room.ID);
+            m_room.Join(roomID);
             m_room.SetLevelLimits(room.MinLevelLimit, room.MaxLevelLimit);
-            m_service.JoinRoom(JoinRoomRequest{room.ID, password}, [this] (const auto& ev)
+            m_service.JoinRoom(JoinRoomRequest{roomID, pass}, [this] (const auto& ev)
             {
                 OnJoinRoomResponded(ev);
             });
@@ -350,6 +362,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnCharacterInfoLoad, RoomCharacterInfoEventArgs{response}))
+                return;
+
             m_session.UpdateFrom(response);
 
             const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
@@ -380,6 +395,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomListLoad, RoomListEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             roomList->Clear();
@@ -406,6 +423,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnUserListLoad, RoomUserListEventArgs{response}))
+                return;
+
             if (response.Users->empty())
                 return;
 
@@ -431,6 +451,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnCreateRoomResponded, RoomCreateResponseEventArgs{response, request, music}))
+                return;
+
             if (response.ResultCode != CreateRoomResult::Success)
             {
                 ShowDialog(Constants::Messages::Planet::CHANNEL_FULL, DialogStyle::Information);
@@ -466,6 +489,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnJoinRoomResponded, RoomJoinResponseEventArgs{response}))
+                return;
+
             if (response.Result != JoinResult::Success)
             {
                 if (response.Result == JoinResult::Full)
@@ -533,6 +559,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomCreated, RoomCreatedEventArgs{response}))
+                return;
 
             auto room = Room{};
             room.ID            = response.ID;
@@ -568,6 +596,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomMusicChanged, RoomMusicChangedEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -594,6 +624,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomStateChanged, RoomStateChangedEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -615,6 +647,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomTitleChanged, RoomTitleChangedEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -636,6 +670,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomUserCountChanged, RoomUserCountChangedEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -659,6 +695,8 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
+            if (Dispatch(RoomEvents::OnRoomRemoved, RoomRemovedEventArgs{response}))
+                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             roomList->Remove(response.ID);

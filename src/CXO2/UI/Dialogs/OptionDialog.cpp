@@ -1,4 +1,7 @@
 #include <CXO2/UI/Dialogs/OptionDialog.hpp>
+
+#include <CXO2/Events/OptionEvents.hpp>
+
 #include <CXO2/States/State.hpp>
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
@@ -22,7 +25,8 @@ namespace Cx
 {
     using namespace Constants::Identifiers;
 
-    OptionDialog::OptionDialog(Gx::AudioMixer& mixer, GameConfig& config) :
+    OptionDialog::OptionDialog(Gx::AudioMixer& mixer, GameConfig& config, Gx::EventDispatcher& events) :
+        Dispatchable(events),
         m_parent(),
         m_mixer(mixer),
         m_appConfig(config),
@@ -35,6 +39,9 @@ namespace Cx
         Gx::Dialog::Initialize();
 
         if (m_initialized)
+            return;
+
+        if (Dispatch(OptionEvents::OnInitialize, OptionEventArgs{}))
             return;
 
         m_parent                 = dynamic_cast<Cx::State*>(GetPresentableParent());
@@ -271,6 +278,9 @@ namespace Cx
         if (!ValidateConfig())
             return;
 
+        if (Dispatch(OptionEvents::OnSave, OptionConfigEventArgs{m_tempConfig}))
+            return;
+
         const auto& application = Gx::Application::Instance();
         m_appConfig.Apply(m_tempConfig);
 
@@ -306,6 +316,9 @@ namespace Cx
 
         const auto keyTab   = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_KEY_TAB);
         const auto soundTab = FindChild<Gx::RadioButton>(Resource::Option::IDC_BUTTON_SOUND_TAB);
+
+        if (Dispatch(OptionEvents::OnReset, OptionConfigEventArgs{m_tempConfig}))
+            return;
 
         m_tempConfig.Reset();
         btnSave->PerformClick();

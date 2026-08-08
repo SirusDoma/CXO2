@@ -170,6 +170,11 @@ namespace Cx
         m_callback = std::move(callback);
     }
 
+    void ChannelBoard::SetTabChangedCallback(std::function<void(ChannelBoard&, TabChangedEvent&)> callback)
+    {
+        m_tabChangedCallback = std::move(callback);
+    }
+
     void ChannelBoard::CaptureCurrentState()
     {
         m_renderTexture.clear(sf::Color::Transparent);
@@ -398,7 +403,17 @@ namespace Cx
             return;
         }
 
-        SwitchTab(Tab::ChannelList);
+        auto uiEvent = TabChangedEvent{{false, GetControlState()}, Tab::ChannelList};
+        if (m_tabChangedCallback)
+            m_tabChangedCallback(*this, uiEvent);
+
+        if (uiEvent.Handled)
+        {
+            ev.Handled = true;
+            return;
+        }
+
+        SwitchTab(uiEvent.Tab);
     }
 
     void ChannelBoard::OnNoticeTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
@@ -409,7 +424,17 @@ namespace Cx
             return;
         }
 
-        SwitchTab(Tab::Notice);
+        auto uiEvent = TabChangedEvent{{false, GetControlState()}, Tab::Notice};
+        if (m_tabChangedCallback)
+            m_tabChangedCallback(*this, uiEvent);
+
+        if (uiEvent.Handled)
+        {
+            ev.Handled = true;
+            return;
+        }
+
+        SwitchTab(uiEvent.Tab);
     }
 
     void ChannelBoard::OnChannelEnterButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)

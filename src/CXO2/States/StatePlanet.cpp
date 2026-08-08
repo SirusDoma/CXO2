@@ -11,6 +11,7 @@
 #include <CXO2/Network/Responses/AuthResponse.hpp>
 #include <CXO2/Network/Responses/PingResponse.hpp>
 
+#include <CXO2/Events/PlanetEvents.hpp>
 #include <CXO2/Models/Planet.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
@@ -47,7 +48,8 @@ namespace Cx
 
     void StatePlanet::Initialize()
     {
-        State::Initialize();
+        if (!State::Initialize(StateEventArgs{GetName()}))
+            return;
 
         m_network.StopHeartbeat();
 
@@ -76,6 +78,11 @@ namespace Cx
         channelBoard->SetChannelEnterCallback([=] (auto hall, std::uint16_t serverID, std::uint16_t channelID)
         {
             OnChannelEnterButtonClicked(hall, serverID, channelID);
+        });
+
+        channelBoard->SetTabChangedCallback([this] (auto& sender, auto& ev)
+        {
+            OnChannelBoardTabChanged(sender, ev);
         });
 
         std::unordered_map<MusicHall, Gx::RadioButton*> planets =
@@ -129,6 +136,9 @@ namespace Cx
 
     void StatePlanet::OnAuthenticated(const AuthResult result)
     {
+        if (Dispatch(PlanetEvents::OnAuthenticated, PlanetAuthEventArgs{result}))
+            return;
+
         if (result != AuthResult::Success)
         {
             auto message = std::string();
@@ -186,6 +196,9 @@ namespace Cx
 
     void StatePlanet::OnChannelListUpdated(const ChannelListResponse& response)
     {
+        if (Dispatch(PlanetEvents::OnChannelListUpdated, PlanetChannelListEventArgs{response}))
+            return;
+
         const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(true);
 
@@ -196,6 +209,9 @@ namespace Cx
 
     void StatePlanet::OnChannelLogin(const ChannelLoginResponse& response)
     {
+        if (Dispatch(PlanetEvents::OnChannelLogin, PlanetChannelLoginEventArgs{response}))
+            return;
+
         if (response.Full)
         {
             ShowDialog(Constants::Messages::Planet::CHANNEL_FULL, DialogStyle::Information);
@@ -215,8 +231,11 @@ namespace Cx
         director.Present<StateRoom>();
     }
 
-    void StatePlanet::OnMusicHallSelected(const MusicHall hall)
+    void StatePlanet::OnMusicHallSelected(MusicHall hall)
     {
+        if (Dispatch(PlanetEvents::OnPlanetEnter, PlanetEnterEventArgs{hall}))
+            return;
+
         const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(false);
 
@@ -240,8 +259,11 @@ namespace Cx
         });
     }
 
-    void StatePlanet::OnChannelEnterButtonClicked(const MusicHall hall, const std::uint16_t serverID, const std::uint16_t channelID)
+    void StatePlanet::OnChannelEnterButtonClicked(MusicHall hall, std::uint16_t serverID, std::uint16_t channelID)
     {
+        if (Dispatch(PlanetEvents::OnChannelEnter, ChannelEnterEventArgs{hall, serverID, channelID}))
+            return;
+
         const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(false);
 
@@ -265,5 +287,11 @@ namespace Cx
                 channelBoard->SetEnabled(true);
             }
         });
+    }
+
+    void StatePlanet::OnChannelBoardTabChanged(ChannelBoard& sender, ChannelBoard::TabChangedEvent& ev)
+    {
+        if (Dispatch(PlanetEvents::OnChannelBoardTabChange, PlanetTabEventArgs{ev.Tab}))
+            ev.Handled = true;
     }
 }
