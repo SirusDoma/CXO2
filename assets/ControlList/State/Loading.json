@@ -15,6 +15,11 @@
       "IDC_IMAGE_STATE_LOADING9": "ControlList/State/Loading/MusicLoading9.json",
       "IDC_IMAGE_STATE_LOADING10": "ControlList/State/Loading/MusicLoading10.json",
       "IDC_LIST_LOADING_SIGN": "ControlList/State/Loading/Loading_List.json",
+      "IDC_TEXT_MUSIC_TITLE": "ControlList/State/Loading/Loading_MusicTitle.json",
+      "IDC_TEXT_MUSIC_ARTIST": "ControlList/State/Loading/Loading_MusicArtist.json",
+      "IDC_TEXT_MUSIC_NOTE_COUNT": "ControlList/State/Loading/Loading_MusicNoteCount.json",
+      "IDC_TEXT_MUSIC_SPEED": "ControlList/State/Loading/Loading_MusicSpeed.json",
+      "IDC_TEXT_MUSIC_NOTE_DESIGNER": "ControlList/State/Loading/Loading_MusicNoteDesigner.json",
       "IDC_TEXT_MISSION_HEADER": "ControlList/State/Loading/Loading_MissionHeader.json",
       "IDC_TEXT_MISSION_REQUIREMENT": "ControlList/State/Loading/Loading_MissionRequirement.json",
       "IDC_TEXT_MISSION_NOTICE": "ControlList/State/Loading/Loading_MissionNotice.json"
