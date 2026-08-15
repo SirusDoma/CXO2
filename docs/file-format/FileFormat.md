@@ -434,7 +434,7 @@ Item entries follow the file header, repeated once per item. They are variable-l
 | v3.82          | O2Jam NX       | [ItemData.md](3.82/ItemData.md) |
 | v2.33          | O2Jam X2       | [ItemData.md](3.82/ItemData.md) |
 | v5.89          | O2JamO2 Beta   | [ItemData.md](3.82/ItemData.md) |
-| v5.89          | O2JamO2 Final  | [ItemData.md](3.82/ItemData.md) |
+| v6.65          | O2JamO2        | [ItemData.md](3.82/ItemData.md) |
 | v8.02          | O2Jam Classic  | [ItemData.md](8.02/ItemData.md) |
 
 ---
@@ -533,8 +533,8 @@ Refer to the per-version documentation:
 | v3.10          | O2Jam Original | `OJNList.dat`<sup>\*</sup> | [OJNList.md](3.10/OJNList.md)      |
 | v3.82          | O2Jam NX       | `OJNList.dat`              | [OJNList.md](3.82/OJNList.md)      |
 | v2.33          | O2Jam X2       | `X2OJNList.dat`            | [X2OJNList.md](2.33/X2OJNList.md)  |
-| v5.89          | O2JamO2 Beta   | `OJNList.dat`              | [OJNList.md](5.89-beta/OJNList.md) |
-| v5.89          | O2JamO2 Final  | `OJNList.dat`              | [OJNList.md](5.89/OJNList.md)      |
+| v5.89          | O2JamO2 Beta   | `OJNList.dat`              | [OJNList.md](5.89/OJNList.md) |
+| v6.65          | O2JamO2        | `OJNList.dat`              | [OJNList.md](6.65/OJNList.md)      |
 | v8.02          | O2Jam Classic  | `OJNList.dat`              | [OJNList.md](8.02/OJNList.md)      |
 
 <sup>\* Placed inside `Playing(1).opi`</sup>

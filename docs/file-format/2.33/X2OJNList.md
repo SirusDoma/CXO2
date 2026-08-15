@@ -70,12 +70,10 @@ Defines the mission list. Each entry binds a mission level to a music entry and 
 |--------|---------|------------------------------------------------------------|
 | +0     | `int32` | Music ID                                                   |
 | +4     | `int32` | Difficulty (see [Mission Difficulty](#mission-difficulty)) |
-| +8     | `int32` | Unknown<sup>\*</sup>                                       |
+| +8     | `int32` | Price Gem                                                  |
 | +12    | `int32` | Mission Level                                              |
 
 The mission level is independent of the music's own difficulty level stored in the [OJN](../FileFormat.md#o2jam-note) header.
-
-<sup>\* Always `0`.</sup>
 
 #### Mission Difficulty
 
