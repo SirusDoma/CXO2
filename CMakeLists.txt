@@ -289,8 +289,3 @@ set_target_properties(ResourceCompiler PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${COMPILER_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${COMPILER_OUTPUT_DIR}
 )
-
-# Samples (untracked, built only when present)
-if(EXISTS ${CMAKE_SOURCE_DIR}/samples/O2CX/CMakeLists.txt)
-    add_subdirectory(samples/O2CX)
-endif()

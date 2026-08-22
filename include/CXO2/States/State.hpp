@@ -1,10 +1,7 @@
 #pragma once
 
-#include <CXO2/Events/StateEvents.hpp>
-#include <CXO2/States/StateExtension.hpp>
-
 #include <Genode/SceneGraph/Scene.hpp>
-#include <Genode/UI/Dialog.hpp>
+#include <CXO2/UI/Dialog.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 
 #include <SFML/Audio/Sound.hpp>
@@ -12,7 +9,6 @@
 
 #include <memory>
 #include <optional>
-#include <vector>
 
 namespace Cx
 {
@@ -58,30 +54,17 @@ namespace Cx
         Gx::ResourceManager& GetResources(ResourceScope scope = ResourceScope::Local);
         bool OnAppClose() override;
 
-        virtual void ShowDialog(const sf::String& content, DialogStyle style, std::function<void(bool)> callback = nullptr);
-        virtual void ShowDialog(const sf::String& content, DialogStyle style, bool persist, bool backdrop, std::function<void(bool)> callback = nullptr);
-        virtual void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
-
-        template<typename T, typename... Args, std::enable_if_t<std::is_base_of_v<StateExtension, T>, int> = 0>
-        T& AddExtension(Args&&... args);
-
-        virtual StateExtension& Attach(StateExtensionPtr extension);
+        void ShowDialog(const sf::String& content, DialogStyle style, std::function<void(bool)> callback = nullptr);
+        void ShowDialog(const sf::String& content, DialogStyle style, bool persist, bool backdrop, std::function<void(bool)> callback = nullptr);
+        void ShowDialog(Gx::Node& content, DialogStyle style, bool backdrop = false, std::function<void(bool)> callback = nullptr);
 
         static void Announce(const sf::String& content);
 
     protected:
-        bool Initialize(StateEventArgs&& args);
+        void Initialize() override;
         void Finalize() override;
 
-        template <typename TKey, typename TSender, typename... TArgs, typename... UArgs>
-        bool Dispatch(const Gx::Event<TKey, TSender, TArgs...>& event, UArgs&&... args);
-
-        template <typename TKey, typename TSender, typename... TArgs, typename... UArgs>
-        bool Dispatch(const Gx::Event<TKey, TSender, TArgs...>& event, UArgs&&... args) const;
-
-        void Update(const sf::Time& delta) override;
         Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
-        bool Input(const sf::Event& ev) override;
 
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
 
@@ -96,34 +79,9 @@ namespace Cx
             std::function<void(bool)> Callback;
         };
 
-        class ExtensionTerminal final : public StateExtension
-        {
-        public:
-            explicit ExtensionTerminal(State& owner);
-
-        protected:
-            bool Initialize() override;
-            void Finalize() override;
-            void Update(const sf::Time& delta) override;
-            Gx::RenderStates Render(Gx::RenderSurface& surface, Gx::RenderStates states) const override;
-            bool Input(const sf::Event& ev) override;
-
-        private:
-            State& m_owner;
-        };
-
-        bool InternalInitialize();
-        void InternalFinalize();
-        void InternalUpdate(const sf::Time& delta);
-        Gx::RenderStates InternalRender(Gx::RenderSurface& surface, Gx::RenderStates states) const;
-        bool InternalInput(const sf::Event& ev);
-
-        StateExtension& GetNextExtension();
-        const StateExtension& GetNextExtension() const;
-
         void LoadCommonResources();
 
-        static Gx::Dialog* GetDialog(DialogStyle style);
+        static Cx::Dialog* GetDialog(DialogStyle style);
 
         template<typename R>
         R* Locate(Gx::ResourceManager& resources, const std::string& id);
@@ -131,10 +89,7 @@ namespace Cx
         std::unique_ptr<Gx::ResourceManager> m_resources;
         std::unique_ptr<Gx::ResourceManager> m_tempResources;
 
-        ExtensionTerminal m_terminal{*this};
-        std::vector<StateExtensionPtr> m_extensions;
-
-        inline static Gx::Dialog* m_dialogInfo, *m_dialog1, *m_dialog2, *m_dialogNotice, *m_exitDialog;
+        inline static Cx::Dialog* m_dialogInfo, *m_dialog1, *m_dialog2, *m_dialogNotice, *m_exitDialog;
         inline static sf::Sound* m_popupSound, *m_cancelSound;
         inline static bool m_exitPrompted = false;
         inline static sf::Clock m_noticeTimer{};

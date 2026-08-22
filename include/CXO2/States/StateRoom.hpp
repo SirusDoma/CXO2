@@ -72,24 +72,24 @@ namespace Cx
 
         void OnRoomEntered(const Room& room);
 
-        void OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCreateRoomButtonClicked(Control& sender, Control::Event& ev);
+        void OnQuickJoinRoomButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnWaitingButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnShowAllButtonClicked(Control& sender, Control::Event& ev);
+        void OnWaitingButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnRoomLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnRoomRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnRoomLeftButtonClicked(Control& sender, Control::Event& ev);
+        void OnRoomRightButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnMusicShopButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
-        void OnItemShopButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
-        void OnMyRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
-        void OnBulletinButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const;
+        void OnMusicShopButtonClicked(Control& sender, Control::Event& ev) const;
+        void OnItemShopButtonClicked(Control& sender, Control::Event& ev) const;
+        void OnMyRoomButtonClicked(Control& sender, Control::Event& ev) const;
+        void OnBulletinButtonClicked(Control& sender, Control::Event& ev) const;
 
-        void OnOptionButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnTutorialButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnOptionButtonClicked(Control& sender, Control::Event& ev);
+        void OnTutorialButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBackButtonClicked(Control& sender, Control::Event& ev);
 
         Gx::AudioMixer& m_mixer;
         CharacterService& m_charService;

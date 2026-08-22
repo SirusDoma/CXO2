@@ -89,7 +89,7 @@ namespace Cx
                     }
 
                     if (sheet->TexCoords.size() < 2)
-                        channelBoard->AddFrame(names[1], Gx::Image::Frame{ {}, {}, position, {}, {1.f, 1.f} });
+                        channelBoard->AddFrame(names[1], Image::Frame{ {}, {}, position, {}, {1.f, 1.f} });
                 }
                 else if (metadata->Frames.size() > 0)
                 {

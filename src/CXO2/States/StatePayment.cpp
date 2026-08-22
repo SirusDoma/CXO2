@@ -6,8 +6,8 @@
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Payment.hpp>
 
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <CXO2/UI/BitmapNumber.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -25,8 +25,7 @@ namespace Cx
 
     void StatePayment::Initialize()
     {
-        if (!State::Initialize(StateEventArgs{GetName()}))
-            return;
+        State::Initialize();
 
         const auto& itemData    = m_items.GetItemData();
         const auto& setInfoData = m_items.GetSetInfoData();
@@ -60,13 +59,13 @@ namespace Cx
         m_cart.Clear();
         m_session.Save();
 
-        const auto currentGem = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_GEM);
+        const auto currentGem = Instantiate<BitmapNumber>(Resource::Payment::IDC_NUMBER_GEM);
         currentGem->SetValue(m_session.GetWallet().Gem);
 
-        const auto currentCash = Instantiate<Gx::BitmapNumber>(Resource::Payment::IDC_NUMBER_CASH);
+        const auto currentCash = Instantiate<BitmapNumber>(Resource::Payment::IDC_NUMBER_CASH);
         currentCash->SetValue(m_session.GetWallet().Cash);
 
-        const auto backButton = Instantiate<Gx::Button>(Resource::Payment::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Payment::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto&, auto&)
         {
             GetDirector().Dismiss();

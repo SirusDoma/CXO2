@@ -26,10 +26,8 @@ namespace Cx
         std::string GetFtpUrl() const;
         std::string GetFtpPath() const;
         std::vector<Gateway> GetGatewayInfo() const;
-        std::vector<std::string> GetLibraries() const;
 
     private:
         std::vector<std::string> m_arguments{};
-        std::vector<std::string> m_libraries{};
     };
 }

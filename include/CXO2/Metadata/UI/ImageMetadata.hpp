@@ -2,7 +2,7 @@
 
 #include <CXO2/Metadata/Graphics/SpriteMetadata.hpp>
 
-#include <Genode/UI/Image.hpp>
+#include <CXO2/UI/Image.hpp>
 
 namespace Cx
 {
@@ -11,12 +11,12 @@ namespace Cx
         struct FrameMetadata
         {
             std::string Name = std::string();
-            Gx::Image::Frame Value = {};
+            Image::Frame Value = {};
 
             std::optional<std::uint16_t> ID = std::nullopt;
         };
 
-        Gx::Image::SizeMode SizeMode = Gx::Image::SizeMode::Normal;
+        Image::SizeMode SizeMode = Image::SizeMode::Normal;
         sf::FloatRect Bounds = sf::FloatRect();
         std::vector<FrameMetadata> Frames = {};
     };

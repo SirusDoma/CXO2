@@ -3,7 +3,7 @@
 #include <CXO2/Avatar/Item.hpp>
 #include <CXO2/Models/Equipment.hpp>
 #include <CXO2/Models/Room.hpp>
-#include <CXO2/UI/Waiting/AvatarInfo.hpp>
+#include <CXO2/UI/Components/Waiting/AvatarInfo.hpp>
 
 #include <Genode/SceneGraph.hpp>
 

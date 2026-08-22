@@ -4,7 +4,7 @@
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Bulletin.hpp>
 
-#include <Genode/UI/Button.hpp>
+#include <CXO2/UI/Button.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -19,10 +19,9 @@ namespace Cx
 
     void StateBulletin::Initialize()
     {
-        if (!State::Initialize(StateEventArgs{GetName()}))
-            return;
+        State::Initialize();
 
-        const auto backButton = Instantiate<Gx::Button>(Resource::Bulletin::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Bulletin::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto&, auto&)
         {
             GetDirector().Present<StateRoom>();

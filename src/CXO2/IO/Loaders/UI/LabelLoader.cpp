@@ -9,7 +9,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Label> LabelLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         LabelMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -24,7 +24,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::Label> LabelLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Label> LabelLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const LabelMetadata*>(&meta);
         if (!metadata)
@@ -82,13 +82,13 @@ namespace Cx
 
         std::uint32_t style = 0;
         if (metadata->Bold)
-            style |= Gx::Label::Style::Bold;
+            style |= Label::Style::Bold;
 
         if (metadata->Italic)
-            style |= Gx::Label::Style::Italic;
+            style |= Label::Style::Italic;
 
         if (metadata->Underlined)
-            style |= Gx::Label::Style::Underlined;
+            style |= Label::Style::Underlined;
 
         label->SetName(metadata->Name);
         label->SetStyle(style);
@@ -195,10 +195,10 @@ namespace Cx
                 metadata.Alignment = parsed.value();
         }
 
-        metadata.VerticalAlignment = Gx::Label::VerticalAlignment::Center;
+        metadata.VerticalAlignment = Label::VerticalAlignment::Center;
         if (auto alignment = attributes.find("verticalAlignment"); alignment != attributes.end())
         {
-            if (auto parsed = magic_enum::enum_cast<Gx::Label::VerticalAlignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            if (auto parsed = magic_enum::enum_cast<Label::VerticalAlignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                 metadata.VerticalAlignment = parsed.value();
         }
 

@@ -5,7 +5,7 @@
 
 #include <CXO2/Metadata/UI/ListMetadata.hpp>
 
-#include <CXO2/UI/Room/RoomList.hpp>
+#include <CXO2/UI/Components/Room/RoomList.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/IO/ResourceManager.hpp>
@@ -17,13 +17,13 @@ namespace Cx
 {
     void ListLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::List>::OnRegistered(id, builder);
+        ResourceLoader<List>::OnRegistered(id, builder);
 
-        Gx::ResourceLoaderFactory::Map<Gx::List, RoomList>();
+        Gx::ResourceLoaderFactory::Map<List, RoomList>();
         Gx::ResourceLoaderFactory::Map<Gx::Node, RoomList>();
     }
 
-    Gx::ResourcePtr<Gx::List> ListLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<List> ListLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = ListMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -78,11 +78,11 @@ namespace Cx
 
                 if (const auto order = attributes.find("order"); order != attributes.end())
                 {
-                    if (const auto parsed = magic_enum::enum_cast<Gx::List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+                    if (const auto parsed = magic_enum::enum_cast<List::Order>(order->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                         metadata.Order = parsed.value();
                 }
                 else
-                    metadata.Order = Gx::List::Order::Vertical;
+                    metadata.Order = List::Order::Vertical;
             }
         }
 
@@ -141,7 +141,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::List> ListLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<List> ListLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const ListMetadata*>(&meta);
         if (!metadata)

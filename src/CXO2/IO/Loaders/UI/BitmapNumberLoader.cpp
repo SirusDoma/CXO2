@@ -9,7 +9,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<BitmapNumber> BitmapNumberLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = BitmapNumberMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -91,13 +91,13 @@ namespace Cx
 
             if (auto alignment = attributes.find("alignment"); alignment != attributes.end())
             {
-                if (auto parsed = magic_enum::enum_cast<Gx::BitmapNumber::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+                if (auto parsed = magic_enum::enum_cast<BitmapNumber::Alignment>(alignment->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                     metadata.Alignment = parsed.value();
                 else
-                    metadata.Alignment = Gx::BitmapNumber::Alignment::None;
+                    metadata.Alignment = BitmapNumber::Alignment::None;
             }
             else
-                metadata.Alignment = Gx::BitmapNumber::Alignment::None;
+                metadata.Alignment = BitmapNumber::Alignment::None;
 
             if (auto value = attributes.find("value"); value != attributes.end())
                 metadata.Value = value->get<unsigned int>();
@@ -115,7 +115,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::BitmapNumber> BitmapNumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<BitmapNumber> BitmapNumberLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const BitmapNumberMetadata*>(&meta);
         if (!metadata)
@@ -188,7 +188,7 @@ namespace Cx
                     static_cast<float>(bound->position.y),
                 });
 
-                if (metadata->Alignment == Gx::BitmapNumber::Alignment::Right)
+                if (metadata->Alignment == BitmapNumber::Alignment::Right)
                 {
                     number->SetPosition(number->GetPosition() + sf::Vector2f{
                         static_cast<float>(bound->size.x),

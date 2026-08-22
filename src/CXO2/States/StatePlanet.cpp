@@ -11,11 +11,10 @@
 #include <CXO2/Network/Responses/AuthResponse.hpp>
 #include <CXO2/Network/Responses/PingResponse.hpp>
 
-#include <CXO2/Events/PlanetEvents.hpp>
 #include <CXO2/Models/Planet.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
-#include <CXO2/UI/Planet/ChannelBoard.hpp>
+#include <CXO2/UI/Components/Planet/ChannelBoard.hpp>
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Planet.hpp>
@@ -48,8 +47,7 @@ namespace Cx
 
     void StatePlanet::Initialize()
     {
-        if (!State::Initialize(StateEventArgs{GetName()}))
-            return;
+        State::Initialize();
 
         m_network.StopHeartbeat();
 
@@ -57,15 +55,15 @@ namespace Cx
         auto clickSfx  = Instantiate<sf::Sound>(Sound::Effects::EF_02);
         auto hoverSfx  = Find<sf::Sound>(Sound::Effects::PLANET_BEEP);
 
-        const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
-        auto euta     = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_01);
-        auto thalo    = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_02);
-        auto melpomin = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_03);
-        auto kalliope = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_HIGH_01);
-        auto kleo     = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_INTERMEDIATE_01);
-        auto philix   = container->FindChild<Gx::RadioButton>(Resource::Planet::IDC_RADIO_PREMIUM_01);
+        const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+        auto euta     = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_01);
+        auto thalo    = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_02);
+        auto melpomin = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_BEGINNER_03);
+        auto kalliope = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_HIGH_01);
+        auto kleo     = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_INTERMEDIATE_01);
+        auto philix   = container->FindChild<Cx::RadioButton>(Resource::Planet::IDC_RADIO_PREMIUM_01);
 
-        const auto exitButton = Instantiate<Gx::Button>(Resource::Planet::IDC_BUTTON_EXIT);
+        const auto exitButton = Instantiate<Cx::Button>(Resource::Planet::IDC_BUTTON_EXIT);
         exitButton->SetClickCallback([&] (auto&, auto&)
         {
             if (Require<MusicDownloaderService>().IsDownloading())
@@ -85,7 +83,7 @@ namespace Cx
             OnChannelBoardTabChanged(sender, ev);
         });
 
-        std::unordered_map<MusicHall, Gx::RadioButton*> planets =
+        std::unordered_map<MusicHall, Cx::RadioButton*> planets =
         {
             { MusicHall::Melpomin, melpomin },
             { MusicHall::Thalo,    thalo    },
@@ -99,7 +97,7 @@ namespace Cx
         {
             radio->SetFocusChangedCallback([&, hoverSfx] (auto& sender, auto&)
             {
-                if (const auto r = dynamic_cast<Gx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
+                if (const auto r = dynamic_cast<Cx::RadioButton*>(&sender); !r || !r->IsFocused() || r->IsChecked())
                     return;
 
                 if (hoverSfx)
@@ -136,8 +134,6 @@ namespace Cx
 
     void StatePlanet::OnAuthenticated(const AuthResult result)
     {
-        if (Dispatch(PlanetEvents::OnAuthenticated, PlanetAuthEventArgs{result}))
-            return;
 
         if (result != AuthResult::Success)
         {
@@ -172,7 +168,7 @@ namespace Cx
 
             ShowDialog(message, DialogStyle::Information);
 
-            const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+            const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
             container->SetEnabled(true);
 
             return;
@@ -186,7 +182,7 @@ namespace Cx
             }
             catch (const Gx::NetworkException&)
             {
-                const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+                const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
                 container->SetEnabled(true);
 
                 ShowDialog(Constants::Messages::Network::CONNECT_FAILED, DialogStyle::Information);
@@ -196,10 +192,8 @@ namespace Cx
 
     void StatePlanet::OnChannelListUpdated(const ChannelListResponse& response)
     {
-        if (Dispatch(PlanetEvents::OnChannelListUpdated, PlanetChannelListEventArgs{response}))
-            return;
 
-        const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+        const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(true);
 
         const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
@@ -209,8 +203,6 @@ namespace Cx
 
     void StatePlanet::OnChannelLogin(const ChannelLoginResponse& response)
     {
-        if (Dispatch(PlanetEvents::OnChannelLogin, PlanetChannelLoginEventArgs{response}))
-            return;
 
         if (response.Full)
         {
@@ -233,10 +225,8 @@ namespace Cx
 
     void StatePlanet::OnMusicHallSelected(MusicHall hall)
     {
-        if (Dispatch(PlanetEvents::OnPlanetEnter, PlanetEnterEventArgs{hall}))
-            return;
 
-        const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+        const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(false);
 
         const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
@@ -261,10 +251,8 @@ namespace Cx
 
     void StatePlanet::OnChannelEnterButtonClicked(MusicHall hall, std::uint16_t serverID, std::uint16_t channelID)
     {
-        if (Dispatch(PlanetEvents::OnChannelEnter, ChannelEnterEventArgs{hall, serverID, channelID}))
-            return;
 
-        const auto container = Instantiate<Gx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
+        const auto container = Instantiate<Cx::UiContainer>(Resource::Planet::IDC_CONTAINER_MUSIC_HALL);
         container->SetEnabled(false);
 
         const auto channelBoard = Instantiate<ChannelBoard>(Resource::Planet::IDC_CHANNEL_BOARD);
@@ -291,7 +279,5 @@ namespace Cx
 
     void StatePlanet::OnChannelBoardTabChanged(ChannelBoard& sender, ChannelBoard::TabChangedEvent& ev)
     {
-        if (Dispatch(PlanetEvents::OnChannelBoardTabChange, PlanetTabEventArgs{ev.Tab}))
-            ev.Handled = true;
     }
 }

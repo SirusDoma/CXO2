@@ -1,16 +1,16 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <Genode/UI/ScrollBar.hpp>
+#include <CXO2/UI/ScrollBar.hpp>
 
 namespace Cx
 {
-    class ScrollBarLoader : public ResourceLoader<Gx::ScrollBar>
+    class ScrollBarLoader : public ResourceLoader<ScrollBar>
     {
     public :
         ScrollBarLoader() = default;
 
-        [[nodiscard]] Gx::ResourcePtr<Gx::ScrollBar> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        [[nodiscard]] Gx::ResourcePtr<Gx::ScrollBar> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<ScrollBar> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<ScrollBar> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
     };
 }

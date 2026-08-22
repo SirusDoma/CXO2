@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/Metadata/Graphics/SpriteMetadata.hpp>
-#include <Genode/UI/Control.hpp>
+#include <CXO2/UI/Control.hpp>
 
 #include <unordered_map>
 
@@ -21,6 +21,6 @@ namespace Cx
 
         bool Enabled = true;
         bool Visible = true;
-        std::unordered_map<Gx::Control::State, ButtonState> States = {};
+        std::unordered_map<Control::State, ButtonState> States = {};
     };
 }

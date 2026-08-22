@@ -11,7 +11,6 @@
 #include <CXO2/Services/WaitingService.hpp>
 #include <CXO2/Services/PlayingService.hpp>
 
-
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Result.hpp>
@@ -20,10 +19,10 @@
 
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Tween/Move.hpp>
-#include <Genode/UI/List.hpp>
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/Label.hpp>
+#include <CXO2/UI/List.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <CXO2/UI/BitmapNumber.hpp>
+#include <CXO2/UI/Label.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 namespace Cx
@@ -48,9 +47,8 @@ namespace Cx
 
     void StateResult::Initialize()
     {
-        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
-            return;
-        if (const auto container = Instantiate<Gx::UiContainer>(Resource::Result::IDC_CONTAINER_BACKGROUND); container)
+        State::Initialize();
+        if (const auto container = Instantiate<Cx::UiContainer>(Resource::Result::IDC_CONTAINER_BACKGROUND); container)
         {
             const auto& resources = GetResources(ResourceScope::Shared);
             if (const auto texture = resources.Find<sf::Texture>(Resource::Cache::IDC_TEXTURE_STATE_PLAYING); texture)
@@ -64,10 +62,10 @@ namespace Cx
         const auto background = Instantiate<Gx::Sprite>(Resource::Result::IDC_IMAGE_STATE_RESULT);
         background->SetVisible(false);
 
-        auto top = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_TOP);
-        auto bottom = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM);
+        auto top = Instantiate<Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_TOP);
+        auto bottom = Instantiate<Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM);
 
-        const auto banner = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_WINLOSE);
+        const auto banner = Instantiate<Image>(Resource::Result::IDC_IMAGE_WINLOSE);
         banner->SetVisible(false);
 
         auto height = bottom->GetLocalBounds().size.y;
@@ -78,40 +76,40 @@ namespace Cx
         bottom->SetPosition(0.f, view.getSize().y + height);
 
         const auto& scoreTracker = m_context.GetScoreTracker();
-        if (const auto container = top->FindChild<Gx::UiContainer>(Resource::Result::Top::IDC_CONTAINER_PLAYER_SCORE); container)
+        if (const auto container = top->FindChild<Cx::UiContainer>(Resource::Result::Top::IDC_CONTAINER_PLAYER_SCORE); container)
         {
-            if (const auto cool = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_COOL); cool)
+            if (const auto cool = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_COOL); cool)
                 cool->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Cool)));
 
-            if (const auto good = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_GOOD); good)
+            if (const auto good = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_GOOD); good)
                 good->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Good)));
 
-            if (const auto bad = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_BAD); bad)
+            if (const auto bad = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_BAD); bad)
                 bad->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Bad)));
 
-            if (const auto miss = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MISS); miss)
+            if (const auto miss = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MISS); miss)
                 miss->SetString(std::to_string(scoreTracker.GetPoint(Accuracy::Miss)));
 
-            if (const auto maxCombo = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_COMBO); maxCombo)
+            if (const auto maxCombo = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_COMBO); maxCombo)
                 maxCombo->SetString(std::to_string(scoreTracker.GetMaxCombo()));
 
-            if (const auto maxJamCombo = container->FindChild<Gx::Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_JAM_COMBO); maxJamCombo)
+            if (const auto maxJamCombo = container->FindChild<Label>(Resource::Result::Top::Score::IDC_TEXT_PLAYER_MAX_JAM_COMBO); maxJamCombo)
                 maxJamCombo->SetString(std::to_string(scoreTracker.GetMaxJamCombo()));
         }
 
-        if (const auto point = top->FindChild<Gx::BitmapNumber>(Resource::Result::Top::IDC_NUMBER_POINT); point)
+        if (const auto point = top->FindChild<BitmapNumber>(Resource::Result::Top::IDC_NUMBER_POINT); point)
             point->SetValue(scoreTracker.GetScorePoint());
 
-        if (const auto gem = top->FindChild<Gx::Label>(Resource::Result::Top::IDC_TEXT_GEM); gem)
+        if (const auto gem = top->FindChild<Label>(Resource::Result::Top::IDC_TEXT_GEM); gem)
             gem->SetString(std::to_string(100));
 
-        if (const auto list = bottom->FindChild<Gx::List>(Resource::Result::Bottom::IDC_LIST_RANK_SCORE); list)
+        if (const auto list = bottom->FindChild<List>(Resource::Result::Bottom::IDC_LIST_RANK_SCORE); list)
         {
             const auto listItems  = list->GetChildren();
             const auto& scoreItems = m_context.GetScores();
             for (std::size_t i = 0; i < listItems.size(); i++)
             {
-                const auto item = dynamic_cast<Gx::UiContainer*>(listItems[i]);
+                const auto item = dynamic_cast<Cx::UiContainer*>(listItems[i]);
                 if (!item)
                     continue;
 
@@ -169,37 +167,37 @@ namespace Cx
                         highlighter->SetColor(secondaryTeamColor[slot.Team]);
                 }
 
-                if (const auto rank = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NUMBER); rank)
+                if (const auto rank = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NUMBER); rank)
                     rank->SetString(std::to_string(i + 1));
 
-                if (const auto name = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NAME); name)
+                if (const auto name = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_NAME); name)
                     name->SetString(member.Name);
 
-                if (const auto cool = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_COOL); cool)
+                if (const auto cool = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_COOL); cool)
                     cool->SetString(std::to_string(entry.Cool));
 
-                if (const auto good = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_GOOD); good)
+                if (const auto good = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_GOOD); good)
                     good->SetString(std::to_string(entry.Good));
 
-                if (const auto bad = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_BAD); bad)
+                if (const auto bad = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_BAD); bad)
                     bad->SetString(std::to_string(entry.Bad));
 
-                if (const auto miss = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MISS); miss)
+                if (const auto miss = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MISS); miss)
                     miss->SetString(std::to_string(entry.Miss));
 
-                if (const auto maxCombo = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_COMBO); maxCombo)
+                if (const auto maxCombo = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_COMBO); maxCombo)
                     maxCombo->SetString(std::to_string(entry.MaxCombo));
 
-                if (const auto maxJamCombo = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_JAM_COMBO); maxJamCombo)
+                if (const auto maxJamCombo = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_MAX_JAM_COMBO); maxJamCombo)
                     maxJamCombo->SetString(std::to_string(entry.MaxJamCombo));
 
-                if (const auto point = item->FindChild<Gx::Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_POINT); point)
+                if (const auto point = item->FindChild<Label>(Resource::Result::Bottom::Score::IDC_TEXT_RANK_POINT); point)
                     point->SetString(std::to_string(entry.Score));
             }
         }
 
-        const auto btnBack = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK);
-        const auto btnRetry = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_PLAY_RETRY);
+        const auto btnBack = bottom->FindChild<Cx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK);
+        const auto btnRetry = bottom->FindChild<Cx::Button>(Resource::Result::Bottom::IDC_BUTTON_PLAY_RETRY);
 
         btnRetry->SetVisible(m_room.GetMode() == GameMode::Single);
         btnRetry->SetEnabled(false);
@@ -245,7 +243,6 @@ namespace Cx
                 });
             });
         });
-
 
         btnBack->SetEnabled(false);
         btnBack->SetFocusChangedCallback([btnRetry] (auto& sender, const auto&)
@@ -371,9 +368,9 @@ namespace Cx
 
         if (ev.code == sf::Keyboard::Key::Enter)
         {
-            if (const auto bottom = Instantiate<Gx::Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM); bottom)
+            if (const auto bottom = Instantiate<Image>(Resource::Result::IDC_IMAGE_STATE_RESULT_BOTTOM); bottom)
             {
-                if (const auto btnBack = bottom->FindChild<Gx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK); btnBack)
+                if (const auto btnBack = bottom->FindChild<Cx::Button>(Resource::Result::Bottom::IDC_BUTTON_BACK); btnBack)
                     btnBack->PerformClick();
             }
         }

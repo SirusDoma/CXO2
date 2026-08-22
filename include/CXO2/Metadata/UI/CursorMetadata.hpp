@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/Metadata/ResourceMetadata.hpp>
-#include <Genode/UI/Cursor.hpp>
+#include <Genode/Graphics/Cursor.hpp>
 
 namespace Cx
 {

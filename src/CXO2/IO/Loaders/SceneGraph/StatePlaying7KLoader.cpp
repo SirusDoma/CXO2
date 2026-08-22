@@ -7,7 +7,7 @@
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Constants/Identifiers/Playing7K.hpp>
 
-#include <Genode/UI/List.hpp>
+#include <CXO2/UI/List.hpp>
 
 #include <random>
 
@@ -123,7 +123,7 @@ namespace Cx
             composer.Add(name, object, rctx);
         }
 
-        if (auto keyEffectContainer = state->FindChild<Gx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)
+        if (auto keyEffectContainer = state->FindChild<Cx::UiContainer>(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT); keyEffectContainer)
         {
             if (ctx.GetMode() == GameMode::Tutorial)
             {
@@ -138,7 +138,7 @@ namespace Cx
         else
             throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_CONTAINER_KEY_EFFECT);
 
-        if (auto longNoteEffectList = state->Find<Gx::List>(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
+        if (auto longNoteEffectList = state->Find<List>(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
         {
             for (auto child :longNoteEffectList->GetChildren())
             {
@@ -158,7 +158,7 @@ namespace Cx
         else
             throw Gx::ResourceAccessException(Resource::Playing7K::Require::IDC_LIST_LONG_NOTE_EFFECT);
 
-        if (auto noteClickList = state->Find<Gx::List>(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK); noteClickList)
+        if (auto noteClickList = state->Find<List>(Resource::Playing7K::Require::IDC_LIST_NOTE_CLICK); noteClickList)
         {
             auto noteClickSuffix = std::string();
             if (ctx.IsFxEnabled())

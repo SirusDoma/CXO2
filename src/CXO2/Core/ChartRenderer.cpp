@@ -5,11 +5,11 @@
 #include <CXO2/Core/NoteContainer.hpp>
 #include <CXO2/Core/NoteFactory.hpp>
 #include <CXO2/Config/GameConfig.hpp>
-#include <CXO2/UI/Playing/Equalizer.hpp>
+#include <CXO2/UI/Components/Playing/Equalizer.hpp>
 #include <CXO2/Constants/Identifiers/Game.hpp>
 
 #include <Genode/Tween/Fade.hpp>
-#include <Genode/UI/List.hpp>
+#include <CXO2/UI/List.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 namespace Cx

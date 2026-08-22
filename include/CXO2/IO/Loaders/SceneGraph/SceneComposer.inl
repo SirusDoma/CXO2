@@ -53,7 +53,7 @@ namespace Cx
             if constexpr (std::is_base_of_v<Gx::Node, R>)
             {
                 result->SetName(name);
-                if (m_instantiate && !dynamic_cast<Gx::Dialog*>(result))
+                if (m_instantiate && !dynamic_cast<Cx::Dialog*>(result))
                     state->AddChild(*result);
             }
         }
@@ -63,7 +63,7 @@ namespace Cx
             if constexpr (std::is_base_of_v<Gx::Node, R>)
             {
                 resource.SetName(name);
-                if (m_instantiate && !dynamic_cast<Gx::Dialog*>(&resource))
+                if (m_instantiate && !dynamic_cast<Cx::Dialog*>(&resource))
                     m_target->AddChild(resource);
             }
         }

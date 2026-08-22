@@ -1,7 +1,5 @@
 #include <CXO2/States/StateWaiting7K.hpp>
 
-#include <CXO2/Events/WaitingEvents.hpp>
-
 #include <CXO2/States/StatePlanet.hpp>
 #include <CXO2/States/StateRoom.hpp>
 #include <CXO2/States/StateLoading.hpp>
@@ -28,11 +26,11 @@
 #include <CXO2/Network/Events/WaitingMusicChangedEventData.hpp>
 #include <CXO2/Network/Events/WaitingTitleChangedEventData.hpp>
 
-#include <CXO2/UI/Common/ChatPanel.hpp>
-#include <CXO2/UI/Waiting/AvatarInfo.hpp>
-#include <CXO2/UI/Waiting/MapSelector.hpp>
-#include <CXO2/UI/Waiting/InstrumentSelector.hpp>
-#include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
+#include <CXO2/UI/Components/ChatPanel.hpp>
+#include <CXO2/UI/Components/Waiting/AvatarInfo.hpp>
+#include <CXO2/UI/Components/Waiting/MapSelector.hpp>
+#include <CXO2/UI/Components/Waiting/InstrumentSelector.hpp>
+#include <CXO2/UI/Components/Dialogs/SelectMusicDialog.hpp>
 
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Identifiers/Waiting7K.hpp>
@@ -41,10 +39,10 @@
 #include <CXO2/Constants/Messages/Waiting.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/RadioButton.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/Image.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <CXO2/UI/RadioButton.hpp>
+#include <CXO2/UI/BitmapNumber.hpp>
+#include <CXO2/UI/Image.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 #include <fmt/format.h>
@@ -165,14 +163,13 @@ namespace Cx
 
     void StateWaiting7K::Initialize()
     {
-        if (!State::Initialize(StateEventArgs{GetName()}))
-            return;
+        State::Initialize();
 
         RegisterMessageEvents();
 
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_WAITING);
 
-        const auto channelCategory = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_CHANNEL_CATEGORY);
+        const auto channelCategory = Instantiate<Image>(Resource::Waiting7K::IDC_IMAGE_CHANNEL_CATEGORY);
         switch (m_session.GetMusicHall())
         {
             case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
@@ -187,20 +184,20 @@ namespace Cx
         InitializeAvatars();
 
         // Team buttons
-        const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
-        auto teamButtonMatcher = [=] (const Room::Team team) -> Gx::RadioButton*
+        const auto teamButtons = Instantiate<Cx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
+        auto teamButtonMatcher = [=] (const Room::Team team) -> Cx::RadioButton*
         {
             switch (team)
             {
                 default:
-                case Room::Team::A: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_A);
-                case Room::Team::B: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_B);
-                case Room::Team::C: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_C);
-                case Room::Team::D: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_D);
-                case Room::Team::E: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_E);
-                case Room::Team::F: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_F);
-                case Room::Team::G: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_G);
-                case Room::Team::H: return teamButtons->FindChild<Gx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_H);
+                case Room::Team::A: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_A);
+                case Room::Team::B: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_B);
+                case Room::Team::C: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_C);
+                case Room::Team::D: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_D);
+                case Room::Team::E: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_E);
+                case Room::Team::F: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_F);
+                case Room::Team::G: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_G);
+                case Room::Team::H: return teamButtons->FindChild<Cx::RadioButton>(Resource::Waiting7K::Team::IDC_RADIO_TEAM_H);
             }
         };
 
@@ -221,23 +218,23 @@ namespace Cx
         }
 
         // Emoticon dialog
-        const auto emoticonDialog      = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
-        const auto emoticonPrevButton  = emoticonDialog->FindChild<Gx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_LEFT);
-        const auto emoticonNextButton  = emoticonDialog->FindChild<Gx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_RIGHT);
+        const auto emoticonDialog      = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
+        const auto emoticonPrevButton  = emoticonDialog->FindChild<Cx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_LEFT);
+        const auto emoticonNextButton  = emoticonDialog->FindChild<Cx::Button>(Resource::Waiting7K::Emoticon::IDC_BUTTON_RIGHT);
 
         emoticonPrevButton->SetClickCallback([this] (auto& sender, auto& ev) { OnEmoticonPreviousPageButtonClicked(sender, ev); });
         emoticonNextButton->SetClickCallback([this] (auto& sender, auto& ev) { OnEmoticonNextPageButtonClicked(sender, ev); });
 
-        const auto emoticonHelpButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_EMOTICON);
+        const auto emoticonHelpButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_EMOTICON);
         emoticonHelpButton->SetClickCallback([this] (auto& sender, auto& ev) { OnEmoticonButtonClicked(sender, ev); });
 
         // Change title dialog
-        const auto changeTitleDialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
-        const auto changeTitleBox = changeTitleDialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
+        const auto changeTitleDialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
+        const auto changeTitleBox = changeTitleDialog->FindChild<Cx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
         changeTitleBox->SetMaximumTextLength(21);
         changeTitleDialog->SetAcceptCallback([this] (auto&, auto&) { OnChangeTitleDialogAccepted(); });
 
-        const auto changeTitleButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_CHANGE_TITLE);
+        const auto changeTitleButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_CHANGE_TITLE);
         changeTitleButton->SetClickCallback([this] (auto& sender, auto& ev) { OnChangeTitleButtonClicked(sender, ev); });
 
         // Map selector
@@ -263,7 +260,7 @@ namespace Cx
         const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
         selectMusicDialog->SetAcceptCallback([this] (auto&, auto&) { OnSelectMusicDialogAccepted(); });
 
-        const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
+        const auto selectMusicButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
         selectMusicButton->SetClickCallback([this] (auto& sender, auto& ev) { OnSelectMusicButtonClicked(sender, ev); });
 
         // Chat panel & window
@@ -275,21 +272,21 @@ namespace Cx
         chatWindow->PushSystemMessage("Let's play together~");
         chatWindow->PushSystemMessage(Constants::Messages::Waiting::Welcome::CHANGE_TITLE);
 
-        if (const auto cover = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))
+        if (const auto cover = Instantiate<Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))
             cover->SetVisible(!m_room.GetCurrentSlot().IsMaster);
 
         // Buttons
-        const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
+        const auto startButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
         startButton->SetVisible(m_room.GetCurrentSlot().IsMaster);
         startButton->SetEnabled(startButton->IsVisible());
         startButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnStartStateChanged(sender, ev); });
 
-        const auto readyButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
+        const auto readyButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
         readyButton->SetVisible(!m_room.GetCurrentSlot().IsMaster);
         readyButton->SetEnabled(readyButton->IsVisible());
         readyButton->SetCheckStateChangeCallback([this] (auto& sender, auto& ev) { OnReadyStateChanged(sender, ev); });
 
-        const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
         backButton->SetClickCallback([this] (auto& sender, auto& ev) { OnBackButtonClicked(sender, ev); });
 
         InvalidateRoomInfo();
@@ -310,7 +307,7 @@ namespace Cx
 
     void StateWaiting7K::InitializeAvatars()
     {
-        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+        const auto avatarList = Instantiate<List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
         int memberID = 0;
         for (const auto child : avatarList->GetChildren())
@@ -318,7 +315,7 @@ namespace Cx
             if (memberID >= RoomContext::MaxCapacity)
                 break;
 
-            const auto container = dynamic_cast<Gx::UiContainer*>(child);
+            const auto container = dynamic_cast<Cx::UiContainer*>(child);
             if (!container)
                 continue;
 
@@ -326,7 +323,7 @@ namespace Cx
             if (!avatar)
                 continue;
 
-            auto& emoticonContainer = Create<Gx::UiContainer>();
+            auto& emoticonContainer = Create<Cx::UiContainer>();
             emoticonContainer.SetName(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
             emoticonContainer.SetVisible(false);
             avatar->AddChild(emoticonContainer);
@@ -364,8 +361,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnSlotChanged, WaitingSlotChangedEventArgs{response}))
-                return;
 
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
@@ -418,8 +413,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnKicked, WaitingKickedEventArgs{response}))
-                return;
 
             m_room.Leave();
             GetDirector().Dismiss<StateRoom>(RoomTransitionEventType::Kick);
@@ -438,8 +431,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMemberJoined, WaitingMemberJoinedEventArgs{response}))
-                return;
 
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
@@ -476,8 +467,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMemberLeft, WaitingMemberLeftEventArgs{response}))
-                return;
 
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
@@ -519,8 +508,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMemberTeamChanged, WaitingMemberTeamChangedEventArgs{response}))
-                return;
 
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
@@ -543,8 +530,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMemberReadyStateChanged, WaitingMemberReadyStateChangedEventArgs{response}))
-                return;
 
             if (response.ID < 0 || response.ID >= RoomContext::MaxCapacity)
                 return;
@@ -610,7 +595,7 @@ namespace Cx
         }
 
         const auto code = emoticon->second;
-        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+        const auto avatarList = Instantiate<List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
         int memberID = 0;
         Avatar* avatar = nullptr;
@@ -619,7 +604,7 @@ namespace Cx
             if (memberID >= RoomContext::MaxCapacity)
                 break;
 
-            const auto container = dynamic_cast<Gx::UiContainer*>(child);
+            const auto container = dynamic_cast<Cx::UiContainer*>(child);
             if (!container)
                 continue;
 
@@ -640,8 +625,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMusicChanged, WaitingMusicChangedEventArgs{response}))
-                return;
 
             const auto music = MusicID::From(response.MusicID);
 
@@ -667,8 +650,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnTitleChanged, WaitingTitleChangedEventArgs{response}))
-                return;
 
             m_room.SetTitle(response.Title);
             InvalidateRoomInfo();
@@ -687,8 +668,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnMapChanged, WaitingMapChangedEventArgs{response}))
-                return;
 
             m_room.SetMap(Map::From(response.Map));
 
@@ -708,11 +687,9 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnStartGame, WaitingGameStartedEventArgs{response}))
-                return;
 
-            const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
-            const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+            const auto startButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
+            const auto backButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
 
             if (response.ResultCode != StartGameResult::Success)
             {
@@ -756,13 +733,11 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
+    void StateWaiting7K::OnReadyStateChanged(Cx::ToggleButton& sender, Control::Event& ev)
     {
-        if (Dispatch(WaitingEvents::OnReady, WaitingReadyEventArgs{sender.IsChecked()}))
-            return;
 
-        const auto teamButtons = Instantiate<Gx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
-        const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+        const auto teamButtons = Instantiate<Cx::UiContainer>(Resource::Waiting7K::IDC_CONTAINER_TEAM_BUTTONS);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
 
         sender.SetEnabled(false);
         backButton->SetEnabled(false);
@@ -771,9 +746,9 @@ namespace Cx
         m_service.UpdateReadyState([=, &sender] (const auto& ev) { OnUpdateReadyStateResponded(sender, ev); });
     }
 
-    void StateWaiting7K::OnUpdateReadyStateResponded(Gx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev)
+    void StateWaiting7K::OnUpdateReadyStateResponded(Cx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev)
     {
-        const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
 
         try
         {
@@ -791,64 +766,55 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnStartStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev)
+    void StateWaiting7K::OnStartStateChanged(Cx::ToggleButton& sender, Control::Event& ev)
     {
          if (!sender.IsChecked())
             return;
 
-        auto args = WaitingStartGameEventArgs{};
-        if (Dispatch(WaitingEvents::OnStartGameCheck, args))
-        {
-            if (!args.Authorized)
-                return;
-        }
-        else
-        {
-            const auto sfxStart = Instantiate<sf::Sound>(Sound::Effects::EF_33);
-            m_mixer.Play(*sfxStart, Sound::Channel::SFX);
+        const auto sfxStart = Instantiate<sf::Sound>(Sound::Effects::EF_33);
+        m_mixer.Play(*sfxStart, Sound::Channel::SFX);
 
-            if (m_room.GetMusic().ID == 0)
+        if (m_room.GetMusic().ID == 0)
+        {
+            ShowDialog(Constants::Messages::Waiting::TUNE_NOT_SELECTED, DialogStyle::Information);
+            sender.SetCheckedState(false);
+
+            return;
+        }
+
+        for (const auto& meta : m_session.GetNonPlayableMusicList())
+        {
+            if (meta.ID == m_room.GetMusic().ID)
             {
-                ShowDialog(Constants::Messages::Waiting::TUNE_NOT_SELECTED, DialogStyle::Information);
+                auto prompt = sf::String();
+                if (meta.Status == MusicStatus::Unacquired)
+                    prompt = Constants::Messages::Waiting::TUNE_NOT_PURCHASED;
+                else
+                    prompt = Constants::Messages::Waiting::TUNE_NOT_FOUND;
+
+                ShowDialog(prompt, DialogStyle::Information);
                 sender.SetCheckedState(false);
 
                 return;
             }
+        }
 
-            for (const auto& meta : m_session.GetNonPlayableMusicList())
+        for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
+        {
+            const auto& slot = m_room.GetSlot(i);
+            if (slot.State != Room::SlotState::Occupied || slot.IsMaster)
+                continue;
+
+            if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
             {
-                if (meta.ID == m_room.GetMusic().ID)
-                {
-                    auto prompt = sf::String();
-                    if (meta.Status == MusicStatus::Unacquired)
-                        prompt = Constants::Messages::Waiting::TUNE_NOT_PURCHASED;
-                    else
-                        prompt = Constants::Messages::Waiting::TUNE_NOT_FOUND;
+                ShowDialog(Constants::Messages::Waiting::TUNE_MISSING_FOR_OTHERS, DialogStyle::Information);
+                sender.SetCheckedState(false);
 
-                    ShowDialog(prompt, DialogStyle::Information);
-                    sender.SetCheckedState(false);
-
-                    return;
-                }
-            }
-
-            for (std::size_t i = 0; i < RoomContext::MaxCapacity; i++)
-            {
-                const auto& slot = m_room.GetSlot(i);
-                if (slot.State != Room::SlotState::Occupied || slot.IsMaster)
-                    continue;
-
-                if (slot.MusicIDs.find(m_room.GetMusic().ID) == slot.MusicIDs.end())
-                {
-                    ShowDialog(Constants::Messages::Waiting::TUNE_MISSING_FOR_OTHERS, DialogStyle::Information);
-                    sender.SetCheckedState(false);
-
-                    return;
-                }
+                return;
             }
         }
 
-        const auto backButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_BACK);
         backButton->SetEnabled(false);
 
         sender.SetEnabled(false);
@@ -870,7 +836,7 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnSelectMusicButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateWaiting7K::OnSelectMusicButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
         const auto sfxSelectMusic    = Instantiate<sf::Sound>(Sound::Effects::EF_35);
@@ -882,7 +848,7 @@ namespace Cx
     void StateWaiting7K::OnSelectMusicDialogAccepted()
     {
         const auto selectMusicDialog = Instantiate<SelectMusicDialog>(Resource::Waiting7K::IDC_DIALOG_SELECT_MUSIC);
-        const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
+        const auto selectMusicButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
 
         selectMusicButton->SetEnabled(false);
 
@@ -944,7 +910,7 @@ namespace Cx
 
     void StateWaiting7K::OnUpdateMusicResponded(const MessageEnvelope<UpdateRoomMusicRequest>& ev)
     {
-        const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
+        const auto selectMusicButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC);
 
         try
         {
@@ -963,10 +929,10 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnChangeTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateWaiting7K::OnChangeTitleButtonClicked(Control& sender, Control::Event& ev)
     {
-        const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
-        const auto titleBox = dialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
+        const auto dialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
+        const auto titleBox = dialog->FindChild<Cx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
 
         if (!m_room.GetCurrentSlot().IsMaster)
         {
@@ -974,7 +940,7 @@ namespace Cx
             return;
         }
 
-        auto ctx   = Gx::DialogPresentationContext();
+        auto ctx   = Cx::DialogPresentationContext();
         ctx.Bounds = {{}, GetView().getSize()};
         ctx.Prompt = Constants::Messages::Waiting::ChangeRoomTitle::TITLE_PROMPT;
 
@@ -989,8 +955,8 @@ namespace Cx
 
     void StateWaiting7K::OnChangeTitleDialogAccepted()
     {
-        const auto dialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
-        const auto titleBox = dialog->FindChild<Gx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
+        const auto dialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_CHANGE_TITLE);
+        const auto titleBox = dialog->FindChild<Cx::InputField>(Resource::Waiting7K::ChangeTitle::IDC_EDIT_TITLE);
 
         if (titleBox->GetString().getSize() > titleBox->GetMaximumTextLength())
         {
@@ -1021,15 +987,12 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnTeamButtonStateChanged(Gx::RadioButton& sender, Gx::Control::Event& ev)
+    void StateWaiting7K::OnTeamButtonStateChanged(Cx::RadioButton& sender, Control::Event& ev)
     {
         if (!sender.IsChecked() || !m_avatarInfo)
             return;
 
         auto team = m_teamButtons.at(&sender);
-
-        if (Dispatch(WaitingEvents::OnTeamChange, WaitingTeamEventArgs{team}))
-            return;
 
         m_service.UpdateTeam(UpdateMemberTeamRequest{team}, [=] (const auto& ev) { OnUpdateTeamResponded(ev); });
     }
@@ -1103,12 +1066,12 @@ namespace Cx
         m_room.SetEffectID(effectID);
     }
 
-    void StateWaiting7K::OnEmoticonButtonClicked(Gx::Control&, Gx::Control::Event&)
+    void StateWaiting7K::OnEmoticonButtonClicked(Control&, Control::Event&)
     {
-        const auto emoticonDialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
-        const auto content        = emoticonDialog->FindChild<Gx::Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
-        const auto currentPage    = emoticonDialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
-        const auto maxPage        = emoticonDialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_MAX_PAGE);
+        const auto emoticonDialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
+        const auto content        = emoticonDialog->FindChild<Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
+        const auto currentPage    = emoticonDialog->FindChild<BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
+        const auto maxPage        = emoticonDialog->FindChild<BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_MAX_PAGE);
 
         content->SetFrame(0);
         currentPage->SetValue(1);
@@ -1117,11 +1080,11 @@ namespace Cx
         Present(*emoticonDialog, Gx::PresentationContext::Default);
     }
 
-    void StateWaiting7K::OnEmoticonNextPageButtonClicked(Gx::Control&, Gx::Control::Event&)
+    void StateWaiting7K::OnEmoticonNextPageButtonClicked(Control&, Control::Event&)
     {
-        const auto emoticonDialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
-        const auto content        = emoticonDialog->FindChild<Gx::Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
-        const auto currentPage    = emoticonDialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
+        const auto emoticonDialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
+        const auto content        = emoticonDialog->FindChild<Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
+        const auto currentPage    = emoticonDialog->FindChild<BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
 
         if (content->GetCurrentFrameIndex() < content->GetFrameCount() - 1)
         {
@@ -1130,11 +1093,11 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnEmoticonPreviousPageButtonClicked(Gx::Control&, Gx::Control::Event&)
+    void StateWaiting7K::OnEmoticonPreviousPageButtonClicked(Control&, Control::Event&)
     {
-        const auto emoticonDialog = Instantiate<Gx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
-        const auto content        = emoticonDialog->FindChild<Gx::Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
-        const auto currentPage    = emoticonDialog->FindChild<Gx::BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
+        const auto emoticonDialog = Instantiate<Cx::Dialog>(Resource::Waiting7K::IDC_DIALOG_EMOTICON);
+        const auto content        = emoticonDialog->FindChild<Image>(Resource::Waiting7K::Emoticon::IDC_IMAGE_CONTENT);
+        const auto currentPage    = emoticonDialog->FindChild<BitmapNumber>(Resource::Waiting7K::Emoticon::IDC_NUMBER_CURRENT_PAGE);
 
         if (content->GetCurrentFrameIndex() > 0)
         {
@@ -1143,12 +1106,12 @@ namespace Cx
         }
     }
 
-    void StateWaiting7K::OnExtendButtonDoubleClicked(Gx::Control& sender, Gx::Control::Event&)
+    void StateWaiting7K::OnExtendButtonDoubleClicked(Control& sender, Control::Event&)
     {
         ExtendSlot(m_extendButtonSlotIDs.at(&sender));
     }
 
-    void StateWaiting7K::OnBackButtonClicked(Gx::Control&, Gx::Control::Event&)
+    void StateWaiting7K::OnBackButtonClicked(Control&, Control::Event&)
     {
         m_service.ExitRoom([this] (const auto& ev) { OnExitRoomResponded(ev); });
     }
@@ -1158,8 +1121,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(WaitingEvents::OnExitRoomResponded, WaitingExitRoomEventArgs{response}))
-                return;
 
             m_room.Leave();
 
@@ -1185,16 +1146,15 @@ namespace Cx
         {
             if (m_room.GetCurrentSlot().IsMaster)
             {
-                if (const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START))
+                if (const auto startButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START))
                     startButton->SetCheckedState(true);
             }
             else
             {
-                if (const auto readyButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY))
+                if (const auto readyButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY))
                     readyButton->SetCheckedState(!readyButton->IsChecked());
             }
         }
-
 
         const auto chatPanel = Instantiate<ChatPanel>(Resource::Waiting7K::IDC_CHAT_PANEL);
         if (ev.control)
@@ -1330,9 +1290,6 @@ namespace Cx
         if (kick && slot.Name == m_room.GetCurrentSlot().Name)
             return;
 
-        if (Dispatch(WaitingEvents::OnSlotChange, WaitingSlotEventArgs{slotID, kick}))
-            return;
-
         if (kick)
         {
             ShowDialog(Constants::Messages::Waiting::Members::KICK_CONFIRM, DialogStyle::YesNo, [=] (const bool confirm)
@@ -1347,7 +1304,7 @@ namespace Cx
 
     void StateWaiting7K::ShowEmoticon(const Avatar* avatar, const std::string& emoticonID)
     {
-        const auto container = avatar->FindChild<Gx::UiContainer>(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
+        const auto container = avatar->FindChild<Cx::UiContainer>(Resource::Waiting7K::Avatar::IDC_CONTAINER_EMOTICON);
         if (container->IsVisible())
             return;
 
@@ -1372,8 +1329,6 @@ namespace Cx
 
     void StateWaiting7K::SendEmoticon(std::string command, const std::string& emoticonID)
     {
-        if (Dispatch(WaitingEvents::OnEmoticon, WaitingEmoticonEventArgs{command}))
-            return;
 
         m_messaging.SendWaitingMessage(WaitingMessageRequest{Constants::Messages::Chat::Emoticons::PREFIX + command});
 
@@ -1384,16 +1339,16 @@ namespace Cx
     {
         const bool isMaster = m_room.GetCurrentSlot().IsMaster;
 
-        const auto channelNumber = Instantiate<Gx::BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_CHANNEL_ID);
+        const auto channelNumber = Instantiate<BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_CHANNEL_ID);
         channelNumber->SetValue(m_session.GetChannelID() + 1);
 
-        const auto roomNumber = Instantiate<Gx::BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_ROOM_ID);
+        const auto roomNumber = Instantiate<BitmapNumber>(Resource::Waiting7K::IDC_NUMBER_ROOM_ID);
         roomNumber->SetValue(m_room.GetID());
 
-        const auto m_roomName = Instantiate<Gx::Label>(Resource::Waiting7K::IDC_TEXT_ROOM_NAME);
+        const auto m_roomName = Instantiate<Label>(Resource::Waiting7K::IDC_TEXT_ROOM_NAME);
         m_roomName->SetString(m_room.GetTitle());
 
-        const auto musicName = Instantiate<Gx::Label>(Resource::Waiting7K::IDC_TEXT_MUSIC_NAME);
+        const auto musicName = Instantiate<Label>(Resource::Waiting7K::IDC_TEXT_MUSIC_NAME);
         if (m_room.IsRandomActive())
         {
             const auto [start, end] = GetRandomLevelRange(m_room.GetRandomLevel());
@@ -1410,36 +1365,36 @@ namespace Cx
             musicName->SetString(sf::String(fmt::format(U"{} [BPM: {:.2f}]", m_room.GetMusic().Title, m_room.GetMusic().BPM)));
         }
 
-        const auto level = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_ROOM_LEVEL);
+        const auto level = Instantiate<Image>(Resource::Waiting7K::IDC_IMAGE_ROOM_LEVEL);
         level->SetFrame(GetRoomLevelCode(m_room));
 
         const auto mapSelector = Instantiate<MapSelector>(Resource::Waiting7K::IDC_CONTAINER_MAP_SELECTOR);
         mapSelector->SetMapID(m_room.GetMap().Random ? 0 : m_room.GetMap().ID, true);
         mapSelector->SetControlsEnabled(isMaster);
 
-        if (const auto cover = Instantiate<Gx::Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))
+        if (const auto cover = Instantiate<Image>(Resource::Waiting7K::IDC_IMAGE_COVER_MUSIC))
             cover->SetVisible(!isMaster);
 
-        if (const auto selectMusicButton = Instantiate<Gx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC); selectMusicButton)
+        if (const auto selectMusicButton = Instantiate<Cx::Button>(Resource::Waiting7K::IDC_BUTTON_SELECT_MUSIC); selectMusicButton)
             selectMusicButton->SetEnabled(isMaster);
 
-        const auto startButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
+        const auto startButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_START);
         startButton->SetVisible(isMaster);
         startButton->SetEnabled(startButton->IsVisible());
 
-        const auto readyButton = Instantiate<Gx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
+        const auto readyButton = Instantiate<Cx::ToggleButton>(Resource::Waiting7K::IDC_BUTTON_READY);
         readyButton->SetVisible(!isMaster);
         readyButton->SetEnabled(readyButton->IsVisible());
     }
 
     void StateWaiting7K::InvalidateAvatarInfo()
     {
-        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+        const auto avatarList = Instantiate<List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
         int memberIndex = 0;
         for (const auto child : avatarList->GetChildren())
         {
-            const auto container = dynamic_cast<Gx::UiContainer*>(child);
+            const auto container = dynamic_cast<Cx::UiContainer*>(child);
             if (!container)
                 continue;
 
@@ -1472,7 +1427,7 @@ namespace Cx
 
     void StateWaiting7K::InvalidateMembers()
     {
-        const auto avatarList = Instantiate<Gx::List>(Resource::Waiting7K::IDC_LIST_AVATAR);
+        const auto avatarList = Instantiate<List>(Resource::Waiting7K::IDC_LIST_AVATAR);
 
         int memberIndex = 0;
         for (const auto child : avatarList->GetChildren())
@@ -1480,7 +1435,7 @@ namespace Cx
             if (memberIndex >= RoomContext::MaxCapacity)
                 break;
 
-            const auto container = dynamic_cast<Gx::UiContainer*>(child);
+            const auto container = dynamic_cast<Cx::UiContainer*>(child);
             if (!container)
                 continue;
 
@@ -1496,7 +1451,7 @@ namespace Cx
             if (const auto cover = avatar->FindChild<Gx::Sprite>(Resource::Waiting7K::Avatar::IDC_IMAGE_COVER_AVATAR))
                 cover->SetVisible(slot.State == Room::SlotState::Locked);
 
-            if (const auto btnExtend = container->FindChild<Gx::Button>(Resource::Waiting7K::Avatar::IDC_BUTTON_EXTEND))
+            if (const auto btnExtend = container->FindChild<Cx::Button>(Resource::Waiting7K::Avatar::IDC_BUTTON_EXTEND))
             {
                 btnExtend->SetEnabled(m_room.GetCurrentSlot().IsMaster);
                 m_extendButtonSlotIDs[btnExtend] = memberIndex;

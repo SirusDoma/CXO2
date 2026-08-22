@@ -7,7 +7,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::InputField> InputFieldLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<InputField> InputFieldLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         InputFieldMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -63,7 +63,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::InputField> InputFieldLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<InputField> InputFieldLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const InputFieldMetadata*>(&meta);
         if (!metadata)

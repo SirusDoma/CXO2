@@ -1,7 +1,5 @@
 #include <CXO2/States/StatePlaying7K.hpp>
 
-#include <CXO2/Events/PlayingEvents.hpp>
-
 #include <CXO2/States/StateWaiting7K.hpp>
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/States/StatePlanet.hpp>
@@ -23,22 +21,22 @@
 #include <CXO2/Avatar/Avatar.hpp>
 #include <CXO2/Avatar/ItemFactory.hpp>
 
-#include <CXO2/UI/Common/ChatPanel.hpp>
-#include <CXO2/UI/Waiting/AvatarInfo.hpp>
-#include <CXO2/UI/Playing/ComboCounter.hpp>
-#include <CXO2/UI/Playing/JudgementIndicator.hpp>
-#include <CXO2/UI/Playing/PlayMenu.hpp>
-#include <CXO2/UI/Playing/Equalizer.hpp>
+#include <CXO2/UI/Components/ChatPanel.hpp>
+#include <CXO2/UI/Components/Waiting/AvatarInfo.hpp>
+#include <CXO2/UI/Components/Playing/ComboCounter.hpp>
+#include <CXO2/UI/Components/Playing/JudgementIndicator.hpp>
+#include <CXO2/UI/Components/Playing/PlayMenu.hpp>
+#include <CXO2/UI/Components/Playing/Equalizer.hpp>
 
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 #include <CXO2/Constants/Identifiers/Game.hpp>
 #include <CXO2/Constants/Identifiers/Playing7K.hpp>
 
 #include <Genode/Tasks/Scheduler.hpp>
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/List.hpp>
-#include <Genode/UI/Gauge.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <CXO2/UI/BitmapNumber.hpp>
+#include <CXO2/UI/List.hpp>
+#include <CXO2/UI/Gauge.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 #include <CXO2/Network/Events/GameCompletedEventData.hpp>
 #include <CXO2/Network/Events/PlayingMemberLeftEventData.hpp>
@@ -102,8 +100,7 @@ namespace Cx
 
     void StatePlaying7K::Initialize()
     {
-        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
-            return;
+        State::Initialize();
 
         m_service.SetMemberStatsUpdateEventCallback([this] (const auto& ev) { OnMemberStatsUpdate(ev); });
         m_service.SetMemberScoreSubmittedEventCallback([this] (const auto& ev) { OnMemberScoreSubmitted(ev); });
@@ -130,7 +127,7 @@ namespace Cx
 
         // Setup chat panel
         const auto chatPanel = Instantiate<ChatPanel>(Resource::Playing7K::IDC_CHAT_PANEL);
-        m_chatBox = chatPanel->FindChild<Gx::InputField>(Resource::Playing7K::IDC_EDIT_CHAT);
+        m_chatBox = chatPanel->FindChild<Cx::InputField>(Resource::Playing7K::IDC_EDIT_CHAT);
         if (m_context.GetMode() != GameMode::Tutorial)
         {
             chatPanel->SetMaximumTextLength(50);
@@ -147,7 +144,7 @@ namespace Cx
         if (const auto instructor = Instantiate<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_INSTRUCTOR))
             instructor->SetVisible(m_context.GetMode() == GameMode::Tutorial);
 
-        if (const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
+        if (const auto instruction = Instantiate<Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION))
             instruction->SetVisible(false);
 
         // Map user states
@@ -171,11 +168,11 @@ namespace Cx
         }
 
         // Setup avatars + avatars effects'
-        const auto avatarList = Instantiate<Gx::List>(Resource::Playing7K::IDC_LIST_AVATAR);
+        const auto avatarList = Instantiate<List>(Resource::Playing7K::IDC_LIST_AVATAR);
         const auto avaContainers = avatarList->GetChildren();
         for (std::size_t i = 0; i < avaContainers.size(); i++)
         {
-            const auto container = dynamic_cast<Gx::UiContainer*>(avaContainers[i]);
+            const auto container = dynamic_cast<Cx::UiContainer*>(avaContainers[i]);
             if (!container)
                 continue;
 
@@ -219,8 +216,8 @@ namespace Cx
 
                 EquipAvatar(avatar, slot.Gender, slot.EquippedItemIDs);
 
-                auto efc = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
-                auto& effectContainer = efc ? *efc : Create<Gx::UiContainer>();
+                auto efc = avatar->FindChild<Cx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
+                auto& effectContainer = efc ? *efc : Create<Cx::UiContainer>();
 
                 effectContainer.SetName(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
 
@@ -243,10 +240,10 @@ namespace Cx
                     });
                 }
 
-                auto numEffect = effectContainer.FindChild<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
-                if (const auto numPrefab = Find<Gx::BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM); numEffect && numPrefab)
+                auto numEffect = effectContainer.FindChild<BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM);
+                if (const auto numPrefab = Find<BitmapNumber>(Resource::Playing7K::Avatar::IDC_NUMBER_EFFECT_JAM); numEffect && numPrefab)
                 {
-                    numEffect = &Create<Gx::BitmapNumber>(*numPrefab);
+                    numEffect = &Create<BitmapNumber>(*numPrefab);
                     effectContainer.AddChild(*numEffect);
                 }
 
@@ -275,24 +272,24 @@ namespace Cx
         }
 
         // Key down & effects
-        const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
-        const auto keyDownContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_DOWN);
+        const auto keyEffectContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
+        const auto keyDownContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_DOWN);
         for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
         {
             const int id = static_cast<int>(channel) - 2;
             if (id < 0 || id > 6)
                 continue;
 
-            const auto keyDown = keyDownContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_KEY_DOWN[id]);
+            const auto keyDown = keyDownContainer->FindChild<Image>(Resource::Playing7K::IDC_IMAGE_KEY_DOWN[id]);
             keyDown->SetVisible(false);
 
-            const auto keyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_KEY_EFFECT[id]);
+            const auto keyEffect = keyEffectContainer->FindChild<Image>(Resource::Playing7K::IDC_IMAGE_KEY_EFFECT[id]);
             keyEffect->SetFrame(id);
             keyEffect->SetVisible(false);
 
             if (m_context.GetMode() == GameMode::Tutorial)
             {
-                const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
+                const auto guideKeyEffect = keyEffectContainer->FindChild<Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
                 guideKeyEffect->SetVisible(false);
                 m_guideKeyEffects[channel] = guideKeyEffect;
             }
@@ -307,9 +304,9 @@ namespace Cx
         playMenu->SetScoreTracker(m_context.GetScoreTracker());
 
         // Setup Score Counter
-        const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
-        const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
-        const auto bufferContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_BUFFER);
+        const auto scoreNumber = Instantiate<BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
+        const auto jamGauge = Instantiate<Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
+        const auto bufferContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_BUFFER);
         m_buffers = bufferContainer->GetChildren();
         for (std::size_t i = 0; i < m_buffers.size(); i++)
         {
@@ -318,7 +315,7 @@ namespace Cx
         }
 
         // Setup Life Bar
-        const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
+        const auto lifeBar = Instantiate<Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
         if (!O2::InInteropMode(InteropMode::Playing))
             lifeBar->SetSlanted(true);
 
@@ -326,10 +323,10 @@ namespace Cx
         lifeBar->SetValue(0);
 
           // Setup Jam Combo
-        const auto jamContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
+        const auto jamContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
         jamContainer->SetVisible(false);
         const auto jamAnimation = jamContainer->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_JAM);
-        const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
+        const auto jamNumber    = jamContainer->FindChild<BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
 
         jamContainer->SetVisible(false);
         jamAnimation->Stop();
@@ -340,7 +337,7 @@ namespace Cx
         // Setup Combo Counter
         m_comboCounter = &Create<ComboCounter>(
             Find<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_COMBO),
-            Find<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
+            Find<BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_COMBO)
         );
         m_comboCounter->SetName(Resource::Playing7K::IDC_CONTAINER_COMBO);
         AddChild(*m_comboCounter);
@@ -359,7 +356,7 @@ namespace Cx
         AddChild(*m_judgementIndicator);
 
         // Setup Long Note effects
-        if (const auto longNoteEffectList = Find<Gx::List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
+        if (const auto longNoteEffectList = Find<List>(Resource::Playing7K::IDC_LIST_LONG_NOTE_EFFECT); longNoteEffectList)
         {
             for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
             {
@@ -378,7 +375,7 @@ namespace Cx
         }
 
         // Setup Note Clicks
-        if (const auto noteClickList = Find<Gx::List>(Resource::Playing7K::IDC_LIST_NOTE_CLICK); noteClickList)
+        if (const auto noteClickList = Find<List>(Resource::Playing7K::IDC_LIST_NOTE_CLICK); noteClickList)
         {
             for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
             {
@@ -423,7 +420,7 @@ namespace Cx
         });
 
         // Exit button
-        const auto exitButton = Instantiate<Gx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
+        const auto exitButton = Instantiate<Cx::Button>(Resource::Playing7K::IDC_BUTTON_EXIT);
         exitButton->SetClickCallback([this] (auto& sender, auto& ev) { OnExitButtonClicked(sender, ev); });
 
         for (auto [_, avatar] : m_avatars)
@@ -451,8 +448,6 @@ namespace Cx
 
     void StatePlaying7K::OnRenderComplete()
     {
-        if (Dispatch(PlayingEvents::OnComplete, PlayingEventArgs{}))
-            return;
 
         if (m_context.GetMode() == GameMode::Tutorial)
         {
@@ -519,8 +514,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(PlayingEvents::OnMemberStatsUpdate, PlayingMemberStatsEventArgs{response}))
-                return;
 
             if (response.Type == UpdateStatsType::Life)
             {
@@ -566,8 +559,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(PlayingEvents::OnMemberScoreSubmitted, PlayingMemberScoreEventArgs{response}))
-                return;
 
             const auto it = m_states.find(response.ID);
             if (it == m_states.end() || !it->second.Valid)
@@ -589,8 +580,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(PlayingEvents::OnMemberLeft, PlayingMemberLeftEventArgs{response}))
-                return;
 
             if (const auto it = m_states.find(response.ID); it != m_states.end())
             {
@@ -628,8 +617,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(PlayingEvents::OnGameCompleted, PlayingGameCompletedEventArgs{response}))
-                return;
 
             auto entries = std::array<GameCompletedEventData::ScoreEntry, 8>();
             const auto& container = response.Entries.GetContainer();
@@ -712,8 +699,6 @@ namespace Cx
 
     void StatePlaying7K::OnChartInput(const Chart::Channel channel, const bool state)
     {
-        if (Dispatch(PlayingEvents::OnInput, PlayingInputEventArgs{m_renderer.GetRenderPosition(), channel, state}))
-            return;
 
         m_inputStates[channel] = state;
         if (const auto keyEffect = m_keyEffects.find(channel); keyEffect != m_keyEffects.end())
@@ -734,12 +719,10 @@ namespace Cx
 
     void StatePlaying7K::OnScoreIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long count)
     {
-        if (Dispatch(PlayingEvents::OnJudgement, PlayingJudgementEventArgs{m_renderer.GetRenderPosition(), ev, acc, count}))
-            return;
 
-        const auto scoreNumber = Instantiate<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
-        const auto jamGauge = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
-        const auto lifeBar = Instantiate<Gx::Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
+        const auto scoreNumber = Instantiate<BitmapNumber>(Resource::Playing7K::IDC_NUMBER_POINT_NUMBER);
+        const auto jamGauge = Instantiate<Gauge>(Resource::Playing7K::IDC_GAUGE_JAM_BAR);
+        const auto lifeBar = Instantiate<Gauge>(Resource::Playing7K::IDC_GAUGE_LIFE_BAR);
 
         auto& scoreTracker = m_context.GetScoreTracker();
         if (!scoreTracker.IsEnabled() && m_context.GetDifficulty() != Difficulty::EX)
@@ -817,12 +800,10 @@ namespace Cx
 
     void StatePlaying7K::OnJamComboIncremented(const Chart::NoteEvent& ev, const Accuracy acc, const unsigned long long jamCombo)
     {
-        if (Dispatch(PlayingEvents::OnJamCombo, PlayingJamComboEventArgs{m_renderer.GetRenderPosition(), ev, acc, jamCombo}))
-            return;
 
-        const auto jamContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
+        const auto jamContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_NOTE_JAM);
         const auto jamAnimation = jamContainer->FindChild<Gx::Animation>(Resource::Playing7K::IDC_ANIMATION_NOTE_JAM);
-        const auto jamNumber    = jamContainer->FindChild<Gx::BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
+        const auto jamNumber    = jamContainer->FindChild<BitmapNumber>(Resource::Playing7K::IDC_NUMBER_NOTE_JAM);
 
         jamNumber->SetValue(jamCombo);
         jamAnimation->Reset();
@@ -836,10 +817,8 @@ namespace Cx
         });
     }
 
-    void StatePlaying7K::OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StatePlaying7K::OnExitButtonClicked(Control& sender, Control::Event& ev)
     {
-        if (Dispatch(PlayingEvents::OnExit, PlayingEventArgs{}))
-            return;
 
         m_service.ExitPlaying(m_context.GetMode(), [=] (const auto& ev)
         {
@@ -853,7 +832,7 @@ namespace Cx
 
         if (m_context.GetMode() == GameMode::Tutorial)
         {
-            const auto keyEffectContainer = Instantiate<Gx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
+            const auto keyEffectContainer = Instantiate<Cx::UiContainer>(Resource::Playing7K::IDC_CONTAINER_KEY_EFFECT);
             const auto frontBuffers = m_renderer.GetFrontBuffers();
             for (auto [channel, _] : m_config.KeyBindings.at(KeyMode::Seven))
             {
@@ -861,7 +840,7 @@ namespace Cx
                 if (id < 0|| id > 6)
                     continue;
 
-                const auto guideKeyEffect = keyEffectContainer->FindChild<Gx::Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
+                const auto guideKeyEffect = keyEffectContainer->FindChild<Image>(Resource::Playing7K::IDC_IMAGE_GUIDE_KEY_EFFECT[id]);
                 const auto frameName      = fmt::format("{}A", id);
                 if (auto buffer = frontBuffers.find(channel); buffer != frontBuffers.end() && buffer->second)
                 {
@@ -889,7 +868,7 @@ namespace Cx
                 }
             }
 
-            const auto instruction = Instantiate<Gx::Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION);
+            const auto instruction = Instantiate<Image>(Resource::Playing7K::IDC_IMAGE_INSTRUCTION);
             const double position  = m_renderer.GetRenderPosition();
             if (instruction && position >= 9.f)
             {
@@ -926,13 +905,13 @@ namespace Cx
 
     void StatePlaying7K::PlayAvatarJamCombo(const Avatar* avatar, const std::uint16_t jams)
     {
-        const auto effectContainer = avatar->FindChild<Gx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
+        const auto effectContainer = avatar->FindChild<Cx::UiContainer>(Resource::Playing7K::Avatar::IDC_CONTAINER_EFFECT_JAM);
         if (!effectContainer)
             return;
 
         for (const auto child : effectContainer->GetChildren())
         {
-            if (const auto number = dynamic_cast<Gx::BitmapNumber*>(child); number)
+            if (const auto number = dynamic_cast<BitmapNumber*>(child); number)
             {
                 number->SetValue(jams);
                 number->Reset();
@@ -983,9 +962,6 @@ namespace Cx
             /* .Score       = */ static_cast<std::uint32_t>(scoreTracker.GetScorePoint()),
             /* .Life        = */ static_cast<std::uint8_t>((static_cast<float>(m_lifeSystem.GetCurrentLifePoint()) / static_cast<float>(m_lifeSystem.GetMaxLifePoint())) * 100.f),
         };
-
-        if (Dispatch(PlayingEvents::OnSubmitScore, PlayingSubmitScoreEventArgs{request}))
-            return;
 
         m_service.SubmitScore(request, [=] (const auto& ev)
         {

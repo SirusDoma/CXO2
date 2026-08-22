@@ -5,7 +5,7 @@
 #include <CXO2/Models/Room.hpp>
 #include <CXO2/Services/WaitingService.hpp>
 #include <Genode/Audio/AudioMixer.hpp>
-#include <Genode/UI/ToggleButton.hpp>
+#include <CXO2/UI/ToggleButton.hpp>
 
 #include <SFML/System/String.hpp>
 
@@ -16,12 +16,13 @@
 
 namespace Gx
 {
-    class RadioButton;
     class Sprite;
 }
 
 namespace Cx
 {
+    class RadioButton;
+
     struct ItemMetadata;
 
     class Avatar;
@@ -59,33 +60,33 @@ namespace Cx
         void OnStartGame(const MessageEnvelope<StartGameEventData>& ev);
 
         void OnStartGameResponded(const MessageEnvelope<StartGameRequest>& ev);
-        void OnUpdateReadyStateResponded(Gx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev);
+        void OnUpdateReadyStateResponded(Cx::ToggleButton& sender, const MessageEnvelope<UpdateMemberReadyStateRequest>& ev);
         void OnUpdateMusicResponded(const MessageEnvelope<UpdateRoomMusicRequest>& ev);
         void OnUpdateRoomTitleResponded(const MessageEnvelope<UpdateRoomTitleRequest>& ev);
         void OnUpdateTeamResponded(const MessageEnvelope<UpdateMemberTeamRequest>& ev);
         void OnExitRoomResponded(const MessageEnvelope<ExitWaitingResponse>& ev);
 
-        void OnReadyStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
-        void OnStartStateChanged(Gx::ToggleButton& sender, Gx::Control::Event& ev);
+        void OnReadyStateChanged(Cx::ToggleButton& sender, Control::Event& ev);
+        void OnStartStateChanged(Cx::ToggleButton& sender, Control::Event& ev);
 
-        void OnSelectMusicButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnSelectMusicButtonClicked(Control& sender, Control::Event& ev);
         void OnSelectMusicDialogAccepted();
 
-        void OnChangeTitleButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnChangeTitleButtonClicked(Control& sender, Control::Event& ev);
         void OnChangeTitleDialogAccepted();
 
-        void OnTeamButtonStateChanged(Gx::RadioButton& sender, Gx::Control::Event& ev);
+        void OnTeamButtonStateChanged(Cx::RadioButton& sender, Control::Event& ev);
         void OnInstrumentSelectorStateChanged(const ItemMetadata& metadata) const;
         void OnMapSelectorStateChanged(unsigned int mapID);
         void OnEffectSelectorStateChanged(unsigned int effectID);
 
-        void OnEmoticonButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnEmoticonNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnEmoticonPreviousPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnEmoticonButtonClicked(Control& sender, Control::Event& ev);
+        void OnEmoticonNextPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnEmoticonPreviousPageButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnExtendButtonDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnExtendButtonDoubleClicked(Control& sender, Control::Event& ev);
 
-        void OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBackButtonClicked(Control& sender, Control::Event& ev);
 
         void OnKeyPressed(const sf::Event::KeyPressed& ev) override;
         void OnKeyReleased(const sf::Event::KeyReleased& ev) override;
@@ -112,7 +113,7 @@ namespace Cx
 
         std::vector<Avatar*> m_avatars;
 
-        std::unordered_map<Gx::RadioButton*, Room::Team> m_teamButtons;
-        std::unordered_map<Gx::Control*, int> m_extendButtonSlotIDs;
+        std::unordered_map<Cx::RadioButton*, Room::Team> m_teamButtons;
+        std::unordered_map<Control*, int> m_extendButtonSlotIDs;
     };
 }

@@ -10,7 +10,7 @@ namespace Cx
         int   HorizontalCount   = 1;
         float VerticalSpacing   = 0.f;
         float HorizontalSpacing = 0.f;
-        Gx::List::Order Order   = Gx::List::Order::Vertical;
+        List::Order Order       = List::Order::Vertical;
         std::vector<TransformMetadata> Layouts = {};
 
         ResourceType ItemType  = ResourceType::None;

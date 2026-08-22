@@ -7,7 +7,7 @@
 #include <Genode/Tasks/Delay.hpp>
 #include <Genode/Tween/Fade.hpp>
 #include <Genode/Tasks/Sequence.hpp>
-#include <Genode/UI/Image.hpp>
+#include <CXO2/UI/Image.hpp>
 
 #include <SFML/Audio/Music.hpp>
 
@@ -22,14 +22,13 @@ namespace Cx
 
     void StateAvi::Initialize()
     {
-        if (!State::Initialize(StateEventArgs{GetName()}))
-            return;
+        State::Initialize();
 
         auto& director = GetDirector();
         const auto bgm = Instantiate<sf::Music>(Sound::BGM::BG_LOGO);
         m_mixer.Play(*bgm, Sound::Channel::BGM);
 
-        const auto logo = GetChildrenCount() > 0 ? dynamic_cast<Gx::Image*>(GetChildren()[0]) : nullptr;
+        const auto logo = GetChildrenCount() > 0 ? dynamic_cast<Image*>(GetChildren()[0]) : nullptr;
         if (!logo || logo->GetFrameCount() == 1)
         {
             auto& overlay = Create<Gx::Rectangle>(GetView().getSize());

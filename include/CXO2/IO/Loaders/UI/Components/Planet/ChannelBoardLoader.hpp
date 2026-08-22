@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Planet/ChannelBoard.hpp>
+#include <CXO2/UI/Components/Planet/ChannelBoard.hpp>
 
 namespace Cx
 {

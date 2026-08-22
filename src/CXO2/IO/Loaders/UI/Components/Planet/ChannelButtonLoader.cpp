@@ -35,11 +35,11 @@ namespace Cx
                     if (const auto itStates = data.find("states"); itStates != data.end())
                     {
                         const auto& states = itStates.value();
-                        std::unordered_map<std::string, Gx::RadioButton::State> stateMap =
+                        std::unordered_map<std::string, RadioButton::State> stateMap =
                         {
-                            {"normal", Gx::RadioButton::State::Normal},
-                            {"hover",  Gx::RadioButton::State::Hover},
-                            {"active", Gx::RadioButton::State::Active},
+                            {"normal", RadioButton::State::Normal},
+                            {"hover",  RadioButton::State::Hover},
+                            {"active", RadioButton::State::Active},
                         };
 
                         for (auto [name, state]: stateMap)
@@ -90,14 +90,14 @@ namespace Cx
                     if (data.empty())
                     {
                         if (sheet->TexCoords.size() > 1)
-                            channelButton->AddStateFrame(mode, Gx::Button::State::Normal, sheet->TexCoords[0]);
+                            channelButton->AddStateFrame(mode, Button::State::Normal, sheet->TexCoords[0]);
 
                         if (sheet->TexCoords.size() > 2)
-                            channelButton->AddStateFrame(mode, Gx::Button::State::Hover, sheet->TexCoords[1]);
+                            channelButton->AddStateFrame(mode, Button::State::Hover, sheet->TexCoords[1]);
 
                         const std::size_t index = 2 + static_cast<int>(mode);
                         if (index < sheet->TexCoords.size())
-                            channelButton->AddStateFrame(mode, Gx::Button::State::Active, sheet->TexCoords[index]);
+                            channelButton->AddStateFrame(mode, Button::State::Active, sheet->TexCoords[index]);
                     }
                     else
                     {

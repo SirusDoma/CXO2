@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Waiting/AvatarInfo.hpp>
+#include <CXO2/UI/Components/Waiting/AvatarInfo.hpp>
 
 namespace Cx
 {

@@ -1,7 +1,5 @@
 #include <CXO2/States/StateLoading.hpp>
 
-#include <CXO2/Events/LoadingEvents.hpp>
-
 #include <CXO2/States/StatePlanet.hpp>
 
 #include <CXO2/States/StatePlaying7K.hpp>
@@ -21,22 +19,18 @@
 #include <CXO2/Constants/Messages/Result.hpp>
 #include <CXO2/Utilities/StringFormatter.hpp>
 
-#include <Genode/UI/Image.hpp>
-#include <Genode/UI/Label.hpp>
-#include <Genode/UI/List.hpp>
+#include <CXO2/UI/Image.hpp>
+#include <CXO2/UI/Label.hpp>
+#include <CXO2/UI/List.hpp>
 #include <Genode/Tasks/Sequence.hpp>
 #include <Genode/Utilities/Randomizer.hpp>
 
 #include <fmt/format.h>
 #include <thread>
 
-namespace Gx
-{
-    class List;
-}
-
 namespace Cx
 {
+    class List;
 
     using namespace Constants::Identifiers;
 
@@ -61,16 +55,15 @@ namespace Cx
 
     void StateLoading::Initialize()
     {
-        if (!State::Initialize(StateGameEventArgs{GetName(), m_context}))
-            return;
+        State::Initialize();
 
         m_service.SetMemberMusicLoadedEventCallback([this] (const auto& ev) { OnMemberConfirmMusicLoaded(ev); });
 
         std::size_t index = 0;
-        auto imageSet = std::vector<Gx::Image*>();
+        auto imageSet = std::vector<Image*>();
         for (const auto child : GetChildren())
         {
-            if (const auto image = dynamic_cast<Gx::Image*>(child); image && Gx::StringHelper::StartsWith(image->GetName(), Resource::Loading::IDC_IMAGE_STATE_LOADING))
+            if (const auto image = dynamic_cast<Image*>(child); image && Gx::StringHelper::StartsWith(image->GetName(), Resource::Loading::IDC_IMAGE_STATE_LOADING))
                 imageSet.push_back(image);
         }
 
@@ -90,13 +83,13 @@ namespace Cx
         const auto& resources = GetResources(ResourceScope::Shared);
         auto loader           = O2JamChartLoader(m_context.GetMode(), m_context.GetDifficulty());
 
-        const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
+        const auto list = Instantiate<List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
         for (std::size_t i = 0; i < list->GetChildrenCount(); i++)
         {
             if (i >= RoomContext::MaxCapacity)
                 break;
 
-            const auto container = dynamic_cast<Gx::UiContainer*>(list->GetChildren()[i]);
+            const auto container = dynamic_cast<Cx::UiContainer*>(list->GetChildren()[i]);
             if (!container)
                 continue;
 
@@ -107,16 +100,16 @@ namespace Cx
                 continue;
             }
 
-            if (const auto level = container->FindChild<Gx::Label>(Resource::Loading::IDC_TEXT_USER_LEVEL))
+            if (const auto level = container->FindChild<Label>(Resource::Loading::IDC_TEXT_USER_LEVEL))
                 level->SetString(fmt::format("Lv. {}", slot.Level));
 
-            if (const auto name = container->FindChild<Gx::Label>(Resource::Loading::IDC_TEXT_USER_NAME))
+            if (const auto name = container->FindChild<Label>(Resource::Loading::IDC_TEXT_USER_NAME))
             {
                 name->SetString(slot.Name);
                 name->SetColor(slot.TeamColor);
             }
 
-            if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
+            if (const auto sign = container->FindChild<Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
                 sign->SetFrame("Loading");
         }
 
@@ -124,15 +117,15 @@ namespace Cx
         const auto noteIt    = metadata.NoteCounts.find(m_context.GetDifficulty());
         const auto noteCount = noteIt != metadata.NoteCounts.end() ? noteIt->second : 0u;
 
-        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_TITLE)->SetString(metadata.Title);
-        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_ARTIST)->SetString(metadata.Artist);
-        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_COUNT)->SetString(std::to_string(noteCount));
-        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_DESIGNER)->SetString(metadata.NoteDesigner);
-        Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MUSIC_SPEED)->SetString(fmt::format(Constants::Messages::Loading::SPEED, m_context.GetSpeed()));
+        Instantiate<Label>(Resource::Loading::IDC_TEXT_MUSIC_TITLE)->SetString(metadata.Title);
+        Instantiate<Label>(Resource::Loading::IDC_TEXT_MUSIC_ARTIST)->SetString(metadata.Artist);
+        Instantiate<Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_COUNT)->SetString(std::to_string(noteCount));
+        Instantiate<Label>(Resource::Loading::IDC_TEXT_MUSIC_NOTE_DESIGNER)->SetString(metadata.NoteDesigner);
+        Instantiate<Label>(Resource::Loading::IDC_TEXT_MUSIC_SPEED)->SetString(fmt::format(Constants::Messages::Loading::SPEED, m_context.GetSpeed()));
 
-        const auto missionHeader      = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_HEADER);
-        const auto missionRequirement = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_REQUIREMENT);
-        const auto missionNotice      = Instantiate<Gx::Label>(Resource::Loading::IDC_TEXT_MISSION_NOTICE);
+        const auto missionHeader      = Instantiate<Label>(Resource::Loading::IDC_TEXT_MISSION_HEADER);
+        const auto missionRequirement = Instantiate<Label>(Resource::Loading::IDC_TEXT_MISSION_REQUIREMENT);
+        const auto missionNotice      = Instantiate<Label>(Resource::Loading::IDC_TEXT_MISSION_NOTICE);
 
         missionHeader->SetVisible(false);
         missionRequirement->SetVisible(false);
@@ -197,20 +190,18 @@ namespace Cx
         try
         {
             const auto& ev = envelope.Open();
-            if (Dispatch(LoadingEvents::OnMemberMusicLoaded, LoadingMemberMusicLoadedEventArgs{ev}))
-                return;
 
             auto lock = std::lock_guard(m_mutex);
 
             m_loadedUsers.insert(ev.ID);
             m_signal.notify_one();
 
-            const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
+            const auto list = Instantiate<List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
             if (ev.ID < list->GetChildrenCount())
             {
-                if (const auto container = dynamic_cast<Gx::UiContainer*>(list->GetChildren()[ev.ID]))
+                if (const auto container = dynamic_cast<Cx::UiContainer*>(list->GetChildren()[ev.ID]))
                 {
-                    if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
+                    if (const auto sign = container->FindChild<Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
                         sign->SetFrame("Completed");
                 }
             }
@@ -226,20 +217,18 @@ namespace Cx
 
     void StateLoading::OnMemberLeft(const WaitingMemberLeftEventData& ev)
     {
-        if (Dispatch(LoadingEvents::OnMemberLeft, LoadingMemberLeftEventArgs{ev}))
-            return;
 
         auto lock = std::lock_guard(m_mutex);
 
         m_loadedUsers.erase(ev.ID);
         m_signal.notify_one();
 
-        const auto list = Instantiate<Gx::List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
+        const auto list = Instantiate<List>(Resource::Loading::IDC_LIST_LOADING_SIGN);
         if (ev.ID < list->GetChildrenCount())
         {
-            if (const auto container = dynamic_cast<Gx::UiContainer*>(list->GetChildren()[ev.ID]))
+            if (const auto container = dynamic_cast<Cx::UiContainer*>(list->GetChildren()[ev.ID]))
             {
-                if (const auto sign = container->FindChild<Gx::Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
+                if (const auto sign = container->FindChild<Image>(Resource::Loading::IDC_IMAGE_LOADING_SIGN))
                     sign->SetFrame("Failed");
             }
         }
@@ -249,7 +238,7 @@ namespace Cx
     {
         for (const auto child : GetChildren())
         {
-            if (const auto image = dynamic_cast<Gx::Image*>(child); image && image->IsVisible() && m_texture.loadFromImage(*cover))
+            if (const auto image = dynamic_cast<Image*>(child); image && image->IsVisible() && m_texture.loadFromImage(*cover))
             {
                 image->SetTexture(m_texture);
                 return;
@@ -259,8 +248,6 @@ namespace Cx
 
     void StateLoading::OnChartLoaded(const Chart* chart)
     {
-        if (Dispatch(LoadingEvents::OnMusicLoaded, LoadingMusicEventArgs{*chart}))
-            return;
 
         m_service.ConfirmMusicLoaded([this] (const auto& ev)
         {

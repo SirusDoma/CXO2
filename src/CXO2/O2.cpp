@@ -58,23 +58,22 @@
 #include <CXO2/IO/TextureCacheBuilder.hpp>
 #include <CXO2/Metadata/Legacy/ControlList.hpp>
 
-#include <CXO2/UI/Common/ChatPanel.hpp>
-#include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
-#include <CXO2/UI/Dialogs/OptionDialog.hpp>
-#include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
-#include <CXO2/UI/Room/RoomButton.hpp>
-#include <CXO2/UI/Room/RoomList.hpp>
-#include <CXO2/UI/Room/UserList.hpp>
-#include <CXO2/UI/Waiting/InstrumentSelector.hpp>
-#include <CXO2/UI/Waiting/MapSelector.hpp>
-#include <CXO2/UI/Playing/PlayMenu.hpp>
-#include <CXO2/UI/Playing/Equalizer.hpp>
+#include <CXO2/UI/Components/ChatPanel.hpp>
+#include <CXO2/UI/Components/Dialogs/CreateRoomDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/OptionDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/SelectMusicDialog.hpp>
+#include <CXO2/UI/Components/Room/RoomButton.hpp>
+#include <CXO2/UI/Components/Room/RoomList.hpp>
+#include <CXO2/UI/Components/Room/UserList.hpp>
+#include <CXO2/UI/Components/Waiting/InstrumentSelector.hpp>
+#include <CXO2/UI/Components/Waiting/MapSelector.hpp>
+#include <CXO2/UI/Components/Playing/PlayMenu.hpp>
+#include <CXO2/UI/Components/Playing/Equalizer.hpp>
 
 #include <CXO2/Decorators/SceneGraph/SceneDirectorDecorator.hpp>
 
 #include <CXO2/Services/NetworkService.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
-#include <CXO2/Services/PluginService.hpp>
 
 #include <CXO2/Services/Online/AuthOnlineService.hpp>
 #include <CXO2/Services/Online/PlanetOnlineService.hpp>
@@ -221,14 +220,6 @@ namespace Cx
 
         context.Provide<RoomContext>(Gx::Context::Scope::Singleton);
         context.Provide<CartContext>(Gx::Context::Scope::Singleton);
-        context.Provide<PluginService>([&context] (auto& ctx)
-        {
-            return std::make_unique<PluginService>(
-                ctx.template Require<CommandLineContext>(),
-                context,
-                ctx.template Require<Gx::EventDispatcher>()
-            );
-        }, Gx::Context::Scope::Singleton);
 
         // Initialize local providers
         context.Provide<JudgementStrategy>([] (auto&)
@@ -290,19 +281,19 @@ namespace Cx
         Gx::ResourceLoaderFactory::Register<Gx::Sprite, SpriteLoader>();
         Gx::ResourceLoaderFactory::Register<Gx::Animation, AnimationLoader>();
         // UI
-        Gx::ResourceLoaderFactory::Register<Gx::Image, ImageLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Label, LabelLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::ToolTip, ToolTipLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::BitmapNumber, BitmapNumberLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Button, ButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::ToggleButton, ToggleButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::RadioButton, RadioButtonLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Gauge, GaugeLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::List, ListLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::Dialog, DialogLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::InputField, InputFieldLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::ScrollBar, ScrollBarLoader>();
-        Gx::ResourceLoaderFactory::Register<Gx::UiContainer, UiContainerLoader>();
+        Gx::ResourceLoaderFactory::Register<Image, ImageLoader>();
+        Gx::ResourceLoaderFactory::Register<Label, LabelLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::ToolTip, ToolTipLoader>();
+        Gx::ResourceLoaderFactory::Register<BitmapNumber, BitmapNumberLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::Button, ButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::ToggleButton, ToggleButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::RadioButton, RadioButtonLoader>();
+        Gx::ResourceLoaderFactory::Register<Gauge, GaugeLoader>();
+        Gx::ResourceLoaderFactory::Register<List, ListLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::Dialog, DialogLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::InputField, InputFieldLoader>();
+        Gx::ResourceLoaderFactory::Register<ScrollBar, ScrollBarLoader>();
+        Gx::ResourceLoaderFactory::Register<Cx::UiContainer, UiContainerLoader>();
         // Avatar
         Gx::ResourceLoaderFactory::Register<Item, ItemLoader>();
         Gx::ResourceLoaderFactory::Register<ItemData, ItemDataLoader>();
@@ -604,8 +595,6 @@ namespace Cx
         director.Register<StateBulletin>("Interface/State/Bulletin.json");
         director.Register<StatePayment>("Interface/State/Payment.json");
 
-        context.Require<PluginService>().Load();
-
         director.Present<StateAvi>();
     }
 
@@ -670,8 +659,6 @@ namespace Cx
 
     int O2::Shutdown()
     {
-        GetModule<Gx::Context>().Require<PluginService>().ShutDown();
-
         auto& director  = GetModule<Gx::SceneDirector>();
         auto& mixer     = GetModule<Gx::Context>().Require<Gx::AudioMixer>();
         auto& resources = GetModule<Gx::Context>().Require<Gx::ResourceManager>();

@@ -6,8 +6,8 @@
 #include <CXO2/Decorators/IO/ResourceContextDecorator.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 
-#include <CXO2/UI/Room/RoomButton.hpp>
-#include <CXO2/UI/Playing/PlayMenu.hpp>
+#include <CXO2/UI/Components/Room/RoomButton.hpp>
+#include <CXO2/UI/Components/Playing/PlayMenu.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Config/GameConfig.hpp>
@@ -20,9 +20,9 @@ namespace Cx
 {
     void ImageLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::Image>::OnRegistered(id, builder);
+        ResourceLoader<Image>::OnRegistered(id, builder);
 
-        Gx::ResourceLoaderFactory::Map<Gx::Image,
+        Gx::ResourceLoaderFactory::Map<Image,
             RoomButton,
             PlayMenu
         >();
@@ -33,7 +33,7 @@ namespace Cx
         >();
     }
 
-    Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Image> ImageLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         ImageMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -52,7 +52,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::Image> ImageLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Image> ImageLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const ImageMetadata*>(&meta);
         if (!metadata)
@@ -191,7 +191,7 @@ namespace Cx
 
         if (const auto mode = attributes.find("sizeMode"); mode != attributes.end())
         {
-            if (const auto parsed = magic_enum::enum_cast<Gx::Image::SizeMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
+            if (const auto parsed = magic_enum::enum_cast<Image::SizeMode>(mode->get<std::string>(), magic_enum::case_insensitive); parsed.has_value())
                 metadata.SizeMode = parsed.value();
         }
 
@@ -223,7 +223,7 @@ namespace Cx
         auto frames = attributes.find("frames");
         if (frames == attributes.end())
         {
-            metadata.Frames.push_back({ "default", Gx::Image::Frame
+            metadata.Frames.push_back({ "default", Image::Frame
                 {
                     metadata.TexCoords,
                     metadata.Origin,
@@ -238,7 +238,7 @@ namespace Cx
 
         for (auto [frameName, frameAttr] : frames->items())
         {
-            auto frame = Gx::Image::Frame();
+            auto frame = Image::Frame();
             auto position = metadata.Position.value_or(sf::Vector2f());
             if (auto p = frameAttr.find("position"); p != frameAttr.end())
             {

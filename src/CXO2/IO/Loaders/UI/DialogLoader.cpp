@@ -8,8 +8,8 @@
 
 #include <CXO2/Constants/Identifiers/Cache.hpp>
 
-#include <CXO2/UI/Dialogs/OptionDialog.hpp>
-#include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/OptionDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/CreateRoomDialog.hpp>
 
 #include <CXO2/Contexts/SessionContext.hpp>
 #include <CXO2/Contexts/RoomContext.hpp>
@@ -26,9 +26,9 @@ namespace Cx
 
     void DialogLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::Dialog>::OnRegistered(id, builder);
+        ResourceLoader<Dialog>::OnRegistered(id, builder);
 
-        Gx::ResourceLoaderFactory::Map<Gx::Dialog,
+        Gx::ResourceLoaderFactory::Map<Dialog,
             OptionDialog,
             CreateRoomDialog
         >();
@@ -39,7 +39,7 @@ namespace Cx
         >();
     }
 
-    Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Dialog> DialogLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = DialogMetadata();
         if (!ParseMetadata(json, metadata, context))
@@ -97,7 +97,7 @@ namespace Cx
         return true;
     }
 
-    void DialogLoader::Apply(Gx::Dialog& dialog, const DialogMetadata& metadata, const Gx::ResourceContext& context)
+    void DialogLoader::Apply(Dialog& dialog, const DialogMetadata& metadata, const Gx::ResourceContext& context)
     {
         const auto ctx = ResourceContextDecorator::Decorate(context);
         if (const auto texture = ctx.Require<sf::Texture>(metadata); texture)
@@ -143,7 +143,7 @@ namespace Cx
         dialog.SetRotation(metadata.Rotation);
     }
 
-    Gx::ResourcePtr<Gx::Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Dialog> DialogLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const DialogMetadata*>(&meta);
         if (!metadata)

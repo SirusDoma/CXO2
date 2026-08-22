@@ -3,10 +3,10 @@
 #include <CXO2/IO/Loaders/Graphics/TransformLoader.hpp>
 #include <CXO2/IO/Loaders/SceneGraph/SceneComposer.hpp>
 #include <CXO2/Metadata/UI/UiContainerMetadata.hpp>
-#include <CXO2/UI/Room/UserList.hpp>
-#include <CXO2/UI/Common/ChatPanel.hpp>
-#include <CXO2/UI/Waiting/MapSelector.hpp>
-#include <CXO2/UI/Waiting/InstrumentSelector.hpp>
+#include <CXO2/UI/Components/Room/UserList.hpp>
+#include <CXO2/UI/Components/ChatPanel.hpp>
+#include <CXO2/UI/Components/Waiting/MapSelector.hpp>
+#include <CXO2/UI/Components/Waiting/InstrumentSelector.hpp>
 
 #include <CXO2/Constants/Identifiers/Room.hpp>
 
@@ -25,9 +25,9 @@ namespace Cx
 
     void UiContainerLoader::OnRegistered(const std::string& id, const Builder& builder)
     {
-        ResourceLoader<Gx::UiContainer>::OnRegistered(id, builder);
+        ResourceLoader<UiContainer>::OnRegistered(id, builder);
 
-        Gx::ResourceLoaderFactory::Map<Gx::UiContainer,
+        Gx::ResourceLoaderFactory::Map<UiContainer,
             ChatPanel,
             UserList,
             MapSelector,
@@ -41,7 +41,7 @@ namespace Cx
         >();
     }
 
-    Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<UiContainer> UiContainerLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         UiContainerMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -76,7 +76,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::UiContainer> UiContainerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<UiContainer> UiContainerLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const UiContainerMetadata*>(&meta);
         if (metadata == nullptr)

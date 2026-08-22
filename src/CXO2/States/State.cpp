@@ -7,7 +7,6 @@
 #include <CXO2/States/StatePlaying7K.hpp>
 #include <CXO2/States/StateResult.hpp>
 #include <CXO2/Config/GameConfig.hpp>
-#include <CXO2/Events/StateEvents.hpp>
 
 #include <CXO2/Network/Requests/SyncMusicDownloadRequest.hpp>
 #include <CXO2/Services/MusicDownloaderService.hpp>
@@ -18,13 +17,13 @@
 #include <CXO2/Constants/Identifiers/Sound.hpp>
 #include <CXO2/Constants/Messages/Application.hpp>
 
-#include <Genode/Events/EventDispatcher.hpp>
+#include <Genode/IO/FileSystem.hpp>
 #include <Genode/IO/ResourceManager.hpp>
 #include <Genode/SceneGraph/SceneDirector.hpp>
 
-#include <Genode/UI/Label.hpp>
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/Cursor.hpp>
+#include <CXO2/UI/Label.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <Genode/Graphics/Cursor.hpp>
 
 #include <memory>
 
@@ -54,71 +53,7 @@ namespace Cx
         LoadCommonResources();
     }
 
-    State::ExtensionTerminal::ExtensionTerminal(State& owner) :
-        m_owner(owner)
-    {
-    }
-
-    bool State::ExtensionTerminal::Initialize()
-    {
-        return m_owner.InternalInitialize();
-    }
-
-    void State::ExtensionTerminal::Finalize()
-    {
-        m_owner.InternalFinalize();
-    }
-
-    void State::ExtensionTerminal::Update(const sf::Time& delta)
-    {
-        m_owner.InternalUpdate(delta);
-    }
-
-    Gx::RenderStates State::ExtensionTerminal::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
-    {
-        return m_owner.InternalRender(surface, states);
-    }
-
-    bool State::ExtensionTerminal::Input(const sf::Event& ev)
-    {
-        return m_owner.InternalInput(ev);
-    }
-
-    StateExtension& State::Attach(StateExtensionPtr extension)
-    {
-        auto& ext = *extension;
-        ext.m_state = this;
-        ext.m_next  = &m_terminal;
-
-        if (!m_extensions.empty())
-            m_extensions.back()->m_next = &ext;
-
-        m_extensions.push_back(std::move(extension));
-        return ext;
-    }
-
-    StateExtension& State::GetNextExtension()
-    {
-        return m_extensions.empty() ? static_cast<StateExtension&>(m_terminal) : *m_extensions.front();
-    }
-
-    const StateExtension& State::GetNextExtension() const
-    {
-        return m_extensions.empty() ? static_cast<const StateExtension&>(m_terminal) : *m_extensions.front();
-    }
-
-    bool State::Initialize(StateEventArgs&& args)
-    {
-        if (Dispatch(StateEvents::OnInitialize, args))
-            return false;
-
-        m_extensions.clear();
-        Dispatch(StateEvents::OnExtend, StateEventArgs{GetName()});
-
-        return GetNextExtension().Initialize();
-    }
-
-    bool State::InternalInitialize()
+    void State::Initialize()
     {
         if (m_persistentDialog)
         {
@@ -148,8 +83,6 @@ namespace Cx
 
         Gx::Scene::Initialize();
         m_tempResources->Clear();
-
-        return true;
     }
 
     void State::Finalize()
@@ -162,19 +95,12 @@ namespace Cx
                 dialog->Dismiss();
         }
 
-        GetNextExtension().Finalize();
-        Dispatch(StateEvents::OnFinalize, StateEventArgs{GetName()});
-        m_extensions.clear();
+        Scene::Finalize();
 
         Require<Gx::AudioMixer>().Reset(true);
 
         m_exitPrompted = false;
         m_exitDialog->Dismiss();
-    }
-
-    void State::InternalFinalize()
-    {
-        Scene::Finalize();
     }
 
     void State::LoadCommonResources()
@@ -186,19 +112,19 @@ namespace Cx
         m_exitPrompted    = false;
         if (Gx::FileSystem::Contains("ControlList_Interface.txt"))
         {
-            m_dialogInfo   = Instantiate<Gx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
-            m_dialog1      = Instantiate<Gx::Dialog>("ControlList/Dialog/Question1.json", ResourceScope::Shared);
-            m_dialog2      = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
-            m_dialogNotice = Instantiate<Gx::Dialog>("ControlList/Dialog/Notice.json", ResourceScope::Shared);
-            m_exitDialog   = Instantiate<Gx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+            m_dialogInfo   = Instantiate<Cx::Dialog>("ControlList/Dialog/Information.json", ResourceScope::Shared);
+            m_dialog1      = Instantiate<Cx::Dialog>("ControlList/Dialog/Question1.json", ResourceScope::Shared);
+            m_dialog2      = Instantiate<Cx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
+            m_dialogNotice = Instantiate<Cx::Dialog>("ControlList/Dialog/Notice.json", ResourceScope::Shared);
+            m_exitDialog   = Instantiate<Cx::Dialog>("ControlList/Dialog/Question2.json", ResourceScope::Shared);
         }
         else
         {
-            m_dialogInfo   = Instantiate<Gx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
-            m_dialog1      = Instantiate<Gx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
-            m_dialog2      = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
-            m_dialogNotice = Instantiate<Gx::Dialog>("Interface/Dialog/Notice.json", ResourceScope::Shared);
-            m_exitDialog   = Instantiate<Gx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+            m_dialogInfo   = Instantiate<Cx::Dialog>("Interface/Dialog/Information.json", ResourceScope::Shared);
+            m_dialog1      = Instantiate<Cx::Dialog>("Interface/Dialog/Question1.json", ResourceScope::Shared);
+            m_dialog2      = Instantiate<Cx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
+            m_dialogNotice = Instantiate<Cx::Dialog>("Interface/Dialog/Notice.json", ResourceScope::Shared);
+            m_exitDialog   = Instantiate<Cx::Dialog>("Interface/Dialog/Question2.json", ResourceScope::Shared);
         }
 
         const auto center    = GetApplication().GetView().getCenter();
@@ -215,7 +141,7 @@ namespace Cx
         loaded = true;
     }
 
-    Gx::Dialog* State::GetDialog(const DialogStyle style)
+    Cx::Dialog* State::GetDialog(const DialogStyle style)
     {
         if (style == DialogStyle::OkCancel)
             return m_dialog1;
@@ -261,7 +187,7 @@ namespace Cx
             callback(false);
         });
 
-        auto ctx        = Gx::DialogPresentationContext();
+        auto ctx        = Cx::DialogPresentationContext();
         ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
         ctx.Prompt      = content;
         ctx.UseBackdrop = backdrop;
@@ -289,7 +215,7 @@ namespace Cx
         dialog->SetAcceptCallback([=] (auto&, auto&) { callback(true); });
         dialog->SetCancelCallback([=] (auto&, auto&) { callback(false); });
 
-        auto ctx        = Gx::DialogPresentationContext();
+        auto ctx        = Cx::DialogPresentationContext();
         ctx.Bounds      = sf::FloatRect{{0, 0}, GetDefaultView().getSize() };
         ctx.UseBackdrop = backdrop;
 
@@ -419,51 +345,14 @@ namespace Cx
             m_exitPrompted = false;
         });
 
-        auto ctx        = Gx::DialogPresentationContext();
+        auto ctx        = Cx::DialogPresentationContext();
         ctx.Bounds      = bounds.size == sf::Vector2f{} ? sf::FloatRect{{0, 0}, GetDefaultView().getSize() } : bounds;
         ctx.Prompt      = prompt;
         ctx.UseBackdrop = true;
         Present(*m_exitDialog, ctx);
     }
 
-    void State::Update(const sf::Time& delta)
-    {
-        auto ev = StateUpdateEventArgs{{}, delta};
-        if (Dispatch(StateEvents::OnUpdate, ev))
-            return;
-
-        GetNextExtension().Update(ev.Delta);
-    }
-
-    void State::InternalUpdate(const sf::Time& delta)
-    {
-        Scene::Update(delta);
-    }
-
-    bool State::Input(const sf::Event& ev)
-    {
-        auto data = StateInputEventArgs{{}, ev};
-        if (Dispatch(StateEvents::OnInput, data))
-            return false;
-
-        return GetNextExtension().Input(data.Input);
-    }
-
-    bool State::InternalInput(const sf::Event& ev)
-    {
-        return Scene::Input(ev);
-    }
-
     Gx::RenderStates State::Render(Gx::RenderSurface& surface, Gx::RenderStates states) const
-    {
-        auto ev = StateRenderEventArgs{{}, surface, states};
-        if (Dispatch(StateEvents::OnRender, ev))
-            return states;
-
-        return GetNextExtension().Render(surface, states);
-    }
-
-    Gx::RenderStates State::InternalRender(Gx::RenderSurface& surface, Gx::RenderStates states) const
     {
         auto result = Scene::Render(surface, states);
         if (m_dialogNotice->IsVisible() && m_noticeTimer.getElapsedTime() < sf::seconds(15))

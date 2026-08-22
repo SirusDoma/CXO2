@@ -6,7 +6,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<ToolTip> ToolTipLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         ToolTipMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -105,7 +105,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<ToolTip> ToolTipLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const ToolTipMetadata*>(&meta);
         if (!metadata)

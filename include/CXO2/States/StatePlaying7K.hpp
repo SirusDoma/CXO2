@@ -11,8 +11,8 @@
 
 #include <Genode/Audio/AudioMixer.hpp>
 #include <Genode/Graphics/Animation.hpp>
-#include <Genode/UI/Image.hpp>
-#include <Genode/UI/InputField.hpp>
+#include <CXO2/UI/Image.hpp>
+#include <CXO2/UI/InputField.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -89,9 +89,9 @@ namespace Cx
         void OnScoreIncremented(const Chart::NoteEvent& ev, Accuracy acc, unsigned long long count);
         void OnJamComboIncremented(const Chart::NoteEvent& ev, Accuracy acc, unsigned long long jamCombo);
 
-        void OnExitButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnExitButtonClicked(Control& sender, Control::Event& ev);
 
-        using ImageMap = std::unordered_map<Chart::Channel, Gx::Image*>;
+        using ImageMap = std::unordered_map<Chart::Channel, Image*>;
         using InputStateMap = std::unordered_map<Chart::Channel, bool>;
         using AnimationMap = std::unordered_map<Chart::Channel, Gx::Animation*>;
         using AvatarMap = std::unordered_map<unsigned int, Avatar*>;
@@ -113,7 +113,7 @@ namespace Cx
         JudgementIndicator* m_judgementIndicator;
         std::vector<Gx::Node*> m_buffers;
 
-        Gx::InputField* m_chatBox;
+        Cx::InputField* m_chatBox;
         ImageMap m_keyDowns, m_keyEffects, m_guideKeyEffects;
         InputStateMap m_inputStates;
         InputStateMap m_guideKeyEffectStates;

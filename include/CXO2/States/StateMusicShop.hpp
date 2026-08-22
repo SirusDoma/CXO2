@@ -6,7 +6,7 @@
 #include <CXO2/Services/MusicDownloaderService.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
-#include <Genode/UI/Image.hpp>
+#include <CXO2/UI/Image.hpp>
 
 #include <optional>
 #include <unordered_map>
@@ -38,30 +38,30 @@ namespace Cx
         void SetDownloadStatus(const sf::String& status);
         void SortMusicList(std::vector<ChartMetadata>& list, MusicSortKey key, bool ascending) const;
 
-        void OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnShowBuyableButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnShowAllButtonClicked(Control& sender, Control::Event& ev);
+        void OnShowBuyableButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnDownloadTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnCartTabButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnDownloadTabButtonClicked(Control& sender, Control::Event& ev);
+        void OnCartTabButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnMusicItemFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicItemToggleClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicItemToggleFocusChanged(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicItemClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicItemFocusChanged(Control& sender, Control::Event& ev);
+        void OnMusicItemToggleClicked(Control& sender, Control::Event& ev);
+        void OnMusicItemToggleFocusChanged(Control& sender, Control::Event& ev);
+        void OnMusicItemClicked(Control& sender, Control::Event& ev);
 
-        void OnMusicPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicListScrolled(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnMusicPrevPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnMusicNextPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnMusicListScrolled(Control& sender, Control::Event& ev);
 
-        void OnShopPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnShopNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnShopListScrolled(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnShopPrevPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnShopNextPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnShopListScrolled(Control& sender, Control::Event& ev);
 
-        void OnShopSortButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnMusicSortButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnShopSortButtonClicked(Control& sender, Control::Event& ev);
+        void OnMusicSortButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnDownloadButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnCancelButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnDownloadButtonClicked(Control& sender, Control::Event& ev);
+        void OnCancelButtonClicked(Control& sender, Control::Event& ev);
         void OnCancelDialogAnswered(bool answer);
 
         void OnDownloadStarted(std::uint16_t musicID);
@@ -70,17 +70,17 @@ namespace Cx
         void OnQueueCompleted();
         void OnDownloadFailed(MusicDownloadError error);
 
-        void OnBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev, const ChartMetadata& entry);
-        void OnCartBuyButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBuyButtonClicked(Control& sender, Control::Event& ev, const ChartMetadata& entry);
+        void OnCartBuyButtonClicked(Control& sender, Control::Event& ev);
         void OnCartBuyDialogAnswered(bool answer);
-        void OnCartGiftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartGiftButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnCartPrevPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnCartNextPageButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnCartListScrolled(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnCartItemDeleteButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnCartPrevPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnCartNextPageButtonClicked(Control& sender, Control::Event& ev);
+        void OnCartListScrolled(Control& sender, Control::Event& ev);
+        void OnCartItemDeleteButtonClicked(Control& sender, Control::Event& ev);
 
-        void OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBackButtonClicked(Control& sender, Control::Event& ev);
 
         Gx::AudioMixer& m_mixer;
         SessionContext& m_session;
@@ -89,21 +89,21 @@ namespace Cx
         MusicDownloaderService& m_downloader;
 
         unsigned int m_cartCurrentPage;
-        std::unordered_map<Gx::Control*, std::size_t> m_cartDeleteButtonIndices;
+        std::unordered_map<Control*, std::size_t> m_cartDeleteButtonIndices;
 
         unsigned int m_musicCurrentPage;
         std::vector<ChartMetadata> m_musicList;
-        std::unordered_map<Gx::Control*, std::size_t> m_musicItemIndices;
+        std::unordered_map<Control*, std::size_t> m_musicItemIndices;
 
         unsigned int m_shopCurrentPage;
         std::vector<ChartMetadata> m_shopList;
 
-        std::unordered_map<Gx::Control*, MusicSortKey> m_sortKeys;
+        std::unordered_map<Control*, MusicSortKey> m_sortKeys;
         MusicSortKey m_shopSortKey{MusicSortKey::Title};
         MusicSortKey m_musicSortKey{MusicSortKey::Title};
         bool m_shopSortAscending  = true;
         bool m_musicSortAscending = true;
 
-        Gx::Image* m_selector;
+        Image* m_selector;
     };
 }

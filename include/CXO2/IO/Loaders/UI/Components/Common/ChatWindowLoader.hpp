@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Common/ChatWindow.hpp>
+#include <CXO2/UI/Components/ChatWindow.hpp>
 
 namespace Cx
 {

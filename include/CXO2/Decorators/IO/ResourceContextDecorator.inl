@@ -6,7 +6,7 @@
 
 #include <Genode/IO/FileSystem.hpp>
 #include <Genode/Graphics/Font.hpp>
-#include <Genode/UI/Control.hpp>
+#include <CXO2/UI/Control.hpp>
 
 #include <SFML/Audio/SoundBuffer.hpp>
 

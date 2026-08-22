@@ -6,7 +6,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Button> ButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = ButtonMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -22,7 +22,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::Button> ButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Button> ButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const ButtonMetadata*>(&meta);
         if (!metadata)
@@ -91,7 +91,7 @@ namespace Cx
                         bounds.push_back({ {}, frames[i].size });
                 }
 
-                auto states = std::unordered_map<Gx::Button::State, Gx::Button::Frame>();
+                auto states = std::unordered_map<Button::State, Button::Frame>();
                 if (!metadata->States.empty())
                 {
                     for (auto [state, frame] : metadata->States)
@@ -115,30 +115,30 @@ namespace Cx
                     if (frames.size() > 3)
                     {
                         states = {
-                            { Gx::Button::State::Normal, { frames[0], bounds[0] } },
-                            { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
-                            { Gx::Button::State::Active, { frames[frames.size() - 1], bounds[bounds.size() - 1] } },
+                            { Button::State::Normal, { frames[0], bounds[0] } },
+                            { Button::State::Hover,  { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[frames.size() - 1], bounds[bounds.size() - 1] } },
                         };
                     }
                     else if (frames.size() == 3)
                     {
                         states = {
-                            { Gx::Button::State::Normal, { frames[0], bounds[0] } },
-                            { Gx::Button::State::Hover,  { frames[1], bounds[1] } },
-                            { Gx::Button::State::Active, { frames[2], bounds[2] } },
+                            { Button::State::Normal, { frames[0], bounds[0] } },
+                            { Button::State::Hover,  { frames[1], bounds[1] } },
+                            { Button::State::Active, { frames[2], bounds[2] } },
                         };
                     }
                     else if (frames.size() == 2)
                     {
                         states = {
-                            { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
-                            { Gx::Button::State::Active, { frames[1], bounds[1] } },
+                            { Button::State::Hover,  { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[1], bounds[1] } },
                         };
                     }
                     else if (frames.size() == 1)
                     {
                         states = {
-                            { Gx::Button::State::Active, { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[0], bounds[0] } },
                         };
                     }
                 }
@@ -148,7 +148,7 @@ namespace Cx
             }
             else if (metadata->States.empty() && bound != sf::IntRect())
             {
-                button->SetFrame( Gx::Button::State::Active,
+                button->SetFrame( Button::State::Active,
                     { {}, { {}, bound.size } } );
             }
         }
@@ -179,10 +179,10 @@ namespace Cx
         if (const auto it = attributes.find("states"); it != attributes.end())
         {
             const auto& states = attributes.at("states");
-            std::unordered_map<std::string, Gx::Button::State> stateMap = {
-                { "normal", Gx::Button::State::Normal },
-                { "hover", Gx::Button::State::Hover },
-                { metadata.Type == ResourceMetadata::ResourceType::Button ? "click" : "active", Gx::Button::State::Active },
+            std::unordered_map<std::string, Button::State> stateMap = {
+                { "normal", Button::State::Normal },
+                { "hover", Button::State::Hover },
+                { metadata.Type == ResourceMetadata::ResourceType::Button ? "click" : "active", Button::State::Active },
             };
 
             for (auto [name, state] : stateMap)

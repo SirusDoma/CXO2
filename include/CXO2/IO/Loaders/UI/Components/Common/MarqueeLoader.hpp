@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Common/Marquee.hpp>
+#include <CXO2/UI/Components/Marquee.hpp>
 
 namespace Cx
 {

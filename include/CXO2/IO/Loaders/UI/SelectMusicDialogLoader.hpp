@@ -2,7 +2,7 @@
 
 #include <CXO2/IO/ResourceLoader.hpp>
 #include <CXO2/Metadata/UI/SelectMusicDialogMetadata.hpp>
-#include <CXO2/UI/Dialogs/SelectMusicDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/SelectMusicDialog.hpp>
 
 namespace Cx
 {

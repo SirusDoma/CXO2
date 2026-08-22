@@ -19,12 +19,12 @@
 #include <CXO2/Contexts/GameContext.hpp>
 #include <CXO2/Models/Map.hpp>
 
-#include <CXO2/UI/Common/Marquee.hpp>
-#include <CXO2/UI/Common/ChatPanel.hpp>
-#include <CXO2/UI/Room/RoomList.hpp>
-#include <CXO2/UI/Room/UserList.hpp>
-#include <CXO2/UI/Dialogs/OptionDialog.hpp>
-#include <CXO2/UI/Dialogs/CreateRoomDialog.hpp>
+#include <CXO2/UI/Components/Marquee.hpp>
+#include <CXO2/UI/Components/ChatPanel.hpp>
+#include <CXO2/UI/Components/Room/RoomList.hpp>
+#include <CXO2/UI/Components/Room/UserList.hpp>
+#include <CXO2/UI/Components/Dialogs/OptionDialog.hpp>
+#include <CXO2/UI/Components/Dialogs/CreateRoomDialog.hpp>
 
 #include <CXO2/Services/ChannelService.hpp>
 #include <CXO2/Services/CharacterService.hpp>
@@ -37,8 +37,6 @@
 #include <CXO2/Network/Responses/UserListResponse.hpp>
 #include <CXO2/Network/Responses/CreateRoomResponse.hpp>
 #include <CXO2/Network/Responses/JoinRoomResponse.hpp>
-
-#include <CXO2/Events/RoomEvents.hpp>
 
 #include <CXO2/Network/Events/RoomCreatedEventData.hpp>
 #include <CXO2/Network/Events/RoomMusicChangedEventData.hpp>
@@ -60,9 +58,9 @@
 
 #include <Genode/Graphics.hpp>
 #include <Genode/SceneGraph.hpp>
-#include <Genode/UI/BitmapNumber.hpp>
-#include <Genode/UI/Button.hpp>
-#include <Genode/UI/ToolTip.hpp>
+#include <CXO2/UI/BitmapNumber.hpp>
+#include <CXO2/UI/Button.hpp>
+#include <CXO2/UI/ToolTip.hpp>
 
 namespace Cx
 {
@@ -87,8 +85,7 @@ namespace Cx
 
     void StateRoom::Initialize(RoomTransitionEventType evType)
     {
-        if (!State::Initialize(StateRoomEventArgs{GetName(), evType}))
-            return;
+        State::Initialize();
 
         SyncCharacterInfo();
         SyncChannelInfo();
@@ -101,7 +98,7 @@ namespace Cx
         const auto notice = Instantiate<Marquee>(Resource::Room::IDC_TEXT_NOTICE);
         notice->SetString("Welcome to O2Jam! Let's play together~");
 
-        const auto channelCategory = Instantiate<Gx::Image>(Resource::Room::IDC_IMAGE_CHANNEL_CATEGORY);
+        const auto channelCategory = Instantiate<Image>(Resource::Room::IDC_IMAGE_CHANNEL_CATEGORY);
         switch (m_session.GetMusicHall())
         {
             case MusicHall::Kalliope: channelCategory->SetFrame("Kalliope"); break;
@@ -113,7 +110,7 @@ namespace Cx
             default: break;
         }
 
-        const auto channelNumber = Instantiate<Gx::BitmapNumber>(Resource::Room::IDC_NUMBER_CHANNEL_ID);
+        const auto channelNumber = Instantiate<BitmapNumber>(Resource::Room::IDC_NUMBER_CHANNEL_ID);
         channelNumber->SetValue(m_session.GetChannelID() + 1);
 
         const auto chatPanel = Instantiate<ChatPanel>(Resource::Room::IDC_CHAT_PANEL);
@@ -128,17 +125,17 @@ namespace Cx
         chatWindow->PushSystemMessage("F9          : Toggle equalizer on/off");
         chatWindow->PushSystemMessage("F10        : Toggle Vsync on/off");
 
-        const auto createRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_CREATE_ROOM);
+        const auto createRoomButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_CREATE_ROOM);
         createRoomButton->SetClickCallback(std::bind(&StateRoom::OnCreateRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto quickJoinButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_QUICK_JOIN);
+        const auto quickJoinButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_QUICK_JOIN);
         quickJoinButton->SetClickCallback(std::bind(&StateRoom::OnQuickJoinRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
         const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
         roomList->SetEnterRoomCallback(std::bind(&StateRoom::OnRoomEntered, this, std::placeholders::_1));
 
-        const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
-        const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
+        const auto showAllButton     = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
+        const auto waitingRoomButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
 
         showAllButton->SetVisible(false);
         showAllButton->SetEnabled(false);
@@ -148,31 +145,31 @@ namespace Cx
         showAllButton->SetClickCallback(std::bind(&StateRoom::OnShowAllButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
         waitingRoomButton->SetClickCallback(std::bind(&StateRoom::OnWaitingButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto roomLeftButton  = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ROOM_LEFT);
-        const auto roomRightButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ROOM_RIGHT);
+        const auto roomLeftButton  = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_ROOM_LEFT);
+        const auto roomRightButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_ROOM_RIGHT);
 
         roomLeftButton->SetClickCallback(std::bind(&StateRoom::OnRoomLeftButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
         roomRightButton->SetClickCallback(std::bind(&StateRoom::OnRoomRightButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto musicShopButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_MUSIC_SHOP);
+        const auto musicShopButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_MUSIC_SHOP);
         musicShopButton->SetClickCallback(std::bind(&StateRoom::OnMusicShopButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto itemShopButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_ITEM_SHOP);
+        const auto itemShopButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_ITEM_SHOP);
         itemShopButton->SetClickCallback(std::bind(&StateRoom::OnItemShopButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto myRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_MY_ROOM);
+        const auto myRoomButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_MY_ROOM);
         myRoomButton->SetClickCallback(std::bind(&StateRoom::OnMyRoomButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto bulletinButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_BULLETIN);
+        const auto bulletinButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_BULLETIN);
         bulletinButton->SetClickCallback(std::bind(&StateRoom::OnBulletinButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto tutorialButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_TUTORIAL);
+        const auto tutorialButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_TUTORIAL);
         tutorialButton->SetClickCallback(std::bind(&StateRoom::OnTutorialButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto optionButton = FindChild<Gx::Button>(Resource::Room::IDC_BUTTON_OPTION);
+        const auto optionButton = FindChild<Cx::Button>(Resource::Room::IDC_BUTTON_OPTION);
         optionButton->SetClickCallback(std::bind(&StateRoom::OnOptionButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
-        const auto backButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_BACK);
+        const auto backButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_BACK);
         backButton->SetClickCallback(std::bind(&StateRoom::OnBackButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
 
         if (evType == RoomTransitionEventType::Kick)
@@ -227,8 +224,6 @@ namespace Cx
         unsigned int maxLevelLimit
     )
     {
-        if (Dispatch(RoomEvents::OnCreateRoom, RoomCreateEventArgs{title, mode, password, minLevelLimit, maxLevelLimit}))
-            return;
 
         m_busy = true;
 
@@ -322,9 +317,6 @@ namespace Cx
             auto roomID = room.ID;
             auto pass   = password;
 
-            if (Dispatch(RoomEvents::OnJoinRoom, RoomJoinEventArgs{room, roomID, pass}))
-                return;
-
             m_busy = true;
             m_room.Join(roomID);
             m_room.SetLevelLimits(room.MinLevelLimit, room.MaxLevelLimit);
@@ -336,8 +328,8 @@ namespace Cx
 
         if (room.Locked)
         {
-            const auto passwordDialog = Instantiate<Gx::Dialog>(Resource::Room::IDC_DIALOG_PASSWORD);
-            const auto field = passwordDialog->FindChild<Gx::InputField>(Resource::Room::Password::IDC_EDIT_PASSWORD);
+            const auto passwordDialog = Instantiate<Cx::Dialog>(Resource::Room::IDC_DIALOG_PASSWORD);
+            const auto field = passwordDialog->FindChild<Cx::InputField>(Resource::Room::Password::IDC_EDIT_PASSWORD);
             field->SetMaximumTextLength(20);
             field->SetMasked(true);
             field->SetString(std::string());
@@ -347,7 +339,7 @@ namespace Cx
                 join(field->GetString().toAnsiString());
             });
 
-            auto ctx = Gx::DialogPresentationContext();
+            auto ctx = Cx::DialogPresentationContext();
             ctx.Bounds = sf::FloatRect{{0, 0}, GetView().getSize()};
             ctx.Prompt = Constants::Messages::Room::JoinRequest::PASSWORD_PROMPT;
 
@@ -362,12 +354,10 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnCharacterInfoLoad, RoomCharacterInfoEventArgs{response}))
-                return;
 
             m_session.UpdateFrom(response);
 
-            const auto nicknameLabel = Instantiate<Gx::Label>(Resource::Room::IDC_TEXT_NICKNAME);
+            const auto nicknameLabel = Instantiate<Label>(Resource::Room::IDC_TEXT_NICKNAME);
             nicknameLabel->SetString(fmt::format(U"Lv.{}: {}", m_session.GetLevel(), m_session.GetName()));
 
             const auto avatar = Instantiate<Avatar>(Resource::Room::IDC_AVATAR);
@@ -395,8 +385,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomListLoad, RoomListEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             roomList->Clear();
@@ -423,8 +411,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnUserListLoad, RoomUserListEventArgs{response}))
-                return;
 
             if (response.Users->empty())
                 return;
@@ -451,8 +437,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnCreateRoomResponded, RoomCreateResponseEventArgs{response, request, music}))
-                return;
 
             if (response.ResultCode != CreateRoomResult::Success)
             {
@@ -489,8 +473,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnJoinRoomResponded, RoomJoinResponseEventArgs{response}))
-                return;
 
             if (response.Result != JoinResult::Success)
             {
@@ -559,8 +541,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomCreated, RoomCreatedEventArgs{response}))
-                return;
 
             auto room = Room{};
             room.ID            = response.ID;
@@ -596,8 +576,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomMusicChanged, RoomMusicChangedEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -624,8 +602,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomStateChanged, RoomStateChangedEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -647,8 +623,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomTitleChanged, RoomTitleChangedEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -670,8 +644,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomUserCountChanged, RoomUserCountChangedEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             auto& room = roomList->GetRoom(response.ID);
@@ -695,8 +667,6 @@ namespace Cx
         try
         {
             const auto& response = ev.Open();
-            if (Dispatch(RoomEvents::OnRoomRemoved, RoomRemovedEventArgs{response}))
-                return;
 
             const auto roomList = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
             roomList->Remove(response.ID);
@@ -718,7 +688,7 @@ namespace Cx
         JoinRoom(room);
     }
 
-    void StateRoom::OnCreateRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnCreateRoomButtonClicked(Control& sender, Control::Event& ev)
     {
         if (m_busy)
             return;
@@ -740,7 +710,7 @@ namespace Cx
         });
     }
 
-    void StateRoom::OnQuickJoinRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnQuickJoinRoomButtonClicked(Control& sender, Control::Event& ev)
     {
         if (m_busy)
             return;
@@ -750,7 +720,7 @@ namespace Cx
 
         if (!room)
         {
-            const auto tooltip = Instantiate<Gx::ToolTip>(Resource::Room::IDC_TOOLTIP_QUICK_JOIN);
+            const auto tooltip = Instantiate<Cx::ToolTip>(Resource::Room::IDC_TOOLTIP_QUICK_JOIN);
             tooltip->SetString(Constants::Messages::Room::NO_ROOM_AVAILABLE);
             tooltip->Show();
 
@@ -760,12 +730,12 @@ namespace Cx
         JoinRoom(*room);
     }
 
-    void StateRoom::OnShowAllButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnShowAllButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto sfxToggle         = Instantiate<sf::Sound>(Sound::Effects::EF_14);
         const auto roomList          = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
-        const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
+        const auto showAllButton     = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
+        const auto waitingRoomButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
 
         m_mixer.Play(*sfxToggle, Sound::Channel::SFX);
 
@@ -778,12 +748,12 @@ namespace Cx
         roomList->ShowAll();
     }
 
-    void StateRoom::OnWaitingButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnWaitingButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto sfxToggle         = Instantiate<sf::Sound>(Sound::Effects::EF_14);
         const auto roomList          = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
-        const auto showAllButton     = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
-        const auto waitingRoomButton = Instantiate<Gx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
+        const auto showAllButton     = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_ALL);
+        const auto waitingRoomButton = Instantiate<Cx::Button>(Resource::Room::IDC_BUTTON_SHOW_WAITING);
 
         m_mixer.Play(*sfxToggle, Sound::Channel::SFX);
 
@@ -796,7 +766,7 @@ namespace Cx
         roomList->ShowWaitingOnly();
     }
 
-    void StateRoom::OnRoomLeftButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnRoomLeftButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto sfxNavigate = Instantiate<sf::Sound>(Sound::Effects::EF_07);
         const auto roomList    = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
@@ -805,7 +775,7 @@ namespace Cx
         roomList->PreviousPage();
     }
 
-    void StateRoom::OnRoomRightButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnRoomRightButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto sfxNavigate = Instantiate<sf::Sound>(Sound::Effects::EF_07);
         const auto roomList    = Instantiate<RoomList>(Resource::Room::IDC_ROOM_LIST);
@@ -814,37 +784,37 @@ namespace Cx
         roomList->NextPage();
     }
 
-    void StateRoom::OnMusicShopButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    void StateRoom::OnMusicShopButtonClicked(Control& sender, Control::Event& ev) const
     {
         auto& director = GetDirector();
         director.Present<StateMusicShop>();
     }
 
-    void StateRoom::OnItemShopButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    void StateRoom::OnItemShopButtonClicked(Control& sender, Control::Event& ev) const
     {
         auto& director = GetDirector();
         director.Present<StateItemShop>();
     }
 
-    void StateRoom::OnMyRoomButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    void StateRoom::OnMyRoomButtonClicked(Control& sender, Control::Event& ev) const
     {
         auto& director = GetDirector();
         director.Present<StateMyRoom>();
     }
 
-    void StateRoom::OnBulletinButtonClicked(Gx::Control& sender, Gx::Control::Event& ev) const
+    void StateRoom::OnBulletinButtonClicked(Control& sender, Control::Event& ev) const
     {
         auto& director = GetDirector();
         director.Present<StateBulletin>();
     }
 
-    void StateRoom::OnOptionButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnOptionButtonClicked(Control& sender, Control::Event& ev)
     {
         const auto optionDialog = Instantiate<OptionDialog>(Resource::Room::IDC_DIALOG_OPTION);
         Present(*optionDialog, Gx::PresentationContext::Default);
     }
 
-    void StateRoom::OnTutorialButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnTutorialButtonClicked(Control& sender, Control::Event& ev)
     {
         auto chart = std::make_unique<Chart>();
         chart->Source = "Tutorial.ojn";
@@ -873,7 +843,7 @@ namespace Cx
         director.Present<StateLoading>(std::move(game));
     }
 
-    void StateRoom::OnBackButtonClicked(Gx::Control& sender, Gx::Control::Event& ev)
+    void StateRoom::OnBackButtonClicked(Control& sender, Control::Event& ev)
     {
         if (m_busy)
             return;

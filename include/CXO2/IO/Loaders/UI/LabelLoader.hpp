@@ -5,13 +5,13 @@
 
 namespace Cx
 {
-    class LabelLoader : public ResourceLoader<Gx::Label>
+    class LabelLoader : public ResourceLoader<Label>
     {
     public :
         LabelLoader() = default;
 
-        [[nodiscard]] Gx::ResourcePtr<Gx::Label> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
-        [[nodiscard]] Gx::ResourcePtr<Gx::Label> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Label> LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const override;
+        [[nodiscard]] Gx::ResourcePtr<Label> LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const override;
 
         static bool ParseMetadata(const Gx::Json& attributes, LabelMetadata& metadata, const Gx::ResourceContext& context);
     };

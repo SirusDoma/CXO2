@@ -7,7 +7,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<ScrollBar> ScrollBarLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         ScrollBarMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -22,9 +22,9 @@ namespace Cx
             if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
             {
                 if (Gx::StringHelper::EqualsCaseInsensitive(orientation->get<std::string>(), "VERTICAL"))
-                    metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Vertical;
+                    metadata.Orientation = ScrollBar::ScrollOrientation::Vertical;
                 else
-                    metadata.Orientation = Gx::ScrollBar::ScrollOrientation::Horizontal;
+                    metadata.Orientation = ScrollBar::ScrollOrientation::Horizontal;
             }
 
             if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
@@ -51,7 +51,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<ScrollBar> ScrollBarLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const ScrollBarMetadata*>(&meta);
         if (!metadata)

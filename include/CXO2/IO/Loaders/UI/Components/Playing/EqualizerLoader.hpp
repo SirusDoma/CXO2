@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Playing/Equalizer.hpp>
+#include <CXO2/UI/Components/Playing/Equalizer.hpp>
 
 namespace Cx
 {

@@ -8,7 +8,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<RadioButton> RadioButtonLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         auto metadata = RadioButtonMetadata();
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -24,7 +24,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::RadioButton> RadioButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<RadioButton> RadioButtonLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const RadioButtonMetadata*>(&meta);
         if (!metadata)
@@ -93,7 +93,7 @@ namespace Cx
                         bounds.push_back({ {}, frames[i].size });
                 }
 
-                auto states = std::unordered_map<Gx::Button::State, Gx::Button::Frame>();
+                auto states = std::unordered_map<Button::State, Button::Frame>();
                 if (!metadata->States.empty())
                 {
                     for (auto [state, frame] : metadata->States)
@@ -117,30 +117,30 @@ namespace Cx
                     if (frames.size() > 3)
                     {
                         states = {
-                            { Gx::Button::State::Normal, { frames[0], bounds[0] } },
-                            { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
-                            { Gx::Button::State::Active, { frames[frames.size() - 1], bounds[bounds.size() - 1] } },
+                            { Button::State::Normal, { frames[0], bounds[0] } },
+                            { Button::State::Hover,  { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[frames.size() - 1], bounds[bounds.size() - 1] } },
                         };
                     }
                     else if (frames.size() == 3)
                     {
                         states = {
-                            { Gx::Button::State::Normal, { frames[0], bounds[0] } },
-                            { Gx::Button::State::Hover,  { frames[1], bounds[1] } },
-                            { Gx::Button::State::Active, { frames[2], bounds[2] } },
+                            { Button::State::Normal, { frames[0], bounds[0] } },
+                            { Button::State::Hover,  { frames[1], bounds[1] } },
+                            { Button::State::Active, { frames[2], bounds[2] } },
                         };
                     }
                     else if (frames.size() == 2)
                     {
                         states = {
-                            { Gx::Button::State::Hover,  { frames[0], bounds[0] } },
-                            { Gx::Button::State::Active, { frames[1], bounds[1] } },
+                            { Button::State::Hover,  { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[1], bounds[1] } },
                         };
                     }
                     else if (frames.size() == 1)
                     {
                         states = {
-                            { Gx::Button::State::Active, { frames[0], bounds[0] } },
+                            { Button::State::Active, { frames[0], bounds[0] } },
                         };
                     }
                 }
@@ -150,7 +150,7 @@ namespace Cx
             }
             else if (metadata->States.empty() && bound != sf::IntRect())
             {
-                radio->SetFrame( Gx::Button::State::Active,
+                radio->SetFrame( Button::State::Active,
                     { {}, { {}, bound.size } } );
             }
         }

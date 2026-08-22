@@ -10,18 +10,15 @@
 #include <CXO2/Network/Responses/SellItemResponse.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
-#include <Genode/UI/Image.hpp>
+#include <CXO2/UI/Image.hpp>
 
 #include <cstddef>
 #include <unordered_map>
 
-namespace Gx
-{
-    class Control;
-}
-
 namespace Cx
 {
+    class Control;
+
     class ItemShopService;
     class ItemFactory;
     class CharacterService;
@@ -35,11 +32,11 @@ namespace Cx
 
     private:
         void Invalidate();
-        void InvalidateSlot(Gx::Image* slot, EquipmentType type, RenderPart thumbnail = RenderPart::LargeThumbnail);
+        void InvalidateSlot(Image* slot, EquipmentType type, RenderPart thumbnail = RenderPart::LargeThumbnail);
 
-        void OnBagSlotClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnBagSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
-        void OnEquippedSlotDoubleClicked(Gx::Control& sender, Gx::Control::Event& ev);
+        void OnBagSlotClicked(Control& sender, Control::Event& ev);
+        void OnBagSlotDoubleClicked(Control& sender, Control::Event& ev);
+        void OnEquippedSlotDoubleClicked(Control& sender, Control::Event& ev);
 
         void OnEquipItemResponded(const MessageEnvelope<EquipItemResponse>& ev);
         void OnUnequipItemResponded(const MessageEnvelope<EquipItemResponse>& ev, const Item& item);
@@ -56,12 +53,12 @@ namespace Cx
 
         bool m_busy = false;
         Item* m_selectedItem;
-        Gx::Image* m_bagSelectIndicator;
+        Image* m_bagSelectIndicator;
         std::vector<Item> m_inventory;
 
-        std::unordered_map<Gx::Control*, Item*> m_bagSlotItems;
-        std::unordered_map<Gx::Control*, unsigned int> m_bagSlotQuantities;
-        std::unordered_map<Gx::Control*, std::size_t> m_bagSlotTargets;
-        std::unordered_map<Gx::Control*, const Item*> m_equippedSlotItems;
+        std::unordered_map<Control*, Item*> m_bagSlotItems;
+        std::unordered_map<Control*, unsigned int> m_bagSlotQuantities;
+        std::unordered_map<Control*, std::size_t> m_bagSlotTargets;
+        std::unordered_map<Control*, const Item*> m_equippedSlotItems;
     };
 }

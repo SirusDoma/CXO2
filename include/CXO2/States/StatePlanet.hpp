@@ -2,7 +2,7 @@
 
 #include <CXO2/States/State.hpp>
 #include <CXO2/Models/Planet.hpp>
-#include <CXO2/UI/Planet/ChannelBoard.hpp>
+#include <CXO2/UI/Components/Planet/ChannelBoard.hpp>
 
 #include <Genode/Audio/AudioMixer.hpp>
 

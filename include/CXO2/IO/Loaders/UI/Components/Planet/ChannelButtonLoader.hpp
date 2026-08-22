@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Planet/ChannelButton.hpp>
+#include <CXO2/UI/Components/Planet/ChannelButton.hpp>
 
 namespace Cx
 {

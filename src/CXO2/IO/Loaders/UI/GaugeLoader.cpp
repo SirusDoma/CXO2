@@ -9,7 +9,7 @@
 
 namespace Cx
 {
-    Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Gauge> GaugeLoader::LoadFromJson(const Gx::Json& json, const Gx::ResourceContext& context) const
     {
         GaugeMetadata metadata;
         if (!MetadataLoader::Parse(json, metadata, context))
@@ -24,9 +24,9 @@ namespace Cx
             if (const auto orientation = attributes.find("orientation"); orientation != attributes.end())
             {
                 if (Gx::StringHelper::EqualsCaseInsensitive(orientation->get<std::string>(), "VERTICAL"))
-                    metadata.Orientation = Gx::Gauge::Orientation::Vertical;
+                    metadata.Orientation = Gauge::Orientation::Vertical;
                 else
-                    metadata.Orientation = Gx::Gauge::Orientation::Horizontal;
+                    metadata.Orientation = Gauge::Orientation::Horizontal;
             }
 
             if (const auto maximum = attributes.find("maximum"); maximum != attributes.end())
@@ -85,7 +85,7 @@ namespace Cx
         return LoadFromMetadata(metadata, context);
     }
 
-    Gx::ResourcePtr<Gx::Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
+    Gx::ResourcePtr<Gauge> GaugeLoader::LoadFromMetadata(const ResourceMetadata& meta, const Gx::ResourceContext& context) const
     {
         const auto metadata = dynamic_cast<const GaugeMetadata*>(&meta);
         if (!metadata)

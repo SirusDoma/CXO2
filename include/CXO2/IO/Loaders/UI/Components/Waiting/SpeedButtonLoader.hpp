@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CXO2/IO/ResourceLoader.hpp>
-#include <CXO2/UI/Waiting/SpeedButton.hpp>
+#include <CXO2/UI/Components/Waiting/SpeedButton.hpp>
 
 namespace Cx
 {

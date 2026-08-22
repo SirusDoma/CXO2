@@ -13,16 +13,7 @@ namespace Cx
     CommandLineContext::CommandLineContext(const int argc, char** argv)
     {
         for (std::size_t i = 1; i < argc; i++)
-        {
-            auto arg = std::string(argv[i]);
-            if (arg == "-k" && i + 1 < argc)
-            {
-                m_libraries.push_back(std::string(argv[++i]));
-                continue;
-            }
-
-            m_arguments.push_back(arg);
-        }
+            m_arguments.push_back(std::string(argv[i]));
     }
 
     std::size_t CommandLineContext::GetArgumentCount() const
@@ -124,8 +115,4 @@ namespace Cx
         }
     }
 
-    std::vector<std::string> CommandLineContext::GetLibraries() const
-    {
-        return m_libraries;
-    }
 }
