@@ -66,40 +66,40 @@ There are 42 sprite references per item. The order determines which body part an
 | 1     | Preview / Thumbnail (Small)        |
 | 2     | Body – No Instrument (Male)        |
 | 3     | Body – No Instrument (Female)      |
-| 4     | Body – Bass (Male)                 |
-| 5     | Body – Bass (Female)               |
-| 6     | Body – Guitar (Male)               |
-| 7     | Body – Guitar (Female)             |
+| 4     | Body – Guitar (Male)               |
+| 5     | Body – Guitar (Female)             |
+| 6     | Body – Bass (Male)                 |
+| 7     | Body – Bass (Female)               |
 | 8     | Body – Keyboard (Male)             |
 | 9     | Body – Keyboard (Female)           |
 | 10    | Body – Drum (Male)                 |
 | 11    | Body – Drum (Female)               |
 | 12    | Left Arm – No Instrument (Male)    |
 | 13    | Left Arm – No Instrument (Female)  |
-| 14    | Left Arm – Bass (Male)             |
-| 15    | Left Arm – Bass (Female)           |
-| 16    | Left Arm – Guitar (Male)           |
-| 17    | Left Arm – Guitar (Female)         |
+| 14    | Left Arm – Guitar (Male)           |
+| 15    | Left Arm – Guitar (Female)         |
+| 16    | Left Arm – Bass (Male)             |
+| 17    | Left Arm – Bass (Female)           |
 | 18    | Left Arm – Keyboard (Male)         |
 | 19    | Left Arm – Keyboard (Female)       |
 | 20    | Left Arm – Drum (Male)             |
 | 21    | Left Arm – Drum (Female)           |
 | 22    | Right Arm – No Instrument (Male)   |
 | 23    | Right Arm – No Instrument (Female) |
-| 24    | Right Arm – Bass (Male)            |
-| 25    | Right Arm – Bass (Female)          |
-| 26    | Right Arm – Guitar (Male)          |
-| 27    | Right Arm – Guitar (Female)        |
+| 24    | Right Arm – Guitar (Male)          |
+| 25    | Right Arm – Guitar (Female)        |
+| 26    | Right Arm – Bass (Male)            |
+| 27    | Right Arm – Bass (Female)          |
 | 28    | Right Arm – Keyboard (Male)        |
 | 29    | Right Arm – Keyboard (Female)      |
 | 30    | Right Arm – Drum (Male)            |
 | 31    | Right Arm – Drum (Female)          |
 | 32    | Back – No Instrument (Male)        |
 | 33    | Back – No Instrument (Female)      |
-| 34    | Back – Bass (Male)                 |
-| 35    | Back – Bass (Female)               |
-| 36    | Back – Guitar (Male)               |
-| 37    | Back – Guitar (Female)             |
+| 34    | Back – Guitar (Male)               |
+| 35    | Back – Guitar (Female)             |
+| 36    | Back – Bass (Male)                 |
+| 37    | Back – Bass (Female)               |
 | 38    | Back – Keyboard (Male)             |
 | 39    | Back – Keyboard (Female)           |
 | 40    | Back – Drum (Male)                 |
@@ -109,37 +109,37 @@ There are 42 sprite references per item. The order determines which body part an
 
 ### Item Type
 
-| Value | Description         |
-|-------|---------------------|
-| 0     | Body                |
-| 1     | Left Arm            |
-| 2     | Right Arm           |
-| 3     | Left Hand           |
-| 4     | Right Hand          |
-| 5     | Face                |
-| 6     | Hair                |
-| 7     | Glasses             |
-| 8     | Earrings            |
-| 9     | Necklace            |
-| 10    | Armlet              |
-| 11    | Accessories         |
-| 12    | Glove               |
-| 13    | Pants               |
-| 14    | Shoes               |
-| 15    | Instrument – Piano  |
-| 16    | Instrument – Bass   |
-| 17    | Instrument – Drum   |
-| 18    | Instrument – Guitar |
-| 19    | Jacket              |
-| 20    | Wings               |
-| 21    | Musical Accessories |
-| 22    | Pet                 |
-| 23    | Hair Accessories    |
-| 24    | Attributive Item    |
-| 25    | Name Changer        |
-| 26    | Penalty Reset       |
-| 27    | Bag Expansion       |
-| 28    | Costume             |
+| Value | Description           |
+|-------|-----------------------|
+| 0     | Body                  |
+| 1     | Left Arm              |
+| 2     | Right Arm             |
+| 3     | Left Hand             |
+| 4     | Right Hand            |
+| 5     | Face                  |
+| 6     | Hair                  |
+| 7     | Glasses               |
+| 8     | Earrings              |
+| 9     | Necklace              |
+| 10    | Armlet                |
+| 11    | Accessories           |
+| 12    | Glove                 |
+| 13    | Pants                 |
+| 14    | Shoes                 |
+| 15    | Instrument – Keyboard |
+| 16    | Instrument – Guitar   |
+| 17    | Instrument – Drum     |
+| 18    | Instrument – Bass     |
+| 19    | Jacket                |
+| 20    | Wings                 |
+| 21    | Musical Accessories   |
+| 22    | Pet                   |
+| 23    | Hair Accessories      |
+| 24    | Attributive Item      |
+| 25    | Name Changer          |
+| 26    | Penalty Reset         |
+| 27    | Bag Expansion         |
+| 28    | Costume               |
 
 ### Planet
 
