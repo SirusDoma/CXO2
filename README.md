@@ -13,6 +13,13 @@
   </tr>
  </table>
 
+> [!IMPORTANT]
+> This project is free from copyrighted materials. All code is original work written from scratch.  
+> No copyrighted game assets, binaries, or master data are distributed in this repository.
+>
+> You must obtain and provide the supported copy of the game asset in order to run the game.  
+> See [Compiling the project](#compiling-the-project) below to learn more.
+
 A faithful, customizable, and cross-platform implementation of O2Jam client written in C++ on top of [Genode](https://github.com/SirusDoma/Genode),
 an in-house game engine based on [SFML](https://github.com/SFML/SFML/).
 
