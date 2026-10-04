@@ -79,7 +79,11 @@ if(WIN32)
     )
 
     # Allow big obj (for embedded Resource.hpp)
-    target_compile_options(${TARGET} PRIVATE /bigobj)
+    if(MSVC)
+        target_compile_options(${TARGET} PRIVATE /bigobj)
+    else()
+        target_compile_options(${TARGET} PRIVATE -Wa,-mbig-obj)
+    endif()
 
     # Windows API for fetching font
     target_link_libraries(${TARGET} PRIVATE Advapi32)

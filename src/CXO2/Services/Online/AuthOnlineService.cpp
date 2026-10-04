@@ -8,6 +8,8 @@
 #include <CXO2/Network/Responses/AuthResponse.hpp>
 #include <CXO2/Services/NetworkService.hpp>
 
+#include <algorithm>
+
 namespace Cx
 {
     AuthOnlineService::AuthOnlineService(NetworkService& network, SessionContext& session, CommandLineContext& args) :

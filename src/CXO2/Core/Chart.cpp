@@ -1,6 +1,7 @@
 #include <CXO2/Core/Chart.hpp>
 #include <Genode/System/Exception.hpp>
 
+#include <algorithm>
 #include <vector>
 
 namespace Cx
