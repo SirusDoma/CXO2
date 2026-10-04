@@ -432,16 +432,41 @@ namespace Cx
         if (!ev || !ev->Sample)
             return;
 
-        if (m_sounds.find(ev->ID) == m_sounds.end())
+        // Play on a free voice so a repeated sample overlaps its previous playback instead of restarting it
+        constexpr std::size_t MaxVoices = 8;
+        auto& voices = m_sounds[ev->ID];
+        sf::Sound* voice = nullptr;
+        for (const auto candidate : voices)
         {
-            m_sounds[ev->ID] = &m_resources.Create<sf::Sound>(std::to_string(ev->ID), *ev->Sample);
-            m_sounds[ev->ID]->setVolume(ev->Volume);
+            if (candidate->getStatus() != sf::SoundSource::Status::Playing)
+            {
+                voice = candidate;
+                break;
+            }
+        }
+
+        if (!voice && voices.size() < MaxVoices)
+        {
+            voice = &m_resources.Create<sf::Sound>(std::to_string(ev->ID) + "#" + std::to_string(voices.size()), *ev->Sample);
+            voices.push_back(voice);
+        }
+
+        // All voices are busy, reuse the one that has played the longest
+        if (!voice)
+        {
+            voice = *std::max_element(voices.begin(), voices.end(), [](const sf::Sound* a, const sf::Sound* b)
+            {
+                return a->getPlayingOffset() < b->getPlayingOffset();
+            });
         }
 
         if (m_equalizer && ev->SampleType == Chart::SampleType::KeySound && ev->Sample->getDuration() < sf::seconds(60.0))
-            m_equalizer->Register(*ev, *m_sounds[ev->ID]);
+            m_equalizer->Register(*ev, *voice);
 
-        m_mixer.Play(*m_sounds[ev->ID], group);
+        // The mixer resets the volume to the group volume, so apply the note volume and pan afterwards
+        m_mixer.Play(*voice, group);
+        voice->setVolume(voice->getVolume() * ev->Volume / 100.f);
+        voice->setPan(ev->Pan);
     }
 
     bool ChartRenderer::EventState::IsRenderable(const double position) const

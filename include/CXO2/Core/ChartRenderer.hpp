@@ -103,7 +103,7 @@ namespace Cx
         using EventStateList = std::vector<EventState>;
         using FrontBufferMap = std::unordered_map<Chart::Channel, EventState*>;
         using InputStateMap  = std::unordered_map<Chart::Channel, bool>;
-        using SoundMap       = std::unordered_map<unsigned int, sf::Sound*>;
+        using SoundMap       = std::unordered_map<unsigned int, std::vector<sf::Sound*>>;
 
         JudgementStrategy& m_judgement;
         LifeSystem& m_life;
