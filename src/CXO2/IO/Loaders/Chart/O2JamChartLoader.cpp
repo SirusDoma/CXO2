@@ -87,12 +87,15 @@ namespace Cx
                 if (!entry)
                     continue;
 
-                auto payload = std::vector<std::uint8_t>(entry->GetSize());
-                if (!entry->Read(&payload[0]).has_value())
+                // Read by index, sample names are not unique and non-ASCII names do not survive conversion
+                const auto stream = archive->Open(entry->GetIndex());
+                const auto size = stream ? stream->getSize().value_or(0) : 0;
+                auto payload = std::vector<std::uint8_t>(size);
+                if (size == 0 || stream->read(payload.data(), size) != size)
                     continue;
 
                 const auto loader = Gx::ResourceLoaderFactory::CreateLoader<sf::SoundBuffer>();
-                if (auto buffer = loader->LoadFromMemory(&payload[0], entry->GetSize(), Gx::ResourceContext::Default); buffer)
+                if (auto buffer = loader->LoadFromMemory(payload.data(), size, Gx::ResourceContext::Default); buffer)
                     chart->AddSample(entry->GetIndex(), std::move(buffer));
             }
         };
